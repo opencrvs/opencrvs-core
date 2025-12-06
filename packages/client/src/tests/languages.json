@@ -1017,6 +1017,7 @@
         "review.modal.desc.submitConfirmation": "{completeDeclaration, select, true {This declaration will be sent to the Registrar for them to review.} false {This declaration will be sent to the Registrar for completion. Please inform the Informant that they will need to visit the office with the missing information and supporting documents.}}",
         "review.modal.title.registerConfirmation": "Register this {event}?",
         "review.modal.title.submitConfirmation": "{completeDeclaration, select, true {Send declaration for review?} false {Send incomplete declaration?}}",
+        "review.panViewer.openPDF": "Open PDF in new tab",
         "review.rejection.form": "Rejection form",
         "review.rejection.form.commentInstruction": "Please provide specific instructions of what needs to be updated by the health worker to correctly update the declaration",
         "review.rejection.form.commentLabel": "Comments or instructions for health worker to rectify declaration",

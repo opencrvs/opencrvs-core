@@ -9,8 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
+import { useIntl } from 'react-intl'
 import { useState } from 'react'
 import ReactPanZoom from './PanDraggable'
+import { Button } from '../../Button'
+import { Icon } from '../../Icon'
 import styled from 'styled-components'
 
 const StyledReactPanZoom = styled(ReactPanZoom)<{
@@ -39,8 +42,22 @@ interface IProps {
 }
 
 const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
+  const intl = useIntl()
   const [dx] = useState(0)
   const [dy] = useState(0)
+
+  const isPdf = image.endsWith('.pdf')
+
+  const handleOpenPdf = async () => {
+    try {
+      const res = await fetch(image, { cache: 'default' })
+      const blob = await res.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      window.open(blobUrl, '_blank')
+    } catch (err) {
+      console.error('Failed to open PDF', err)
+    }
+  }
 
   return (
     <React.Fragment>
@@ -51,11 +68,29 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
         rotation={rotation}
         key={dx}
       >
-        <img
-          src={image}
-          alt="Supporting Document"
-          style={{ transform: `rotate(${rotation}deg)` }}
-        />
+        {!isPdf ? (
+          <img
+            src={image}
+            alt="Supporting Document"
+            style={{ transform: `rotate(${rotation}deg)` }}
+          />
+        ) : (
+          <Button
+            id="preview_close"
+            aria-label="Preview PDF1970
+             in new tab"
+            size="medium"
+            type="positive"
+            onClick={handleOpenPdf}
+          >
+            {intl.formatMessage({
+              id: 'review.panViewer.openPDF',
+              defaultMessage: 'Open PDF in a new tab',
+              description: 'Label for open PDF button'
+            })}
+            <Icon name="ArrowSquareOut" size="medium" />
+          </Button>
+        )}
       </StyledReactPanZoom>
     </React.Fragment>
   )

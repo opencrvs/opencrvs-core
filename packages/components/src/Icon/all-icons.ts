@@ -16,6 +16,7 @@ export {
   ArchiveTray,
   ArrowCircleDown,
   ArrowCounterClockwise,
+  ArrowSquareOut,
   ArrowLeft,
   ArrowRight,
   Buildings,

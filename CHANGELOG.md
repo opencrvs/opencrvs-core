@@ -25,6 +25,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
   field(<page>.query-params).get('data.code')
 
 - **Removed support for following scopes**
+
   - `NATLSYSADMIN`
   - `DECLARE`
   - `VALIDATE`
@@ -40,6 +41,8 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
   - `RECORD_PRINT_CERTIFIED_COPIES`
   - `RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES`
   - `PROFILE_UPDATE`
+
+  - Review page now supports PDF rendering when a PDF link is clicked allowing to verify the uploaded PDF
 
 ## [1.9.0](https://github.com/opencrvs/opencrvs-core/compare/v1.8.1...v1.9.0)
 
