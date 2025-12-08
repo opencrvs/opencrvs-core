@@ -16,9 +16,7 @@ import {
   SCOPES,
   UUID,
   findScope,
-  JurisdictionFilter,
-  RecordScopeV2,
-  UserFilter
+  RecordScopeV2
 } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -68,41 +66,6 @@ import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
-
-function getLocationIdsFromScopeOptions(
-  filter: string | undefined,
-  user: {
-    primaryOfficeId: UUID
-    administrativeAreaId?: UUID | null
-    id: string
-  }
-) {
-  // eslint-disable-next-line no-nested-ternary
-  return filter === JurisdictionFilter.enum.all
-    ? undefined
-    : // eslint-disable-next-line no-nested-ternary
-      filter === JurisdictionFilter.enum.location
-      ? user.primaryOfficeId
-      : filter === JurisdictionFilter.enum.administrativeArea
-        ? user.administrativeAreaId
-        : undefined
-}
-
-function scopeJurisdictionToLocationIds(
-  options: RecordScopeV2['options'],
-  user: { primaryOfficeId: UUID; administrativeAreaId: UUID; id: string }
-) {
-  return {
-    event: options.event,
-    eventLocation: getLocationIdsFromScopeOptions(options.eventLocation, user),
-    declaredIn: getLocationIdsFromScopeOptions(options.declaredIn, user),
-    declaredBy:
-      options.declaredBy === UserFilter.enum.user ? user.id : undefined,
-    registeredIn: getLocationIdsFromScopeOptions(options.registeredIn, user),
-    registeredBy:
-      options.registeredBy === UserFilter.enum.user ? user.id : undefined
-  }
-}
 
 export const eventRouter = router({
   config: router({
@@ -352,53 +315,45 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes(ctx.token)
+
       const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
-      const allAccessForEveryEventType = Object.fromEntries(
-        eventConfigs.map(({ id }) => [id, 'all' as const])
-      )
 
       if (isRecordSearchSystemClient) {
-        return findRecordsByQuery(
-          input,
-          eventConfigs,
-          allAccessForEveryEventType,
-          ctx.user.primaryOfficeId
+        const allAccessForEveryEventType = Object.fromEntries(
+          eventConfigs.map(({ id }) => [id, 'all' as const])
         )
+
+        return findRecordsByQuery({
+          search: input,
+          eventConfigs,
+          options: allAccessForEveryEventType,
+          user: ctx.user
+        })
       }
 
       if (ctx.acceptedScopes) {
-        const resolvedScopes = ctx.acceptedScopes
-          ? ctx.acceptedScopes.map((scope) => ({
-              type: scope.type,
-              options: scopeJurisdictionToLocationIds(
-                scope.options as any,
-                ctx.user as any
-              )
-            }))
-          : undefined
-
-        return findRecordsByQuery(
-          input,
+        return findRecordsByQuery({
+          search: input,
           eventConfigs,
-          { birth: 'all' },
-          ctx.user.primaryOfficeId,
-          resolvedScopes
-        )
+          options: { birth: 'all' },
+          user: ctx.user,
+          acceptedScopes: ctx.acceptedScopes as RecordScopeV2[]
+        })
       }
 
-      const searchScope = findScope(scopes, 'search')
+      const searchScopeV1 = findScope(scopes, 'search')
 
       // Only to satisfy type checking, as findScope will return undefined if no scope is found
-      if (!searchScope) {
+      if (!searchScopeV1) {
         throw new Error('No search scope provided')
       }
 
-      return findRecordsByQuery(
-        input,
+      return findRecordsByQuery({
+        search: input,
         eventConfigs,
-        searchScope.options,
-        ctx.user.primaryOfficeId
-      )
+        options: searchScopeV1.options,
+        user: ctx.user
+      })
     }),
   bulkImport: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))

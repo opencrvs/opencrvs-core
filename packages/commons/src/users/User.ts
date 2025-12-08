@@ -60,6 +60,7 @@ export const System = z.object({
   type: TokenUserType.extract(['system']),
   role: SystemRole,
   primaryOfficeId: z.undefined().optional(),
+  administrativeAreaId: z.undefined().optional(),
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
   fullHonorificName: z.string().optional()

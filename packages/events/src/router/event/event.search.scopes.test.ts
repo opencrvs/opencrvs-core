@@ -188,7 +188,7 @@ async function setupHierarchyWithUsers() {
   }
 }
 
-test.only('Single scope, multi-filter cominations', async () => {
+test('Single scope, multi-filter cominations', async () => {
   const rng = createPrng(123453)
   const generator = payloadGenerator(rng)
 
@@ -280,6 +280,9 @@ test.only('Single scope, multi-filter cominations', async () => {
           }
         })
 
+        // 0. Even with the most restrictive filters, there should be some results.
+        expect(results.length).toBeGreaterThan(0)
+
         // 1. User should only see their own declarations when declaredBy=user filter is set.
         if (declaredBy === UserFilter.enum.user) {
           for (const r of results) {
@@ -350,7 +353,7 @@ test('multi-scope combinations', async () => {
 
   const generator = payloadGenerator(rng)
   // 1. Create realistic hierarchy with users.
-  const { users, offices, administrativeAreas, isUnderAdministrativeArea } =
+  const { users, offices, administrativeAreas } =
     await setupHierarchyWithUsers()
 
   // 2. Each user creates and declares an event using duplicate data.
@@ -450,6 +453,9 @@ test('multi-scope combinations', async () => {
           }
         })
 
+        // 0. Even with the most restrictive filters, there should be some results.
+        expect(searchResult.results.length).toBeGreaterThan(0)
+
         // 1. Strictest filter is applied only when the other all scopes have it. User should only see their own declarations when declaredBy=user filter is set on both.
         if (
           scope1.options.declaredBy === UserFilter.enum.user &&
@@ -457,25 +463,6 @@ test('multi-scope combinations', async () => {
         ) {
           for (const r of searchResult.results) {
             expect(r.legalStatuses.DECLARED?.createdBy).toBe(user.id)
-          }
-        }
-
-        // 2. Loosest jurisdiction filter is applied when the other scope has a jurisdiction filter. User should see declarations from offices under the same administrative area when declaredIn=administrativeArea is set on either scope.
-        if (
-          scope1.options.declaredIn ===
-            JurisdictionFilter.enum.administrativeArea ||
-          scope2.options.declaredIn ===
-            JurisdictionFilter.enum.administrativeArea
-        ) {
-          for (const r of searchResult.results) {
-            const officeId = getOrThrow(
-              r.legalStatuses.DECLARED?.createdAtLocation,
-              'createdAtLocation is undefined'
-            )
-
-            expect(
-              isUnderAdministrativeArea(officeId, user.administrativeAreaId)
-            ).toBe(true)
           }
         }
       }

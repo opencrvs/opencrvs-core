@@ -23,7 +23,14 @@ import {
   QueryInputType,
   UUID
 } from '@opencrvs/commons/events'
+import {
+  JurisdictionFilter,
+  RecordScopeV2,
+  UserFilter,
+  ResolvedRecordScopeV2
+} from '@opencrvs/commons'
 import { getLocationHierarchyRaw } from '@events/storage/postgres/events/locations'
+import { TrpcUserContext } from '../../context'
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
@@ -326,4 +333,61 @@ export function generateQueryForAddressField(
       should: undefined
     }
   } satisfies estypes.QueryDslQueryContainer
+}
+
+export function valueFromTotal(total?: number | estypes.SearchTotalHits) {
+  if (!total) {
+    return 0
+  }
+  if (typeof total === 'number') {
+    return total
+  } else {
+    return total.value
+  }
+}
+
+function getLocationIdsFromScopeOptions(
+  filter: string | undefined,
+  user: TrpcUserContext
+) {
+  if (!filter) {
+    return undefined
+  }
+
+  if (filter === JurisdictionFilter.enum.all) {
+    return undefined
+  }
+
+  if (filter === JurisdictionFilter.enum.location) {
+    return user.primaryOfficeId
+  }
+
+  if (filter === JurisdictionFilter.enum.administrativeArea) {
+    return user.administrativeAreaId
+  }
+
+  throw new Error(`Unknown jurisdiction filter: ${filter}`)
+}
+
+export function resolveRecordActionScopeToIds(
+  scope: RecordScopeV2,
+  user: TrpcUserContext
+): ResolvedRecordScopeV2 {
+  const { type, options } = scope
+  return {
+    type,
+    options: {
+      event: options.event,
+      eventLocation: getLocationIdsFromScopeOptions(
+        options.eventLocation,
+        user
+      ),
+      declaredIn: getLocationIdsFromScopeOptions(options.declaredIn, user),
+      declaredBy:
+        options.declaredBy === UserFilter.enum.user ? user.id : undefined,
+      registeredIn: getLocationIdsFromScopeOptions(options.registeredIn, user),
+      registeredBy:
+        options.registeredBy === UserFilter.enum.user ? user.id : undefined
+    }
+  }
 }

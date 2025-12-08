@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { estypes } from '@elastic/elasticsearch'
+import type * as estypes from '@elastic/elasticsearch/lib/api/types'
 import {
   EventConfig,
   FieldType,
@@ -21,7 +21,7 @@ import {
   SearchScopeAccessLevels,
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
-import { getOrThrow, RecordScopeV2, UUID } from '@opencrvs/commons'
+import { getOrThrow, ResolvedRecordScopeV2, UUID } from '@opencrvs/commons'
 import { getChildLocations } from '../locations/locations'
 import {
   encodeFieldId,
@@ -351,18 +351,15 @@ export function withJurisdictionFilters({
   query: estypes.QueryDslQueryContainer
   options: Record<string, SearchScopeAccessLevels>
   userOfficeId: string | undefined
-  scopesV2?: RecordScopeV2[]
+  scopesV2?: ResolvedRecordScopeV2[]
 }): estypes.QueryDslQueryContainer {
   // Scopes v2 take precedence over v1 options
-
   if (scopesV2) {
-    const scopeQueries: estypes.QueryDslQueryContainer[] = scopesV2
+    const scopeQueries = scopesV2
       .map((scope) => {
         const must: estypes.QueryDslQueryContainer[] = []
 
-        for (const [filterProperty, value] of Object.entries(
-          scope.options ?? {}
-        )) {
+        for (const [filterProperty, value] of Object.entries(scope.options)) {
           if (!value) {
             continue
           }
@@ -371,17 +368,18 @@ export function withJurisdictionFilters({
             case 'event':
               must.push({
                 terms: {
+                  // @TODO: Clarify why V1 had 1-tuple.
                   type: Array.isArray(value) ? value : [value]
                 }
               })
               break
 
             case 'eventLocation':
+              // @TODO: Once event location specification is completed, update to include the configurable place of event.
               must.push({
                 term: { createdAtLocation: value }
               })
               break
-
             case 'declaredIn':
               must.push({
                 term: {
@@ -428,13 +426,14 @@ export function withJurisdictionFilters({
           }
         }
       })
-      .filter((q): q is estypes.QueryDslQueryContainer => q !== null)
+      .filter((q) => q !== null)
 
     if (!scopeQueries.length) {
       // No scopes → just return base query
       return {
         bool: {
-          must: [query]
+          must: [query],
+          should: undefined
         }
       }
     }
@@ -442,6 +441,7 @@ export function withJurisdictionFilters({
     return {
       bool: {
         must: [query],
+        // @ts-expect-error -- TypeScript does not resolve the recursive type.
         filter: {
           bool: {
             should: scopeQueries,

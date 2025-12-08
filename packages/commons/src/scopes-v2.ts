@@ -16,6 +16,7 @@ import {
   parseConfigurableScope,
   parseLiteralScope
 } from './authentication'
+import { UUID } from './uuid'
 
 /*
  * V2 file will be unified with the scopes during 2.0 development.
@@ -47,6 +48,22 @@ export const RecordAction = z.enum([
   'record.correct',
   'record.unassign-others'
 ])
+
+export const ResolvedRecordScopeV2 = z
+  .object({
+    type: RecordAction,
+    options: z.object({
+      event: z.array(z.string()).describe('Event type, e.g. birth, death'),
+      eventLocation: UUID.nullish(),
+      declaredIn: UUID.nullish(),
+      declaredBy: z.string().or(z.undefined()).optional(),
+      registeredIn: UUID.nullish(),
+      registeredBy: z.string().or(z.undefined()).optional()
+    })
+  })
+  .describe('Resolved scope with location/user IDs instead of filters.')
+
+export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
 export const RecordScopeV2 = z
   .object({

@@ -42,6 +42,7 @@ export const SystemContext = System.pick({
   role: true,
   type: true,
   primaryOfficeId: true,
+  administrativeAreaId: true,
   signature: true
 })
 type SystemContext = z.infer<typeof SystemContext>

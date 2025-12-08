@@ -31,12 +31,13 @@ import {
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
-import { logger } from '@opencrvs/commons'
+import { logger, RecordScopeV2 } from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { TrpcUserContext } from '../../context'
 import {
   decodeEventIndex,
   EncodedEventIndex,
@@ -45,7 +46,9 @@ import {
   getEventIndexWithLocationHierarchy,
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
-  removeSecuredFields
+  removeSecuredFields,
+  resolveRecordActionScopeToIds,
+  valueFromTotal
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
@@ -437,32 +440,31 @@ export async function getIndexedEvents(
     })
 }
 
-function valueFromTotal(total?: number | estypes.SearchTotalHits) {
-  if (!total) {
-    return 0
-  }
-  if (typeof total === 'number') {
-    return total
-  } else {
-    return total.value
-  }
-}
-
-export async function findRecordsByQuery(
-  search: SearchQuery,
-  eventConfigs: EventConfig[],
-  options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined,
-  resolvedScopes?: any[]
-) {
+export async function findRecordsByQuery({
+  search,
+  eventConfigs,
+  options,
+  user,
+  acceptedScopes
+}: {
+  search: SearchQuery
+  eventConfigs: EventConfig[]
+  options: Record<string, SearchScopeAccessLevels>
+  user: TrpcUserContext
+  acceptedScopes?: RecordScopeV2[]
+}) {
   const esClient = getOrCreateClient()
 
   const { query, limit, offset } = search
 
+  const resolvedScopes = acceptedScopes?.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
+  )
+
   const esQuery = withJurisdictionFilters({
     query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
     options,
-    userOfficeId,
+    userOfficeId: user.primaryOfficeId,
     scopesV2: resolvedScopes
   })
 
