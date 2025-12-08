@@ -1,10 +1,4 @@
 -- Up Migration
-CREATE TYPE status_type AS ENUM(
-  'pending',
-  'active',
-  'deactivated'
-);
-
 CREATE TABLE users(
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   legacy_id text UNIQUE NULLS DISTINCT,
@@ -12,7 +6,7 @@ CREATE TABLE users(
   surname text,
   full_honorific_name text,
   role text NOT NULL,
-  status status_type NOT NULL,
+  status text NOT NULL,
   email text UNIQUE NULLS DISTINCT,
   mobile text UNIQUE NULLS DISTINCT,
   signature_path text,
