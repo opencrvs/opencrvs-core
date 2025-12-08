@@ -1,5 +1,5 @@
 -- Up Migration
-CREATE TABLE IF EXISTS users(
+CREATE TABLE IF NOT EXISTS users(
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   legacy_id text UNIQUE NULLS DISTINCT,
   firstname text,
