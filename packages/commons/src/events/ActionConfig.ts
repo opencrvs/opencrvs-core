@@ -16,6 +16,7 @@ import { ActionFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
 import { ActionConditional } from './Conditional'
+import { AvailableIcons } from '../icons'
 
 export const DeclarationReviewConfig = z
   .object({
@@ -41,6 +42,7 @@ export const ActionConfigBase = z.object({
   supportingCopy: TranslationConfig.optional().describe(
     'Text displayed on the confirmation'
   ),
+  icon: AvailableIcons.describe('Icon representing the action'),
   conditionals: z
     .array(ActionConditional)
     .optional()
