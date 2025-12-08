@@ -167,6 +167,15 @@ test('Returns event with all actions', async () => {
     transactionId: getUUID()
   })
 
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
   await client.event.actions.validate.request(
     generator.event.actions.validate(event.id)
   )

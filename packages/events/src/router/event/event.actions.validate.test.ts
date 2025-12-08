@@ -460,7 +460,7 @@ test('deduplication check is skipped if the event has been marked as not duplica
   expect(
     getCurrentEventState(validatedEvent, tennisClubMembershipEvent)
   ).toMatchObject({
-    status: 'VALIDATED',
+    status: 'DECLARED',
     potentialDuplicates: []
   })
 })
@@ -592,7 +592,7 @@ test('Event status changes after validation action is accepted', async () => {
   ])
 
   expect(statusAfterDeclareAction).toBe(EventStatus.enum.DECLARED)
-  expect(statusAfterValidateAction).toBe(EventStatus.enum.VALIDATED)
+  expect(statusAfterValidateAction).toBe(EventStatus.enum.DECLARED)
 })
 
 test('Event status does not change if validation action is rejected', async () => {

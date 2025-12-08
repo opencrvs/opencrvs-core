@@ -37,6 +37,7 @@ exports[`getAvailableActions should return the correct actions for "DECLARED" st
 [
   "READ",
   "VALIDATE",
+  "REGISTER",
   "ARCHIVE",
   "REJECT",
   "CUSTOM",
@@ -95,25 +96,6 @@ exports[`getAvailableActions should return the correct actions for "REGISTERED" 
   "READ",
   "PRINT_CERTIFICATE",
   "REQUEST_CORRECTION",
-  "CUSTOM",
-]
-`;
-
-exports[`getAvailableActions should return the correct actions for "VALIDATED" status with no flags 1`] = `
-[
-  "READ",
-  "REGISTER",
-  "ARCHIVE",
-  "REJECT",
-  "CUSTOM",
-]
-`;
-
-exports[`getAvailableActions should return the correct actions for "VALIDATED" status with rejected flag 1`] = `
-[
-  "READ",
-  "VALIDATE",
-  "ARCHIVE",
   "CUSTOM",
 ]
 `;

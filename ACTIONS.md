@@ -28,7 +28,7 @@ In v2.0, the available event statuses are:
 The status is applied by the corresponding action.
 
 > [!NOTE]
-> Beyond v2.0, we will review which core actions could be removed (and implemented instead as custom actions within our Farajaland configuration). We expect the following actions may be transitioned to custom actions: `VALIDATE`, `REJECT`, `ARCHIVE`, `DELETE`
+> Beyond v2.0, we will review which core actions could be removed (and implemented instead as custom actions within our Farajaland configuration). We expect the following actions may be transitioned to custom actions: `VALIDATE`, `REJECT`
 
 ## Custom actions
 
