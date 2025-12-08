@@ -203,6 +203,7 @@ const testCases = [
         location: {
           href: 'http://example.com',
           pathname: '/path',
+          originPathname: '/path',
           hostname: 'example.com'
         }
       }
@@ -222,6 +223,7 @@ const testCases = [
         location: {
           href: 'http://example.com',
           pathname: '/path',
+          originPathname: '/path',
           hostname: 'example.com'
         }
       }
@@ -241,6 +243,7 @@ const testCases = [
         location: {
           href: 'http://example.com',
           pathname: '/path',
+          originPathname: '/path',
           hostname: 'example.com'
         }
       }
@@ -260,6 +263,7 @@ const testCases = [
         location: {
           href: 'http://example.com',
           pathname: '/path',
+          originPathname: '/path',
           hostname: 'example.com'
         }
       }
@@ -282,6 +286,7 @@ const testCases = [
         location: {
           href: 'http://example.com',
           pathname: '/path',
+          originPathname: '/path',
           hostname: 'example.com'
         }
       }
