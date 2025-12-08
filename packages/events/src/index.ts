@@ -26,8 +26,8 @@ const appModulePath = require('app-module-path')
 appModulePath.addPath(path.join(__dirname, '../'))
 
 export async function main() {
-  await ensureConnection()
   try {
+    await ensureConnection()
     const anonymousToken = await getAnonymousToken()
     const configurations = await getInMemoryEventConfigurations(
       `Bearer ${anonymousToken}`
