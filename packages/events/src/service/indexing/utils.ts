@@ -15,12 +15,15 @@ import {
   AddressType,
   EventConfig,
   EventIndex,
+  FieldType,
   FieldValue,
   getDeclarationFieldById,
   isNameFieldType,
   NameFieldValue,
-  QueryInputType
+  QueryInputType,
+  UUID
 } from '@opencrvs/commons/events'
+import { getLocationHierarchyRaw } from '@events/storage/postgres/events/locations'
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
@@ -94,6 +97,145 @@ function stripIndexFieldsFromValue(
   }
 
   return value
+}
+
+const LocationFieldTypes: FieldType[] = [
+  FieldType.ADDRESS,
+  FieldType.LOCATION,
+  FieldType.ADMINISTRATIVE_AREA,
+  FieldType.FACILITY,
+  FieldType.OFFICE
+]
+
+export function getEventIndexWithoutLocationHierarchy(
+  eventConfig: EventConfig,
+  event: EventIndex
+) {
+  const takeLast = (v: unknown) => (Array.isArray(v) ? v[v.length - 1] : v)
+
+  // Normalize top-level locations
+  event.createdAtLocation = takeLast(event.createdAtLocation)
+  event.updatedAtLocation = takeLast(event.updatedAtLocation)
+
+  if (event.legalStatuses.DECLARED) {
+    event.legalStatuses.DECLARED.createdAtLocation = takeLast(
+      event.legalStatuses.DECLARED.createdAtLocation
+    )
+  }
+
+  if (event.legalStatuses.REGISTERED) {
+    event.legalStatuses.REGISTERED.createdAtLocation = takeLast(
+      event.legalStatuses.REGISTERED.createdAtLocation
+    )
+  }
+
+  const fieldConfigs = Object.fromEntries(
+    eventConfig.declaration.pages.flatMap((p) => p.fields).map((f) => [f.id, f])
+  )
+
+  // Process declaration fields
+  for (const [key, value] of Object.entries(event.declaration)) {
+    const fieldConfig = fieldConfigs[key]
+    if (!LocationFieldTypes.includes(fieldConfig.type)) {
+      continue
+    }
+
+    if (fieldConfig.type === FieldType.ADDRESS) {
+      const address = value as AddressFieldValue
+      if (address.addressType === AddressType.DOMESTIC) {
+        address.administrativeArea = takeLast(address.administrativeArea)
+        event.declaration[key] = address
+        continue
+      }
+    }
+
+    // All other types just take the last value
+    event.declaration[key] = takeLast(value)
+  }
+
+  return event
+}
+
+const locationHierarchyCache = new Map<string, string[]>()
+export async function getEventIndexWithLocationHierarchy(
+  eventConfig: EventConfig,
+  event: EventIndex
+) {
+  const buildFullLocationHierarchy = async (
+    locationId: UUID
+  ): Promise<string[]> => {
+    if (!locationId) {
+      return []
+    }
+    if (locationHierarchyCache.has(locationId)) {
+      return locationHierarchyCache.get(locationId) || [locationId]
+    }
+    const hierarchyRows = await getLocationHierarchyRaw(locationId)
+    locationHierarchyCache.set(locationId, hierarchyRows)
+    return locationHierarchyCache.get(locationId) || [locationId]
+  }
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const tempEvent = { ...event, declaration: { ...event.declaration } } as any
+  // Normalize top-level locations
+  if (event.createdAtLocation) {
+    tempEvent.createdAtLocation = await buildFullLocationHierarchy(
+      event.createdAtLocation
+    )
+  }
+  if (event.updatedAtLocation) {
+    tempEvent.updatedAtLocation = await buildFullLocationHierarchy(
+      event.updatedAtLocation
+    )
+  }
+
+  if (event.legalStatuses.DECLARED?.createdAtLocation) {
+    tempEvent.legalStatuses.DECLARED.createdAtLocation =
+      await buildFullLocationHierarchy(
+        event.legalStatuses.DECLARED.createdAtLocation
+      )
+  }
+
+  if (event.legalStatuses.REGISTERED?.createdAtLocation) {
+    tempEvent.legalStatuses.REGISTERED.createdAtLocation =
+      await buildFullLocationHierarchy(
+        event.legalStatuses.REGISTERED.createdAtLocation
+      )
+  }
+
+  const fieldConfigs = Object.fromEntries(
+    eventConfig.declaration.pages.flatMap((p) => p.fields).map((f) => [f.id, f])
+  )
+
+  // Process declaration fields
+  for (const [k, value] of Object.entries(event.declaration)) {
+    const key = decodeFieldId(k)
+    const fieldConfig = fieldConfigs[key]
+    if (!LocationFieldTypes.includes(fieldConfig.type)) {
+      continue
+    }
+
+    if (fieldConfig.type === FieldType.ADDRESS) {
+      const parsed = AddressFieldValue.safeParse(value)
+      if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        const address: Record<string, any> = parsed.data
+        address.administrativeArea = await buildFullLocationHierarchy(
+          address.administrativeArea
+        )
+        tempEvent.declaration[k] = address
+        continue
+      }
+    }
+
+    // All other location types are assigned to location hierarchy
+    const uuid = UUID.safeParse(value)
+
+    if (uuid.success) {
+      tempEvent.declaration[k] = await buildFullLocationHierarchy(uuid.data)
+    }
+  }
+
+  return tempEvent
 }
 
 export function decodeEventIndex(

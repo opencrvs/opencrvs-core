@@ -65,7 +65,6 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
   EventStatus.enum.DECLARED,
-  EventStatus.enum.VALIDATED,
   EventStatus.enum.REGISTERED,
   EventStatus.enum.ARCHIVED
 ]
@@ -219,8 +218,8 @@ function useViewableActionConfigurations(
   const isOnline = useOnlineStatus()
   const { clearEphemeralFormState } = useEventFormNavigation()
 
-  const { findFromCache } = useEvents().getEvent
-  const isDownloaded = Boolean(findFromCache(event.id).data)
+  const { useFindEventFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
 
   const [assignModal, openAssignModal] = useModal()
   const intl = useIntl()
@@ -251,7 +250,9 @@ function useViewableActionConfigurations(
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
-  const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
+  const { refetch: refetchEvent } = events.getEvent.useFindEventFromCache(
+    event.id
+  )
 
   const { eventConfiguration } = useEventConfiguration(event.type)
 
@@ -439,7 +440,8 @@ function useViewableActionConfigurations(
           navigate(
             ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
           ),
-        disabled: !isDownloadedAndAssignedToUser
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: !event.flags.includes('validated')
       },
       [ActionType.MARK_AS_DUPLICATE]: {
         label: actionLabels[ActionType.MARK_AS_DUPLICATE],
@@ -537,18 +539,19 @@ function useViewableActionConfigurations(
   }
 }
 
+const ALL_ACTIONS = [
+  ...Object.values(ActionType),
+  ...Object.values(ClientSpecificAction)
+]
+
 export function useUserAllowedActions(eventType: string) {
   const scopes = useSelector(getScope)
-
-  const actions = Object.values(ActionType)
-  const clientSpecificActions = Object.values(ClientSpecificAction)
-
   const allowedActions = useMemo(
     () =>
-      [...actions, ...clientSpecificActions].filter((action) =>
+      ALL_ACTIONS.filter((action) =>
         isActionInScope(scopes ?? [], action, eventType)
       ),
-    [scopes, eventType, actions, clientSpecificActions]
+    [scopes, eventType]
   )
 
   return {
@@ -568,8 +571,8 @@ function useCustomActionConfigs(
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
-  const { findFromCache } = useEvents().getEvent
-  const isDownloaded = Boolean(findFromCache(event.id).data)
+  const { useFindEventFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const isDownloadedAndAssignedToUser =
@@ -669,29 +672,31 @@ export function useAllowedActionConfigurations(
     openDraft
   )
 
-  const availableAssignmentActions = getAvailableAssignmentActions(
-    event,
-    authentication
-  )
-
-  const availableEventActions = getAvailableActionsForEvent(event)
-  const openDraftAction = openDraft ? [openDraft.action.type] : []
-
-  const allowedActionConfigs: ActionMenuItem[] = [
-    ...availableAssignmentActions,
-    ...availableEventActions,
-    ...openDraftAction
-  ]
-    // deduplicate after adding the draft
-    .filter((action, index, self) => self.indexOf(action) === index)
-    .filter(
-      (action): action is ActionMenuActionType =>
-        ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
-        workqueueActions.safeParse(action).success
+  const allowedActionConfigs: ActionMenuItem[] = useMemo(() => {
+    const availableAssignmentActions = getAvailableAssignmentActions(
+      event,
+      authentication
     )
-    .filter((action) => isActionAllowed(action))
-    // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
-    .map((a) => ({ ...config[a], type: a }))
+    const availableEventActions = getAvailableActionsForEvent(event)
+    const openDraftAction = openDraft ? [openDraft.action.type] : []
+    return (
+      [
+        ...availableAssignmentActions,
+        ...availableEventActions,
+        ...openDraftAction
+      ]
+        // deduplicate after adding the draft
+        .filter((action, index, self) => self.indexOf(action) === index)
+        .filter(
+          (action): action is ActionMenuActionType =>
+            ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
+            workqueueActions.safeParse(action).success
+        )
+        .filter((action) => isActionAllowed(action))
+        // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
+        .map((a) => ({ ...config[a], type: a }))
+    )
+  }, [openDraft, config, isActionAllowed, event, authentication])
 
   const { customActionModal, customActionConfigs } = useCustomActionConfigs(
     event,
