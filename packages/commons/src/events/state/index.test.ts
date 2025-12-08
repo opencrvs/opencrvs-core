@@ -312,7 +312,7 @@ describe('getCurrentEventState()', () => {
         declareRequestAction.declaration
       ) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
-      flags: [InherentFlags.PENDING_CERTIFICATION],
+      flags: [InherentFlags.PENDING_CERTIFICATION, 'validated'],
       potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
@@ -432,7 +432,7 @@ describe('getCurrentEventState()', () => {
       updatedAtLocation: registerAcceptAction.createdAtLocation,
       declaration: deepDropNulls(declareAcceptAction.declaration) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
-      flags: [InherentFlags.PENDING_CERTIFICATION],
+      flags: [InherentFlags.PENDING_CERTIFICATION, 'validated'],
       potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
