@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -27,8 +28,14 @@ import {
   Draft,
   isActionInScope,
   configurableEventScopeAllowed,
-  canUserReadEvent,
-  ITokenPayload
+  ITokenPayload,
+  ActionTypes,
+  CustomActionConfig,
+  isActionEnabled,
+  isActionVisible,
+  getActionConfig,
+  ValidatorContext,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -48,12 +55,16 @@ import { useOnlineStatus } from '@client/utils'
 import { UnassignModal } from '@client/v2-events/components/UnassignModal'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
+import {
+  useQuickActionModal,
+  useCustomActionModal
+} from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
+import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
   EventStatus.enum.DECLARED,
-  EventStatus.enum.VALIDATED,
   EventStatus.enum.REGISTERED,
   EventStatus.enum.ARCHIVED
 ]
@@ -94,10 +105,10 @@ function getAvailableAssignmentActions(
 }
 
 export const actionLabels = {
-  [ActionType.READ]: {
-    id: 'action.view.record',
-    description: 'Label for view record',
-    defaultMessage: 'View'
+  [ActionType.NOTIFY]: {
+    defaultMessage: 'Notify',
+    description: 'Notify action label',
+    id: 'actions.notify'
   },
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
@@ -115,8 +126,13 @@ export const actionLabels = {
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'event.birth.action.declare.label'
   },
+  [ActionType.REJECT]: {
+    defaultMessage: 'Reject',
+    description: 'Label for reject button in dropdown menu',
+    id: 'event.birth.action.reject.label'
+  },
   [ActionType.VALIDATE]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Validate',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'event.birth.action.validate.label'
@@ -127,7 +143,7 @@ export const actionLabels = {
     id: 'event.birth.action.archive.label'
   },
   [ActionType.REGISTER]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Register',
     description: 'Label for review record button in dropdown menu',
     id: 'event.birth.action.register.label'
   },
@@ -153,24 +169,36 @@ export const actionLabels = {
     id: 'event.birth.action.request-correction.label'
   },
   [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Review correction request',
     description: 'Label for review correction button in dropdown menu',
     id: 'event.action.review-correction.label'
   }
 } as const
 
+const reviewLabel = {
+  id: 'buttons.review',
+  defaultMessage: 'Review',
+  description: 'Label for review CTA button'
+}
+
 interface ActionConfig {
   label: TranslationConfig
   icon: IconProps['name']
+  /** onClick is used when clicking an action menu item. */
   onClick: (workqueue?: string) => Promise<void> | void
+  /** onCtaClick is used when clicking a workqueue CTA button. If its not defined, the onClick will be used. */
+  onCtaClick?: (workqueue?: string) => Promise<void> | void
+  /** ctaLabel is used on workqueue CTA buttons to override the label */
+  ctaLabel?: TranslationConfig
   disabled?: boolean
   hidden?: boolean
+  customActionType?: string
 }
 
-export type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
+type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
 
 interface ActionMenuItem extends ActionConfig {
-  type: ActionMenuActionType
+  type: ActionMenuActionType | (typeof ActionTypes.enum)['CUSTOM']
 }
 
 /**
@@ -190,24 +218,24 @@ function useViewableActionConfigurations(
   const isOnline = useOnlineStatus()
   const { clearEphemeralFormState } = useEventFormNavigation()
 
-  const { findFromCache } = useEvents().getEvent
-  const isDownloaded = Boolean(findFromCache(event.id).data)
+  const { useFindEventFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
 
   const [assignModal, openAssignModal] = useModal()
   const intl = useIntl()
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
   const assignedToUser = getUser.useQuery(event.assignedTo || '', {
     enabled: !!event.assignedTo
   })
   const assignedUserFullName = assignedToUser.data
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
-  const assignedOffice = assignedToUser.data?.primaryOfficeId || ''
+
+  const assignedOffice = assignedToUser.data?.primaryOfficeId
   const assignedOfficeName =
-    locations.find((l) => l.id === assignedOffice)?.name || ''
-  const { archiveModal, onArchive } = useArchiveModal()
+    (assignedOffice && locations.get(assignedOffice)?.name) || ''
 
   const { modal: deleteModal, deleteDeclaration } = useEventFormNavigation()
   const onDelete = useCallback(
@@ -216,12 +244,15 @@ function useViewableActionConfigurations(
     },
     [event, deleteDeclaration]
   )
+  const { rejectionModal, handleRejection } = useRejectionModal(event.id, false)
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
-  const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
+  const { refetch: refetchEvent } = events.getEvent.useFindEventFromCache(
+    event.id
+  )
 
   const { eventConfiguration } = useEventConfiguration(event.type)
 
@@ -273,19 +304,31 @@ function useViewableActionConfigurations(
     event.type
   )
 
+  const { quickActionModal, onQuickAction } = useQuickActionModal(event)
+
+  const userMayRegister = isActionInScope(
+    authentication.scope,
+    ActionType.REGISTER,
+    event.type
+  )
+
+  function resolveValidateLabel() {
+    if (isReviewingIncompleteDeclaration) {
+      return reviewLabel
+    }
+
+    return userMayRegister
+      ? actionLabels[ActionType.REGISTER]
+      : actionLabels[ActionType.VALIDATE]
+  }
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
-    modals: [assignModal, archiveModal, deleteModal],
+    modals: [assignModal, deleteModal, rejectionModal, quickActionModal],
     config: {
-      [ActionType.READ]: {
-        label: actionLabels[ActionType.READ],
-        icon: 'Eye' as const,
-        disabled: !isOnline,
-        onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
-      },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
         icon: 'PushPin' as const,
@@ -332,11 +375,10 @@ function useViewableActionConfigurations(
       },
       [ActionType.DECLARE]: {
         icon: 'PencilLine' as const,
-        // NOTE: Only label changes for convenience. Trying to actually VALIDATE before DECLARE will not work.
         label: isReviewingDeclaration
-          ? actionLabels[ActionType.VALIDATE]
+          ? reviewLabel
           : actionLabels[ActionType.DECLARE],
-        onClick: (workqueue?: string) => {
+        onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
@@ -348,41 +390,58 @@ function useViewableActionConfigurations(
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
         hidden: shouldHideDeclareAction
       },
+      [ActionType.REJECT]: {
+        label: actionLabels[ActionType.REJECT],
+        icon: 'FileX',
+        onClick: async (workqueue) =>
+          handleRejection(() =>
+            workqueue
+              ? navigate(
+                  ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
+                )
+              : navigate(ROUTES.V2.buildPath({}))
+          ),
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: isReviewingDeclaration
+      },
       [ActionType.VALIDATE]: {
-        label: actionLabels[ActionType.VALIDATE],
+        label: resolveValidateLabel(),
         icon: 'PencilLine' as const,
-        onClick: (workqueue?: string) => {
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
-              { eventId },
-              { workqueue }
-            )
-          )
+        onClick: async (workqueue) => {
+          if (userMayRegister) {
+            return onQuickAction(ActionType.REGISTER, workqueue)
+          }
+
+          return onQuickAction(ActionType.VALIDATE, workqueue)
         },
+        onCtaClick: (workqueue) =>
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
+          ),
+        ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.ARCHIVE]: {
         label: actionLabels[ActionType.ARCHIVE],
         icon: 'Archive' as const,
-        onClick: async () => {
-          await onArchive(event.id)
-        },
+        onClick: async (workqueue) =>
+          onQuickAction(ActionType.ARCHIVE, workqueue),
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
-        label: actionLabels[ActionType.REGISTER],
+        label: isReviewingIncompleteDeclaration
+          ? reviewLabel
+          : actionLabels[ActionType.REGISTER],
         icon: 'PencilLine' as const,
-        onClick: (workqueue?: string) => {
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
-              { eventId },
-              { workqueue }
-            )
-          )
-        },
-        disabled: !isDownloadedAndAssignedToUser
+        onClick: async (workqueue) =>
+          onQuickAction(ActionType.REGISTER, workqueue),
+        ctaLabel: reviewLabel,
+        onCtaClick: (workqueue) =>
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
+          ),
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: !event.flags.includes('validated')
       },
       [ActionType.MARK_AS_DUPLICATE]: {
         label: actionLabels[ActionType.MARK_AS_DUPLICATE],
@@ -416,9 +475,7 @@ function useViewableActionConfigurations(
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
         icon: 'Trash' as const,
-        onClick: async (workqueue?: string) => {
-          await onDelete(workqueue)
-        },
+        onClick: onDelete,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REQUEST_CORRECTION]: {
@@ -474,6 +531,7 @@ function useViewableActionConfigurations(
             )
           )
         },
+        ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
@@ -481,24 +539,109 @@ function useViewableActionConfigurations(
   }
 }
 
+const ALL_ACTIONS = [
+  ...Object.values(ActionType),
+  ...Object.values(ClientSpecificAction)
+]
+
 export function useUserAllowedActions(eventType: string) {
   const scopes = useSelector(getScope)
-
-  const actions = Object.values(ActionType)
-  const clientSpecificActions = Object.values(ClientSpecificAction)
-
   const allowedActions = useMemo(
     () =>
-      [...actions, ...clientSpecificActions].filter((action) =>
+      ALL_ACTIONS.filter((action) =>
         isActionInScope(scopes ?? [], action, eventType)
       ),
-    [scopes, eventType, actions, clientSpecificActions]
+    [scopes, eventType]
   )
 
   return {
     allowedActions,
     isActionAllowed: (action: ActionType | ClientSpecificAction) =>
       allowedActions.includes(action)
+  }
+}
+
+function useCustomActionConfigs(
+  event: EventIndex,
+  authentication: ITokenPayload
+): {
+  customActionModal: React.ReactNode
+  customActionConfigs: ActionMenuItem[]
+} {
+  const scopes = useSelector(getScope) ?? []
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { customActionModal, onCustomAction } = useCustomActionModal(event)
+  const { useFindEventFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
+  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+
+  const isDownloadedAndAssignedToUser =
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
+
+  const customActionConfigs = useMemo(() => {
+    return eventConfiguration.actions
+      .filter(
+        (action): action is CustomActionConfig =>
+          action.type === ActionType.CUSTOM
+      )
+      .map((action) => ({
+        label: action.label,
+        icon: 'PencilLine' as const,
+        onClick: async (workqueue?: string) =>
+          onCustomAction(action, workqueue),
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: false,
+        type: ActionType.CUSTOM,
+        customActionType: action.customActionType
+      }))
+  }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
+
+  const hasCustomActionScope = configurableEventScopeAllowed(
+    scopes,
+    ['record.custom-action'],
+    event.type
+  )
+
+  if (!hasCustomActionScope) {
+    return {
+      customActionModal: null,
+      customActionConfigs: []
+    }
+  }
+
+  return { customActionModal, customActionConfigs }
+}
+
+/** Actions might have configured SHOW or ENABLE conditionals. Let's apply their effects here. */
+function applyActionConditionalEffects({
+  event,
+  action,
+  validatorContext,
+  eventConfiguration
+}: {
+  event: EventIndex
+  action: ActionMenuItem
+  validatorContext: ValidatorContext
+  eventConfiguration: EventConfig
+}) {
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: action.type as ActionType,
+    customActionType:
+      'customActionType' in action ? action.customActionType : undefined
+  })
+
+  if (!actionConfig || !actionConfig.conditionals) {
+    return action
+  }
+
+  const hidden = !isActionVisible(actionConfig, event, validatorContext)
+  const disabled = !isActionEnabled(actionConfig, event, validatorContext)
+
+  return {
+    ...action,
+    hidden: action.hidden || hidden,
+    disabled: action.disabled || disabled
   }
 }
 
@@ -512,9 +655,12 @@ export function useUserAllowedActions(eventType: string) {
 export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
-) {
+): [React.ReactNode, ActionMenuItem[]] {
+  const isPending = event.flags.some((flag) => flag.endsWith(':requested'))
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
+  const validatorContext = useValidatorContext()
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const openDraft = drafts
     .getAllRemoteDrafts()
@@ -526,61 +672,61 @@ export function useAllowedActionConfigurations(
     openDraft
   )
 
-  const availableAssignmentActions = getAvailableAssignmentActions(
+  const allowedActionConfigs: ActionMenuItem[] = useMemo(() => {
+    const availableAssignmentActions = getAvailableAssignmentActions(
+      event,
+      authentication
+    )
+    const availableEventActions = getAvailableActionsForEvent(event)
+    const openDraftAction = openDraft ? [openDraft.action.type] : []
+    return (
+      [
+        ...availableAssignmentActions,
+        ...availableEventActions,
+        ...openDraftAction
+      ]
+        // deduplicate after adding the draft
+        .filter((action, index, self) => self.indexOf(action) === index)
+        .filter(
+          (action): action is ActionMenuActionType =>
+            ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
+            workqueueActions.safeParse(action).success
+        )
+        .filter((action) => isActionAllowed(action))
+        // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
+        .map((a) => ({ ...config[a], type: a }))
+    )
+  }, [openDraft, config, isActionAllowed, event, authentication])
+
+  const { customActionModal, customActionConfigs } = useCustomActionConfigs(
     event,
     authentication
   )
 
-  const availableEventActions = getAvailableActionsForEvent(event)
-
-  const openDraftAction = openDraft ? [openDraft.action.type] : []
-
-  const allowedWorkqueueConfigs: ActionMenuItem[] = [
-    ...availableAssignmentActions,
-    ...availableEventActions,
-    ...openDraftAction
-  ]
-    // deduplicate after adding the draft
-    .filter((action, index, self) => self.indexOf(action) === index)
-    .filter(
-      (action): action is ActionMenuActionType =>
-        ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
-        workqueueActions.safeParse(action).success
+  const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
+    .map((action) =>
+      applyActionConditionalEffects({
+        event,
+        action,
+        validatorContext,
+        eventConfiguration
+      })
     )
-    .filter(
-      (action) =>
-        isActionAllowed(action) ||
-        (action === ActionType.READ &&
-          canUserReadEvent(event, {
-            userId: authentication.sub,
-            scopes: authentication.scope
-          }))
-    )
-    // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
-    .map((a) => ({ ...config[a], type: a }))
     .filter((a: ActionConfig) => !a.hidden)
 
-  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
-  const hasOnlyMetaActions = allowedWorkqueueConfigs.every(({ type }) =>
+  // Check if the user can perform any action other than ASSIGN, or UNASSIGN
+  const hasOnlyMetaActions = allActionConfigs.every(({ type }) =>
     isMetaAction(type)
   )
 
-  // If user has no other allowed actions, return only READ.
-  // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
-  if (hasOnlyMetaActions) {
-    return [
-      modals,
-      [
-        {
-          ...config[ActionType.READ],
-          type: ActionType.READ
-        }
-      ].filter((a: ActionConfig) => !a.hidden)
-    ] satisfies [React.ReactNode, ActionMenuItem[]]
+  if (isPending) {
+    return [null, []]
   }
 
-  return [modals, allowedWorkqueueConfigs] satisfies [
-    React.ReactNode,
-    ActionMenuItem[]
+  // If user has no other actions than assign or unassign, return no actions.
+  // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
+  return [
+    [modals, customActionModal],
+    hasOnlyMetaActions ? [] : allActionConfigs
   ]
 }

@@ -10,7 +10,7 @@
  */
 import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { logger, UUID } from '@opencrvs/commons'
 import {
@@ -31,7 +31,8 @@ import {
   RejectCorrectionActionInput,
   getPendingAction,
   ActionInputWithType,
-  EventConfig
+  EventConfig,
+  CustomActionInput
 } from '@opencrvs/commons/events'
 import {
   TokenUserType,
@@ -78,6 +79,10 @@ const defaultConfig = {
 } as const
 
 const ACTION_PROCEDURE_CONFIG = {
+  [ActionType.CUSTOM]: {
+    ...defaultConfig,
+    inputSchema: CustomActionInput
+  },
   [ActionType.NOTIFY]: {
     ...defaultConfig,
     inputSchema: NotifyActionInput,
@@ -189,7 +194,12 @@ export async function defaultRequestHandler(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   actionConfirmationResponseSchema?: z.ZodObject<any>
 ) {
-  await throwConflictIfActionNotAllowed(input.eventId, input.type, token)
+  await throwConflictIfActionNotAllowed(
+    input.eventId,
+    input.type,
+    token,
+    'customActionType' in input ? input.customActionType : undefined
+  )
 
   const eventWithRequestedAction = await addAction(input, {
     event,
@@ -200,10 +210,12 @@ export async function defaultRequestHandler(
   })
 
   const requestedAction = getPendingAction(eventWithRequestedAction.actions)
+
   const eventActionToken = await getActionConfirmationToken(
     { eventId: input.eventId, actionId: requestedAction.id },
     token
   )
+
   const { responseStatus, responseBody: confirmationResponse } =
     await requestActionConfirmation(
       input.type,
@@ -334,7 +346,7 @@ export function getDefaultActionProcedures(
     request: systemProcedure
       .meta(meta)
       .use(requireScopesForRequestMiddleware)
-      .input(actionConfig.inputSchema)
+      .input(actionConfig.inputSchema.strict())
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
@@ -370,7 +382,9 @@ export function getDefaultActionProcedures(
       }),
 
     accept: systemProcedure
-      .input(actionConfig.inputSchema.merge(asyncAcceptInputFields))
+      .input(
+        actionConfig.inputSchema.extend(asyncAcceptInputFields.shape).strict()
+      )
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
@@ -469,7 +483,7 @@ export function getDefaultActionProcedures(
           originalActionId: actionId,
           type: actionType,
           createdBy: ctx.user.id,
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: TokenUserType.enum.user,
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,

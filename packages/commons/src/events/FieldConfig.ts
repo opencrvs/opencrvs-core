@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /*  eslint-disable max-lines */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldType } from './FieldType'
@@ -34,16 +34,14 @@ import {
   IdReaderFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
-import { JSONSchema } from '../client'
-extendZodWithOpenApi(z)
 
 const FieldId = z
   .string()
-  .refine(
+  .superRefine((val, ctx) => {
     /*
      * Disallow underscores '_' in field ids.
      * Why? Theres two reasons:
@@ -51,11 +49,13 @@ const FieldId = z
      *   2. On Kysely-SQL queries, we use the CamelCasePlugin. This plugin transforms snake_case to camelCase also on nested (jsonb) object keys.
      *      This could be disabled via 'maintainNestedObjectKeys: true', but this would also affect SQL queries which use e.g. json_agg() or to_jsonb() to aggregate results.
      */
-    (val) => !val.includes('_'),
-    (val) => ({
-      message: `id: '${val}' must not contain underscores '_'`
-    })
-  )
+    if (val.includes('_')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `id: '${val}' must not contain underscores '_'`
+      })
+    }
+  })
   .describe('Unique identifier for the field')
 
 export const FieldReference = z
@@ -249,7 +249,7 @@ export const EmailField = BaseField.extend({
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text')
     })
-    .default({ maxLength: 10 })
+    .default({ maxLength: 255 })
     .optional(),
   defaultValue: NonEmptyTextValue.optional()
 })
@@ -703,8 +703,8 @@ const HttpField = BaseField.extend({
     trigger: FieldReference,
     url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
-    headers: z.record(z.string()).optional(),
-    body: z.record(z.any()).optional(),
+    headers: z.record(z.string(), z.string()).optional(),
+    body: z.record(z.string(), z.any()).optional(),
     errorValue: z
       .any()
       .optional()
@@ -806,11 +806,17 @@ const QrReaderField = BaseField.extend({
   defaultValue: QrReaderFieldValue.optional(),
   configuration: z
     .object({
-      validator: z.custom<JSONSchema>(
-        (val) => typeof val === 'object' && val !== null
-      )
+      validator: z.any().meta({
+        description:
+          'JSON Schema to validate the scanned QR code data against before populating the form fields.',
+        id: 'QrReaderFieldValidator'
+      })
     })
     .optional()
+}).meta({
+  description:
+    'Configuration for QR code reader field, including optional JSON Schema validator.',
+  id: 'QrReaderField'
 })
 
 export type QrReaderField = z.infer<typeof QrReaderField>
@@ -838,103 +844,7 @@ const LoaderField = BaseField.extend({
 
 export type LoaderField = z.infer<typeof LoaderField>
 
-/** @knipignore */
-export type FieldConfig =
-  | z.infer<typeof Address>
-  | z.infer<typeof TextField>
-  | z.infer<typeof NumberField>
-  | z.infer<typeof TextAreaField>
-  | z.infer<typeof DateField>
-  | z.infer<typeof AgeField>
-  | z.infer<typeof TimeField>
-  | z.infer<typeof DateRangeField>
-  | z.infer<typeof SelectDateRangeField>
-  | z.infer<typeof Paragraph>
-  | z.infer<typeof RadioGroup>
-  | z.infer<typeof BulletList>
-  | z.infer<typeof PageHeader>
-  | z.infer<typeof Select>
-  | z.infer<typeof NameField>
-  | z.infer<typeof PhoneField>
-  | z.infer<typeof IdField>
-  | z.infer<typeof Checkbox>
-  | z.infer<typeof File>
-  | z.infer<typeof FileUploadWithOptions>
-  | z.infer<typeof Country>
-  | z.infer<typeof AdministrativeArea>
-  | z.infer<typeof Divider>
-  | z.infer<typeof LocationInput>
-  | z.infer<typeof Facility>
-  | z.infer<typeof Office>
-  | z.infer<typeof SignatureField>
-  | z.infer<typeof EmailField>
-  | z.infer<typeof DataField>
-  | z.infer<typeof ButtonField>
-  | z.infer<typeof AlphaPrintButton>
-  | z.infer<typeof HttpField>
-  | z.infer<typeof SearchField>
-  | z.infer<typeof LinkButtonField>
-  | z.infer<typeof VerificationStatus>
-  | z.infer<typeof QueryParamReaderField>
-  | z.infer<typeof QrReaderField>
-  | z.infer<typeof IdReaderField>
-  | z.infer<typeof LoaderField>
-
-/** @knipignore */
-/**
- * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
- */
-export type FieldConfigInput =
-  | z.input<typeof Address>
-  | z.input<typeof TextField>
-  | z.input<typeof TimeField>
-  | z.input<typeof SelectDateRangeField>
-  | z.input<typeof ButtonField>
-  | z.input<typeof AlphaPrintButton>
-  | z.input<typeof NumberField>
-  | z.input<typeof TextAreaField>
-  | z.input<typeof DateField>
-  | z.input<typeof AgeField>
-  | z.input<typeof DateRangeField>
-  | z.input<typeof Paragraph>
-  | z.input<typeof RadioGroup>
-  | z.input<typeof BulletList>
-  | z.input<typeof PageHeader>
-  | z.input<typeof Select>
-  | z.input<typeof NameField>
-  | z.input<typeof PhoneField>
-  | z.input<typeof IdField>
-  | z.input<typeof Checkbox>
-  | z.input<typeof File>
-  | z.input<typeof FileUploadWithOptions>
-  | z.input<typeof Country>
-  | z.input<typeof AdministrativeArea>
-  | z.input<typeof Divider>
-  | z.input<typeof LocationInput>
-  | z.input<typeof Facility>
-  | z.input<typeof Office>
-  | z.input<typeof SignatureField>
-  | z.input<typeof EmailField>
-  | z.input<typeof DataField>
-  | z.input<typeof HttpField>
-  | z.input<typeof SearchField>
-  | z.input<typeof LinkButtonField>
-  | z.input<typeof VerificationStatus>
-  | z.input<typeof QueryParamReaderField>
-  | z.input<typeof QrReaderField>
-  | z.input<typeof IdReaderField>
-  | z.input<typeof LoaderField>
-/*
- *  Using explicit type for the FieldConfig schema intentionally as it's
- *  referenced quite extensively througout various other schemas. Leaving the
- *  type to be inferred causes typescript compiler to fail with "inferred type
- *  exeeds max lenght"
- */
-export const FieldConfig: z.ZodType<
-  FieldConfig,
-  z.ZodTypeDef,
-  FieldConfigInput
-> = z
+export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
     TextField,
@@ -976,10 +886,12 @@ export const FieldConfig: z.ZodType<
     LoaderField,
     SearchField
   ])
-  .openapi({
+  .meta({
     description: 'Form field configuration',
-    ref: 'FieldConfig'
+    id: 'FieldConfig'
   })
+
+export type FieldConfig = z.infer<typeof FieldConfig>
 
 export type SelectField = z.infer<typeof Select>
 export type NameField = z.infer<typeof NameField>
@@ -994,6 +906,7 @@ export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
   Extract<FieldConfig, { type: T }>,
   'value'
 >
+
 export type SelectOption = z.infer<typeof SelectOption>
 
 export type AdministrativeAreaConfiguration = z.infer<
@@ -1010,6 +923,8 @@ export const AnyFileField = z.discriminatedUnion('type', [
 ])
 
 export type AnyFileField = z.infer<typeof AnyFileField>
+
+export type FieldConfigInput = z.input<typeof FieldConfig>
 
 export type FieldTypeToFieldConfig<T extends FieldType> = Extract<
   FieldConfigInput,

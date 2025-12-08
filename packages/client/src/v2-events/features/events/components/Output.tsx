@@ -47,7 +47,8 @@ import {
   isSignatureFieldType,
   isDataFieldType,
   EventConfig,
-  isAgeFieldType
+  isAgeFieldType,
+  FieldUpdateValue
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -97,7 +98,7 @@ export function ValueOutput({
   eventConfig
 }: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
   searchMode?: {} | boolean
   eventConfig?: EventConfig
 }) {
@@ -283,7 +284,7 @@ export function Output({
   displayEmptyAsDash = false
 }: {
   field: FieldConfig
-  value?: FieldValue
+  value?: FieldValue | FieldUpdateValue
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged?: boolean
   previousForm?: EventState

@@ -62,7 +62,7 @@ const successfulMutationEvent = generateEventDocument({
 
 export const SuccessfulMutation: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -98,11 +98,17 @@ export const SuccessfulMutation: Story = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    await step('Send for review', async () => {
-      const submitButton = await canvas.findByText('Send for review')
-      await userEvent.click(submitButton)
-      const confirmButton = await canvas.findByText('Confirm')
-      await userEvent.click(confirmButton)
+    await step('Declare', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Declare'))
+      await userEvent.click(
+        await canvas.findByRole('button', {
+          name: 'Declare'
+        })
+      )
+
       const outboxButton = await canvas.findByTestId(
         'navigation_workqueue_outbox'
       )
@@ -145,7 +151,7 @@ const failedMutationEvent = generateEventDocument({
 
 export const FailedMutation: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -183,11 +189,17 @@ export const FailedMutation: Story = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    await step('Send for review', async () => {
-      const submitButton = await canvas.findByText('Send for review')
-      await userEvent.click(submitButton)
-      const confirmButton = await canvas.findByText('Confirm')
-      await userEvent.click(confirmButton)
+    await step('Declare', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Declare'))
+      await userEvent.click(
+        await canvas.findByRole('button', {
+          name: 'Declare'
+        })
+      )
+
       const outboxButton = await canvas.findByTestId(
         'navigation_workqueue_outbox'
       )
@@ -225,7 +237,7 @@ const failedMutationConflictEvent = generateEventDocument({
 
 export const FailedMutationConflict: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.FIELD_AGENT,
+    userRole: TestUserRole.enum.FIELD_AGENT,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -263,11 +275,16 @@ export const FailedMutationConflict: Story = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    await step('Send for review', async () => {
-      const submitButton = await canvas.findByText('Send for review')
-      await userEvent.click(submitButton)
-      const confirmButton = await canvas.findByText('Confirm')
-      await userEvent.click(confirmButton)
+    await step('Declare', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Declare'))
+      await userEvent.click(
+        await canvas.findByRole('button', {
+          name: 'Declare'
+        })
+      )
       const outboxButton = await canvas.findByTestId(
         'navigation_workqueue_outbox'
       )

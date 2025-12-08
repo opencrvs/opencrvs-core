@@ -238,7 +238,7 @@ async function buildClause(
       case 'data': {
         // @todo: The type for this comes out as "any"
         const value = clause[key]
-        const dataQuery = generateQuery(value, eventConfigs)
+        const dataQuery = generateQuery(value as QueryInputType, eventConfigs)
         const innerMust = dataQuery.bool?.must
         if (Array.isArray(innerMust)) {
           must.push(...innerMust)

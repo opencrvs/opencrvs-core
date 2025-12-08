@@ -10,7 +10,7 @@
  */
 
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -42,6 +42,8 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  getEventIndexWithLocationHierarchy,
+  getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
   removeSecuredFields
 } from './utils'
@@ -137,6 +139,7 @@ function mapFieldTypeToElasticsearch(
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
+
       return {
         type: 'object',
         properties: addressProperties
@@ -340,10 +343,20 @@ export async function indexEventsInBulk(
 ) {
   const esClient = getOrCreateClient()
 
-  const body = batch.flatMap((doc) => [
-    { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
-    eventToEventIndex(doc, getEventConfigById(configs, doc.type))
-  ])
+  const indexedDocs = await Promise.all(
+    batch.map(async (doc) => {
+      const config = getEventConfigById(configs, doc.type)
+      const eventIndex = eventToEventIndex(doc, config)
+      const eventIndexWithLocationHierarchy =
+        await getEventIndexWithLocationHierarchy(config, eventIndex)
+      return [
+        { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+        eventIndexWithLocationHierarchy
+      ]
+    })
+  )
+
+  const body = indexedDocs.flat()
 
   return esClient.bulk({ refresh: false, body })
 }
@@ -351,12 +364,14 @@ export async function indexEventsInBulk(
 export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
-
+  const eventIndex = eventToEventIndex(event, config)
+  const eventIndexWithLocationHierarchy =
+    await getEventIndexWithLocationHierarchy(config, eventIndex)
   return esClient.index<EventIndex>({
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventToEventIndex(event, config),
+    document: eventIndexWithLocationHierarchy,
     refresh: 'wait_for'
   })
 }
@@ -395,10 +410,12 @@ export async function getIndexedEvents(
               { term: { status: EventStatus.enum.CREATED } },
               { term: { createdBy: userId } }
             ],
+
             should: undefined
           }
         }
       ],
+
       minimum_should_match: 1
     }
   } satisfies estypes.QueryDslQueryContainer
@@ -475,7 +492,13 @@ export async function findRecordsByQuery(
     .map((eventIndex) => {
       const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
       const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
-      return removeSecuredFields(eventConfig, decodedEventIndex)
+      const eventIndexWithoutLocationHierarchy =
+        getEventIndexWithoutLocationHierarchy(eventConfig, decodedEventIndex)
+
+      return removeSecuredFields(
+        eventConfig,
+        eventIndexWithoutLocationHierarchy
+      )
     })
 
   return { results: events, total: valueFromTotal(response.hits.total) }

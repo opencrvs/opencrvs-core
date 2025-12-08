@@ -10,7 +10,7 @@
  */
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
 import { UUID } from './uuid'

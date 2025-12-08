@@ -155,7 +155,7 @@ export function Summary() {
     if (workqueue) {
       navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue }))
     } else {
-      navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+      navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
     }
   }, [
     form,

@@ -15,10 +15,11 @@ import {
 } from '../events/EventConfigInput'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
-import { BIRTH_EVENT } from '../events/Constants'
+import { CHILD_ONBOARDING_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { createFieldConditionals } from '../conditionals/conditionals'
+import { field } from '../events/field'
 
 function generateTranslationConfig(message: string): TranslationConfig {
   return {
@@ -27,6 +28,7 @@ function generateTranslationConfig(message: string): TranslationConfig {
     id: message
   }
 }
+
 const child = defineFormPage({
   id: 'child',
   type: PageTypes.enum.FORM,
@@ -48,6 +50,61 @@ const child = defineFormPage({
       secured: true,
       validation: [],
       label: generateTranslationConfig('Date of birth')
+    },
+    {
+      id: 'child.placeOfBirth',
+      analytics: true,
+      type: FieldType.SELECT,
+      required: true,
+      secured: true,
+      label: {
+        defaultMessage: 'Place of delivery',
+        description: 'This is the label for the field',
+        id: 'event.birth.action.declare.form.section.child.field.placeOfBirth.label'
+      },
+      options: [
+        {
+          value: 'child.placeOfBirth-SELECT-2',
+          label: generateTranslationConfig('Health Institution')
+        },
+        {
+          value: 'PRIVATE_HOME',
+          label: generateTranslationConfig('Residential address')
+        }
+      ]
+    },
+    {
+      id: 'child.birthLocation',
+      analytics: true,
+      type: 'FACILITY',
+      required: true,
+      secured: true,
+      label: generateTranslationConfig('Health Institution'),
+      conditionals: [
+        {
+          type: 'SHOW',
+          conditional: field('child.placeOfBirth').isEqualTo(
+            'child.placeOfBirth-SELECT-2'
+          )
+        }
+      ]
+    },
+    {
+      id: 'child.birthLocation.privateHome',
+      analytics: true,
+      type: FieldType.ADDRESS,
+      secured: true,
+      hideLabel: true,
+      label: generateTranslationConfig("Child's address"),
+      conditionals: [
+        {
+          type: 'SHOW',
+          conditional: field('child.placeOfBirth').isEqualTo('PRIVATE_HOME')
+        }
+      ],
+      configuration: {
+        streetAddressForm: []
+      }
     }
   ]
 })
@@ -127,7 +184,7 @@ const mother = defineFormPage({
   ]
 })
 
-const BIRTH_DECLARATION_REVIEW = {
+const CHILD_ONBOARDING_DECLARATION_REVIEW = {
   title: generateTranslationConfig(
     '{child.name.firstname, select, __EMPTY__ {Birth declaration} other {{child.name.surname, select, __EMPTY__ {Birth declaration for {child.name.firstname}} other {Birth declaration for {child.name.firstname} {child.name.surname}}}}}'
   ),
@@ -148,14 +205,14 @@ const BIRTH_DECLARATION_REVIEW = {
   ]
 }
 
-const BIRTH_DECLARATION_FORM = defineDeclarationForm({
+const CHILD_ONBOARDING_DECLARATION_FORM = defineDeclarationForm({
   label: generateTranslationConfig('Birth decalration form'),
 
   pages: [child, mother]
 })
 
-export const v2BirthEvent = defineConfig({
-  id: BIRTH_EVENT,
+export const ChildOnboardingEvent = defineConfig({
+  id: CHILD_ONBOARDING_EVENT,
   title: generateTranslationConfig(
     '{child.name.firstname} {child.name.surname}'
   ),
@@ -163,27 +220,25 @@ export const v2BirthEvent = defineConfig({
   summary: {
     fields: []
   },
-  declaration: BIRTH_DECLARATION_FORM,
+  declaration: CHILD_ONBOARDING_DECLARATION_FORM,
   actions: [
     {
       type: ActionType.READ,
       label: generateTranslationConfig('Read'),
-      review: BIRTH_DECLARATION_REVIEW
+      review: CHILD_ONBOARDING_DECLARATION_REVIEW
     },
     {
       type: ActionType.DECLARE,
       label: generateTranslationConfig('Declare'),
-      review: BIRTH_DECLARATION_REVIEW
+      review: CHILD_ONBOARDING_DECLARATION_REVIEW
     },
     {
       type: ActionType.VALIDATE,
-      label: generateTranslationConfig('Validate'),
-      review: BIRTH_DECLARATION_REVIEW
+      label: generateTranslationConfig('Validate')
     },
     {
       type: ActionType.REGISTER,
-      label: generateTranslationConfig('Register'),
-      review: BIRTH_DECLARATION_REVIEW
+      label: generateTranslationConfig('Register')
     }
   ],
   advancedSearch: []

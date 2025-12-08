@@ -37,7 +37,7 @@ import { hasDeclarationFieldChanged } from '../utils'
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
   const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW
   )
   const intl = useIntl()
   const navigate = useNavigate()

@@ -25,7 +25,7 @@ import {
   IS_LEAF_LEVEL_LOCATION
 } from '@client/views/SysAdmin/Performance/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { stringify, parse } from 'query-string'
+import { stringify, parse } from 'qs'
 import { GraphQLError } from 'graphql'
 import { vi } from 'vitest'
 import { formatUrl } from '@client/navigation'
@@ -186,9 +186,9 @@ describe('Registraion Rates tests', () => {
   })
 
   it('changing location id from location picker updates the query params', async () => {
-    const locationIdBeforeChange = parse(
-      router.state.location.search
-    ).locationId
+    const locationIdBeforeChange = parse(router.state.location.search, {
+      ignoreQueryPrefix: true
+    }).locationId
 
     const locationPickerElement = await waitForElement(
       component,
@@ -211,7 +211,9 @@ describe('Registraion Rates tests', () => {
     )
     searchResultOption.hostNodes().simulate('click')
 
-    const newLocationId = parse(router.state.location.search).locationId
+    const newLocationId = parse(router.state.location.search, {
+      ignoreQueryPrefix: true
+    }).locationId
     expect(newLocationId).not.toBe(locationIdBeforeChange)
     expect(newLocationId).toBe('bfe8306c-0910-48fe-8bf5-0db906cf3155')
   })

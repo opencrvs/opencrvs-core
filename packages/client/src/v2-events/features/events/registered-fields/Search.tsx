@@ -252,7 +252,8 @@ function SearchInput({
         error: {
           statusCode: 204,
           message: 'cleard'
-        }
+        },
+        data: undefined
       })
     }
   }

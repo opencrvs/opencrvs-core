@@ -16,7 +16,6 @@ import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
-  AssertType,
   Scenario,
   UserRoles
 } from '../ActionMenu.common'
@@ -39,8 +38,7 @@ const inExternalValidationScenariosForRegistrationAgent: Scenario[] = [
     ],
     requested: ActionType.REGISTER,
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   }
 ]

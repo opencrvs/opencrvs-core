@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import format from 'date-fns/format'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
@@ -23,11 +22,13 @@ import {
   EventState,
   isFieldVisible,
   isPageVisible,
+  Location,
   PageConfig,
   PageTypes,
   RequestedCorrectionAction,
   TranslationConfig,
   User,
+  UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
@@ -41,7 +42,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
-import { getLocations } from '@client/offline/selectors'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
 const messages = defineMessages({
@@ -80,14 +81,13 @@ const Label = styled.label`
 function getRequestActionDetails(
   correctionRequestAction: Action,
   users: User[],
-  locations: ReturnType<typeof getLocations>,
+  locations: Map<UUID, Location>,
   intl: IntlShape
 ): CorrectionDetail[] {
   const user = users.find((u) => u.id === correctionRequestAction.createdBy)
   const location =
     correctionRequestAction.createdAtLocation &&
-    locations[correctionRequestAction.createdAtLocation]
-
+    locations.get(correctionRequestAction.createdAtLocation)
   return [
     {
       label: messages.correctionSubmittedBy,
@@ -116,7 +116,7 @@ function buildCorrectionDetails(
   form: EventState,
   intl: IntlShape,
   users: User[],
-  locations: ReturnType<typeof getLocations>,
+  locations: Map<UUID, Location>,
   validatorContext: ValidatorContext,
   correctionRequestAction?: Action
 ): CorrectionDetail[] {
@@ -211,7 +211,9 @@ export function CorrectionDetails({
   const navigate = useNavigate()
   const { getUser } = useUsers()
   const users = getUser.getAllCached()
-  const locations = useSelector(getLocations)
+
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
 
   const correctionFormPages =
     eventConfiguration.actions.find(

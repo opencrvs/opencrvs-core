@@ -16,7 +16,6 @@ import {
   DeclarationActionType,
   EventConfig,
   EventDocument,
-  getAcceptedActions,
   getCurrentEventState,
   UUID,
   ValidatorContext,

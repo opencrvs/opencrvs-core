@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.0 Release Candidate
+
+### New features
+
+#### HTTP Input
+
+HTTP input now accepts `field('..')` references in the HTTP body definition.
+
+#### Jurisdiction
+
+- Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
+
 ## [1.9.1](https://github.com/opencrvs/opencrvs-core/compare/v1.9.0...v1.9.1)
 
 ### Breaking changes

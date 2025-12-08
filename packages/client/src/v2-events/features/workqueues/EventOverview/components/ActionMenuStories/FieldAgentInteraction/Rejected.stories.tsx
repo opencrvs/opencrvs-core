@@ -40,9 +40,8 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [REJECTED_DECLARE_AS_REVIEW]: AssertType.DISABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Review']: AssertType.DISABLED
     }
   },
   {
@@ -56,9 +55,8 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [REJECTED_DECLARE_AS_REVIEW]: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Review']: AssertType.ENABLED
     }
   },
   {
@@ -72,8 +70,7 @@ const rejectedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED,
-      [REJECTED_DECLARE_AS_REVIEW]: AssertType.DISABLED
+      ['Review']: AssertType.DISABLED
     }
   }
 ]

@@ -10,7 +10,12 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, generateEventDocument, SCOPES } from '@opencrvs/commons'
+import {
+  ActionType,
+  createPrng,
+  generateEventDocument,
+  SCOPES
+} from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createSystemTestClient, setupTestCase } from '@events/tests/utils'
 
@@ -57,7 +62,8 @@ describe('bulkImport', () => {
       actions: [
         { type: ActionType.CREATE, user },
         { type: ActionType.DECLARE, user }
-      ]
+      ],
+      rng: createPrng(871)
     })
 
     const event2 = generateEventDocument({
@@ -65,7 +71,8 @@ describe('bulkImport', () => {
       actions: [
         { type: ActionType.CREATE, user },
         { type: ActionType.DECLARE, user }
-      ]
+      ],
+      rng: createPrng(872)
     })
     await client.event.bulkImport([event1, event2])
 

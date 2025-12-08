@@ -49,16 +49,19 @@ export function useLocations() {
         const { queryFn, ...rest } =
           trpcOptionsProxy.locations.list.queryOptions()
 
-        return [
-          useSuspenseQuery({
-            ...rest,
-            queryKey: trpc.locations.list.queryKey({
-              isActive,
-              locationIds,
-              locationType
-            })
-          }).data
-        ]
+        const locationArray = useSuspenseQuery({
+          ...rest,
+          queryKey: trpc.locations.list.queryKey({
+            isActive,
+            locationIds,
+            locationType
+          })
+        }).data
+
+        const locationMap = new Map<UUID, Location>(
+          locationArray.map((location) => [location.id, location])
+        )
+        return locationMap
       }
     }
   }
@@ -90,12 +93,12 @@ function matchesType(
  * @returns The list of leaf location IDs.
  */
 export function getLeafLocationIds(
-  locations: Location[],
+  locations: Map<UUID, Location>,
   locationTypes?: LocationType[]
 ): Array<{ id: UUID }> {
   const nonLeafLocationIds = new Set<string>()
 
-  for (const location of locations) {
+  for (const [id, location] of locations) {
     if (
       location.parentId &&
       matchesType(location.locationType, locationTypes)
@@ -105,12 +108,12 @@ export function getLeafLocationIds(
   }
 
   const result: { id: UUID }[] = []
-  for (const loc of locations) {
+  for (const [id, location] of locations) {
     if (
-      !nonLeafLocationIds.has(loc.id) &&
-      matchesType(loc.locationType, locationTypes)
+      !nonLeafLocationIds.has(id) &&
+      matchesType(location.locationType, locationTypes)
     ) {
-      result.push({ id: loc.id })
+      result.push({ id })
     }
   }
 
@@ -129,14 +132,14 @@ let cachedLeafIds: { id: UUID }[] | null = null
  */
 export function useSuspenseAdminLeafLevelLocations() {
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
   if (cachedLeafIds && cachedLocationsRef === locations) {
     return cachedLeafIds
   }
 
   const leafIds = getLeafLocationIds(locations, [
-    LocationType.Enum.ADMIN_STRUCTURE
+    LocationType.enum.ADMIN_STRUCTURE
   ])
 
   cachedLocationsRef = locations

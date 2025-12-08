@@ -72,7 +72,7 @@ import {
 } from '@client/components/WithRouterProps'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import {
   generateCreateUserSectionUrl,
   generateUserReviewFormUrl
