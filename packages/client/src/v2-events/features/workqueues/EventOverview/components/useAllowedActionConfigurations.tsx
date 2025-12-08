@@ -333,6 +333,7 @@ function useViewableActionConfigurations(
   return {
     modals: [assignModal, deleteModal, rejectionModal, quickActionModal],
     config: {
+      // Core actions
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
         icon: 'PushPin' as const,
@@ -377,6 +378,34 @@ function useViewableActionConfigurations(
         },
         disabled: !isOnline
       },
+      [ActionType.ARCHIVE]: {
+        label: actionLabels[ActionType.ARCHIVE],
+        icon: 'Archive' as const,
+        onClick: async (workqueue) =>
+          onQuickAction(ActionType.ARCHIVE, workqueue),
+        disabled: !isDownloadedAndAssignedToUser
+      },
+      [ActionType.MARK_AS_DUPLICATE]: {
+        label: actionLabels[ActionType.MARK_AS_DUPLICATE],
+        icon: 'PencilLine' as const,
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath(
+              { eventId },
+              { workqueue }
+            )
+          )
+        },
+        disabled: !isDownloadedAndAssignedToUser || isAssignmentInProgress
+      },
+      [ActionType.DELETE]: {
+        label: actionLabels[ActionType.DELETE],
+        icon: 'Trash' as const,
+        onClick: onDelete,
+        disabled: !isDownloadedAndAssignedToUser
+      },
+      // Configurable event actions
       [ActionType.DECLARE]: {
         icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
         label: isReviewingDeclaration
@@ -425,13 +454,6 @@ function useViewableActionConfigurations(
         ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser
       },
-      [ActionType.ARCHIVE]: {
-        label: actionLabels[ActionType.ARCHIVE],
-        icon: 'Archive' as const,
-        onClick: async (workqueue) =>
-          onQuickAction(ActionType.ARCHIVE, workqueue),
-        disabled: !isDownloadedAndAssignedToUser
-      },
       [ActionType.REGISTER]: {
         label: isReviewingIncompleteDeclaration
           ? reviewLabel
@@ -446,20 +468,6 @@ function useViewableActionConfigurations(
           ),
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !event.flags.includes('validated')
-      },
-      [ActionType.MARK_AS_DUPLICATE]: {
-        label: actionLabels[ActionType.MARK_AS_DUPLICATE],
-        icon: 'PencilLine' as const,
-        onClick: (workqueue?: string) => {
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath(
-              { eventId },
-              { workqueue }
-            )
-          )
-        },
-        disabled: !isDownloadedAndAssignedToUser || isAssignmentInProgress
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
@@ -476,12 +484,6 @@ function useViewableActionConfigurations(
         },
         disabled: !isDownloadedAndAssignedToUser || eventIsWaitingForCorrection,
         hidden: eventIsWaitingForCorrection
-      },
-      [ActionType.DELETE]: {
-        label: actionLabels[ActionType.DELETE],
-        icon: 'Trash' as const,
-        onClick: onDelete,
-        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REQUEST_CORRECTION]: {
         label: actionLabels[ActionType.REQUEST_CORRECTION],
