@@ -1,12 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { makeKyselyHook, kyselyCamelCaseHook } = require('kanel-kysely')
 
-const tablesToIgnore = [
-  'pgmigrations',
-  'pgmigrations_superuser',
-  'legacy_users',
-  'legacy_practitioners'
-]
+const tablesToIgnore = ['pgmigrations']
 
 /** @type {import('kanel').Config} */
 module.exports = {

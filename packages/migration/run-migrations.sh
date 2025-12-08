@@ -94,7 +94,7 @@ run_pg_migrations() {
   restore_backups
 }
 
-# Run superuser events migrations
+# migrate legacy users
 if [ $MIGRATE_LEGACRY_USERS = true ]; then
   export EVENTS_MIGRATION_USER="${EVENTS_MIGRATION_USER:-events_migrator}"
 
