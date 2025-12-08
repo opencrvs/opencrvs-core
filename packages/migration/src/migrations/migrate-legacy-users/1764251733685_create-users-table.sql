@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS users(
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON users TO ${EVENTS_DB_USER};
 
+ALTER TABLE users OWNER TO ${EVENTS_MIGRATION_USER};
+
 COMMENT ON COLUMN users.legacy_id IS 'References the user id from the legacy database.';
 
 -- Down Migration

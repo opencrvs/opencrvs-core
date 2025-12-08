@@ -10,5 +10,7 @@ CREATE TABLE IF NOT EXISTS user_credentials(
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON user_credentials TO ${EVENTS_DB_USER};
 
+ALTER TABLE user_credentials OWNER TO ${EVENTS_MIGRATION_USER};
+
 -- Down Migration
 DROP TABLE user_credentials;
