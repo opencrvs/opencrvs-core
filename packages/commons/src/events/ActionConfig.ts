@@ -53,59 +53,45 @@ const DeclarationActionBase = ActionConfigBase.extend({
   deduplication: DeduplicationConfig.optional()
 })
 
-const ReadActionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.READ),
-    review: DeclarationReviewConfig.describe(
-      'Configuration of the review page for read-only view.'
-    ),
-    conditionals: z
-      .never()
-      .optional()
-      .describe('Read-action can not be disabled or hidden with conditionals.')
-  }).shape
-)
+const ReadActionConfig = ActionConfigBase.extend({
+  type: z.literal(ActionType.READ),
+  review: DeclarationReviewConfig.describe(
+    'Configuration of the review page for read-only view.'
+  ),
+  conditionals: z
+    .never()
+    .optional()
+    .describe('Read-action can not be disabled or hidden with conditionals.')
+})
 
-const DeclareConfig = DeclarationActionBase.extend(
-  z.object({
-    type: z.literal(ActionType.DECLARE),
-    review: DeclarationReviewConfig.describe(
-      'Configuration of the review page fields.'
-    )
-  }).shape
-)
+const DeclareConfig = DeclarationActionBase.extend({
+  type: z.literal(ActionType.DECLARE),
+  review: DeclarationReviewConfig.describe(
+    'Configuration of the review page fields.'
+  )
+})
 
-const RejectConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.REJECT)
-  }).shape
-)
+const RejectConfig = ActionConfigBase.extend({
+  type: z.literal(ActionType.REJECT)
+})
 
-const ValidateConfig = DeclarationActionBase.extend(
-  z.object({
-    type: z.literal(ActionType.VALIDATE)
-  }).shape
-)
+const ValidateConfig = DeclarationActionBase.extend({
+  type: z.literal(ActionType.VALIDATE)
+})
 
-const RegisterConfig = DeclarationActionBase.extend(
-  z.object({
-    type: z.literal(ActionType.REGISTER)
-  }).shape
-)
+const RegisterConfig = DeclarationActionBase.extend({
+  type: z.literal(ActionType.REGISTER)
+})
 
-const PrintCertificateActionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.PRINT_CERTIFICATE),
-    printForm: ActionFormConfig
-  }).shape
-)
+const PrintCertificateActionConfig = ActionConfigBase.extend({
+  type: z.literal(ActionType.PRINT_CERTIFICATE),
+  printForm: ActionFormConfig
+})
 
-const RequestCorrectionConfig = ActionConfigBase.extend(
-  z.object({
-    type: z.literal(ActionType.REQUEST_CORRECTION),
-    correctionForm: ActionFormConfig
-  }).shape
-)
+const RequestCorrectionConfig = ActionConfigBase.extend({
+  type: z.literal(ActionType.REQUEST_CORRECTION),
+  correctionForm: ActionFormConfig
+})
 
 const CustomActionConfig = ActionConfigBase.merge(
   z.object({
@@ -149,7 +135,8 @@ export type ActionConfig = z.infer<typeof ActionConfig>
 
 // Build a runtime set directly from the schema
 export const actionConfigTypes: Set<ActionConfigTypes> = new Set(
-  ActionConfig.options.map((opt) => opt.shape.type.value)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ActionConfig.options.map((opt: z.ZodObject<any>) => opt.shape.type.value)
 )
 /**
  * Action types that come specifically from the country configuration.
