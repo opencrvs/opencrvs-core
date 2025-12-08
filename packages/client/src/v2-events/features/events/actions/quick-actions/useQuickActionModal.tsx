@@ -151,7 +151,7 @@ function QuickActionModal({
               : undefined) ??
             'PencilLine'
           }
-          size="small"
+          size="large"
         />
       }
       variant={'large'}
