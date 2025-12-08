@@ -420,12 +420,20 @@ function applySearchFieldOverridesToFieldConfig(
     }
   }
   if (field.type === FieldType.ADDRESS) {
+    const streetAddressForm = field.configuration?.streetAddressForm?.map(
+      (subField) => ({
+        ...subField,
+        required: false
+      })
+    )
+
     return {
       ...field,
       ...commonConfig,
       configuration: {
         ...field.configuration,
-        fields: ['country']
+        fields: ['country'],
+        streetAddressForm
       }
     }
   }
