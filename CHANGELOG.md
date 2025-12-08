@@ -12,6 +12,12 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 
 - Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
 
+## 1.9.2
+
+### New features
+
+- Toolkit now exports `window().location.get` to country config that can be used as a template variable e.g. in HttpField request body.
+
 ## [1.9.1](https://github.com/opencrvs/opencrvs-core/compare/v1.9.0...v1.9.1)
 
 ### Breaking changes
@@ -49,6 +55,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - **Searchable Select**: A new select component that allows searching through options. Useful for selects with a large number of options. Currently being used in address fields. [#10749](https://github.com/opencrvs/opencrvs-core/issues/10749)
 
 ### Bug fixes
+
 - During user password reset, email address lookup is now case insensitive [#9869](https://github.com/opencrvs/opencrvs-core/issues/9869)
 - Users cannot activate or reactivate users with roles not specified in the `user.edit` scope [#9933](https://github.com/opencrvs/opencrvs-core/issues/9933)
 - Login page no longer show "Farajaland CRVS" before showing the correct title [#10958](https://github.com/opencrvs/opencrvs-core/issues/10958)
