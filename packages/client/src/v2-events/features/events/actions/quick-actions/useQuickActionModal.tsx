@@ -146,9 +146,7 @@ function QuickActionModal({
           color="primary"
           name={
             config.icon ??
-            (config.actionType !== undefined
-              ? DefaultIcons[config.actionType]
-              : undefined) ??
+            (config.actionType && DefaultIcons[config.actionType]) ??
             'PencilLine'
           }
           size="large"
