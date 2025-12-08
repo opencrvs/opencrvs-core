@@ -322,6 +322,10 @@ function useViewableActionConfigurations(
       : actionLabels[ActionType.VALIDATE]
   }
 
+  const getAction = (type: ActionType) => {
+    return eventConfiguration.actions.find((action) => action.type === type)
+  }
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
@@ -374,7 +378,7 @@ function useViewableActionConfigurations(
         disabled: !isOnline
       },
       [ActionType.DECLARE]: {
-        icon: 'PencilLine' as const,
+        icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
         label: isReviewingDeclaration
           ? reviewLabel
           : actionLabels[ActionType.DECLARE],
@@ -392,7 +396,7 @@ function useViewableActionConfigurations(
       },
       [ActionType.REJECT]: {
         label: actionLabels[ActionType.REJECT],
-        icon: 'FileX',
+        icon: getAction(ActionType.REJECT)?.icon ?? 'FileX',
         onClick: async (workqueue) =>
           handleRejection(() =>
             workqueue
@@ -406,7 +410,7 @@ function useViewableActionConfigurations(
       },
       [ActionType.VALIDATE]: {
         label: resolveValidateLabel(),
-        icon: 'PencilLine' as const,
+        icon: getAction(ActionType.VALIDATE)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) => {
           if (userMayRegister) {
             return onQuickAction(ActionType.REGISTER, workqueue)
@@ -432,7 +436,7 @@ function useViewableActionConfigurations(
         label: isReviewingIncompleteDeclaration
           ? reviewLabel
           : actionLabels[ActionType.REGISTER],
-        icon: 'PencilLine' as const,
+        icon: getAction(ActionType.REGISTER)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) =>
           onQuickAction(ActionType.REGISTER, workqueue),
         ctaLabel: reviewLabel,
@@ -459,7 +463,8 @@ function useViewableActionConfigurations(
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
-        icon: 'Printer' as const,
+        icon:
+          getAction(ActionType.PRINT_CERTIFICATE)?.icon ?? ('Printer' as const),
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           return navigate(
@@ -480,7 +485,9 @@ function useViewableActionConfigurations(
       },
       [ActionType.REQUEST_CORRECTION]: {
         label: actionLabels[ActionType.REQUEST_CORRECTION],
-        icon: 'NotePencil' as const,
+        icon:
+          getAction(ActionType.REQUEST_CORRECTION)?.icon ??
+          ('NotePencil' as const),
         onClick: (workqueue?: string) => {
           const correctionPages = eventConfiguration.actions.find(
             (action) => action.type === ActionType.REQUEST_CORRECTION
@@ -586,8 +593,7 @@ function useCustomActionConfigs(
       )
       .map((action) => ({
         label: action.label,
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        icon: action.icon ?? 'PencilLine',
+        icon: action.icon ?? ('PencilLine' as const),
         onClick: async (workqueue?: string) =>
           onCustomAction(action, workqueue),
         disabled: !isDownloadedAndAssignedToUser,
