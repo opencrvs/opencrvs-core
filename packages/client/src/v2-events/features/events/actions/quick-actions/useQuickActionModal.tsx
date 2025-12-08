@@ -18,6 +18,7 @@ import {
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import {
   ActionType,
   CustomActionConfig,
@@ -134,15 +135,17 @@ function QuickActionModal({
       width={898}
       onClose={() => close({ result: false })}
     >
-      <FormFieldGenerator
-        fields={config.fields ?? []}
-        id={'quick-action-modal-form'}
-        validatorContext={validatorContext}
-        onChange={handleChange}
-      />
-      <Text color="grey500" element="p" variant="reg16">
-        {config.description ? intl.formatMessage(config.description) : null}
-      </Text>
+      <Stack alignItems="left" direction="column" gap={16}>
+        <Text color="grey500" element="p" variant="reg16">
+          {config.description ? intl.formatMessage(config.description) : null}
+        </Text>
+        <FormFieldGenerator
+          fields={config.fields ?? []}
+          id={'quick-action-modal-form'}
+          validatorContext={validatorContext}
+          onChange={handleChange}
+        />
+      </Stack>
     </Dialog>
   )
 }
