@@ -586,7 +586,8 @@ function useCustomActionConfigs(
       )
       .map((action) => ({
         label: action.label,
-        icon: 'PencilLine' as const,
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        icon: action.icon ?? 'PencilLine',
         onClick: async (workqueue?: string) =>
           onCustomAction(action, workqueue),
         disabled: !isDownloadedAndAssignedToUser,
