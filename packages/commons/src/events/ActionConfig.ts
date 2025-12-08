@@ -42,7 +42,7 @@ export const ActionConfigBase = z.object({
   supportingCopy: TranslationConfig.optional().describe(
     'Text displayed on the confirmation'
   ),
-  icon: AvailableIcons.describe('Icon representing the action'),
+  icon: AvailableIcons.describe('Icon representing the action').optional(),
   conditionals: z
     .array(ActionConditional)
     .optional()
