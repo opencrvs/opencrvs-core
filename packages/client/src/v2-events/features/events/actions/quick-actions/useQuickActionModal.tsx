@@ -251,7 +251,8 @@ export function useCustomActionModal(event: EventIndex) {
           ...customActionConfigBase,
           label: actionConfig.label,
           description: actionConfig.supportingCopy,
-          fields: actionConfig.form
+          fields: actionConfig.form,
+          icon: actionConfig.icon
         }}
       />
     ))
