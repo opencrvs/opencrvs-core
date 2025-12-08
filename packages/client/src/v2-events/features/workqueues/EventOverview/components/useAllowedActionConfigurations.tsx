@@ -76,6 +76,9 @@ function getAvailableAssignmentActions(
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
   const eventStatus = event.status
 
+  console.log('scopes')
+  console.log(authentication.scope)
+
   const mayUnassignOthers = configurableEventScopeAllowed(
     authentication.scope,
     ['record.unassign-others'],
@@ -125,6 +128,11 @@ export const actionLabels = {
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'event.birth.action.declare.label'
+  },
+  [ActionType.EDIT]: {
+    defaultMessage: 'Edit',
+    description: 'Edit action label',
+    id: 'actions.edit'
   },
   [ActionType.REJECT]: {
     defaultMessage: 'Reject',
@@ -389,6 +397,17 @@ function useViewableActionConfigurations(
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
         hidden: shouldHideDeclareAction
+      },
+      [ActionType.EDIT]: {
+        icon: 'PencilLine' as const,
+        label: actionLabels[ActionType.EDIT],
+        onClick: (workqueue) => {
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId }, { workqueue })
+          )
+        },
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REJECT]: {
         label: actionLabels[ActionType.REJECT],

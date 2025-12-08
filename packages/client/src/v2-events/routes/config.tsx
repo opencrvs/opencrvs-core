@@ -164,6 +164,29 @@ export const routesConfig = {
         }
       ]
     },
+    {
+      path: ROUTES.V2.EVENTS.EDIT.path,
+      element: (
+        <DeclarationAction actionType={ActionType.EDIT}>
+          <Outlet />
+        </DeclarationAction>
+      ),
+      children: [
+        {
+          index: true,
+          // TODO CIHAN:
+          element: <Declare.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EDIT.PAGES.path,
+          element: <Declare.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
+          element: <Declare.Review />
+        }
+      ]
+    },
     correctionRequestRouter,
     correctionReviewRouter,
     {
