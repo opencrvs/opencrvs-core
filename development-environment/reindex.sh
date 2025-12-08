@@ -18,12 +18,31 @@ get_reindexing_token() {
 }
 
 trigger_reindex() {
-  local token
+  local token raw status body
   token=$(get_reindexing_token)
-  curl -s -f -X POST \
+
+  raw=$(curl -X POST \
     -H "Authorization: Bearer ${token}" \
     -H "Content-Type: application/json" \
-    "${EVENTS_URL%/}/events/reindex"
+    -w "\n%{http_code}" \
+    "${EVENTS_URL%/}/events/reindex" 2>&1)
+
+  status=$(echo "$raw" | tail -n1)
+  body=$(echo "$raw" | sed '$d')
+
+  if [[ "$status" == "000" ]]; then
+    echo "curl failed (connection or TLS error)"
+    echo "$body"
+    return 1
+  fi
+
+  if (( status >= 200 && status < 300 )); then
+    return 0
+  fi
+
+  echo "curl failed with status $status"
+  echo "$body"
+  return 1
 }
 
 reindexing_attempts=0

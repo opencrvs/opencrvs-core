@@ -20,7 +20,8 @@ import {
   generateEventDraftDocument,
   generateWorkqueues,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -70,17 +71,6 @@ const modifiedDraft = generateEventDraftDocument({
 })
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
-  loaders: [
-    async () => {
-      window.localStorage.setItem(
-        'opencrvs',
-        generator.user.token.localRegistrar
-      )
-      //  Intermittent failures starts to happen when global state gets out of whack.
-      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    }
-  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -91,6 +81,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
     )
   },
   parameters: {
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
