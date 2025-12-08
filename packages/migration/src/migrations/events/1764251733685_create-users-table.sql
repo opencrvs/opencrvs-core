@@ -25,19 +25,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON users TO ${EVENTS_DB_USER};
 
 COMMENT ON COLUMN users.legacy_id IS 'References the user id from the legacy database.';
 
-CREATE TABLE user_credentials(
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  username text UNIQUE NOT NULL,
-  password_hash text NOT NULL,
-  salt text NOT NULL,
-  security_questions jsonb DEFAULT '{}' ::jsonb NOT NULL
-);
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON user_credentials TO ${EVENTS_DB_USER};
-
 -- Down Migration
-DROP TABLE user_credentials;
-
 DROP TABLE users;
 
