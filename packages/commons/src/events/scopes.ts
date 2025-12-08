@@ -35,6 +35,7 @@ export const ACTION_SCOPE_MAP = {
     'record.declared.validate',
     'record.register'
   ],
+  [ActionType.EDIT]: ['record.declared.edit'],
   [ActionType.DELETE]: ['record.declare'],
   [ActionType.VALIDATE]: ['record.declared.validate', 'record.register'],
   [ActionType.REGISTER]: ['record.register'],
