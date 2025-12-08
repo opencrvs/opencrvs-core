@@ -21,6 +21,10 @@ export default interface UserCredentialsTable {
     Record<string, any> | undefined,
     Record<string, any>
   >
+
+  createdAt: ColumnType<string, string | undefined, string>
+
+  updatedAt: ColumnType<string, string | undefined, string>
 }
 
 export type UserCredentials = Selectable<UserCredentialsTable>

@@ -27,20 +27,6 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
--- Name: mongo_fdw; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS mongo_fdw WITH SCHEMA app;
-
-
---
--- Name: EXTENSION mongo_fdw; Type: COMMENT; Schema: -; Owner:
---
-
-COMMENT ON EXTENSION mongo_fdw IS 'foreign data wrapper for MongoDB access';
-
-
---
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
 --
 
@@ -67,19 +53,6 @@ CREATE TYPE app.location_type AS ENUM (
 ALTER TYPE app.location_type OWNER TO events_migrator;
 
 --
--- Name: status_type; Type: TYPE; Schema: app; Owner: events_migrator
---
-
-CREATE TYPE app.status_type AS ENUM (
-    'pending',
-    'active',
-    'deactivated'
-);
-
-
-ALTER TYPE app.status_type OWNER TO events_migrator;
-
---
 -- Name: user_type; Type: TYPE; Schema: app; Owner: events_migrator
 --
 
@@ -90,25 +63,6 @@ CREATE TYPE app.user_type AS ENUM (
 
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
-
---
--- Name: mongo; Type: SERVER; Schema: -; Owner: postgres
---
-
-CREATE SERVER mongo FOREIGN DATA WRAPPER mongo_fdw OPTIONS (
-    address 'mongo1',
-    port '27017'
-);
-
-
-ALTER SERVER mongo OWNER TO postgres;
-
---
--- Name: USER MAPPING events_migrator SERVER mongo; Type: USER MAPPING; Schema: -; Owner: postgres
---
-
-CREATE USER MAPPING FOR events_migrator SERVER mongo;
-
 
 SET default_tablespace = '';
 
@@ -228,53 +182,6 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 
 --
--- Name: legacy_practitioners; Type: FOREIGN TABLE; Schema: app; Owner: events_migrator
---
-
-CREATE FOREIGN TABLE app.legacy_practitioners (
-    _id name,
-    id text,
-    extension json
-)
-SERVER mongo
-OPTIONS (
-    collection 'Practitioner',
-    database 'hearth-dev'
-);
-
-
-ALTER FOREIGN TABLE app.legacy_practitioners OWNER TO events_migrator;
-
---
--- Name: legacy_users; Type: FOREIGN TABLE; Schema: app; Owner: events_migrator
---
-
-CREATE FOREIGN TABLE app.legacy_users (
-    _id name,
-    name json,
-    username text,
-    "emailForNotification" text,
-    mobile text,
-    "fullHonorificName" text,
-    "passwordHash" text,
-    salt text,
-    role text,
-    "primaryOfficeId" text,
-    "practitionerId" text,
-    status text,
-    "securityQuestionAnswers" json,
-    "avatar.data" text
-)
-SERVER mongo
-OPTIONS (
-    collection 'users',
-    database 'user-mgnt'
-);
-
-
-ALTER FOREIGN TABLE app.legacy_users OWNER TO events_migrator;
-
---
 -- Name: locations; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -329,21 +236,6 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
 
 --
--- Name: pgmigrations_superuser_id_seq; Type: SEQUENCE; Schema: app; Owner: postgres
---
-
-CREATE SEQUENCE app.pgmigrations_superuser_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE app.pgmigrations_superuser_id_seq OWNER TO postgres;
-
---
 -- Name: user_credentials; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -353,7 +245,9 @@ CREATE TABLE app.user_credentials (
     username text NOT NULL,
     password_hash text NOT NULL,
     salt text NOT NULL,
-    security_questions jsonb DEFAULT '{}'::jsonb NOT NULL
+    security_questions jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -370,12 +264,14 @@ CREATE TABLE app.users (
     surname text,
     full_honorific_name text,
     role text NOT NULL,
-    status app.status_type NOT NULL,
+    status text NOT NULL,
     email text,
     mobile text,
     signature_path text,
     profile_image_path text,
     office_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
 );
 
@@ -652,13 +548,6 @@ ALTER TABLE ONLY app.users
 --
 
 GRANT USAGE ON SCHEMA app TO events_app;
-
-
---
--- Name: FOREIGN SERVER mongo; Type: ACL; Schema: -; Owner: postgres
---
-
-GRANT ALL ON FOREIGN SERVER mongo TO events_migrator;
 
 
 --
