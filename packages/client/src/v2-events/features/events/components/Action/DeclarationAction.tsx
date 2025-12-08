@@ -16,7 +16,6 @@ import {
   Draft,
   createEmptyDraft,
   findActiveDraftForEvent,
-  dangerouslyGetCurrentEventStateWithDrafts,
   getActionAnnotation,
   ActionType,
   deepMerge,
@@ -26,7 +25,8 @@ import {
   EventDocument,
   EventConfig,
   getAvailableActionsForEvent,
-  getCurrentEventState
+  getCurrentEventState,
+  applyDraftToEventIndex
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -190,14 +190,10 @@ function DeclarationActionComponent({
     ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
     : localDraftWithAdjustedTimestamp
 
-  const eventStateWithDrafts = useMemo(
-    () =>
-      dangerouslyGetCurrentEventStateWithDrafts({
-        event,
-        draft: mergedDraft,
-        configuration
-      }),
-    [mergedDraft, event, configuration]
+  const eventStateWithDraftApplied = applyDraftToEventIndex(
+    getCurrentEventState(event, configuration),
+    mergedDraft,
+    configuration
   )
 
   const actionAnnotation = useMemo(() => {
@@ -249,7 +245,7 @@ function DeclarationActionComponent({
     // Then use form values from drafts.
     const initialFormValues = deepMerge(
       currentDeclaration || {},
-      eventStateWithDrafts.declaration
+      eventStateWithDraftApplied.declaration
     )
 
     setFormValues(initialFormValues)

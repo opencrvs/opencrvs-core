@@ -22,7 +22,6 @@ import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { Provider, useSelector } from 'react-redux'
-import { clear } from 'idb-keyval'
 import {
   createMemoryRouter,
   Outlet,
@@ -55,6 +54,7 @@ import {
 } from '@client/v2-events/features/events/fixtures'
 import { EventConfig } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { storage } from '@client/storage'
 
 WebFont.load({
   google: {
@@ -167,15 +167,6 @@ export const parameters = {
 
 const generator = testDataGenerator()
 
-/*
- * Clear all indexedDB databases before each story
- */
-export async function clearStorage() {
-  clear()
-}
-
-clearStorage()
-
 const tennisClubMembershipEventWithCustomAction = {
   ...tennisClubMembershipEvent,
   actions: tennisClubMembershipEvent.actions.concat([
@@ -229,7 +220,7 @@ const preview: Preview = {
       }
     },
     async (options) => {
-      await clearStorage()
+      await storage.clearStorage()
       queryClient.clear()
       const primaryOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 

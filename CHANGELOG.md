@@ -18,7 +18,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Remove legacy mongo migration status outputs and skip typecheck which reduced the migration service startup time by 66%.
 - The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
 
-## 1.9.1
+## [1.9.1](https://github.com/opencrvs/opencrvs-core/compare/v1.9.0...v1.9.1)
 
 ### Breaking changes
 
@@ -46,6 +46,19 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
   - `RECORD_PRINT_CERTIFIED_COPIES`
   - `RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES`
   - `PROFILE_UPDATE`
+
+### New features
+
+- Add multi-field search with a single component [#10617](https://github.com/opencrvs/opencrvs-core/issues/10617)
+- **Search Field**: A new form field that allows searching previous records and using the data to pre-fill the current form. [#10131](https://github.com/opencrvs/opencrvs-core/issues/10131)
+- HTTP input now accepts `field('..')` references in the HTTP body definition.
+- **Searchable Select**: A new select component that allows searching through options. Useful for selects with a large number of options. Currently being used in address fields. [#10749](https://github.com/opencrvs/opencrvs-core/issues/10749)
+
+### Bug fixes
+- During user password reset, email address lookup is now case insensitive [#9869](https://github.com/opencrvs/opencrvs-core/issues/9869)
+- Users cannot activate or reactivate users with roles not specified in the `user.edit` scope [#9933](https://github.com/opencrvs/opencrvs-core/issues/9933)
+- Login page no longer show "Farajaland CRVS" before showing the correct title [#10958](https://github.com/opencrvs/opencrvs-core/issues/10958)
+- `ALPHA_PRINT_BUTTON` does not get disabled after first print [#10953](https://github.com/opencrvs/opencrvs-core/issues/10953)
 
 ## [1.9.0](https://github.com/opencrvs/opencrvs-core/compare/v1.8.1...v1.9.0)
 
@@ -325,7 +338,6 @@ To see Events V2 in action, check out the example configurations in the **countr
 - Add Import/Export system client and `record.export` scope to enable data migrations [#10415](https://github.com/opencrvs/opencrvs-core/issues/10415)
 - Add an Alpha version of configurable "Print" button that will be refactored in a later release - this button can be used to print certificates during declaration/correction flow. [#10039](https://github.com/opencrvs/opencrvs-core/issues/10039)
 - Add bulk import endpoint [#10590](https://github.com/opencrvs/opencrvs-core/pull/10590)
-- Add multi-field search with a single component [#10617](https://github.com/opencrvs/opencrvs-core/issues/10617)
 
 ### Improvements
 
