@@ -1250,9 +1250,9 @@ test('Returns relevant events in right order', async () => {
     }
   })
 
-  expect(declaredEvents).toHaveLength(1)
+  expect(declaredEvents).toHaveLength(3)
   expect(
-    sanitizeForSnapshot(declaredEvents[0], UNSTABLE_EVENT_FIELDS)
+    sanitizeForSnapshot(declaredEvents, UNSTABLE_EVENT_FIELDS)
   ).toMatchSnapshot()
 
   const { results: registeredEventsPendingCertification } =

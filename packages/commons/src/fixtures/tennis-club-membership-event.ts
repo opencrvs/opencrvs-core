@@ -21,7 +21,8 @@ import {
   TENNIS_CLUB_DECLARATION_FORM,
   TENNIS_CLUB_DECLARATION_REVIEW
 } from './forms'
-import { Clause, EventConfig } from '../events'
+import { Clause, EventConfig, ConditionalType } from '../events'
+import { flag, not } from '../conditionals'
 import { and, field as dedupField } from '../events/deduplication'
 
 export const tennisClubMembershipEvent = defineConfig({
@@ -57,6 +58,17 @@ export const tennisClubMembershipEvent = defineConfig({
       }
     ]
   },
+  flags: [
+    {
+      id: 'validated',
+      label: {
+        id: 'event.tennis-club-membership.flag.validated',
+        defaultMessage: 'Validated',
+        description: 'Flag label for validated'
+      },
+      requiresAction: true
+    }
+  ],
   actions: [
     {
       type: ActionType.READ,
@@ -84,7 +96,21 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.validate.label'
-      }
+      },
+      flags: [{ id: 'validated', operation: 'add' }],
+      conditionals: [
+        { type: ConditionalType.SHOW, conditional: not(flag('validated')) }
+      ]
+    },
+    {
+      type: ActionType.REJECT,
+      label: {
+        defaultMessage: 'Reject',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from',
+        id: 'event.tennis-club-membership.action.reject.label'
+      },
+      flags: [{ id: 'validated', operation: 'remove' }]
     },
     {
       type: ActionType.REGISTER,
