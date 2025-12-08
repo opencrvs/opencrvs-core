@@ -7,7 +7,7 @@ SELECT
   lu.name -> 0 ->> 'family' AS surname,
   lu."fullHonorificName" AS full_honorific_name,
   lu.role AS role,
-  lu.status::status_type AS status,
+  lu.status AS status,
   LOWER(lu."emailForNotification") AS email,
   lu.mobile AS mobile,
 (
