@@ -94,6 +94,9 @@ run_pg_migrations() {
   restore_backups
 }
 
+# needed for both legacy users and events migrations
+export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
+
 # migrate legacy users
 if [ $MIGRATE_LEGACRY_USERS = true ]; then
   export EVENTS_MIGRATION_USER="${EVENTS_MIGRATION_USER:-events_migrator}"
@@ -117,8 +120,6 @@ if [ $MIGRATE_LEGACRY_USERS = true ]; then
 fi
 
 # Run events migrations
-export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
-
 run_pg_migrations \
   "$SCRIPT_PATH/src/migrations/events" \
   "$EVENTS_POSTGRES_URL" \
