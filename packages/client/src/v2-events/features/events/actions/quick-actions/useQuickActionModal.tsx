@@ -26,6 +26,7 @@ import {
   EventIndex,
   FieldConfig,
   FieldUpdateValue,
+  getActionConfig,
   runFieldValidations
 } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
@@ -169,13 +170,6 @@ function QuickActionModal({
   )
 }
 
-function getActionConfig(
-  actionType: keyof typeof quickActions,
-  eventConfiguration: EventConfig
-) {
-  return eventConfiguration.actions.find((a) => a.type === actionType)
-}
-
 export function useQuickActionModal(event: EventIndex) {
   const [quickActionModal, openModal] = useModal()
   const navigate = useNavigate()
@@ -189,7 +183,7 @@ export function useQuickActionModal(event: EventIndex) {
   ) => {
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
-    const actionConfig = getActionConfig(actionType, eventConfiguration)
+    const actionConfig = getActionConfig({ actionType, eventConfiguration })
     const { result } = await openModal<ModalResult>((close) => (
       <QuickActionModal
         close={close}
