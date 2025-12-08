@@ -656,7 +656,6 @@ components:
                   - CREATED
                   - NOTIFIED
                   - DECLARED
-                  - VALIDATED
                   - REGISTERED
                   - ARCHIVED
               updatedAt:
@@ -736,7 +735,6 @@ components:
               - CREATED
               - NOTIFIED
               - DECLARED
-              - VALIDATED
               - REGISTERED
               - ARCHIVED
       required:
@@ -754,7 +752,6 @@ components:
             - CREATED
             - NOTIFIED
             - DECLARED
-            - VALIDATED
             - REGISTERED
             - ARCHIVED
       required:
@@ -3467,6 +3464,7 @@ components:
       oneOf:
         - $ref: "#/components/schemas/ReadActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
+        - $ref: "#/components/schemas/RejectActionConfig"
         - $ref: "#/components/schemas/ValidateActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
         - $ref: "#/components/schemas/PrintCertificateActionConfig"
@@ -3478,6 +3476,7 @@ components:
         mapping:
           READ: "#/components/schemas/ReadActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
+          REJECT: "#/components/schemas/RejectActionConfig"
           VALIDATE: "#/components/schemas/ValidateActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateActionConfig"
@@ -10385,7 +10384,6 @@ components:
                             - CREATED
                             - NOTIFIED
                             - DECLARED
-                            - VALIDATED
                             - REGISTERED
                             - ARCHIVED
                         updatedAt:
@@ -10899,6 +10897,83 @@ components:
             - type
           additionalProperties: false
       type: object
+    RejectActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          description: Flag actions which are executed when the action is performed.
+          default: []
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                description: Custom flag identifier defined by the country config.
+                type: string
+              operation:
+                description: Operation to perform on the flag.
+                type: string
+                enum:
+                  - add
+                  - remove
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+            additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
+        supportingCopy:
+          description: Text displayed on the confirmation
+          $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
+        type:
+          type: string
+          const: REJECT
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
     ValidateActionConfig:
       type: object
       properties:
@@ -11768,7 +11843,6 @@ components:
             - CREATED
             - NOTIFIED
             - DECLARED
-            - VALIDATED
             - REGISTERED
             - ARCHIVED
         legalStatuses:
@@ -12451,7 +12525,6 @@ components:
                   - CREATED
                   - NOTIFIED
                   - DECLARED
-                  - VALIDATED
                   - REGISTERED
                   - ARCHIVED
               updatedAt:
@@ -12533,7 +12606,6 @@ components:
               - CREATED
               - NOTIFIED
               - DECLARED
-              - VALIDATED
               - REGISTERED
               - ARCHIVED
       required:
@@ -12552,7 +12624,6 @@ components:
             - CREATED
             - NOTIFIED
             - DECLARED
-            - VALIDATED
             - REGISTERED
             - ARCHIVED
       required:
