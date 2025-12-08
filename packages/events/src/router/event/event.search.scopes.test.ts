@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as _ from 'lodash'
+import _ from 'lodash'
+import fc from 'fast-check'
 import {
   AddressType,
   JurisdictionFilter,
@@ -17,69 +18,16 @@ import {
   LocationType,
   TENNIS_CLUB_MEMBERSHIP,
   TestUserRole,
+  UUID,
   UserFilter,
   createPrng,
   encodeScope,
   generateUuid,
-  joinValues,
+  getOrThrow,
   pickRandom
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { payloadGenerator } from '../../tests/generators'
-
-test.only('User without any search scopes should not see any events', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
-    'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
-    'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
-    'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
-    encodeScope({
-      type: 'record.search',
-      options: {
-        event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'administrativeArea'
-      }
-    })
-  ])
-
-  const event = await client.event.create(generator.event.create())
-  const data = generator.event.actions.declare(event.id, {
-    declaration: {
-      'applicant.dob': '2000-11-11',
-      'applicant.name': {
-        firstname: 'Unique',
-        surname: 'Doe'
-      },
-      'recommender.none': true,
-      'applicant.address': {
-        country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
-        streetLevelDetails: {
-          state: 'state',
-          district2: 'district2'
-        }
-      }
-    }
-  })
-
-  await client.event.actions.declare.request(data)
-
-  await client.event.search({
-    query: {
-      type: 'and',
-      clauses: [
-        {
-          eventType: TENNIS_CLUB_MEMBERSHIP,
-          data: {
-            'applicant.name': { type: 'fuzzy', term: 'Unique' }
-          }
-        }
-      ]
-    }
-  })
-})
+import { payloadGenerator } from '@events/tests/generators'
 
 function generateOfficeLocations(
   adminAreas: Location[],
@@ -230,82 +178,122 @@ test.only('Single scope, multi-filter combinations', async () => {
     await testClient.event.actions.declare.request(data)
   }
 
-  // 5. We generate combinations of users and jurisdiction filters to test search results.
-  const cartesian = (...a: unknown[][]) =>
-    a.reduce((b, c) =>
-      b.flatMap((d: unknown) => c.map((e: unknown) => [d, e].flat()))
-    )
-
-  const combinations = cartesian(
-    users, // user
-    JurisdictionFilter.options, // declaredIn,
-    [UserFilter.enum.user, undefined] // declaredBy
+  const jurisdictionOptions = fc.option(
+    fc.constantFrom(...JurisdictionFilter.options),
+    { nil: undefined }
   )
 
-  const combinationResults = []
-  // 6. Each user searches with each combination and we snapshot the results.
-  for (const [user, declaredIn, declaredBy] of combinations) {
-    const searchScope = encodeScope({
-      type: 'record.search',
-      options: {
-        event: [TENNIS_CLUB_MEMBERSHIP],
-        declaredIn,
-        declaredBy
-      }
-    })
+  const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
+    nil: undefined
+  })
 
-    const testClient = createTestClient(user, [searchScope])
+  const testUsers = fc.constantFrom(...users)
 
-    const searchResult = await testClient.event.search({
-      query: {
-        type: 'and',
-        clauses: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            data: {
-              'applicant.name': { type: 'fuzzy', term: 'Unique' }
-            }
+  const scopeCombinations = fc.record({
+    user: testUsers,
+    declaredIn: jurisdictionOptions,
+    declaredBy: userOptions
+  })
+
+  await fc.assert(
+    fc.asyncProperty(
+      scopeCombinations,
+      async ({ user, declaredIn, declaredBy }) => {
+        const searchScope = encodeScope({
+          type: 'record.search',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP],
+            declaredIn,
+            declaredBy
           }
-        ]
-      }
-    })
+        })
 
-    // 7. We want to see 1) jurisdiction scope limits search results. 2) combining jurisdiction filter and user is treated as AND.
-    const cleanedResults = searchResult.results.map((r) => ({
-      type: r.type,
-      legalStatuses: {
-        DECLARED: {
-          createdAtLocation: r.legalStatuses.DECLARED?.createdAtLocation,
-          readableLocation: offices.find(
-            (o) => o.id === r.legalStatuses.DECLARED?.createdAtLocation
-          )?.name,
-          createdBy: r.legalStatuses.DECLARED?.createdBy
+        const testClient = createTestClient(user, [searchScope])
+
+        const { results } = await testClient.event.search({
+          query: {
+            type: 'and',
+            clauses: [
+              {
+                eventType: TENNIS_CLUB_MEMBERSHIP,
+                data: {
+                  'applicant.name': { type: 'fuzzy', term: 'Unique' }
+                }
+              }
+            ]
+          }
+        })
+
+        const officeById = new Map(offices.map((o) => [o.id, o]))
+
+        const adminById = new Map(administrativeAreas.map((a) => [a.id, a]))
+
+        function isUnderAdministrativeArea(
+          officeId: UUID,
+          adminAreaId: UUID | null
+        ): boolean {
+          const current = officeById.get(officeId)
+          if (!current) {
+            return false
+          }
+
+          let parentId = current.parentId
+
+          while (parentId) {
+            if (parentId === adminAreaId) {
+              return true
+            }
+
+            const parent = adminById.get(parentId)
+            parentId = parent?.parentId ?? null
+          }
+
+          return false
+        }
+
+        // 1. User should only see their own declarations when declaredBy=user filter is set.
+        if (declaredBy === UserFilter.enum.user) {
+          for (const r of results) {
+            expect(r.legalStatuses.DECLARED?.createdBy).toBe(user.id)
+          }
+        }
+
+        // 2. user should only see declarations from their exact location.
+        if (declaredIn === JurisdictionFilter.enum.location) {
+          for (const r of results) {
+            expect(r.legalStatuses.DECLARED?.createdAtLocation).toBe(
+              user.primaryOfficeId
+            )
+          }
+        }
+
+        // 3. user should see declarations from offices under the same administrative area.
+        if (declaredIn === JurisdictionFilter.enum.administrativeArea) {
+          for (const r of results) {
+            expect(r.legalStatuses.DECLARED?.createdAtLocation).toBe(
+              user.primaryOfficeId
+            )
+
+            const officeId = getOrThrow(
+              r.legalStatuses.DECLARED?.createdAtLocation,
+              'createdAtLocation is undefined'
+            )
+
+            const shouldBeVisible = isUnderAdministrativeArea(
+              officeId,
+              user.administrativeAreaId
+            )
+
+            expect(shouldBeVisible).toBe(true)
+          }
         }
       }
-    }))
-
-    const snapshot = {
-      scope: searchScope,
-      total: cleanedResults.length,
-      user: {
-        id: user.id,
-        primaryOfficeId: user.primaryOfficeId,
-        administrativeAreaId: user.administrativeAreaId,
-        locations: `${offices.find((o) => o.id === user.primaryOfficeId)?.name}, ${
-          administrativeAreas.find((aa) => aa.id === user.administrativeAreaId)
-            ?.name
-        }`
-      },
-      results: cleanedResults
+    ),
+    {
+      numRuns: 200,
+      verbose: true
     }
-
-    combinationResults.push(snapshot)
-  }
-
-  // Group by scope for easier snapshot reading
-  const resultsByScope = _.groupBy(combinationResults, (r) => r.scope)
-
-  expect(resultsByScope).toMatchSnapshot()
+  )
 })
 
 test('multi-scope combinations', async () => {
@@ -442,9 +430,14 @@ test('multi-scope combinations', async () => {
     users, // user
     JurisdictionFilter.options, // declaredIn,
     [UserFilter.enum.user, undefined] // declaredBy
-  )
+  ) as [
+    (typeof users)[number],
+    (typeof JurisdictionFilter.options)[number],
+    typeof UserFilter.enum.user | undefined
+  ][]
 
   const combinationResults = []
+
   // 6. Each user searches with each combination and we snapshot the results.
   for (const [user, declaredIn, declaredBy] of combinations) {
     const declaredInScope = encodeScope({

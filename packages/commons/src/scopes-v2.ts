@@ -77,7 +77,9 @@ export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
  */
 export const AnyScope = z.object({
   type: z.string(),
-  options: z.record(z.string(), z.string().or(z.array(z.string()))).optional()
+  options: z
+    .record(z.string(), z.string().or(z.array(z.string()).or(z.undefined())))
+    .optional()
 })
 export type AnyScope = z.infer<typeof AnyScope>
 
