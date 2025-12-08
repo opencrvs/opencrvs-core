@@ -192,12 +192,13 @@ export function getEventIndexWithoutLocationHierarchy(
  *
  * @param eventConfig Event configuration containing field definitions
  * @param event Event index with leaf-level location UUIDs
+ * @param locationHierarchyCache Optional in-memory cache for location hierarchies, to avoid redundant lookups
  * @returns Event index with full location hierarchies (arrays of UUIDs from top to leaf)
  */
-const locationHierarchyCache = new Map<string, string[]>()
 export async function getEventIndexWithLocationHierarchy(
   eventConfig: EventConfig,
-  event: EventIndex
+  event: EventIndex,
+  locationHierarchyCache?: Map<string, string[]>
 ) {
   const buildFullLocationHierarchy = async (
     locationId: UUID
@@ -205,12 +206,14 @@ export async function getEventIndexWithLocationHierarchy(
     if (!locationId) {
       return []
     }
-    if (locationHierarchyCache.has(locationId)) {
+    if (locationHierarchyCache && locationHierarchyCache.has(locationId)) {
       return locationHierarchyCache.get(locationId) || [locationId]
     }
     const hierarchyRows = await getLocationHierarchyRaw(locationId)
-    locationHierarchyCache.set(locationId, hierarchyRows)
-    return locationHierarchyCache.get(locationId) || [locationId]
+    if (locationHierarchyCache) {
+      locationHierarchyCache.set(locationId, hierarchyRows)
+    }
+    return hierarchyRows
   }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const tempEvent = { ...event, declaration: { ...event.declaration } } as any

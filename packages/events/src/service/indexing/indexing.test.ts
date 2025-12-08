@@ -17,15 +17,17 @@ import {
   AddressType,
   createPrng,
   EventConfig,
+  EventState,
   field,
   FieldConditional,
   FieldType,
   generateActionDeclarationInput,
+  generateUuid,
   LocationType,
   QueryType,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  TestUserRole
 } from '@opencrvs/commons/events'
-import { getUUID } from '@opencrvs/commons'
 import {
   createTestClient,
   setupTestCase,
@@ -849,7 +851,9 @@ test('builds Address field query', async () => {
 
 test('placeOfEvent resolves from conditional address fields and returns leaf-level locations in search results', async () => {
   // Setup: Generate location IDs upfront
-  const parentLocationId = getUUID()
+  const prng = createPrng(942)
+  const childOfficeId = generateUuid(prng)
+  const parentLocationId = generateUuid(prng)
 
   // Setup: Configure event with conditional address fields
   const createAddressField = (
@@ -893,11 +897,10 @@ test('placeOfEvent resolves from conditional address fields and returns leaf-lev
         if (i !== 0) {
           return page
         }
-
         return {
           ...page,
           fields: [
-            ...page.fields,
+            ...page.fields.filter((x) => x.type !== FieldType.ADDRESS),
             {
               id: 'addressType',
               type: FieldType.TEXT,
@@ -906,37 +909,41 @@ test('placeOfEvent resolves from conditional address fields and returns leaf-lev
                 defaultMessage: 'Address Type',
                 description: ''
               },
-              defaultValue: 'homeAddress'
+              defaultValue: 'home.address'
             },
-            createAddressField('homeAddress', [
+            createAddressField('home.address', [
               {
                 type: 'SHOW',
-                conditional: field('addressType').isEqualTo('homeAddress')
+                conditional: field('addressType').isEqualTo('home.address')
               }
             ]),
-            createAddressField('officeAddress', [
+            createAddressField('office.address', [
               {
                 type: 'SHOW',
-                conditional: field('addressType').isEqualTo('officeAddress')
+                conditional: field('addressType').isEqualTo('office.address')
               }
             ])
           ]
         }
       })
     },
-    placeOfEvent: [field('homeAddress'), field('officeAddress')]
+    placeOfEvent: [field('home.address'), field('office.address')]
   }
-
-  const { user, generator, seed } = await setupTestCase(
-    100,
-    modifiedEventConfig
-  )
-
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
       return HttpResponse.json([modifiedEventConfig])
     })
   )
+
+  // Setup: seed, user, client, esClient
+  const { generator, seed } = await setupTestCase(942, modifiedEventConfig)
+
+  const user = seed.user({
+    role: TestUserRole.enum.LOCAL_REGISTRAR,
+    name: [{ use: 'en', family: 'Doe', given: ['John'] }],
+    primaryOfficeId: childOfficeId,
+    fullHonorificName: undefined
+  })
 
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
@@ -945,30 +952,29 @@ test('placeOfEvent resolves from conditional address fields and returns leaf-lev
   const esClient = getOrCreateClient()
 
   // Setup: Create location hierarchy (grandparent -> parent -> child office)
-  const locationRng = createPrng(842)
   const grandParentLocation = {
-    ...generator.locations.set(1, locationRng)[0],
+    ...generator.locations.set(1, prng)[0],
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     name: 'Grand Parent location'
   }
   const parentLocation = {
-    ...generator.locations.set(1, locationRng)[0],
+    ...generator.locations.set(1, prng)[0],
     id: parentLocationId,
     parentId: grandParentLocation.id,
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     name: 'Parent location'
   }
   const childOffice = {
-    ...generator.locations.set(1, locationRng)[0],
+    ...generator.locations.set(1, prng)[0],
     id: user.primaryOfficeId,
-    parentId: parentLocation.id,
+    parentId: parentLocationId,
     name: 'Child location',
     locationType: LocationType.enum.CRVS_OFFICE
   }
 
   await seed.locations([grandParentLocation, parentLocation, childOffice])
 
-  // Test Part 1: Declare event with homeAddress, verify ES contains full hierarchy
+  // Test Part 1: Declare event with home.address, verify ES contains full hierarchy
   const createdEvent = await client.event.create(
     generator.event.create({ type: TENNIS_CLUB_MEMBERSHIP })
   )
@@ -979,12 +985,12 @@ test('placeOfEvent resolves from conditional address fields and returns leaf-lev
       ActionType.DECLARE,
       createPrng(100)
     ),
-    addressType: 'homeAddress',
-    homeAddress: {
+    addressType: 'home.address',
+    'home.address': {
       country: 'FAR',
       streetLevelDetails: { town: 'Gazipur' },
       addressType: AddressType.DOMESTIC,
-      administrativeArea: parentLocation.id
+      administrativeArea: parentLocationId
     }
   }
 
@@ -1034,12 +1040,13 @@ test('placeOfEvent resolves from conditional address fields and returns leaf-lev
       }
     },
     declaration: {
-      applicant____address: {
-        administrativeArea: [
-          grandParentLocation.id,
-          parentLocation.id,
-          childOffice.id
-        ]
+      home____address: {
+        addressType: 'DOMESTIC',
+        country: 'FAR',
+        streetLevelDetails: {
+          town: 'Gazipur'
+        },
+        administrativeArea: [grandParentLocation.id, parentLocation.id]
       }
     }
   })
@@ -1057,18 +1064,22 @@ test('placeOfEvent resolves from conditional address fields and returns leaf-lev
     childOffice.id
   )
 
-  // Test Part 2: Register event with officeAddress, verify placeOfEvent updates correctly
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { homeAddress, ...declarationWithoutHomeAddress } =
+  // Test Part 2: Register event with office.address, verify placeOfEvent updates correctly
+  const declarationWithoutHomeAddress = Object.keys(
     declarationWithHomeAddress
+  ).reduce((obj, key) => {
+    if (key !== 'home.address') {
+      obj[key] = (declarationWithHomeAddress as EventState)[key]
+    }
+    return obj
+  }, {} as EventState)
 
   await client.event.actions.register.request(
     generator.event.actions.register(createdEvent.id, {
       declaration: {
         ...declarationWithoutHomeAddress,
-        addressType: 'officeAddress',
-        officeAddress: {
+        addressType: 'office.address',
+        'office.address': {
           country: 'FAR',
           streetLevelDetails: { town: 'Dhaka' },
           addressType: AddressType.DOMESTIC,
