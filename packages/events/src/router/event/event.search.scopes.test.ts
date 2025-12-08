@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import _ from 'lodash'
 import fc from 'fast-check'
 import {
   AddressType,
@@ -26,13 +25,10 @@ import {
   getOrThrow,
   pickRandom
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
+import { createTestClient } from '@events/tests/utils'
+import { payloadGenerator, seeder } from '@events/tests/generators'
 
-function generateOfficeLocations(
-  adminAreas: Location[],
-  rng: () => number
-): Location[] {
+function generateOfficeLocations(adminAreas: Location[], rng: () => number) {
   return adminAreas.flatMap((admin) => {
     const crvs = {
       name: `${admin.name} CRVS Office`,
@@ -54,15 +50,15 @@ function generateOfficeLocations(
   })
 }
 
-test.only('Single scope, multi-filter combinations', async () => {
-  const { seed } = await setupTestCase()
-
+/**
+ * Sets up a realistic hierarchy of administrative areas, offices, and users for testing scopes.
+ * Each location has two users assigned to it. Hiearchies include cases where some levels are skipped or do not exist.
+ *
+ */
+async function setupHierarchyWithUsers() {
   const rng = createPrng(1234)
-
-  const generator = payloadGenerator(rng)
-
-  // 1. Setup administrative areas. 3 branches, some with children, some "skipping" levels.
-
+  const seed = seeder()
+  // Generate Administrative areas with children, some "skipping" levels.
   const provinceA = {
     name: 'Province A',
     locationType: LocationType.enum.ADMIN_STRUCTURE,
@@ -119,30 +115,88 @@ test.only('Single scope, multi-filter combinations', async () => {
     villageA,
     villageB
   ]
+
   await seed.locations(administrativeAreas)
 
-  // 2. Setup offices/health facilities under each admin area.
+  //2. Setup offices/health facilities under each admin area.
   const offices = generateOfficeLocations(administrativeAreas, rng)
   await seed.locations(offices)
 
   expect(administrativeAreas.length).toBe(6)
   expect(offices.length).toBe(12) // 6 admin areas x 2 offices each
 
-  // 3. Create user each office.
-  const users = offices.map((office) =>
-    seed.user({
+  // 3. Create two users for each office to test 'user' scope limitations.
+  const users = offices.flatMap((office, i) => {
+    const base = {
       administrativeAreaId: administrativeAreas.find((aa) => {
         return aa.id === office.parentId
       })?.id,
       primaryOfficeId: office.id,
-      name: [{ use: 'en', given: ['Jonathan'], family: office.name }],
-      role: pickRandom(rng, TestUserRole.options),
-      id: generateUuid(rng),
       fullHonorificName: `${office.name} full honorific name`
-    })
+    }
+
+    return [
+      seed.user({
+        ...base,
+        name: [{ use: 'en', given: [`Mirella-${i}`], family: office.name }],
+        role: pickRandom(rng, TestUserRole.options),
+        id: generateUuid(rng)
+      }),
+      seed.user({
+        ...base,
+        name: [{ use: 'en', given: [`Jonathan-${i}`], family: office.name }],
+        role: pickRandom(rng, TestUserRole.options),
+        id: generateUuid(rng)
+      })
+    ]
+  })
+
+  const officeById = new Map(offices.map((o) => [o.id, o]))
+  const administrativeAreaById = new Map(
+    administrativeAreas.map((a) => [a.id, a])
   )
 
-  // 4. Each user creates and declares an event using duplicate data.
+  // Helper to check if an office is under a given administrative area. Used for testing propositions.
+  function isUnderAdministrativeArea(
+    officeId: UUID,
+    administrativeAreaId: UUID | null
+  ): boolean {
+    const current = officeById.get(officeId)
+    if (!current) {
+      return false
+    }
+
+    let parentId: UUID | null = current.parentId
+
+    while (parentId) {
+      if (parentId === administrativeAreaId) {
+        return true
+      }
+
+      const parent = administrativeAreaById.get(parentId)
+      parentId = parent?.parentId ?? null
+    }
+
+    return false
+  }
+
+  return {
+    users,
+    offices,
+    administrativeAreas,
+    isUnderAdministrativeArea
+  }
+}
+
+test.only('Single scope, multi-filter cominations', async () => {
+  const rng = createPrng(123453)
+  const generator = payloadGenerator(rng)
+
+  // 1. Create realistic hierarchy with users.
+  const { users, offices, administrativeAreas, isUnderAdministrativeArea } =
+    await setupHierarchyWithUsers()
+
+  // 2. Each user creates and declares an event using duplicate data.
   for (const user of users) {
     const testClient = createTestClient(user, [
       'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
@@ -178,6 +232,7 @@ test.only('Single scope, multi-filter combinations', async () => {
     await testClient.event.actions.declare.request(data)
   }
 
+  // 3. Setup possible combinations of jurisdiction and user filters.
   const jurisdictionOptions = fc.option(
     fc.constantFrom(...JurisdictionFilter.options),
     { nil: undefined }
@@ -195,6 +250,7 @@ test.only('Single scope, multi-filter combinations', async () => {
     declaredBy: userOptions
   })
 
+  // 4. Property based test to verify each combination works as expected.
   await fc.assert(
     fc.asyncProperty(
       scopeCombinations,
@@ -224,33 +280,6 @@ test.only('Single scope, multi-filter combinations', async () => {
           }
         })
 
-        const officeById = new Map(offices.map((o) => [o.id, o]))
-
-        const adminById = new Map(administrativeAreas.map((a) => [a.id, a]))
-
-        function isUnderAdministrativeArea(
-          officeId: UUID,
-          adminAreaId: UUID | null
-        ): boolean {
-          const current = officeById.get(officeId)
-          if (!current) {
-            return false
-          }
-
-          let parentId = current.parentId
-
-          while (parentId) {
-            if (parentId === adminAreaId) {
-              return true
-            }
-
-            const parent = adminById.get(parentId)
-            parentId = parent?.parentId ?? null
-          }
-
-          return false
-        }
-
         // 1. User should only see their own declarations when declaredBy=user filter is set.
         if (declaredBy === UserFilter.enum.user) {
           for (const r of results) {
@@ -258,34 +287,54 @@ test.only('Single scope, multi-filter combinations', async () => {
           }
         }
 
-        // 2. user should only see declarations from their exact location.
+        // 2. user should only see declarations from their exact location when declaredIn=location is set.
         if (declaredIn === JurisdictionFilter.enum.location) {
           for (const r of results) {
             expect(r.legalStatuses.DECLARED?.createdAtLocation).toBe(
               user.primaryOfficeId
             )
+
+            const otherUserInLocation = getOrThrow(
+              users.find(
+                (user2) =>
+                  user.primaryOfficeId === user2.primaryOfficeId &&
+                  user.id !== user2.id
+              ),
+              'No other user in the same location'
+            )
+
+            expect([otherUserInLocation.id, user.id]).toContain(
+              r.legalStatuses.DECLARED?.createdBy
+            )
           }
         }
 
-        // 3. user should see declarations from offices under the same administrative area.
+        // 3. user should see declarations from offices under the same administrative area when declaredIn=administrativeArea is set.
         if (declaredIn === JurisdictionFilter.enum.administrativeArea) {
           for (const r of results) {
-            expect(r.legalStatuses.DECLARED?.createdAtLocation).toBe(
-              user.primaryOfficeId
-            )
-
             const officeId = getOrThrow(
               r.legalStatuses.DECLARED?.createdAtLocation,
               'createdAtLocation is undefined'
             )
 
-            const shouldBeVisible = isUnderAdministrativeArea(
-              officeId,
-              user.administrativeAreaId
-            )
-
-            expect(shouldBeVisible).toBe(true)
+            expect(
+              isUnderAdministrativeArea(officeId, user.administrativeAreaId)
+            ).toBe(true)
           }
+
+          // 3.1 User without administrativeArea should see all results when declaredIn=administrativeArea is set.
+          if (user.administrativeAreaId === null) {
+            // Each user created one declaration.
+            expect(results.length).toBe(users.length)
+          }
+        }
+
+        // 4. User should see all declarations when declaredIn=all and no declaredBy filter is not set
+        if (
+          declaredIn === JurisdictionFilter.enum.all &&
+          declaredBy === undefined
+        ) {
+          expect(results.length).toBe(users.length)
         }
       }
     ),
@@ -297,94 +346,14 @@ test.only('Single scope, multi-filter combinations', async () => {
 })
 
 test('multi-scope combinations', async () => {
-  const { seed } = await setupTestCase()
-
   const rng = createPrng(1234)
 
   const generator = payloadGenerator(rng)
+  // 1. Create realistic hierarchy with users.
+  const { users, offices, administrativeAreas, isUnderAdministrativeArea } =
+    await setupHierarchyWithUsers()
 
-  // 1. Setup administrative areas. 3 branches, some with children, some "skipping" levels.
-
-  const provinceA = {
-    name: 'Province A',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const provinceB = {
-    name: 'Province B',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const districtC = {
-    name: 'District C',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const districtA = {
-    name: 'District A',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: provinceA.id,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const villageA = {
-    name: 'Village A',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: districtA.id,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const villageB = {
-    name: 'Village B',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: provinceB.id,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const administrativeAreas = [
-    provinceA,
-    provinceB,
-    districtC,
-    districtA,
-    villageA,
-    villageB
-  ]
-  await seed.locations(administrativeAreas)
-
-  // 2. Setup offices/health facilities under each admin area.
-  const offices = generateOfficeLocations(administrativeAreas, rng)
-  await seed.locations(offices)
-
-  expect(administrativeAreas.length).toBe(6)
-  expect(offices.length).toBe(12) // 6 admin areas x 2 offices each
-
-  // 3. Create user each office.
-  const users = offices.map((office) =>
-    seed.user({
-      administrativeAreaId: administrativeAreas.find((aa) => {
-        return aa.id === office.parentId
-      })?.id,
-      primaryOfficeId: office.id,
-      name: [{ use: 'en', given: ['Jonathan'], family: office.name }],
-      role: pickRandom(rng, TestUserRole.options),
-      id: generateUuid(rng),
-      fullHonorificName: `${office.name} full honorific name`
-    })
-  )
-
-  // 4. Each user creates and declares an event using duplicate data.
+  // 2. Each user creates and declares an event using duplicate data.
   for (const user of users) {
     const testClient = createTestClient(user, [
       'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
@@ -420,94 +389,100 @@ test('multi-scope combinations', async () => {
     await testClient.event.actions.declare.request(data)
   }
 
-  // 5. We generate combinations of users and jurisdiction filters to test search results.
-  const cartesian = (...a: unknown[][]) =>
-    a.reduce((b, c) =>
-      b.flatMap((d: unknown) => c.map((e: unknown) => [d, e].flat()))
-    )
+  // 3. Setup possible combinations of jurisdiction and user filters.
+  const jurisdictionOptions = fc.option(
+    fc.constantFrom(...JurisdictionFilter.options),
+    { nil: undefined }
+  )
 
-  const combinations = cartesian(
-    users, // user
-    JurisdictionFilter.options, // declaredIn,
-    [UserFilter.enum.user, undefined] // declaredBy
-  ) as [
-    (typeof users)[number],
-    (typeof JurisdictionFilter.options)[number],
-    typeof UserFilter.enum.user | undefined
-  ][]
+  const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
+    nil: undefined
+  })
 
-  const combinationResults = []
+  const testUsers = fc.constantFrom(...users)
 
-  // 6. Each user searches with each combination and we snapshot the results.
-  for (const [user, declaredIn, declaredBy] of combinations) {
-    const declaredInScope = encodeScope({
-      type: 'record.search',
-      options: {
-        event: [TENNIS_CLUB_MEMBERSHIP],
-        declaredIn
-      }
-    })
+  const scopeCombinations = fc.record({
+    user: testUsers,
+    declaredIn1: jurisdictionOptions,
+    declaredBy1: userOptions,
+    declaredIn2: jurisdictionOptions,
+    declaredBy2: userOptions
+  })
 
-    const declaredByScope = encodeScope({
-      type: 'record.search',
-      options: {
-        event: [TENNIS_CLUB_MEMBERSHIP],
-        declaredBy
-      }
-    })
-
-    const scopes = [declaredInScope, declaredByScope]
-
-    const testClient = createTestClient(user, scopes)
-
-    const searchResult = await testClient.event.search({
-      query: {
-        type: 'and',
-        clauses: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            data: {
-              'applicant.name': { type: 'fuzzy', term: 'Unique' }
-            }
+  // 4. Property based test to verify each combination works as expected.
+  await fc.assert(
+    fc.asyncProperty(
+      scopeCombinations,
+      async ({ user, declaredIn1, declaredBy1, declaredIn2, declaredBy2 }) => {
+        const scope1 = {
+          type: 'record.search',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP],
+            declaredIn: declaredIn1,
+            declaredBy: declaredBy1
           }
-        ]
-      }
-    })
+        }
 
-    // 7. We want to see 1) jurisdiction scope limits search results. 2) combining jurisdiction filter and user is treated as AND.
-    const cleanedResults = searchResult.results.map((r) => ({
-      type: r.type,
-      legalStatuses: {
-        DECLARED: {
-          createdAtLocation: r.legalStatuses.DECLARED?.createdAtLocation,
-          readableLocation: offices.find(
-            (o) => o.id === r.legalStatuses.DECLARED?.createdAtLocation
-          )?.name,
-          createdBy: r.legalStatuses.DECLARED?.createdBy
+        const scope2 = {
+          type: 'record.search',
+          options: {
+            event: [TENNIS_CLUB_MEMBERSHIP],
+            declaredBy: declaredBy2,
+            declaredIn: declaredIn2
+          }
+        }
+
+        const scopes = [scope1, scope2]
+
+        const testClient = createTestClient(user, scopes.map(encodeScope))
+
+        const searchResult = await testClient.event.search({
+          query: {
+            type: 'and',
+            clauses: [
+              {
+                eventType: TENNIS_CLUB_MEMBERSHIP,
+                data: {
+                  'applicant.name': { type: 'fuzzy', term: 'Unique' }
+                }
+              }
+            ]
+          }
+        })
+
+        // 1. Strictest filter is applied only when the other all scopes have it. User should only see their own declarations when declaredBy=user filter is set on both.
+        if (
+          scope1.options.declaredBy === UserFilter.enum.user &&
+          scope2.options.declaredBy === UserFilter.enum.user
+        ) {
+          for (const r of searchResult.results) {
+            expect(r.legalStatuses.DECLARED?.createdBy).toBe(user.id)
+          }
+        }
+
+        // 2. Loosest jurisdiction filter is applied when the other scope has a jurisdiction filter. User should see declarations from offices under the same administrative area when declaredIn=administrativeArea is set on either scope.
+        if (
+          scope1.options.declaredIn ===
+            JurisdictionFilter.enum.administrativeArea ||
+          scope2.options.declaredIn ===
+            JurisdictionFilter.enum.administrativeArea
+        ) {
+          for (const r of searchResult.results) {
+            const officeId = getOrThrow(
+              r.legalStatuses.DECLARED?.createdAtLocation,
+              'createdAtLocation is undefined'
+            )
+
+            expect(
+              isUnderAdministrativeArea(officeId, user.administrativeAreaId)
+            ).toBe(true)
+          }
         }
       }
-    }))
-
-    const snapshot = {
-      scopes: `[${scopes.join(', ')}]`,
-      total: cleanedResults.length,
-      user: {
-        id: user.id,
-        primaryOfficeId: user.primaryOfficeId,
-        administrativeAreaId: user.administrativeAreaId,
-        locations: `${offices.find((o) => o.id === user.primaryOfficeId)?.name}, ${
-          administrativeAreas.find((aa) => aa.id === user.administrativeAreaId)
-            ?.name
-        }`
-      },
-      results: cleanedResults
+    ),
+    {
+      numRuns: 200,
+      verbose: true
     }
-
-    combinationResults.push(snapshot)
-  }
-
-  // Group by scope for easier snapshot reading
-  const resultsByScopes = _.groupBy(combinationResults, (r) => r.scopes)
-
-  expect(resultsByScopes).toMatchSnapshot()
+  )
 })
