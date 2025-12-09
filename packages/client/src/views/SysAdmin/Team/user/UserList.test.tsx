@@ -35,7 +35,6 @@ import { NetworkStatus } from '@apollo/client'
 import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { createMemoryRouter } from 'react-router-dom'
 import * as useLocationsModule from '@client/v2-events/hooks/useLocations'
-import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from '../../../../../.storybook/default-request-handlers'
 
 const searchUserResultsMock = (
   officeId: string,
@@ -112,14 +111,6 @@ const mockNationalSystemAdmin = (officeId: string) => ({
 describe('for user with create my jurisdiction scope', () => {
   let store: AppStore
 
-  beforeAll(async () => {
-    vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-      getLocations: {
-        useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-      }
-    }))
-  })
-
   beforeEach(async () => {
     ;({ store } = createStore())
     setScopes([SCOPES.USER_CREATE_MY_JURISDICTION], store)
@@ -182,14 +173,6 @@ describe('for user with create my jurisdiction scope', () => {
 describe('for user with create scope', () => {
   let store: AppStore
 
-  beforeAll(async () => {
-    vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-      getLocations: {
-        useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-      }
-    }))
-  })
-
   beforeEach(async () => {
     ;({ store } = createStore())
     setScopes([SCOPES.USER_CREATE], store)
@@ -250,14 +233,6 @@ describe('for user with create scope', () => {
 
 describe('for user with update my jurisdiction scope', () => {
   let store: AppStore
-
-  beforeAll(async () => {
-    vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-      getLocations: {
-        useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-      }
-    }))
-  })
 
   beforeEach(async () => {
     ;({ store } = createStore())
@@ -359,14 +334,6 @@ describe('for user with update my jurisdiction scope', () => {
 
 describe('for user with update scope', () => {
   let store: AppStore
-
-  beforeAll(async () => {
-    vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-      getLocations: {
-        useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-      }
-    }))
-  })
 
   beforeEach(async () => {
     ;({ store } = createStore())
@@ -476,11 +443,6 @@ describe('for user with defined scope that can edit only reg agent users', () =>
   let component: ReactWrapper
 
   beforeAll(async () => {
-    vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-      getLocations: {
-        useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-      }
-    }))
     ;({ store } = createStore())
     setScopes(['user.edit[role=REGISTRATION_AGENT]'], store)
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)(
@@ -526,11 +488,6 @@ describe('User list tests', () => {
   let store: AppStore
 
   beforeAll(async () => {
-    vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-      getLocations: {
-        useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-      }
-    }))
     Date.now = vi.fn(() => 1487076708000)
     ;({ store } = createStore())
     setScopes([SCOPES.USER_UPDATE, SCOPES.USER_CREATE], store)
@@ -545,14 +502,6 @@ describe('User list tests', () => {
   })
 
   describe('Header test', () => {
-    beforeAll(async () => {
-      vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-        getLocations: {
-          useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-        }
-      }))
-    })
-
     it('add user button redirects to user form', async () => {
       const userListMock = [
         {
@@ -651,14 +600,6 @@ describe('User list tests', () => {
   })
 
   describe('Table test', () => {
-    beforeAll(async () => {
-      vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-        getLocations: {
-          useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-        }
-      }))
-    })
-
     it('renders no result text for empty user list in response', async () => {
       const userListMock = [
         {
@@ -705,14 +646,6 @@ describe('User list tests', () => {
     })
 
     describe('when there is a result from query', () => {
-      beforeAll(async () => {
-        vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-          getLocations: {
-            useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-          }
-        }))
-      })
-
       userMutations.resendInvite = vi.fn()
       userMutations.usernameReminderSend = vi.fn()
       userMutations.sendResetPasswordInvite = vi.fn()

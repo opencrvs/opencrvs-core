@@ -15,8 +15,6 @@ import { createTestComponent, flushPromises } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import React from 'react'
-import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from '../../.storybook/default-request-handlers'
-import * as useLocationsModule from '@client/v2-events/hooks/useLocations'
 import { LocationPicker } from './LocationPicker'
 
 describe('location picker tests', () => {
@@ -25,12 +23,6 @@ describe('location picker tests', () => {
   const onChangeLocationMock = vi.fn()
 
   beforeAll(async () => {
-    vi.spyOn(useLocationsModule, 'useLocations').mockImplementation(() => ({
-      getLocations: {
-        useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
-      }
-    }))
-
     const appStore = createStore()
     store = appStore.store
   })
