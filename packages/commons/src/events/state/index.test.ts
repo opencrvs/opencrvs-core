@@ -313,7 +313,7 @@ describe('getCurrentEventState()', () => {
       ) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
       placeOfEvent: createAction.createdAtLocation,
-      flags: [InherentFlags.PENDING_CERTIFICATION],
+      flags: [InherentFlags.PENDING_CERTIFICATION, 'validated'],
       potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {

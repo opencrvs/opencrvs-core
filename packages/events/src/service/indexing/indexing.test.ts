@@ -864,6 +864,7 @@ describe('placeOfEvent location hierarchy handling', () => {
   let grandParentLocation: Location
   let parentLocation: Location
   let childOffice: Location
+  let modifiedEventConfig: EventConfig
   beforeEach(async () => {
     // Setup: Generate location IDs upfront
     const prng = createPrng(942)
@@ -884,8 +885,7 @@ describe('placeOfEvent location hierarchy handling', () => {
       },
       defaultValue: {
         country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        administrativeArea: parentLocationId
+        addressType: AddressType.DOMESTIC
       },
       conditionals,
       configuration: {
@@ -904,7 +904,7 @@ describe('placeOfEvent location hierarchy handling', () => {
       }
     })
 
-    const modifiedEventConfig: EventConfig = {
+    modifiedEventConfig = {
       ...tennisClubMembershipEvent,
       declaration: {
         ...tennisClubMembershipEvent.declaration,
@@ -917,7 +917,7 @@ describe('placeOfEvent location hierarchy handling', () => {
             fields: [
               ...page.fields.filter((x) => x.type !== FieldType.ADDRESS),
               {
-                id: 'addressType',
+                id: 'selected.address.type',
                 type: FieldType.TEXT,
                 label: {
                   id: 'addressType.label',
@@ -929,13 +929,17 @@ describe('placeOfEvent location hierarchy handling', () => {
               createAddressField('home.address', [
                 {
                   type: 'SHOW',
-                  conditional: field('addressType').isEqualTo('home.address')
+                  conditional: field('selected.address.type').isEqualTo(
+                    'home.address'
+                  )
                 }
               ]),
               createAddressField('office.address', [
                 {
                   type: 'SHOW',
-                  conditional: field('addressType').isEqualTo('office.address')
+                  conditional: field('selected.address.type').isEqualTo(
+                    'office.address'
+                  )
                 }
               ])
             ]
@@ -1001,7 +1005,7 @@ describe('placeOfEvent location hierarchy handling', () => {
         ActionType.DECLARE,
         createPrng(100)
       ),
-      addressType: 'home.address',
+      'selected.address.type': 'home.address',
       'home.address': {
         country: 'FAR',
         streetLevelDetails: { town: 'Gazipur' },
@@ -1101,7 +1105,7 @@ describe('placeOfEvent location hierarchy handling', () => {
       generator.event.actions.register(createdEvent.id, {
         declaration: {
           ...declarationWithoutHomeAddress,
-          addressType: 'office.address',
+          'selected.address.type': 'office.address',
           'office.address': {
             country: 'FAR',
             streetLevelDetails: { town: 'Dhaka' },
@@ -1245,5 +1249,165 @@ describe('placeOfEvent location hierarchy handling', () => {
         ...expectedLocationHierarchy
       })
     }
+  })
+
+  test('records are indexed with createdAtLocation for AddressType.INTERNATIONAL', async () => {
+    // Step 1: Create and declare events with international address
+
+    const declarationWithInternationalAddress = {
+      ...generateActionDeclarationInput(
+        modifiedEventConfig,
+        ActionType.DECLARE,
+        createPrng(100)
+      ),
+      'selected.address.type': 'home.address',
+      'home.address': {
+        country: 'USA',
+        addressType: AddressType.INTERNATIONAL,
+        streetLevelDetails: {
+          town: 'Oklahoma'
+        }
+      }
+    }
+
+    const event = await client.event.create(
+      generator.event.create({ type: TENNIS_CLUB_MEMBERSHIP })
+    )
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, {
+        declaration: declarationWithInternationalAddress,
+        keepAssignment: true
+      })
+    )
+
+    await client.event.actions.validate.request(
+      generator.event.actions.validate(event.id, {
+        declaration: declarationWithInternationalAddress,
+        keepAssignment: true
+      })
+    )
+
+    // Step 2: Verify events are indexed correctly BEFORE reindexing
+    const initialSearchResponse = await esClient.search({
+      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+      body: { query: { match_all: {} } }
+    })
+
+    expect(initialSearchResponse.hits.hits).toHaveLength(1)
+
+    const expectedLocationHierarchy = {
+      type: TENNIS_CLUB_MEMBERSHIP,
+      status: 'DECLARED',
+      createdAtLocation: [
+        grandParentLocation.id,
+        parentLocation.id,
+        childOffice.id
+      ],
+      updatedAtLocation: [
+        grandParentLocation.id,
+        parentLocation.id,
+        childOffice.id
+      ],
+      placeOfEvent: [grandParentLocation.id, parentLocation.id, childOffice.id],
+      legalStatuses: {
+        DECLARED: {
+          createdAtLocation: [
+            grandParentLocation.id,
+            parentLocation.id,
+            childOffice.id
+          ]
+        }
+      },
+      declaration: {
+        home____address: {
+          addressType: AddressType.INTERNATIONAL,
+          country: 'USA',
+          streetLevelDetails: {
+            town: 'Oklahoma'
+          }
+        }
+      }
+    }
+
+    expect(initialSearchResponse.hits.hits[0]._source).toMatchObject(
+      expectedLocationHierarchy
+    )
+  })
+
+  test('records are indexed with createdAtLocation for no placeOfEvent config', async () => {
+    // Step 1: Create and declare events with international address
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+        return HttpResponse.json([
+          { ...modifiedEventConfig, placeOfEvent: undefined }
+        ])
+      })
+    )
+
+    const event = await client.event.create(
+      generator.event.create({ type: TENNIS_CLUB_MEMBERSHIP })
+    )
+
+    await client.event.actions.declare.request(
+      generator.event.actions.declare(event.id, {
+        declaration: declarationWithHomeAddress,
+        keepAssignment: true
+      })
+    )
+
+    await client.event.actions.validate.request(
+      generator.event.actions.validate(event.id, {
+        declaration: declarationWithHomeAddress,
+        keepAssignment: true
+      })
+    )
+
+    // Step 2: Verify events are indexed correctly BEFORE reindexing
+    const initialSearchResponse = await esClient.search({
+      index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+      body: { query: { match_all: {} } }
+    })
+
+    expect(initialSearchResponse.hits.hits).toHaveLength(1)
+
+    const expectedLocationHierarchy = {
+      type: TENNIS_CLUB_MEMBERSHIP,
+      status: 'DECLARED',
+      createdAtLocation: [
+        grandParentLocation.id,
+        parentLocation.id,
+        childOffice.id
+      ],
+      updatedAtLocation: [
+        grandParentLocation.id,
+        parentLocation.id,
+        childOffice.id
+      ],
+      placeOfEvent: [grandParentLocation.id, parentLocation.id, childOffice.id],
+      legalStatuses: {
+        DECLARED: {
+          createdAtLocation: [
+            grandParentLocation.id,
+            parentLocation.id,
+            childOffice.id
+          ]
+        }
+      },
+      declaration: {
+        home____address: {
+          addressType: 'DOMESTIC',
+          country: 'FAR',
+          streetLevelDetails: {
+            town: 'Gazipur'
+          },
+          administrativeArea: [grandParentLocation.id, parentLocation.id]
+        }
+      }
+    }
+
+    expect(initialSearchResponse.hits.hits[0]._source).toMatchObject(
+      expectedLocationHierarchy
+    )
   })
 })

@@ -221,7 +221,8 @@ export function resolvePlaceOfEvent(
     // Otherwise parse as standard location field
     const zodType = mapFieldTypeToZod(fieldConfig, ActionType.CREATE)
     const parsed = zodType.safeParse(value)
-    if (parsed.success) {
+    // making sure it's any other field other than an international address field
+    if (parsed.success && !addressField.success) {
       return getParsedUUID(parsed.data)
     }
   }
