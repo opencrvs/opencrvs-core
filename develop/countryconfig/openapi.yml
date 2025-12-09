@@ -2763,8 +2763,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -2860,6 +2871,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -10381,8 +10393,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10478,6 +10501,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -10713,8 +10737,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10810,6 +10845,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -10893,8 +10929,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10990,6 +11037,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -11087,8 +11135,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -11184,6 +11243,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -11281,8 +11341,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -11378,6 +11449,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -11571,8 +11643,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -11668,6 +11751,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -11825,8 +11909,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -11922,6 +12017,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
