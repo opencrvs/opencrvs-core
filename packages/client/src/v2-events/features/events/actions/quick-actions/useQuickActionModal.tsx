@@ -18,12 +18,15 @@ import {
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import { Icon, IconProps } from '@opencrvs/components/src/Icon'
 import {
   ActionType,
   CustomActionConfig,
+  EventConfig,
   EventIndex,
   FieldConfig,
   FieldUpdateValue,
+  getActionConfig,
   runFieldValidations
 } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
@@ -34,9 +37,16 @@ import { useUserAllowedActions } from '../../../workqueues/EventOverview/compone
 import { useModal } from '../../../../hooks/useModal'
 import { useEvents } from '../../useEvents/useEvents'
 import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useEventConfiguration } from '../../useEventConfiguration'
 import { validate } from './validate'
 import { register } from './register'
 import { archive } from './archive'
+
+const quickActions = {
+  [ActionType.VALIDATE]: validate,
+  [ActionType.REGISTER]: register,
+  [ActionType.ARCHIVE]: archive
+} as const satisfies Partial<Record<ActionType, QuickActionConfig>>
 
 interface ModalConfig {
   label?: MessageDescriptor
@@ -44,6 +54,8 @@ interface ModalConfig {
   confirmButtonType?: 'primary' | 'danger'
   confirmButtonLabel?: MessageDescriptor
   fields?: FieldConfig[]
+  actionType?: keyof typeof quickActions
+  icon?: IconProps['name']
 }
 
 export interface QuickActionConfig {
@@ -61,18 +73,18 @@ export interface QuickActionConfig {
   }) => void | Promise<void>
 }
 
-const quickActions = {
-  [ActionType.VALIDATE]: validate,
-  [ActionType.REGISTER]: register,
-  [ActionType.ARCHIVE]: archive
-} as const satisfies Partial<Record<ActionType, QuickActionConfig>>
-
 interface ModalResult {
   /** Whether the modal was confirmed/accepted or not */
   result: boolean
   /** The values entered in the modal form, if any */
   values?: Record<string, FieldUpdateValue>
 }
+
+const DefaultIcons = {
+  [ActionType.VALIDATE]: 'PencilLine',
+  [ActionType.REGISTER]: 'PencilLine',
+  [ActionType.ARCHIVE]: 'Archive'
+} as const
 
 function QuickActionModal({
   close,
@@ -130,6 +142,17 @@ function QuickActionModal({
       id={`quick-action-modal-${config.label.id}`}
       isOpen={true}
       title={intl.formatMessage(config.label)}
+      titleIcon={
+        <Icon
+          color="primary"
+          name={
+            config.icon ??
+            (config.actionType && DefaultIcons[config.actionType]) ??
+            'PencilLine'
+          }
+          size="large"
+        />
+      }
       variant={'large'}
       width={898}
       onClose={() => close({ result: false })}
@@ -152,6 +175,7 @@ export function useQuickActionModal(event: EventIndex) {
   const navigate = useNavigate()
   const { actions, customActions } = useEvents()
   const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const onQuickAction = async (
     actionType: keyof typeof quickActions,
@@ -159,8 +183,17 @@ export function useQuickActionModal(event: EventIndex) {
   ) => {
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
+    const actionConfig = getActionConfig({ actionType, eventConfiguration })
     const { result } = await openModal<ModalResult>((close) => (
-      <QuickActionModal close={close} config={{ label, ...config.modal }} />
+      <QuickActionModal
+        close={close}
+        config={{
+          label,
+          actionType,
+          icon: actionConfig?.icon,
+          ...config.modal
+        }}
+      />
     ))
 
     // On confirmed modal, we will:
@@ -210,7 +243,8 @@ export function useCustomActionModal(event: EventIndex) {
           ...customActionConfigBase,
           label: actionConfig.label,
           description: actionConfig.supportingCopy,
-          fields: actionConfig.form
+          fields: actionConfig.form,
+          icon: actionConfig.icon
         }}
       />
     ))
