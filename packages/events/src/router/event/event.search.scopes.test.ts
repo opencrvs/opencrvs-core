@@ -8,13 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import fc from 'fast-check'
 import {
   AddressType,
   JurisdictionFilter,
   Location,
   LocationType,
+  RecordScopeV2,
   TENNIS_CLUB_MEMBERSHIP,
   TestUserRole,
   UUID,
@@ -25,7 +26,7 @@ import {
   getOrThrow,
   pickRandom
 } from '@opencrvs/commons'
-import { createTestClient } from '@events/tests/utils'
+import { createTestClient, TEST_USER_DEFAULT_SCOPES } from '@events/tests/utils'
 import { payloadGenerator, seeder } from '@events/tests/generators'
 
 function generateOfficeLocations(adminAreas: Location[], rng: () => number) {
@@ -125,12 +126,15 @@ async function setupHierarchyWithUsers() {
   expect(administrativeAreas.length).toBe(6)
   expect(offices.length).toBe(12) // 6 admin areas x 2 offices each
 
+  const officeById = new Map(offices.map((o) => [o.id, o]))
+  const administrativeAreaById = new Map(
+    administrativeAreas.map((a) => [a.id, a])
+  )
+
   // 3. Create two users for each office to test 'user' scope limitations.
   const users = offices.flatMap((office, i) => {
     const base = {
-      administrativeAreaId: administrativeAreas.find((aa) => {
-        return aa.id === office.parentId
-      })?.id,
+      administrativeAreaId: office.parentId,
       primaryOfficeId: office.id,
       fullHonorificName: `${office.name} full honorific name`
     }
@@ -150,11 +154,6 @@ async function setupHierarchyWithUsers() {
       })
     ]
   })
-
-  const officeById = new Map(offices.map((o) => [o.id, o]))
-  const administrativeAreaById = new Map(
-    administrativeAreas.map((a) => [a.id, a])
-  )
 
   // Helper to check if an office is under a given administrative area. Used for testing propositions.
   function isUnderAdministrativeArea(
@@ -184,11 +183,13 @@ async function setupHierarchyWithUsers() {
     users,
     offices,
     administrativeAreas,
-    isUnderAdministrativeArea
+    isUnderAdministrativeArea,
+    administrativeAreaById,
+    officeById
   }
 }
 
-test('Single scope, multi-filter cominations', async () => {
+test('single scope, multi-filter combinations', async () => {
   const rng = createPrng(123453)
   const generator = payloadGenerator(rng)
 
@@ -342,8 +343,7 @@ test('Single scope, multi-filter cominations', async () => {
       }
     ),
     {
-      numRuns: 200,
-      verbose: true
+      numRuns: 200
     }
   )
 })
@@ -353,8 +353,7 @@ test('multi-scope combinations', async () => {
 
   const generator = payloadGenerator(rng)
   // 1. Create realistic hierarchy with users.
-  const { users, offices, administrativeAreas } =
-    await setupHierarchyWithUsers()
+  const { users } = await setupHierarchyWithUsers()
 
   // 2. Each user creates and declares an event using duplicate data.
   for (const user of users) {
@@ -377,10 +376,7 @@ test('multi-scope combinations', async () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
-          administrativeArea: administrativeAreas.find((aa) => {
-            const office = offices.find((o) => o.id === user.primaryOfficeId)
-            return aa.id === office?.parentId
-          })?.id,
+          administrativeArea: user.administrativeAreaId ?? undefined,
           streetLevelDetails: {
             state: 'state',
             district2: 'district2'
@@ -468,8 +464,198 @@ test('multi-scope combinations', async () => {
       }
     ),
     {
-      numRuns: 200,
-      verbose: true
+      numRuns: 200
     }
   )
+})
+
+test('combined registeredIn and declaredIn filters in scope', async () => {
+  const { users, administrativeAreas } = await setupHierarchyWithUsers()
+  const rng = createPrng(567823)
+  const generator = payloadGenerator(rng)
+
+  const provinceA = administrativeAreas.find(
+    (area) => area.name === 'Province A'
+  )
+  const userInProvinceA = users.find(
+    (user) => user.administrativeAreaId === provinceA?.id
+  )
+
+  const districtA = administrativeAreas.find(
+    (area) => area.name === 'District A'
+  )
+  const userInDistrictA = users.find(
+    (user) => user.administrativeAreaId === districtA?.id
+  )
+
+  if (!userInProvinceA || !userInDistrictA) {
+    throw new Error('Test users not found')
+  }
+
+  const searchScope = {
+    type: 'record.search',
+    options: {
+      event: [TENNIS_CLUB_MEMBERSHIP],
+      declaredIn: JurisdictionFilter.enum.administrativeArea,
+      registeredIn: JurisdictionFilter.enum.administrativeArea
+    }
+  } satisfies RecordScopeV2
+
+  const userInDistrictAClient = createTestClient(userInDistrictA, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope(searchScope)
+  ])
+
+  const userInProvinceAClient = createTestClient(userInProvinceA, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope(searchScope)
+  ])
+
+  const originalEvent = await userInDistrictAClient.event.create(
+    generator.event.create()
+  )
+
+  const declareInput = generator.event.actions.declare(originalEvent.id, {
+    keepAssignment: true
+  })
+
+  await userInDistrictAClient.event.actions.declare.request(declareInput)
+
+  await userInDistrictAClient.event.actions.validate.request(
+    generator.event.actions.validate(originalEvent.id, {
+      declaration: {}
+    })
+  )
+
+  await userInProvinceAClient.event.actions.assignment.assign(
+    generator.event.actions.assign(originalEvent.id, {
+      assignedTo: userInProvinceA.id
+    })
+  )
+
+  await userInProvinceAClient.event.actions.register.request(
+    generator.event.actions.register(originalEvent.id, {
+      declaration: {}
+    })
+  )
+
+  const query = {
+    type: 'and',
+    clauses: [
+      {
+        eventType: TENNIS_CLUB_MEMBERSHIP
+      }
+    ]
+  }
+
+  const { results: districtAUserResults } =
+    await userInDistrictAClient.event.search({
+      query
+    })
+
+  const { results: provinceAUserResults } =
+    await userInProvinceAClient.event.search({
+      query
+    })
+
+  // Even if the event was declared in District A, the user there should not see it as it was registered in Province A.
+  expect(districtAUserResults.length).toBe(0)
+  expect(provinceAUserResults.length).toBe(1)
+})
+
+test('combined registeredBy and declaredBy filters in scope', async () => {
+  const { users, administrativeAreas } = await setupHierarchyWithUsers()
+  const rng = createPrng(567822)
+  const generator = payloadGenerator(rng)
+
+  const provinceA = administrativeAreas.find(
+    (area) => area.name === 'Province A'
+  )
+  const userInProvinceA = users.find(
+    (user) => user.administrativeAreaId === provinceA?.id
+  )
+
+  const districtA = administrativeAreas.find(
+    (area) => area.name === 'District A'
+  )
+  const userInDistrictA = users.find(
+    (user) => user.administrativeAreaId === districtA?.id
+  )
+
+  if (!userInProvinceA || !userInDistrictA) {
+    throw new Error('Test users not found')
+  }
+
+  const searchScope = {
+    type: 'record.search',
+    options: {
+      event: [TENNIS_CLUB_MEMBERSHIP],
+      declaredBy: UserFilter.enum.user,
+      registeredBy: UserFilter.enum.user
+    }
+  } satisfies RecordScopeV2
+
+  const userInDistrictAClient = createTestClient(userInDistrictA, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope(searchScope)
+  ])
+
+  const userInProvinceAClient = createTestClient(userInProvinceA, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope(searchScope)
+  ])
+
+  const originalEvent = await userInDistrictAClient.event.create(
+    generator.event.create()
+  )
+
+  const declareInput = generator.event.actions.declare(originalEvent.id, {
+    keepAssignment: true
+  })
+
+  await userInDistrictAClient.event.actions.declare.request(declareInput)
+
+  await userInDistrictAClient.event.actions.validate.request(
+    generator.event.actions.validate(originalEvent.id, {
+      declaration: {}
+    })
+  )
+
+  await userInProvinceAClient.event.actions.assignment.assign(
+    generator.event.actions.assign(originalEvent.id, {
+      assignedTo: userInProvinceA.id
+    })
+  )
+
+  const registerResult =
+    await userInProvinceAClient.event.actions.register.request(
+      generator.event.actions.register(originalEvent.id, {
+        declaration: {}
+      })
+    )
+
+  console.log('registerResult', registerResult)
+
+  const query = {
+    type: 'and',
+    clauses: [
+      {
+        eventType: TENNIS_CLUB_MEMBERSHIP
+      }
+    ]
+  }
+
+  const { results: districtAUserResults } =
+    await userInDistrictAClient.event.search({
+      query
+    })
+
+  const { results: provinceAUserResults } =
+    await userInProvinceAClient.event.search({
+      query
+    })
+
+  // None of the users should see the event as it was declared by or registered by a different user than themselves.
+  expect(districtAUserResults.length).toBe(0)
+  expect(provinceAUserResults.length).toBe(0)
 })
