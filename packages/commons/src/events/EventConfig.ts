@@ -139,11 +139,9 @@ export const EventConfig = z
       }
     }
 
-    if (event.placeOfEvent) {
-      const eventPlaceFieldId = getDeclarationFields(event).find(
-        ({ id }) =>
-          Array.isArray(event.placeOfEvent) &&
-          event.placeOfEvent.find((config) => config.$$field === id)
+    if (Array.isArray(event.placeOfEvent)) {
+      const eventPlaceFieldId = getDeclarationFields(event).find(({ id }) =>
+        event.placeOfEvent?.find((config) => config.$$field === id)
       )
       if (!eventPlaceFieldId) {
         ctx.addIssue({
