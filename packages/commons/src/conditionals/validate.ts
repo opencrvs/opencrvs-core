@@ -287,7 +287,7 @@ function isActionConditionMet(
   context: ValidatorContext,
   conditionalType: ConditionalType
 ) {
-  if (!actionConfig.conditionals) {
+  if (!('conditionals' in actionConfig) || !actionConfig.conditionals) {
     return true
   }
 

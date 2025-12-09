@@ -53,15 +53,11 @@ const DeclarationActionBase = ActionConfigBase.extend({
   deduplication: DeduplicationConfig.optional()
 })
 
-const ReadActionConfig = ActionConfigBase.extend({
+const ReadActionConfig = ActionConfigBase.omit({ conditionals: true }).extend({
   type: z.literal(ActionType.READ),
   review: DeclarationReviewConfig.describe(
     'Configuration of the review page for read-only view.'
-  ),
-  conditionals: z
-    .never()
-    .optional()
-    .describe('Read-action can not be disabled or hidden with conditionals.')
+  )
 })
 
 const DeclareConfig = DeclarationActionBase.extend({
