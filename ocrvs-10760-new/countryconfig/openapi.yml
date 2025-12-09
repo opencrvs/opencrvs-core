@@ -2902,6 +2902,9 @@ components:
             - Fingerprint
             - PushPin
             - Timer
+        conditionals:
+          description: Read-action can not be disabled or hidden with conditionals.
+          not: {}
         type:
           type: string
           const: READ
