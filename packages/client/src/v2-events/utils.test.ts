@@ -196,8 +196,8 @@ const testCases = [
     defaultValue: undefined,
     systemVariables: {
       $user: {
-        district: '',
-        province: ''
+        name: '',
+        role: ''
       },
       $window: {
         location: {
@@ -216,8 +216,8 @@ const testCases = [
     defaultValue: 'Hello',
     systemVariables: {
       $user: {
-        district: '',
-        province: ''
+        name: '',
+        role: ''
       },
       $window: {
         location: {
@@ -233,11 +233,11 @@ const testCases = [
   },
   {
     currentValue: undefined,
-    defaultValue: '$user.district',
+    defaultValue: '$user.name',
     systemVariables: {
       $user: {
-        district: 'Ibombo',
-        province: ''
+        name: 'Jon Doe',
+        role: ''
       },
       $window: {
         location: {
@@ -248,16 +248,16 @@ const testCases = [
         }
       }
     },
-    expected: 'Ibombo',
+    expected: 'Jon Doe',
     field: TextField
   },
   {
     currentValue: 'Hello world',
-    defaultValue: '$user.district',
+    defaultValue: '$user.name',
     systemVariables: {
       $user: {
-        district: 'Ibombo',
-        province: ''
+        name: 'Jon Doe',
+        role: ''
       },
       $window: {
         location: {
@@ -279,8 +279,8 @@ const testCases = [
     },
     systemVariables: {
       $user: {
-        district: 'Ibombo',
-        province: 'Central'
+        name: 'Jon Doe',
+        role: 'Field Agent'
       },
       $window: {
         location: {
