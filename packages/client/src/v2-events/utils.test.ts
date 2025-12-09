@@ -198,6 +198,14 @@ const testCases = [
       $user: {
         district: '',
         province: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: undefined,
@@ -210,6 +218,14 @@ const testCases = [
       $user: {
         district: '',
         province: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: 'Hello',
@@ -222,6 +238,14 @@ const testCases = [
       $user: {
         district: 'Ibombo',
         province: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: 'Ibombo',
@@ -234,6 +258,14 @@ const testCases = [
       $user: {
         district: 'Ibombo',
         province: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: 'Hello world',
@@ -249,6 +281,14 @@ const testCases = [
       $user: {
         district: 'Ibombo',
         province: 'Central'
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: {

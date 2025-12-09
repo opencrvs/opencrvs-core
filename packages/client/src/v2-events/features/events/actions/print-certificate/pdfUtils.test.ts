@@ -11,7 +11,7 @@
 
 import { createIntl } from 'react-intl'
 import createFetchMock from 'vitest-fetch-mock'
-import { ContentSvg } from 'pdfmake/interfaces'
+import { Content, ContentSvg } from 'pdfmake/interfaces'
 import {
   ActionDocument,
   eventQueryDataGenerator,
@@ -162,6 +162,36 @@ describe('svgToPdfTemplate', () => {
       </svg>
       `.trim()
     )
+  })
+
+  test('multipage certificate', async () => {
+    const svgString = `
+      <svg width="200" height="400" xmlns="http://www.w3.org/2000/svg">
+        <g data-page="1">
+          <rect x="10" y="10" width="180" height="380" fill="red"/>
+        </g>
+        <g data-page="2">
+          <circle cx="100" cy="200" r="80" fill="green"/>
+        </g>
+      </svg>
+    `.trim()
+
+    const result = await svgToPdfTemplate(svgString, {})
+    const contents = result.definition.content as ContentSvg[]
+
+    expect(contents.length).toBe(2)
+
+    expect(contents[0].svg).toContain(
+      '<svg width="200" height="400" xmlns="http://www.w3.org/2000/svg"><g data-page="1">\n' +
+        '          <rect x="10" y="10" width="180" height="380" fill="red"></rect>\n' +
+        '        </g></svg>'
+    )
+    expect(contents[1].svg).toContain(
+      '<svg width="200" height="400" xmlns="http://www.w3.org/2000/svg"><g data-page="2">\n' +
+        '          <circle cx="100" cy="200" r="80" fill="green"></circle>\n' +
+        '        </g></svg>'
+    )
+    expect(result.definition.pageSize).toEqual({ width: 200, height: 200 })
   })
 })
 
