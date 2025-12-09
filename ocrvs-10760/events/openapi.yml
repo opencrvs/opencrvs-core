@@ -3520,9 +3520,6 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
-        conditionals:
-          description: Read-action can not be disabled or hidden with conditionals.
-          not: {}
         type:
           type: string
           const: READ
