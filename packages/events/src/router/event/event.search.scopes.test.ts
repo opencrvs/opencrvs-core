@@ -634,8 +634,6 @@ test('combined registeredBy and declaredBy filters in scope', async () => {
       })
     )
 
-  console.log('registerResult', registerResult)
-
   const query = {
     type: 'and',
     clauses: [
