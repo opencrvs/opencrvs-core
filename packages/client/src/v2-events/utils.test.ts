@@ -196,8 +196,8 @@ const testCases = [
     defaultValue: undefined,
     systemVariables: {
       $user: {
-        district: '',
-        province: ''
+        name: '',
+        role: ''
       }
     },
     expected: undefined,
@@ -208,8 +208,8 @@ const testCases = [
     defaultValue: 'Hello',
     systemVariables: {
       $user: {
-        district: '',
-        province: ''
+        name: '',
+        role: ''
       }
     },
     expected: 'Hello',
@@ -217,23 +217,23 @@ const testCases = [
   },
   {
     currentValue: undefined,
-    defaultValue: '$user.district',
+    defaultValue: '$user.name',
     systemVariables: {
       $user: {
-        district: 'Ibombo',
-        province: ''
+        name: 'Jon Doe',
+        role: ''
       }
     },
-    expected: 'Ibombo',
+    expected: 'Jon Doe',
     field: TextField
   },
   {
     currentValue: 'Hello world',
-    defaultValue: '$user.district',
+    defaultValue: '$user.name',
     systemVariables: {
       $user: {
-        district: 'Ibombo',
-        province: ''
+        name: 'Jon Doe',
+        role: ''
       }
     },
     expected: 'Hello world',
@@ -247,8 +247,8 @@ const testCases = [
     },
     systemVariables: {
       $user: {
-        district: 'Ibombo',
-        province: 'Central'
+        name: 'Jon Doe',
+        role: 'Field Agent'
       }
     },
     expected: {
