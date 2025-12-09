@@ -10,6 +10,35 @@
  */
 import { UUID, LocationType, Location } from '@opencrvs/commons/client'
 
+/*
+ * Central
+ * | -- Central Provincial Office
+ * | --- Ibombo
+ *    | -- Chamakubi Health Post
+ *    | -- Ibombo Rural Health Centre
+ *    | -- Chikobo Rural Health Centre
+ *    | -- Chilochabalenje Health Post
+ *    | -- Chipeso Rural Health Centre
+ *    | -- Chisamba Rural Health Centre
+ *    | -- Chitanda Rural Health Centre
+ *    | -- Golden Valley Rural Health Centre
+ *    | -- Ipongo Rural Health Centre
+ *    | -- Itumbwe Health Post
+ *    | -- Kabangalala Rural Health Centre
+ *    | -- Ibombo District Office
+ *    | -- Isamba District Office
+ * | --- Isango
+ *    | -- Isango District Office
+ * | --- Isamba
+ * | --- Itambo
+ * | --- Ezhi
+ * Sulaka
+ * | -- Sulaka Provincial Office
+ * | --- Ilanga
+ *    | -- Ilanga District Office
+ * Pualula
+ * Chuminga
+ */
 export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
@@ -82,6 +111,14 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     validUntil: null,
     externalId: 'xK8cQ0ZRy5Wd'
+  },
+  {
+    id: '8fbd09d2-212b-47f4-beb3-5e1694931d9f' as UUID,
+    name: 'Ilanga',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
+    validUntil: null,
+    externalId: 'Cq4Jm1XvN8Ls'
   },
   {
     id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
@@ -172,6 +209,14 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     externalId: 'Pz8Kc1TqH6Jn'
   },
   {
+    id: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID,
+    name: 'Central Provincial Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null,
+    externalId: 'Xr3Df8WpK6Ys'
+  },
+  {
     id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
     name: 'Ibombo District Office',
     locationType: LocationType.enum.CRVS_OFFICE,
@@ -186,6 +231,30 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
     validUntil: null,
     externalId: 'Vg1Bq5XeH9Lt'
+  },
+  {
+    id: '954c93e1-13f7-4435-bb82-35e0e215e07d' as UUID,
+    name: 'Isango District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    parentId: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+    validUntil: null,
+    externalId: 'Je7Lm2XqN9Vz'
+  },
+  {
+    id: '2884f5b9-17b4-49ce-bf4d-f538228935df' as UUID,
+    name: 'Sulaka Provincial Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    parentId: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
+    validUntil: null,
+    externalId: 'Ht2Wp9KcX5Qv'
+  },
+  {
+    id: '030358c6-54af-44be-821b-8e4af963a49c' as UUID,
+    name: 'Ilanga District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    parentId: '8fbd09d2-212b-47f4-beb3-5e1694931d9f' as UUID,
+    validUntil: null,
+    externalId: 'Yp6Ds1WqN3Xz'
   }
 ]
 
