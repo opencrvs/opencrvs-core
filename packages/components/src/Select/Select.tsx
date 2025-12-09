@@ -52,7 +52,6 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
 
   .react-select__control {
     height: 48px;
-    ${({ height }) => (height ? `height: ${height}px;` : `height: 46px`)}
     cursor: pointer;
     border: 1.5px solid
       ${({ error, touched, disabled, theme }) =>
