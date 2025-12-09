@@ -440,7 +440,6 @@ export function withJurisdictionFilters({
     return {
       bool: {
         must: [query],
-        // @ts-expect-error -- TypeScript does not resolve the recursive type.
         filter: {
           bool: {
             should: scopeQueries,
@@ -448,7 +447,7 @@ export function withJurisdictionFilters({
           }
         }
       }
-    }
+    } as estypes.QueryDslQueryContainer
   }
 
   // This is transient check that will be removed once we have replaced all v1 scopes with v2.
