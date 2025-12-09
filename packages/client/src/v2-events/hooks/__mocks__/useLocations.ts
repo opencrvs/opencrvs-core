@@ -11,6 +11,8 @@
 
 import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from "@client/tests/v2-events/locations-mock";
 
+export { getLeafLocationIds } from "@client/v2-events/hooks/useLocations"
+
 export function useLocations() {
   return {
     getLocations: {
