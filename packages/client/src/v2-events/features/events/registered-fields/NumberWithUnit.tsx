@@ -71,11 +71,11 @@ function NumberWithUnitInput({
 
 export const NumberWithUnit = {
   Input: NumberWithUnitInput,
-  Output: ({ value }: { value?: NumberWithUnitFieldValue }) => {
-    if (value?.numericValue === undefined || value?.unit === undefined) {
+  Output: ({ value }: { value?: NumberWithUnitFieldUpdateValue }) => {
+    if (value?.numericValue === undefined || value.unit === undefined) {
       return null
     }
 
-    return <>{`${value.numericValue} ${value.unit}` || ''}</>
+    return <>{`${value.numericValue} ${value.unit}`}</>
   }
 }
