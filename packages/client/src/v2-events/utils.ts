@@ -23,6 +23,8 @@ import {
   SystemVariables,
   Scope,
   ActionScopes,
+  ConfigurableActionScopes,
+  parseConfigurableScope,
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
@@ -232,7 +234,14 @@ export enum CoreWorkqueues {
 }
 
 export function hasOutboxWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => ActionScopes.safeParse(scope).success)
+  const hasLiteralActionScopes = scopes.some(
+    (scope) => ActionScopes.safeParse(scope).success
+  )
+  const parsedScopes = scopes.map(parseConfigurableScope)
+  const hasConfigurableActionScopes = parsedScopes.some(
+    (scope) => ConfigurableActionScopes.safeParse(scope).success
+  )
+  return hasLiteralActionScopes || hasConfigurableActionScopes
 }
 
 export function hasDraftWorkqueue(scopes: Scope[]) {
