@@ -2871,6 +2871,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -10500,6 +10501,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -10843,6 +10845,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -11034,6 +11037,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -11239,6 +11243,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -11444,6 +11449,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -11745,6 +11751,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
@@ -12010,6 +12017,7 @@ components:
             - Plus
             - Printer
             - SignOut
+            - Stamp
             - Star
             - Target
             - TextT
