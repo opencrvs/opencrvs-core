@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type * as estypes from '@elastic/elasticsearch/lib/api/types'
+import { type estypes } from '@elastic/elasticsearch'
 import {
   EventConfig,
   FieldType,

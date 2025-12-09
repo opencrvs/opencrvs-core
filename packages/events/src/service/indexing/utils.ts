@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import _ from 'lodash'
-import { estypes } from '@elastic/elasticsearch'
+import { type estypes } from '@elastic/elasticsearch'
 import {
   AddressFieldValue,
   AddressType,
