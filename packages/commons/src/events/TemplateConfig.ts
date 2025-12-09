@@ -29,6 +29,7 @@ export type SystemVariables = {
       href: string
       pathname: string
       hostname: string
+      originPathname: string
     }
   }
 }
@@ -38,7 +39,7 @@ export type SystemVariables = {
  */
 export const window = () => ({
   location: {
-    get: (key: 'href' | 'pathname' | 'hostname') => {
+    get: (key: 'href' | 'pathname' | 'hostname' | 'originPathname') => {
       return `$window.location.${key}`
     }
   }

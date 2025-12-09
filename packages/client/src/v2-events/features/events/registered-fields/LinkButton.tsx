@@ -35,23 +35,7 @@ function LinkButtonInput({
 }) {
   const intl = useIntl()
   const url = setRedirectURI(configuration.url)
-  const { submitLocalDraft, isLocalDraftSubmitted } = useDrafts()
 
-  useEffect(() => {
-    if (isLocalDraftSubmitted) {
-      window.location.href = url
-    }
-  }, [isLocalDraftSubmitted, url])
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    try {
-      submitLocalDraft()
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Error submitting local draft:', err)
-    }
-  }
   return (
     <Button
       fullWidth
@@ -61,7 +45,6 @@ function LinkButtonInput({
       id={id}
       size="large"
       type="secondary"
-      onClick={handleClick}
     >
       {configuration.icon && (
         <Icon
