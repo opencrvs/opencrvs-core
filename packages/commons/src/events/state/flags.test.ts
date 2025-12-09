@@ -58,6 +58,16 @@ const eventConfig: DeepPartial<EventConfig> = {
       ]
     },
     {
+      type: ActionType.PRINT_CERTIFICATE,
+      flags: [
+        {
+          id: 'pending-certified-copy-issuance',
+          operation: 'add',
+          conditional: field('text-field').isEqualTo('ADD_FLAG_IN_PRINT')
+        }
+      ]
+    },
+    {
       type: ActionType.CUSTOM,
       customActionType: 'ADD_FLAG_ALWAYS',
       flags: [
@@ -81,7 +91,10 @@ const eventConfig: DeepPartial<EventConfig> = {
         id: 'first-page',
         type: PageTypes.enum.FORM,
         title: { id: '', defaultMessage: '', description: '' },
-        fields: [{ id: 'number-field', type: FieldType.NUMBER }]
+        fields: [
+          { id: 'number-field', type: FieldType.NUMBER },
+          { id: 'text-field', type: FieldType.TEXT }
+        ]
       }
     ]
   }
@@ -141,6 +154,24 @@ describe('resolveEventCustomFlags()', () => {
     // @ts-expect-error - allow partial actions and event config
     const flags = resolveEventCustomFlags(event, eventConfig)
     expect(flags).toEqual(['too-large-number-flag'])
+  })
+
+  test('should add flag when conditional is met for Print Certificate action', () => {
+    const event: DeepPartial<EventDocument> = {
+      actions: [
+        {
+          type: ActionType.PRINT_CERTIFICATE,
+          declaration: {},
+          annotation: { 'text-field': 'ADD_FLAG_IN_PRINT' },
+          createdAt: formatISO(now),
+          status: ActionStatus.Accepted
+        }
+      ]
+    }
+
+    // @ts-expect-error - allow partial actions and event config
+    const flags = resolveEventCustomFlags(event, eventConfig)
+    expect(flags).toEqual(['pending-certified-copy-issuance'])
   })
 
   test('should not add flag when conditional is not met', () => {
