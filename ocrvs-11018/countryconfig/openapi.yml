@@ -2765,8 +2765,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -2788,6 +2799,110 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Read-action can not be disabled or hidden with conditionals.
           not: {}
@@ -10471,8 +10586,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10494,6 +10620,110 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -10700,8 +10930,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10723,6 +10964,110 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -10777,8 +11122,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10800,6 +11156,110 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -10868,8 +11328,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10891,6 +11362,110 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -10959,8 +11534,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10982,6 +11568,110 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -11146,8 +11836,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -11169,6 +11870,110 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -11297,8 +12102,19 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -11320,6 +12136,110 @@ components:
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
