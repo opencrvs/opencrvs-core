@@ -627,12 +627,11 @@ test('combined registeredBy and declaredBy filters in scope', async () => {
     })
   )
 
-  const registerResult =
-    await userInProvinceAClient.event.actions.register.request(
-      generator.event.actions.register(originalEvent.id, {
-        declaration: {}
-      })
-    )
+  await userInProvinceAClient.event.actions.register.request(
+    generator.event.actions.register(originalEvent.id, {
+      declaration: {}
+    })
+  )
 
   const query = {
     type: 'and',
