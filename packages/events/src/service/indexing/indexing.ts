@@ -449,7 +449,7 @@ export async function findRecordsByQuery({
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
-  options: Record<string, SearchScopeAccessLevels>
+  options?: Record<string, SearchScopeAccessLevels>
   user: TrpcUserContext
   acceptedScopes?: RecordScopeV2[]
 }) {

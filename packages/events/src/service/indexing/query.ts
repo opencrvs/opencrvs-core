@@ -349,7 +349,7 @@ export function withJurisdictionFilters({
   scopesV2
 }: {
   query: estypes.QueryDslQueryContainer
-  options: Record<string, SearchScopeAccessLevels>
+  options?: Record<string, SearchScopeAccessLevels>
   userOfficeId: string | undefined
   scopesV2?: ResolvedRecordScopeV2[]
 }): estypes.QueryDslQueryContainer {
@@ -429,7 +429,6 @@ export function withJurisdictionFilters({
       .filter((q) => q !== null)
 
     if (!scopeQueries.length) {
-      // No scopes → just return base query
       return {
         bool: {
           must: [query],
@@ -450,6 +449,11 @@ export function withJurisdictionFilters({
         }
       }
     }
+  }
+
+  // This is transient check that will be removed once we have replaced all v1 scopes with v2.
+  if (!options) {
+    throw new Error('Either options or scopesV2 must be provided for filtering')
   }
 
   const filteredQueries = Object.entries(options).map(

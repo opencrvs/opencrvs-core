@@ -335,7 +335,6 @@ export const eventRouter = router({
         return findRecordsByQuery({
           search: input,
           eventConfigs,
-          options: { birth: 'all' },
           user: ctx.user,
           acceptedScopes: ctx.acceptedScopes as RecordScopeV2[]
         })
