@@ -47,8 +47,6 @@ export function getStatusFromActions(actions: Array<Action>) {
           return EventStatus.enum.CREATED
         case ActionType.DECLARE:
           return EventStatus.enum.DECLARED
-        case ActionType.VALIDATE:
-          return EventStatus.enum.VALIDATED
         case ActionType.REGISTER:
           return EventStatus.enum.REGISTERED
         case ActionType.ARCHIVE:
@@ -68,6 +66,7 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.REJECT_CORRECTION:
         case ActionType.READ:
         case ActionType.CUSTOM:
+        case ActionType.VALIDATE:
         default:
           return status
       }

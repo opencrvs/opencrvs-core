@@ -23,7 +23,6 @@ export const EventStatus = z.enum([
   'CREATED',
   'NOTIFIED',
   'DECLARED',
-  'VALIDATED',
   'REGISTERED',
   'ARCHIVED'
 ])

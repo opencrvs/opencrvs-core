@@ -16,6 +16,7 @@ import { ActionFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
 import { ActionConditional } from './Conditional'
+import { AvailableIcons } from '../icons'
 
 export const DeclarationReviewConfig = z
   .object({
@@ -41,6 +42,7 @@ export const ActionConfigBase = z.object({
   supportingCopy: TranslationConfig.optional().describe(
     'Text displayed on the confirmation'
   ),
+  icon: AvailableIcons.describe('Icon representing the action').optional(),
   conditionals: z
     .array(ActionConditional)
     .optional()
@@ -70,6 +72,12 @@ const DeclareConfig = DeclarationActionBase.extend(
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
     )
+  }).shape
+)
+
+const RejectConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REJECT)
   }).shape
 )
 
@@ -123,6 +131,7 @@ export const ActionConfig = z
      */
     ReadActionConfig.meta({ id: 'ReadActionConfig' }),
     DeclareConfig.meta({ id: 'DeclareActionConfig' }),
+    RejectConfig.meta({ id: 'RejectActionConfig' }),
     ValidateConfig.meta({ id: 'ValidateActionConfig' }),
     RegisterConfig.meta({ id: 'RegisterActionConfig' }),
     PrintCertificateActionConfig.meta({

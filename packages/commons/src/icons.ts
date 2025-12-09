@@ -83,6 +83,7 @@ export const AvailableIcons = z.enum([
   'Plus',
   'Printer',
   'SignOut',
+  'Stamp',
   'Star',
   'Target',
   'TextT',

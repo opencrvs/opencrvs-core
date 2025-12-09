@@ -1048,6 +1048,9 @@ describe('"flag" conditionals', () => {
     expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
       false
     )
+    expect(
+      validate(not(flag(InherentFlags.CORRECTION_REQUESTED)), params)
+    ).toBe(true)
   })
 
   it('validation fails if params dont include flags', () => {
@@ -1073,7 +1076,6 @@ describe('"status" conditionals', () => {
       $online: true
     } satisfies EventStateConditionalParameters
 
-    expect(validate(status('VALIDATED'), params)).toBe(false)
     expect(validate(status('REGISTERED'), params)).toBe(true)
   })
 
