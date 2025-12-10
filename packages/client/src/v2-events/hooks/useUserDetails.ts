@@ -57,12 +57,16 @@ export function useUserDetails() {
     name: string
     role: string | undefined
   } => {
+    const role = createdByRole
+      ? intl.formatMessage(messages.role, { role: createdByRole })
+      : undefined
+
     if (createdByUserType === 'system') {
       const system = systems.find((s) => s._id === createdBy)
       return {
         type: 'integration',
         name: system?.name ?? intl.formatMessage(messages.systemDefaultName),
-        role: undefined
+        role
       } as const
     }
 
@@ -70,7 +74,7 @@ export function useUserDetails() {
       return {
         type: 'system',
         name: intl.formatMessage(messages.system),
-        role: undefined
+        role
       } as const
     }
 
@@ -79,9 +83,7 @@ export function useUserDetails() {
     return {
       type: 'user',
       name: user ? getUsersFullName(user.name, intl.locale) : 'Missing user',
-      role: createdByRole
-        ? intl.formatMessage(messages.role, { role: createdByRole })
-        : undefined
+      role
     } as const
   }
 
