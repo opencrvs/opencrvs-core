@@ -49,6 +49,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - **Searchable Select**: A new select component that allows searching through options. Useful for selects with a large number of options. Currently being used in address fields. [#10749](https://github.com/opencrvs/opencrvs-core/issues/10749)
 
 ### Bug fixes
+
 - During user password reset, email address lookup is now case insensitive [#9869](https://github.com/opencrvs/opencrvs-core/issues/9869)
 - Users cannot activate or reactivate users with roles not specified in the `user.edit` scope [#9933](https://github.com/opencrvs/opencrvs-core/issues/9933)
 - Login page no longer show "Farajaland CRVS" before showing the correct title [#10958](https://github.com/opencrvs/opencrvs-core/issues/10958)
@@ -332,6 +333,8 @@ To see Events V2 in action, check out the example configurations in the **countr
 - Add Import/Export system client and `record.export` scope to enable data migrations [#10415](https://github.com/opencrvs/opencrvs-core/issues/10415)
 - Add an Alpha version of configurable "Print" button that will be refactored in a later release - this button can be used to print certificates during declaration/correction flow. [#10039](https://github.com/opencrvs/opencrvs-core/issues/10039)
 - Add bulk import endpoint [#10590](https://github.com/opencrvs/opencrvs-core/pull/10590)
+- Add multi-field search with a single component [#10617](https://github.com/opencrvs/opencrvs-core/issues/10617)
+- Add registration number field to advanced search configuration so that documents can be searched by their `Registration Number`. [#10760](https://github.com/opencrvs/opencrvs-core/issues/10760)
 
 ### Improvements
 
