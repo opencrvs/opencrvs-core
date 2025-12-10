@@ -175,15 +175,11 @@ export const QueryExpression = z
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     'legalStatuses.REGISTERED.acceptedAt': z.optional(DateCondition),
-    'legalStatuses.DECLARED.createdAtLocation': z.optional(
-      z.union([Within, Exact])
-    ),
-    'legalStatuses.REGISTERED.createdAtLocation': z.optional(
-      z.union([Within, Exact])
-    ),
+    'legalStatuses.DECLARED.createdAtLocation': z.optional(Within),
+    'legalStatuses.REGISTERED.createdAtLocation': z.optional(Within),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
-    createdAtLocation: z.optional(z.union([Within, Exact])),
-    updatedAtLocation: z.optional(z.union([Within, Exact])),
+    createdAtLocation: z.optional(Within),
+    updatedAtLocation: z.optional(Within),
     assignedTo: z.optional(Exact),
     createdByUserType: z.optional(ExactUserType),
     createdBy: z.optional(Exact),

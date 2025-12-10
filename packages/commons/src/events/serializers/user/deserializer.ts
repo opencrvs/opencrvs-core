@@ -44,7 +44,8 @@ import { SerializedUserField } from './serializer'
  */
 function userDeserializer(
   serializedUserField: SerializedUserField | string,
-  user: User
+  user: User,
+  fallback: string = ''
 ): string {
   if (typeof serializedUserField === 'string') {
     return serializedUserField
@@ -58,7 +59,7 @@ function userDeserializer(
       `Deserializer for ${serializedUserField.$userField} is not implemented yet`
     )
   }
-  return user[serializedUserField.$userField]
+  return user[serializedUserField.$userField] ?? fallback
 }
 
 function deserializeQueryExpression(
@@ -80,34 +81,32 @@ function deserializeQueryExpression(
       ...expression.updatedBy,
       term: userDeserializer(expression.updatedBy.term, user)
     },
-    createdAtLocation:
-      expression.createdAtLocation &&
-      (expression.createdAtLocation.type === 'within'
-        ? {
-            ...expression.createdAtLocation,
-            location: userDeserializer(
-              expression.createdAtLocation.location,
-              user
-            )
-          }
-        : {
-            ...expression.createdAtLocation,
-            term: userDeserializer(expression.createdAtLocation.term, user)
-          }),
-    updatedAtLocation:
-      expression.updatedAtLocation &&
-      (expression.updatedAtLocation.type === 'within'
-        ? {
-            ...expression.updatedAtLocation,
-            location: userDeserializer(
-              expression.updatedAtLocation.location,
-              user
-            )
-          }
-        : {
-            ...expression.updatedAtLocation,
-            term: userDeserializer(expression.updatedAtLocation.term, user)
-          })
+    createdAtLocation: expression.createdAtLocation && {
+      ...expression.createdAtLocation,
+      location: userDeserializer(expression.createdAtLocation.location, user)
+    },
+    updatedAtLocation: expression.updatedAtLocation && {
+      ...expression.updatedAtLocation,
+      location: userDeserializer(expression.updatedAtLocation.location, user)
+    },
+    ['legalStatuses.DECLARED.createdAtLocation']: expression[
+      'legalStatuses.DECLARED.createdAtLocation'
+    ] && {
+      ...expression['legalStatuses.DECLARED.createdAtLocation'],
+      location: userDeserializer(
+        expression['legalStatuses.DECLARED.createdAtLocation'].location,
+        user
+      )
+    },
+    ['legalStatuses.REGISTERED.createdAtLocation']: expression[
+      'legalStatuses.REGISTERED.createdAtLocation'
+    ] && {
+      ...expression['legalStatuses.REGISTERED.createdAtLocation'],
+      location: userDeserializer(
+        expression['legalStatuses.REGISTERED.createdAtLocation'].location,
+        user
+      )
+    }
   }
 }
 

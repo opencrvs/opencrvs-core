@@ -21,8 +21,7 @@ import {
   SearchScopeAccessLevels,
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
-import { getOrThrow, ResolvedRecordScopeV2, UUID } from '@opencrvs/commons'
-import { getChildLocations } from '../locations/locations'
+import { getOrThrow, ResolvedRecordScopeV2 } from '@opencrvs/commons'
 import {
   encodeFieldId,
   generateQueryForAddressField,
@@ -156,10 +155,7 @@ function typedKeys<T extends object>(obj: T): (keyof T)[] {
   return Object.keys(obj) as (keyof T)[]
 }
 
-async function buildClause(
-  clause: QueryExpression,
-  eventConfigs: EventConfig[]
-) {
+function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
 
   for (const key of typedKeys(clause)) {
@@ -216,22 +212,10 @@ async function buildClause(
       case 'legalStatuses.REGISTERED.createdAtLocation': {
         const value = clause[key]
 
-        if (value.type === 'exact') {
-          must.push({ term: { [key]: value.term } })
-        } else {
-          const childLocations = await getChildLocations(value.location as UUID)
-          const locationIds = [
-            value.location,
-            ...childLocations.map((location) => location.id)
-          ]
-
-          must.push({
-            bool: {
-              should: locationIds.map((id) => ({ term: { [key]: id } })),
-              minimum_should_match: 1
-            }
-          })
+        if (value.location !== '') {
+          must.push({ term: { [key]: value.location } })
         }
+
         break
       }
 
@@ -282,7 +266,7 @@ async function buildClauseOrQuery(
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return buildElasticQueryFromSearchPayload(clause, eventConfigs)
   } else {
-    const must = await buildClause(clause, eventConfigs)
+    const must = buildClause(clause, eventConfigs)
     return {
       bool: {
         must,
