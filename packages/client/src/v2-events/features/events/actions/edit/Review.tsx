@@ -98,7 +98,7 @@ export function Review() {
     <>
       <EditPageBanner />
       <FormLayout
-        actionComponent={<EditActionMenu />}
+        actionComponent={<EditActionMenu event={event} />}
         route={ROUTES.V2.EVENTS.EDIT}
       >
         <ReviewComponent.Body

@@ -38,7 +38,7 @@ const StyledText = styled(Text)`
 const message = defineMessage({
   id: 'editPageBanner.message',
   defaultMessage:
-    'You are editing a birth record declared by Jane Smith ({role} at {location})',
+    'You are editing a record declared by TODO ({role} at {location})',
   description: 'The message for the edit page banner'
 })
 
