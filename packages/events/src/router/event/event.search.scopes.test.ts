@@ -524,7 +524,25 @@ test('combined registeredIn and declaredIn filters in scope', async () => {
     keepAssignment: true
   })
 
-  await userInDistrictAClient.event.actions.declare.request(declareInput)
+  const leafLevelAdminAreas = administrativeAreas.filter((aa) =>
+    administrativeAreas.every((other) => other.parentId !== aa.id)
+  )
+
+  await userInDistrictAClient.event.actions.declare.request({
+    ...declareInput,
+    declaration: {
+      ...declareInput.declaration,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: pickRandom(rng, leafLevelAdminAreas).id,
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
 
   await userInDistrictAClient.event.actions.validate.request(
     generator.event.actions.validate(originalEvent.id, {
@@ -618,7 +636,25 @@ test('combined registeredBy and declaredBy filters in scope', async () => {
     keepAssignment: true
   })
 
-  await userInDistrictAClient.event.actions.declare.request(declareInput)
+  const leafLevelAdminAreas = administrativeAreas.filter((aa) =>
+    administrativeAreas.every((other) => other.parentId !== aa.id)
+  )
+
+  await userInDistrictAClient.event.actions.declare.request({
+    ...declareInput,
+    declaration: {
+      ...declareInput.declaration,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: pickRandom(rng, leafLevelAdminAreas).id,
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
 
   await userInDistrictAClient.event.actions.validate.request(
     generator.event.actions.validate(originalEvent.id, {
