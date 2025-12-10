@@ -11,7 +11,14 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
-import { ActionType, EventDocument } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventDocument,
+  getUUID,
+  getDeclaration,
+  getActionReview,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
@@ -23,7 +30,12 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useEventConfiguration } from '../../useEventConfiguration'
+import { useActionAnnotation } from '../../useActionAnnotation'
+import { useEventFormData } from '../../useEventFormData'
+import { hasDeclarationFieldChanged } from '../correct/utils'
 
 const messages = {
   cancel: {
@@ -71,6 +83,38 @@ function useEditActions(event: EventDocument) {
   const { closeActionView } = useEventFormNavigation()
   const [modal, openModal] = useModal()
   const events = useEvents()
+  const formConfig = getDeclaration(eventConfiguration)
+  const declaration = useEventFormData((state) => state.getFormValues())
+  const { getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
+  const validatorContext = useValidatorContext()
+  const reviewConfig = getActionReview(eventConfiguration, ActionType.EDIT)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+
+  const formFields = formConfig.pages.flatMap((page) => page.fields)
+  const changedFields = formFields.filter((f) =>
+    hasDeclarationFieldChanged(
+      f,
+      declaration,
+      eventIndex.declaration,
+      eventConfiguration,
+      validatorContext
+    )
+  )
+
+  const anyValuesHaveChanged = changedFields.length > 0
+
+  if (!reviewConfig) {
+    throw new Error('Review config not found')
+  }
+
+  const hasValidationErrors = validationErrorsInActionFormExist({
+    formConfig,
+    form: declaration,
+    annotation,
+    context: validatorContext,
+    reviewFields: reviewConfig.fields
+  })
 
   return {
     modals: [modal],
@@ -96,10 +140,17 @@ function useEditActions(event: EventDocument) {
           })
 
           if (confirm) {
-            // TODO CIHAN: call mutate fn
+            events.customActions.editAndRegister.mutate({
+              eventId: event.id,
+              transactionId: getUUID(),
+              declaration,
+              annotation
+            })
+
             closeActionView(slug)
           }
         },
+        disabled: hasValidationErrors || !anyValuesHaveChanged,
         hidden: !isActionAllowed(ActionType.REGISTER)
       },
       {
@@ -123,10 +174,18 @@ function useEditActions(event: EventDocument) {
           })
 
           if (confirm) {
-            // TODO CIHAN: call mutate fn
+            events.customActions.editAndDeclare.mutate({
+              eventId: event.id,
+              transactionId: getUUID(),
+              declaration,
+              annotation
+            })
+
             closeActionView(slug)
           }
-        }
+        },
+        disabled: hasValidationErrors || !anyValuesHaveChanged,
+        hidden: !isActionAllowed(ActionType.DECLARE)
       },
       {
         icon: 'ArchiveBox' as const,
@@ -161,8 +220,12 @@ export function EditActionMenu({ event }: { event: EventDocument }) {
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {actions.map(({ onClick, icon, label }, index) => (
-            <DropdownMenu.Item key={index} onClick={onClick}>
+          {actions.map(({ onClick, icon, label, disabled }, index) => (
+            <DropdownMenu.Item
+              key={index}
+              disabled={disabled}
+              onClick={onClick}
+            >
               <Icon color="currentColor" name={icon} size="small" />
               {intl.formatMessage(label)}
             </DropdownMenu.Item>

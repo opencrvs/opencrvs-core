@@ -104,6 +104,59 @@ export async function registerOnDeclare({
   return latestResponse
 }
 
+export async function editAndRegister({
+  eventId,
+  eventConfiguration,
+  declaration,
+  transactionId,
+  annotation
+}: CustomMutationParams) {
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignment: true
+  })
+
+  if (hasPotentialDuplicates(editedEvent, eventConfiguration)) {
+    return editedEvent
+  }
+
+  return trpcClient.event.actions.register.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId
+  })
+}
+
+export async function editAndDeclare({
+  eventId,
+  eventConfiguration,
+  declaration,
+  transactionId,
+  annotation
+}: CustomMutationParams) {
+  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignment: true
+  })
+
+  if (hasPotentialDuplicates(editedEvent, eventConfiguration)) {
+    return editedEvent
+  }
+
+  return trpcClient.event.actions.declare.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId
+  })
+}
 /**
  * Runs a sequence of actions from declare to validate.
  *

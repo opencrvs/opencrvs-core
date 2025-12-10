@@ -150,6 +150,17 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   meta: { actionType: ActionType.DECLARE }
 })
 
+setMutationDefaults(trpcOptionsProxy.event.actions.edit.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.edit.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.EDIT }
+})
+
 setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.register.request
@@ -302,6 +313,8 @@ export const customMutationKeys = {
   validateOnDeclare: [['validateOnDeclare']],
   registerOnDeclare: [['registerOnDeclare']],
   registerOnValidate: [['registerOnValidate']],
+  editAndRegister: [['editAndRegister']],
+  editAndDeclare: [['editAndDeclare']],
   archiveOnDuplicate: [['archiveOnDuplicate']],
   makeCorrectionOnRequest: [['makeCorrectionOnRequest']]
 } satisfies Record<CustomMutationKeys, MutationKey>
@@ -310,6 +323,8 @@ interface CustomMutationTypes {
   validateOnDeclare: customApi.CustomMutationParams
   registerOnDeclare: customApi.CustomMutationParams
   registerOnValidate: customApi.CustomMutationParams
+  editAndRegister: customApi.CustomMutationParams
+  editAndDeclare: customApi.CustomMutationParams
   archiveOnDuplicate: customApi.ArchiveOnDuplicateParams
   makeCorrectionOnRequest: customApi.CorrectionRequestParams
 }
@@ -341,6 +356,23 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   meta: { actionType: ActionType.REGISTER }
 })
 
+queryClient.setMutationDefaults(customMutationKeys.editAndRegister, {
+  mutationFn: customApi.editAndRegister,
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.REGISTER }
+})
+
+queryClient.setMutationDefaults(customMutationKeys.editAndDeclare, {
+  mutationFn: customApi.editAndDeclare,
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.DECLARE }
+})
 queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
   mutationFn: customApi.archiveOnDuplicate,
   retry: retryUnlessConflict,

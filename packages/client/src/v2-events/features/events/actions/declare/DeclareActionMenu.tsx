@@ -23,7 +23,8 @@ import {
   UUID,
   isActionAvailable,
   getActionConfig,
-  InherentFlags
+  InherentFlags,
+  getActionReview
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -98,14 +99,10 @@ function useDeclarationActions(event: EventDocument) {
     [ActionType.REGISTER]: events.customActions.registerOnDeclare.mutate
   }
 
-  const actionConfiguration = eventConfiguration.actions.find(
-    (a) => a.type === ActionType.DECLARE
-  )
-  if (!actionConfiguration) {
-    throw new Error('Action configuration not found')
+  const reviewConfig = getActionReview(eventConfiguration, ActionType.EDIT)
+  if (!reviewConfig) {
+    throw new Error('Review config not found')
   }
-
-  const reviewConfig = actionConfiguration.review
 
   /**
    * hasValidationErrors is true if:

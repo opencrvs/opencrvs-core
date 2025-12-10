@@ -253,7 +253,9 @@ export function useEvents() {
       validateOnDeclare: useEventCustomAction('validateOnDeclare'),
       registerOnValidate: useEventCustomAction('registerOnValidate'),
       archiveOnDuplicate: useEventCustomAction('archiveOnDuplicate'),
-      makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest')
+      makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest'),
+      editAndRegister: useEventCustomAction('editAndRegister'),
+      editAndDeclare: useEventCustomAction('editAndDeclare')
     }
   }
 }
