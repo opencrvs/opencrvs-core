@@ -117,5 +117,3 @@ export function Review() {
     </>
   )
 }
-
-export const ReviewIndex = withSuspense(Review)
