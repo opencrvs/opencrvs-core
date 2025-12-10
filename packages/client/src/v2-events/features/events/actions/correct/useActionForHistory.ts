@@ -139,7 +139,7 @@ export function expandWithClientSpecificActions(
 ): EventHistoryActionDocument[] {
   return extractHistoryActions(fullEvent).flatMap<EventHistoryActionDocument>(
     (action) => {
-      if (isDeclarationAction(action)) {
+      if (isDeclarationAction(action) && action.type !== ActionType.EDIT) {
         if (
           !hasDeclarationChanged(
             fullEvent,
