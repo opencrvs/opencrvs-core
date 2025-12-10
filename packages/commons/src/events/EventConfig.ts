@@ -18,7 +18,7 @@ import { DeclarationFormConfig } from './FormConfig'
 
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
-import { FlagConfig } from './Flag'
+import { FlagConfig, InherentFlags } from './Flag'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -134,6 +134,9 @@ export const EventConfig = z
       }
     }
 
+    const isInherentFlag = (value: unknown): value is InherentFlags =>
+      Object.values(InherentFlags).includes(value as InherentFlags)
+
     // Validate that all referenced action flags are configured in the event flags array.
     const configuredFlagIds = event.flags.map((flag) => flag.id)
     const actionFlagIds = event.actions.flatMap((action) =>
@@ -141,10 +144,13 @@ export const EventConfig = z
     )
 
     for (const actionFlagId of actionFlagIds) {
-      if (!configuredFlagIds.includes(actionFlagId)) {
+      const isConfigured = configuredFlagIds.includes(actionFlagId)
+      const isInherent = isInherentFlag(actionFlagId)
+
+      if (!isConfigured && !isInherent) {
         ctx.addIssue({
           code: 'custom',
-          message: `Action flag id must match a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
+          message: `Action flag id must match an inherent flag or a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
           path: ['actions']
         })
       }

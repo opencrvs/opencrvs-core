@@ -79,7 +79,7 @@ export type FlagConfig = z.infer<typeof FlagConfig>
  * Configuration for a flag action, which is executed when the action is performed.
  */
 export const ActionFlagConfig = z.object({
-  id: CustomFlag,
+  id: Flag,
   operation: z
     .enum(['add', 'remove'])
     .describe('Operation to perform on the flag.'),
