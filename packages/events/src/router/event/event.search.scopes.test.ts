@@ -194,8 +194,12 @@ test('single scope, multi-filter combinations', async () => {
   const generator = payloadGenerator(rng)
 
   // 1. Create realistic hierarchy with users.
-  const { users, offices, administrativeAreas, isUnderAdministrativeArea } =
+  const { users, administrativeAreas, isUnderAdministrativeArea } =
     await setupHierarchyWithUsers()
+
+  const leafLevelAdminAreas = administrativeAreas.filter((aa) =>
+    administrativeAreas.every((other) => other.parentId !== aa.id)
+  )
 
   // 2. Each user creates and declares an event using duplicate data.
   for (const user of users) {
@@ -218,10 +222,7 @@ test('single scope, multi-filter combinations', async () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
-          administrativeArea: administrativeAreas.find((aa) => {
-            const office = offices.find((o) => o.id === user.primaryOfficeId)
-            return aa.id === office?.parentId
-          })?.id,
+          administrativeArea: pickRandom(rng, leafLevelAdminAreas).id,
           streetLevelDetails: {
             state: 'state',
             district2: 'district2'
@@ -353,7 +354,11 @@ test('multi-scope combinations', async () => {
 
   const generator = payloadGenerator(rng)
   // 1. Create realistic hierarchy with users.
-  const { users } = await setupHierarchyWithUsers()
+  const { users, administrativeAreas } = await setupHierarchyWithUsers()
+
+  const leafLevelAdminAreas = administrativeAreas.filter((aa) =>
+    administrativeAreas.every((other) => other.parentId !== aa.id)
+  )
 
   // 2. Each user creates and declares an event using duplicate data.
   for (const user of users) {
@@ -376,7 +381,7 @@ test('multi-scope combinations', async () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.DOMESTIC,
-          administrativeArea: user.administrativeAreaId ?? undefined,
+          administrativeArea: pickRandom(rng, leafLevelAdminAreas).id,
           streetLevelDetails: {
             state: 'state',
             district2: 'district2'
