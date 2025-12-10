@@ -101,6 +101,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
     case FieldType.TIME:
+    case FieldType.HIDDEN:
       return { type: 'text' }
     case FieldType.EMAIL:
       return {

@@ -941,12 +941,30 @@ describe('placeOfEvent location hierarchy handling', () => {
                     'office.address'
                   )
                 }
-              ])
+              ]),
+              {
+                id: 'locationId',
+                type: FieldType.HIDDEN,
+                label: {
+                  defaultMessage: 'Health Institution',
+                  description: 'This is the label for the field',
+                  id: 'event.birth.action.declare.form.section.child.field.birthLocation.label'
+                },
+                parent: [
+                  field('selected.address.type'),
+                  field('home.address'),
+                  field('office.address')
+                ],
+                value: [
+                  field('home.address').get('administrativeArea'),
+                  field('office.address').get('administrativeArea')
+                ]
+              }
             ]
           }
         })
       },
-      placeOfEvent: [field('home.address'), field('office.address')]
+      placeOfEvent: field('locationId')
     }
     mswServer.use(
       http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
@@ -980,7 +998,7 @@ describe('placeOfEvent location hierarchy handling', () => {
     grandParentLocation = {
       ...generator.locations.set(1, prng)[0],
       locationType: LocationType.enum.ADMIN_STRUCTURE,
-      name: 'Grand Parent location'
+      name: 'Grand Parent locations'
     }
     parentLocation = {
       ...generator.locations.set(1, prng)[0],
@@ -1011,7 +1029,8 @@ describe('placeOfEvent location hierarchy handling', () => {
         streetLevelDetails: { town: 'Gazipur' },
         addressType: AddressType.DOMESTIC,
         administrativeArea: parentLocationId
-      }
+      },
+      locationId: parentLocationId
     }
   })
 
@@ -1111,7 +1130,8 @@ describe('placeOfEvent location hierarchy handling', () => {
             streetLevelDetails: { town: 'Dhaka' },
             addressType: AddressType.DOMESTIC,
             administrativeArea: grandParentLocation.id
-          }
+          },
+          locationId: grandParentLocation.id
         }
       })
     )
@@ -1267,7 +1287,8 @@ describe('placeOfEvent location hierarchy handling', () => {
         streetLevelDetails: {
           town: 'Oklahoma'
         }
-      }
+      },
+      locationId: undefined
     }
 
     const event = await client.event.create(

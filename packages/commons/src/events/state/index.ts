@@ -37,10 +37,7 @@ import {
   FullDocumentPath,
   FullDocumentUrl
 } from '../../documents'
-import { mapFieldTypeToZod } from '../FieldTypeMapping'
-import { FieldType } from '../FieldType'
-import { AddressFieldUpdateValue, AddressType } from '../CompositeFieldValue'
-import { isFieldVisible, LOCATIONS_FIELD_TYPES } from '..'
+import { AddressFieldValue, AddressType } from '../CompositeFieldValue'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -169,65 +166,50 @@ export function resolveDateOfEvent(
 export const DEFAULT_PLACE_OF_EVENT_PROPERTY =
   'createdAtLocation' satisfies keyof EventMetadata
 
-function getParsedUUID(id: unknown) {
-  const parsed = UUID.safeParse(id)
-  return parsed.success ? parsed.data : undefined
+/**
+ *
+ * @param value value to parse
+ * @param oldValue fallback value, its needed when the value is invalid but we want
+ * to keep the previous valid value, since this can be used mutliple times in one flow
+ * @returns successfully parsed UUID or fallback value
+ */
+function getParsedUUID(value: unknown, oldValue?: UUID) {
+  const parsed = UUID.safeParse(value)
+  return parsed.success ? parsed.data : oldValue
 }
 
 export function resolvePlaceOfEvent(
   eventMetadata: {
-    createdAtLocation?: UUID | null | undefined
+    createdAtLocation?: UUID | undefined | null
   },
   declaration: EventState,
   config: EventConfig
-): UUID | undefined {
-  if (!config.placeOfEvent || config.placeOfEvent.length === 0) {
-    return getParsedUUID(eventMetadata.createdAtLocation)
-  }
-  const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+): UUID | undefined | null {
+  let placeOfEvent: UUID | undefined | null = getParsedUUID(
+    eventMetadata[DEFAULT_PLACE_OF_EVENT_PROPERTY]
+  )
 
-  // Find first valid location from configured fields
-  for (const { $$field } of config.placeOfEvent) {
-    const value = declaration[$$field]
-    if (value === null || value === undefined) {
-      continue
-    }
-
-    const fieldConfig = fieldConfigs.find((f) => f.id === $$field)
-
-    if (!fieldConfig) {
-      continue
-    }
+  if (config.placeOfEvent) {
+    const addressFieldValue = AddressFieldValue.safeParse(
+      declaration[config.placeOfEvent.$$field]
+    )
     if (
-      !(LOCATIONS_FIELD_TYPES as readonly FieldType[]).includes(
-        fieldConfig.type
+      addressFieldValue.success &&
+      addressFieldValue.data.addressType === AddressType.DOMESTIC &&
+      addressFieldValue.data.administrativeArea
+    ) {
+      placeOfEvent = getParsedUUID(
+        addressFieldValue.data.administrativeArea,
+        placeOfEvent
       )
-    ) {
-      continue
-    }
-    if (!isFieldVisible(fieldConfig, declaration, {})) {
-      continue
-    }
-
-    // Try parsing as address field first (domestic addresses use administrative area)
-    const addressField = AddressFieldUpdateValue.safeParse(value)
-    if (
-      addressField.success &&
-      addressField.data?.addressType === AddressType.DOMESTIC
-    ) {
-      return getParsedUUID(addressField.data.administrativeArea)
-    }
-
-    // Otherwise parse as standard location field
-    const zodType = mapFieldTypeToZod(fieldConfig, ActionType.CREATE)
-    const parsed = zodType.safeParse(value)
-    // making sure it's any other field other than an international address field
-    if (parsed.success && !addressField.success) {
-      return getParsedUUID(parsed.data)
+    } else {
+      placeOfEvent = getParsedUUID(
+        declaration[config.placeOfEvent.$$field],
+        placeOfEvent
+      )
     }
   }
-  // When no value can not be resolved, it defaults again to registrar office location, (ex: AddressType.DOMESTIC etc)
-  return getParsedUUID(eventMetadata.createdAtLocation)
+  return placeOfEvent
 }
 
 export function extractPotentialDuplicatesFromActions(
