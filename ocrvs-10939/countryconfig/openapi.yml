@@ -206,6 +206,7 @@ components:
         - $ref: "#/components/schemas/UnassignedAction"
         - $ref: "#/components/schemas/PrintCertificateAction"
         - $ref: "#/components/schemas/ReadAction"
+        - $ref: "#/components/schemas/EditAction"
         - $ref: "#/components/schemas/CustomAction"
       type: object
       discriminator:
@@ -228,6 +229,7 @@ components:
           UNASSIGN: "#/components/schemas/UnassignedAction"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateAction"
           READ: "#/components/schemas/ReadAction"
+          EDIT: "#/components/schemas/EditAction"
           CUSTOM: "#/components/schemas/CustomAction"
     CreatedAction:
       type: object
@@ -1880,6 +1882,99 @@ components:
         type:
           type: string
           const: READ
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
+    EditAction:
+      type: object
+      properties:
+        id:
+          description: Unique identifier of the action.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        transactionId:
+          description: Unique identifier of the transaction.
+          type: string
+        createdByUserType:
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+          type: string
+          enum:
+            - user
+            - system
+        createdAt:
+          description: Timestamp indicating when the action was created.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          description: Identifier of the user who created the action.
+          type: string
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+        annotation:
+          description: Action-specific metadata used to annotate the event.
+          anyOf:
+            - description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+              type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+            - type: "null"
+        status:
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+        originalActionId:
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        type:
+          type: string
+          const: EDIT
       required:
         - id
         - transactionId
@@ -11313,6 +11408,7 @@ components:
         - $ref: "#/components/schemas/UnassignedActionOutput"
         - $ref: "#/components/schemas/PrintCertificateActionOutput"
         - $ref: "#/components/schemas/ReadActionOutput"
+        - $ref: "#/components/schemas/EditActionOutput"
         - $ref: "#/components/schemas/CustomActionOutput"
       type: object
       discriminator:
@@ -11335,6 +11431,7 @@ components:
           UNASSIGN: "#/components/schemas/UnassignedActionOutput"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateActionOutput"
           READ: "#/components/schemas/ReadActionOutput"
+          EDIT: "#/components/schemas/EditActionOutput"
           CUSTOM: "#/components/schemas/CustomActionOutput"
     CreatedActionOutput:
       type: object
@@ -13010,6 +13107,100 @@ components:
         type:
           type: string
           const: READ
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
+      additionalProperties: false
+    EditActionOutput:
+      type: object
+      properties:
+        id:
+          description: Unique identifier of the action.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        transactionId:
+          description: Unique identifier of the transaction.
+          type: string
+        createdByUserType:
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+          type: string
+          enum:
+            - user
+            - system
+        createdAt:
+          description: Timestamp indicating when the action was created.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          description: Identifier of the user who created the action.
+          type: string
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+        annotation:
+          description: Action-specific metadata used to annotate the event.
+          anyOf:
+            - description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+              type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+            - type: "null"
+        status:
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+        originalActionId:
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        type:
+          type: string
+          const: EDIT
       required:
         - id
         - transactionId
