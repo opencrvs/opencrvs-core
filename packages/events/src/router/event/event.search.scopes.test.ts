@@ -59,6 +59,7 @@ function generateOfficeLocations(adminAreas: Location[], rng: () => number) {
 async function setupHierarchyWithUsers() {
   const rng = createPrng(1234)
   const seed = seeder()
+
   // Generate Administrative areas with children, some "skipping" levels.
   const provinceA = {
     name: 'Province A',
