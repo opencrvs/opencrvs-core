@@ -13,8 +13,9 @@ import {
   ConfigurableScopeType,
   findScope,
   getAuthorizedEventsFromScopes,
-  RecordScopeType,
-  Scope
+  ConfigurableRawScopes,
+  Scope,
+  RecordScopeType
 } from '../scopes'
 import {
   ClientSpecificAction,
@@ -65,7 +66,8 @@ export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
 export function configurableEventScopeAllowed(
   scopes: Scope[],
   allowedConfigurableScopes: ConfigurableScopeType[],
-  eventType: string
+  eventType: string,
+  customActionType?: string
 ) {
   // Find the scopes that are authorized for the given action
   const parsedScopes = allowedConfigurableScopes
@@ -74,6 +76,21 @@ export function configurableEventScopeAllowed(
 
   // Ensure that the given event type is authorized in the found scopes
   const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+  const firstScope = parsedScopes[0] as Extract<
+    ConfigurableRawScopes,
+    { type: 'record.custom-action' }
+  >
+  if (
+    firstScope &&
+    firstScope.type === 'record.custom-action' &&
+    customActionType
+  ) {
+    // Type guard: only access customActionType if type is 'record.custom-action'
+    const allowedCustomActionTypes = firstScope.options.customActionType || []
+    if (!allowedCustomActionTypes.includes(customActionType)) {
+      return false
+    }
+  }
   return authorizedEvents.includes(eventType)
 }
 

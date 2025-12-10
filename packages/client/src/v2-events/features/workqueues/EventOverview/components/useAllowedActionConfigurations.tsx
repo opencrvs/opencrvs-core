@@ -577,6 +577,7 @@ function useCustomActionConfigs(
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
@@ -593,6 +594,14 @@ function useCustomActionConfigs(
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
       )
+      .filter((action) =>
+        configurableEventScopeAllowed(
+          scopes,
+          ['record.custom-action'],
+          event.type,
+          action.customActionType
+        )
+      )
       .map((action) => ({
         label: action.label,
         icon: action.icon ?? ('PencilLine' as const),
@@ -603,7 +612,13 @@ function useCustomActionConfigs(
         type: ActionType.CUSTOM,
         customActionType: action.customActionType
       }))
-  }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
+  }, [
+    eventConfiguration.actions,
+    scopes,
+    event.type,
+    isDownloadedAndAssignedToUser,
+    onCustomAction
+  ])
 
   const hasCustomActionScope = configurableEventScopeAllowed(
     scopes,
