@@ -13,7 +13,6 @@ import {
   ConfigurableScopeType,
   findScope,
   getAuthorizedEventsFromScopes,
-  ConfigurableRawScopes,
   Scope,
   RecordScopeType
 } from '../scopes'
@@ -76,17 +75,13 @@ export function configurableEventScopeAllowed(
 
   // Ensure that the given event type is authorized in the found scopes
   const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-  const firstScope = parsedScopes[0] as Extract<
-    ConfigurableRawScopes,
-    { type: 'record.custom-action' }
-  >
+  const firstScope = parsedScopes[0]
   if (
-    firstScope &&
+    parsedScopes.length > 0 &&
     firstScope.type === 'record.custom-action' &&
     customActionType
   ) {
-    // Type guard: only access customActionType if type is 'record.custom-action'
-    const allowedCustomActionTypes = firstScope.options.customActionType || []
+    const allowedCustomActionTypes = firstScope.options.customActionType
     if (!allowedCustomActionTypes.includes(customActionType)) {
       return false
     }
