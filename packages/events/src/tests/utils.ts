@@ -353,6 +353,7 @@ function actionToClientAction(
     case ActionType.DELETE:
     case ActionType.CUSTOM:
     case ActionType.READ:
+    case ActionType.EDIT:
     default:
       throw new Error(
         `Unsupported action type: ${action}. Create a case for it if you need it.`
