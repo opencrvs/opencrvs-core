@@ -124,6 +124,7 @@ export const EventFieldIdInput = z.enum([
   'status',
   'legalStatuses.REGISTERED.acceptedAt',
   'legalStatuses.REGISTERED.createdAtLocation',
+  'legalStatuses.REGISTERED.registrationNumber',
   'updatedAt'
 ])
 
@@ -142,6 +143,7 @@ export const EventFieldId = z.enum([
   `${METADATA_FIELD_PREFIX}status`,
   `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.acceptedAt`,
   `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.createdAtLocation`,
+  `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.registrationNumber`,
   `${METADATA_FIELD_PREFIX}updatedAt`
 ])
 

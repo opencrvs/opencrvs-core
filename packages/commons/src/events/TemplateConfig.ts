@@ -10,7 +10,7 @@
  */
 
 /**
- * TemplateConfig defines configuration rules for system-based variables (e.g. $user.province).
+ * TemplateConfig defines configuration rules for system-based variables (e.g. $user.role).
  * They are currently used for providing default values in FieldConfig.
  */
 
@@ -21,8 +21,8 @@ import { FieldValue } from './FieldValue'
  */
 export type SystemVariables = {
   $user: {
-    province: string
-    district: string
+    name: string
+    role: string
   }
 }
 
