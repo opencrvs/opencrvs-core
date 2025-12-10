@@ -30,7 +30,7 @@ import { hasAnnotationChanged, getDeclarationComparison } from './utils'
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
  */
 export const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
-type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
+export type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
 
 type UpdateActionDocument = Omit<ActionDocument, 'type'> & {
   type: DECLARATION_ACTION_UPDATE

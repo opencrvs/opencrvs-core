@@ -20,7 +20,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { roleMessage } from '@client/v2-events/features/workqueues/EventOverview/components/EventHistory/EventHistory'
+import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 
 const Wrapper = styled.div`
   display: flex;
@@ -38,7 +38,7 @@ const StyledText = styled(Text)`
 const message = defineMessage({
   id: 'editPageBanner.message',
   defaultMessage:
-    'You are editing a record declared by TODO ({role} at {location})',
+    'You are editing a record declared by {name} ({role} at {location})',
   description: 'The message for the edit page banner'
 })
 
@@ -48,8 +48,6 @@ export function EditPageBanner() {
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
   const { getUser } = useUsers()
-  const users = getUser.getAllCached()
-
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
 
@@ -58,23 +56,26 @@ export function EditPageBanner() {
   )
 
   // Fetch createdAtLocation and createdBy from latest declaration action
-  const { createdAtLocation, createdBy } =
+  const { createdAtLocation, createdBy, createdByRole, createdByUserType } =
     declarationActions[declarationActions.length - 1]
 
-  const user = users.find((u) => u.id === createdBy)
+  const { getUserDetails } = useUserDetails()
+  const { role, name } = getUserDetails({
+    createdByUserType,
+    createdBy,
+    type: ActionType.DECLARE,
+    createdByRole
+  })
 
   const location = createdAtLocation
     ? locations.get(createdAtLocation)
     : undefined
 
-  const role = intl.formatMessage(roleMessage, { role: user?.role })
-
-  // @TODO CIHAN: get user name
   return (
     <Wrapper>
       <Icon name="PencilSimpleLine" size="small" />
       <StyledText color="white" element="span" variant="bold14">
-        {intl.formatMessage(message, { location: location?.name, role })}
+        {intl.formatMessage(message, { location: location?.name, role, name })}
       </StyledText>
     </Wrapper>
   )

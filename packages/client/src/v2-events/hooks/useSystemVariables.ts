@@ -10,13 +10,13 @@
  */
 
 import { SystemVariables } from '@opencrvs/commons/client'
-import { useUserDetails } from './useUserDetails'
+import { useCurrentUserDetails } from './useCurrentUserDetails'
 
 /**
  * Exposes template variables such as `$user` for components to replace field values or other templates
  */
 export function useSystemVariables() {
-  const user = useUserDetails()
+  const user = useCurrentUserDetails()
 
   const variables = {
     $user: user

@@ -9,57 +9,82 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useIntl, defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { LocationType } from '@opencrvs/commons/client'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { ActionType, TokenUserType } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
-import { getAdminLevelHierarchy, getUsersFullName } from '../utils'
-import { useLocations } from './useLocations'
-import { useUsers } from './useUsers'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { useEventOverviewContext } from '../features/workqueues/EventOverview/EventOverviewContext'
+import { DECLARATION_ACTION_UPDATE } from '../features/events/actions/correct/useActionForHistory'
+
+const messages = defineMessages({
+  systemDefaultName: {
+    id: 'event.history.systemDefaultName',
+    defaultMessage: 'System integration',
+    description: 'Fallback for system integration name in the event history'
+  },
+  system: {
+    id: 'event.history.system',
+    defaultMessage: 'System',
+    description: 'Name for system initiated actions in the event history'
+  },
+  role: {
+    id: 'event.history.role',
+    defaultMessage:
+      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} HEALTH {Health integration} IMPORT_EXPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
+    description: 'Role of the user in the event history'
+  }
+})
 
 export function useUserDetails() {
-  const { config } = useSelector(getOfflineData)
-  const appConfigAdminLevels = config.ADMIN_STRUCTURE
-
-  const loggedInUser = useSelector(getUserDetails)
+  const intl = useIntl()
   const { getUser } = useUsers()
-  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
+  const users = getUser.getAllCached()
+  const { systems } = useSelector(getOfflineData)
 
-  const { getLocations } = useLocations()
-  const locations = getLocations.useSuspenseQuery()
-
-  const name = getUsersFullName(user.name, 'en')
-
-  if (user.primaryOfficeId) {
-    const primaryOfficeLocation = locations.get(user.primaryOfficeId)
-
-    const adminStructureLocations = new Map(
-      [...locations].filter(
-        ([, location]) =>
-          location.locationType === LocationType.enum.ADMIN_STRUCTURE
-      )
-    )
-
-    const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
-
-    const adminLevels = getAdminLevelHierarchy(
-      primaryOfficeLocation?.parentId ?? undefined,
-      adminStructureLocations,
-      adminLevelIds
-    )
-    return {
-      name,
-      role: user.role,
-      district: '',
-      province: '',
-      ...adminLevels
+  const getUserDetails = ({
+    createdByUserType,
+    createdBy,
+    type,
+    createdByRole
+  }: {
+    createdByUserType: TokenUserType
+    createdBy: string
+    type: ActionType | DECLARATION_ACTION_UPDATE
+    createdByRole?: string
+  }): {
+    type: 'user' | 'system' | 'integration'
+    name: string
+    role: string | undefined
+  } => {
+    if (createdByUserType === 'system') {
+      const system = systems.find((s) => s._id === createdBy)
+      return {
+        type: 'integration',
+        name: system?.name ?? intl.formatMessage(messages.systemDefaultName),
+        role: undefined
+      } as const
     }
+
+    if (type === ActionType.DUPLICATE_DETECTED) {
+      return {
+        type: 'system',
+        name: intl.formatMessage(messages.system),
+        role: undefined
+      } as const
+    }
+
+    const user = users.find((u) => u.id === createdBy)
+
+    return {
+      type: 'user',
+      name: user ? getUsersFullName(user.name, intl.locale) : 'Missing user',
+      role: createdByRole
+        ? intl.formatMessage(messages.role, { role: createdByRole })
+        : undefined
+    } as const
   }
 
-  return {
-    name,
-    role: user.role,
-    district: '',
-    province: ''
-  }
+  return { getUserDetails }
 }
