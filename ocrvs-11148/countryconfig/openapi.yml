@@ -9903,8 +9903,8 @@ components:
                       - $$field
                     additionalProperties: false
             required:
+              default: false
               type: boolean
-              const: false
             conditionals:
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
@@ -9990,6 +9990,8 @@ components:
             type:
               type: string
               const: HIDDEN
+            defaultValue:
+              type: string
           required:
             - id
             - label
