@@ -96,8 +96,8 @@ export function getActionConfig({
       return a.customActionType === customActionType
     }
 
-    // Notify uses the declare action config
-    if (actionType === ActionType.NOTIFY) {
+    // Notify and edit use the declare action config
+    if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
       return a.type === ActionType.DECLARE
     }
 
@@ -198,9 +198,14 @@ export function getActionReview(
   configuration: EventConfig,
   actionType: ActionType
 ) {
-  const [actionConfig] = configuration.actions.filter(
-    (a): a is DeclarationActionConfig => a.type === actionType
-  )
+  const actionConfig = getActionConfig({
+    eventConfiguration: configuration,
+    actionType
+  })
+
+  if (!actionConfig) {
+    throw 'Tried to get action review for an action that is not a declaration action'
+  }
 
   if ('review' in actionConfig) {
     return actionConfig.review

@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"}]]`;
+
+exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;

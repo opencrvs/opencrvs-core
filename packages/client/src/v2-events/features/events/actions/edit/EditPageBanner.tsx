@@ -67,12 +67,9 @@ export function EditPageBanner() {
     ? locations.get(createdAtLocation)
     : undefined
 
-  // TODO CIHAN: get user name
-  console.log('foo')
-  console.log(user)
-
   const role = intl.formatMessage(roleMessage, { role: user?.role })
 
+  // @TODO CIHAN: get user name
   return (
     <Wrapper>
       <Icon name="PencilSimpleLine" size="small" />

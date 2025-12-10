@@ -27,6 +27,7 @@ import {
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
+  EditActionInput,
   MarkAsDuplicateActionInput,
   MarkNotDuplicateActionInput,
   NotifyActionInput,
@@ -487,6 +488,26 @@ export function eventPayloadGenerator(
           keepAssignment: input.keepAssignment
         }
       },
+      edit: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            EditActionInput,
+            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.EDIT,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration:
+          input.declaration ??
+          generateActionDeclarationInput(configuration, ActionType.EDIT, rng),
+        annotation:
+          input.annotation ??
+          generateActionAnnotationInput(configuration, ActionType.EDIT, rng),
+        eventId,
+        ...input
+      }),
       validate: (
         eventId: string,
         input: Partial<

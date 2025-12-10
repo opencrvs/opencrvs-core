@@ -99,6 +99,7 @@ export const TEST_USER_DEFAULT_SCOPES = [
   'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.validate[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
