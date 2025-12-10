@@ -1099,14 +1099,6 @@ export async function getReviewFormFromStore(
   return getReviewForm(state)![event]
 }
 
-export function setPageVisibility(isVisible: boolean) {
-  // @ts-ignore
-  document.hidden = !isVisible
-  const evt = document.createEvent('HTMLEvents')
-  evt.initEvent('visibilitychange', false, true)
-  document.dispatchEvent(evt)
-}
-
 export function loginAsFieldAgent(store: AppStore) {
   return store.dispatch(
     setUserDetails({
