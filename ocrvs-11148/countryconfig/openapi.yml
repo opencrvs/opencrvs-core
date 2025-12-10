@@ -9903,18 +9903,8 @@ components:
                       - $$field
                     additionalProperties: false
             required:
-              description: Indicates whether the field is mandatory.
-              default: false
-              anyOf:
-                - type: boolean
-                - type: object
-                  properties:
-                    message:
-                      description: Custom required validation message
-                      $ref: "#/components/schemas/TranslationConfig"
-                  required:
-                    - message
-                  additionalProperties: false
+              type: boolean
+              const: false
             conditionals:
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
