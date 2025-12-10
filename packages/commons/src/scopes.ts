@@ -328,6 +328,12 @@ const ConfigurableRawScopes = z.discriminatedUnion('type', [
   CustomActionScope
 ])
 
+export const ConfigurableActionScopes = z.discriminatedUnion('type', [
+  // @TODO - Record scope holds non-action scopes as well e.g., `record.read`
+  RecordScope,
+  CustomActionScope
+])
+
 type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
 export type ConfigurableScopeType = ConfigurableRawScopes['type']
 

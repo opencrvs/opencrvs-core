@@ -15,7 +15,6 @@ import { ActionType, TokenUserType } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { useEventOverviewContext } from '../features/workqueues/EventOverview/EventOverviewContext'
 import { DECLARATION_ACTION_UPDATE } from '../features/events/actions/correct/useActionForHistory'
 
 const messages = defineMessages({

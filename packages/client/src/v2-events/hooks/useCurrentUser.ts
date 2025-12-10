@@ -17,7 +17,7 @@ import { getAdminLevelHierarchy, getUsersFullName } from '../utils'
 import { useLocations } from './useLocations'
 import { useUsers } from './useUsers'
 
-export function useCurrentUserDetails() {
+export function useCurrentUser() {
   const { config } = useSelector(getOfflineData)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
 
@@ -50,16 +50,12 @@ export function useCurrentUserDetails() {
     return {
       name,
       role: user.role,
-      district: '',
-      province: '',
       ...adminLevels
     }
   }
 
   return {
     name,
-    role: user.role,
-    district: '',
-    province: ''
+    role: user.role
   }
 }
