@@ -25,8 +25,10 @@ import {
   generateTrackingId
 } from '@opencrvs/commons/client'
 import { getTestValidatorContext } from '../../../../../../../../.storybook/decorators'
-import { expandWithClientSpecificActions } from '../../../../../events/actions/correct/useActionForHistory'
-import { DECLARATION_ACTION_UPDATE } from '../../../../../events/registered-fields'
+import {
+  expandWithClientSpecificActions,
+  DECLARATION_ACTION_UPDATE
+} from '../../../../../events/actions/correct/useActionForHistory'
 import { testDataGenerator } from '../../../../../../../tests/test-data-generators'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
