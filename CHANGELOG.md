@@ -12,6 +12,12 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 
 - Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
 
+### Improvements
+
+- Refactor the tRPC context to allow defining public procedures that don't require authentication.
+- Remove legacy mongo migration status outputs and skip typecheck which reduced the migration service startup time by 66%.
+- The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
+
 ## 1.9.2
 
 ### New features
@@ -339,6 +345,8 @@ To see Events V2 in action, check out the example configurations in the **countr
 - Add Import/Export system client and `record.export` scope to enable data migrations [#10415](https://github.com/opencrvs/opencrvs-core/issues/10415)
 - Add an Alpha version of configurable "Print" button that will be refactored in a later release - this button can be used to print certificates during declaration/correction flow. [#10039](https://github.com/opencrvs/opencrvs-core/issues/10039)
 - Add bulk import endpoint [#10590](https://github.com/opencrvs/opencrvs-core/pull/10590)
+- Add multi-field search with a single component [#10617](https://github.com/opencrvs/opencrvs-core/issues/10617)
+- Add registration number field to advanced search configuration so that documents can be searched by their `Registration Number`. [#10760](https://github.com/opencrvs/opencrvs-core/issues/10760)
 
 ### Improvements
 

@@ -13,6 +13,7 @@
     "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "create:hearth": "./create-mongo-migrations.sh hearth",
     "create:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/events --migration-file-language=sql",
+    "create:migrate-legacy-users": "DATABASE_URL=postgres://postgres:postgres@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/migrate-legacy-users --migration-file-language=sql --migrations-table=pgmigrations_legacy_users",
     "create:openhim": "./create-mongo-migrations.sh openhim",
     "create:performance": "./create-mongo-migrations.sh performance",
     "create:user-mgnt": "./create-mongo-migrations.sh user-mgnt",
@@ -24,10 +25,12 @@
     "status:application-config": "migrate-mongo status -f ./src/migrate-mongo-config-application-config.js",
     "lint": "eslint -c eslint.config.cjs --max-warnings=0",
     "test:compilation": "tsc --noEmit",
-    "build": "rimraf build && tsc"
+    "test": "yarn test:compilation",
+    "build": "rimraf build && tsc --noCheck"
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.13.1",
+    "@opencrvs/commons": "^1.9.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/lodash-es": "^4.17.0",
     "@types/uuid": "^3.4.3",
