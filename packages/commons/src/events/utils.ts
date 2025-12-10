@@ -46,8 +46,7 @@ import { getUUID, UUID } from '../uuid'
 import {
   ActionConfig,
   actionConfigTypes,
-  ActionConfigTypes,
-  DeclarationActionConfig
+  ActionConfigTypes
 } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
