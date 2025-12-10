@@ -41,6 +41,7 @@ exports[`getAvailableActions should return the correct actions for "DECLARED" st
   "ARCHIVE",
   "REJECT",
   "CUSTOM",
+  "EDIT",
 ]
 `;
 
