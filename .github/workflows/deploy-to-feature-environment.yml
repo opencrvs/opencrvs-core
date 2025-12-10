@@ -70,6 +70,7 @@ jobs:
       author: ${{ steps.get_author.outputs.AUTHOR }}
       slugified_branch: ${{ steps.slugify_bname.outputs.stack }}
       e2e_branch: ${{ steps.get_e2e_branch.outputs.branch }}
+      chart_branch: ${{ steps.get_chart_branch.outputs.branch }}
     steps:
       - uses: actions/checkout@v5
 
@@ -141,6 +142,20 @@ jobs:
           fi
           echo "e2e branch name=${e2e_branch}"
           echo "branch=$e2e_branch" >> $GITHUB_OUTPUT
+      - name: Get chart branch
+        id: get_chart_branch
+        # ls-remote should provide list of branches. When none are found, it should be empty string.
+        run: |
+          chart_repo_url="https://github.com/opencrvs/infrastructure.git"
+          if [ -n "$(git ls-remote --heads "$chart_repo_url" "refs/heads/${{ github.head_ref }}")" ]; then
+            branch=${{ github.head_ref }}
+          elif [ -n "$(git ls-remote --heads "$chart_repo_url" "refs/heads/${{ github.base_ref }}")" ]; then
+            branch="${{ github.base_ref }}"
+          else
+            branch="develop"
+          fi
+          echo "chart branch name=${branch}"
+          echo "branch=$branch" >> $GITHUB_OUTPUT
       - name: Get PR Author
         id: get_author
         env:
@@ -266,6 +281,7 @@ jobs:
                 stack: '${{  steps.generate_stack.outputs.stack  }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
                 'branch': '${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}',
+                'chart-branch': '${{ needs.generate_stack_name_and_branch.outputs.chart_branch }}',
                 'runtime': '${{ needs.generate_stack_name_and_branch.outputs.runtime }}'
               }
             });
