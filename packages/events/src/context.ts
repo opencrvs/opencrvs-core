@@ -163,18 +163,10 @@ async function resolveUserDetails(
 
 export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
-  let token: TokenWithBearer
+  const token = TokenWithBearer.safeParse(normalizedHeaders.authorization).data
 
-  try {
-    token = TokenWithBearer.parse(normalizedHeaders.authorization)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Authorization token is missing'
-    })
+  return {
+    token,
+    user: token && (await resolveUserDetails(token).catch(() => undefined))
   }
-
-  const user = await resolveUserDetails(token)
-  return { token, user }
 }

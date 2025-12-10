@@ -44,7 +44,7 @@ import {
   requiresAnyOfScopes,
   setBearerForToken
 } from '@events/router/middleware'
-import { systemProcedure } from '@events/router/trpc'
+import { userAndSystemProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
@@ -348,7 +348,7 @@ export function getDefaultActionProcedures(
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
   return {
-    request: systemProcedure
+    request: userAndSystemProcedure
       .meta(meta)
       .use(requireScopesForRequestMiddleware)
       .input(actionConfig.inputSchema.strict())
@@ -386,7 +386,7 @@ export function getDefaultActionProcedures(
         )
       }),
 
-    accept: systemProcedure
+    accept: userAndSystemProcedure
       .input(
         actionConfig.inputSchema.extend(asyncAcceptInputFields.shape).strict()
       )
@@ -457,7 +457,7 @@ export function getDefaultActionProcedures(
         )
       }),
 
-    reject: systemProcedure
+    reject: userAndSystemProcedure
       .input(AsyncActionConfirmationResponseSchema)
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {
