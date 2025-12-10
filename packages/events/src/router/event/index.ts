@@ -39,7 +39,11 @@ import {
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
-import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
+import {
+  userOnlyProcedure,
+  router,
+  userAndSystemProcedure
+} from '@events/router/trpc'
 import {
   getEventConfigurationById,
   getInMemoryEventConfigurations
@@ -73,7 +77,7 @@ export const eventRouter = router({
      * Event configurations are intentionally available to all user types.
      * Some of the dynamic scopes require knowledge of available types.
      */
-    get: publicProcedure
+    get: userOnlyProcedure
       .meta({
         openapi: {
           summary: 'List event configurations',
@@ -89,7 +93,7 @@ export const eventRouter = router({
         getInMemoryEventConfigurations(options.ctx.token)
       )
   }),
-  create: systemProcedure
+  create: userAndSystemProcedure
     .meta({
       openapi: {
         summary: 'Create event',
@@ -116,7 +120,7 @@ export const eventRouter = router({
         config
       })
     }),
-  get: publicProcedure
+  get: userOnlyProcedure
     .input(UUID)
     // @ts-expect-error: middleware.userCanReadEvent does not have proper type definitions but works as intended
     .use(middleware.userCanReadEvent)
@@ -146,7 +150,7 @@ export const eventRouter = router({
 
       return updatedEvent
     }),
-  getDuplicates: publicProcedure
+  getDuplicates: userOnlyProcedure
     .use(requiresAnyOfScopes([], ['record.declared.review-duplicates']))
     .input(EventIdParam)
     .use(middleware.eventTypeAuthorization)
@@ -156,7 +160,7 @@ export const eventRouter = router({
 
       return getDuplicateEvents(event, ctx)
     }),
-  delete: publicProcedure
+  delete: userOnlyProcedure
     .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.DELETE]))
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
@@ -173,10 +177,10 @@ export const eventRouter = router({
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
-    list: publicProcedure
+    list: userOnlyProcedure
       .output(z.array(Draft))
       .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
-    create: publicProcedure
+    create: userOnlyProcedure
       .input(DraftInput)
       .use(middleware.requireAssignment)
       .output(Draft)
@@ -231,14 +235,14 @@ export const eventRouter = router({
     ),
     custom: router(customActionProcedures()),
     assignment: router({
-      assign: publicProcedure
+      assign: userOnlyProcedure
         .input(AssignActionInput)
         .use(middleware.validateAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
           return assignRecord({ input, user, token })
         }),
-      unassign: publicProcedure
+      unassign: userOnlyProcedure
         .input(UnassignActionInput)
         .use(middleware.validateAction)
         .mutation(async ({ input, ctx }) => {
@@ -256,7 +260,7 @@ export const eventRouter = router({
       reject: router(getDefaultActionProcedures(ActionType.REJECT_CORRECTION))
     }),
     duplicate: router({
-      markAsDuplicate: publicProcedure
+      markAsDuplicate: userOnlyProcedure
         .input(MarkAsDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
@@ -273,7 +277,7 @@ export const eventRouter = router({
             configuration
           )
         }),
-      markNotDuplicate: publicProcedure
+      markNotDuplicate: userOnlyProcedure
         .input(MarkNotDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
@@ -292,7 +296,7 @@ export const eventRouter = router({
         })
     })
   }),
-  search: systemProcedure
+  search: userAndSystemProcedure
     .meta({
       openapi: {
         summary: 'Search for events',
@@ -354,7 +358,7 @@ export const eventRouter = router({
         user: ctx.user
       })
     }),
-  bulkImport: systemProcedure
+  bulkImport: userAndSystemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({
       openapi: {
@@ -367,7 +371,7 @@ export const eventRouter = router({
     .input(z.array(EventDocument))
     .output(z.any())
     .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
-  reindex: systemProcedure
+  reindex: userAndSystemProcedure
     .input(z.void())
     .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
     .output(z.void())
