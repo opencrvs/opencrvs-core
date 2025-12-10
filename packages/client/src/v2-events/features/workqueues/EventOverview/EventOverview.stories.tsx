@@ -661,7 +661,7 @@ const duplicateEvent = {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DUPLICATE_DETECTED,
-      defaults: actionDefaults
+      defaults: { ...actionDefaults, createdByRole: undefined }
     }),
     generateActionDocument({
       configuration: tennisClubMembershipEvent,

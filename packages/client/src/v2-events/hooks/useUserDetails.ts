@@ -57,9 +57,9 @@ export function useUserDetails() {
     name: string
     role: string | undefined
   } => {
-    const role = createdByRole
-      ? intl.formatMessage(messages.role, { role: createdByRole })
-      : undefined
+    const role = intl.formatMessage(messages.role, {
+      role: createdByRole || ''
+    })
 
     if (createdByUserType === 'system') {
       const system = systems.find((s) => s._id === createdBy)
