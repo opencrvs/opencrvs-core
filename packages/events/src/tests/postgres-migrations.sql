@@ -237,6 +237,56 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
 
 --
+-- Name: user_credentials; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.user_credentials (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    username text NOT NULL,
+    password_hash text NOT NULL,
+    salt text NOT NULL,
+    security_questions jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE app.user_credentials OWNER TO events_migrator;
+
+--
+-- Name: users; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.users (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    legacy_id text,
+    firstname text,
+    surname text,
+    full_honorific_name text,
+    role text NOT NULL,
+    status text NOT NULL,
+    email text,
+    mobile text,
+    signature_path text,
+    profile_image_path text,
+    office_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
+);
+
+
+ALTER TABLE app.users OWNER TO events_migrator;
+
+--
+-- Name: COLUMN users.legacy_id; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.users.legacy_id IS 'References the user id from the legacy database.';
+
+
+--
 -- Name: pgmigrations id; Type: DEFAULT; Schema: app; Owner: events_migrator
 --
 
@@ -340,6 +390,54 @@ ALTER TABLE ONLY app.pgmigrations
 
 
 --
+-- Name: user_credentials user_credentials_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.user_credentials
+    ADD CONSTRAINT user_credentials_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_credentials user_credentials_username_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.user_credentials
+    ADD CONSTRAINT user_credentials_username_key UNIQUE (username);
+
+
+--
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- Name: users users_legacy_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_legacy_id_key UNIQUE (legacy_id);
+
+
+--
+-- Name: users users_mobile_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_mobile_key UNIQUE (mobile);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
@@ -439,6 +537,22 @@ ALTER TABLE ONLY app.locations
 
 
 --
+-- Name: user_credentials user_credentials_user_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.user_credentials
+    ADD CONSTRAINT user_credentials_user_id_fkey FOREIGN KEY (user_id) REFERENCES app.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users users_office_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_office_id_fkey FOREIGN KEY (office_id) REFERENCES app.locations(id);
+
+
+--
 -- Name: SCHEMA app; Type: ACL; Schema: -; Owner: events_migrator
 --
 
@@ -478,6 +592,20 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.events TO events_app;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
+
+
+--
+-- Name: TABLE user_credentials; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.user_credentials TO events_app;
+
+
+--
+-- Name: TABLE users; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 
 
 --
