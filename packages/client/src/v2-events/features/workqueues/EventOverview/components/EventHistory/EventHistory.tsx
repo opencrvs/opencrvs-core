@@ -67,18 +67,20 @@ const TableDiv = styled.div`
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
+export const roleMessage = {
+  id: 'event.history.role',
+  defaultMessage:
+    '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} HEALTH {Health integration} IMPORT_EXPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
+  description: 'Role of the user in the event history'
+}
+
 const messages = defineMessages({
   timeFormat: {
     defaultMessage: 'MMMM dd, yyyy · hh.mm a',
     id: 'configuration.timeFormat',
     description: 'Time format for timestamps in event history'
   },
-  role: {
-    id: 'event.history.role',
-    defaultMessage:
-      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} HEALTH {Health integration} IMPORT_EXPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
-    description: 'Role of the user in the event history'
-  },
+  role: roleMessage,
   system: {
     id: 'event.history.system',
     defaultMessage: 'System',

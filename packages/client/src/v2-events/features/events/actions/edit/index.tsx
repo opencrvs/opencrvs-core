@@ -12,7 +12,9 @@
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Pages } from './Pages'
 import { Review } from './Review'
+import { EditPageBanner } from './EditPageBanner'
 
 const PagesIndex = withSuspense(Pages)
 const ReviewIndex = withSuspense(Review)
+
 export { PagesIndex as Pages, ReviewIndex as Review }

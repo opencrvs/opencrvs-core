@@ -15,7 +15,11 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getDeclaration } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  getDeclaration,
+  getCurrentEventState
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
@@ -28,6 +32,8 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { EditActionMenu } from './EditActionMenu'
+import { EditPageBanner } from './EditPageBanner'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EDIT.REVIEW)
@@ -42,6 +48,8 @@ export function Review() {
   const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: config } = useEventConfiguration(event.type)
   const formConfig = getDeclaration(config)
+  const currentEventState = getCurrentEventState(event, config)
+  const previousFormValues = currentEventState.declaration
   const actionConfiguration = config.actions.find(
     (a) => a.type === ActionType.DECLARE
   )
@@ -87,19 +95,26 @@ export function Review() {
   }
 
   return (
-    <FormLayout actionComponent={<>Foo</>} route={ROUTES.V2.EVENTS.EDIT}>
-      <ReviewComponent.Body
-        annotation={annotation}
-        form={form}
-        formConfig={formConfig}
-        reviewFields={reviewConfig.fields}
-        title={formatMessage(reviewConfig.title, form)}
-        validatorContext={validatorContext}
-        onAnnotationChange={(values) => setAnnotation(values)}
-        onEdit={handleEdit}
-      />
-      {modal}
-    </FormLayout>
+    <>
+      <EditPageBanner />
+      <FormLayout
+        actionComponent={<EditActionMenu />}
+        route={ROUTES.V2.EVENTS.EDIT}
+      >
+        <ReviewComponent.Body
+          annotation={annotation}
+          form={form}
+          formConfig={formConfig}
+          previousFormValues={previousFormValues}
+          reviewFields={reviewConfig.fields}
+          title={formatMessage(reviewConfig.title, form)}
+          validatorContext={validatorContext}
+          onAnnotationChange={(values) => setAnnotation(values)}
+          onEdit={handleEdit}
+        />
+        {modal}
+      </FormLayout>
+    </>
   )
 }
 

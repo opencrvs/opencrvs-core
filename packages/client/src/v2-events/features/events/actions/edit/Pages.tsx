@@ -21,18 +21,16 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { isTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { EditPageBanner } from './EditPageBanner'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.EDIT.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.EDIT.PAGES)
   const events = useEvents()
   const navigate = useNavigate()
-  const drafts = useDrafts()
   const { modal, closeActionView } = useEventFormNavigation()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
@@ -67,34 +65,37 @@ export function Pages() {
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.EDIT}>
-      {modal}
-      <PagesComponent
-        actionType={ActionType.EDIT}
-        eventConfig={configuration}
-        form={formValues}
-        formPages={declarationPages}
-        pageId={currentPageId}
-        setFormData={(data) => setFormValues(data)}
-        showReviewButton={searchParams.from === 'review'}
-        validatorContext={validatorContext}
-        onPageChange={(nextPageId: string) =>
-          navigate(
-            ROUTES.V2.EVENTS.EDIT.PAGES.buildPath(
-              { eventId, pageId: nextPageId },
-              searchParams
+    <>
+      <EditPageBanner />
+      <FormLayout route={ROUTES.V2.EVENTS.EDIT}>
+        {modal}
+        <PagesComponent
+          actionType={ActionType.EDIT}
+          eventConfig={configuration}
+          form={formValues}
+          formPages={declarationPages}
+          pageId={currentPageId}
+          setFormData={(data) => setFormValues(data)}
+          showReviewButton={searchParams.from === 'review'}
+          validatorContext={validatorContext}
+          onPageChange={(nextPageId: string) =>
+            navigate(
+              ROUTES.V2.EVENTS.EDIT.PAGES.buildPath(
+                { eventId, pageId: nextPageId },
+                searchParams
+              )
             )
-          )
-        }
-        onSubmit={() =>
-          navigate(
-            ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath(
-              { eventId },
-              { workqueue: searchParams.workqueue }
+          }
+          onSubmit={() =>
+            navigate(
+              ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath(
+                { eventId },
+                { workqueue: searchParams.workqueue }
+              )
             )
-          )
-        }
-      />
-    </FormLayout>
+          }
+        />
+      </FormLayout>
+    </>
   )
 }

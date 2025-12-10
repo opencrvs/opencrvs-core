@@ -17,6 +17,7 @@ import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { Icon } from '@opencrvs/components'
 import { messages } from '@client/i18n/messages/views/action'
 
+// @TODO CIHAN: register/validate should be unavailable if declaration blocks it
 const actions = [
   {
     icon: 'PaperPlaneTilt' as const,
@@ -50,7 +51,7 @@ const actions = [
 /**
  * Menu component available on the edit review page.
  * */
-export function DeclareActionMenu({ event }: { event: EventDocument }) {
+export function EditActionMenu({ event }: { event: EventDocument }) {
   const intl = useIntl()
 
   return (
