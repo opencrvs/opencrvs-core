@@ -76,9 +76,6 @@ function getAvailableAssignmentActions(
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
   const eventStatus = event.status
 
-  console.log('scopes')
-  console.log(authentication.scope)
-
   const mayUnassignOthers = configurableEventScopeAllowed(
     authentication.scope,
     ['record.unassign-others'],
