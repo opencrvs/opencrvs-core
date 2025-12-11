@@ -119,10 +119,6 @@ export async function editAndRegister({
     keepAssignment: true
   })
 
-  if (hasPotentialDuplicates(editedEvent, eventConfiguration)) {
-    return editedEvent
-  }
-
   return trpcClient.event.actions.register.request.mutate({
     declaration,
     annotation,
@@ -145,10 +141,6 @@ export async function editAndDeclare({
     transactionId,
     keepAssignment: true
   })
-
-  if (hasPotentialDuplicates(editedEvent, eventConfiguration)) {
-    return editedEvent
-  }
 
   return trpcClient.event.actions.declare.request.mutate({
     declaration,
