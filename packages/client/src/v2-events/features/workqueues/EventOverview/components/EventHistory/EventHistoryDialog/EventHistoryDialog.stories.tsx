@@ -105,12 +105,6 @@ const fullEvent = {
     {
       ...actionBase,
       id: generateUuid(prng),
-      type: ActionType.VALIDATE,
-      declaration
-    },
-    {
-      ...actionBase,
-      id: generateUuid(prng),
       type: ActionType.REGISTER,
       declaration
     }
@@ -201,19 +195,6 @@ const declareAction = generateActionDocument({
   }
 })
 
-const validateAction = generateActionDocument({
-  configuration: tennisClubMembershipEvent,
-  action: ActionType.VALIDATE,
-  rng: prng,
-  defaults: {
-    createdAt: addDays(new Date(createActionCreatedAt), 2).toISOString(),
-    id: generateUuid(prng)
-  },
-  declarationOverrides: {
-    'applicant.email': 'mail.that.updated@opencrvs.org'
-  }
-})
-
 const registerAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.REGISTER,
@@ -253,41 +234,6 @@ export const DeclaredOnDeclarationUpdate: Story = {
     title: 'Sent for review',
     fullEvent: eventWhenDeclareUpdatesDeclaration,
     action: declareAction
-  }
-}
-
-const eventWhenValidateUpdatesDeclaration = {
-  trackingId: generateUuid(prng),
-  type: tennisClubMembershipEvent.id,
-  actions: [createAction, declareAction, validateAction],
-  createdAt: createActionCreatedAt,
-  id: generateUuid(prng),
-  updatedAt: addDays(new Date(createActionCreatedAt), 2).toISOString()
-}
-
-export const Validated: Story = {
-  args: {
-    ...argbase,
-    title: 'Validated',
-    action: {
-      ...argbase.action,
-      id: generateUuid(prng),
-      type: ActionType.VALIDATE
-    }
-  }
-}
-
-const updateActionForValidate = expandWithClientSpecificActions(
-  eventWhenValidateUpdatesDeclaration,
-  getTestValidatorContext(),
-  tennisClubMembershipEvent
-).find((a) => a.type === DECLARATION_ACTION_UPDATE)
-
-export const ValidatedOnDeclarationUpdate: Story = {
-  args: {
-    title: 'Updated',
-    fullEvent: eventWhenValidateUpdatesDeclaration,
-    action: updateActionForValidate
   }
 }
 
@@ -505,48 +451,6 @@ const newFullEvent = {
       assignedTo: '68cbd26ec6476156546958e5'
     },
     {
-      id: '0a38f1e0-b7eb-4aeb-9290-a9d82fcda252' as UUID,
-      transactionId: 'c5e7515b-4b2f-4e6b-8158-74d71ce2cbc5',
-      createdByUserType: 'user' as const,
-      createdAt: '2025-09-26T06:57:38.800Z',
-      createdBy: '68cbd26ec6476156546958e5',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: '07cd7e8c-fa6e-4828-8d79-035dab47adc5' as UUID,
-      declaration: {
-        'applicant.dob': '2025-05-22',
-        'applicant.name': {
-          surname: 'last',
-          firstname: 'first',
-          middlename: 'middle'
-        },
-        'recommender.id': '123123',
-        'senior-pass.id': '123123', // Senior pass ID was added on the previous action. Still visible on the change set of record audit. Should not be visible.
-        'recommender.name': {
-          surname: 'rec last', // Recommender added, visible correctly.
-          firstname: 'rec first',
-          middlename: ''
-        },
-        'recommender.none': false, // Should be visible.
-        'applicant.image.label': 'picture text'
-      },
-      annotation: {},
-      status: 'Requested' as const,
-      type: 'VALIDATE' as const
-    },
-    {
-      id: '9ef1c7e9-b761-4d5a-a0da-80a9e4eb096a' as UUID,
-      transactionId: 'c5e7515b-4b2f-4e6b-8158-74d71ce2cbc5',
-      createdByUserType: 'user' as const,
-      createdAt: '2025-09-26T06:57:38.868Z',
-      createdBy: '68cbd26ec6476156546958e5',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: '07cd7e8c-fa6e-4828-8d79-035dab47adc5' as UUID,
-      declaration: {},
-      status: 'Accepted' as const,
-      originalActionId: '0a38f1e0-b7eb-4aeb-9290-a9d82fcda252' as UUID,
-      type: 'VALIDATE' as const
-    },
-    {
       id: 'cdaf8cb4-f01e-45c4-b744-56261a71291c' as UUID,
       transactionId: 'c5e7515b-4b2f-4e6b-8158-74d71ce2cbc5',
       createdByUserType: 'user' as const,
@@ -629,55 +533,6 @@ const newFullEvent = {
       status: 'Accepted' as const,
       type: 'ASSIGN' as const,
       assignedTo: '68cbd26ec6476156546958e5'
-    },
-    {
-      id: '4f50fcad-586f-4794-baa6-008b4a335f10' as UUID,
-      transactionId: '9d7c6402-69b1-41a5-8114-d0af76bc7d41',
-      createdByUserType: 'user' as const,
-      createdAt: '2025-09-26T06:59:44.323Z',
-      createdBy: '68cbd26ec6476156546958e5',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: '07cd7e8c-fa6e-4828-8d79-035dab47adc5' as UUID,
-      declaration: {
-        'applicant.dob': '2025-05-22',
-        'applicant.name': {
-          surname: 'last',
-          firstname: 'FIRST CAPITALIZED', // Changes name, should show.
-          middlename: 'middle'
-        },
-        'recommender.id': '123123', // Should not show since present on previous actions.
-        'senior-pass.id': '123123', // Should not show since present on previous actions.
-        'recommender.name': {
-          surname: 'rec last', // Recommender added on previous VALIDATE action, should not be visible.
-          firstname: 'rec first',
-          middlename: ''
-        },
-        'recommender.none': false, // Should never be visible
-        'applicant.image.label': 'picture text222' // Changes image label, shown correctly.
-      },
-      annotation: {
-        'review.comment': 'dfsdfdsf', // should show in review section
-        'review.signature': {
-          path: '/ocrvs/7774a11b-ad7b-4cf2-8433-79ab72f25cc3/c9dfff3c-394e-4095-a5b6-2429d7492436.png',
-          type: 'image/png',
-          originalFilename: 'signature-review____signature-1758869981775.png'
-        }
-      },
-      status: 'Requested' as const,
-      type: 'VALIDATE' as const // Second VALIDATE. After rejection, previous action must be resent.
-    },
-    {
-      id: '3307ab9d-8d0a-4a42-819e-547df61cc297' as UUID,
-      transactionId: '9d7c6402-69b1-41a5-8114-d0af76bc7d41',
-      createdByUserType: 'user' as const,
-      createdAt: '2025-09-26T06:59:44.410Z',
-      createdBy: '68cbd26ec6476156546958e5',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: '07cd7e8c-fa6e-4828-8d79-035dab47adc5' as UUID,
-      declaration: {},
-      status: 'Accepted' as const,
-      originalActionId: '4f50fcad-586f-4794-baa6-008b4a335f10' as UUID,
-      type: 'VALIDATE' as const
     },
     {
       id: 'b15c3e45-6404-4dd6-99eb-e57a240f9e26' as UUID,
@@ -824,22 +679,6 @@ export const DeclarationUpdateOnDeclare: Story = {
     fullEvent: newFullEvent,
     title: 'Updated',
     action: updateActions[0]
-  }
-}
-
-export const DeclarationUpdateOnValidate: Story = {
-  args: {
-    fullEvent: newFullEvent,
-    title: 'Updated',
-    action: updateActions[1]
-  }
-}
-
-export const DeclarationUpdateOnSecondValidate: Story = {
-  args: {
-    fullEvent: newFullEvent,
-    title: 'Updated',
-    action: updateActions[2]
   }
 }
 
@@ -1055,7 +894,7 @@ export const DeclarationUpdateNotify: Story = {
 const eventWhenRegisterUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
-  actions: [createAction, declareAction, validateAction, registerAction],
+  actions: [createAction, declareAction, registerAction],
   createdAt: createActionCreatedAt,
   id: generateUuid(prng),
   updatedAt: addDays(new Date(createActionCreatedAt), 3).toISOString()
@@ -1191,24 +1030,6 @@ const notDuplicateUpdateEvent = generateEventDocument({
       }
     },
     {
-      type: ActionType.VALIDATE,
-      user: {
-        role: TestUserRole.enum.LOCAL_REGISTRAR,
-        id: generator.user.id.localRegistrar
-      },
-      declarationOverrides: {
-        'applicant.dob': '1999-11-11',
-        'applicant.name': {
-          surname: 'Drinkwater',
-          firstname: 'Updated Danny', // updated when marked as not duplicate, should be visible in updated modal
-          middlename: ''
-        },
-        'senior-pass.id': '23213213',
-        'recommender.none': true,
-        'applicant.image.label': ''
-      }
-    },
-    {
       type: ActionType.UNASSIGN
     },
     {
@@ -1337,12 +1158,6 @@ export const Certified: Story = {
         {
           ...actionBase,
           id: generateUuid(prng),
-          type: ActionType.VALIDATE,
-          declaration
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
           type: ActionType.REGISTER,
           declaration
         }
@@ -1394,12 +1209,6 @@ export const CertifiedBySomeoneElse: Story = {
         {
           ...actionBase,
           id: generateUuid(prng),
-          type: ActionType.VALIDATE,
-          declaration
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
           type: ActionType.REGISTER,
           declaration
         }
@@ -1429,12 +1238,6 @@ export const RequestCorrection: Story = {
           ...actionBase,
           id: generateUuid(prng),
           type: ActionType.DECLARE,
-          declaration
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
-          type: ActionType.VALIDATE,
           declaration
         },
         {
@@ -1477,12 +1280,6 @@ export const UpdateAction: Story = {
         {
           ...actionBase,
           id: generateUuid(prng),
-          type: ActionType.VALIDATE,
-          declaration: {}
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
           type: ActionType.REGISTER,
           declaration: {}
         }
@@ -1518,12 +1315,6 @@ export const RecordCorrected: Story = {
           ...actionBase,
           id: generateUuid(prng),
           type: ActionType.DECLARE,
-          declaration
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
-          type: ActionType.VALIDATE,
           declaration
         },
         {

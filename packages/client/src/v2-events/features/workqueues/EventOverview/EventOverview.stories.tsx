@@ -839,31 +839,6 @@ const annotationUpdateOnValidateEvent = {
       }
     }),
     generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      declarationOverrides: {},
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
-        id: validateActionUuid,
-        status: ActionStatus.Requested,
-        annotation: {
-          'review.signature': generateRandomSignature(rng)
-        }
-      }
-    }),
-    generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      declarationOverrides: {},
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
-        status: ActionStatus.Accepted,
-        originalActionId: validateActionUuid
-      }
-    }),
-    generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.ASSIGN,
       defaults: {
@@ -929,15 +904,6 @@ const annotationChangeDuringRegisterEvent = {
           'review.signature': generateRandomSignature(rng)
         }
       }
-    }),
-    generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString()
-      },
-      declarationOverrides: {}
     }),
     generateActionDocument({
       action: ActionType.REGISTER,

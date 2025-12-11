@@ -136,12 +136,6 @@ export const actionLabels = {
     description: 'Label for reject button in dropdown menu',
     id: 'event.birth.action.reject.label'
   },
-  [ActionType.VALIDATE]: {
-    defaultMessage: 'Validate',
-    description:
-      'This is shown as the action name anywhere the user can trigger the action from',
-    id: 'event.birth.action.validate.label'
-  },
   [ActionType.ARCHIVE]: {
     defaultMessage: 'Archive',
     description: 'Label for archive record button in dropdown menu',
@@ -273,12 +267,6 @@ function useViewableActionConfigurations(
 
   const eventId = event.id
 
-  const userMayValidate = isActionInScope(
-    authentication.scope,
-    ActionType.VALIDATE,
-    event.type
-  )
-
   const isAssignmentInProgress = events.actions.assignment.assign.isAssigning(
     event.id
   )
@@ -288,8 +276,7 @@ function useViewableActionConfigurations(
   const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
 
   // Incomplete declarations are always shown as "Review" for the reviewer.
-  const isReviewingIncompleteDeclaration =
-    userMayValidate && !isRejected && isNotifiedState
+  const isReviewingIncompleteDeclaration = !isRejected && isNotifiedState
 
   // Rejected declarations are always shown as "Review" for the reviewer.
   const isReviewingRejectedDeclaration =
@@ -300,8 +287,8 @@ function useViewableActionConfigurations(
 
   // By default, field agent has both scopes for incomplete (notify) and complete (declare) actions.
   // As a business rule, for notified event, client hides the declare action if the user has no scope for validate.
-  const shouldHideDeclareAction =
-    isNotifiedState && !userMayValidate && !isRejected
+  // TODO CIHAN?
+  const shouldHideDeclareAction = isNotifiedState && !isRejected
 
   const userMayCorrect = isActionInScope(
     authentication.scope,
@@ -316,16 +303,6 @@ function useViewableActionConfigurations(
     ActionType.REGISTER,
     event.type
   )
-
-  function resolveValidateLabel() {
-    if (isReviewingIncompleteDeclaration) {
-      return reviewLabel
-    }
-
-    return userMayRegister
-      ? actionLabels[ActionType.REGISTER]
-      : actionLabels[ActionType.VALIDATE]
-  }
 
   const getAction = (type: ActionType) => {
     return eventConfiguration.actions.find((action) => action.type === type)
@@ -358,7 +335,7 @@ function useViewableActionConfigurations(
         disabled:
           // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
           !isOnline || (eventIsWaitingForCorrection && !userMayCorrect),
-        hidden: isNotifiedState && !isRejected && !userMayValidate
+        hidden: isNotifiedState && !isRejected
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
@@ -453,23 +430,6 @@ function useViewableActionConfigurations(
         disabled: !isDownloadedAndAssignedToUser,
         hidden: isReviewingDeclaration
       },
-      [ActionType.VALIDATE]: {
-        label: resolveValidateLabel(),
-        icon: getAction(ActionType.VALIDATE)?.icon ?? ('PencilLine' as const),
-        onClick: async (workqueue) => {
-          if (userMayRegister) {
-            return onQuickAction(ActionType.REGISTER, workqueue)
-          }
-
-          return onQuickAction(ActionType.VALIDATE, workqueue)
-        },
-        onCtaClick: (workqueue) =>
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
-          ),
-        ctaLabel: reviewLabel,
-        disabled: !isDownloadedAndAssignedToUser
-      },
       [ActionType.REGISTER]: {
         label: isReviewingIncompleteDeclaration
           ? reviewLabel
@@ -482,8 +442,7 @@ function useViewableActionConfigurations(
           navigate(
             ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
           ),
-        disabled: !isDownloadedAndAssignedToUser,
-        hidden: !event.flags.includes('validated')
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
@@ -673,7 +632,7 @@ function applyActionConditionalEffects({
 /**
  *
  * NOTE: In principle, you should never add new business rules to the `useAction` hook alone. All the actions are validated by the server and their order is enforced.
- * Each action has their own route and will take care of the actions needed. If you "skip" action (e.g. showing 'VALIDATE' instead of 'DECLARE') by directing the user to the wrong route, it will fail at the end.
+ * Each action has their own route and will take care of the actions needed. If you "skip" action (e.g. showing 'REGISTER' instead of 'DECLARE') by directing the user to the wrong route, it will fail at the end.
  *
  * @returns a tuple containing a modal (which must be rendered in the parent where this hook is called) and a list of action menu items based on the event state and scopes provided.
  */

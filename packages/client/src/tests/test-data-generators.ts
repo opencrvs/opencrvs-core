@@ -393,12 +393,12 @@ export function testDataGenerator(rngSeed?: number) {
         'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
         'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
         'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
-        'record.declared.validate[event=birth|death|tennis-club-membership|child-onboarding]',
         'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
         'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
         'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
         'record.registered.print-certified-copies[event=birth|death|tennis-club-membership|child-onboarding]',
-        'record.registered.request-correction[event=birth|death|tennis-club-membership|child-onboarding]'
+        'record.registered.request-correction[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.custom-action[event=tennis-club-membership,customActionType=Validate]'
       ],
       fieldAgent: [
         SCOPES.RECORD_SUBMIT_FOR_REVIEW,

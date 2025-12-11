@@ -21,7 +21,6 @@ export const ActionType = {
   NOTIFY: 'NOTIFY',
   // Declaration actions
   DECLARE: 'DECLARE',
-  VALIDATE: 'VALIDATE',
   REGISTER: 'REGISTER',
   EDIT: 'EDIT',
   // Declaration system actions. Non-configurable.
@@ -49,7 +48,6 @@ export const ConfirmableActions = [
   ActionType.NOTIFY,
   ActionType.DECLARE,
   ActionType.EDIT,
-  ActionType.VALIDATE,
   ActionType.REGISTER,
   ActionType.REJECT,
   ActionType.ARCHIVE,
@@ -67,7 +65,6 @@ export const ActionTypes = z.enum([
   'NOTIFY',
   'DECLARE',
   'EDIT',
-  'VALIDATE',
   'REGISTER',
   'DUPLICATE_DETECTED',
   'REJECT',
@@ -97,7 +94,6 @@ export type ClientSpecificAction =
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
   ActionTypes.enum.EDIT,
-  ActionTypes.enum.VALIDATE,
   ActionTypes.enum.REGISTER,
   ActionTypes.enum.NOTIFY,
   ActionTypes.enum.DUPLICATE_DETECTED

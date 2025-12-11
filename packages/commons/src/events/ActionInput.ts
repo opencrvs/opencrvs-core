@@ -50,14 +50,6 @@ export const RegisterActionInput = BaseActionInput.extend(
 
 export type RegisterActionInput = z.infer<typeof RegisterActionInput>
 
-export const ValidateActionInput = BaseActionInput.extend(
-  z.object({
-    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE)
-  }).shape
-)
-
-export type ValidateActionInput = z.infer<typeof ValidateActionInput>
-
 export const NotifyActionInput = BaseActionInput.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
@@ -243,7 +235,6 @@ export type CustomActionInput = z.infer<typeof CustomActionInput>
 export const ActionInput = z
   .discriminatedUnion('type', [
     CreateActionInput.meta({ id: 'CreateActionInput' }),
-    ValidateActionInput.meta({ id: 'ValidateActionInput' }),
     RegisterActionInput.meta({ id: 'RegisterActionInput' }),
     NotifyActionInput.meta({ id: 'NotifyActionInput' }),
     DeclareActionInput.meta({ id: 'DeclareActionInput' }),

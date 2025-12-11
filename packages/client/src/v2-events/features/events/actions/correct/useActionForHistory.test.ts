@@ -70,14 +70,6 @@ const eventCreatedByRegAgent = generateEventDocument({
         id: generator.user.id.registrationAgent
       }
     },
-    {
-      type: ActionTypes.enum.VALIDATE,
-      declarationOverrides: {},
-      user: {
-        role: TestUserRole.enum.REGISTRATION_AGENT,
-        id: generator.user.id.registrationAgent
-      }
-    },
     { type: ActionTypes.enum.UNASSIGN },
     {
       type: ActionTypes.enum.ASSIGN,
@@ -148,37 +140,6 @@ describe('useActionForHistory', () => {
             annotation: {
               'review.signature': generateRandomSignature(rng)
             }
-          }
-        }),
-        generateActionDocument({
-          action: ActionType.VALIDATE,
-          configuration: tennisClubMembershipEvent,
-          declarationOverrides: {},
-          defaults: {
-            ...actionDefaults,
-            createdAt: addDays(
-              new Date(actionDefaults.createdAt),
-              2
-            ).toISOString(),
-            id: validateActionUuid,
-            status: ActionStatus.Requested,
-            annotation: {
-              'review.signature': generateRandomSignature(rng)
-            }
-          }
-        }),
-        generateActionDocument({
-          action: ActionType.VALIDATE,
-          configuration: tennisClubMembershipEvent,
-          declarationOverrides: {},
-          defaults: {
-            ...actionDefaults,
-            createdAt: addDays(
-              new Date(actionDefaults.createdAt),
-              2
-            ).toISOString(),
-            status: ActionStatus.Accepted,
-            originalActionId: validateActionUuid
           }
         }),
         generateActionDocument({
