@@ -382,7 +382,8 @@ paths:
                   type: object
                   properties:
                     reason:
-                      description: Message describing the reason for rejecting or archiving the event.
+                      description: Message describing the reason for rejecting, archiving or editing
+                        the event.
                       type: string
                       minLength: 1
                   required:
@@ -1272,7 +1273,8 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting or archiving the event.
+              description: Message describing the reason for rejecting, archiving or editing
+                the event.
               type: string
               minLength: 1
           required:
@@ -1683,7 +1685,8 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting or archiving the event.
+              description: Message describing the reason for rejecting, archiving or editing
+                the event.
               type: string
               minLength: 1
           required:
@@ -2357,7 +2360,8 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting or archiving the event.
+              description: Message describing the reason for rejecting, archiving or editing
+                the event.
               type: string
               minLength: 1
           required:
@@ -2743,6 +2747,16 @@ components:
         type:
           type: string
           const: EDIT
+        content:
+          type: object
+          properties:
+            reason:
+              description: Message describing the reason for rejecting, archiving or editing
+                the event.
+              type: string
+              minLength: 1
+          required:
+            - reason
       required:
         - id
         - transactionId
@@ -14185,7 +14199,8 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting or archiving the event.
+              description: Message describing the reason for rejecting, archiving or editing
+                the event.
               type: string
               minLength: 1
           required:
@@ -14604,7 +14619,8 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting or archiving the event.
+              description: Message describing the reason for rejecting, archiving or editing
+                the event.
               type: string
               minLength: 1
           required:
@@ -15286,7 +15302,8 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting or archiving the event.
+              description: Message describing the reason for rejecting, archiving or editing
+                the event.
               type: string
               minLength: 1
           required:
@@ -15678,6 +15695,17 @@ components:
         type:
           type: string
           const: EDIT
+        content:
+          type: object
+          properties:
+            reason:
+              description: Message describing the reason for rejecting, archiving or editing
+                the event.
+              type: string
+              minLength: 1
+          required:
+            - reason
+          additionalProperties: false
       required:
         - id
         - transactionId
