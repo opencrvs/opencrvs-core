@@ -12,5 +12,4 @@
 export { DeclarationUpdate } from './DeclarationUpdate'
 export { RequestCorrection } from './RequestCorrection'
 export { PrintCertificate } from './PrintCertificate'
-export { Edit } from './Edit'
 export { ActionTypeSpecificContent } from './ActionTypeSpecificContent'
