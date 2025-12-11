@@ -10106,9 +10106,13 @@ components:
         legalStatuses.REGISTERED.acceptedAt:
           $ref: "#/components/schemas/DateCondition"
         legalStatuses.DECLARED.createdAtLocation:
-          $ref: "#/components/schemas/Within"
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - type: "null"
         legalStatuses.REGISTERED.createdAtLocation:
-          $ref: "#/components/schemas/Within"
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - type: "null"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
