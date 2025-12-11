@@ -1,6 +1,26 @@
 # Changelog
 
-## 2.0.0 Release Candidate
+## 1.9.3
+
+### Improvements
+
+- Add support for validating dates before/after another date field using `isBefore` and `isAfter` validators. [#11194](https://github.com/opencrvs/opencrvs-core/issues/11194)
+
+Usage example:
+
+```ts
+// 6570 days before another field
+field('mother.dob').isBefore().days(6570).fromDate(field('child.dob'))
+
+// 6570 days after another field
+field('mother.dateOfMarriage')
+  .isAfter()
+  .days(6570)
+  .fromDate(field('mother.dob'))
+
+// 45 days before now
+field('child.dob').isAfter().days(45).fromNow()
+```
 
 ### New features
 
