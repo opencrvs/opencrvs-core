@@ -1048,6 +1048,9 @@ describe('"flag" conditionals', () => {
     expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
       false
     )
+    expect(
+      validate(not(flag(InherentFlags.CORRECTION_REQUESTED)), params)
+    ).toBe(true)
   })
 
   it('validation fails if params dont include flags', () => {

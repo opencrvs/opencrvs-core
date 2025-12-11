@@ -322,6 +322,10 @@ function useViewableActionConfigurations(
       : actionLabels[ActionType.VALIDATE]
   }
 
+  const getAction = (type: ActionType) => {
+    return eventConfiguration.actions.find((action) => action.type === type)
+  }
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
@@ -329,6 +333,7 @@ function useViewableActionConfigurations(
   return {
     modals: [assignModal, deleteModal, rejectionModal, quickActionModal],
     config: {
+      // Core actions
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
         icon: 'PushPin' as const,
@@ -373,8 +378,36 @@ function useViewableActionConfigurations(
         },
         disabled: !isOnline
       },
-      [ActionType.DECLARE]: {
+      [ActionType.ARCHIVE]: {
+        label: actionLabels[ActionType.ARCHIVE],
+        icon: 'Archive' as const,
+        onClick: async (workqueue) =>
+          onQuickAction(ActionType.ARCHIVE, workqueue),
+        disabled: !isDownloadedAndAssignedToUser
+      },
+      [ActionType.MARK_AS_DUPLICATE]: {
+        label: actionLabels[ActionType.MARK_AS_DUPLICATE],
         icon: 'PencilLine' as const,
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath(
+              { eventId },
+              { workqueue }
+            )
+          )
+        },
+        disabled: !isDownloadedAndAssignedToUser || isAssignmentInProgress
+      },
+      [ActionType.DELETE]: {
+        label: actionLabels[ActionType.DELETE],
+        icon: 'Trash' as const,
+        onClick: onDelete,
+        disabled: !isDownloadedAndAssignedToUser
+      },
+      // Configurable event actions
+      [ActionType.DECLARE]: {
+        icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
         label: isReviewingDeclaration
           ? reviewLabel
           : actionLabels[ActionType.DECLARE],
@@ -392,7 +425,7 @@ function useViewableActionConfigurations(
       },
       [ActionType.REJECT]: {
         label: actionLabels[ActionType.REJECT],
-        icon: 'FileX',
+        icon: getAction(ActionType.REJECT)?.icon ?? 'FileX',
         onClick: async (workqueue) =>
           handleRejection(() =>
             workqueue
@@ -406,7 +439,7 @@ function useViewableActionConfigurations(
       },
       [ActionType.VALIDATE]: {
         label: resolveValidateLabel(),
-        icon: 'PencilLine' as const,
+        icon: getAction(ActionType.VALIDATE)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) => {
           if (userMayRegister) {
             return onQuickAction(ActionType.REGISTER, workqueue)
@@ -421,18 +454,11 @@ function useViewableActionConfigurations(
         ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser
       },
-      [ActionType.ARCHIVE]: {
-        label: actionLabels[ActionType.ARCHIVE],
-        icon: 'Archive' as const,
-        onClick: async (workqueue) =>
-          onQuickAction(ActionType.ARCHIVE, workqueue),
-        disabled: !isDownloadedAndAssignedToUser
-      },
       [ActionType.REGISTER]: {
         label: isReviewingIncompleteDeclaration
           ? reviewLabel
           : actionLabels[ActionType.REGISTER],
-        icon: 'PencilLine' as const,
+        icon: getAction(ActionType.REGISTER)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) =>
           onQuickAction(ActionType.REGISTER, workqueue),
         ctaLabel: reviewLabel,
@@ -443,23 +469,10 @@ function useViewableActionConfigurations(
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !event.flags.includes('validated')
       },
-      [ActionType.MARK_AS_DUPLICATE]: {
-        label: actionLabels[ActionType.MARK_AS_DUPLICATE],
-        icon: 'PencilLine' as const,
-        onClick: (workqueue?: string) => {
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath(
-              { eventId },
-              { workqueue }
-            )
-          )
-        },
-        disabled: !isDownloadedAndAssignedToUser || isAssignmentInProgress
-      },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
-        icon: 'Printer' as const,
+        icon:
+          getAction(ActionType.PRINT_CERTIFICATE)?.icon ?? ('Printer' as const),
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           return navigate(
@@ -472,15 +485,11 @@ function useViewableActionConfigurations(
         disabled: !isDownloadedAndAssignedToUser || eventIsWaitingForCorrection,
         hidden: eventIsWaitingForCorrection
       },
-      [ActionType.DELETE]: {
-        label: actionLabels[ActionType.DELETE],
-        icon: 'Trash' as const,
-        onClick: onDelete,
-        disabled: !isDownloadedAndAssignedToUser
-      },
       [ActionType.REQUEST_CORRECTION]: {
         label: actionLabels[ActionType.REQUEST_CORRECTION],
-        icon: 'NotePencil' as const,
+        icon:
+          getAction(ActionType.REQUEST_CORRECTION)?.icon ??
+          ('NotePencil' as const),
         onClick: (workqueue?: string) => {
           const correctionPages = eventConfiguration.actions.find(
             (action) => action.type === ActionType.REQUEST_CORRECTION
@@ -586,7 +595,7 @@ function useCustomActionConfigs(
       )
       .map((action) => ({
         label: action.label,
-        icon: 'PencilLine' as const,
+        icon: action.icon ?? ('PencilLine' as const),
         onClick: async (workqueue?: string) =>
           onCustomAction(action, workqueue),
         disabled: !isDownloadedAndAssignedToUser,

@@ -266,6 +266,8 @@ services:
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
+      - MONGO_HOST=mongo1
+      - MONGO_PORT=27017
       - WAIT_HOSTS=mongo1:27017,influxdb:8086,minio:9000,elasticsearch:9200
   documents:
     image: ghcr.io/opencrvs/ocrvs-documents:${VERSION}

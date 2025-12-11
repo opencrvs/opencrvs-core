@@ -138,6 +138,15 @@ const defaultSearchFieldGenerator: Record<
       id: 'advancedSearch.status'
     },
     options: statusOptions
+  }),
+  'event.legalStatuses.REGISTERED.registrationNumber': (_) => ({
+    id: 'event.legalStatuses.REGISTERED.registrationNumber',
+    type: FieldType.TEXT,
+    label: {
+      defaultMessage: 'Registration number',
+      description: 'Label for registration number field',
+      id: 'advancedSearch.registrationNumber'
+    }
   })
 } satisfies Record<EventFieldId, (config: AdvancedSearchField) => FieldConfig>
 
@@ -420,12 +429,20 @@ function applySearchFieldOverridesToFieldConfig(
     }
   }
   if (field.type === FieldType.ADDRESS) {
+    const streetAddressForm = field.configuration?.streetAddressForm?.map(
+      (subField) => ({
+        ...subField,
+        required: false
+      })
+    )
+
     return {
       ...field,
       ...commonConfig,
       configuration: {
         ...field.configuration,
-        fields: ['country']
+        fields: ['country'],
+        streetAddressForm
       }
     }
   }

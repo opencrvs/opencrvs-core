@@ -32,10 +32,23 @@ export const useHomePage = () => {
   const { pathname } = useLocation()
   const { routes } = useNavigation()
   const userDetails = useSelector(getUserDetails)
-  const firstNavItem = routes
-    .filter((navigationGroup) => navigationGroup.tabs.length > 0)
-    .at(0)
-    ?.tabs.at(0)?.name
+
+  const firstDashboard = window.config.DASHBOARDS?.at(0)?.id
+
+  const tabs = routes.flatMap((navigationGroup) => navigationGroup.tabs)
+
+  const firstNavItem = tabs
+    .filter((tab) => {
+      if (
+        tab.name === WORKQUEUE_TABS.dashboard &&
+        window.config.DASHBOARDS.length === 0
+      ) {
+        // ignores dashboard tab when no dashboard is configured
+        return false
+      }
+      return true
+    })
+    .at(0)?.name
 
   let path: string | Partial<Path> = REGISTRAR_HOME
 
@@ -76,7 +89,7 @@ export const useHomePage = () => {
       path = ALL_USER_EMAIL
       break
     case WORKQUEUE_TABS.dashboard:
-      path = DASHBOARD
+      path = formatUrl(DASHBOARD, { id: firstDashboard! })
       break
     case WORKQUEUE_TABS.performance:
       path = generatePerformanceHomeUrl({
