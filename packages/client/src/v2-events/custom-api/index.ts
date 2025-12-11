@@ -20,7 +20,8 @@ import {
   ArchiveActionInput,
   MarkAsDuplicateActionInput,
   ActionStatus,
-  ValidatorContext
+  ValidatorContext,
+  EditActionInput
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -32,6 +33,10 @@ export interface CustomMutationParams {
   transactionId: string
   eventConfiguration: EventConfig
   annotation?: EventState
+}
+
+export interface EditRequestParams extends CustomMutationParams {
+  content: EditActionInput['content']
 }
 
 export interface CorrectionRequestParams extends CustomMutationParams {
@@ -108,15 +113,16 @@ export async function editAndRegister({
   eventId,
   declaration,
   transactionId,
-  annotation
-}: CustomMutationParams) {
+  annotation,
+  content
+}: EditRequestParams) {
   await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
     keepAssignment: true,
-    content: { reason: 'TODO REASSON HERE' }
+    content
   })
 
   return trpcClient.event.actions.register.request.mutate({
@@ -131,15 +137,16 @@ export async function editAndDeclare({
   eventId,
   declaration,
   transactionId,
-  annotation
-}: CustomMutationParams) {
+  annotation,
+  content
+}: EditRequestParams) {
   await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
     keepAssignment: true,
-    content: { reason: 'TODO REASSON HERE' }
+    content
   })
 
   return trpcClient.event.actions.declare.request.mutate({

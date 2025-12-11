@@ -323,8 +323,8 @@ interface CustomMutationTypes {
   validateOnDeclare: customApi.CustomMutationParams
   registerOnDeclare: customApi.CustomMutationParams
   registerOnValidate: customApi.CustomMutationParams
-  editAndRegister: customApi.CustomMutationParams
-  editAndDeclare: customApi.CustomMutationParams
+  editAndRegister: customApi.EditRequestParams
+  editAndDeclare: customApi.EditRequestParams
   archiveOnDuplicate: customApi.ArchiveOnDuplicateParams
   makeCorrectionOnRequest: customApi.CorrectionRequestParams
 }

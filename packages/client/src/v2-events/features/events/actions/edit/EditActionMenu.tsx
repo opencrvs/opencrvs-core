@@ -8,9 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { useIntl } from 'react-intl'
+import React, { useState } from 'react'
+import { useIntl, MessageDescriptor } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import styled from 'styled-components'
 import {
   ActionType,
   EventDocument,
@@ -22,13 +23,19 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { Icon } from '@opencrvs/components'
+import {
+  Icon,
+  ResponsiveModal,
+  Button,
+  Stack,
+  Text,
+  TextArea
+} from '@opencrvs/components'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { messages as actionMessages } from '@client/i18n/messages/views/action'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { Review } from '@client/v2-events/features/events/components/Review'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -36,6 +43,12 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { hasDeclarationFieldChanged } from '../correct/utils'
+
+export const commentLabel = {
+  id: 'event.edit.comment.label',
+  defaultMessage: 'Comments',
+  description: 'The label for the comment'
+}
 
 const messages = {
   cancel: {
@@ -68,8 +81,73 @@ const messages = {
     id: 'event.edit.declareWithEdits.description',
     description: 'Description for "Declare with edits" in edit action menu',
     defaultMessage:
-      'Are you sure you want to edit this declaration? By confirming you are redeclaring this event and overide past changes...'
+      'Are you sure you want to edit this declaration? By confirming you are redeclaring this event and override past changes...'
   }
+}
+
+interface EditActionModalResult {
+  confirmed: boolean
+  comment?: string
+}
+
+const CommentLabel = styled(Text)`
+  padding: 16px 0 4px 0;
+`
+
+function EditActionModal({
+  title,
+  description,
+  close
+}: {
+  title: MessageDescriptor
+  description: MessageDescriptor
+  close: (result: EditActionModalResult) => void
+}) {
+  const intl = useIntl()
+  const [comment, setComment] = useState('')
+
+  return (
+    <ResponsiveModal
+      autoHeight
+      show
+      showHeaderBorder
+      actions={[
+        <Button
+          key={'cancel_edit'}
+          id={'cancel_edit'}
+          type="tertiary"
+          onClick={() => close({ confirmed: false })}
+        >
+          {intl.formatMessage(messages.cancel)}
+        </Button>,
+        <Button
+          key={'confirm_edit'}
+          id={'confirm_edit'}
+          type="primary"
+          onClick={() => close({ confirmed: true, comment })}
+        >
+          {intl.formatMessage(messages.confirm)}
+        </Button>
+      ]}
+      handleClose={() => close({ confirmed: false })}
+      title={intl.formatMessage(title)}
+      width={800}
+    >
+      <Stack>
+        <Text color="grey500" element="p" variant="reg16">
+          {intl.formatMessage(description)}
+        </Text>
+      </Stack>
+      <CommentLabel element="h3" variant="bold16">
+        {intl.formatMessage(commentLabel)}
+      </CommentLabel>
+      <TextArea
+        data-testid="edit-comment"
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+      />
+    </ResponsiveModal>
+  )
 }
 
 function useEditActions(event: EventDocument) {
@@ -122,28 +200,25 @@ function useEditActions(event: EventDocument) {
         icon: 'PaperPlaneTilt' as const,
         label: messages.editAndRegisterLabel,
         onClick: async () => {
-          const confirm = await openModal<boolean | null>((close) => {
-            return (
-              <Review.ActionModal.Accept
-                action="EditAndRegister"
-                close={close}
-                copy={{
-                  onCancel: messages.cancel,
-                  onConfirm: messages.confirm,
-                  eventLabel: eventConfiguration.label,
-                  title: messages.editAndRegisterLabel,
-                  description: messages.editAndRegisterDescription
-                }}
-              />
-            )
-          })
+          const { confirmed, comment } = await openModal<EditActionModalResult>(
+            (close) => {
+              return (
+                <EditActionModal
+                  close={close}
+                  description={messages.editAndRegisterDescription}
+                  title={messages.editAndRegisterLabel}
+                />
+              )
+            }
+          )
 
-          if (confirm) {
+          if (confirmed) {
             events.customActions.editAndRegister.mutate({
               eventId: event.id,
               transactionId: getUUID(),
               declaration,
-              annotation
+              annotation,
+              content: { comment }
             })
 
             closeActionView(slug)
@@ -156,28 +231,25 @@ function useEditActions(event: EventDocument) {
         icon: 'PaperPlaneTilt' as const,
         label: messages.editAndDeclareLabel,
         onClick: async () => {
-          const confirm = await openModal<boolean | null>((close) => {
-            return (
-              <Review.ActionModal.Accept
-                action="EditAndDeclare"
-                close={close}
-                copy={{
-                  onCancel: messages.cancel,
-                  onConfirm: messages.confirm,
-                  eventLabel: eventConfiguration.label,
-                  title: messages.editAndDeclareLabel,
-                  description: messages.editAndDeclareDescription
-                }}
-              />
-            )
-          })
+          const { confirmed, comment } = await openModal<EditActionModalResult>(
+            (close) => {
+              return (
+                <EditActionModal
+                  close={close}
+                  description={messages.editAndDeclareDescription}
+                  title={messages.editAndDeclareLabel}
+                />
+              )
+            }
+          )
 
-          if (confirm) {
+          if (confirmed) {
             events.customActions.editAndDeclare.mutate({
               eventId: event.id,
               transactionId: getUUID(),
               declaration,
-              annotation
+              annotation,
+              content: { comment }
             })
 
             closeActionView(slug)

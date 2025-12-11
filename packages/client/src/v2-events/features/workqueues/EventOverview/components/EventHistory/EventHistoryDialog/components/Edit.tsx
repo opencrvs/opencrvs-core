@@ -20,16 +20,11 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { DeclarationComparisonTable } from '@client/v2-events/features/events/actions/correct/request/Summary/DeclarationComparisonTable'
+import { commentLabel } from '@client/v2-events/features/events/actions/edit/EditActionMenu'
 
 const ReasonParagraph = styled(Text)`
   padding: 16px 0;
 `
-
-const reasonLabel = {
-  id: 'event.edit.reason.label',
-  defaultMessage: 'Reason of edit',
-  description: 'The label for the reason of edit'
-}
 
 /** Displays reason for edit and made edits */
 function EditComponent({
@@ -42,18 +37,18 @@ function EditComponent({
   validatorContext: ValidatorContext
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const reason = action.content?.reason
+  const comment = action.content.comment
   const intl = useIntl()
 
   return (
     <>
-      {reason && (
+      {comment && (
         <ReasonParagraph element="p" variant="reg16">
           <b>
-            {intl.formatMessage(reasonLabel)}
+            {intl.formatMessage(commentLabel)}
             {':'}
           </b>{' '}
-          {reason}
+          {comment}
         </ReasonParagraph>
       )}
       <DeclarationComparisonTable
