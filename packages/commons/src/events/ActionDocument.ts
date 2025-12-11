@@ -137,7 +137,7 @@ export const ReasonContent = z.object({
     .string()
     .min(1, { error: 'Message cannot be empty' })
     .describe(
-      'Message describing the reason for rejecting or archiving the event.'
+      'Message describing the reason for rejecting, archiving or editing the event.'
     )
 })
 
@@ -202,9 +202,11 @@ const NotifiedAction = ActionBase.extend(
 
 const EditAction = ActionBase.extend(
   z.object({
-    type: z.literal(ActionType.EDIT)
+    type: z.literal(ActionType.EDIT),
+    content: ReasonContent.optional()
   }).shape
 )
+export type EditAction = z.infer<typeof EditAction>
 
 export const PrintContent = z.object({
   templateId: z.string().optional()

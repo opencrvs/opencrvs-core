@@ -82,7 +82,8 @@ export const DeclareActionInput = BaseActionInput.extend(
 
 export const EditActionInput = BaseActionInput.extend(
   z.object({
-    type: z.literal(ActionType.EDIT).default(ActionType.EDIT)
+    type: z.literal(ActionType.EDIT).default(ActionType.EDIT),
+    content: ReasonContent.optional()
   }).shape
 )
 

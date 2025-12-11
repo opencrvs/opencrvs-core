@@ -115,7 +115,8 @@ export async function editAndRegister({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignment: true,
+    content: { reason: 'TODO REASSON HERE' }
   })
 
   return trpcClient.event.actions.register.request.mutate({
@@ -137,7 +138,8 @@ export async function editAndDeclare({
     annotation,
     eventId,
     transactionId,
-    keepAssignment: true
+    keepAssignment: true,
+    content: { reason: 'TODO REASSON HERE' }
   })
 
   return trpcClient.event.actions.declare.request.mutate({
