@@ -106,12 +106,11 @@ export async function registerOnDeclare({
 
 export async function editAndRegister({
   eventId,
-  eventConfiguration,
   declaration,
   transactionId,
   annotation
 }: CustomMutationParams) {
-  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
+  await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
@@ -129,12 +128,11 @@ export async function editAndRegister({
 
 export async function editAndDeclare({
   eventId,
-  eventConfiguration,
   declaration,
   transactionId,
   annotation
 }: CustomMutationParams) {
-  const editedEvent = await trpcClient.event.actions.edit.request.mutate({
+  await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
