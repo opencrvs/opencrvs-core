@@ -18,8 +18,7 @@ import {
   createStoriesFromScenarios,
   AssertType,
   Scenario,
-  UserRoles,
-  REJECTED_DECLARE_AS_REVIEW
+  UserRoles
 } from '../ActionMenu.common'
 
 export default {

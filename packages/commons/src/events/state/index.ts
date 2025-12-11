@@ -65,7 +65,6 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.MARK_AS_DUPLICATE:
         case ActionType.REJECT_CORRECTION:
         case ActionType.READ:
-        case ActionType.VALIDATE:
         case ActionType.EDIT:
         default:
           return status

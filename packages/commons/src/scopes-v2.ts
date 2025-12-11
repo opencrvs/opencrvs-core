@@ -132,7 +132,6 @@ const v1ToV2ConfigScopeTypeMap: Record<LegacyScopeType, string> = {
   'record.notify': 'record.notify',
   'record.register': 'record.register',
   'record.unassign-others': 'record.unassign-others',
-  'record.declared.validate': 'record.validate',
   'record.declared.reject': 'record.reject',
   'record.declared.archive': 'record.archive',
   'record.declared.review-duplicates': 'record.review-duplicates',

@@ -126,12 +126,6 @@ const DeclareAction = ActionBase.extend(
   }).shape
 )
 
-const ValidateAction = ActionBase.extend(
-  z.object({
-    type: z.literal(ActionType.VALIDATE)
-  }).shape
-)
-
 export const ReasonContent = z.object({
   reason: z
     .string()
@@ -265,7 +259,6 @@ export type CustomAction = z.infer<typeof CustomAction>
 export const ActionDocument = z
   .discriminatedUnion('type', [
     CreatedAction.meta({ id: 'CreatedAction' }),
-    ValidateAction.meta({ id: 'ValidateAction' }),
     RejectAction.meta({ id: 'RejectAction' }),
     DuplicateDetectedAction.meta({ id: 'DuplicateDetectedAction' }),
     MarkNotDuplicateAction.meta({ id: 'MarkNotDuplicateAction' }),

@@ -88,7 +88,6 @@ const updateActions = ActionTypes.extract([
   ActionType.CREATE,
   ActionType.NOTIFY,
   ActionType.DECLARE,
-  ActionType.VALIDATE,
   ActionType.REGISTER,
   ActionType.REJECT,
   ActionType.ARCHIVE,

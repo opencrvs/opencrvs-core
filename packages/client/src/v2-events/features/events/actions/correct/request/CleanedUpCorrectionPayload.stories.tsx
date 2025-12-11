@@ -188,11 +188,6 @@ const overriddenEvent = {
     }),
     generateActionDocument({
       configuration: overriddenEventConfig,
-      action: ActionType.VALIDATE,
-      defaults: { declaration: {} }
-    }),
-    generateActionDocument({
-      configuration: overriddenEventConfig,
       action: ActionType.REGISTER,
       defaults: { declaration: {} }
     })

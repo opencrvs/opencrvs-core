@@ -55,7 +55,6 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 const actionModalMessages = {
   [ActionType.NOTIFY]: reviewMessages.incomplete.declare,
   [ActionType.DECLARE]: reviewMessages.complete.declare,
-  [ActionType.VALIDATE]: reviewMessages.complete.validate,
   [ActionType.REGISTER]: reviewMessages.complete.register
 }
 
@@ -95,7 +94,6 @@ function useDeclarationActions(event: EventDocument) {
   const mutateFns = {
     [ActionType.NOTIFY]: events.actions.notify.mutate,
     [ActionType.DECLARE]: events.actions.declare.mutate,
-    [ActionType.VALIDATE]: events.customActions.validateOnDeclare.mutate,
     [ActionType.REGISTER]: events.customActions.registerOnDeclare.mutate
   }
 
@@ -159,13 +157,11 @@ function useDeclarationActions(event: EventDocument) {
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
   /**
-   * Logic to check whether direct declare + validate or declare + validate + register is possible.
+   * Logic to check whether direct register (declare + register) is possible.
    * We do this by 'looking in to the future' by applying the would-be actions to the event,
-   * and checking if the validate and register actions are still allowed.
+   * and checking if the register action is still allowed.
    */
-  function isDirectActionPossible(
-    actionType: typeof ActionType.VALIDATE | typeof ActionType.REGISTER
-  ) {
+  function isDirectRegistrationPossible() {
     if (!userDetails) {
       return false
     }
@@ -194,44 +190,6 @@ function useDeclarationActions(event: EventDocument) {
       eventConfiguration
     )
 
-    const validateActionConfig = getActionConfig({
-      eventConfiguration,
-      actionType: ActionType.VALIDATE
-    })
-
-    if (!validateActionConfig) {
-      return false
-    }
-
-    const validateIsAvailable = isActionAvailable(
-      validateActionConfig,
-      eventIndexAfterDeclare,
-      validatorContext
-    )
-
-    if (actionType === ActionType.VALIDATE) {
-      return validateIsAvailable
-    }
-
-    const eventAfterValidate = {
-      ...eventAfterDeclare,
-      actions: eventAfterDeclare.actions.concat({
-        type: ActionType.VALIDATE,
-        id: 'placeholder' as UUID,
-        transactionId: 'placeholder' as UUID,
-        createdByUserType: TokenUserType.enum.user,
-        createdByRole: userDetails.role.id,
-        declaration,
-        annotation,
-        createdAt: new Date().toISOString(),
-        createdBy: userDetails.id,
-        originalActionId: null,
-        status: 'Accepted',
-        createdBySignature: undefined,
-        createdAtLocation: userDetails.primaryOffice.id as UUID
-      })
-    }
-
     const registerActionConfig = getActionConfig({
       eventConfiguration,
       actionType: ActionType.REGISTER
@@ -241,14 +199,9 @@ function useDeclarationActions(event: EventDocument) {
       return false
     }
 
-    const eventIndexAfterValidate = getCurrentEventState(
-      eventAfterValidate,
-      eventConfiguration
-    )
-
     return isActionAvailable(
       registerActionConfig,
-      eventIndexAfterValidate,
+      eventIndexAfterDeclare,
       validatorContext
     )
   }
@@ -261,16 +214,7 @@ function useDeclarationActions(event: EventDocument) {
         label: actionLabels[ActionType.REGISTER],
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
-        disabled:
-          hasValidationErrors || !isDirectActionPossible(ActionType.REGISTER)
-      },
-      {
-        icon: 'PaperPlaneTilt' as const,
-        label: actionLabels[ActionType.VALIDATE],
-        onClick: async () => handleDeclaration(ActionType.VALIDATE),
-        hidden: !isActionAllowed(ActionType.VALIDATE),
-        disabled:
-          hasValidationErrors || !isDirectActionPossible(ActionType.VALIDATE)
+        disabled: hasValidationErrors || !isDirectRegistrationPossible()
       },
       {
         icon: 'UploadSimple' as const,

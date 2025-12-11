@@ -36,7 +36,6 @@ exports[`getAvailableActions should return the correct actions for "CREATED" sta
 exports[`getAvailableActions should return the correct actions for "DECLARED" status with no flags 1`] = `
 [
   "READ",
-  "VALIDATE",
   "REGISTER",
   "ARCHIVE",
   "REJECT",

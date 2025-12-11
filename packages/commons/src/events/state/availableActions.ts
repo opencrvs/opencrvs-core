@@ -35,7 +35,6 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   ],
   [EventStatus.enum.DECLARED]: [
     ActionType.READ,
-    ActionType.VALIDATE,
     ActionType.REGISTER,
     ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
@@ -80,9 +79,6 @@ const ACTION_FILTERS: {
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.MARK_AS_DUPLICATE]: (flags) =>
     flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
-    !flags.some((flag) => flag.endsWith(':requested')),
-  [ActionType.VALIDATE]: (flags) =>
-    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.EDIT]: (flags) =>
     !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&

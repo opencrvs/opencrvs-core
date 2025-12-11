@@ -94,13 +94,6 @@ test('records are indexed with full location hierarchy', async () => {
     })
   })
 
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(createdEvent.id, {
-      declaration: event.declaration,
-      keepAssignment: true
-    })
-  )
-
   // --- Verify indexed ES document contains full hierarchy -------------------
   const searchResponse = await esClient.search({
     index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
