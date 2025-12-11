@@ -50,6 +50,9 @@ function userDeserializer(
   if (typeof serializedUserField === 'string') {
     return serializedUserField
   }
+  if (typeof serializedUserField !== 'object') {
+    return fallback
+  }
   if (
     serializedUserField.$userField === 'name' ||
     serializedUserField.$userField === 'signature' ||
