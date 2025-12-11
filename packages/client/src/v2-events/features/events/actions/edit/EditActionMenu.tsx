@@ -72,7 +72,6 @@ const messages = {
   }
 }
 
-// @TODO CIHAN: register/validate should be unavailable if declaration blocks it
 function useEditActions(event: EventDocument) {
   const eventType = event.type
   const { eventConfiguration } = useEventConfiguration(eventType)
