@@ -198,6 +198,14 @@ const testCases = [
       $user: {
         name: '',
         role: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: undefined,
@@ -210,6 +218,14 @@ const testCases = [
       $user: {
         name: '',
         role: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: 'Hello',
@@ -222,6 +238,14 @@ const testCases = [
       $user: {
         name: 'Jon Doe',
         role: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: 'Jon Doe',
@@ -234,6 +258,14 @@ const testCases = [
       $user: {
         name: 'Jon Doe',
         role: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: 'Hello world',
@@ -249,6 +281,14 @@ const testCases = [
       $user: {
         name: 'Jon Doe',
         role: 'Field Agent'
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
       }
     },
     expected: {
