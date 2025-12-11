@@ -136,10 +136,7 @@ function getAvailableActionsWithoutFlagFilters(
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
     case EventStatus.enum.DECLARED: {
-      if (
-        flags.includes(InherentFlags.REJECTED) ||
-        flags.includes(InherentFlags.EDIT_IN_PROGRESS)
-      ) {
+      if (flags.includes(InherentFlags.REJECTED)) {
         return getAvailableActionsWithoutFlagFilters(
           EventStatus.enum.CREATED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
@@ -147,6 +144,11 @@ function getAvailableActionsWithoutFlagFilters(
           .filter((action) => action !== ActionType.DELETE)
           .concat(ActionType.ARCHIVE)
       }
+
+      if (flags.includes(InherentFlags.EDIT_IN_PROGRESS)) {
+        return [ActionType.DECLARE, ActionType.REGISTER]
+      }
+
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
     case EventStatus.enum.REGISTERED: {
