@@ -2872,6 +2872,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -10395,6 +10396,7 @@ components:
                       - rejected
                       - correction-requested
                       - potential-duplicate
+                      - edit-in-progress
               - description: Custom flag identifier defined by the country config.
                 type: string
         noneOf:
@@ -10411,6 +10413,7 @@ components:
                       - rejected
                       - correction-requested
                       - potential-duplicate
+                      - edit-in-progress
               - description: Custom flag identifier defined by the country config.
                 type: string
       additionalProperties: false
@@ -10502,6 +10505,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -10846,6 +10850,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -11038,6 +11043,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -11244,6 +11250,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -11450,6 +11457,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -11752,6 +11760,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -12018,6 +12027,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
