@@ -199,6 +199,12 @@ function getMockActions(createdBy: string) {
       createdBy,
       id: generateUuid(rng),
       type: ActionType.CUSTOM
+    },
+    [ActionType.EDIT]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.EDIT
     }
   }
 }
