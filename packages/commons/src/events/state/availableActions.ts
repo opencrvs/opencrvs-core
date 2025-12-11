@@ -136,7 +136,10 @@ function getAvailableActionsWithoutFlagFilters(
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
     case EventStatus.enum.DECLARED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
+      if (
+        flags.includes(InherentFlags.REJECTED) ||
+        flags.includes(InherentFlags.EDIT_IN_PROGRESS)
+      ) {
         return getAvailableActionsWithoutFlagFilters(
           EventStatus.enum.CREATED,
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
