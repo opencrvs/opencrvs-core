@@ -186,6 +186,7 @@ function mapFieldTypeToElasticsearch(
           option: { type: 'keyword' }
         }
       }
+    case FieldType.IMAGE:
     case FieldType.SEARCH:
     case FieldType.ID_READER:
     case FieldType.QR_READER:
