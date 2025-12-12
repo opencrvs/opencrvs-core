@@ -10,7 +10,11 @@
  */
 
 import { useMemo } from 'react'
-import { getOrThrow, ValidatorContext } from '@opencrvs/commons/client'
+import {
+  EventDocument,
+  getOrThrow,
+  ValidatorContext
+} from '@opencrvs/commons/client'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { useAuthentication } from '../../utils/userUtils'
 import { useSuspenseAdminLeafLevelLocations } from './useLocations'
@@ -29,12 +33,13 @@ function useUser() {
   )
 }
 
-export function useValidatorContext(): ValidatorContext {
+export function useValidatorContext(event?: EventDocument): ValidatorContext {
   const leafAdminStructureLocationIds = useSuspenseAdminLeafLevelLocations()
   const user = useUser()
 
   return {
     user,
-    leafAdminStructureLocationIds
+    leafAdminStructureLocationIds,
+    event
   }
 }
