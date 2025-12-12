@@ -11,6 +11,7 @@
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
+import { Location, UUID } from '@opencrvs/commons/client'
 
 export enum UserStatus {
   ACTIVE,
@@ -68,6 +69,16 @@ export const getAddressName = (
   if (parentLocationId === '0') return name
   const parentLocation = offlineCountryConfig?.locations[parentLocationId]
   return `${name}, ${getAddressName(offlineCountryConfig, parentLocation)}`
+}
+
+export const getAddressNameV2 = (
+  locations: Map<UUID, Location>,
+  location?: Location
+): string => {
+  if (!location) return ''
+  const { name, parentId } = location
+  if (!parentId) return name
+  return `${name}, ${getAddressNameV2(locations, locations.get(parentId))}`
 }
 
 export function getUserAuditDescription(

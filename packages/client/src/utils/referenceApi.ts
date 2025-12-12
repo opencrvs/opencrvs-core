@@ -310,38 +310,7 @@ async function loadContent(): Promise<IContentResponse> {
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = `${window.config.API_GATEWAY_URL}location?type=ADMIN_STRUCTURE&_count=0`
-
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  if (res && res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  const response = await res.json()
-  const locations = {
-    data: response.entry.reduce(
-      (accumulator: { [key: string]: ILocation }, entry: fhir.BundleEntry) => {
-        if (!entry.resource || !entry.resource.id) {
-          throw new Error('Resource in entry not valid')
-        }
-
-        accumulator[entry.resource.id] = generateLocationResource(
-          entry.resource as fhir.Location
-        )
-
-        return accumulator
-      },
-      {}
-    )
-  }
-
-  return locations.data
+  return {}
 }
 
 function generateLocationResource(fhirLocation: fhir.Location): ILocation {
@@ -381,45 +350,7 @@ function generateLocationResource(fhirLocation: fhir.Location): ILocation {
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
-  const resCRVSOffices = await fetch(
-    `${window.config.API_GATEWAY_URL}location?type=CRVS_OFFICE&_count=0`
-  )
-  const resHealthFacilities = await fetch(
-    `${window.config.API_GATEWAY_URL}location?type=HEALTH_FACILITY&_count=0`
-  )
-
-  const locationBundleCRVSOffices = await resCRVSOffices.json()
-  const locationBundleHealthFacilities = await resHealthFacilities.json()
-
-  const facilities = locationBundleCRVSOffices.entry.reduce(
-    (accumulator: { [key: string]: ILocation }, entry: fhir.BundleEntry) => {
-      if (!entry.resource || !entry.resource.id) {
-        throw new Error('Resource in entry not valid')
-      }
-
-      accumulator[entry.resource.id] = generateLocationResource(
-        entry.resource as fhir.Location
-      )
-      return accumulator
-    },
-    {}
-  )
-
-  locationBundleHealthFacilities.entry.reduce(
-    (accumulator: { [key: string]: ILocation }, entry: fhir.BundleEntry) => {
-      if (!entry.resource || !entry.resource.id) {
-        throw new Error('Resource in entry not valid')
-      }
-
-      accumulator[entry.resource.id] = generateLocationResource(
-        entry.resource as fhir.Location
-      )
-      return accumulator
-    },
-    facilities
-  )
-
-  return facilities
+  return {}
 }
 
 export const referenceApi = {

@@ -315,7 +315,7 @@ function renderSelectOrRadioLabel(
   return option?.label ? intl.formatMessage(option.label) : value
 }
 
-export function renderSelectDynamicLabel(
+function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,

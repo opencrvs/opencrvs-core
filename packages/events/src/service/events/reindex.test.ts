@@ -64,6 +64,7 @@ beforeEach(async () => {
     {
       name: 'Adming level 1',
       parentId: null,
+      externalId: 'AS0978ASD2A',
       locationType: LocationType.enum.ADMIN_STRUCTURE,
       id: adminLevel1Id,
       validUntil: null
@@ -71,6 +72,7 @@ beforeEach(async () => {
     {
       name: 'Admin level 2',
       parentId: adminLevel1Id,
+      externalId: 'AS0978ASD2B',
       locationType: LocationType.enum.ADMIN_STRUCTURE,
       id: adminLevel2Id,
       validUntil: null
@@ -78,6 +80,7 @@ beforeEach(async () => {
     {
       name: 'Admin level 2',
       parentId: adminLevel2Id,
+      externalId: 'AS0978ASD2C',
       locationType: LocationType.enum.CRVS_OFFICE,
       id: crvsOfficeId,
       validUntil: null

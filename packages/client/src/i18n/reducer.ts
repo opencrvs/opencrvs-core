@@ -139,12 +139,12 @@ export const intlReducer: LoopReducer<IntlState, any> = (
       )
 
       const languagesWithLocations = formatLocationLanguageState(
-        Object.values(action.payload.locations),
+        Object.values(action.payload.locations ?? []),
         loadedLanguagesState
       )
 
       const languagesWithFacilities = formatLocationLanguageState(
-        Object.values(action.payload.facilities),
+        Object.values(action.payload.facilities ?? []),
         languagesWithLocations
       )
 

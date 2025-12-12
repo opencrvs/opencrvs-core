@@ -13,9 +13,9 @@ import {
   createTestComponent,
   userDetails,
   flushPromises,
-  getFileFromBase64String,
-  validImageB64String
+  getFileFromBase64String
 } from '@client/tests/util'
+import { validImageB64String } from '@client/tests/mock-offline-data'
 import { createStore } from '@client/store'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'

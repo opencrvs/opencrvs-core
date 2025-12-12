@@ -845,6 +845,7 @@ export interface IDynamicFormField
   type: any
 }
 
+/** @knipignore */
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
 
 type Params<Fn> = Fn extends (...args: infer A) => void ? A : never

@@ -23,6 +23,7 @@ export type LocationType = z.infer<typeof LocationType>
 export const Location = z.object({
   id: UUID,
   name: z.string(),
+  externalId: z.string().nullable(),
   parentId: UUID.nullable(),
   validUntil: z.iso.datetime().nullable(),
   locationType: LocationType.nullable()

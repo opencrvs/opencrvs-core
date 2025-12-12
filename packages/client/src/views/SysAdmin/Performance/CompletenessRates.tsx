@@ -162,7 +162,9 @@ function Filter({
       <LocationPicker
         additionalLocations={getAdditionalLocations(intl)}
         selectedLocationId={locationId}
-        locationFilter={({ type }) => type === 'ADMIN_STRUCTURE'}
+        locationFilter={({ locationType }) =>
+          locationType === 'ADMIN_STRUCTURE'
+        }
         onChangeLocation={(newLocationId) => {
           navigate(
             generateCompletenessRatesUrl({

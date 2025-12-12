@@ -36,6 +36,7 @@ function generateOfficeLocations(adminAreas: Location[], rng: () => number) {
       locationType: LocationType.enum.CRVS_OFFICE,
       parentId: admin.id,
       id: generateUuid(rng),
+      externalId: generateUuid(rng),
       validUntil: null
     } satisfies Location
 
@@ -43,6 +44,7 @@ function generateOfficeLocations(adminAreas: Location[], rng: () => number) {
       name: `${admin.name} Health Facility`,
       locationType: LocationType.enum.HEALTH_FACILITY,
       parentId: admin.id,
+      externalId: generateUuid(rng),
       id: generateUuid(rng),
       validUntil: null
     } satisfies Location
@@ -66,6 +68,7 @@ async function setupHierarchyWithUsers() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     id: generateUuid(rng),
+    externalId: generateUuid(rng),
     validUntil: null
   } satisfies Location
 
@@ -74,6 +77,7 @@ async function setupHierarchyWithUsers() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     id: generateUuid(rng),
+    externalId: generateUuid(rng),
     validUntil: null
   } satisfies Location
 
@@ -82,6 +86,7 @@ async function setupHierarchyWithUsers() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     id: generateUuid(rng),
+    externalId: generateUuid(rng),
     validUntil: null
   } satisfies Location
 
@@ -90,6 +95,7 @@ async function setupHierarchyWithUsers() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: provinceA.id,
     id: generateUuid(rng),
+    externalId: generateUuid(rng),
     validUntil: null
   } satisfies Location
 
@@ -98,6 +104,7 @@ async function setupHierarchyWithUsers() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: districtA.id,
     id: generateUuid(rng),
+    externalId: generateUuid(rng),
     validUntil: null
   } satisfies Location
 
@@ -106,6 +113,7 @@ async function setupHierarchyWithUsers() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: provinceB.id,
     id: generateUuid(rng),
+    externalId: generateUuid(rng),
     validUntil: null
   } satisfies Location
 

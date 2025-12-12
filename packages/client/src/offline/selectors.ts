@@ -22,13 +22,7 @@ function getKey<K extends keyof IOfflineDataState>(store: IStoreState, key: K) {
 export function isOfflineDataLoaded(
   state: Partial<IOfflineData>
 ): state is IOfflineData {
-  const hasAllRequiredData =
-    state.facilities &&
-    state.locations &&
-    state.config &&
-    state.forms &&
-    state.templates &&
-    state.languages
+  const hasAllRequiredData = state.config && state.templates && state.languages
 
   const isOfflineDataLoaded = Boolean(hasAllRequiredData)
   if (isOfflineDataLoaded) merge(window.config, state.config)

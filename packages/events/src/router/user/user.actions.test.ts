@@ -112,14 +112,16 @@ test('Finds user in nested location with my jurisdiction scope', async () => {
       parentId: userOnParentLocation.primaryOfficeId,
       locationType: LocationType.enum.ADMIN_STRUCTURE,
       id: childLocationId,
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz457'
     },
     {
       name: 'Grandchild office',
       parentId: childLocationId,
       locationType: LocationType.enum.CRVS_OFFICE,
       id: grandchildLocationId,
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz458'
     }
   ])
 
@@ -170,7 +172,8 @@ test('Find user with appropriate scopes', async () => {
       parentId: userOnParentLocation.primaryOfficeId,
       locationType: LocationType.enum.CRVS_OFFICE,
       id: userToSearchLocationId,
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz459'
     }
   ])
 

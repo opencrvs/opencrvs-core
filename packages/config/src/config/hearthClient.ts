@@ -42,5 +42,3 @@ export const start = async (): Promise<MongoClient> => {
 export const stop = async (): Promise<void> => {
   await client.close()
 }
-
-export default client

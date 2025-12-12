@@ -709,17 +709,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   })
                 )
               }}
-              locationFilter={
-                window.config.DECLARATION_AUDIT_LOCATIONS
-                  ? ({ jurisdictionType }) =>
-                      Boolean(
-                        jurisdictionType &&
-                          window.config.DECLARATION_AUDIT_LOCATIONS.split(
-                            ','
-                          ).includes(jurisdictionType)
-                      )
-                  : undefined
-              }
             />
             <PerformanceSelect
               onChange={({ value }) => {

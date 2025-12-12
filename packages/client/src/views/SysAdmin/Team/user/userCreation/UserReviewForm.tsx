@@ -78,6 +78,9 @@ import {
   generateUserReviewFormUrl
 } from '@client/navigation'
 import { getListOfLocations } from '@client/utils/validate'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { UUID } from '@opencrvs/commons/client'
+import { getOfficesUnderJurisdiction } from '@client/utils/locationUtils'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -302,20 +305,28 @@ const UserReviewFormComponent = ({
 }: IFullProps & IDispatchProps & IStateProps) => {
   const navigate = useNavigate()
 
-  const { canAccessOffice } = usePermissions()
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
 
   let title: string | undefined
   let actionComponent: JSX.Element
   const locationId = formData['registrationOffice'] as string
-  const locationDetails =
-    offlineCountryConfiguration['locations'][locationId] ||
-    offlineCountryConfiguration['facilities'][locationId] ||
-    offlineCountryConfiguration['offices'][locationId]
+
+  const parsedLocationId = UUID.safeParse(locationId)
 
   const userRole = userRoles.find(({ id }) => id === formData.role)
-  const offlineOffices = Object.values(offlineCountryConfiguration['offices'])
+
+  const parsedPrimaryOfficeId = UUID.safeParse(userDetails?.primaryOffice.id)
+  let jurisdictionId = null
+  if (parsedPrimaryOfficeId.success) {
+    jurisdictionId = locations.get(parsedPrimaryOfficeId.data)?.parentId ?? null
+  }
+
   const isMultipleOfficeUnderJurisdiction =
-    offlineOffices.filter(canAccessOffice).length > 1
+    getOfficesUnderJurisdiction({
+      locations,
+      jurisdictionId
+    }).length > 1
 
   const handleSubmit = () => {
     const variables = draftToGqlTransformer(
@@ -380,11 +391,11 @@ const UserReviewFormComponent = ({
       title={title}
       goBack={() => navigate(-1)}
       goHome={() => {
-        if (locationDetails.id) {
+        if (parsedLocationId.success && locations.get(parsedLocationId.data)) {
           navigate({
             pathname: routes.TEAM_USER_LIST,
             search: stringify({
-              locationId: locationDetails.id
+              locationId
             })
           })
         } else if (userDetails?.primaryOffice?.id) {

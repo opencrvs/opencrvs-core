@@ -108,17 +108,26 @@ export async function setLocations(locations: NewLocations[]) {
 export async function getLocations({
   locationType,
   locationIds,
-  isActive
+  isActive,
+  externalId
 }: {
   locationType?: LocationType
   locationIds?: UUID[]
   isActive?: boolean
+  externalId?: string
 } = {}) {
   const db = getClient()
 
   let query = db
     .selectFrom('locations')
-    .select(['id', 'name', 'parentId', 'validUntil', 'locationType'])
+    .select([
+      'id',
+      'name',
+      'parentId',
+      'validUntil',
+      'locationType',
+      'externalId'
+    ])
     .where('deletedAt', 'is', null)
     .$narrowType<{
       deletedAt: null
@@ -127,6 +136,10 @@ export async function getLocations({
 
   if (locationType) {
     query = query.where('locationType', '=', locationType)
+  }
+
+  if (externalId) {
+    query = query.where('externalId', '=', externalId)
   }
 
   if (locationIds && locationIds.length > 0) {
@@ -288,7 +301,7 @@ export async function getLocationById(locationId: UUID) {
 export async function getLocationHierarchyRaw(locationId: string) {
   const db = getClient()
 
-  const query = sql<{ ids: string[] }>`
+  const query = sql<{ ids: UUID[] }>`
     WITH RECURSIVE area_chain AS (
         -- Base case: Start with the location itself
         SELECT

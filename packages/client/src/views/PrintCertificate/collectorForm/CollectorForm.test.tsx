@@ -13,7 +13,6 @@ import {
   createTestComponent,
   selectOption,
   getFileFromBase64String,
-  validImageB64String,
   inValidImageB64String,
   mockDeclarationData,
   mockDeathDeclarationData,
@@ -22,6 +21,7 @@ import {
   flushPromises
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
+import { validImageB64String } from '@client/tests/mock-offline-data'
 import * as React from 'react'
 import { CollectorForm } from './CollectorForm'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
