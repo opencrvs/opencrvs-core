@@ -238,8 +238,9 @@ function useEditActions(event: EventDocument) {
             closeActionView(slug)
           }
         },
-        disabled: hasValidationErrors || !anyValuesHaveChanged,
-        hidden: !isActionAllowed(ActionType.REGISTER) || !canDirectlyRegister
+        disabled:
+          hasValidationErrors || !anyValuesHaveChanged || !canDirectlyRegister,
+        hidden: !isActionAllowed(ActionType.REGISTER)
       },
       {
         icon: 'PaperPlaneTilt' as const,
