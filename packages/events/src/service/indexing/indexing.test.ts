@@ -944,7 +944,7 @@ describe('placeOfEvent location hierarchy handling', () => {
               ]),
               {
                 id: 'locationId',
-                type: FieldType.HIDDEN,
+                type: FieldType.ALPHA_HIDDEN,
                 label: {
                   defaultMessage: 'Health Institution',
                   description: 'This is the label for the field',

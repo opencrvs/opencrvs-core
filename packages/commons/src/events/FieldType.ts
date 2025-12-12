@@ -51,7 +51,7 @@ export const FieldType = {
   QR_READER: 'QR_READER',
   ID_READER: 'ID_READER',
   LOADER: 'LOADER',
-  HIDDEN: 'HIDDEN'
+  ALPHA_HIDDEN: 'ALPHA_HIDDEN'
 } as const
 
 /**

@@ -847,7 +847,7 @@ const LoaderField = BaseField.extend({
 export type LoaderField = z.infer<typeof LoaderField>
 
 const HiddenField = BaseField.extend({
-  type: z.literal(FieldType.HIDDEN),
+  type: z.literal(FieldType.ALPHA_HIDDEN),
   required: z.boolean().default(false).optional(),
   defaultValue: TextValue.optional()
 }).describe(
