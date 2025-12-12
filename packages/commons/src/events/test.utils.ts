@@ -498,6 +498,7 @@ export function eventPayloadGenerator(
         > = {}
       ) => ({
         type: ActionType.EDIT,
+        content: { comment: 'Test comment' },
         transactionId: input.transactionId ?? getUUID(),
         declaration:
           input.declaration ??
