@@ -34,7 +34,9 @@ import {
   canUserReadEvent,
   hasScope,
   SCOPES,
-  hasAnyOfScopes
+  hasAnyOfScopes,
+  AnyScope,
+  decodeScope
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -92,6 +94,7 @@ function getAuthorizedEntities(
 
 type CtxWithAuthorizedEntities = TrpcContext & {
   authorizedEntities?: { events?: string[] }
+  acceptedScopes?: AnyScope[]
 }
 
 function inScope(token: string, scopes: Scope[]) {
@@ -108,7 +111,11 @@ function inScope(token: string, scopes: Scope[]) {
  */
 export function requiresAnyOfScopes(
   scopes: Scope[],
-  configurableScopes?: ConfigurableScopeType[]
+  configurableScopes?: ConfigurableScopeType[],
+  /**
+   * Truly transient property. After complete migration to V2 scopes we should have a single parameter instead of 2-3.
+   */
+  v2ScopeTypes?: string[]
 ) {
   const fn: MiddlewareFunction<
     TrpcContext,
@@ -122,6 +129,28 @@ export function requiresAnyOfScopes(
     // If the user has any of the allowed plain scopes, allow access
     if (inScope(token, scopes)) {
       return opts.next()
+    }
+
+    if (v2ScopeTypes && v2ScopeTypes.length > 0) {
+      const tokenScopes = getScopes(token)
+      const acceptedScopes = tokenScopes
+        .map((scope) => {
+          const parsedScope = decodeScope(scope)
+          return parsedScope && v2ScopeTypes.includes(parsedScope.type)
+            ? parsedScope
+            : null
+        })
+        .filter((scope): scope is z.infer<typeof AnyScope> => scope !== null)
+
+      if (acceptedScopes.length > 0) {
+        return opts.next({
+          ...opts,
+          ctx: {
+            ...opts.ctx,
+            acceptedScopes
+          }
+        })
+      }
     }
 
     // If the user has any of the allowed configurable scopes, allow the user to continue

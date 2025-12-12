@@ -16,23 +16,24 @@ import {
   parseConfigurableScope,
   parseLiteralScope
 } from './authentication'
+import { UUID } from './uuid'
 
 /*
  * V2 file will be unified with the scopes during 2.0 development.
  * We separate scope changes to phases in order to not block other development.
  */
 
-const JurisdictionFilter = z
+export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
   .describe(
     'Filters based on user jurisdiction relative to their office location in hierarchy.'
   )
-const UserFilter = z
+export const UserFilter = z
   .enum(['user'])
   .describe('Filters based on the user. Limits to self.')
 
-const RecordAction = z.enum([
-  'recoed.search',
+export const RecordAction = z.enum([
+  'record.search',
   'record.create',
   'record.read',
   'record.declare',
@@ -48,7 +49,23 @@ const RecordAction = z.enum([
   'record.unassign-others'
 ])
 
-const RecordScope = z
+export const ResolvedRecordScopeV2 = z
+  .object({
+    type: RecordAction,
+    options: z.object({
+      event: z.array(z.string()).describe('Event type, e.g. birth, death'),
+      eventLocation: UUID.nullish(),
+      declaredIn: UUID.nullish(),
+      declaredBy: z.string().or(z.undefined()).optional(),
+      registeredIn: UUID.nullish(),
+      registeredBy: z.string().or(z.undefined()).optional()
+    })
+  })
+  .describe('Resolved scope with location/user IDs instead of filters.')
+
+export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
+
+export const RecordScopeV2 = z
   .object({
     type: RecordAction,
     options: z
@@ -68,18 +85,20 @@ const RecordScope = z
     "Scopes used to check user's permission to perform actions on a record."
   )
 
-export type RecordScope = z.infer<typeof RecordScope>
+export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
 
 /**
  * Generic scope structure that can represent any scope.
  * Used for encoding/decoding scopes to/from strings.
  * We can then later refine to more specific scope types as needed.
  */
-const AnyScope = z.object({
+export const AnyScope = z.object({
   type: z.string(),
-  options: z.record(z.string(), z.string().or(z.array(z.string()))).optional()
+  options: z
+    .record(z.string(), z.string().or(z.array(z.string()).or(z.undefined())))
+    .optional()
 })
-type AnyScope = z.infer<typeof AnyScope>
+export type AnyScope = z.infer<typeof AnyScope>
 
 const flattenScope = (scope: AnyScope) => ({
   type: scope.type,
@@ -110,7 +129,7 @@ export const decodeScope = (query: string) => {
   })
 
   const unflattenedScope = unflattenScope(scope)
-  return AnyScope.parse(unflattenedScope)
+  return AnyScope.safeParse(unflattenedScope)?.data
 }
 
 type LegacyScopeType = ConfigurableScopeType
