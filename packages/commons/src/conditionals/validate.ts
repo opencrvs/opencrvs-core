@@ -46,6 +46,44 @@ const DataContext = z.object({
 
 type DataContext = z.infer<typeof DataContext>
 
+function resolveDataPath(
+  rootData: Record<string, unknown>,
+  dataPath: string,
+  instancePath: string
+): unknown {
+  const pathParts = dataPath.split('/')
+
+  // First part is the depth level (how many levels up to traverse)
+  const levels = parseInt(pathParts[0], 10)
+  const referencePath = pathParts.slice(1)
+
+  // Parse instancePath to get current location
+  // instancePath looks like: "/$form/mother.dob"
+  const instanceParts = instancePath.split('/').filter(Boolean) // Remove empty strings
+
+  // Traverse up by `levels` from current location
+  const traversedParts = instanceParts.slice(0, -levels)
+
+  // Start from rootData and navigate to the traversed location
+  let current: unknown | Record<string, unknown> = rootData
+  for (const part of traversedParts) {
+    if (current === null || current === undefined) {
+      return undefined
+    }
+    current = (current as Record<string, unknown>)[part]
+  }
+
+  // Now navigate using the reference path from that location
+  for (const part of referencePath) {
+    if (current === null || current === undefined) {
+      return undefined
+    }
+    current = (current as Record<string, unknown>)[part]
+  }
+
+  return current
+}
+
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
 
@@ -60,24 +98,29 @@ addFormats(ajv)
  *   "properties": {
  *     "birthDate": {
  *       "type": "string",
- *       "daysFromNow": {
+ *       "daysFromDate": {
  *         "days": 30,
- *         "clause": "before"
+ *         "clause": "before",
+ *         "referenceDate": { "$data": "1/child.dob" } // optional, defaults to $now
  *       }
  *    }
  * }
  */
 ajv.addKeyword({
-  keyword: 'daysFromNow',
+  keyword: 'daysFromDate',
   type: 'string',
   schemaType: 'object',
   $data: true,
   errors: true,
   validate(
-    schema: { days: number; clause: 'after' | 'before' },
+    schema: {
+      days: number
+      clause: 'after' | 'before'
+      referenceDate?: string | { $data: string }
+    },
     data: string,
     _: unknown,
-    dataContext?: { rootData: unknown }
+    dataContext?: { rootData: unknown; instancePath: string }
   ) {
     if (
       !(
@@ -101,8 +144,35 @@ ajv.addKeyword({
       return false
     }
 
-    const now = new Date(dataContext.rootData.$now)
-    const offsetDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000)
+    let referenceDate = schema.referenceDate
+
+    if (
+      referenceDate &&
+      typeof referenceDate === 'object' &&
+      '$data' in referenceDate
+    ) {
+      /**
+       * For some reason AJV does not resolve $data references automatically inside custom keywords
+       * So we have to do it manually here
+       */
+      referenceDate = resolveDataPath(
+        dataContext.rootData,
+        referenceDate.$data,
+        dataContext.instancePath
+      ) as string
+    }
+
+    if (!referenceDate) {
+      referenceDate = dataContext.rootData.$now
+    }
+
+    const baseDate = new Date(referenceDate)
+
+    if (isNaN(baseDate.getTime())) {
+      return false
+    }
+
+    const offsetDate = new Date(baseDate.getTime() + days * 24 * 60 * 60 * 1000)
 
     return clause === 'after'
       ? isAfter(date, offsetDate)
@@ -152,6 +222,7 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
       })
     )
   }
+
   const result = validator(data) as boolean
   return result
 }
