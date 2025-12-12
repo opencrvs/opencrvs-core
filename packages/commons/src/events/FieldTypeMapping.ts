@@ -273,7 +273,8 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
     case FieldType.CUSTOM:
-      return undefined satisfies CustomFieldValue
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return undefined as any as CustomFieldValue
   }
 }
 
@@ -565,7 +566,7 @@ export const isLoaderFieldType = (field: {
 export const isCustomFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
-}): field is { value: undefined; config: CustomField } => {
+}): field is { value: CustomFieldValue; config: CustomField } => {
   return field.config.type === FieldType.CUSTOM
 }
 

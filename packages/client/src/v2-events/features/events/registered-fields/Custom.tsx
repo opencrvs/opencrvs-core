@@ -10,11 +10,12 @@
  */
 import React from 'react'
 import { Spinner } from '@opencrvs/components'
+import { CustomFieldValue } from '@opencrvs/commons/client'
 
 interface InputProps {
   id: string
   src: string
-  onChange: (val: unknown) => void
+  onChange: (val: CustomFieldValue) => void
   value?: unknown
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
