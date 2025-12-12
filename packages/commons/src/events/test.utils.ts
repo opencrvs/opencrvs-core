@@ -838,8 +838,13 @@ export function generateActionDocument<T extends ActionType>({
     case ActionType.VALIDATE:
     case ActionType.REGISTER:
     case ActionType.REQUEST_CORRECTION:
-    case ActionType.EDIT:
       return { ...actionBase, type: action }
+    case ActionType.EDIT:
+      return {
+        ...actionBase,
+        type: action,
+        content: { comment: 'Test comment' }
+      }
     case ActionType.CUSTOM:
       return {
         ...actionBase,
