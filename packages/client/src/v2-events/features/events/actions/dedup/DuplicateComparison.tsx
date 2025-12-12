@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import {
   DeclarationFormConfig,
-  EventDocument,
   EventIndex,
   EventState,
   FieldConfig,
@@ -116,31 +115,24 @@ function UserFullName({ userId }: { userId: string }) {
 
 export function DuplicateComparison({
   originalEvent,
-  potentialDuplicateEvent,
-  originalEventState,
-  potentialDuplicateEventState
+  potentialDuplicateEvent
 }: {
-  originalEvent: EventDocument
-  potentialDuplicateEvent: EventDocument
-  originalEventState: EventIndex
-  potentialDuplicateEventState: EventIndex
+  originalEvent: EventIndex
+  potentialDuplicateEvent: EventIndex
 }) {
   const intl = useIntl()
-  const validatorContextOfOriginalEvent = useValidatorContext(originalEvent)
-  const validatorContextOfPotentialDuplicateEvent = useValidatorContext(
-    potentialDuplicateEvent
-  )
+  const validatorContext = useValidatorContext()
 
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
-  const { eventConfiguration } = useEventConfiguration(originalEventState.type)
+  const { eventConfiguration } = useEventConfiguration(originalEvent.type)
 
   const flattenedPotentialDuplicateEvent = flattenEventIndex(
-    potentialDuplicateEventState
+    potentialDuplicateEvent
   )
-  const flattenedOriginalEvent = flattenEventIndex(originalEventState)
+  const flattenedOriginalEvent = flattenEventIndex(originalEvent)
 
-  const originalDeclaration = originalEventState.declaration
-  const potentialDuplicateDeclaration = potentialDuplicateEventState.declaration
+  const originalDeclaration = originalEvent.declaration
+  const potentialDuplicateDeclaration = potentialDuplicateEvent.declaration
 
   const hideFieldTypes = [
     ...FieldTypesToHideInReview,
@@ -152,16 +144,8 @@ export function DuplicateComparison({
     eventConfiguration.declaration.pages
       .filter(
         (page) =>
-          isPageVisible(
-            page,
-            originalDeclaration,
-            validatorContextOfOriginalEvent
-          ) ||
-          isPageVisible(
-            page,
-            potentialDuplicateDeclaration,
-            validatorContextOfPotentialDuplicateEvent
-          )
+          isPageVisible(page, originalDeclaration, validatorContext) ||
+          isPageVisible(page, potentialDuplicateDeclaration, validatorContext)
       )
       .map((page) => ({
         title: intl.formatMessage(page.title),
@@ -171,12 +155,12 @@ export function DuplicateComparison({
               isFieldDisplayedOnReview(
                 field,
                 originalDeclaration,
-                validatorContextOfOriginalEvent
+                validatorContext
               ) ||
               isFieldDisplayedOnReview(
                 field,
                 potentialDuplicateDeclaration,
-                validatorContextOfPotentialDuplicateEvent
+                validatorContext
               )
           )
           .filter(
@@ -225,10 +209,10 @@ export function DuplicateComparison({
       {
         label: intl.formatMessage(summaryMessages.status.label),
         rightValue: flattenedIntl.formatMessage(summaryMessages.status.value, {
-          'event.status': potentialDuplicateEventState.status
+          'event.status': potentialDuplicateEvent.status
         }),
         leftValue: flattenedIntl.formatMessage(summaryMessages.status.value, {
-          'event.status': originalEventState.status
+          'event.status': originalEvent.status
         })
       },
       {
@@ -241,13 +225,13 @@ export function DuplicateComparison({
         rightValue: flattenedIntl.formatMessage(
           summaryMessages.trackingId.value,
           {
-            'event.trackingId': potentialDuplicateEventState.trackingId
+            'event.trackingId': potentialDuplicateEvent.trackingId
           }
         ),
         leftValue: flattenedIntl.formatMessage(
           summaryMessages.trackingId.value,
           {
-            'event.trackingId': originalEventState.trackingId
+            'event.trackingId': originalEvent.trackingId
           }
         )
       },
@@ -302,10 +286,10 @@ export function DuplicateComparison({
             {
               actualTrackingId: (
                 <Text color="negative" element="span" variant="bold18">
-                  {originalEventState.trackingId}
+                  {originalEvent.trackingId}
                 </Text>
               ),
-              duplicateTrackingId: potentialDuplicateEventState.trackingId
+              duplicateTrackingId: potentialDuplicateEvent.trackingId
             }
           )}
         >
@@ -319,16 +303,16 @@ export function DuplicateComparison({
                   <ComparisonListView
                     key={`comparison-${index}`}
                     headings={[
-                      originalEventState.trackingId,
-                      potentialDuplicateEventState.trackingId
+                      originalEvent.trackingId,
+                      potentialDuplicateEvent.trackingId
                     ]}
                   >
                     {sections.data.map((item, id) => (
                       <ComparisonListView.Row
                         key={`row-${id}`}
                         heading={{
-                          right: potentialDuplicateEventState.trackingId,
-                          left: originalEventState.trackingId
+                          right: potentialDuplicateEvent.trackingId,
+                          left: originalEvent.trackingId
                         }}
                         label={
                           <Text color="grey600" element="span" variant="bold16">
@@ -371,7 +355,7 @@ export function DuplicateComparison({
           <SupportingDocumentWrapper gap={25} justifyContent={'space-between'}>
             <div style={{ flex: 1 }}>
               <Text color="redDark" element="p" variant="bold14">
-                {originalEventState.trackingId}
+                {originalEvent.trackingId}
               </Text>
               <DocumentViewer
                 comparisonView={true}
@@ -390,7 +374,7 @@ export function DuplicateComparison({
             </div>
             <div style={{ flex: 1 }}>
               <Text color="grey400" element="p" variant="bold14">
-                {potentialDuplicateEventState.trackingId}
+                {potentialDuplicateEvent.trackingId}
               </Text>
               <DocumentViewer
                 comparisonView={true}

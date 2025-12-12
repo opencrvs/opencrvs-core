@@ -11,7 +11,6 @@
 import React from 'react'
 import type { Decorator } from '@storybook/react'
 import {
-  EventDocument,
   getOrThrow,
   getTokenPayload,
   LocationType,
@@ -58,10 +57,7 @@ export const withValidatorContext: Decorator = (Story, context) => {
     />
   )
 }
-export function getTestValidatorContext(
-  userRole?: TestUserRole,
-  event?: EventDocument
-) {
+export function getTestValidatorContext(userRole?: TestUserRole) {
   let token
 
   if (userRole === TestUserRole.Enum.FIELD_AGENT) {
@@ -86,7 +82,6 @@ export function getTestValidatorContext(
 
   return {
     user,
-    leafAdminStructureLocationIds,
-    event
+    leafAdminStructureLocationIds
   }
 }

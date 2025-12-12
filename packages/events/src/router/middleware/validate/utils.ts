@@ -101,7 +101,7 @@ export function getInvalidUpdateKeys<T>({
 
 export async function getValidatorContext(
   token: string
-): Promise<Omit<ValidatorContext, 'event'>> {
+): Promise<ValidatorContext> {
   const leafAdminStructureLocationIds = await getLeafLocationIds({
     locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
   })

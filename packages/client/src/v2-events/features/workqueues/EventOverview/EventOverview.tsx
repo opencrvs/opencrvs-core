@@ -59,7 +59,7 @@ function EventOverviewFull({
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const validatorContext = useValidatorContext(event)
+  const validatorContext = useValidatorContext()
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
   const draft = getRemoteDraftByEventId(eventIndex.id, {
@@ -114,9 +114,8 @@ function EventOverviewFull({
       ]}
     >
       <EventSummary
-        event={event}
+        event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        eventIndex={flattenedEventIndex}
         flags={flags}
       />
       <EventHistory
@@ -193,8 +192,8 @@ function EventOverviewProtected({
     >
       <EventSummary
         hideSecuredFields
+        event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
-        eventIndex={flattenedEventIndex}
         flags={flags}
       />
       <EventHistorySkeleton />

@@ -455,10 +455,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         eventConfiguration,
         originalDeclaration,
         declarationDiff: params.declaration,
-        validatorContext: {
-          ...validatorContext,
-          event: findLocalEventDocument(eventId)
-        }
+        validatorContext
       }),
       annotation
     }
@@ -516,7 +513,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
           eventConfiguration,
           originalDeclaration,
           declarationDiff: params.declaration,
-          validatorContext: { ...validatorContext, event: localEvent }
+          validatorContext
         })
       })
     }

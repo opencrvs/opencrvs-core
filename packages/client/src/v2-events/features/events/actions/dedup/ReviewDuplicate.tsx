@@ -17,7 +17,6 @@ import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
-  EventDocument,
   EventIndex,
   getActionReview,
   getCurrentEventState,
@@ -128,11 +127,12 @@ const TopBar = styled.div`
 function ReviewDuplicate() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
 
+  const validatorContext = useValidatorContext()
+
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEvents()
   const event = events.getEvent.findFromCache(eventId).data
-  const validatorContext = useValidatorContext(event)
 
   useEffect(() => {
     if (!event) {
@@ -157,7 +157,7 @@ function ReviewDuplicate() {
   const eventState = getCurrentEventState(event, configuration)
 
   const potentialDuplicates = eventState.potentialDuplicates.reduce<
-    Record<string, { eventState: EventIndex; event: EventDocument }>
+    Record<string, EventIndex>
   >((acc, { id, trackingId }) => {
     const localEvent = findLocalEventDocument(id)
     if (!localEvent) {
@@ -165,10 +165,7 @@ function ReviewDuplicate() {
         `Event with id ${id} and trackingId ${trackingId} not found in cache.`
       )
     }
-    acc[trackingId] = {
-      eventState: getCurrentEventState(localEvent, configuration),
-      event: localEvent
-    }
+    acc[trackingId] = getCurrentEventState(localEvent, configuration)
     return acc
   }, {})
 
@@ -227,12 +224,8 @@ function ReviewDuplicate() {
         </React.Suspense>
       ) : (
         <DuplicateComparison
-          originalEvent={event}
-          originalEventState={eventState}
-          potentialDuplicateEvent={potentialDuplicates[selectedTab].event}
-          potentialDuplicateEventState={
-            potentialDuplicates[selectedTab].eventState
-          }
+          originalEvent={eventState}
+          potentialDuplicateEvent={potentialDuplicates[selectedTab]}
         />
       )}
     </Frame>

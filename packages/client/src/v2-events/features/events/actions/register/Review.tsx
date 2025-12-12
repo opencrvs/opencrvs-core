@@ -62,6 +62,7 @@ export function Review() {
   )
   const events = useEvents()
   const drafts = useDrafts()
+  const validatorContext = useValidatorContext()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { closeActionView: closeActionView } = useEventFormNavigation()
@@ -71,7 +72,6 @@ export function Review() {
   const registerMutation = events.actions.register
 
   const event = events.getEvent.getFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
 
   const previousAnnotation = getActionAnnotation({
     event,

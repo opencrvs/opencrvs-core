@@ -41,6 +41,7 @@ function getCorrectablePages(formPages: PageConfig[]) {
 }
 
 export function Pages() {
+  const validatorContext = useValidatorContext()
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
   const setFormValues = useEventFormData((state) => state.setFormValues)
@@ -50,7 +51,6 @@ export function Pages() {
   const { modal } = useEventFormNavigation()
 
   const event = events.getEvent.getFromCache(eventId)
-  const validatorContext = useValidatorContext(event)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type

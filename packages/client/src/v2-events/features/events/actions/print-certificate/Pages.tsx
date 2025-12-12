@@ -49,7 +49,7 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const validatorContext = useValidatorContext(event)
+  const validatorContext = useValidatorContext()
   const eventIndex = getCurrentEventState(event, configuration)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
