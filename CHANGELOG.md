@@ -19,7 +19,7 @@ field('mother.dateOfMarriage')
   .fromDate(field('mother.dob'))
 
 // 45 days before now
-field('child.dob').isAfter().days(45).fromNow()
+field('child.dob').isBefore().days(45).fromNow()
 ```
 
 ### New features
