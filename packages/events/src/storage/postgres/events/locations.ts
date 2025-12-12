@@ -301,7 +301,7 @@ export async function getLocationById(locationId: UUID) {
 export async function getLocationHierarchyRaw(locationId: string) {
   const db = getClient()
 
-  const query = sql<{ ids: string[] }>`
+  const query = sql<{ ids: UUID[] }>`
     WITH RECURSIVE area_chain AS (
         -- Base case: Start with the location itself
         SELECT
