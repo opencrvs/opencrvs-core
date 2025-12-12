@@ -18,7 +18,8 @@ import {
   getUUID,
   getDeclaration,
   getActionReview,
-  getCurrentEventState
+  getCurrentEventState,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -42,6 +43,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
+import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import { hasDeclarationFieldChanged } from '../correct/utils'
 
 export const commentLabel = {
@@ -71,6 +73,11 @@ const messages = {
     description: 'Label for "Declare with edits" in edit action menu',
     id: 'event.edit.declareWithEdits.label'
   },
+  editAndNotifyLabel: {
+    defaultMessage: 'Notify with edits',
+    description: 'Label for "Notify with edits" in edit action menu',
+    id: 'event.edit.notifyWithEdits.label'
+  },
   editAndRegisterDescription: {
     id: 'event.edit.registerWithEdits.description',
     description: 'Description for "Register with edits" in edit action menu',
@@ -82,6 +89,12 @@ const messages = {
     description: 'Description for "Declare with edits" in edit action menu',
     defaultMessage:
       'Are you sure you want to edit this declaration? By confirming you are redeclaring this event and override past changes...'
+  },
+  editAndNotifyDescription: {
+    id: 'event.edit.notifyWithEdits.description',
+    description: 'Description for "Notify with edits" in edit action menu',
+    defaultMessage:
+      'Are you sure you want to notify this event with these edits?'
   }
 }
 
@@ -157,6 +170,7 @@ function useEditActions(event: EventDocument) {
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.EDIT.REVIEW
   )
+  const canDirectlyRegister = useCanDirectlyRegister(event)
   const { closeActionView } = useEventFormNavigation()
   const [modal, openModal] = useModal()
   const events = useEvents()
@@ -225,7 +239,7 @@ function useEditActions(event: EventDocument) {
           }
         },
         disabled: hasValidationErrors || !anyValuesHaveChanged,
-        hidden: !isActionAllowed(ActionType.REGISTER)
+        hidden: !isActionAllowed(ActionType.REGISTER) || !canDirectlyRegister
       },
       {
         icon: 'PaperPlaneTilt' as const,
@@ -257,6 +271,39 @@ function useEditActions(event: EventDocument) {
         },
         disabled: hasValidationErrors || !anyValuesHaveChanged,
         hidden: !isActionAllowed(ActionType.DECLARE)
+      },
+      {
+        icon: 'PaperPlaneTilt' as const,
+        label: messages.editAndNotifyLabel,
+        onClick: async () => {
+          const { confirmed, comment } = await openModal<EditActionModalResult>(
+            (close) => {
+              return (
+                <EditActionModal
+                  close={close}
+                  description={messages.editAndNotifyDescription}
+                  title={messages.editAndNotifyLabel}
+                />
+              )
+            }
+          )
+
+          if (confirmed) {
+            events.customActions.editAndNotify.mutate({
+              eventId: event.id,
+              transactionId: getUUID(),
+              declaration,
+              annotation,
+              content: { comment }
+            })
+
+            closeActionView(slug)
+          }
+        },
+        disabled: !anyValuesHaveChanged,
+        hidden:
+          !isActionAllowed(ActionType.NOTIFY) ||
+          eventIndex.status !== EventStatus.enum.NOTIFIED
       },
       {
         icon: 'ArchiveBox' as const,

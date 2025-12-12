@@ -315,6 +315,7 @@ export const customMutationKeys = {
   registerOnValidate: [['registerOnValidate']],
   editAndRegister: [['editAndRegister']],
   editAndDeclare: [['editAndDeclare']],
+  editAndNotify: [['editAndNotify']],
   archiveOnDuplicate: [['archiveOnDuplicate']],
   makeCorrectionOnRequest: [['makeCorrectionOnRequest']]
 } satisfies Record<CustomMutationKeys, MutationKey>
@@ -325,6 +326,7 @@ interface CustomMutationTypes {
   registerOnValidate: customApi.CustomMutationParams
   editAndRegister: customApi.EditRequestParams
   editAndDeclare: customApi.EditRequestParams
+  editAndNotify: customApi.EditRequestParams
   archiveOnDuplicate: customApi.ArchiveOnDuplicateParams
   makeCorrectionOnRequest: customApi.CorrectionRequestParams
 }
@@ -373,6 +375,16 @@ queryClient.setMutationDefaults(customMutationKeys.editAndDeclare, {
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.DECLARE }
 })
+
+queryClient.setMutationDefaults(customMutationKeys.editAndNotify, {
+  mutationFn: customApi.editAndNotify,
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.DECLARE }
+})
+
 queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
   mutationFn: customApi.archiveOnDuplicate,
   retry: retryUnlessConflict,

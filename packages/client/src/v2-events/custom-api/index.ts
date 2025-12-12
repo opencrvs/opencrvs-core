@@ -82,21 +82,6 @@ export async function registerOnDeclare({
     return declaredEvent
   }
 
-  // update is a patch, no need to send again.
-  const validatedEvent = await trpcClient.event.actions.validate.request.mutate(
-    {
-      declaration: {},
-      annotation,
-      eventId,
-      transactionId,
-      keepAssignment: true
-    }
-  )
-
-  if (hasPotentialDuplicates(validatedEvent, eventConfiguration)) {
-    return validatedEvent
-  }
-
   const latestResponse = await trpcClient.event.actions.register.request.mutate(
     {
       declaration: {},
@@ -114,7 +99,8 @@ export async function editAndRegister({
   declaration,
   transactionId,
   annotation,
-  content
+  content,
+  eventConfiguration
 }: EditRequestParams) {
   await trpcClient.event.actions.edit.request.mutate({
     declaration,
@@ -124,6 +110,19 @@ export async function editAndRegister({
     keepAssignment: true,
     content
   })
+
+  // TODO CIHAN: do declare only if its not been notified previously?
+  // const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
+  //   declaration,
+  //   annotation,
+  //   eventId,
+  //   transactionId,
+  //   keepAssignment: true
+  // })
+
+  // if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  //   return declaredEvent
+  // }
 
   return trpcClient.event.actions.register.request.mutate({
     declaration,
@@ -156,6 +155,31 @@ export async function editAndDeclare({
     transactionId
   })
 }
+
+export async function editAndNotify({
+  eventId,
+  declaration,
+  transactionId,
+  annotation,
+  content
+}: EditRequestParams) {
+  await trpcClient.event.actions.edit.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignment: true,
+    content
+  })
+
+  return trpcClient.event.actions.notify.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId
+  })
+}
+
 /**
  * Runs a sequence of actions from declare to validate.
  *

@@ -426,7 +426,7 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: shouldHideDeclareAction
+        hidden: shouldHideDeclareAction || isRejected
       },
       [ActionType.EDIT]: {
         icon: 'PencilLine' as const,

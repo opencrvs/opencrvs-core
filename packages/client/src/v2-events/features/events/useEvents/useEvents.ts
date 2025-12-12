@@ -255,7 +255,8 @@ export function useEvents() {
       archiveOnDuplicate: useEventCustomAction('archiveOnDuplicate'),
       makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest'),
       editAndRegister: useEventCustomAction('editAndRegister'),
-      editAndDeclare: useEventCustomAction('editAndDeclare')
+      editAndDeclare: useEventCustomAction('editAndDeclare'),
+      editAndNotify: useEventCustomAction('editAndNotify')
     }
   }
 }

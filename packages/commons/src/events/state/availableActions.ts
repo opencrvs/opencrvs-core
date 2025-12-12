@@ -131,6 +131,7 @@ function getAvailableActionsWithoutFlagFilters(
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
           .filter((action) => action !== ActionType.DELETE)
+          .concat(ActionType.EDIT)
           .concat(ActionType.ARCHIVE)
       }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
@@ -142,6 +143,7 @@ function getAvailableActionsWithoutFlagFilters(
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
           .filter((action) => action !== ActionType.DELETE)
+          .concat(ActionType.EDIT)
           .concat(ActionType.ARCHIVE)
       }
 

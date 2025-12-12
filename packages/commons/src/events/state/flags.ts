@@ -181,6 +181,12 @@ export function resolveEventCustomFlags(
         conditional ? isFlagConditionMet(conditional, form, action) : true
     )
 
+    if (action.type === ActionType.DECLARE) {
+      console.log('Declare flags')
+      console.log(actionConfig.flags)
+      console.log(flagsWithMetConditions)
+    }
+
     const addedFlags = flagsWithMetConditions
       .filter(({ operation }) => operation === 'add')
       .map(({ id }) => id)
