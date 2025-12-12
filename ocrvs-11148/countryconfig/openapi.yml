@@ -2275,7 +2275,7 @@ components:
                             - QR_READER
                             - ID_READER
                             - LOADER
-                            - HIDDEN
+                            - ALPHA_HIDDEN
                         label:
                           description: "
 
@@ -2526,7 +2526,7 @@ components:
                             - QR_READER
                             - ID_READER
                             - LOADER
-                            - HIDDEN
+                            - ALPHA_HIDDEN
                         label:
                           description: "
 
@@ -9989,7 +9989,7 @@ components:
               type: boolean
             type:
               type: string
-              const: HIDDEN
+              const: ALPHA_HIDDEN
             defaultValue:
               type: string
           required:
