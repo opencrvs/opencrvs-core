@@ -50,7 +50,8 @@ import {
   QrReaderField,
   IdReaderField,
   LoaderField,
-  AgeField
+  AgeField,
+  CustomField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -82,7 +83,8 @@ import {
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
   IdReaderFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  CustomFieldValue
 } from './CompositeFieldValue'
 import {
   getDynamicNameValue,
@@ -205,6 +207,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ID_READER:
       schema = IdReaderFieldValue
       break
+    case FieldType.CUSTOM:
+      schema = CustomFieldValue
+      break
   }
 
   return field.required ? schema : schema.nullish()
@@ -267,6 +272,8 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
+    case FieldType.CUSTOM:
+      return undefined satisfies CustomFieldValue
   }
 }
 
@@ -553,6 +560,13 @@ export const isLoaderFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: LoaderField } => {
   return field.config.type === FieldType.LOADER
+}
+
+export const isCustomFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: undefined; config: CustomField } => {
+  return field.config.type === FieldType.CUSTOM
 }
 
 export type NonInteractiveFieldType =

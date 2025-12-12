@@ -27,6 +27,7 @@ import {
   VerificationStatusValue
 } from './FieldValue'
 import {
+  CustomFieldValue,
   DomesticAddressFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
@@ -835,6 +836,15 @@ const IdReaderField = BaseField.extend({
 
 export type IdReaderField = z.infer<typeof IdReaderField>
 
+const CustomField = BaseField.extend({
+  type: z.literal(FieldType.CUSTOM),
+  defaultValue: CustomFieldValue.optional(),
+  src: z.string().describe('Module source path for the custom field component'),
+  configuration: z.unknown().optional()
+})
+
+export type CustomField = z.infer<typeof CustomField>
+
 const LoaderField = BaseField.extend({
   type: z.literal(FieldType.LOADER),
   configuration: z.object({
@@ -886,7 +896,8 @@ export const FieldConfig = z
     IdReaderField,
     QueryParamReaderField,
     LoaderField,
-    SearchField
+    SearchField,
+    CustomField
   ])
   .meta({
     description: 'Form field configuration',

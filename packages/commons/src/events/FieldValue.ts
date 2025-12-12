@@ -21,7 +21,8 @@ import {
   QueryParamReaderFieldValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
-  IdReaderFieldValue
+  IdReaderFieldValue,
+  CustomFieldValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -115,7 +116,8 @@ const FieldValuesWithoutDataField = z.union([
   VerificationStatusValue,
   QueryParamReaderFieldValue,
   QrReaderFieldValue,
-  IdReaderFieldValue
+  IdReaderFieldValue,
+  CustomFieldValue
 ])
 type FieldValuesWithoutDataField = z.infer<typeof FieldValuesWithoutDataField>
 
@@ -229,6 +231,7 @@ export type FieldUpdateValue =
   | z.infer<typeof NameFieldUpdateValue>
   | z.infer<typeof HttpFieldUpdateValue>
   | z.infer<typeof QueryParamReaderFieldUpdateValue>
+  | z.infer<typeof CustomFieldValue>
 
 // All schemas are tagged using .describe() so we can identify them later
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
@@ -247,7 +250,8 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   DataFieldValue.describe('DataFieldValue'),
   NameFieldUpdateValue.describe('NameFieldUpdateValue'),
   HttpFieldUpdateValue.describe('HttpFieldUpdateValue'),
-  QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue')
+  QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue'),
+  CustomFieldValue.describe('CustomFieldValue')
 ])
 
 /**
@@ -287,5 +291,6 @@ export type FieldUpdateValueSchema =
   | typeof IdReaderFieldValue
   | typeof DateValue
   | typeof EmailValue
+  | typeof CustomFieldValue
   | z.ZodString
   | z.ZodBoolean

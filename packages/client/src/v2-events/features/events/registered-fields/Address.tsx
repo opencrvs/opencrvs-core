@@ -240,6 +240,8 @@ function AddressInput(props: Props) {
   } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
+  console.log(otherProps)
+
   const locations = getLocations.useSuspenseQuery()
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
