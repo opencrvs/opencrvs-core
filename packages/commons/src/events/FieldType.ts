@@ -87,5 +87,6 @@ export const FieldTypesToHideInReview = [
   FieldType.LOADER,
   FieldType.HTTP,
   FieldType.QUERY_PARAM_READER,
-  FieldType.DATA
+  FieldType.DATA,
+  FieldType.ALPHA_HIDDEN
 ]
