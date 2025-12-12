@@ -74,6 +74,7 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { config } from './config'
+import { TRPCProvider } from './v2-events/trpc'
 
 // Injecting global styles for the body tag - used only once
 const GlobalStyle = createGlobalStyle`
@@ -323,19 +324,35 @@ export const routesConfig = turnOffV2Events
           },
           {
             path: routes.CREATE_USER_ON_LOCATION,
-            element: <CreateNewUser />
+            element: (
+              <TRPCProvider>
+                <CreateNewUser />
+              </TRPCProvider>
+            )
           },
           {
             path: routes.CREATE_USER_SECTION,
-            element: <CreateNewUser />
+            element: (
+              <TRPCProvider>
+                <CreateNewUser />
+              </TRPCProvider>
+            )
           },
           {
             path: routes.REVIEW_USER_FORM,
-            element: <CreateNewUser />
+            element: (
+              <TRPCProvider>
+                <CreateNewUser />
+              </TRPCProvider>
+            )
           },
           {
             path: routes.REVIEW_USER_DETAILS,
-            element: <CreateNewUser />
+            element: (
+              <TRPCProvider>
+                <CreateNewUser />
+              </TRPCProvider>
+            )
           }
         ]
       }
@@ -415,19 +432,35 @@ export const routesConfig = turnOffV2Events
           },
           {
             path: routes.CREATE_USER_ON_LOCATION,
-            element: <CreateNewUser />
+            element: (
+              <TRPCProvider>
+                <CreateNewUser />
+              </TRPCProvider>
+            )
           },
           {
             path: routes.CREATE_USER_SECTION,
-            element: <CreateNewUser />
+            element: (
+              <TRPCProvider>
+                <CreateNewUser />
+              </TRPCProvider>
+            )
           },
           {
             path: routes.REVIEW_USER_FORM,
-            element: <CreateNewUser />
+            element: (
+              <TRPCProvider>
+                <CreateNewUser />
+              </TRPCProvider>
+            )
           },
           {
             path: routes.REVIEW_USER_DETAILS,
-            element: <CreateNewUser />
+            element: (
+              <TRPCProvider>
+                <CreateNewUser />
+              </TRPCProvider>
+            )
           }
         ]
       }

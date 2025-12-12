@@ -217,6 +217,45 @@ export function generateLocationsV2(
   return generateSearchableLocationsV2(locationArray, locations, intl, officeId)
 }
 
+function isLocationUnderJurisdiction({
+  locations,
+  locationId,
+  jurisdictionId
+}: {
+  locations: Map<UUID, Location>
+  locationId: UUID | null | undefined
+  jurisdictionId: UUID | null
+}): boolean {
+  if (!jurisdictionId) {
+    return true
+  }
+  if (!locationId) {
+    return false
+  }
+  if (jurisdictionId === locationId) {
+    return true
+  }
+  return isLocationUnderJurisdiction({
+    locations,
+    locationId: locations.get(locationId)?.parentId,
+    jurisdictionId
+  })
+}
+
+export function getOfficesUnderJurisdiction({
+  locations,
+  jurisdictionId
+}: {
+  locations: Map<UUID, Location>
+  jurisdictionId: UUID | null
+}): Location[] {
+  return [...locations.values()].filter(
+    ({ id, locationType }) =>
+      locationType === 'CRVS_OFFICE' &&
+      isLocationUnderJurisdiction({ locations, locationId: id, jurisdictionId })
+  )
+}
+
 export function getJurisidictionType(
   locations: { [key: string]: ILocation },
   locationId: string
