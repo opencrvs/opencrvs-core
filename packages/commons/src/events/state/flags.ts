@@ -18,6 +18,7 @@ import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag, CustomFlag } from '../Flag'
 import { EventConfig } from '../EventConfig'
 import {
+  aggregateActionAnnotations,
   aggregateActionDeclarations,
   getAcceptedActions,
   getActionConfig,
@@ -152,7 +153,7 @@ export function resolveEventCustomFlags(
     }
 
     const declaration = aggregateActionDeclarations(eventUpToThisAction)
-    const annotation = aggregateActionDeclarations(eventUpToThisAction)
+    const annotation = aggregateActionAnnotations(eventUpToThisAction.actions)
     const form = { ...declaration, ...annotation }
 
     const flagsWithMetConditions = actionConfig.flags.filter(

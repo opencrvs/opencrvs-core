@@ -10,7 +10,7 @@
  */
 
 /**
- * TemplateConfig defines configuration rules for system-based variables (e.g. $user.province).
+ * TemplateConfig defines configuration rules for system-based variables (e.g. $user.role).
  * They are currently used for providing default values in FieldConfig.
  */
 
@@ -21,10 +21,29 @@ import { FieldValue } from './FieldValue'
  */
 export type SystemVariables = {
   $user: {
-    province: string
-    district: string
+    name: string
+    role: string
+  }
+  $window: {
+    location: {
+      href: string
+      pathname: string
+      hostname: string
+      originPathname: string
+    }
   }
 }
+
+/**
+ * Resolves `window().location.get('href')` to `window.location.href` to allow us to 1) type check system variables 2) change the implementation later if needed
+ */
+export const window = () => ({
+  location: {
+    get: (key: 'href' | 'pathname' | 'hostname' | 'originPathname') => {
+      return `$window.location.${key}`
+    }
+  }
+})
 
 /**
  * Recursively flatten the keys of an object. Used to limit types when configuring default values in country config.

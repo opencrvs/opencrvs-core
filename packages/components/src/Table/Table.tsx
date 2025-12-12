@@ -146,7 +146,7 @@ const ValueWrapper = styled.span<{
   alignment?: string
   color?: string
   // TODO: The children can be passed a `IDynamicValues` value, which is a very flexible / any-like type.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   children?: any
 }>`
   width: ${({ width, totalWidth }) =>
@@ -209,8 +209,8 @@ const TableScroller = styled.div<{
     isFullPage
       ? `calc(100vh - ${offsetTop}px - 180px)`
       : height
-      ? `${height}px`
-      : 'auto'};
+        ? `${height}px`
+        : 'auto'};
 
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth

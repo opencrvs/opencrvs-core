@@ -31,6 +31,7 @@ import {
   DefaultAddressFieldValue,
   LocationType,
   ValidatorContext,
+  RequireConfig,
   DomesticAddressFieldValue,
   UUID
 } from '@opencrvs/commons/client'
@@ -134,7 +135,8 @@ function isDomesticAddress() {
 }
 
 function generateAdminStructureFields(
-  inputArray: AdminStructureItem[]
+  inputArray: AdminStructureItem[],
+  required: RequireConfig
 ): AdministrativeArea[] {
   return inputArray.map((item, index) => {
     const { id, label } = item
@@ -168,7 +170,7 @@ function generateAdminStructureFields(
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
       parent: createFieldCondition(parentId),
-      required: true,
+      required,
       label,
       configuration
     }
@@ -242,7 +244,10 @@ function AddressInput(props: Props) {
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
-  const adminStructure = generateAdminStructureFields(appConfigAdminLevels)
+  const adminStructure = generateAdminStructureFields(
+    appConfigAdminLevels,
+    otherProps.required
+  )
   const customAddressFields = props.configuration?.streetAddressForm
 
   const adminStructureLocations = new Map(
@@ -306,23 +311,25 @@ function AddressInput(props: Props) {
     adminLevelIds
   )
 
-  const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields].map(
-    (x) => {
-      const existingEnableCondition =
-        x.conditionals?.find((c) => c.type === ConditionalType.ENABLE)
-          ?.conditional ?? not(not(alwaysTrue()))
-      return {
-        ...x,
-        conditionals: [
-          ...(x.conditionals ?? []),
-          {
-            type: ConditionalType.ENABLE,
-            conditional: disabled ? not(alwaysTrue()) : existingEnableCondition
-          }
-        ]
-      }
+  const fields = [
+    { ...COUNTRY_FIELD, required: otherProps.required },
+    ...adminStructure,
+    ...addressFields
+  ].map((x) => {
+    const existingEnableCondition =
+      x.conditionals?.find((c) => c.type === ConditionalType.ENABLE)
+        ?.conditional ?? not(not(alwaysTrue()))
+    return {
+      ...x,
+      conditionals: [
+        ...(x.conditionals ?? []),
+        {
+          type: ConditionalType.ENABLE,
+          conditional: disabled ? not(alwaysTrue()) : existingEnableCondition
+        }
+      ]
     }
-  )
+  })
 
   const handleChange = (values: EventState) => {
     const addressLines = extractAddressLines(values, adminLevelIds)
@@ -402,7 +409,10 @@ function AddressOutput({
     ...adminLevels
   }
 
-  const adminStructure = generateAdminStructureFields(appConfigAdminLevels)
+  const adminStructure = generateAdminStructureFields(
+    appConfigAdminLevels,
+    configuration?.required
+  )
 
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
@@ -423,7 +433,11 @@ function AddressOutput({
 
   const flattenedAddressValues = flattenAddressObject(addressValues)
 
-  const fieldsToShow = [COUNTRY_FIELD, ...adminStructure, ...addressFields]
+  const fieldsToShow = [
+    { ...COUNTRY_FIELD, required: configuration?.required },
+    ...adminStructure,
+    ...addressFields
+  ]
     .map((field) => ({
       field,
       value: flattenedAddressValues[field.id]

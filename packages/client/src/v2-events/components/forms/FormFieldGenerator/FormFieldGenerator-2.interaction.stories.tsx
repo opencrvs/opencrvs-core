@@ -505,7 +505,7 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
 
       // in react-select v5 literal inputs are not rendered when disabled, so we ensure the fields are there.
       await canvas.findByLabelText('Region')
-      await canvas.findByLabelText('District *')
+      await canvas.findByLabelText('District')
     })
   }
 }
@@ -559,7 +559,7 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
       }
 
       await canvas.findByLabelText('Region')
-      await canvas.findByLabelText('District *')
+      await canvas.findByLabelText('District')
     })
   }
 }
@@ -647,9 +647,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
       }
 
       await expect(await canvas.findByLabelText('Region')).not.toBeDisabled()
-      await expect(
-        await canvas.findByLabelText('District *')
-      ).not.toBeDisabled()
+      await expect(await canvas.findByLabelText('District')).not.toBeDisabled()
     })
 
     await step('All form fields should be disabled again', async () => {
@@ -674,7 +672,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
 
         // in react-select v5 literal inputs are not rendered when disabled, so we ensure the fields are there.
         await canvas.findByLabelText('Region')
-        await canvas.findByLabelText('District *')
+        await canvas.findByLabelText('District')
       }
     })
   }

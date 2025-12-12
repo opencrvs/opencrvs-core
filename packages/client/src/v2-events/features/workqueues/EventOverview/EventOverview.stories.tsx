@@ -661,7 +661,12 @@ const duplicateEvent = {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.DUPLICATE_DETECTED,
-      defaults: actionDefaults
+      defaults: {
+        ...actionDefaults,
+        content: {
+          duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
+        }
+      }
     }),
     generateActionDocument({
       configuration: tennisClubMembershipEvent,

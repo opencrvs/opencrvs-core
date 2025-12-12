@@ -50,16 +50,12 @@ export function useUserDetails() {
     return {
       name,
       role: user.role,
-      district: '',
-      province: '',
       ...adminLevels
     }
   }
 
   return {
     name,
-    role: user.role,
-    district: '',
-    province: ''
+    role: user.role
   }
 }

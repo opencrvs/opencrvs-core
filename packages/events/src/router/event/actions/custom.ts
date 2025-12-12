@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/commons/events'
 import { getScopes, parseConfigurableScope } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
-import { systemProcedure } from '@events/router/trpc'
+import { userAndSystemProcedure } from '@events/router/trpc'
 import { getEventById } from '@events/service/events/events'
 import {
   defaultRequestHandler,
@@ -48,7 +48,7 @@ function allowCustomAction(
 export function customActionProcedures() {
   return {
     ...getDefaultActionProcedures(ActionType.CUSTOM),
-    request: systemProcedure
+    request: userAndSystemProcedure
       .input(CustomActionInput)
       .use(async ({ ctx, input, next }) => {
         try {
