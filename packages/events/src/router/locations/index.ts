@@ -13,6 +13,7 @@ import * as z from 'zod/v4'
 import { Location, LocationType, SCOPES, UUID } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import {
+  getChildLocations,
   getLocations,
   setLocations,
   syncLocations
@@ -56,6 +57,14 @@ export const locationRouter = router({
         locationType: input?.locationType
       })
     ),
+  getChild: userAndSystemProcedure
+    .input(
+      z.object({
+        parentId: UUID
+      })
+    )
+    .output(z.array(Location))
+    .query(async ({ input }) => getChildLocations(input.parentId)),
   set: userAndSystemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
