@@ -2,6 +2,10 @@
 
 ## 1.9.3
 
+### New features
+
+- Introduced form page level config - `requireCompletionToContinue` to enforce full completion of the form page before moving to the next page.
+
 ### Improvements
 
 - Add support for validating dates before/after another date field using `isBefore` and `isAfter` validators. [#11194](https://github.com/opencrvs/opencrvs-core/issues/11194)
@@ -21,18 +25,6 @@ field('mother.dateOfMarriage')
 // 45 days before now
 field('child.dob').isBefore().days(45).fromNow()
 ```
-
-### New features
-
-#### HTTP Input
-
-HTTP input now accepts `field('..')` references in the HTTP body definition.
-
-## 1.9.3
-
-### New features
-
-- Introduced form page level config - `requireCompletionToContinue` to enforce full completion of the form page before moving to the next page.
 
 ### Bug fixes
 
