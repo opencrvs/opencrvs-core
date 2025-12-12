@@ -29,6 +29,12 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Remove legacy mongo migration status outputs and skip typecheck which reduced the migration service startup time by 66%.
 - The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
 
+## 1.9.2
+
+### New features
+
+- Toolkit now exports `window().location.get` to country config that can be used as a template variable e.g. in HttpField request body.
+
 ## [1.9.1](https://github.com/opencrvs/opencrvs-core/compare/v1.9.0...v1.9.1)
 
 ### Breaking changes

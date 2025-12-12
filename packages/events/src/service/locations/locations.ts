@@ -67,6 +67,16 @@ export async function getLocations(params?: {
   return locations
 }
 
+export async function getLocationById(locationId: UUID) {
+  const location = await locationsRepo.getLocationById(locationId)
+
+  if (!location) {
+    throw new Error(`Location with id ${locationId} not found`)
+  }
+
+  return location
+}
+
 export const getChildLocations = async (parentIdToSearch: UUID) => {
   const locations = await locationsRepo.getChildLocations(parentIdToSearch)
 

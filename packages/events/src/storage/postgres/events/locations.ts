@@ -269,6 +269,27 @@ export async function isLocationUnderJurisdiction({
   return !!result.rows[0].isChild
 }
 
+export async function getLocationById(locationId: UUID) {
+  const db = getClient()
+
+  return db
+    .selectFrom('locations')
+    .select([
+      'id',
+      'name',
+      'administrativeAreaId',
+      'validUntil',
+      'locationType'
+    ])
+    .where('id', '=', locationId)
+    .where('deletedAt', 'is', null)
+    .$narrowType<{
+      deletedAt: null
+      validUntil: Location['validUntil']
+    }>()
+    .executeTakeFirst()
+}
+
 /**
  * Given a location ID, this function retrieves the full chain of parent administrative areas
  * from `administrative_areas` corresponding to the location's `administrative_area_id`.
@@ -287,18 +308,18 @@ export async function getLocationHierarchyRaw(locationId: string) {
             l.id,
             l.administrative_area_id AS parent_id,
             0 AS depth
-            
+
         FROM app.locations l
         WHERE l.id = ${locationId}
-        
+
         UNION ALL
-        
+
         -- Recursive case: Get administrative areas
         SELECT
             aa.id,
             aa.parent_id,
             ac.depth + 1
-            
+
         FROM app.administrative_areas aa
         JOIN area_chain ac
             ON ac.parent_id = aa.id
