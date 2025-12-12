@@ -3392,6 +3392,7 @@ components:
                             - event.status
                             - event.legalStatuses.REGISTERED.acceptedAt
                             - event.legalStatuses.REGISTERED.createdAtLocation
+                            - event.legalStatuses.REGISTERED.registrationNumber
                             - event.updatedAt
                         fieldType:
                           type: string
