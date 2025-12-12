@@ -38,9 +38,6 @@ import {
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useAllowedActionConfigurations'
 
-/** There is discrepancy between the actual action, and what we communicate. Even if next action is declare, it should have the text of validate  */
-export const REJECTED_DECLARE_AS_REVIEW = ActionType.VALIDATE
-
 const generator = testDataGenerator()
 
 const actionProps: ActionBase = {
