@@ -493,7 +493,7 @@ export async function findRecordsByQuery({
   const events = response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((eventIndex) => {
+    .map((eventIndex: EncodedEventIndex) => {
       const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
       const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
       const eventIndexWithoutLocationHierarchy =

@@ -19,7 +19,8 @@ export const SerializedUserField = z.object({
     'role',
     'signature',
     'avatar',
-    'primaryOfficeId'
+    'primaryOfficeId',
+    'administrativeAreaId'
   ]),
   $location: z.string().optional()
 })
