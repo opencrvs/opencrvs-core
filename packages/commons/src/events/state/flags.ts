@@ -143,6 +143,8 @@ export function resolveEventCustomFlags(
   let actions = sortedActions
 
   // If there is more than one declare action, lets filter out all actions between the second last and last declare actions
+  // Why is this done? This is to handle 'redeclaration' cases, i.e. when a user edits a declared record and then does 'Declare with edits'
+  // Then we want to ignore all the actions between the second last and last declare actions.
   if (declareIndexes.length >= 2) {
     const secondLast = declareIndexes[declareIndexes.length - 2]
     const last = declareIndexes[declareIndexes.length - 1]
