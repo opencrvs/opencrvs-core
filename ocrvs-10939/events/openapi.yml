@@ -382,8 +382,7 @@ paths:
                   type: object
                   properties:
                     reason:
-                      description: Message describing the reason for rejecting, archiving or editing
-                        the event.
+                      description: Message describing the reason for rejecting or archiving the event.
                       type: string
                       minLength: 1
                   required:
@@ -1273,8 +1272,7 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting, archiving or editing
-                the event.
+              description: Message describing the reason for rejecting or archiving the event.
               type: string
               minLength: 1
           required:
@@ -1685,8 +1683,7 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting, archiving or editing
-                the event.
+              description: Message describing the reason for rejecting or archiving the event.
               type: string
               minLength: 1
           required:
@@ -2360,8 +2357,7 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting, archiving or editing
-                the event.
+              description: Message describing the reason for rejecting or archiving the event.
               type: string
               minLength: 1
           required:
@@ -2750,13 +2746,9 @@ components:
         content:
           type: object
           properties:
-            reason:
-              description: Message describing the reason for rejecting, archiving or editing
-                the event.
+            comment:
+              description: Comment for the edit action.
               type: string
-              minLength: 1
-          required:
-            - reason
       required:
         - id
         - transactionId
@@ -2767,6 +2759,7 @@ components:
         - declaration
         - status
         - type
+        - content
     CustomAction:
       type: object
       properties:
@@ -14199,8 +14192,7 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting, archiving or editing
-                the event.
+              description: Message describing the reason for rejecting or archiving the event.
               type: string
               minLength: 1
           required:
@@ -14619,8 +14611,7 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting, archiving or editing
-                the event.
+              description: Message describing the reason for rejecting or archiving the event.
               type: string
               minLength: 1
           required:
@@ -15302,8 +15293,7 @@ components:
           type: object
           properties:
             reason:
-              description: Message describing the reason for rejecting, archiving or editing
-                the event.
+              description: Message describing the reason for rejecting or archiving the event.
               type: string
               minLength: 1
           required:
@@ -15698,13 +15688,9 @@ components:
         content:
           type: object
           properties:
-            reason:
-              description: Message describing the reason for rejecting, archiving or editing
-                the event.
+            comment:
+              description: Comment for the edit action.
               type: string
-              minLength: 1
-          required:
-            - reason
           additionalProperties: false
       required:
         - id
@@ -15716,6 +15702,7 @@ components:
         - declaration
         - status
         - type
+        - content
       additionalProperties: false
     CustomActionOutput:
       type: object
