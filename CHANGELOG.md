@@ -28,6 +28,12 @@ field('child.dob').isAfter().days(45).fromNow()
 
 HTTP input now accepts `field('..')` references in the HTTP body definition.
 
+## 1.9.3
+
+### New features
+
+- Introduced form page level config - `requireCompletionToContinue` to enforce full completion of the form page before moving to the next page.
+
 ## 1.9.2
 
 ### New features
