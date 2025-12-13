@@ -148,7 +148,10 @@ export function resolveEventCustomFlags(
   if (declareIndexes.length >= 2) {
     const secondLast = declareIndexes[declareIndexes.length - 2]
     const last = declareIndexes[declareIndexes.length - 1]
-    actions = sortedActions.filter((_, idx) => idx < secondLast || idx >= last)
+    actions = [
+      ...sortedActions.slice(0, secondLast),
+      ...sortedActions.slice(last)
+    ]
   }
 
   return actions.reduce((acc, action, idx) => {
