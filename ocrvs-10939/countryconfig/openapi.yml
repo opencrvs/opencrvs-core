@@ -2988,6 +2988,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -10621,6 +10622,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -10966,6 +10968,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -11159,6 +11162,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -11366,6 +11370,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -11573,6 +11578,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -11876,6 +11882,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -12143,6 +12150,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
