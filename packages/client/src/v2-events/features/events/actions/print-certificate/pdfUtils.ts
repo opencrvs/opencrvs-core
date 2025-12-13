@@ -363,7 +363,8 @@ export function compileSvg({
               adminLevels
             }
           ),
-          createdByRole: action.data.createdByRole
+          createdByRole: action.data.createdByRole,
+          annotation: action.data.annotation
         }
 
         return getMixedPath(resolvedAction, propertyPath)
