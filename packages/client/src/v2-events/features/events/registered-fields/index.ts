@@ -21,6 +21,7 @@ import { Http } from './Http'
 import { LocationSearch } from './LocationSearch'
 import { Name } from './Name'
 import { Number } from './Number'
+import { NumberWithUnit } from './NumberWithUnit'
 import { PageHeader } from './PageHeader'
 import { AgeField } from './AgeField'
 import { Paragraph } from './Paragraph'
@@ -49,6 +50,7 @@ export * from './Http'
 export * from './LocationSearch'
 export * from './Name'
 export * from './Number'
+export * from './NumberWithUnit'
 export * from './PageHeader'
 export * from './Paragraph'
 export * from './RadioGroup'
@@ -97,6 +99,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Text
     case FieldType.NUMBER:
       return Number
+    case FieldType.NUMBER_WITH_UNIT:
+      return NumberWithUnit
     case FieldType.DIVIDER:
       return Divider
     case FieldType.PAGE_HEADER:
