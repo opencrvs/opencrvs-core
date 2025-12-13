@@ -37,6 +37,7 @@ import {
  */
 
 export const TextValue = z.string()
+export const HiddenFieldValue = z.string()
 export const NonEmptyTextValue = TextValue.min(1)
 
 export const DateValue = z.iso.date().describe('Date in the format YYYY-MM-DD')
@@ -229,6 +230,7 @@ export type FieldUpdateValue =
   | z.infer<typeof NameFieldUpdateValue>
   | z.infer<typeof HttpFieldUpdateValue>
   | z.infer<typeof QueryParamReaderFieldUpdateValue>
+  | z.infer<typeof HiddenFieldValue>
 
 // All schemas are tagged using .describe() so we can identify them later
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
@@ -247,7 +249,8 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   DataFieldValue.describe('DataFieldValue'),
   NameFieldUpdateValue.describe('NameFieldUpdateValue'),
   HttpFieldUpdateValue.describe('HttpFieldUpdateValue'),
-  QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue')
+  QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue'),
+  HiddenFieldValue.describe('HiddenFieldValue')
 ])
 
 /**

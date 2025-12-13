@@ -240,9 +240,27 @@ export function FormSectionComponent({
       )
 
       const firstNonFalsyValue = compact(
-        referencesToOtherFields.map((reference) =>
-          resolveFieldReferenceValue(reference, fieldValues)
-        )
+        referencesToOtherFields.map((reference) => {
+          const referenceFieldConfig = allFieldsWithDotSeparator.find(
+            (field: FieldConfig) => field.id === reference.$$field
+          )
+
+          if (!referenceFieldConfig) {
+            return undefined
+          }
+
+          const isReferenceVisible = isFieldVisible(
+            referenceFieldConfig,
+            makeFormikFieldIdsOpenCRVSCompatible(fieldValues),
+            validatorContext
+          )
+
+          if (!isReferenceVisible || !listenerFieldConfig) {
+            return undefined
+          }
+
+          return resolveFieldReferenceValue(reference, fieldValues)
+        })
       )[0]
 
       if (firstNonFalsyValue) {
@@ -261,7 +279,7 @@ export function FormSectionComponent({
 
       return
     },
-    [allFieldsWithDotSeparator, systemVariables]
+    [allFieldsWithDotSeparator, systemVariables, validatorContext]
   )
 
   const onFieldValueChange = useCallback(
