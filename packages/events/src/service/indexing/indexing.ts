@@ -201,6 +201,15 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         enabled: false
       }
+    case FieldType.CUSTOM:
+      /**
+       * Custom fields are not indexed as their structure is unknown.
+       */
+
+      return {
+        type: 'object',
+        enabled: false
+      }
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     default:

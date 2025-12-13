@@ -249,6 +249,7 @@ function mapFieldTypeToMockValue(
       } satisfies HttpFieldValue
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
+    case FieldType.CUSTOM:
       return undefined
     case FieldType.QR_READER:
       return Object.create(null)

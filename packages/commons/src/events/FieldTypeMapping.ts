@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -50,7 +51,8 @@ import {
   QrReaderField,
   IdReaderField,
   LoaderField,
-  AgeField
+  AgeField,
+  CustomField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -82,7 +84,8 @@ import {
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
   IdReaderFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  CustomFieldValue
 } from './CompositeFieldValue'
 import {
   getDynamicNameValue,
@@ -205,6 +208,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ID_READER:
       schema = IdReaderFieldValue
       break
+    case FieldType.CUSTOM:
+      schema = CustomFieldValue
+      break
   }
 
   return field.required ? schema : schema.nullish()
@@ -267,6 +273,9 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
+    case FieldType.CUSTOM:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return undefined as any as CustomFieldValue
   }
 }
 
@@ -553,6 +562,13 @@ export const isLoaderFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: LoaderField } => {
   return field.config.type === FieldType.LOADER
+}
+
+export const isCustomFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: CustomFieldValue; config: CustomField } => {
+  return field.config.type === FieldType.CUSTOM
 }
 
 export type NonInteractiveFieldType =
