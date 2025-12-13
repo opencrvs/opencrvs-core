@@ -172,7 +172,7 @@ const tennisClubMembershipEventWithCustomAction = {
   actions: tennisClubMembershipEvent.actions.concat([
     {
       type: ActionType.CUSTOM,
-      customActionType: 'CONFIRM',
+      customActionType: 'Approve',
       label: {
         id: 'event.tennis-club-membership.action.confirm.label',
         defaultMessage: 'Confirm',
