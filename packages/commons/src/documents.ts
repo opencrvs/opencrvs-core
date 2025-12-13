@@ -12,7 +12,7 @@
 import * as z from 'zod/v4'
 
 export const MINIO_REGEX =
-  /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|svg)(\?.*)?$/i
+  /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|pdf|svg)(\?.*)?$/i
 
 export function isBase64FileString(str: string) {
   if (str === '' || str.trim() === '') {
