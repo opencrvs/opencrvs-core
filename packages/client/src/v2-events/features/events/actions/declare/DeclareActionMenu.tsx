@@ -12,24 +12,19 @@ import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { v4 as uuid } from 'uuid'
-import { useSelector } from 'react-redux'
 import {
   ActionType,
   getDeclaration,
   EventStatus,
   EventDocument,
   getCurrentEventState,
-  TokenUserType,
-  UUID,
-  isActionAvailable,
-  getActionConfig,
-  InherentFlags
+  InherentFlags,
+  getActionReview
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { Icon } from '@opencrvs/components'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -44,6 +39,7 @@ import { Review } from '@client/v2-events/features/events/components/Review'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
+import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { useRejectionModal } from '../reject/useRejectionModal'
@@ -54,7 +50,6 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 const actionModalMessages = {
   [ActionType.NOTIFY]: reviewMessages.incomplete.declare,
   [ActionType.DECLARE]: reviewMessages.complete.declare,
-  [ActionType.VALIDATE]: reviewMessages.complete.validate,
   [ActionType.REGISTER]: reviewMessages.complete.register
 }
 
@@ -84,28 +79,23 @@ function useDeclarationActions(event: EventDocument) {
   const annotation = getAnnotation()
   const [modal, openModal] = useModal()
   const { rejectionModal, handleRejection } = useRejectionModal(event.id)
+  const canDirectlyRegister = useCanDirectlyRegister(event)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.DECLARE.REVIEW
   )
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const events = useEvents()
-  const userDetails = useSelector(getUserDetails)
 
   const mutateFns = {
     [ActionType.NOTIFY]: events.actions.notify.mutate,
     [ActionType.DECLARE]: events.actions.declare.mutate,
-    [ActionType.VALIDATE]: events.customActions.validateOnDeclare.mutate,
     [ActionType.REGISTER]: events.customActions.registerOnDeclare.mutate
   }
 
-  const actionConfiguration = eventConfiguration.actions.find(
-    (a) => a.type === ActionType.DECLARE
-  )
-  if (!actionConfiguration) {
-    throw new Error('Action configuration not found')
+  const reviewConfig = getActionReview(eventConfiguration, ActionType.EDIT)
+  if (!reviewConfig) {
+    throw new Error('Review config not found')
   }
-
-  const reviewConfig = actionConfiguration.review
 
   /**
    * hasValidationErrors is true if:
@@ -161,101 +151,6 @@ function useDeclarationActions(event: EventDocument) {
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
-  /**
-   * Logic to check whether direct declare + validate or declare + validate + register is possible.
-   * We do this by 'looking in to the future' by applying the would-be actions to the event,
-   * and checking if the validate and register actions are still allowed.
-   */
-  function isDirectActionPossible(
-    actionType: typeof ActionType.VALIDATE | typeof ActionType.REGISTER
-  ) {
-    if (!userDetails) {
-      return false
-    }
-
-    const eventAfterDeclare = {
-      ...event,
-      actions: event.actions.concat({
-        type: ActionType.DECLARE,
-        id: 'placeholder' as UUID,
-        transactionId: 'placeholder' as UUID,
-        createdByUserType: TokenUserType.enum.user,
-        createdByRole: userDetails.role.id,
-        declaration,
-        annotation,
-        createdAt: new Date().toISOString(),
-        createdBy: userDetails.id,
-        originalActionId: null,
-        status: 'Accepted',
-        createdBySignature: undefined,
-        createdAtLocation: userDetails.primaryOffice.id as UUID
-      })
-    }
-
-    const eventIndexAfterDeclare = getCurrentEventState(
-      eventAfterDeclare,
-      eventConfiguration
-    )
-
-    const validateActionConfig = getActionConfig({
-      eventConfiguration,
-      actionType: ActionType.VALIDATE
-    })
-
-    if (!validateActionConfig) {
-      return false
-    }
-
-    const validateIsAvailable = isActionAvailable(
-      validateActionConfig,
-      eventIndexAfterDeclare,
-      validatorContext
-    )
-
-    if (actionType === ActionType.VALIDATE) {
-      return validateIsAvailable
-    }
-
-    const eventAfterValidate = {
-      ...eventAfterDeclare,
-      actions: eventAfterDeclare.actions.concat({
-        type: ActionType.VALIDATE,
-        id: 'placeholder' as UUID,
-        transactionId: 'placeholder' as UUID,
-        createdByUserType: TokenUserType.enum.user,
-        createdByRole: userDetails.role.id,
-        declaration,
-        annotation,
-        createdAt: new Date().toISOString(),
-        createdBy: userDetails.id,
-        originalActionId: null,
-        status: 'Accepted',
-        createdBySignature: undefined,
-        createdAtLocation: userDetails.primaryOffice.id as UUID
-      })
-    }
-
-    const registerActionConfig = getActionConfig({
-      eventConfiguration,
-      actionType: ActionType.REGISTER
-    })
-
-    if (!registerActionConfig) {
-      return false
-    }
-
-    const eventIndexAfterValidate = getCurrentEventState(
-      eventAfterValidate,
-      eventConfiguration
-    )
-
-    return isActionAvailable(
-      registerActionConfig,
-      eventIndexAfterValidate,
-      validatorContext
-    )
-  }
-
   return {
     modals: [modal, rejectionModal, saveAndExitModal, deleteDeclarationModal],
     actions: [
@@ -264,16 +159,7 @@ function useDeclarationActions(event: EventDocument) {
         label: actionLabels[ActionType.REGISTER],
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
-        disabled:
-          hasValidationErrors || !isDirectActionPossible(ActionType.REGISTER)
-      },
-      {
-        icon: 'PaperPlaneTilt' as const,
-        label: actionLabels[ActionType.VALIDATE],
-        onClick: async () => handleDeclaration(ActionType.VALIDATE),
-        hidden: !isActionAllowed(ActionType.VALIDATE),
-        disabled:
-          hasValidationErrors || !isDirectActionPossible(ActionType.VALIDATE)
+        disabled: hasValidationErrors || !canDirectlyRegister
       },
       {
         icon: 'UploadSimple' as const,

@@ -279,6 +279,7 @@ export const RecordScopeType = z.enum([
   'record.read',
   'record.declare',
   'record.notify',
+  'record.declared.edit',
   'record.declared.validate',
   'record.declared.reject',
   'record.declared.archive',

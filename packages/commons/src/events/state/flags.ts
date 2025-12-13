@@ -29,6 +29,10 @@ import { EventDocument } from '../EventDocument'
 import { JSONSchema } from '../../conditionals/conditionals'
 import { validate } from '../../conditionals/validate'
 
+function isEditInProgress(actions: Action[]) {
+  return actions.at(-1)?.type === ActionType.EDIT
+}
+
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
     return false
@@ -127,10 +131,28 @@ export function resolveEventCustomFlags(
   event: EventDocument,
   eventConfiguration: EventConfig
 ): CustomFlag[] {
-  const acceptedActions = getAcceptedActions(event)
-  const actions = acceptedActions
+  const sortedActions = getAcceptedActions(event)
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  // First find indices of all declare actions
+  const declareIndexes = sortedActions
+    .map((a, i) => (a.type === ActionType.DECLARE ? i : -1))
+    .filter((i) => i !== -1)
+
+  let actions = sortedActions
+
+  // If there is more than one declare action, lets filter out all actions between the second last and last declare actions
+  // Why is this done? This is to handle 'redeclaration' cases, i.e. when a user edits a declared record and then does 'Declare with edits'
+  // Then we want to ignore all the actions between the second last and last declare actions.
+  if (declareIndexes.length >= 2) {
+    const secondLast = declareIndexes[declareIndexes.length - 2]
+    const last = declareIndexes[declareIndexes.length - 1]
+    actions = [
+      ...sortedActions.slice(0, secondLast),
+      ...sortedActions.slice(last)
+    ]
+  }
 
   return actions.reduce((acc, action, idx) => {
     let actionConfig
@@ -223,6 +245,9 @@ export function getEventFlags(
   }
   if (isPotentialDuplicate(sortedActions)) {
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
+  }
+  if (isEditInProgress(sortedActions)) {
+    flags.push(InherentFlags.EDIT_IN_PROGRESS)
   }
 
   return [...flags, ...resolveEventCustomFlags(event, config)]

@@ -43,6 +43,11 @@ const flagMessages = {
     id: 'flags.builtin.pending-certification.label',
     defaultMessage: 'Pending certification',
     description: 'Flag label for pending certification'
+  },
+  [InherentFlags.EDIT_IN_PROGRESS]: {
+    id: 'flags.builtin.edit-in-progress.label',
+    defaultMessage: 'Edit in progress',
+    description: 'Flag label for edit in progress'
   }
 } satisfies Record<InherentFlags, TranslationConfig>
 

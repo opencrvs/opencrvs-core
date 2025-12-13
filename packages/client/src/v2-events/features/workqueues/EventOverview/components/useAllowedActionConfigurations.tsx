@@ -126,6 +126,11 @@ export const actionLabels = {
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'event.birth.action.declare.label'
   },
+  [ActionType.EDIT]: {
+    defaultMessage: 'Edit',
+    description: 'Edit action label',
+    id: 'actions.edit'
+  },
   [ActionType.REJECT]: {
     defaultMessage: 'Reject',
     description: 'Label for reject button in dropdown menu',
@@ -421,7 +426,18 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: shouldHideDeclareAction
+        hidden: shouldHideDeclareAction || isRejected
+      },
+      [ActionType.EDIT]: {
+        icon: 'PencilLine' as const,
+        label: actionLabels[ActionType.EDIT],
+        onClick: (workqueue) => {
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId }, { workqueue })
+          )
+        },
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REJECT]: {
         label: actionLabels[ActionType.REJECT],

@@ -80,6 +80,17 @@ export const DeclareActionInput = BaseActionInput.extend(
   }).shape
 )
 
+export const EditActionInput = BaseActionInput.extend(
+  z.object({
+    type: z.literal(ActionType.EDIT).default(ActionType.EDIT),
+    content: z.object({
+      comment: z.string().describe('Comment for the edit action.').optional()
+    })
+  }).shape
+)
+
+export type EditActionInput = z.infer<typeof EditActionInput>
+
 export const PrintCertificateActionInput = BaseActionInput.extend(
   z.object({
     type: z
@@ -262,7 +273,8 @@ export const ActionInput = z
       id: 'ApproveCorrectionActionInput'
     }),
     ReadActionInput.meta({ id: 'ReadActionInput' }),
-    CustomActionInput.meta({ id: 'CustomActionInput' })
+    CustomActionInput.meta({ id: 'CustomActionInput' }),
+    EditActionInput.meta({ id: 'EditActionInput' })
   ])
   .meta({
     id: 'ActionInput'

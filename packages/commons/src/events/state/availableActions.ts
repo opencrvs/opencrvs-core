@@ -40,7 +40,8 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
     ActionType.REJECT,
-    ActionType.CUSTOM
+    ActionType.CUSTOM,
+    ActionType.EDIT
   ],
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,
@@ -81,6 +82,9 @@ const ACTION_FILTERS: {
     flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.VALIDATE]: (flags) =>
+    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.EDIT]: (flags) =>
     !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.REGISTER]: (flags) =>
@@ -127,6 +131,7 @@ function getAvailableActionsWithoutFlagFilters(
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
           .filter((action) => action !== ActionType.DELETE)
+          .concat(ActionType.EDIT)
           .concat(ActionType.ARCHIVE)
       }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
@@ -138,8 +143,14 @@ function getAvailableActionsWithoutFlagFilters(
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
           .filter((action) => action !== ActionType.DELETE)
+          .concat(ActionType.EDIT)
           .concat(ActionType.ARCHIVE)
       }
+
+      if (flags.includes(InherentFlags.EDIT_IN_PROGRESS)) {
+        return [ActionType.DECLARE, ActionType.REGISTER]
+      }
+
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
     }
     case EventStatus.enum.REGISTERED: {

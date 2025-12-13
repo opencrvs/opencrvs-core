@@ -16,7 +16,6 @@ import {
   EventConfig,
   EventDocument,
   EventState,
-  getAcceptedActions,
   getDeclaration,
   isFieldDisplayedOnReview,
   ValidatorContext

@@ -24,6 +24,7 @@ import { PrintCertificate } from './PrintCertificate'
 import { DeclarationUpdate } from './DeclarationUpdate'
 import { CustomActionContent } from './CustomAction'
 import { DetectedDuplicate } from './DetectedDuplicate'
+import { Edit } from './Edit'
 
 const SyntheticDeclarationActionTypes = z.enum([DECLARATION_ACTION_UPDATE])
 
@@ -77,6 +78,16 @@ export function ActionTypeSpecificContent({
       <CustomActionContent
         action={action}
         event={fullEvent}
+        validatorContext={validatorContext}
+      />
+    )
+  }
+
+  if (type === ActionType.EDIT) {
+    return (
+      <Edit
+        action={action}
+        fullEvent={fullEvent}
         validatorContext={validatorContext}
       />
     )

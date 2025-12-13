@@ -63,15 +63,11 @@ export const ROUTES = {
             'declare/:eventId',
             {
               params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
+              searchParams: { workqueue: string() }
             },
             {
               REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
+                searchParams: { workqueue: string() }
               }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
@@ -79,6 +75,23 @@ export const ROUTES = {
                   from: string(),
                   workqueue: string()
                 },
+                hash: hashValues()
+              })
+            }
+          ),
+          EDIT: route(
+            'edit/:eventId',
+            {
+              params: { eventId: uuid().defined() },
+              searchParams: { workqueue: string() }
+            },
+            {
+              REVIEW: route('review', {
+                searchParams: { workqueue: string() }
+              }),
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
+                searchParams: { from: string(), workqueue: string() },
                 hash: hashValues()
               })
             }

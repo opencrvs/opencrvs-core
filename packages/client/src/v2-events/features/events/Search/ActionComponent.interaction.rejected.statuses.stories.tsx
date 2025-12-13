@@ -103,11 +103,11 @@ export const DirectsRejectedNotifiedToDeclare: Story = {
             }
           },
           {
-            path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
+            path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
             Component: () => {
               return (
                 <div>
-                  {ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+                  {ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
                     eventId: rejectedNotifiedEvent.event.id
                   })}
                 </div>
@@ -122,7 +122,7 @@ export const DirectsRejectedNotifiedToDeclare: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
+      name: 'Edit'
     })
 
     await userEvent.click(actionButton)
@@ -131,7 +131,7 @@ export const DirectsRejectedNotifiedToDeclare: Story = {
     await waitFor(async () => {
       await expect(
         canvas.getByText(
-          ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+          ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
             eventId: rejectedNotifiedEvent.event.id
           })
         )
@@ -177,11 +177,11 @@ export const DirectsRejectedDeclaredToDeclared: Story = {
             }
           },
           {
-            path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
+            path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
             Component: () => {
               return (
                 <div>
-                  {ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+                  {ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
                     eventId: rejectedDeclaredEvent.event.id
                   })}
                 </div>
@@ -196,7 +196,7 @@ export const DirectsRejectedDeclaredToDeclared: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
+      name: 'Edit'
     })
 
     await userEvent.click(actionButton)
@@ -205,7 +205,7 @@ export const DirectsRejectedDeclaredToDeclared: Story = {
     await waitFor(async () => {
       await expect(
         canvas.getByText(
-          ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+          ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
             eventId: rejectedDeclaredEvent.event.id
           })
         )

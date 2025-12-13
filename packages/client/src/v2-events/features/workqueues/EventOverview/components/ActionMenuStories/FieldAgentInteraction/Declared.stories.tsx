@@ -17,7 +17,8 @@ import {
   getHiddenActions,
   createStoriesFromScenarios,
   Scenario,
-  UserRoles
+  UserRoles,
+  AssertType
 } from '../ActionMenu.common'
 
 export default {
@@ -36,7 +37,9 @@ const declaredScenariosForFieldAgent: Scenario[] = [
       ActionType.UNASSIGN
     ],
     expected: {
-      ...getHiddenActions()
+      ...getHiddenActions(),
+      ['Assign']: AssertType.ENABLED,
+      ['Edit']: AssertType.DISABLED
     }
   },
   {
@@ -50,7 +53,24 @@ const declaredScenariosForFieldAgent: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
-      ...getHiddenActions()
+      ...getHiddenActions(),
+      ['Edit']: AssertType.DISABLED
+    }
+  },
+  {
+    name: 'AssignedToSelf',
+    recordDownloaded: true,
+    actions: [
+      ActionType.CREATE,
+      AssignmentStatus.ASSIGNED_TO_SELF,
+      ActionType.DECLARE,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_SELF
+    ],
+    expected: {
+      ...getHiddenActions(),
+      ['Edit']: AssertType.ENABLED,
+      ['Unassign']: AssertType.ENABLED
     }
   }
 ]

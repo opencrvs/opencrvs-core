@@ -52,6 +52,7 @@ export type AvailableActionTypes = Extract<
   | 'REQUEST_CORRECTION'
   | 'APPROVE_CORRECTION'
   | 'REJECT_CORRECTION'
+  | 'EDIT'
 >
 
 /**
@@ -76,6 +77,10 @@ export function getPreviousDeclarationActionType(
     }
     case ActionType.DECLARE: {
       actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
+      break
+    }
+    case ActionType.EDIT: {
+      actionTypes = [ActionType.DECLARE]
       break
     }
     case ActionType.VALIDATE: {
