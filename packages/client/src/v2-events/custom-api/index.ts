@@ -107,18 +107,17 @@ export async function editAndRegister({
     content
   })
 
-  // TODO CIHAN: do declare only if its not been notified previously?
-  // const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
-  //   declaration,
-  //   annotation,
-  //   eventId,
-  //   transactionId,
-  //   keepAssignment: true
-  // })
+  const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignment: true
+  })
 
-  // if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
-  //   return declaredEvent
-  // }
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+    return declaredEvent
+  }
 
   return trpcClient.event.actions.register.request.mutate({
     declaration,
