@@ -177,27 +177,6 @@ export async function editAndNotify({
 }
 
 /**
- * Runs a sequence of actions from declare to validate.
- *
- * Defining the function here, statically allows offline support.
- * Moving the function to one level up will break offline support since the definition needs to be static.
- */
-export async function validateOnDeclare({
-  eventId,
-  transactionId,
-  eventConfiguration,
-  declaration,
-  annotation
-}: CustomMutationParams) {
-  const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
-    declaration,
-    annotation,
-    eventId,
-    transactionId,
-    keepAssignment: true
-  })
-
-/**
  * Runs markAsDuplicate and then archive on sequence.
  */
 export async function archiveOnDuplicate({
