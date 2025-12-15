@@ -27,8 +27,6 @@ function getActionRequests(actionType: ActionType, actions: Action[]) {
     // Reverse the array to get the latest action first, as there might be multiple actions of the same type.
     .reverse()
 
-  console.log('filtered', filtered)
-
   const accept = filtered.find(
     (action) => action.status === ActionStatus.Accepted
   )
