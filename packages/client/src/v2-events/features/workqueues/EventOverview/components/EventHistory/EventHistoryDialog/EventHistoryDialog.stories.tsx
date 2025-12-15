@@ -682,14 +682,6 @@ export const DeclarationUpdateOnDeclare: Story = {
   }
 }
 
-export const DeclarationUpdateOnRegister: Story = {
-  args: {
-    fullEvent: newFullEvent,
-    title: 'Updated',
-    action: updateActions[3]
-  }
-}
-
 const eventWithNotifyActions = {
   id: '2eec9e19-c356-4a0a-8a2d-0730cbc39dca' as UUID,
   type: 'tennis-club-membership',
