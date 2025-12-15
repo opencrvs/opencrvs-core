@@ -453,7 +453,6 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': true,
           'event.actions.declare.request': false,
-
           'event.actions.register.request': false
         })
       })
