@@ -285,11 +285,6 @@ function useViewableActionConfigurations(
   const isReviewingDeclaration =
     isReviewingIncompleteDeclaration || isReviewingRejectedDeclaration
 
-  // By default, field agent has both scopes for incomplete (notify) and complete (declare) actions.
-  // As a business rule, for notified event, client hides the declare action if the user has no scope for validate.
-  // TODO CIHAN?
-  const shouldHideDeclareAction = isNotifiedState && !isRejected
-
   const userMayCorrect = isActionInScope(
     authentication.scope,
     ActionType.REQUEST_CORRECTION,
@@ -297,12 +292,6 @@ function useViewableActionConfigurations(
   )
 
   const { quickActionModal, onQuickAction } = useQuickActionModal(event)
-
-  const userMayRegister = isActionInScope(
-    authentication.scope,
-    ActionType.REGISTER,
-    event.type
-  )
 
   const getAction = (type: ActionType) => {
     return eventConfiguration.actions.find((action) => action.type === type)
@@ -334,8 +323,7 @@ function useViewableActionConfigurations(
         },
         disabled:
           // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
-          !isOnline || (eventIsWaitingForCorrection && !userMayCorrect),
-        hidden: isNotifiedState && !isRejected
+          !isOnline || (eventIsWaitingForCorrection && !userMayCorrect)
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
@@ -403,7 +391,7 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: shouldHideDeclareAction || isRejected
+        hidden: isRejected
       },
       [ActionType.EDIT]: {
         icon: 'PencilLine' as const,
