@@ -126,6 +126,11 @@ export const actionLabels = {
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'event.birth.action.declare.label'
   },
+  [ActionType.EDIT]: {
+    defaultMessage: 'Edit',
+    description: 'Edit action label',
+    id: 'actions.edit'
+  },
   [ActionType.REJECT]: {
     defaultMessage: 'Reject',
     description: 'Label for reject button in dropdown menu',
@@ -421,7 +426,18 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: shouldHideDeclareAction
+        hidden: shouldHideDeclareAction || isRejected
+      },
+      [ActionType.EDIT]: {
+        icon: 'PencilLine' as const,
+        label: actionLabels[ActionType.EDIT],
+        onClick: (workqueue) => {
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId }, { workqueue })
+          )
+        },
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REJECT]: {
         label: actionLabels[ActionType.REJECT],
@@ -577,6 +593,7 @@ function useCustomActionConfigs(
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(event)
@@ -593,6 +610,14 @@ function useCustomActionConfigs(
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
       )
+      .filter((action) =>
+        configurableEventScopeAllowed(
+          scopes,
+          ['record.custom-action'],
+          event.type,
+          action.customActionType
+        )
+      )
       .map((action) => ({
         label: action.label,
         icon: action.icon ?? ('PencilLine' as const),
@@ -603,7 +628,13 @@ function useCustomActionConfigs(
         type: ActionType.CUSTOM,
         customActionType: action.customActionType
       }))
-  }, [eventConfiguration, onCustomAction, isDownloadedAndAssignedToUser])
+  }, [
+    eventConfiguration.actions,
+    scopes,
+    event.type,
+    isDownloadedAndAssignedToUser,
+    onCustomAction
+  ])
 
   const hasCustomActionScope = configurableEventScopeAllowed(
     scopes,

@@ -279,6 +279,7 @@ export const RecordScopeType = z.enum([
   'record.read',
   'record.declare',
   'record.notify',
+  'record.declared.edit',
   'record.declared.validate',
   'record.declared.reject',
   'record.declared.archive',
@@ -333,7 +334,7 @@ export const ConfigurableActionScopes = z.discriminatedUnion('type', [
   CustomActionScope
 ])
 
-type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
+export type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
 export type ConfigurableScopeType = ConfigurableRawScopes['type']
 
 type FlattenedSearchScope = {

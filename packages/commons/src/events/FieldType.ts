@@ -51,7 +51,8 @@ export const FieldType = {
   QR_READER: 'QR_READER',
   ID_READER: 'ID_READER',
   LOADER: 'LOADER',
-  CUSTOM: 'CUSTOM'
+  CUSTOM: 'CUSTOM',
+  ALPHA_HIDDEN: 'ALPHA_HIDDEN'
 } as const
 
 /**
@@ -87,5 +88,6 @@ export const FieldTypesToHideInReview = [
   FieldType.LOADER,
   FieldType.HTTP,
   FieldType.QUERY_PARAM_READER,
-  FieldType.DATA
+  FieldType.DATA,
+  FieldType.ALPHA_HIDDEN
 ]

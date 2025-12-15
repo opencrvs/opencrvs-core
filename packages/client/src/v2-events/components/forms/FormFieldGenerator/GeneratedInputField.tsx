@@ -63,7 +63,8 @@ import {
   isQrReaderFieldType,
   isLoaderFieldType,
   isAgeFieldType,
-  isCustomFieldType
+  isCustomFieldType,
+  isHiddenFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -102,6 +103,7 @@ import { QrReader } from '@client/v2-events/features/events/registered-fields/Qr
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
+import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -811,6 +813,15 @@ export const GeneratedInputField = React.memo(
           value={field.value}
           onBlur={onBlur}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isHiddenFieldType(field)) {
+      return (
+        <Hidden.Input
+          {...inputProps}
+          value={field.value as string | undefined}
         />
       )
     }

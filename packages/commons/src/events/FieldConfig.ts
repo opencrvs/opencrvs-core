@@ -856,6 +856,16 @@ const LoaderField = BaseField.extend({
 
 export type LoaderField = z.infer<typeof LoaderField>
 
+const HiddenField = BaseField.extend({
+  type: z.literal(FieldType.ALPHA_HIDDEN),
+  required: z.boolean().default(false).optional(),
+  defaultValue: TextValue.optional()
+}).describe(
+  'A non-interactive, hidden field that only hold a value in the form'
+)
+
+export type HiddenField = z.infer<typeof HiddenField>
+
 export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
@@ -897,7 +907,8 @@ export const FieldConfig = z
     QueryParamReaderField,
     LoaderField,
     SearchField,
-    CustomField
+    CustomField,
+    HiddenField
   ])
   .meta({
     description: 'Form field configuration',

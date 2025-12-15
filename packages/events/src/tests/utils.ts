@@ -49,6 +49,7 @@ export const UNSTABLE_EVENT_FIELDS = [
   'updatedBy',
   'acceptedAt',
   'dateOfEvent',
+  'placeOfEvent',
   'registrationNumber',
   'originalActionId'
 ]
@@ -99,6 +100,7 @@ export const TEST_USER_DEFAULT_SCOPES = [
   'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.validate[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
@@ -352,6 +354,7 @@ function actionToClientAction(
     case ActionType.DELETE:
     case ActionType.CUSTOM:
     case ActionType.READ:
+    case ActionType.EDIT:
     default:
       throw new Error(
         `Unsupported action type: ${action}. Create a case for it if you need it.`

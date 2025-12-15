@@ -200,6 +200,16 @@ const NotifiedAction = ActionBase.extend(
   }).shape
 )
 
+const EditAction = ActionBase.extend(
+  z.object({
+    type: z.literal(ActionType.EDIT),
+    content: z.object({
+      comment: z.string().describe('Comment for the edit action.').optional()
+    })
+  }).shape
+)
+export type EditAction = z.infer<typeof EditAction>
+
 export const PrintContent = z.object({
   templateId: z.string().optional()
 })
@@ -273,6 +283,7 @@ export const ActionDocument = z
     UnassignedAction.meta({ id: 'UnassignedAction' }),
     PrintCertificateAction.meta({ id: 'PrintCertificateAction' }),
     ReadAction.meta({ id: 'ReadAction' }),
+    EditAction.meta({ id: 'EditAction' }),
     CustomAction.meta({ id: 'CustomAction' })
   ])
   .meta({

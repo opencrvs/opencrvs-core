@@ -52,7 +52,8 @@ import {
   IdReaderField,
   LoaderField,
   AgeField,
-  CustomField
+  CustomField,
+  HiddenField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -162,6 +163,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
     case FieldType.LOADER:
+    case FieldType.ALPHA_HIDDEN:
       schema = field.required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -256,6 +258,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.QR_READER:
     case FieldType.ID_READER:
     case FieldType.LOADER:
+    case FieldType.ALPHA_HIDDEN:
       return null
     case FieldType.ADDRESS:
       return {
@@ -569,6 +572,13 @@ export const isCustomFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: CustomFieldValue; config: CustomField } => {
   return field.config.type === FieldType.CUSTOM
+}
+
+export const isHiddenFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: undefined; config: HiddenField } => {
+  return field.config.type === FieldType.ALPHA_HIDDEN
 }
 
 export type NonInteractiveFieldType =
