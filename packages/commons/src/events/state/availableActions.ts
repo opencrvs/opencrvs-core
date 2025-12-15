@@ -83,9 +83,6 @@ const ACTION_FILTERS: {
   [ActionType.EDIT]: (flags) =>
     !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
     !flags.some((flag) => flag.endsWith(':requested')),
-  [ActionType.EDIT]: (flags) =>
-    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
-    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.REGISTER]: (flags) =>
     !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
     !flags.some((flag) => flag.endsWith(':requested')),
