@@ -130,24 +130,7 @@ export const WithAcceptedRegisterEvent: Story = {
       })
     },
     msw: {
-      handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return [
-              generateEventDraftDocument({
-                eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
-                declaration: {
-                  'applicant.name': {
-                    firstname: 'Riku',
-                    surname: 'This value is from a draft'
-                  }
-                }
-              })
-            ]
-          })
-        ]
-      }
+      handlers: {}
     }
   }
 }
