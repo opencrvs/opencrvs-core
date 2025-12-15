@@ -147,6 +147,7 @@ function getAvailableActionsWithoutFlagFilters(
           .concat(ActionType.ARCHIVE)
       }
 
+      // A record should never stay in the EDIT_IN_PROGRESS flag, since it should always be declared or registered right after
       if (flags.includes(InherentFlags.EDIT_IN_PROGRESS)) {
         return [ActionType.DECLARE, ActionType.REGISTER]
       }

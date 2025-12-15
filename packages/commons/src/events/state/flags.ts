@@ -112,6 +112,26 @@ function isFlagConditionMet(
 }
 
 /**
+ * Omit actions between the second last and last declare actions.
+ * This is to handle 'redeclaration' cases, i.e. when a user edits a declared record and then does 'Declare with edits'
+ * Then we want to ignore all the actions between the second last and last declare actions.
+ */
+function omitOverwrittenActions(sortedActions: Action[]): Action[] {
+  // First find indices of all declare actions
+  const declareIndexes = sortedActions
+    .map((a, i) => (a.type === ActionType.DECLARE ? i : -1))
+    .filter((i) => i !== -1)
+
+  if (declareIndexes.length < 2) {
+    return sortedActions
+  }
+
+  const secondLast = declareIndexes[declareIndexes.length - 2]
+  const last = declareIndexes[declareIndexes.length - 1]
+  return [...sortedActions.slice(0, secondLast), ...sortedActions.slice(last)]
+}
+
+/**
  * This function resolves custom flags for an event based on its actions.
  * Flags are not stored to the event state or any database directly, instead they are always computed/evaluated from the event actions.
  *
@@ -135,24 +155,7 @@ export function resolveEventCustomFlags(
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  // First find indices of all declare actions
-  const declareIndexes = sortedActions
-    .map((a, i) => (a.type === ActionType.DECLARE ? i : -1))
-    .filter((i) => i !== -1)
-
-  let actions = sortedActions
-
-  // If there is more than one declare action, lets filter out all actions between the second last and last declare actions
-  // Why is this done? This is to handle 'redeclaration' cases, i.e. when a user edits a declared record and then does 'Declare with edits'
-  // Then we want to ignore all the actions between the second last and last declare actions.
-  if (declareIndexes.length >= 2) {
-    const secondLast = declareIndexes[declareIndexes.length - 2]
-    const last = declareIndexes[declareIndexes.length - 1]
-    actions = [
-      ...sortedActions.slice(0, secondLast),
-      ...sortedActions.slice(last)
-    ]
-  }
+  const actions = omitOverwrittenActions(sortedActions)
 
   return actions.reduce((acc, action, idx) => {
     let actionConfig
@@ -175,7 +178,7 @@ export function resolveEventCustomFlags(
     }
 
     const declaration = aggregateActionDeclarations(eventUpToThisAction)
-    const annotation = aggregateActionAnnotations(eventUpToThisAction.actions)
+    const annotation = aggregateActionAnnotations(eventUpToThisAction)
     const form = { ...declaration, ...annotation }
 
     const flagsWithMetConditions = actionConfig.flags.filter(
