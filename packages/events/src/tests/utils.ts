@@ -49,6 +49,7 @@ export const UNSTABLE_EVENT_FIELDS = [
   'updatedBy',
   'acceptedAt',
   'dateOfEvent',
+  'placeOfEvent',
   'registrationNumber',
   'originalActionId'
 ]

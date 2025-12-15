@@ -16,6 +16,7 @@ import {
   EventConfig,
   EventDocument,
   EventState,
+  FieldTypesToHideInReview,
   getDeclaration,
   isFieldDisplayedOnReview,
   ValidatorContext
@@ -198,6 +199,12 @@ function DeclarationComparisonTableComponent({
     <>
       {declarationConfig.pages.map((page) => {
         const changedFields = page.fields
+          .filter(
+            ({ type }) =>
+              !FieldTypesToHideInReview.some(
+                (typeToHide) => type === typeToHide
+              )
+          )
           .filter((field) =>
             isFieldDisplayedOnReview(field, latestDeclaration, validatorContext)
           )
