@@ -103,7 +103,6 @@ describe('useActionForHistory', () => {
   })
 
   const rng = createPrng(3123)
-  const validateActionUuid = generateUuid(rng)
 
   const actionDefaults = {
     createdAt: generateRandomDatetime(
@@ -129,7 +128,21 @@ describe('useActionForHistory', () => {
           }
         }),
         generateActionDocument({
-          action: ActionType.DECLARE,
+          action: ActionType.NOTIFY,
+          configuration: tennisClubMembershipEvent,
+          defaults: {
+            ...actionDefaults,
+            createdAt: addDays(
+              new Date(actionDefaults.createdAt),
+              1
+            ).toISOString(),
+            annotation: {
+              'review.signature': generateRandomSignature(rng)
+            }
+          }
+        }),
+        generateActionDocument({
+          action: ActionType.NOTIFY,
           configuration: tennisClubMembershipEvent,
           defaults: {
             ...actionDefaults,
