@@ -31,12 +31,13 @@ import {
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
-import { logger } from '@opencrvs/commons'
+import { logger, RecordScopeV2 } from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { TrpcUserContext } from '../../context'
 import {
   decodeEventIndex,
   EncodedEventIndex,
@@ -45,7 +46,9 @@ import {
   getEventIndexWithLocationHierarchy,
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
-  removeSecuredFields
+  removeSecuredFields,
+  resolveRecordActionScopeToIds,
+  valueFromTotal
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
@@ -98,6 +101,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
     case FieldType.TIME:
+    case FieldType.ALPHA_HIDDEN:
       return { type: 'text' }
     case FieldType.EMAIL:
       return {
@@ -343,12 +347,17 @@ export async function indexEventsInBulk(
 ) {
   const esClient = getOrCreateClient()
 
+  const locationHierarchyCache = new Map<string, string[]>()
   const indexedDocs = await Promise.all(
     batch.map(async (doc) => {
       const config = getEventConfigById(configs, doc.type)
       const eventIndex = eventToEventIndex(doc, config)
       const eventIndexWithLocationHierarchy =
-        await getEventIndexWithLocationHierarchy(config, eventIndex)
+        await getEventIndexWithLocationHierarchy(
+          config,
+          eventIndex,
+          locationHierarchyCache
+        )
       return [
         { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
         eventIndexWithLocationHierarchy
@@ -437,32 +446,33 @@ export async function getIndexedEvents(
     })
 }
 
-function valueFromTotal(total?: number | estypes.SearchTotalHits) {
-  if (!total) {
-    return 0
-  }
-  if (typeof total === 'number') {
-    return total
-  } else {
-    return total.value
-  }
-}
-
-export async function findRecordsByQuery(
-  search: SearchQuery,
-  eventConfigs: EventConfig[],
-  options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined
-) {
+export async function findRecordsByQuery({
+  search,
+  eventConfigs,
+  options,
+  user,
+  acceptedScopes
+}: {
+  search: SearchQuery
+  eventConfigs: EventConfig[]
+  options?: Record<string, SearchScopeAccessLevels>
+  user: TrpcUserContext
+  acceptedScopes?: RecordScopeV2[]
+}) {
   const esClient = getOrCreateClient()
 
   const { query, limit, offset } = search
 
-  const esQuery = withJurisdictionFilters(
-    await buildElasticQueryFromSearchPayload(query, eventConfigs),
-    options,
-    userOfficeId
+  const resolvedScopes = acceptedScopes?.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
   )
+
+  const esQuery = withJurisdictionFilters({
+    query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
+    options,
+    userOfficeId: user.primaryOfficeId,
+    scopesV2: resolvedScopes
+  })
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -530,7 +540,7 @@ export async function getEventCount(
   )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters(query, options, userOfficeId)
+    withJurisdictionFilters({ query, options, userOfficeId })
   )
   const { responses } = await esClient.msearch({
     searches: filteredQueries.flatMap((query) => [
