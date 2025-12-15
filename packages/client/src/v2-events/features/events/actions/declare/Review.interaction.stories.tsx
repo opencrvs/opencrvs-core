@@ -259,18 +259,18 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
-    await step('User can register', async () => {
+    await step('User can declare', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Action' })
       )
-      await userEvent.click(await canvas.findByText('Register'))
+      await userEvent.click(await canvas.findByText('Declare'))
 
       await canvas.findByRole('button', { name: 'Cancel' })
 
       await userEvent.click(
         await canvas.findByRole('button', {
-          name: 'Register'
+          name: 'Declare'
         })
       )
     })
