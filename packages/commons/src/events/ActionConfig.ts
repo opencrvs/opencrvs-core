@@ -121,6 +121,7 @@ const CustomActionConfig = ActionConfigBase.merge(
       )
   })
 )
+
 export type CustomActionConfig = z.infer<typeof CustomActionConfig>
 
 export const ActionConfig = z

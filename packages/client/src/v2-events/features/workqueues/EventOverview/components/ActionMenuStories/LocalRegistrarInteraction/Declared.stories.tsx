@@ -41,7 +41,8 @@ const declaredScenariosForLocalRegistrar: Scenario[] = [
       ['Assign']: AssertType.ENABLED,
       ['Register']: AssertType.DISABLED,
       ['Archive']: AssertType.DISABLED,
-      ['Reject']: AssertType.DISABLED
+      ['Reject']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED
     }
   },
   {
@@ -59,7 +60,8 @@ const declaredScenariosForLocalRegistrar: Scenario[] = [
       ['Unassign']: AssertType.ENABLED,
       ['Register']: AssertType.ENABLED,
       ['Archive']: AssertType.ENABLED,
-      ['Reject']: AssertType.ENABLED
+      ['Reject']: AssertType.ENABLED,
+      ['Edit']: AssertType.ENABLED
     }
   },
   {
@@ -77,7 +79,8 @@ const declaredScenariosForLocalRegistrar: Scenario[] = [
       ['Unassign']: AssertType.ENABLED,
       ['Register']: AssertType.DISABLED,
       ['Archive']: AssertType.DISABLED,
-      ['Reject']: AssertType.DISABLED
+      ['Reject']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED
     }
   }
 ]

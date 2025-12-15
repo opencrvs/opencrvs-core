@@ -29,6 +29,10 @@ import { EventDocument } from '../EventDocument'
 import { JSONSchema } from '../../conditionals/conditionals'
 import { validate } from '../../conditionals/validate'
 
+function isEditInProgress(actions: Action[]) {
+  return actions.at(-1)?.type === ActionType.EDIT
+}
+
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
     return false
@@ -108,6 +112,33 @@ function isFlagConditionMet(
 }
 
 /**
+ * Omit actions between the second last declare action and the edit action.
+ * This is to handle 'redeclaration' cases, i.e. when a user edits a declared record and then does 'Declare with edits'
+ * Then we want to ignore all the actions between the second last declare action and the edit action.
+ */
+function omitOverwrittenActions(sortedActions: Action[]): Action[] {
+  // First find indices of all declare actions
+  const declareIndexes = sortedActions
+    .map((a, i) => (a.type === ActionType.DECLARE ? i : -1))
+    .filter((i) => i !== -1)
+
+  if (declareIndexes.length < 2) {
+    return sortedActions
+  }
+
+  const secondLastDeclareIndex = declareIndexes[declareIndexes.length - 2]
+
+  const editActionIndex = sortedActions.findIndex(
+    (a, index) => a.type === ActionType.EDIT && index > secondLastDeclareIndex
+  )
+
+  return [
+    ...sortedActions.slice(0, secondLastDeclareIndex),
+    ...sortedActions.slice(editActionIndex)
+  ]
+}
+
+/**
  * This function resolves custom flags for an event based on its actions.
  * Flags are not stored to the event state or any database directly, instead they are always computed/evaluated from the event actions.
  *
@@ -127,10 +158,11 @@ export function resolveEventCustomFlags(
   event: EventDocument,
   eventConfiguration: EventConfig
 ): CustomFlag[] {
-  const acceptedActions = getAcceptedActions(event)
-  const actions = acceptedActions
+  const sortedActions = getAcceptedActions(event)
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
+  const actions = omitOverwrittenActions(sortedActions)
 
   return actions.reduce((acc, action, idx) => {
     let actionConfig
@@ -153,7 +185,7 @@ export function resolveEventCustomFlags(
     }
 
     const declaration = aggregateActionDeclarations(eventUpToThisAction)
-    const annotation = aggregateActionAnnotations(eventUpToThisAction.actions)
+    const annotation = aggregateActionAnnotations(eventUpToThisAction)
     const form = { ...declaration, ...annotation }
 
     const flagsWithMetConditions = actionConfig.flags.filter(
@@ -223,6 +255,9 @@ export function getEventFlags(
   }
   if (isPotentialDuplicate(sortedActions)) {
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
+  }
+  if (isEditInProgress(sortedActions)) {
+    flags.push(InherentFlags.EDIT_IN_PROGRESS)
   }
 
   return [...flags, ...resolveEventCustomFlags(event, config)]

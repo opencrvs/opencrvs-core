@@ -14,19 +14,14 @@ import { graphql, http, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import {
   ActionType,
-  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
-  tennisClubMembershipEvent,
-  UUID
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import {
-  tennisClubMembershipEventIndex,
-  TestImage
-} from '@client/v2-events/features/events/fixtures'
+import { TestImage } from '@client/v2-events/features/events/fixtures'
 
 import { ReviewIndex } from './Review'
 
