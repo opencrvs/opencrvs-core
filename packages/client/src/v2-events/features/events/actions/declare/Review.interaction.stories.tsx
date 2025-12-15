@@ -259,30 +259,18 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
-<<<<<<< HEAD
     await step('User can register', async () => {
-=======
-    await step('User can declare', async () => {
->>>>>>> origin/ocrvs-10939
       const canvas = within(canvasElement)
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Action' })
       )
-<<<<<<< HEAD
       await userEvent.click(await canvas.findByText('Register'))
-=======
-      await userEvent.click(await canvas.findByText('Declare'))
->>>>>>> origin/ocrvs-10939
 
       await canvas.findByRole('button', { name: 'Cancel' })
 
       await userEvent.click(
         await canvas.findByRole('button', {
-<<<<<<< HEAD
           name: 'Register'
-=======
-          name: 'Declare'
->>>>>>> origin/ocrvs-10939
         })
       )
     })

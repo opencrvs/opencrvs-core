@@ -151,59 +151,6 @@ function useDeclarationActions(event: EventDocument) {
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
-<<<<<<< HEAD
-  /**
-   * Logic to check whether direct register (declare + register) is possible.
-   * We do this by 'looking in to the future' by applying the would-be actions to the event,
-   * and checking if the register action is still allowed.
-   */
-  function isDirectRegistrationPossible() {
-    if (!userDetails) {
-      return false
-    }
-
-    const eventAfterDeclare = {
-      ...event,
-      actions: event.actions.concat({
-        type: ActionType.DECLARE,
-        id: 'placeholder' as UUID,
-        transactionId: 'placeholder' as UUID,
-        createdByUserType: TokenUserType.enum.user,
-        createdByRole: userDetails.role.id,
-        declaration,
-        annotation,
-        createdAt: new Date().toISOString(),
-        createdBy: userDetails.id,
-        originalActionId: null,
-        status: 'Accepted',
-        createdBySignature: undefined,
-        createdAtLocation: userDetails.primaryOffice.id as UUID
-      })
-    }
-
-    const eventIndexAfterDeclare = getCurrentEventState(
-      eventAfterDeclare,
-      eventConfiguration
-    )
-
-    const registerActionConfig = getActionConfig({
-      eventConfiguration,
-      actionType: ActionType.REGISTER
-    })
-
-    if (!registerActionConfig) {
-      return false
-    }
-
-    return isActionAvailable(
-      registerActionConfig,
-      eventIndexAfterDeclare,
-      validatorContext
-    )
-  }
-
-=======
->>>>>>> origin/ocrvs-10939
   return {
     modals: [modal, rejectionModal, saveAndExitModal, deleteDeclarationModal],
     actions: [
@@ -212,11 +159,7 @@ function useDeclarationActions(event: EventDocument) {
         label: actionLabels[ActionType.REGISTER],
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
-<<<<<<< HEAD
-        disabled: hasValidationErrors || !isDirectRegistrationPossible()
-=======
         disabled: hasValidationErrors || !canDirectlyRegister
->>>>>>> origin/ocrvs-10939
       },
       {
         icon: 'UploadSimple' as const,

@@ -82,25 +82,12 @@ export async function registerOnDeclare({
     return declaredEvent
   }
 
-<<<<<<< HEAD
   return trpcClient.event.actions.register.request.mutate({
     declaration: {},
     annotation,
     eventId,
     transactionId
   })
-=======
-  const latestResponse = await trpcClient.event.actions.register.request.mutate(
-    {
-      declaration: {},
-      annotation,
-      eventId,
-      transactionId
-    }
-  )
-
-  return latestResponse
->>>>>>> origin/ocrvs-10939
 }
 
 export async function editAndRegister({
@@ -164,8 +151,6 @@ export async function editAndDeclare({
     transactionId
   })
 }
-<<<<<<< HEAD
-=======
 
 export async function editAndNotify({
   eventId,
@@ -211,7 +196,6 @@ export async function validateOnDeclare({
     transactionId,
     keepAssignment: true
   })
->>>>>>> origin/ocrvs-10939
 
 /**
  * Runs markAsDuplicate and then archive on sequence.
