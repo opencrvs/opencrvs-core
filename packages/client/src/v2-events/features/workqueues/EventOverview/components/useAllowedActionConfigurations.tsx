@@ -671,7 +671,11 @@ function applyActionConditionalEffects({
       'customActionType' in action ? action.customActionType : undefined
   })
 
-  if (!actionConfig || !actionConfig.conditionals) {
+  if (
+    !actionConfig ||
+    !('conditionals' in actionConfig) ||
+    !actionConfig.conditionals
+  ) {
     return action
   }
 
