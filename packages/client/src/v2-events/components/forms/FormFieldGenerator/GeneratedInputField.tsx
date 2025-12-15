@@ -63,7 +63,8 @@ import {
   isQrReaderFieldType,
   isLoaderFieldType,
   isHiddenFieldType,
-  isAgeFieldType
+  isAgeFieldType,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -136,8 +137,8 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   form: EventState
   disabled?: boolean
   readonlyMode?: boolean
-  allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
+  eventConfig: EventConfig | undefined
 }
 
 export const GeneratedInputField = React.memo(
@@ -149,7 +150,7 @@ export const GeneratedInputField = React.memo(
     onBatchFieldValueChange,
     error,
     touched,
-    allKnownFields,
+    eventConfig,
     value,
     form,
     disabled,
@@ -658,7 +659,7 @@ export const GeneratedInputField = React.memo(
       return (
         <Data.Input
           {...field.config}
-          allKnownFields={allKnownFields}
+          eventConfig={eventConfig}
           formData={form}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />

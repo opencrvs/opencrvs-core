@@ -23,10 +23,9 @@ import {
   StaticDataEntry,
   EventConfig,
   getDeclarationFields,
-  FieldValue,
   DataEntry,
-  TranslationConfig,
-  FieldReference
+  FieldReference,
+  getAllUniqueFields
 } from '@opencrvs/commons/client'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -132,22 +131,29 @@ function DataInput({
   configuration,
   label,
   formData,
-  allKnownFields,
+  eventConfig,
   onChange,
   id
 }: FieldProps<'DATA'> & {
   formData: EventState
-  allKnownFields: FieldConfig[]
+  eventConfig?: EventConfig
   onChange: (value: DataFieldValue) => void
 }) {
   const intl = useIntl()
   const validatorContext = useValidatorContext()
   const { subtitle, data } = configuration
   const title = label.defaultMessage ? intl.formatMessage(label) : ''
+  const allUniqueFields = eventConfig ? getAllUniqueFields(eventConfig) : null
 
   const fields = data.map((entry) => {
     if ('fieldId' in entry) {
-      const config = allKnownFields.find((f) => f.id === entry.fieldId)
+      if (!allUniqueFields) {
+        throw new Error(
+          `EventConfig is required to resolve fieldId references in DATA field ${id}`
+        )
+      }
+
+      const config = allUniqueFields.find((f) => f.id === entry.fieldId)
 
       if (!config) {
         throw new Error(

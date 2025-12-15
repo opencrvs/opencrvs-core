@@ -40,7 +40,9 @@ export interface FormFieldGeneratorProps {
   onChange: (values: EventState) => void
   readonlyMode?: boolean
   className?: string
-  /** Which fields are generated */
+  /** All fields that are configured for this form. Populate to allow fields to listen values across pages. */
+  allFieldConfigs?: FieldConfig[]
+  /** All fields that are rendered */
   fields: FieldConfig[]
   eventConfig?: EventConfig
   /** Default field values. Might equal to declaration, when a declaration form is rendered. */
@@ -54,6 +56,7 @@ export interface FormFieldGeneratorProps {
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
   ({
     onChange,
+    allFieldConfigs,
     fields,
     initialValues,
     className,
@@ -147,6 +150,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
 
           return (
             <FormSectionComponent
+              allFieldConfigs={allFieldConfigs}
               className={className}
               errors={formikProps.errors}
               eventConfig={eventConfig}

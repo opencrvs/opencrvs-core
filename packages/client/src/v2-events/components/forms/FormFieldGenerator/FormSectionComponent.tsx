@@ -49,7 +49,10 @@ import { GeneratedInputField } from './GeneratedInputField'
 type AllProps = {
   id: string
   initialValues?: EventState
+  /** All fields that are configured for this form. Populate to allow fields to listen values across pages. Defaults to EventConfig, but for actions the fields may differ. */
+  allFieldConfigs?: FieldConfig[]
   eventConfig?: EventConfig
+  /** Fields that are rendered to this page */
   fields: FieldConfig[]
   className?: string
   readonlyMode?: boolean
@@ -152,6 +155,7 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
 // @TODO: Clarify and unify the naming of the props. What is from formik and what is from the state.
 export function FormSectionComponent({
   values,
+  allFieldConfigs,
   fields: fieldsWithDotSeparator,
   touched,
   setAllTouchedFields,
@@ -185,9 +189,9 @@ export function FormSectionComponent({
     id: makeFormFieldIdFormikCompatible(field.id)
   }))
 
-  const allFieldsWithDotSeparator = eventConfig
-    ? getAllUniqueFields(eventConfig)
-    : fieldsWithDotSeparator
+  const allFieldsWithDotSeparator =
+    allFieldConfigs ??
+    (eventConfig ? getAllUniqueFields(eventConfig) : fieldsWithDotSeparator)
   const listenerFieldsByParentId = getParentsOfListenerFields(
     allFieldsWithDotSeparator
   )
@@ -477,9 +481,9 @@ export function FormSectionComponent({
             <Field name={field.id}>
               {({ field: formikField }: FieldProps) => (
                 <GeneratedInputField
-                  allKnownFields={allFieldsWithDotSeparator}
                   disabled={isDisabled}
                   error={isDisabled ? '' : error}
+                  eventConfig={eventConfig}
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}

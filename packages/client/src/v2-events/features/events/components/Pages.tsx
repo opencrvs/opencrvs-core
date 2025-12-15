@@ -157,6 +157,7 @@ export function Pages({
 
   const fields = (
     <FormFieldGenerator
+      allFieldConfigs={formPages.flatMap((p) => p.fields)}
       eventConfig={eventConfig}
       fields={page.fields}
       id="pagesSection"
