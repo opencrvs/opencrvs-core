@@ -122,11 +122,16 @@ export async function getLocations({
     .selectFrom('locations')
     .select([
       'id',
+
       'name',
+
       'parentId',
+
       'validUntil',
+
       'locationType',
-      'externalId'
+      'externalId',
+      'administrativeAreaId'
     ])
     .where('deletedAt', 'is', null)
     .$narrowType<{

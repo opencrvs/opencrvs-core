@@ -22,12 +22,14 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 #### Jurisdiction
 
 - Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
+- Added configurable placeOfEvent in EventConfig, allowing multiple location fields to be defined, with only one becoming the active place of event per document (based on conditionals), enabling jurisdiction-specific search by event location (e.g., birth location, child’s home address, death location).
 
 ### Improvements
 
 - Refactor the tRPC context to allow defining public procedures that don't require authentication.
 - Remove legacy mongo migration status outputs and skip typecheck which reduced the migration service startup time by 66%.
 - The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
+- Added experimental ALPHA_HIDDEN form field type, allowing configurable default/derived values and conditional inclusion in form submissions.
 
 ## 1.9.2
 
