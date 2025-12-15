@@ -180,26 +180,6 @@ export function extractPotentialDuplicatesFromActions(
 }
 
 /**
- * Omit actions between the second last and last declare actions.
- * This is to handle 'redeclaration' cases, i.e. when a user edits a declared record and then does 'Declare with edits'
- * Then we want to ignore all the actions between the second last and last declare actions.
- */
-function omitOverwrittenActions(sortedActions: Action[]): Action[] {
-  // First find indices of all declare actions
-  const declareIndexes = sortedActions
-    .map((a, i) => (a.type === ActionType.DECLARE ? i : -1))
-    .filter((i) => i !== -1)
-
-  if (declareIndexes.length < 2) {
-    return sortedActions
-  }
-
-  const secondLast = declareIndexes[declareIndexes.length - 2]
-  const last = declareIndexes[declareIndexes.length - 1]
-  return [...sortedActions.slice(0, secondLast), ...sortedActions.slice(last)]
-}
-
-/**
  * NOTE: This function should not run field validations. It should return the state based on the actions, without considering context (users, roles, permissions, etc).
  *
  * If you update this function, please ensure @EventIndex type is updated accordingly.
@@ -229,10 +209,8 @@ export function getCurrentEventState(
     a.createdAt.localeCompare(b.createdAt)
   )
 
-  const actions = omitOverwrittenActions(sortedActions)
-
   // Includes the metadata of the last action. Whether it was a 'request' by user or 'accept' by user or 3rd party.
-  const requestActionMetadata = getActionUpdateMetadata(actions)
+  const requestActionMetadata = getActionUpdateMetadata(sortedActions)
 
   // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
@@ -242,8 +220,8 @@ export function getCurrentEventState(
   return deepDropNulls({
     id: event.id,
     type: event.type,
-    status: getStatusFromActions(actions),
-    legalStatuses: getLegalStatuses(actions),
+    status: getStatusFromActions(sortedActions),
+    legalStatuses: getLegalStatuses(sortedActions),
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdByUserType: creationAction.createdByUserType,
@@ -258,7 +236,7 @@ export function getCurrentEventState(
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
-    potentialDuplicates: extractPotentialDuplicatesFromActions(actions),
+    potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
     flags: getEventFlags(event, config)
   })
 }
