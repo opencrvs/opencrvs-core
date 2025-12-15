@@ -2007,6 +2007,23 @@ components:
           required:
             - $$field
           additionalProperties: false
+        placeOfEvent:
+          description: Reference to the field capturing the place of the event (e.g. place
+            of birth). Defaults to the meta.createdAtLocation if unspecified.
+          type: object
+          properties:
+            $$field:
+              description: Unique identifier for the field
+              type: string
+            $$subfield:
+              description: 'If the FieldValue is an object, subfield can be used to refer to
+                e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              type: array
+              items:
+                type: string
+          required:
+            - $$field
+          additionalProperties: false
         title:
           description: Title template for the singular event, supporting variables (e.g.
             "{applicant.name.firstname} {applicant.name.surname}").
@@ -2258,6 +2275,7 @@ components:
                             - QR_READER
                             - ID_READER
                             - LOADER
+                            - ALPHA_HIDDEN
                         label:
                           description: "
 
@@ -2508,6 +2526,7 @@ components:
                             - QR_READER
                             - ID_READER
                             - LOADER
+                            - ALPHA_HIDDEN
                         label:
                           description: "
 
@@ -2883,6 +2902,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -9838,6 +9858,146 @@ components:
             - type
             - configuration
           additionalProperties: false
+        - description: A non-interactive, hidden field that only hold a value in the form
+          type: object
+          properties:
+            id:
+              description: Unique identifier of the field.
+              type: string
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                    additionalProperties: false
+            required:
+              default: false
+              type: boolean
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                    additionalProperties: false
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
+              const: ALPHA_HIDDEN
+            defaultValue:
+              type: string
+          required:
+            - id
+            - label
+            - type
+          additionalProperties: false
       type: object
     FieldConditional:
       description: Field conditional configuration
@@ -10513,6 +10673,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -10857,6 +11018,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -11049,6 +11211,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -11255,6 +11418,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -11461,6 +11625,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -11763,6 +11928,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
@@ -12029,6 +12195,7 @@ components:
             - Users
             - WarningCircle
             - X
+            - ChatText
             - CircleWavyCheck
             - CircleWavyQuestion
             - ArchiveBox
