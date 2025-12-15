@@ -563,6 +563,7 @@ paths:
                             enum:
                               - NOTIFY
                               - DECLARE
+                              - EDIT
                               - VALIDATE
                               - REGISTER
                               - REJECT
@@ -866,7 +867,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - pending-certification
@@ -874,6 +875,7 @@ components:
                       - rejected
                       - correction-requested
                       - potential-duplicate
+                      - edit-in-progress
               - description: Custom flag identifier defined by the country config.
                 type: string
         noneOf:
@@ -882,7 +884,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - pending-certification
@@ -890,6 +892,7 @@ components:
                       - rejected
                       - correction-requested
                       - potential-duplicate
+                      - edit-in-progress
               - description: Custom flag identifier defined by the country config.
                 type: string
     QueryInput:
@@ -971,6 +974,7 @@ components:
         - $ref: "#/components/schemas/UnassignedAction"
         - $ref: "#/components/schemas/PrintCertificateAction"
         - $ref: "#/components/schemas/ReadAction"
+        - $ref: "#/components/schemas/EditAction"
         - $ref: "#/components/schemas/CustomAction"
       type: object
       discriminator:
@@ -993,6 +997,7 @@ components:
           UNASSIGN: "#/components/schemas/UnassignedAction"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateAction"
           READ: "#/components/schemas/ReadAction"
+          EDIT: "#/components/schemas/EditAction"
           CUSTOM: "#/components/schemas/CustomAction"
     CreatedAction:
       type: object
@@ -2655,6 +2660,106 @@ components:
         - declaration
         - status
         - type
+    EditAction:
+      type: object
+      properties:
+        id:
+          description: Unique identifier of the action.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        transactionId:
+          description: Unique identifier of the transaction.
+          type: string
+        createdByUserType:
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+          type: string
+          enum:
+            - user
+            - system
+        createdAt:
+          description: Timestamp indicating when the action was created.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          description: Identifier of the user who created the action.
+          type: string
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+        annotation:
+          description: Action-specific metadata used to annotate the event.
+          anyOf:
+            - description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+              type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+            - type: "null"
+        status:
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+        originalActionId:
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        type:
+          type: string
+          const: EDIT
+        content:
+          type: object
+          properties:
+            comment:
+              description: Comment for the edit action.
+              type: string
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
+        - content
     CustomAction:
       type: object
       properties:
@@ -3519,7 +3624,7 @@ components:
                 anyOf:
                   - anyOf:
                       - type: string
-                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                        pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
                           - pending-certification
@@ -3527,6 +3632,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -10961,7 +11067,7 @@ components:
                 anyOf:
                   - anyOf:
                       - type: string
-                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                        pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
                           - pending-certification
@@ -10969,6 +11075,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -11306,7 +11413,7 @@ components:
                 anyOf:
                   - anyOf:
                       - type: string
-                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                        pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
                           - pending-certification
@@ -11314,6 +11421,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -11499,7 +11607,7 @@ components:
                 anyOf:
                   - anyOf:
                       - type: string
-                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                        pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
                           - pending-certification
@@ -11507,6 +11615,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -11706,7 +11815,7 @@ components:
                 anyOf:
                   - anyOf:
                       - type: string
-                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                        pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
                           - pending-certification
@@ -11714,6 +11823,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -11913,7 +12023,7 @@ components:
                 anyOf:
                   - anyOf:
                       - type: string
-                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                        pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
                           - pending-certification
@@ -11921,6 +12031,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -12216,7 +12327,7 @@ components:
                 anyOf:
                   - anyOf:
                       - type: string
-                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                        pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
                           - pending-certification
@@ -12224,6 +12335,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -12483,7 +12595,7 @@ components:
                 anyOf:
                   - anyOf:
                       - type: string
-                        pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                        pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
                           - pending-certification
@@ -12491,6 +12603,7 @@ components:
                           - rejected
                           - correction-requested
                           - potential-duplicate
+                          - edit-in-progress
                   - description: Custom flag identifier defined by the country config.
                     type: string
               operation:
@@ -12852,6 +12965,7 @@ components:
                     enum:
                       - NOTIFY
                       - DECLARE
+                      - EDIT
                       - VALIDATE
                       - REGISTER
                       - REJECT
@@ -13131,7 +13245,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - pending-certification
@@ -13139,6 +13253,7 @@ components:
                       - rejected
                       - correction-requested
                       - potential-duplicate
+                      - edit-in-progress
               - description: Custom flag identifier defined by the country config.
                 type: string
         declaration:
@@ -13839,7 +13954,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - pending-certification
@@ -13847,6 +13962,7 @@ components:
                       - rejected
                       - correction-requested
                       - potential-duplicate
+                      - edit-in-progress
               - description: Custom flag identifier defined by the country config.
                 type: string
         noneOf:
@@ -13855,7 +13971,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|validate|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - pending-certification
@@ -13863,6 +13979,7 @@ components:
                       - rejected
                       - correction-requested
                       - potential-duplicate
+                      - edit-in-progress
               - description: Custom flag identifier defined by the country config.
                 type: string
       additionalProperties: false
@@ -13948,6 +14065,7 @@ components:
         - $ref: "#/components/schemas/UnassignedActionOutput"
         - $ref: "#/components/schemas/PrintCertificateActionOutput"
         - $ref: "#/components/schemas/ReadActionOutput"
+        - $ref: "#/components/schemas/EditActionOutput"
         - $ref: "#/components/schemas/CustomActionOutput"
       type: object
       discriminator:
@@ -13970,6 +14088,7 @@ components:
           UNASSIGN: "#/components/schemas/UnassignedActionOutput"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateActionOutput"
           READ: "#/components/schemas/ReadActionOutput"
+          EDIT: "#/components/schemas/EditActionOutput"
           CUSTOM: "#/components/schemas/CustomActionOutput"
     CreatedActionOutput:
       type: object
@@ -15655,6 +15774,108 @@ components:
         - declaration
         - status
         - type
+      additionalProperties: false
+    EditActionOutput:
+      type: object
+      properties:
+        id:
+          description: Unique identifier of the action.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        transactionId:
+          description: Unique identifier of the transaction.
+          type: string
+        createdByUserType:
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+          type: string
+          enum:
+            - user
+            - system
+        createdAt:
+          description: Timestamp indicating when the action was created.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          description: Identifier of the user who created the action.
+          type: string
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+        annotation:
+          description: Action-specific metadata used to annotate the event.
+          anyOf:
+            - description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+              type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+            - type: "null"
+        status:
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+        originalActionId:
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        type:
+          type: string
+          const: EDIT
+        content:
+          type: object
+          properties:
+            comment:
+              description: Comment for the edit action.
+              type: string
+          additionalProperties: false
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
+        - content
       additionalProperties: false
     CustomActionOutput:
       type: object
