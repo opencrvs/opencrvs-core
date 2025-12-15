@@ -27,6 +27,7 @@ import {
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
+  EditActionInput,
   MarkAsDuplicateActionInput,
   MarkNotDuplicateActionInput,
   NotifyActionInput,
@@ -488,6 +489,27 @@ export function eventPayloadGenerator(
           keepAssignment: input.keepAssignment
         }
       },
+      edit: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            EditActionInput,
+            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.EDIT,
+        content: { comment: 'Test comment' },
+        transactionId: input.transactionId ?? getUUID(),
+        declaration:
+          input.declaration ??
+          generateActionDeclarationInput(configuration, ActionType.EDIT, rng),
+        annotation:
+          input.annotation ??
+          generateActionAnnotationInput(configuration, ActionType.EDIT, rng),
+        eventId,
+        ...input
+      }),
       validate: (
         eventId: string,
         input: Partial<
@@ -809,22 +831,30 @@ export function generateActionDocument<T extends ActionType>({
   } satisfies ActionBase
 
   switch (action) {
+    case ActionType.READ:
+    case ActionType.MARK_AS_NOT_DUPLICATE:
+    case ActionType.DECLARE:
+    case ActionType.UNASSIGN:
+    case ActionType.CREATE:
+    case ActionType.NOTIFY:
+    case ActionType.VALIDATE:
+    case ActionType.REGISTER:
+    case ActionType.REQUEST_CORRECTION:
+      return { ...actionBase, type: action }
+    case ActionType.EDIT:
+      return {
+        ...actionBase,
+        type: action,
+        content: { comment: 'Test comment' }
+      }
     case ActionType.CUSTOM:
       return {
         ...actionBase,
         type: action,
         customActionType: 'CUSTOM_ACTION_TYPE'
       }
-    case ActionType.READ:
-      return { ...actionBase, type: action }
-    case ActionType.MARK_AS_NOT_DUPLICATE:
-      return { ...actionBase, type: action }
     case ActionType.MARK_AS_DUPLICATE:
       return { ...actionBase, type: action, content: undefined }
-    case ActionType.DECLARE:
-      return { ...actionBase, type: action }
-    case ActionType.UNASSIGN:
-      return { ...actionBase, type: action }
     case ActionType.ASSIGN: {
       const assignActionDefaults = defaults as
         | Partial<Extract<ActionDocument, { type: 'ASSIGN' }>>
@@ -835,16 +865,11 @@ export function generateActionDocument<T extends ActionType>({
         type: action
       }
     }
-    case ActionType.VALIDATE:
-      return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
       return { ...actionBase, type: action, content: { reason: 'Archive' } }
     case ActionType.REJECT:
       return { ...actionBase, type: action, content: { reason: 'Reject' } }
-    case ActionType.CREATE:
-      return { ...actionBase, type: action }
-    case ActionType.NOTIFY:
-      return { ...actionBase, type: action }
+
     case ActionType.PRINT_CERTIFICATE: {
       const printActionDefaults = defaults as
         | Partial<PrintCertificateAction>
@@ -855,8 +880,6 @@ export function generateActionDocument<T extends ActionType>({
         content: printActionDefaults?.content
       }
     }
-    case ActionType.REQUEST_CORRECTION:
-      return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
       return { ...actionBase, requestId: getUUID(), type: action }
     case ActionType.REJECT_CORRECTION:
@@ -865,11 +888,6 @@ export function generateActionDocument<T extends ActionType>({
         requestId: getUUID(),
         type: action,
         content: { reason: 'Correction rejection' }
-      }
-    case ActionType.REGISTER:
-      return {
-        ...actionBase,
-        type: action
       }
     case ActionType.DUPLICATE_DETECTED: {
       const duplicateActionDefaults = defaults as
