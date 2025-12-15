@@ -333,7 +333,7 @@ export const ConfigurableActionScopes = z.discriminatedUnion('type', [
   CustomActionScope
 ])
 
-type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
+export type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
 export type ConfigurableScopeType = ConfigurableRawScopes['type']
 
 type FlattenedSearchScope = {

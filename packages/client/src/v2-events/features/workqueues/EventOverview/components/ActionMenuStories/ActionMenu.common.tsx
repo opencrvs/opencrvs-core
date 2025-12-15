@@ -195,7 +195,8 @@ function getMockActions(createdBy: string) {
       ...actionProps,
       createdBy,
       id: generateUuid(rng),
-      type: ActionType.EDIT
+      type: ActionType.EDIT,
+      content: { comment: 'Comment' }
     }
   }
 }

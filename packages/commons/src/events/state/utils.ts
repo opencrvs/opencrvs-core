@@ -23,16 +23,18 @@ import { pick } from 'lodash'
  */
 function getActionRequests(actionType: ActionType, actions: Action[]) {
   const filtered = actions.filter((action) => action.type === actionType)
+  // Reverse the array to get the latest action first, as there might be multiple actions of the same type.
+  const reversed = filtered.reverse()
 
-  const accept = filtered.find(
+  const accept = reversed.find(
     (action) => action.status === ActionStatus.Accepted
   )
 
-  const request = filtered.find(
+  const request = reversed.find(
     (action) => action.status === ActionStatus.Requested
   )
 
-  const reject = filtered.find(
+  const reject = reversed.find(
     (action) => action.status === ActionStatus.Rejected
   )
 

@@ -384,7 +384,7 @@ export const validateAction: MiddlewareFunction<
 
   const declaration = getCurrentEventState(event, eventConfig).declaration
 
-  if (actionType === ActionType.NOTIFY) {
+  if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
     const errors = validateNotifyAction({
       eventConfig,
       annotation: input.annotation,

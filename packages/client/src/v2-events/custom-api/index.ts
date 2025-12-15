@@ -20,7 +20,8 @@ import {
   ArchiveActionInput,
   MarkAsDuplicateActionInput,
   ActionStatus,
-  ValidatorContext
+  ValidatorContext,
+  EditActionInput
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
@@ -32,6 +33,10 @@ export interface CustomMutationParams {
   transactionId: string
   eventConfiguration: EventConfig
   annotation?: EventState
+}
+
+export interface EditRequestParams extends CustomMutationParams {
+  content: EditActionInput['content']
 }
 
 export interface CorrectionRequestParams extends CustomMutationParams {
@@ -77,28 +82,56 @@ export async function registerOnDeclare({
     return declaredEvent
   }
 
+<<<<<<< HEAD
   return trpcClient.event.actions.register.request.mutate({
     declaration: {},
     annotation,
     eventId,
     transactionId
   })
+=======
+  const latestResponse = await trpcClient.event.actions.register.request.mutate(
+    {
+      declaration: {},
+      annotation,
+      eventId,
+      transactionId
+    }
+  )
+
+  return latestResponse
+>>>>>>> origin/ocrvs-10939
 }
 
 export async function editAndRegister({
   eventId,
   declaration,
   transactionId,
-  annotation
-}: CustomMutationParams) {
+  annotation,
+  content,
+  eventConfiguration
+}: EditRequestParams) {
   await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
     keepAssignment: true,
-    content: { reason: 'TODO REASSON HERE' }
+    content
   })
+
+  // TODO CIHAN: do declare only if its not been notified previously?
+  // const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
+  //   declaration,
+  //   annotation,
+  //   eventId,
+  //   transactionId,
+  //   keepAssignment: true
+  // })
+
+  // if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+  //   return declaredEvent
+  // }
 
   return trpcClient.event.actions.register.request.mutate({
     declaration,
@@ -112,15 +145,16 @@ export async function editAndDeclare({
   eventId,
   declaration,
   transactionId,
-  annotation
-}: CustomMutationParams) {
+  annotation,
+  content
+}: EditRequestParams) {
   await trpcClient.event.actions.edit.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId,
     keepAssignment: true,
-    content: { reason: 'TODO REASSON HERE' }
+    content
   })
 
   return trpcClient.event.actions.declare.request.mutate({
@@ -130,6 +164,54 @@ export async function editAndDeclare({
     transactionId
   })
 }
+<<<<<<< HEAD
+=======
+
+export async function editAndNotify({
+  eventId,
+  declaration,
+  transactionId,
+  annotation,
+  content
+}: EditRequestParams) {
+  await trpcClient.event.actions.edit.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignment: true,
+    content
+  })
+
+  return trpcClient.event.actions.notify.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId
+  })
+}
+
+/**
+ * Runs a sequence of actions from declare to validate.
+ *
+ * Defining the function here, statically allows offline support.
+ * Moving the function to one level up will break offline support since the definition needs to be static.
+ */
+export async function validateOnDeclare({
+  eventId,
+  transactionId,
+  eventConfiguration,
+  declaration,
+  annotation
+}: CustomMutationParams) {
+  const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignment: true
+  })
+>>>>>>> origin/ocrvs-10939
 
 /**
  * Runs markAsDuplicate and then archive on sequence.

@@ -12,17 +12,12 @@ import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { v4 as uuid } from 'uuid'
-import { useSelector } from 'react-redux'
 import {
   ActionType,
   getDeclaration,
   EventStatus,
   EventDocument,
   getCurrentEventState,
-  TokenUserType,
-  UUID,
-  isActionAvailable,
-  getActionConfig,
   InherentFlags,
   getActionReview
 } from '@opencrvs/commons/client'
@@ -30,7 +25,6 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { Icon } from '@opencrvs/components'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -45,6 +39,7 @@ import { Review } from '@client/v2-events/features/events/components/Review'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
+import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { useRejectionModal } from '../reject/useRejectionModal'
@@ -84,12 +79,12 @@ function useDeclarationActions(event: EventDocument) {
   const annotation = getAnnotation()
   const [modal, openModal] = useModal()
   const { rejectionModal, handleRejection } = useRejectionModal(event.id)
+  const canDirectlyRegister = useCanDirectlyRegister(event)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.DECLARE.REVIEW
   )
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const events = useEvents()
-  const userDetails = useSelector(getUserDetails)
 
   const mutateFns = {
     [ActionType.NOTIFY]: events.actions.notify.mutate,
@@ -156,6 +151,7 @@ function useDeclarationActions(event: EventDocument) {
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
+<<<<<<< HEAD
   /**
    * Logic to check whether direct register (declare + register) is possible.
    * We do this by 'looking in to the future' by applying the would-be actions to the event,
@@ -206,6 +202,8 @@ function useDeclarationActions(event: EventDocument) {
     )
   }
 
+=======
+>>>>>>> origin/ocrvs-10939
   return {
     modals: [modal, rejectionModal, saveAndExitModal, deleteDeclarationModal],
     actions: [
@@ -214,7 +212,11 @@ function useDeclarationActions(event: EventDocument) {
         label: actionLabels[ActionType.REGISTER],
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
+<<<<<<< HEAD
         disabled: hasValidationErrors || !isDirectRegistrationPossible()
+=======
+        disabled: hasValidationErrors || !canDirectlyRegister
+>>>>>>> origin/ocrvs-10939
       },
       {
         icon: 'UploadSimple' as const,

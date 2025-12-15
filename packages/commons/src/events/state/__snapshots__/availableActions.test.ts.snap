@@ -50,6 +50,7 @@ exports[`getAvailableActions should return the correct actions for "DECLARED" st
   "DECLARE",
   "NOTIFY",
   "CUSTOM",
+  "EDIT",
   "ARCHIVE",
 ]
 `;
@@ -70,6 +71,7 @@ exports[`getAvailableActions should return the correct actions for "NOTIFIED" st
   "DECLARE",
   "NOTIFY",
   "CUSTOM",
+  "EDIT",
   "ARCHIVE",
 ]
 `;

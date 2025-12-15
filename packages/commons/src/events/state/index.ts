@@ -20,7 +20,7 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus, ZodDate } from '../EventMetadata'
+import { EventMetadata, EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import {
   aggregateActionDeclarations,
@@ -37,6 +37,7 @@ import {
   FullDocumentPath,
   FullDocumentUrl
 } from '../../documents'
+import { AddressFieldValue, AddressType } from '../CompositeFieldValue'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -161,6 +162,55 @@ export function resolveDateOfEvent(
   return parsedDate.success ? parsedDate.data : undefined
 }
 
+export const DEFAULT_PLACE_OF_EVENT_PROPERTY =
+  'createdAtLocation' satisfies keyof EventMetadata
+
+/**
+ *
+ * @param value value to parse
+ * @param oldValue fallback value, its needed when the value is invalid but we want
+ * to keep the previous valid value, since this can be used mutliple times in one flow
+ * @returns successfully parsed UUID or fallback value
+ */
+function getParsedUUID(value: unknown, oldValue?: UUID) {
+  const parsed = UUID.safeParse(value)
+  return parsed.success ? parsed.data : oldValue
+}
+
+export function resolvePlaceOfEvent(
+  eventMetadata: {
+    createdAtLocation?: UUID | undefined | null
+  },
+  declaration: EventState,
+  config: EventConfig
+): UUID | undefined | null {
+  let placeOfEvent: UUID | undefined | null = getParsedUUID(
+    eventMetadata[DEFAULT_PLACE_OF_EVENT_PROPERTY]
+  )
+
+  if (config.placeOfEvent) {
+    const addressFieldValue = AddressFieldValue.safeParse(
+      declaration[config.placeOfEvent.$$field]
+    )
+    if (
+      addressFieldValue.success &&
+      addressFieldValue.data.addressType === AddressType.DOMESTIC &&
+      addressFieldValue.data.administrativeArea
+    ) {
+      placeOfEvent = getParsedUUID(
+        addressFieldValue.data.administrativeArea,
+        placeOfEvent
+      )
+    } else {
+      placeOfEvent = getParsedUUID(
+        declaration[config.placeOfEvent.$$field],
+        placeOfEvent
+      )
+    }
+  }
+  return placeOfEvent
+}
+
 export function extractPotentialDuplicatesFromActions(
   actions: Action[]
 ): PotentialDuplicate[] {
@@ -180,6 +230,7 @@ export function extractPotentialDuplicatesFromActions(
 
 /**
  * NOTE: This function should not run field validations. It should return the state based on the actions, without considering context (users, roles, permissions, etc).
+createdAtLocation: CreatedAtLocation
  *
  * If you update this function, please ensure @EventIndex type is updated accordingly.
  * In most cases, you won't need to add new parameters to this function. Discuss with the team before doing so.
@@ -235,6 +286,11 @@ export function getCurrentEventState(
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
+    placeOfEvent: resolvePlaceOfEvent(
+      { createdAtLocation: creationAction.createdAtLocation },
+      declaration,
+      config
+    ),
     potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
     flags: getEventFlags(event, config)
   })
@@ -299,6 +355,11 @@ export function applyDeclarationToEventIndex(
   return {
     ...eventIndex,
     dateOfEvent: resolveDateOfEvent(
+      eventIndex,
+      updatedDeclaration,
+      eventConfiguration
+    ),
+    placeOfEvent: resolvePlaceOfEvent(
       eventIndex,
       updatedDeclaration,
       eventConfiguration

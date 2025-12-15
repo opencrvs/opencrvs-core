@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -191,7 +190,6 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': true,
           'event.actions.register.request': true
         })
       })
@@ -261,18 +259,30 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
+<<<<<<< HEAD
     await step('User can register', async () => {
+=======
+    await step('User can declare', async () => {
+>>>>>>> origin/ocrvs-10939
       const canvas = within(canvasElement)
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Action' })
       )
+<<<<<<< HEAD
       await userEvent.click(await canvas.findByText('Register'))
+=======
+      await userEvent.click(await canvas.findByText('Declare'))
+>>>>>>> origin/ocrvs-10939
 
       await canvas.findByRole('button', { name: 'Cancel' })
 
       await userEvent.click(
         await canvas.findByRole('button', {
+<<<<<<< HEAD
           name: 'Register'
+=======
+          name: 'Declare'
+>>>>>>> origin/ocrvs-10939
         })
       )
     })
@@ -287,7 +297,6 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': true,
           'event.actions.register.request': false
         })
       })

@@ -18,7 +18,6 @@ import { Text } from '@opencrvs/components'
 import { ActionType, ActionStatus } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 
@@ -35,10 +34,17 @@ const StyledText = styled(Text)`
   margin-left: 8px;
 `
 
-const message = defineMessage({
-  id: 'editPageBanner.message',
+const declaredMessage = defineMessage({
+  id: 'editPageBanner.declaredMessage',
   defaultMessage:
     'You are editing a record declared by {name} ({role} at {location})',
+  description: 'The message for the edit page banner'
+})
+
+const notifiedMessage = defineMessage({
+  id: 'editPageBanner.notifiedMessage',
+  defaultMessage:
+    'You are editing a record notified by {name} ({role} at {location})',
   description: 'The message for the edit page banner'
 })
 
@@ -47,17 +53,29 @@ export function EditPageBanner() {
   const intl = useIntl()
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
-  const { getUser } = useUsers()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
+
+  const notificationActions = event.actions.filter(
+    (a) => a.type === ActionType.NOTIFY && a.status === ActionStatus.Accepted
+  )
 
   const declarationActions = event.actions.filter(
     (a) => a.type === ActionType.DECLARE && a.status === ActionStatus.Accepted
   )
 
-  // Fetch createdAtLocation and createdBy from latest declaration action
+  const latestAction =
+    declarationActions.length > 0
+      ? declarationActions[declarationActions.length - 1]
+      : notificationActions[notificationActions.length - 1]
+
+  // Fetch createdAtLocation and createdBy from latest notification or declaration action
   const { createdAtLocation, createdBy, createdByRole, createdByUserType } =
-    declarationActions[declarationActions.length - 1]
+    latestAction
+
+  const location = createdAtLocation
+    ? locations.get(createdAtLocation)
+    : undefined
 
   const { getUserDetails } = useUserDetails()
   const { role, name } = getUserDetails({
@@ -67,15 +85,20 @@ export function EditPageBanner() {
     createdByRole
   })
 
-  const location = createdAtLocation
-    ? locations.get(createdAtLocation)
-    : undefined
+  const message =
+    declarationActions.length > 0 ? declaredMessage : notifiedMessage
+
+  const formattedMessage = intl.formatMessage(message, {
+    location: location?.name,
+    role,
+    name
+  })
 
   return (
     <Wrapper>
       <Icon name="PencilSimpleLine" size="small" />
       <StyledText color="white" element="span" variant="bold14">
-        {intl.formatMessage(message, { location: location?.name, role, name })}
+        {formattedMessage}
       </StyledText>
     </Wrapper>
   )

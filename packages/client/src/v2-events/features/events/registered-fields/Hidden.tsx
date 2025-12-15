@@ -8,19 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
-export * from './url'
-export * from './logger'
-export * from './roles'
-export * from './search'
-export * from './events'
-export * from './users/User'
-export * from './authentication'
-export * from './utils'
-export * from './countryconfig'
-export * from './icons'
-export * from './notification'
-export * from './scopes-v2'
+import * as React from 'react'
+
+function HiddenInput({ id, value }: { id: string; value?: string }) {
+  return (
+    <input
+      data-testid={`text__${id}`}
+      disabled={true}
+      id={id}
+      name={id}
+      type="hidden"
+      value={value}
+    />
+  )
+}
+
+export const Hidden = {
+  Input: HiddenInput,
+  stringify: (value: string | undefined) => {
+    return value?.toString() || ''
+  }
+}

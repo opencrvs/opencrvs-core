@@ -669,10 +669,12 @@ export function aggregateActionDeclarations(event: EventDocument): EventState {
   }, {})
 }
 
-export function aggregateActionAnnotations(
-  actions: ActionDocument[]
-): EventState {
-  return actions.reduce((ann, sortedAction) => {
-    return deepMerge(ann, sortedAction.annotation ?? {})
+export function aggregateActionAnnotations(event: EventDocument): EventState {
+  return event.actions.reduce((ann, sortedAction) => {
+    if (!('annotation' in sortedAction) || !sortedAction.annotation) {
+      return ann
+    }
+
+    return deepMerge(ann, sortedAction.annotation)
   }, {} as EventState)
 }

@@ -92,6 +92,7 @@ export {
   WarningCircle,
   Webcam,
   X,
-  Stamp
+  Stamp,
+  ChatText
 } from 'phosphor-react'
 export * from './custom-icons'

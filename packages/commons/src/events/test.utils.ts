@@ -187,6 +187,7 @@ function mapFieldTypeToMockValue(
     case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
     case FieldType.LOADER:
+    case FieldType.ALPHA_HIDDEN:
       return `${field.id}-${field.type}-${i}`
     case FieldType.VERIFICATION_STATUS:
       return 'verified'
@@ -497,6 +498,7 @@ export function eventPayloadGenerator(
         > = {}
       ) => ({
         type: ActionType.EDIT,
+        content: { comment: 'Test comment' },
         transactionId: input.transactionId ?? getUUID(),
         declaration:
           input.declaration ??
@@ -808,8 +810,13 @@ export function generateActionDocument<T extends ActionType>({
     case ActionType.NOTIFY:
     case ActionType.REGISTER:
     case ActionType.REQUEST_CORRECTION:
-    case ActionType.EDIT:
       return { ...actionBase, type: action }
+    case ActionType.EDIT:
+      return {
+        ...actionBase,
+        type: action,
+        content: { comment: 'Test comment' }
+      }
     case ActionType.CUSTOM:
       return {
         ...actionBase,

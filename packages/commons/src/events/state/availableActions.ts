@@ -127,6 +127,7 @@ function getAvailableActionsWithoutFlagFilters(
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
           .filter((action) => action !== ActionType.DELETE)
+          .concat(ActionType.EDIT)
           .concat(ActionType.ARCHIVE)
       }
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
@@ -138,9 +139,11 @@ function getAvailableActionsWithoutFlagFilters(
           flags.filter((flag) => flag !== InherentFlags.REJECTED)
         )
           .filter((action) => action !== ActionType.DELETE)
+          .concat(ActionType.EDIT)
           .concat(ActionType.ARCHIVE)
       }
 
+      // A record should never stay in the EDIT_IN_PROGRESS flag, since it should always be declared or registered right after
       if (flags.includes(InherentFlags.EDIT_IN_PROGRESS)) {
         return [ActionType.DECLARE, ActionType.REGISTER]
       }
