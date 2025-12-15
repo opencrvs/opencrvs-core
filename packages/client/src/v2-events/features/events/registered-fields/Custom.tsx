@@ -27,7 +27,10 @@ interface OutputProps {
   value?: unknown
 }
 
-async function importModule(url: string): Promise<any> {
+async function importModule(url: string): Promise<{
+  Input: React.FC<InputProps>
+  Output: React.FC<OutputProps>
+}> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const mod = await import(/* @vite-ignore */ url)
   return mod
@@ -69,6 +72,7 @@ function Loader(
   }
 
   if (!loadedModule) {
+    // eslint-disable-next-line react/jsx-no-literals
     return <div>Failed to load component</div>
   }
 
