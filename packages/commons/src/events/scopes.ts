@@ -65,9 +65,9 @@ export function configurableEventScopeAllowed(
   customActionType?: string
 ) {
   // Find the scopes that are authorized for the given action
-  const parsedScopes = allowedConfigurableScopes
-    .flatMap((scope) => findScopes(scopes, scope))
-    .filter((scope) => scope !== undefined)
+  const parsedScopes = allowedConfigurableScopes.flatMap((scope) =>
+    findScopes(scopes, scope)
+  )
 
   if (!customActionType) {
     const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
