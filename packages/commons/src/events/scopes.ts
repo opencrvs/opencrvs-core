@@ -63,6 +63,8 @@ export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
 }
 
+// misc change
+
 export function configurableEventScopeAllowed(
   scopes: Scope[],
   allowedConfigurableScopes: ConfigurableScopeType[],
