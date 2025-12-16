@@ -11,7 +11,6 @@
 import { intersection } from 'lodash'
 import {
   ConfigurableScopeType,
-  findScope,
   getAuthorizedEventsFromScopes,
   Scope,
   RecordScopeType,
