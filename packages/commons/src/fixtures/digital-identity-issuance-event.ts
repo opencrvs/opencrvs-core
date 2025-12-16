@@ -20,6 +20,9 @@ import {
 import { user, and, never, not } from '../conditionals/conditionals'
 import { ConditionalType } from '../events/Conditional'
 
+/**
+ * @knipignore
+ */
 export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
   label: {
     id: 'event.digital-identity.action.certificate.form.label',
