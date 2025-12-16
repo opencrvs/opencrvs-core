@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.4
+
+### Bug fixes
+
+- e-Signet authentication now populates print and correction forms. An issue with FieldConfig `parent` parameter not finding action annotation field references was fixed. [#11210](https://github.com/opencrvs/opencrvs-core/issues/11210)
+
 ## 1.9.3
 
 ### New features
