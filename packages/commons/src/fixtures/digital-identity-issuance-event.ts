@@ -8,22 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { defineConfig } from '../events/defineConfig'
+import { ActionType } from '../events/ActionType'
+import { PageTypes } from '../events/PageConfig'
+import { FieldType } from '../events/FieldType'
+import { field } from '../events/field'
 import {
   defineActionForm,
   defineDeclarationForm
 } from '../events/EventConfigInput'
-import { defineConfig } from '../events/defineConfig'
-import { FieldType } from '../events/FieldType'
-import { PageTypes } from '../events/PageConfig'
-import {
-  field,
-  ConditionalType,
-  and,
-  user,
-  not,
-  ActionType,
-  never
-} from '../client'
+import { user, and, never, not } from '../conditionals/conditionals'
+import { ConditionalType } from '../events/Conditional'
 
 export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
   label: {
