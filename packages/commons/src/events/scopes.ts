@@ -14,7 +14,8 @@ import {
   findScope,
   getAuthorizedEventsFromScopes,
   Scope,
-  RecordScopeType
+  RecordScopeType,
+  findScopes
 } from '../scopes'
 import {
   ClientSpecificAction,
@@ -66,22 +67,24 @@ export function configurableEventScopeAllowed(
 ) {
   // Find the scopes that are authorized for the given action
   const parsedScopes = allowedConfigurableScopes
-    .map((scope) => findScope(scopes, scope))
+    .flatMap((scope) => findScopes(scopes, scope))
     .filter((scope) => scope !== undefined)
 
-  // Ensure that the given event type is authorized in the found scopes
-  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-  const firstScope = parsedScopes[0]
-  if (
-    parsedScopes.length > 0 &&
-    firstScope.type === 'record.custom-action' &&
-    customActionType
-  ) {
-    const allowedCustomActionTypes = firstScope.options.customActionType
-    if (!allowedCustomActionTypes.includes(customActionType)) {
-      return false
-    }
+  if (!customActionType) {
+    const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+    return authorizedEvents.includes(eventType)
   }
+
+  const scopesWithCorrectCustomActionType = parsedScopes.filter(
+    ({ options }) =>
+      'customActionType' in options &&
+      options.customActionType.includes(customActionType as string)
+  )
+
+  const authorizedEvents = getAuthorizedEventsFromScopes(
+    scopesWithCorrectCustomActionType
+  )
+
   return authorizedEvents.includes(eventType)
 }
 
@@ -100,7 +103,8 @@ export function configurableEventScopeAllowed(
 export function isActionInScope(
   scopes: Scope[],
   action: DisplayableAction,
-  eventType: string
+  eventType: string,
+  customActionType?: string
 ) {
   const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
 
@@ -117,7 +121,8 @@ export function isActionInScope(
   return configurableEventScopeAllowed(
     scopes,
     allowedConfigurableScopes,
-    eventType
+    eventType,
+    customActionType
   )
 }
 

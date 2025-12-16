@@ -389,6 +389,21 @@ export function findScope<T extends ConfigurableScopeType>(
   )
 }
 
+export function findScopes<T extends ConfigurableScopeType>(
+  scopes: string[],
+  scopeType: T
+) {
+  const parsedScopes = scopes.map(parseConfigurableScope)
+  const searchScopes = parsedScopes.filter((scope) => scope?.type === 'search')
+  const otherScopes = parsedScopes.filter((scope) => scope?.type !== 'search')
+  const mergedSearchScope = flattenAndMergeScopes(searchScopes)
+
+  return [...otherScopes, mergedSearchScope].filter(
+    (scope): scope is Extract<ConfigurableScopes, { type: T }> =>
+      scope?.type === scopeType
+  )
+}
+
 /**
  * Parses a raw options string for non-search scopes (e.g., workqueues).
  * @param rawOptions - The raw string, e.g. "event=birth|club-reg,all"
