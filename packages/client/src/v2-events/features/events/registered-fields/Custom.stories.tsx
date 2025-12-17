@@ -86,7 +86,7 @@ export const Input: StoryObj<typeof FormFieldGenerator> = {
         fields={[
           {
             id: 'storybook.data',
-            type: FieldType.CUSTOM,
+            type: FieldType._EXPERIMENTAL_CUSTOM,
             src: '/test.js',
             label: {
               id: 'foo.bar',
@@ -132,7 +132,7 @@ export const Output: StoryObj<typeof FormFieldGenerator> = {
                 fields: [
                   {
                     id: 'storybook.data',
-                    type: FieldType.CUSTOM,
+                    type: FieldType._EXPERIMENTAL_CUSTOM,
                     src: '/test.js',
                     label: {
                       id: 'foo.bar',
