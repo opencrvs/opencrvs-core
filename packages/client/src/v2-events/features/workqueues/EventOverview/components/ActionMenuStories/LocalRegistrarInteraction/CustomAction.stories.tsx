@@ -34,7 +34,6 @@ const customActionScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.CUSTOM,
       ActionType.UNASSIGN
     ],
@@ -55,7 +54,6 @@ const customActionScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.CUSTOM,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_SELF
@@ -77,7 +75,6 @@ const customActionScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.CUSTOM,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS

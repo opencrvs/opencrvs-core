@@ -324,10 +324,6 @@ exports[`transform v1 scope to v2 1`] = `
       "v2": "type=record.declare&event=birth,death,tennis-club-membership",
     },
     {
-      "v1": "record.declared.validate[event=birth|death|tennis-club-membership]",
-      "v2": "type=record.validate&event=birth,death,tennis-club-membership",
-    },
-    {
       "v1": "record.declared.reject[event=birth|death|tennis-club-membership]",
       "v2": "type=record.reject&event=birth,death,tennis-club-membership",
     },

@@ -35,8 +35,7 @@ import {
   RejectCorrectionActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
-  UnassignActionInput,
-  ValidateActionInput
+  UnassignActionInput
 } from './ActionInput'
 import { ActionType, DeclarationUpdateActions } from './ActionType'
 import { Draft } from './Draft'
@@ -510,34 +509,6 @@ export function eventPayloadGenerator(
         eventId,
         ...input
       }),
-      validate: (
-        eventId: string,
-        input: Partial<
-          Pick<
-            ValidateActionInput,
-            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
-          >
-        > = {}
-      ) => ({
-        type: ActionType.VALIDATE,
-        transactionId: input.transactionId ?? getUUID(),
-        declaration:
-          input.declaration ??
-          generateActionDeclarationInput(
-            configuration,
-            ActionType.VALIDATE,
-            rng
-          ),
-        annotation:
-          input.annotation ??
-          generateActionAnnotationInput(
-            configuration,
-            ActionType.VALIDATE,
-            rng
-          ),
-        eventId,
-        ...input
-      }),
       assign: (
         eventId: string,
         input: Partial<
@@ -837,7 +808,6 @@ export function generateActionDocument<T extends ActionType>({
     case ActionType.UNASSIGN:
     case ActionType.CREATE:
     case ActionType.NOTIFY:
-    case ActionType.VALIDATE:
     case ActionType.REGISTER:
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
