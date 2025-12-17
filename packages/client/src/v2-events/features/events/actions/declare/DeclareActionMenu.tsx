@@ -197,7 +197,7 @@ function useDeclarationActions(event: EventDocument) {
         icon: 'Trash' as const,
         label: formHeaderMessages.deleteDeclaration,
         onClick: async () => onDelete(),
-        hidden: false
+        hidden: eventIndex.status !== EventStatus.enum.CREATED
       }
     ].filter((a) => !a.hidden)
   }
