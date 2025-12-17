@@ -116,6 +116,7 @@ function isFlagConditionMet(
  * This is to handle 'redeclaration' cases, i.e. when a user edits a declared record and then does 'Declare with edits'
  * Then we want to ignore all the actions between the second last declare action and the edit action.
  */
+// @TODO CIHAN: remove this!!
 function omitOverwrittenActions(sortedActions: Action[]): Action[] {
   // First find indices of all declare actions
   const declareIndexes = sortedActions

@@ -158,7 +158,8 @@ const v1ToV2ConfigScopeTypeMap: Record<LegacyScopeType, string> = {
   'record.registered.request-correction': 'record.request-correction',
   'record.registered.correct': 'record.correct',
   'record.custom-action': 'record.custom-action',
-  'record.declared.edit': 'record.edit'
+  'record.declared.edit': 'record.declared.edit',
+  'record.notified.edit': 'record.notified.edit'
 }
 
 /**

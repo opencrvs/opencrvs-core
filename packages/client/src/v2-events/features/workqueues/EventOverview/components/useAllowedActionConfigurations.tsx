@@ -375,24 +375,6 @@ function useViewableActionConfigurations(
         onClick: onDelete,
         disabled: !isDownloadedAndAssignedToUser
       },
-      // Configurable event actions
-      [ActionType.DECLARE]: {
-        icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
-        label: isReviewingDeclaration
-          ? reviewLabel
-          : actionLabels[ActionType.DECLARE],
-        onClick: (workqueue) => {
-          clearEphemeralFormState()
-          return navigate(
-            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
-              { eventId },
-              { workqueue }
-            )
-          )
-        },
-        disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: isRejected
-      },
       [ActionType.EDIT]: {
         icon: 'PencilLine' as const,
         label: actionLabels[ActionType.EDIT],
@@ -680,7 +662,7 @@ export function useAllowedActionConfigurations(
             workqueueActions.safeParse(action).success
         )
         .filter((action) => isActionAllowed(action))
-        // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
+        .filter((action): action is keyof typeof config => action in config)
         .map((a) => ({ ...config[a], type: a }))
     )
   }, [openDraft, config, isActionAllowed, event, authentication])

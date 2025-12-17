@@ -27,6 +27,7 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   ],
   [EventStatus.enum.NOTIFIED]: [
     ActionType.READ,
+    ActionType.EDIT,
     ActionType.DECLARE,
     ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
@@ -35,12 +36,12 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   ],
   [EventStatus.enum.DECLARED]: [
     ActionType.READ,
+    ActionType.EDIT,
     ActionType.REGISTER,
     ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
     ActionType.REJECT,
-    ActionType.CUSTOM,
-    ActionType.EDIT
+    ActionType.CUSTOM
   ],
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,

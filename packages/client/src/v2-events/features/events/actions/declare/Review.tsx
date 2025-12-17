@@ -20,7 +20,6 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
@@ -38,7 +37,6 @@ export function Review() {
   const events = useEvents()
   const navigate = useNavigate()
   const validatorContext = useValidatorContext()
-  const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
   const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: config } = useEventConfiguration(event.type)
@@ -56,33 +54,23 @@ export function Review() {
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
-  async function handleEdit({
+  function handleEdit({
     pageId,
-    fieldId,
-    confirmation
+    fieldId
   }: {
     pageId: string
     fieldId?: string
-    confirmation?: boolean
   }) {
-    const confirmedEdit =
-      confirmation ||
-      (await openModal<boolean | null>((close) => (
-        <ReviewComponent.EditModal close={close}></ReviewComponent.EditModal>
-      )))
-
-    if (confirmedEdit) {
-      navigate(
-        ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(
-          { pageId, eventId },
-          {
-            from: 'review',
-            workqueue: slug
-          },
-          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
-        )
+    navigate(
+      ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(
+        { pageId, eventId },
+        {
+          from: 'review',
+          workqueue: slug
+        },
+        fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
       )
-    }
+    )
 
     return
   }
@@ -102,7 +90,6 @@ export function Review() {
         onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       />
-      {modal}
     </FormLayout>
   )
 }
