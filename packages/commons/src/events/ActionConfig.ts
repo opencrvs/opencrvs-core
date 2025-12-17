@@ -36,9 +36,6 @@ export const ActionConfigBase = z.object({
     .optional()
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
-  auditHistoryLabel: TranslationConfig.describe(
-    'The label to show in audit history for this action. For example "Approved".'
-  ).optional(),
   supportingCopy: TranslationConfig.optional().describe(
     'Text displayed on the confirmation'
   ),
@@ -118,7 +115,13 @@ const CustomActionConfig = ActionConfigBase.merge(
       .array(FieldConfig)
       .describe(
         'Form configuration for the custom action. The form configured here will be used on the custom action confirmation modal.'
-      )
+      ),
+    dialogTitle: TranslationConfig.describe(
+      'The title to show in the custom action confirmation modal.'
+    ),
+    auditHistoryLabel: TranslationConfig.describe(
+      'The label to show in audit history for this action. For example "Approved".'
+    )
   })
 )
 
