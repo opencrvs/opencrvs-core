@@ -8,11 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { SCOPES, TestUserRole } from '@opencrvs/commons'
+import fc from 'fast-check'
+import { createPrng, SCOPES, TestUserRole, UserFilter } from '@opencrvs/commons'
 import { MiddlewareOptions } from '@events/router/middleware/utils'
 import { createTestToken } from '@events/tests/utils'
 import { TrpcContext } from '@events/context'
+import {
+  generateTestLocations,
+  generateTestAdministrativeAreas,
+  generateTestUsersForLocations
+} from '../../../tests/generators'
 import { requiresAnyOfScopes } from '.'
 
 describe('requiresScopes()', () => {
@@ -62,5 +67,37 @@ describe('requiresScopes()', () => {
     await middleware(mockOpts)
 
     expect(mockOpts.next).toHaveBeenCalled()
+  })
+})
+
+describe('canAccessEventWithScopes', () => {
+  const rng = createPrng(12343244)
+  const administrativeAreas = generateTestAdministrativeAreas()
+  const locations = generateTestLocations(administrativeAreas, rng)
+  const users = generateTestUsersForLocations(locations, rng)
+
+  const userIds = fc.constantFrom(...users.map((u) => u.id))
+  const locationIds = fc.constantFrom(
+    ...locations.map((location) => location.id)
+  )
+
+  const administrativeAreaIds = fc.option(
+    fc.constantFrom(...administrativeAreas.map((area) => area.id)),
+    { nil: undefined }
+  )
+
+  const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
+    nil: undefined
+  })
+
+  const testUsers = fc.constantFrom(...users)
+
+  canAccessEventWithScopes()
+
+  const scopeCombinations = fc.record({
+    eventId: eventIds,
+    user: testUsers,
+    declaredIn: jurisdictionOptions,
+    declaredBy: userOptions
   })
 })
