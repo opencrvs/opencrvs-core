@@ -1,12 +1,34 @@
 # Changelog
 
-## 2.0.0 Release Candidate
+## 1.9.3
 
 ### New features
 
-#### HTTP Input
+- Introduced form page level config - `requireCompletionToContinue` to enforce full completion of the form page before moving to the next page.
 
-HTTP input now accepts `field('..')` references in the HTTP body definition.
+### Improvements
+
+- Add support for validating dates before/after another date field using `isBefore` and `isAfter` validators. [#11194](https://github.com/opencrvs/opencrvs-core/issues/11194)
+
+Usage example:
+
+```ts
+// 6570 days before another field
+field('mother.dob').isBefore().days(6570).fromDate(field('child.dob'))
+
+// 6570 days after another field
+field('mother.dateOfMarriage')
+  .isAfter()
+  .days(6570)
+  .fromDate(field('mother.dob'))
+
+// 45 days before now
+field('child.dob').isBefore().days(45).fromNow()
+```
+
+### Bug fixes
+
+- Fixes an issue where `event.hasAction` was not working in form configurations [#11074](https://github.com/opencrvs/opencrvs-core/issues/11074)
 
 ## 1.9.2
 

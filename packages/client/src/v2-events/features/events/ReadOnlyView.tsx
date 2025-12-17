@@ -37,7 +37,7 @@ function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const event = events.getEvent.viewEvent(eventId)
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
 
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
