@@ -43,6 +43,7 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  EventIndexWithLocationHierarchy,
   getEventIndexWithLocationHierarchy,
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
@@ -370,7 +371,7 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
   const eventIndex = eventToEventIndex(event, config)
   const eventIndexWithLocationHierarchy =
     await getEventIndexWithLocationHierarchy(config, eventIndex)
-  return esClient.index<EventIndex>({
+  return esClient.index<EventIndexWithLocationHierarchy>({
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */

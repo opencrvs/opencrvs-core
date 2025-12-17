@@ -12,6 +12,7 @@ import { TRPCError } from '@trpc/server'
 import {
   ACTION_SCOPE_MAP,
   ActionType,
+  encodeScope,
   generateUuid,
   getUUID,
   RecordScopeType,
@@ -43,7 +44,8 @@ test('prevents access if required scope does not have correct event type configu
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
     `record.declare[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-    'record.read[event=birth]'
+    'record.read[event=birth]',
+    encodeScope({ type: 'record.read', options: { event: 'birth' } })
   ])
 
   await expect(client.event.get(generateUuid())).rejects.toMatchSnapshot()
@@ -88,7 +90,11 @@ test('allows access with required scope when user did not create the event', asy
   const event = await myClient.event.create(generator.event.create())
 
   const anotherClient = createTestClient(users[1], [
-    `record.read[event=${TENNIS_CLUB_MEMBERSHIP}]`
+    `record.read[event=${TENNIS_CLUB_MEMBERSHIP}]`,
+    encodeScope({
+      type: 'record.read',
+      options: { event: TENNIS_CLUB_MEMBERSHIP }
+    })
   ])
 
   await expect(anotherClient.event.get(event.id)).resolves.not.toThrow()

@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
   createPrng,
+  encodeScope,
   EventConfig,
   EventDocument,
   generateRandomSignature,
@@ -96,6 +97,12 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
   'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.read',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
   'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',

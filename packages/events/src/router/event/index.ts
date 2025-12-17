@@ -123,24 +123,23 @@ export const eventRouter = router({
   get: userOnlyProcedure
     .input(UUID)
     // @ts-expect-error: middleware.userCanReadEvent does not have proper type definitions but works as intended
-    .use(middleware.userCanReadEvent)
+    .use(middleware.userCanReadEvent2)
     .query(async ({ ctx }) => {
-      const event = ctx.event
-
+      const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
         token: ctx.token,
-        eventType: event.type
+        eventType
       })
 
       const updatedEvent = await processAction(
         {
           type: ActionType.READ,
-          eventId: event.id,
+          eventId,
           transactionId: getUUID(),
           declaration: {}
         },
         {
-          event,
+          eventId,
           user: ctx.user,
           token: ctx.token,
           status: ActionStatus.Accepted,

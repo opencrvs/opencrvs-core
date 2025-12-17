@@ -36,13 +36,17 @@ import {
   SCOPES,
   hasAnyOfScopes,
   AnyScope,
-  decodeScope
+  getCurrentEventState,
+  ResolvedRecordScopeV2
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
 import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
+import { getInMemoryEventConfigurations } from '../../../service/config/config'
+import { getEventIndexWithLocationHierarchy } from '../../../service/indexing/utils'
+import { canAccessEventWithScopes, getAcceptedScopesFromToken } from './utils'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -132,15 +136,7 @@ export function requiresAnyOfScopes(
     }
 
     if (v2ScopeTypes && v2ScopeTypes.length > 0) {
-      const tokenScopes = getScopes(token)
-      const acceptedScopes = tokenScopes
-        .map((scope) => {
-          const parsedScope = decodeScope(scope)
-          return parsedScope && v2ScopeTypes.includes(parsedScope.type)
-            ? parsedScope
-            : null
-        })
-        .filter((scope): scope is z.infer<typeof AnyScope> => scope !== null)
+      const acceptedScopes = getAcceptedScopesFromToken(token, v2ScopeTypes)
 
       if (acceptedScopes.length > 0) {
         return opts.next({
@@ -336,6 +332,53 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   }
 
   return next()
+}
+
+export const userCanReadEvent2: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { eventId: UUID; eventType: string },
+  UUID
+> = async ({ next, ctx, input }) => {
+  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+
+  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, ['record.read'])
+
+  if (acceptedScopes.length === 0) {
+    throw new EventNotFoundError(input)
+  }
+
+  const event = await getEventById(input)
+  const eventConfig = eventConfigs.find((c) => c.id === event.type)
+
+  if (!eventConfig) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: `Event configuration not found with type: ${event.type}`
+    })
+  }
+
+  const eventIndex = getCurrentEventState(event, eventConfig)
+  const eventIndexWithLocationHierarchy =
+    await getEventIndexWithLocationHierarchy(eventConfig, eventIndex)
+
+  const hasAccess = canAccessEventWithScopes(
+    eventIndexWithLocationHierarchy,
+    acceptedScopes as ResolvedRecordScopeV2[]
+  )
+
+  if (!hasAccess) {
+    throw new EventNotFoundError(input)
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      eventId: input,
+      eventType: event.type
+    }
+  })
 }
 
 export const userCanReadEvent: MiddlewareFunction<

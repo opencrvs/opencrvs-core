@@ -341,20 +341,19 @@ export function buildAction(
 export async function addAction(
   input: ActionInputWithType,
   {
-    event,
+    eventId,
     user,
     token,
     status,
     configuration
   }: {
-    event: EventDocument
+    eventId: UUID
     user: TrpcUserContext
     token: TokenWithBearer
     status: ActionStatus
     configuration: EventConfig
   }
 ): Promise<EventDocument> {
-  const eventId = event.id
   // @TODO: Check that this works after making sure data incldues only declaration fields.
   const fieldConfigs = getDeclarationFields(configuration)
   const fileValuesInCurrentAction = extractFileValues(
@@ -435,13 +434,13 @@ export async function ensureEventIndexed(
 export async function processAction(
   input: ActionInputWithType,
   {
-    event,
+    eventId,
     user,
     token,
     status,
     configuration
   }: {
-    event: EventDocument
+    eventId: UUID
     user: TrpcUserContext
     token: TokenWithBearer
     status: ActionStatus
@@ -449,7 +448,7 @@ export async function processAction(
   }
 ): Promise<EventDocument> {
   const updatedEvent = await addAction(input, {
-    event,
+    eventId,
     user,
     token,
     status,
