@@ -20,7 +20,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "8.16.2",
     "@opencrvs/commons": "^1.9.0",
-    "@trpc/server": "11.4.3",
+    "@trpc/server": "11.8.0",
     "@types/luxon": "^3.6.2",
     "@types/pg": "^8.15.4",
     "@types/pg-cursor": "^2.7.2",
