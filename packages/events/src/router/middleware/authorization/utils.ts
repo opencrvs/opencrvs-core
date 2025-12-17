@@ -10,96 +10,80 @@
  */
 
 import * as z from 'zod/v4'
-import { intersection } from 'lodash'
 import {
   getScopes,
   AnyScope,
   decodeScope,
   ResolvedRecordScopeV2,
-  getMixedPath
+  UserFilter,
+  JurisdictionFilter
 } from '@opencrvs/commons'
 import { EventIndexWithLocationHierarchy } from '../../../service/indexing/utils'
-
-const scopeToEventStateMap = {
-  event: 'type',
-  eventLocation: 'createdAtLocation',
-  declaredIn: 'legalStatuses.DECLARED.createdAtLocation',
-  registeredIn: 'legalStatuses.REGISTERED.createdAtLocation',
-  declaredBy: 'legalStatuses.DECLARED.createdBy',
-  registeredBy: 'legalStatuses.REGISTERED.createdBy'
-} as const
-
-type Options = ResolvedRecordScopeV2['options']
-
-type ScopesAsEventState = {
-  [K in keyof typeof scopeToEventStateMap as (typeof scopeToEventStateMap)[K]]?: Options[K]
-}
-
-/**
- * Given scope, transform its options into criteria that can be matched against event state fields.
- */
-function transformScopeToEventStateCriteria(
-  scope: ResolvedRecordScopeV2
-): ScopesAsEventState {
-  const keys = Object.keys(
-    scopeToEventStateMap
-  ) as (keyof typeof scopeToEventStateMap)[]
-
-  const eventStateCriteria = keys.reduce<ScopesAsEventState>((acc, key) => {
-    const value = scope.options[key]
-    // @todo: check if null is meaningful
-    if (!value) {
-      return acc
-    }
-
-    const esField = scopeToEventStateMap[key]
-
-    switch (key) {
-      case 'event':
-      case 'eventLocation':
-      case 'declaredIn':
-      case 'registeredIn':
-      case 'declaredBy':
-      case 'registeredBy':
-        return {
-          ...acc,
-          [esField]: value
-        }
-
-      default: {
-        throw new Error(`Unhandled option key: ${key}`)
-      }
-    }
-  }, {})
-
-  return eventStateCriteria
-}
+import { UserContext } from '../../../context'
 
 /**
  * Given indexed event and resolved scope, determine if the scope allows access to the event.
  */
 function canAccessEventWithScope(
   event: Partial<EventIndexWithLocationHierarchy>,
-  scope: ResolvedRecordScopeV2
-) {
-  const eventStateCriteria = transformScopeToEventStateCriteria(scope)
-  return Object.entries(eventStateCriteria).every(([field, value]) => {
-    const actualEventValue = getMixedPath(event, field)
+  scope: ResolvedRecordScopeV2,
+  user: UserContext
+): boolean {
+  const opts = scope.options
 
-    if (!actualEventValue) {
+  if (opts.event) {
+    if (!event.type || !opts.event.includes(event.type)) {
       return false
     }
+  }
 
-    if (Array.isArray(value)) {
-      return intersection(value, [actualEventValue]).length > 0
+  if (opts.declaredBy === UserFilter.enum.user) {
+    if (event.legalStatuses?.DECLARED?.createdBy !== user.id) {
+      return false
     }
+  }
 
-    if (Array.isArray(actualEventValue)) {
-      return actualEventValue.includes(value)
+  if (opts.registeredBy === UserFilter.enum.user) {
+    if (event.legalStatuses?.REGISTERED?.createdBy !== user.id) {
+      return false
     }
+  }
 
-    return actualEventValue === value
-  })
+  if (opts.declaredIn === JurisdictionFilter.enum.location) {
+    const locs = event.legalStatuses?.DECLARED?.createdAtLocation
+    if (!locs || !locs.includes(user.primaryOfficeId)) {
+      return false
+    }
+  }
+
+  if (opts.declaredIn === JurisdictionFilter.enum.administrativeArea) {
+    const locationIds = event.legalStatuses?.DECLARED?.createdAtLocation
+    if (
+      !locationIds ||
+      !locationIds.some((id) => id === user.administrativeAreaId)
+    ) {
+      return false
+    }
+  }
+
+  if (opts.registeredIn === JurisdictionFilter.enum.location) {
+    const locationIds = event.legalStatuses?.REGISTERED?.createdAtLocation
+    if (!locationIds || !locationIds.includes(user.primaryOfficeId)) {
+      return false
+    }
+  }
+
+  if (opts.registeredIn === JurisdictionFilter.enum.administrativeArea) {
+    const locationIds = event.legalStatuses?.REGISTERED?.createdAtLocation
+    if (
+      !locationIds ||
+      !locationIds.some((id) => id === user.administrativeAreaId)
+    ) {
+      return false
+    }
+  }
+
+  return true
 }
 
 /**
@@ -107,9 +91,10 @@ function canAccessEventWithScope(
  */
 export function canAccessEventWithScopes(
   event: Partial<EventIndexWithLocationHierarchy>,
-  scopes: ResolvedRecordScopeV2[]
+  scopes: ResolvedRecordScopeV2[],
+  user: UserContext
 ) {
-  return scopes.some((scope) => canAccessEventWithScope(event, scope))
+  return scopes.some((scope) => canAccessEventWithScope(event, scope, user))
 }
 
 export function getAcceptedScopesFromToken(

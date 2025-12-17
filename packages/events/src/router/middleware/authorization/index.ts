@@ -365,7 +365,8 @@ export const userCanReadEvent2: MiddlewareFunction<
 
   const hasAccess = canAccessEventWithScopes(
     eventIndexWithLocationHierarchy,
-    acceptedScopes as ResolvedRecordScopeV2[]
+    acceptedScopes as ResolvedRecordScopeV2[],
+    ctx.user
   )
 
   if (!hasAccess) {

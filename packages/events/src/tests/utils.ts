@@ -418,7 +418,7 @@ export async function seedEvent(
   }: {
     eventConfig: EventConfig
     actions: DeclarationActionType[]
-    user: UserContext
+    user: Omit<UserContext, 'type'>
     rng: () => number
   }
 ) {

@@ -250,112 +250,36 @@ export async function setupHierarchyWithUsers() {
   const seed = seeder()
 
   // Generate Administrative areas with children, some "skipping" levels.
-  const provinceA = {
-    name: 'Province A',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const provinceB = {
-    name: 'Province B',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const districtC = {
-    name: 'District C',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const districtA = {
-    name: 'District A',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: provinceA.id,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const villageA = {
-    name: 'Village A',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: districtA.id,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const villageB = {
-    name: 'Village B',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: provinceB.id,
-    id: generateUuid(rng),
-    validUntil: null
-  } satisfies Location
-
-  const administrativeAreas = [
-    provinceA,
-    provinceB,
-    districtC,
-    districtA,
-    villageA,
-    villageB
-  ]
+  const administrativeAreas = generateTestAdministrativeAreas()
 
   await seed.locations(administrativeAreas)
 
   //2. Setup offices/health facilities under each admin area.
-  const offices = generateTestLocations(administrativeAreas, rng)
-  await seed.locations(offices)
+  const locations = generateTestLocations(administrativeAreas, rng)
+  await seed.locations(locations)
 
   expect(administrativeAreas.length).toBe(6)
-  expect(offices.length).toBe(12) // 6 admin areas x 2 offices each
+  expect(locations.length).toBe(12) // 6 admin areas x 2 offices each
 
-  const officeById = new Map(offices.map((o) => [o.id, o]))
+  const locationById = new Map(locations.map((o) => [o.id, o]))
   const administrativeAreaById = new Map(
     administrativeAreas.map((a) => [a.id, a])
   )
 
   // 3. Create two users for each office to test 'user' scope limitations.
-  const users = offices.flatMap((office, i) => {
-    const base = {
-      administrativeAreaId: office.parentId,
-      primaryOfficeId: office.id,
-      fullHonorificName: `${office.name} full honorific name`
-    }
-
-    return [
-      seed.user({
-        ...base,
-        name: [{ use: 'en', given: [`Mirella-${i}`], family: office.name }],
-        role: pickRandom(rng, TestUserRole.options),
-        id: generateUuid(rng)
-      }),
-      seed.user({
-        ...base,
-        name: [{ use: 'en', given: [`Jonathan-${i}`], family: office.name }],
-        role: pickRandom(rng, TestUserRole.options),
-        id: generateUuid(rng)
-      })
-    ]
-  })
+  const users = generateTestUsersForLocations(locations, rng)
 
   // Helper to check if an office is under a given administrative area. Used for testing propositions.
   function isUnderAdministrativeArea(
-    officeId: UUID,
-    administrativeAreaId: UUID | null
+    locationId: UUID,
+    administrativeAreaId: UUID | null | undefined
   ): boolean {
-    const current = officeById.get(officeId)
+    const current = locationById.get(locationId)
     if (!current) {
       return false
     }
 
-    let parentId: UUID | null = current.parentId
+    let parentId: UUID | null | undefined = current.parentId
 
     while (parentId) {
       if (parentId === administrativeAreaId) {
@@ -371,10 +295,10 @@ export async function setupHierarchyWithUsers() {
 
   return {
     users,
-    offices,
+    locations,
     administrativeAreas,
     isUnderAdministrativeArea,
     administrativeAreaById,
-    officeById
+    locationById
   }
 }
