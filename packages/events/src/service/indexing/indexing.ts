@@ -202,7 +202,7 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         enabled: false
       }
-    case FieldType.CUSTOM:
+    case FieldType._EXPERIMENTAL_CUSTOM:
       /**
        * Custom fields are not indexed as their structure is unknown.
        */

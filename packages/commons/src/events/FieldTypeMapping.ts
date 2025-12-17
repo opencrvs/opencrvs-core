@@ -210,7 +210,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ID_READER:
       schema = IdReaderFieldValue
       break
-    case FieldType.CUSTOM:
+    case FieldType._EXPERIMENTAL_CUSTOM:
       schema = CustomFieldValue
       break
   }
@@ -276,7 +276,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
-    case FieldType.CUSTOM:
+    case FieldType._EXPERIMENTAL_CUSTOM:
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return undefined as any as CustomFieldValue
   }
@@ -571,7 +571,7 @@ export const isCustomFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
 }): field is { value: CustomFieldValue; config: CustomField } => {
-  return field.config.type === FieldType.CUSTOM
+  return field.config.type === FieldType._EXPERIMENTAL_CUSTOM
 }
 
 export const isHiddenFieldType = (field: {

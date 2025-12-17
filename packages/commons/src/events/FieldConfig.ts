@@ -837,7 +837,7 @@ const IdReaderField = BaseField.extend({
 export type IdReaderField = z.infer<typeof IdReaderField>
 
 const CustomField = BaseField.extend({
-  type: z.literal(FieldType.CUSTOM),
+  type: z.literal(FieldType._EXPERIMENTAL_CUSTOM),
   defaultValue: CustomFieldValue.optional(),
   src: z.string().describe('Module source path for the custom field component'),
   configuration: z.unknown().optional()
