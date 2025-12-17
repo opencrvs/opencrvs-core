@@ -19,7 +19,8 @@ import {
   EventDocument,
   getCurrentEventState,
   InherentFlags,
-  getActionReview
+  getActionReview,
+  getAvailableActionsForEvent
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -150,6 +151,7 @@ function useDeclarationActions(event: EventDocument) {
   }
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const availableActions = getAvailableActionsForEvent(eventIndex)
 
   return {
     modals: [modal, rejectionModal, saveAndExitModal, deleteDeclarationModal],
@@ -172,16 +174,15 @@ function useDeclarationActions(event: EventDocument) {
         icon: 'UploadSimple' as const,
         label: actionLabels[ActionType.NOTIFY],
         onClick: async () => handleDeclaration(ActionType.NOTIFY),
-        hidden: !isActionAllowed(ActionType.NOTIFY),
-        disabled: false
+        hidden:
+          !availableActions.includes(ActionType.NOTIFY) ||
+          !isActionAllowed(ActionType.NOTIFY)
       },
       {
         icon: 'FileX' as const,
         label: actionLabels[ActionType.REJECT],
         onClick: async () => handleRejection(() => closeActionView(slug)),
-        hidden:
-          eventIndex.status !== EventStatus.enum.NOTIFIED ||
-          eventIndex.flags.includes(InherentFlags.REJECTED)
+        hidden: !availableActions.includes(ActionType.REJECT)
       },
       {
         icon: 'FloppyDisk' as const,
