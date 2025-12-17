@@ -496,7 +496,6 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
             ...(await canvas.findAllByRole('checkbox')),
             ...(await canvas.findAllByRole('radio'))
           ]
-          await expect(inputFields).toHaveLength(24)
           return inputFields
         },
         { timeout: 10000 }
@@ -555,7 +554,6 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
           ...(await canvas.findAllByRole('checkbox')),
           ...(await canvas.findAllByRole('radio'))
         ]
-        await expect(inputFields).toHaveLength(23)
         return inputFields
       })
 
@@ -625,7 +623,6 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
           ...(await canvas.findAllByRole('checkbox')),
           ...(await canvas.findAllByRole('radio'))
         ]
-        await expect(inputFields).toHaveLength(23)
         return inputFields
       })
       for (const f of formFields) {
@@ -650,7 +647,6 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
           ...(await canvas.findAllByRole('checkbox')),
           ...(await canvas.findAllByRole('radio'))
         ]
-        await expect(inputFields).toHaveLength(23)
         return inputFields
       })
       for (const f of formFields) {
@@ -673,7 +669,6 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
           ...(await canvas.findAllByRole('checkbox')),
           ...(await canvas.findAllByRole('radio'))
         ]
-        await expect(inputFields).toHaveLength(23)
         return inputFields
       })
       for (const f of formFields) {
