@@ -78,8 +78,6 @@ function V2ActionTypeToV1ActionType(
   switch (actionType) {
     case ActionType.DECLARE:
       return 'DECLARED'
-    case ActionType.VALIDATE:
-      return 'VALIDATED'
     case ActionType.REGISTER:
       return 'REGISTERED'
     case ActionType.REJECT:

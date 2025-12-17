@@ -70,14 +70,6 @@ const eventCreatedByRegAgent = generateEventDocument({
         id: generator.user.id.registrationAgent
       }
     },
-    {
-      type: ActionTypes.enum.VALIDATE,
-      declarationOverrides: {},
-      user: {
-        role: TestUserRole.enum.REGISTRATION_AGENT,
-        id: generator.user.id.registrationAgent
-      }
-    },
     { type: ActionTypes.enum.UNASSIGN },
     {
       type: ActionTypes.enum.ASSIGN,
@@ -111,7 +103,6 @@ describe('useActionForHistory', () => {
   })
 
   const rng = createPrng(3123)
-  const validateActionUuid = generateUuid(rng)
 
   const actionDefaults = {
     createdAt: generateRandomDatetime(
@@ -137,7 +128,7 @@ describe('useActionForHistory', () => {
           }
         }),
         generateActionDocument({
-          action: ActionType.DECLARE,
+          action: ActionType.NOTIFY,
           configuration: tennisClubMembershipEvent,
           defaults: {
             ...actionDefaults,
@@ -151,34 +142,17 @@ describe('useActionForHistory', () => {
           }
         }),
         generateActionDocument({
-          action: ActionType.VALIDATE,
+          action: ActionType.NOTIFY,
           configuration: tennisClubMembershipEvent,
-          declarationOverrides: {},
           defaults: {
             ...actionDefaults,
             createdAt: addDays(
               new Date(actionDefaults.createdAt),
-              2
+              1
             ).toISOString(),
-            id: validateActionUuid,
-            status: ActionStatus.Requested,
             annotation: {
               'review.signature': generateRandomSignature(rng)
             }
-          }
-        }),
-        generateActionDocument({
-          action: ActionType.VALIDATE,
-          configuration: tennisClubMembershipEvent,
-          declarationOverrides: {},
-          defaults: {
-            ...actionDefaults,
-            createdAt: addDays(
-              new Date(actionDefaults.createdAt),
-              2
-            ).toISOString(),
-            status: ActionStatus.Accepted,
-            originalActionId: validateActionUuid
           }
         }),
         generateActionDocument({

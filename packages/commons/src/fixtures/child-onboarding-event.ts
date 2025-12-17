@@ -233,10 +233,6 @@ export const ChildOnboardingEvent = defineConfig({
       review: CHILD_ONBOARDING_DECLARATION_REVIEW
     },
     {
-      type: ActionType.VALIDATE,
-      label: generateTranslationConfig('Validate')
-    },
-    {
       type: ActionType.REGISTER,
       label: generateTranslationConfig('Register')
     }

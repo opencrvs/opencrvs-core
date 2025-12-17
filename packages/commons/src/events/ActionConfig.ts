@@ -81,12 +81,6 @@ const RejectConfig = ActionConfigBase.extend(
   }).shape
 )
 
-const ValidateConfig = DeclarationActionBase.extend(
-  z.object({
-    type: z.literal(ActionType.VALIDATE)
-  }).shape
-)
-
 const RegisterConfig = DeclarationActionBase.extend(
   z.object({
     type: z.literal(ActionType.REGISTER)
@@ -133,7 +127,6 @@ export const ActionConfig = z
     ReadActionConfig.meta({ id: 'ReadActionConfig' }),
     DeclareConfig.meta({ id: 'DeclareActionConfig' }),
     RejectConfig.meta({ id: 'RejectActionConfig' }),
-    ValidateConfig.meta({ id: 'ValidateActionConfig' }),
     RegisterConfig.meta({ id: 'RegisterActionConfig' }),
     PrintCertificateActionConfig.meta({
       id: 'PrintCertificateActionConfig'
@@ -164,7 +157,6 @@ export type ActionConfigTypes = ActionConfig['type']
 
 export const DeclarationActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,
-  ValidateConfig,
   RegisterConfig
 ])
 
