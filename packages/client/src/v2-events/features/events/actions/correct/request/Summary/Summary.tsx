@@ -80,7 +80,6 @@ export function Summary() {
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
 
-  const validatorContext = useValidatorContext()
   const [showPrompt, setShowPrompt] = React.useState(false)
   const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
@@ -88,6 +87,7 @@ export function Summary() {
 
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
+  const validatorContext = useValidatorContext(event)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const togglePrompt = () => setShowPrompt(!showPrompt)

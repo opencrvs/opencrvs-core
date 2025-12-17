@@ -41,12 +41,13 @@ export function Onboarding() {
   const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
-  const validatorContext = useValidatorContext()
+
   const events = useEvents()
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
   const event = events.getEvent.getFromCache(eventId)
+  const validatorContext = useValidatorContext(event)
 
   const navigate = useNavigate()
   const intl = useIntl()
@@ -105,7 +106,6 @@ export function Onboarding() {
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={false}
-        validateBeforeNextPage={true}
         validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
           return navigate(

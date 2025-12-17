@@ -36,7 +36,6 @@ export function Pages() {
   const formValues = getFormValues()
   const validatorContext = useValidatorContext()
   const event = events.getEvent.getFromCache(eventId)
-
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

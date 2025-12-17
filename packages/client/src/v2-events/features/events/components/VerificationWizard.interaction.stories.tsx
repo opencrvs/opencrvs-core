@@ -40,6 +40,7 @@ export const VerificationWizardModal: Story = {
           fields: [],
           title: generateTranslationConfig('Verification Wizard'),
           type: PageTypes.enum.VERIFICATION,
+          requireCompletionToContinue: false,
           actions: {
             verify: {
               label: {

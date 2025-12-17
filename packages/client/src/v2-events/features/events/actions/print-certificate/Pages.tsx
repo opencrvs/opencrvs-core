@@ -49,7 +49,7 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const validatorContext = useValidatorContext()
+  const validatorContext = useValidatorContext(event)
   const eventIndex = getCurrentEventState(event, configuration)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
@@ -107,7 +107,6 @@ export function Pages() {
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={searchParams.from === 'review'}
-        validateBeforeNextPage={true}
         validatorContext={validatorContext}
         onPageChange={(nextPageId: string) => {
           return navigate(

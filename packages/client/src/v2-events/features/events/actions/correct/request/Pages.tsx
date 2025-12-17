@@ -41,7 +41,6 @@ function getCorrectablePages(formPages: PageConfig[]) {
 }
 
 export function Pages() {
-  const validatorContext = useValidatorContext()
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES
   )
@@ -55,6 +54,7 @@ export function Pages() {
   const { modal } = useEventFormNavigation()
 
   const event = events.getEvent.getFromCache(eventId)
+  const validatorContext = useValidatorContext(event)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type

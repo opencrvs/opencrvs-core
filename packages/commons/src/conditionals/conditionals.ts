@@ -296,6 +296,65 @@ function getDateRangeToFieldReference(
   }
 }
 
+/**
+ * This function will output JSONSchema which looks for example like this:
+ * @example
+ * {
+ *   "type": "object",
+ *   "properties": {
+ *     "mother.dob": {
+ *       "type": "string",
+ *       "format": "date",
+ *       "daysFromDate": {
+ *         "clause": "before",
+ *         "days": 30,
+ *         "referenceDate": {
+ *           "$data": "1/child.dob"
+ *          }
+ *       }
+ *     },
+ *     "child.dob": {
+ *       "type": "string",
+ *       "format": "date"
+ *     }
+ *   },
+ *   "required": ["mother.dob"]
+ * }
+ */
+function getDayRangeToFieldReference(
+  field: FieldReference,
+  comparedField: FieldReference,
+  days: number,
+  clause: 'before' | 'after'
+) {
+  return {
+    type: 'object',
+    properties: {
+      [field.$$field]: wrapToPath(
+        {
+          type: 'string',
+          format: 'date',
+          daysFromDate: {
+            referenceDate: {
+              $data: `${field.$$subfield.length + 1}/${jsonFieldPath(
+                comparedField
+              )}`
+            },
+            clause,
+            days
+          }
+        },
+        field.$$subfield
+      ),
+      [comparedField.$$field]: wrapToPath(
+        { type: 'string', format: 'date' },
+        comparedField.$$subfield
+      )
+    },
+    required: [field.$$field]
+  }
+}
+
 function defineComparison(
   field: FieldReference,
   value: number | FieldReference,
@@ -379,7 +438,8 @@ export function createFieldConditionals(fieldId: string) {
   const getDayRange = (
     field: FieldReference,
     days: number,
-    clause: 'before' | 'after'
+    clause: 'before' | 'after',
+    referenceDate?: string
   ) => ({
     type: 'object',
     properties: {
@@ -387,9 +447,10 @@ export function createFieldConditionals(fieldId: string) {
         {
           type: 'string',
           format: 'date',
-          daysFromNow: {
+          daysFromDate: {
             days,
-            clause
+            clause,
+            referenceDate
           }
         },
         field.$$subfield
@@ -450,7 +511,22 @@ export function createFieldConditionals(fieldId: string) {
           inPast: () =>
             defineFormConditional(getDayRange(this, -days, 'after')),
           inFuture: () =>
-            defineFormConditional(getDayRange(this, days, 'after'))
+            defineFormConditional(getDayRange(this, days, 'after')),
+          fromDate: (
+            date: `${string}-${string}-${string}` | FieldReference
+          ) => {
+            if (isFieldReference(date)) {
+              const comparedField = date
+              return defineFormConditional(
+                getDayRangeToFieldReference(this, comparedField, days, 'after')
+              )
+            }
+
+            return defineFormConditional(getDayRange(this, days, 'after', date))
+          },
+          fromNow: () => {
+            return defineFormConditional(getDayRange(this, days, 'after'))
+          }
         }),
         date: (date: string | FieldReference) => {
           if (isFieldReference(date)) {
@@ -476,7 +552,30 @@ export function createFieldConditionals(fieldId: string) {
           inPast: () =>
             defineFormConditional(getDayRange(this, -days, 'before')),
           inFuture: () =>
-            defineFormConditional(getDayRange(this, days, 'before'))
+            defineFormConditional(getDayRange(this, days, 'before')),
+          fromDate: (
+            date: `${string}-${string}-${string}` | FieldReference
+          ) => {
+            if (isFieldReference(date)) {
+              const comparedField = date
+
+              return defineFormConditional(
+                getDayRangeToFieldReference(
+                  this,
+                  comparedField,
+                  -days,
+                  'before'
+                )
+              )
+            }
+
+            return defineFormConditional(
+              getDayRange(this, -days, 'before', date)
+            )
+          },
+          fromNow: () => {
+            return defineFormConditional(getDayRange(this, -days, 'before'))
+          }
         }),
         date: (date: `${string}-${string}-${string}` | FieldReference) => {
           if (isFieldReference(date)) {
