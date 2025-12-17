@@ -146,7 +146,7 @@ function useDeclarationActions(event: EventDocument) {
         annotation,
         transactionId: uuid()
       })
-      closeActionView(slug)
+      return closeActionView(slug)
     }
   }
 
@@ -190,7 +190,7 @@ function useDeclarationActions(event: EventDocument) {
         onClick: async () =>
           handleSaveAndExit(() => {
             drafts.submitLocalDraft()
-            closeActionView(slug)
+            return closeActionView(slug)
           }),
         hidden: false
       },
