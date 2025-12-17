@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Spinner } from '@opencrvs/components'
+import { Icon, Pill, Spinner } from '@opencrvs/components'
 import { CustomFieldValue } from '@opencrvs/commons/client'
 
 interface InputProps {
@@ -72,8 +72,19 @@ function Loader(
   }
 
   if (!loadedModule) {
-    // eslint-disable-next-line react/jsx-no-literals
-    return <div>Failed to load component</div>
+    return (
+      <Pill
+        label={
+          <>
+            {/* eslint-disable-next-line react/jsx-no-literals */}
+            <div>Error loading component</div>
+          </>
+        }
+        pillTheme="dark"
+        size="small"
+        type="inactive"
+      />
+    )
   }
 
   const Component = loadedModule[
