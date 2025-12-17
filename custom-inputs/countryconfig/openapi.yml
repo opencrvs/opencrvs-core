@@ -2379,8 +2379,8 @@ components:
                             - QR_READER
                             - ID_READER
                             - LOADER
-                            - CUSTOM
                             - ALPHA_HIDDEN
+                            - CUSTOM
                         label:
                           description: "
 
@@ -2631,8 +2631,8 @@ components:
                             - QR_READER
                             - ID_READER
                             - LOADER
-                            - CUSTOM
                             - ALPHA_HIDDEN
+                            - CUSTOM
                         label:
                           description: "
 
