@@ -122,7 +122,10 @@ export function seeder() {
   }
 }
 
-function generateOfficeLocations(adminAreas: Location[], rng: () => number) {
+export function generateTestLocations(
+  adminAreas: Location[],
+  rng: () => number
+) {
   return adminAreas.flatMap((admin) => {
     const crvs = {
       name: `${admin.name} CRVS Office`,
@@ -144,6 +147,99 @@ function generateOfficeLocations(adminAreas: Location[], rng: () => number) {
   })
 }
 
+export function generateTestAdministrativeAreas() {
+  const rng = createPrng(1234)
+  // Generate Administrative areas with children, some "skipping" levels.
+  const provinceA = {
+    name: 'Province A',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    id: generateUuid(rng),
+    validUntil: null
+  } satisfies Location
+
+  const provinceB = {
+    name: 'Province B',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    id: generateUuid(rng),
+    validUntil: null
+  } satisfies Location
+
+  const districtC = {
+    name: 'District C',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    id: generateUuid(rng),
+    validUntil: null
+  } satisfies Location
+
+  const districtA = {
+    name: 'District A',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: provinceA.id,
+    id: generateUuid(rng),
+    validUntil: null
+  } satisfies Location
+
+  const villageA = {
+    name: 'Village A',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: districtA.id,
+    id: generateUuid(rng),
+    validUntil: null
+  } satisfies Location
+
+  const villageB = {
+    name: 'Village B',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: provinceB.id,
+    id: generateUuid(rng),
+    validUntil: null
+  } satisfies Location
+
+  const administrativeAreas = [
+    provinceA,
+    provinceB,
+    districtC,
+    districtA,
+    villageA,
+    villageB
+  ]
+
+  return administrativeAreas
+}
+
+export function generateTestUsersForLocations(
+  locations: Location[],
+  rng: () => number
+) {
+  // 3. Create two users for each office to test 'user' scope limitations.
+  const users = locations.flatMap((location, i) => {
+    const base = {
+      administrativeAreaId: location.parentId,
+      primaryOfficeId: location.id,
+      fullHonorificName: `${location.name} full honorific name`
+    }
+
+    return [
+      {
+        ...base,
+        name: [{ use: 'en', given: [`Mirella-${i}`], family: location.name }],
+        role: pickRandom(rng, TestUserRole.options),
+        id: generateUuid(rng)
+      },
+      {
+        ...base,
+        name: [{ use: 'en', given: [`Jonathan-${i}`], family: location.name }],
+        role: pickRandom(rng, TestUserRole.options),
+        id: generateUuid(rng)
+      }
+    ]
+  })
+
+  return users
+}
 /**
  * Sets up a realistic hierarchy of administrative areas, offices, and users for testing scopes.
  * Each location has two users assigned to it. Hiearchies include cases where some levels are skipped or do not exist.
@@ -214,7 +310,7 @@ export async function setupHierarchyWithUsers() {
   await seed.locations(administrativeAreas)
 
   //2. Setup offices/health facilities under each admin area.
-  const offices = generateOfficeLocations(administrativeAreas, rng)
+  const offices = generateTestLocations(administrativeAreas, rng)
   await seed.locations(offices)
 
   expect(administrativeAreas.length).toBe(6)

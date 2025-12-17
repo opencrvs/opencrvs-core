@@ -12,23 +12,34 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import {
+  ActionStatus,
   ActionType,
+  ActionTypes,
   createPrng,
+  DeclarationActionType,
   encodeScope,
   EventConfig,
   EventDocument,
+  generateActionDeclarationInput,
   generateRandomSignature,
+  generateRegistrationNumber,
+  generateTrackingId,
+  generateUuid,
+  getUUID,
   Scope,
   SCOPES,
   SystemRole,
   TokenUserType,
-  TokenWithBearer
+  TokenWithBearer,
+  User,
+  UUID
 } from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
-import { SystemContext } from '@events/context'
+import { SystemContext, UserContext } from '@events/context'
 import { getClient } from '@events/storage/postgres/events'
 import { getLocations } from '../service/locations/locations'
+import { NewEventActions } from '../storage/postgres/events/schema/app/EventActions'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 /**
@@ -395,4 +406,95 @@ export async function createEvent(
   }
 
   return createdEvent
+}
+
+export async function seedEvent(
+  dbClient: ReturnType<typeof getClient>,
+  {
+    eventConfig,
+    actions,
+    user,
+    rng
+  }: {
+    eventConfig: EventConfig
+    actions: DeclarationActionType[]
+    user: UserContext
+    rng: () => number
+  }
+) {
+  await dbClient.transaction().execute(async (trx) => {
+    const event = await trx
+      .insertInto('events')
+      .values({
+        eventType: eventConfig.id,
+        transactionId: `tx-${Date.now()}`,
+        trackingId: getUUID()
+      })
+      .returning(['id'])
+      .executeTakeFirstOrThrow()
+
+    const baseAction: Omit<
+      NewEventActions,
+      'transactionId' | 'status' | 'actionType'
+    > = {
+      eventId: event.id,
+      createdByUserType: TokenUserType.enum.user,
+      createdAtLocation: user.primaryOfficeId,
+      createdBy: user.id,
+      createdByRole: user.role,
+      annotation: null
+    }
+
+    const generatedActions: NewEventActions[] = actions.flatMap(
+      (actionType): NewEventActions[] => {
+        return [
+          {
+            ...baseAction,
+            actionType,
+            transactionId: generateUuid(rng),
+            status: ActionStatus.Requested,
+            declaration: generateActionDeclarationInput(
+              eventConfig,
+              actionType,
+              rng
+            )
+          },
+          {
+            ...baseAction,
+            registrationNumber:
+              actionType === ActionTypes.enum.REGISTER
+                ? generateRegistrationNumber(rng)
+                : null,
+            actionType,
+            transactionId: generateUuid(rng),
+            status: ActionStatus.Accepted,
+            declaration: {}
+          }
+        ]
+      }
+    )
+
+    await trx
+      .insertInto('eventActions')
+      .values([
+        {
+          ...baseAction,
+          actionType: ActionTypes.enum.CREATE,
+          transactionId: generateUuid(rng),
+          status: ActionStatus.Accepted
+        },
+        {
+          ...baseAction,
+          actionType: ActionTypes.enum.ASSIGN,
+          assignedTo: user.id,
+          transactionId: generateUuid(rng),
+          status: ActionStatus.Accepted
+        },
+        ...generatedActions
+      ])
+      .onConflict((oc) =>
+        oc.columns(['transactionId', 'actionType', 'status']).doNothing()
+      )
+      .execute()
+  })
 }
