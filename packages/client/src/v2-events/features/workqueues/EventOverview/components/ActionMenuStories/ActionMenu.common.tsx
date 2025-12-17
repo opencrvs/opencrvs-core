@@ -68,12 +68,6 @@ function getMockActions(createdBy: string) {
       id: generateUuid(rng),
       type: ActionType.DECLARE
     },
-    [ActionType.VALIDATE]: {
-      ...actionProps,
-      createdBy,
-      id: generateUuid(rng),
-      type: ActionType.VALIDATE
-    },
     [ActionType.REGISTER]: {
       ...actionProps,
       createdBy,

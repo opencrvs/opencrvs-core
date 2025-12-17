@@ -24,7 +24,6 @@ import {
   ArchiveActionInput,
   PrintCertificateActionInput,
   DeclareActionInput,
-  ValidateActionInput,
   ACTION_SCOPE_MAP,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
@@ -104,10 +103,6 @@ const ACTION_PROCEDURE_CONFIG = {
   [ActionType.DECLARE]: {
     ...defaultConfig,
     inputSchema: DeclareActionInput
-  },
-  [ActionType.VALIDATE]: {
-    ...defaultConfig,
-    inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
     ...defaultConfig,

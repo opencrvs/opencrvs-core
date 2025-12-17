@@ -212,12 +212,6 @@ describe('Overwriting parent field', () => {
         keepAssignment: true
       })
     )
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration,
-        keepAssignment: true
-      })
-    )
     event = await client.event.actions.register.request(
       generator.event.actions.register(event.id, {
         declaration,
