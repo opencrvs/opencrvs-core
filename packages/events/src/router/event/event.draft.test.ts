@@ -145,7 +145,7 @@ test('Allows creating draft for event with actions', async () => {
 
   const draftResponse = await client.event.draft.create({
     eventId: event.id,
-    type: ActionType.VALIDATE,
+    type: ActionType.REGISTER,
     status: 'Accepted',
     transactionId: 'trnx-id'
   })
@@ -167,7 +167,7 @@ test('Creating a draft is idempotent', async () => {
 
   const firstResponse = await client.event.draft.create({
     eventId: event.id,
-    type: ActionType.VALIDATE,
+    type: ActionType.REGISTER,
     status: 'Accepted',
     transactionId: 'trnx-id',
     annotation: {
@@ -177,7 +177,7 @@ test('Creating a draft is idempotent', async () => {
 
   await client.event.draft.create({
     eventId: event.id,
-    type: ActionType.VALIDATE,
+    type: ActionType.REGISTER,
     status: 'Accepted',
     transactionId: 'trnx-id',
     annotation: {

@@ -118,7 +118,14 @@ export async function getLocations({
 
   let query = db
     .selectFrom('locations')
-    .select(['id', 'name', 'parentId', 'validUntil', 'locationType'])
+    .select([
+      'id',
+      'name',
+      'parentId',
+      'validUntil',
+      'locationType',
+      'administrativeAreaId'
+    ])
     .where('deletedAt', 'is', null)
     .$narrowType<{
       deletedAt: null

@@ -116,6 +116,21 @@ const LocationFieldTypes: FieldType[] = [
   FieldType.OFFICE
 ]
 
+/**
+ * Extracts only the leaf-level location from Elasticsearch location hierarchies.
+ *
+ * Elasticsearch stores locations as arrays of UUIDs representing the full administrative
+ * hierarchy from top to bottom (e.g., [province_uuid, district_uuid, facility_uuid]).
+ * This function extracts only the leaf-level location UUID (the last element in each array),
+ * which represents the most specific location.
+ *
+ * Example: { locationId: [province_uuid, distrcit_uuid, crvs_office_uuid] }
+ *       → { locationId: crvs_office_uuid }  // Only the leaf-level location
+ *
+ * @param eventConfig Event configuration containing field definitions
+ * @param event Event index retrieved from Elasticsearch
+ * @returns Event index with only leaf-level location UUIDs (last element from each hierarchy)
+ */
 export function getEventIndexWithoutLocationHierarchy(
   eventConfig: EventConfig,
   event: EventIndex
@@ -125,6 +140,7 @@ export function getEventIndexWithoutLocationHierarchy(
   // Normalize top-level locations
   event.createdAtLocation = takeLast(event.createdAtLocation)
   event.updatedAtLocation = takeLast(event.updatedAtLocation)
+  event.placeOfEvent = takeLast(event.placeOfEvent)
 
   if (event.legalStatuses.DECLARED) {
     event.legalStatuses.DECLARED.createdAtLocation = takeLast(
@@ -192,23 +208,41 @@ export type EventIndexWithLocationHierarchy = Omit<
   }
 }
 
-const locationHierarchyCache = new Map<string, string[]>()
+/**
+ * Expands leaf-level location UUIDs into full administrative hierarchies for Elasticsearch indexing.
+ *
+ * It takes an event with single location UUIDs (leaf-level) (ex: event.createdAtLocation) and expands each into an array representing the
+ * complete administrative hierarchy from top to bottom.
+ *
+ * Example: { locationId: location_uuid }
+ *       → { locationId: [province_uuid, district_uuid, location_uuid] }
+ *
+ * Uses an in-memory cache to avoid redundant database lookups for the same location hierarchies.
+ *
+ * @param eventConfig Event configuration containing field definitions
+ * @param event Event index with leaf-level location UUIDs
+ * @param locationHierarchyCache Optional in-memory cache for location hierarchies, to avoid redundant lookups
+ * @returns Event index with full location hierarchies (arrays of UUIDs from top to leaf)
+ */
 export async function getEventIndexWithLocationHierarchy(
   eventConfig: EventConfig,
-  event: EventIndex
-): Promise<EventIndexWithLocationHierarchy> {
+  event: EventIndex,
+  locationHierarchyCache?: Map<string, string[]>
+) {
   const buildFullLocationHierarchy = async (
     locationId: UUID
   ): Promise<string[]> => {
     if (!locationId) {
       return []
     }
-    if (locationHierarchyCache.has(locationId)) {
+    if (locationHierarchyCache && locationHierarchyCache.has(locationId)) {
       return locationHierarchyCache.get(locationId) || [locationId]
     }
     const hierarchyRows = await getLocationHierarchyRaw(locationId)
-    locationHierarchyCache.set(locationId, hierarchyRows)
-    return locationHierarchyCache.get(locationId) || [locationId]
+    if (locationHierarchyCache) {
+      locationHierarchyCache.set(locationId, hierarchyRows)
+    }
+    return hierarchyRows
   }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const tempEvent = { ...event, declaration: { ...event.declaration } } as any
@@ -218,6 +252,13 @@ export async function getEventIndexWithLocationHierarchy(
       event.createdAtLocation
     )
   }
+
+  if (event.placeOfEvent) {
+    tempEvent.placeOfEvent = await buildFullLocationHierarchy(
+      event.placeOfEvent
+    )
+  }
+
   if (event.updatedAtLocation) {
     tempEvent.updatedAtLocation = await buildFullLocationHierarchy(
       event.updatedAtLocation

@@ -38,9 +38,6 @@ import {
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useAllowedActionConfigurations'
 
-/** There is discrepancy between the actual action, and what we communicate. Even if next action is declare, it should have the text of validate  */
-export const REJECTED_DECLARE_AS_REVIEW = ActionType.VALIDATE
-
 const generator = testDataGenerator()
 
 const actionProps: ActionBase = {
@@ -70,12 +67,6 @@ function getMockActions(createdBy: string) {
       createdBy,
       id: generateUuid(rng),
       type: ActionType.DECLARE
-    },
-    [ActionType.VALIDATE]: {
-      ...actionProps,
-      createdBy,
-      id: generateUuid(rng),
-      type: ActionType.VALIDATE
     },
     [ActionType.REGISTER]: {
       ...actionProps,
@@ -199,6 +190,13 @@ function getMockActions(createdBy: string) {
       createdBy,
       id: generateUuid(rng),
       type: ActionType.CUSTOM
+    },
+    [ActionType.EDIT]: {
+      ...actionProps,
+      createdBy,
+      id: generateUuid(rng),
+      type: ActionType.EDIT,
+      content: { comment: 'Comment' }
     }
   }
 }

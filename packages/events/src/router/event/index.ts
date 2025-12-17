@@ -225,7 +225,7 @@ export const eventRouter = router({
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     declare: router(declareActionProcedures()),
-    validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
+    edit: router(getDefaultActionProcedures(ActionType.EDIT)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
     register: router(getDefaultActionProcedures(ActionType.REGISTER)),

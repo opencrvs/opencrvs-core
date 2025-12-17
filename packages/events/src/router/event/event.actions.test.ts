@@ -87,16 +87,6 @@ describe('Adding actions', () => {
 
     await client.event.actions.assignment.assign(assignmentInput)
 
-    const generatedValidation = generator.event.actions.validate(
-      originalEvent.id
-    )
-    await client.event.actions.validate.request(generatedValidation)
-
-    await client.event.actions.assignment.assign({
-      ...assignmentInput,
-      transactionId: getUUID()
-    })
-
     const generatedRegistration = generator.event.actions.register(
       originalEvent.id
     )
@@ -113,16 +103,6 @@ describe('Adding actions', () => {
       }),
       expect.objectContaining({
         type: ActionType.DECLARE,
-        status: ActionStatus.Accepted
-      }),
-      expect.objectContaining({ type: ActionType.UNASSIGN }),
-      expect.objectContaining({ type: ActionType.ASSIGN }),
-      expect.objectContaining({
-        type: ActionType.VALIDATE,
-        status: ActionStatus.Requested
-      }),
-      expect.objectContaining({
-        type: ActionType.VALIDATE,
         status: ActionStatus.Accepted
       }),
       expect.objectContaining({ type: ActionType.UNASSIGN }),
@@ -351,8 +331,8 @@ describe('Action updates', () => {
       })
     )
 
-    await client.event.actions.validate.request({
-      type: ActionType.VALIDATE,
+    await client.event.actions.register.request({
+      type: ActionType.REGISTER,
       declaration: {
         'applicant.dobUnknown': true,
         'applicant.age': 25
@@ -407,24 +387,8 @@ describe('Action updates', () => {
     const declaredEvent = await createEvent(client, generator, [
       ActionType.DECLARE
     ])
-    const validatePayload = generator.event.actions.validate(declaredEvent.id)
-    const validateDeclarationWithHiddenField = getDeclarationWithHiddenField(
-      validatePayload.declaration
-    )
 
-    await expect(
-      client.event.actions.validate.request({
-        ...validatePayload,
-        declaration: validateDeclarationWithHiddenField
-      })
-    ).rejects.toMatchObject(expectedError)
-
-    const validatedEvent = await createEvent(client, generator, [
-      ActionType.DECLARE,
-      ActionType.VALIDATE
-    ])
-
-    const registerPayload = generator.event.actions.register(validatedEvent.id)
+    const registerPayload = generator.event.actions.register(declaredEvent.id)
     const registerDeclarationWithHiddenField = getDeclarationWithHiddenField(
       registerPayload.declaration
     )
@@ -476,9 +440,9 @@ describe('Action updates', () => {
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
 
-    await client.event.actions.validate.request({
+    await client.event.actions.register.request({
       eventId: originalEvent.id,
-      type: ActionType.VALIDATE,
+      type: ActionType.REGISTER,
       declaration: {
         'documents.multiFile': null,
         'documents.singleFile': null
@@ -488,7 +452,7 @@ describe('Action updates', () => {
       keepAssignment: true
     })
 
-    const { results: resultsAfterValidate } = await client.event.search({
+    const { results: resultsAfterRegister } = await client.event.search({
       query: {
         type: 'and',
         clauses: [
@@ -499,13 +463,13 @@ describe('Action updates', () => {
       }
     })
 
-    const [eventAfterValidate] = resultsAfterValidate
+    const [eventAfterRegister] = resultsAfterRegister
 
     expect(
-      eventAfterValidate.declaration['documents.singleFile']
+      eventAfterRegister.declaration['documents.singleFile']
     ).not.toBeDefined()
     expect(
-      eventAfterValidate.declaration['documents.multiFile']
+      eventAfterRegister.declaration['documents.multiFile']
     ).not.toBeDefined()
   })
 
@@ -546,9 +510,9 @@ describe('Action updates', () => {
 
     expect(fileExistsMock.mock.calls[0]).toEqual(['ocrvs/tree.svg'])
 
-    await client.event.actions.validate.request({
+    await client.event.actions.register.request({
       eventId: originalEvent.id,
-      type: ActionType.VALIDATE,
+      type: ActionType.REGISTER,
       declaration: {
         'documents.multiFile': [],
         'documents.singleFile': null
@@ -560,7 +524,7 @@ describe('Action updates', () => {
     // No files should be deleted, only references removed
     expect(deleteFileMock.mock.calls).toHaveLength(0)
 
-    const { results: resultsAfterValidate } = await client.event.search({
+    const { results: resultsAfterRegister } = await client.event.search({
       query: {
         type: 'and',
         clauses: [
@@ -571,11 +535,11 @@ describe('Action updates', () => {
       }
     })
 
-    const [eventAfterValidate] = resultsAfterValidate
+    const [eventAfterRegister] = resultsAfterRegister
     expect(
-      eventAfterValidate.declaration['documents.singleFile']
+      eventAfterRegister.declaration['documents.singleFile']
     ).not.toBeDefined()
-    expect(eventAfterValidate.declaration['documents.multiFile']).toHaveLength(
+    expect(eventAfterRegister.declaration['documents.multiFile']).toHaveLength(
       0
     )
   })
@@ -589,10 +553,6 @@ test('PRINT_CERTIFICATE action can include a valid content.templateId property i
 
   await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id, { keepAssignment: true })
-  )
-
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(originalEvent.id, { keepAssignment: true })
   )
 
   await client.event.actions.register.request(
@@ -630,10 +590,6 @@ test('REGISTER action throws when content property is in payload', async () => {
 
   await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id, { keepAssignment: true })
-  )
-
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(originalEvent.id, { keepAssignment: true })
   )
 
   const baseRegisterAction = generator.event.actions.register(originalEvent.id)
@@ -851,8 +807,8 @@ describe('Conditionals based on user role', () => {
     })
 
     await expect(
-      registrationAgentClient.event.actions.validate.request({
-        type: ActionType.VALIDATE,
+      registrationAgentClient.event.actions.register.request({
+        type: ActionType.REGISTER,
         declaration: {},
         eventId: event.id,
         transactionId: getUUID()

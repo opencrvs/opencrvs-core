@@ -50,14 +50,6 @@ export const RegisterActionInput = BaseActionInput.extend(
 
 export type RegisterActionInput = z.infer<typeof RegisterActionInput>
 
-export const ValidateActionInput = BaseActionInput.extend(
-  z.object({
-    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE)
-  }).shape
-)
-
-export type ValidateActionInput = z.infer<typeof ValidateActionInput>
-
 export const NotifyActionInput = BaseActionInput.extend(
   z.object({
     type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
@@ -79,6 +71,17 @@ export const DeclareActionInput = BaseActionInput.extend(
     type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
   }).shape
 )
+
+export const EditActionInput = BaseActionInput.extend(
+  z.object({
+    type: z.literal(ActionType.EDIT).default(ActionType.EDIT),
+    content: z.object({
+      comment: z.string().describe('Comment for the edit action.').optional()
+    })
+  }).shape
+)
+
+export type EditActionInput = z.infer<typeof EditActionInput>
 
 export const PrintCertificateActionInput = BaseActionInput.extend(
   z.object({
@@ -234,7 +237,6 @@ export type CustomActionInput = z.infer<typeof CustomActionInput>
 export const ActionInput = z
   .discriminatedUnion('type', [
     CreateActionInput.meta({ id: 'CreateActionInput' }),
-    ValidateActionInput.meta({ id: 'ValidateActionInput' }),
     RegisterActionInput.meta({ id: 'RegisterActionInput' }),
     NotifyActionInput.meta({ id: 'NotifyActionInput' }),
     DeclareActionInput.meta({ id: 'DeclareActionInput' }),
@@ -262,7 +264,8 @@ export const ActionInput = z
       id: 'ApproveCorrectionActionInput'
     }),
     ReadActionInput.meta({ id: 'ReadActionInput' }),
-    CustomActionInput.meta({ id: 'CustomActionInput' })
+    CustomActionInput.meta({ id: 'CustomActionInput' }),
+    EditActionInput.meta({ id: 'EditActionInput' })
   ])
   .meta({
     id: 'ActionInput'

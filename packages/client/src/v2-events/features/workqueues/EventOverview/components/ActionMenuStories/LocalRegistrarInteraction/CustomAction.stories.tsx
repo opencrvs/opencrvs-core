@@ -34,7 +34,6 @@ const customActionScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.CUSTOM,
       ActionType.UNASSIGN
     ],
@@ -44,6 +43,7 @@ const customActionScenariosForLocalRegistrar: Scenario[] = [
       ['Register']: AssertType.DISABLED,
       ['Archive']: AssertType.DISABLED,
       ['Reject']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED,
       ['Confirm']: AssertType.DISABLED
     }
   },
@@ -54,7 +54,6 @@ const customActionScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.CUSTOM,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_SELF
@@ -65,6 +64,7 @@ const customActionScenariosForLocalRegistrar: Scenario[] = [
       ['Register']: AssertType.ENABLED,
       ['Archive']: AssertType.ENABLED,
       ['Reject']: AssertType.ENABLED,
+      ['Edit']: AssertType.ENABLED,
       ['Confirm']: AssertType.ENABLED
     }
   },
@@ -75,7 +75,6 @@ const customActionScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.CUSTOM,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS
@@ -86,6 +85,7 @@ const customActionScenariosForLocalRegistrar: Scenario[] = [
       ['Register']: AssertType.DISABLED,
       ['Archive']: AssertType.DISABLED,
       ['Reject']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED,
       ['Confirm']: AssertType.DISABLED
     }
   }

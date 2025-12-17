@@ -102,6 +102,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
     case FieldType.TIME:
+    case FieldType.ALPHA_HIDDEN:
       return { type: 'text' }
     case FieldType.EMAIL:
       return {
@@ -347,12 +348,17 @@ export async function indexEventsInBulk(
 ) {
   const esClient = getOrCreateClient()
 
+  const locationHierarchyCache = new Map<string, string[]>()
   const indexedDocs = await Promise.all(
     batch.map(async (doc) => {
       const config = getEventConfigById(configs, doc.type)
       const eventIndex = eventToEventIndex(doc, config)
       const eventIndexWithLocationHierarchy =
-        await getEventIndexWithLocationHierarchy(config, eventIndex)
+        await getEventIndexWithLocationHierarchy(
+          config,
+          eventIndex,
+          locationHierarchyCache
+        )
       return [
         { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
         eventIndexWithLocationHierarchy

@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -191,7 +190,6 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': true,
           'event.actions.register.request': true
         })
       })
@@ -261,18 +259,18 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw
   },
   play: async ({ canvasElement, step }) => {
-    await step('User can validate', async () => {
+    await step('User can declare', async () => {
       const canvas = within(canvasElement)
       await userEvent.click(
         await canvas.findByRole('button', { name: 'Action' })
       )
-      await userEvent.click(await canvas.findByText('Validate'))
+      await userEvent.click(await canvas.findByText('Declare'))
 
       await canvas.findByRole('button', { name: 'Cancel' })
 
       await userEvent.click(
         await canvas.findByRole('button', {
-          name: 'Validate'
+          name: 'Declare'
         })
       )
     })
@@ -287,7 +285,6 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': true,
           'event.actions.register.request': false
         })
       })
@@ -345,7 +342,6 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': false,
           'event.actions.declare.request': true,
-          'event.actions.validate.request': false,
           'event.actions.register.request': false
         })
       })
@@ -457,7 +453,6 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           'event.create': false,
           'event.actions.notify.request': true,
           'event.actions.declare.request': false,
-          'event.actions.validate.request': false,
           'event.actions.register.request': false
         })
       })

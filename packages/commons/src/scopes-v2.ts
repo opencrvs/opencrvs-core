@@ -154,14 +154,14 @@ const v1ToV2ConfigScopeTypeMap: Record<LegacyScopeType, string> = {
   'record.notify': 'record.notify',
   'record.register': 'record.register',
   'record.unassign-others': 'record.unassign-others',
-  'record.declared.validate': 'record.validate',
   'record.declared.reject': 'record.reject',
   'record.declared.archive': 'record.archive',
   'record.declared.review-duplicates': 'record.review-duplicates',
   'record.registered.print-certified-copies': 'record.print-certified-copies',
   'record.registered.request-correction': 'record.request-correction',
   'record.registered.correct': 'record.correct',
-  'record.custom-action': 'record.custom-action'
+  'record.custom-action': 'record.custom-action',
+  'record.declared.edit': 'record.edit'
 }
 
 /**

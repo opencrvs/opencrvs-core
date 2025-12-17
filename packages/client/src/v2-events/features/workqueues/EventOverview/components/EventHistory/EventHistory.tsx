@@ -13,7 +13,6 @@ import format from 'date-fns/format'
 import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -31,8 +30,6 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
-import { getUsersFullName } from '@client/v2-events/utils'
-import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
   expandWithClientSpecificActions,
@@ -44,6 +41,7 @@ import {
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { useEventOverviewInfo } from '../useEventOverviewInfo'
 import { UserAvatar } from './UserAvatar'
 import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
@@ -51,7 +49,7 @@ import { EventHistoryDialog } from './EventHistoryDialog/EventHistoryDialog'
 const eventHistoryStatusMessage = {
   id: 'events.history.status',
   defaultMessage:
-    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Notified} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}}}'
+    '{status, select, Requested {Waiting for external validation} other {{action, select, CREATE {Draft} NOTIFY {Notified} EDIT {Edited} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} DUPLICATE_DETECTED {Flagged as potential duplicate} MARK_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} UPDATE {Updated} other {Unknown}}}}'
 }
 
 const LargeGreyedInfo = styled.div`
@@ -73,21 +71,10 @@ const messages = defineMessages({
     id: 'configuration.timeFormat',
     description: 'Time format for timestamps in event history'
   },
-  role: {
-    id: 'event.history.role',
-    defaultMessage:
-      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} HEALTH {Health integration} IMPORT_EXPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
-    description: 'Role of the user in the event history'
-  },
   system: {
     id: 'event.history.system',
     defaultMessage: 'System',
     description: 'Name for system initiated actions in the event history'
-  },
-  systemDefaultName: {
-    id: 'event.history.systemDefaultName',
-    defaultMessage: 'System integration',
-    description: 'Fallback for system integration name in the event history'
   },
   action: {
     defaultMessage: 'Action',
@@ -139,52 +126,20 @@ const SystemName = styled.div`
   }
 `
 
-interface ActionCreator {
-  type: 'user' | 'system' | 'integration'
-  name: string
-}
-
-function useActionCreator() {
-  const intl = useIntl()
-  const { findUser } = useEventOverviewContext()
-  const { systems } = useSelector(getOfflineData)
-
-  const getActionCreator = (
-    action: EventHistoryActionDocument
-  ): ActionCreator => {
-    if (action.createdByUserType === 'system') {
-      const system = systems.find((s) => s._id === action.createdBy)
-      return {
-        type: 'integration',
-        name: system?.name ?? intl.formatMessage(messages.systemDefaultName)
-      } as const
-    }
-    if (action.type === ActionType.DUPLICATE_DETECTED) {
-      return {
-        type: 'system',
-        name: intl.formatMessage(messages.system)
-      } as const
-    }
-    const user = findUser(action.createdBy)
-    return {
-      type: 'user',
-      // @todo:
-      name: user ? getUsersFullName(user.name, intl.locale) : 'Missing user'
-    } as const
-  }
-  return { getActionCreator }
-}
-
 function User({ action }: { action: EventHistoryActionDocument }) {
   const intl = useIntl()
   const { findUser } = useEventOverviewContext()
   const navigate = useNavigate()
   const user = findUser(action.createdBy)
   const { canReadUser } = usePermissions()
+  const { getUserDetails } = useUserDetails()
 
-  const { getActionCreator } = useActionCreator()
-
-  const { type, name } = getActionCreator(action)
+  const { type, name } = getUserDetails({
+    createdByUserType: action.createdByUserType,
+    createdBy: action.createdBy,
+    type: action.type,
+    createdByRole: action.createdByRole
+  })
 
   if (type !== 'user') {
     throw new Error('Expected action creator to be a user')
@@ -218,9 +173,13 @@ function User({ action }: { action: EventHistoryActionDocument }) {
 }
 
 function Integration({ action }: { action: EventHistoryActionDocument }) {
-  const { getActionCreator } = useActionCreator()
+  const { getUserDetails } = useUserDetails()
 
-  const { type, name } = getActionCreator(action)
+  const { type, name } = getUserDetails({
+    createdByUserType: action.createdByUserType,
+    createdBy: action.createdBy,
+    type: action.type
+  })
 
   if (type !== 'integration') {
     throw new Error('Expected action creator to be an integration')
@@ -254,24 +213,11 @@ function ActionCreator({ action }: { action: EventHistoryActionDocument }) {
   return <User action={action} />
 }
 
-function ActionRole({ action }: { action: EventHistoryActionDocument }) {
-  const intl = useIntl()
-  const role = action.createdByRole
-  const { getActionCreator } = useActionCreator()
-  const { type } = getActionCreator(action)
-
-  if (type === 'system') {
-    return null
-  }
-
-  return <>{intl.formatMessage(messages.role, { role })}</>
-}
-
 function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
   const { findUser, getLocation } = useEventOverviewContext()
   const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
-  const { getActionCreator } = useActionCreator()
+  const { getUserDetails } = useUserDetails()
 
   const user = findUser(action.createdBy)
   const locationName = action.createdAtLocation
@@ -284,7 +230,12 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
       id: user.primaryOfficeId
     })
 
-  const { type } = getActionCreator(action)
+  const { type } = getUserDetails({
+    createdByUserType: action.createdByUserType,
+    createdBy: action.createdBy,
+    type: action.type,
+    createdByRole: action.createdByRole
+  })
 
   if (type === 'system') {
     return null
@@ -338,7 +289,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const intl = useIntl()
   const [modal, openModal] = useModal()
   const { getActionTypeForHistory } = useActionForHistory()
-  const { getActionCreator } = useActionCreator()
+  const { getUserDetails } = useUserDetails()
 
   const history = extractHistoryActions(fullEvent)
 
@@ -408,7 +359,12 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
     )
     .map((action) => {
-      const { name: actionCreatorName } = getActionCreator(action)
+      const { name: actionCreatorName, role } = getUserDetails({
+        createdByUserType: action.createdByUserType,
+        createdBy: action.createdBy,
+        type: action.type,
+        createdByRole: action.createdByRole
+      })
 
       // Only configurable action types should call getActionConfig
       let actionConfig
@@ -444,7 +400,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
           intl.formatMessage(messages.timeFormat)
         ),
         user: <ActionCreator action={action} />,
-        role: <ActionRole action={action} />,
+        role,
         location: <ActionLocation action={action} />
       }
     })
