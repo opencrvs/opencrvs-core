@@ -132,6 +132,7 @@ export const writeActions = ActionTypes.exclude([
 /** Actions which are visible in action menu and workqueue */
 export const workqueueActions = ActionTypes.exclude([
   ActionType.READ,
+  ActionType.DECLARE,
   ActionType.CREATE,
   ActionType.NOTIFY,
   ActionType.DUPLICATE_DETECTED,
