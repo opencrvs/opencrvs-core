@@ -805,15 +805,17 @@ export const GeneratedInputField = React.memo(
     }
     if (isCustomFieldType(field)) {
       return (
-        <Custom.Input
-          {...field.config}
-          configuration={field.config.configuration}
-          disabled={disabled}
-          id={field.config.id}
-          value={field.value}
-          onBlur={onBlur}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
-        />
+        <InputField {...inputFieldProps}>
+          <Custom.Input
+            {...field.config}
+            configuration={field.config.configuration}
+            disabled={disabled}
+            id={field.config.id}
+            value={field.value}
+            onBlur={onBlur}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
 
