@@ -374,6 +374,9 @@ const File = BaseField.extend({
       acceptedFileTypes: MimeType.array()
         .optional()
         .describe('List of allowed file formats for the signature'),
+      maxImageSize: z
+        .object({ width: z.number(), height: z.number() })
+        .optional(),
       style: z
         .object({
           width: z
@@ -581,6 +584,9 @@ const FileUploadWithOptions = BaseField.extend({
         .number()
         .describe('Maximum file size in bytes')
         .default(DEFAULT_MAX_FILE_SIZE_BYTES),
+      maxImageSize: z
+        .object({ width: z.number(), height: z.number() })
+        .optional(),
       acceptedFileTypes: MimeType.array()
         .optional()
         .describe('List of allowed file formats for the signature')
