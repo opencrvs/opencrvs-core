@@ -16,6 +16,7 @@ import {
   FieldPropsWithoutReferenceValue,
   Location,
   LocationType,
+  UUID,
   joinValues
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
@@ -44,18 +45,23 @@ function useAdministrativeAreas(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const { getLocations } = useLocations()
-  const [allLocations] = getLocations.useSuspenseQuery({})
+  const allLocations = getLocations.useSuspenseQuery({})
 
   return React.useMemo(() => {
-    const resourceLocations = allLocations.filter(
-      ({ locationType }) =>
-        locationType &&
+    const resourceLocations: Location[] = []
+
+    for (const [, location] of allLocations) {
+      if (
+        location.locationType &&
         searchableResource.some(
           (r) =>
             resourceTypeMap[r satisfies keyof typeof resourceTypeMap] ===
-            locationType
+            location.locationType
         )
-    )
+      ) {
+        resourceLocations.push(location)
+      }
+    }
 
     return resourceLocations.map((location) => ({
       id: location.id,
@@ -115,7 +121,7 @@ function toCertificateVariables(
   value: Stringifiable | undefined | null,
   context: {
     intl: IntlShape
-    locations: Location[]
+    locations: Map<UUID, Location>
     adminLevels?: AdminStructureItem[]
   }
 ) {
@@ -136,8 +142,8 @@ function toCertificateVariables(
     description: 'Country name'
   })
 
-  const locationId = value.toString()
-  const location = locations.find((loc) => loc.id === locationId)
+  const locationId = UUID.safeParse(value.toString()).data
+  const location = locationId ? locations.get(locationId) : undefined
 
   const adminLevelHierarchy = getAdminLevelHierarchy(
     locationId,
@@ -157,7 +163,7 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
   const { config } = useSelector(getOfflineData)
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
   const adminLevels = config.ADMIN_STRUCTURE
 
   const certificateVars = toCertificateVariables(value, {
@@ -173,9 +179,11 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     .filter(Boolean)
     .reverse()
 
-  const location = locations.find(({ id }) => id === value.toString())
+  const locationId = UUID.safeParse(value.toString()).data
 
-  if (location?.locationType === LocationType.Enum.ADMIN_STRUCTURE) {
+  const location = locationId && locations.get(locationId)
+
+  if (location?.locationType === LocationType.enum.ADMIN_STRUCTURE) {
     return joinValues([...resolvedAdminLevels, country], ', ')
   }
   return joinValues([name, ...resolvedAdminLevels, country], ', ')

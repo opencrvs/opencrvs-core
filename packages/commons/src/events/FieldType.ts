@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const FieldType = {
   NAME: 'NAME',
@@ -50,7 +50,8 @@ export const FieldType = {
   QUERY_PARAM_READER: 'QUERY_PARAM_READER',
   QR_READER: 'QR_READER',
   ID_READER: 'ID_READER',
-  LOADER: 'LOADER'
+  LOADER: 'LOADER',
+  ALPHA_HIDDEN: 'ALPHA_HIDDEN'
 } as const
 
 /**
@@ -86,5 +87,6 @@ export const FieldTypesToHideInReview = [
   FieldType.LOADER,
   FieldType.HTTP,
   FieldType.QUERY_PARAM_READER,
-  FieldType.DATA
+  FieldType.DATA,
+  FieldType.ALPHA_HIDDEN
 ]

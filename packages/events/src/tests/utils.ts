@@ -49,6 +49,7 @@ export const UNSTABLE_EVENT_FIELDS = [
   'updatedBy',
   'acceptedAt',
   'dateOfEvent',
+  'placeOfEvent',
   'registrationNumber',
   'originalActionId'
 ]
@@ -95,19 +96,19 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
   SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
-  `record.create[event=birth|death|tennis-club-membership]`,
-  'record.read[event=birth|death|tennis-club-membership]',
-  'record.notify[event=birth|death|tennis-club-membership]',
-  'record.create[event=birth|death|tennis-club-membership]',
-  'record.declare[event=birth|death|tennis-club-membership]',
-  'record.declared.validate[event=birth|death|tennis-club-membership]',
-  'record.declared.reject[event=birth|death|tennis-club-membership]',
-  'record.declared.archive[event=birth|death|tennis-club-membership]',
-  'record.register[event=birth|death|tennis-club-membership]',
-  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
-  'record.registered.request-correction[event=birth|death|tennis-club-membership]',
-  'record.registered.correct[event=birth|death|tennis-club-membership]',
-  'record.unassign-others[event=birth|death|tennis-club-membership]'
+  'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.validate[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.register[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.registered.request-correction[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.registered.correct[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.unassign-others[event=birth|death|tennis-club-membership|child-onboarding]'
 ]
 
 export function createTestToken({
@@ -351,7 +352,9 @@ function actionToClientAction(
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REJECT_CORRECTION:
     case ActionType.DELETE:
+    case ActionType.CUSTOM:
     case ActionType.READ:
+    case ActionType.EDIT:
     default:
       throw new Error(
         `Unsupported action type: ${action}. Create a case for it if you need it.`

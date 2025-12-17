@@ -52,7 +52,7 @@ import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import styled from 'styled-components'
 import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import { ProfileState } from '../../profile/profileReducer'
 import { RawScopes } from '@opencrvs/commons/client'
 

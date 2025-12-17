@@ -15,7 +15,7 @@
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.router.json",
     "build:clean": "rm -rf build",
     "generate-db-types": "kanel && prettier src/storage/postgres/events/schema --write",
-    "generate-db-schema": "docker run --rm postgres:17.6 pg_dump postgres://events_migrator:migrator_password@host.docker.internal:5432/events -s > src/tests/postgres-migrations.sql"
+    "generate-db-schema": "docker run --rm postgres:17.6 pg_dump postgres://events_migrator:migrator_password@host.docker.internal:5432/events -s > src/tests/postgres-migrations.sql --exclude-schema=analytics"
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.16.2",
@@ -23,6 +23,7 @@
     "@trpc/server": "11.4.3",
     "@types/luxon": "^3.6.2",
     "@types/pg": "^8.15.4",
+    "@types/pg-cursor": "^2.7.2",
     "app-module-path": "^2.2.0",
     "envalid": "^8.0.0",
     "json-stream-stringify": "^3.1.6",
@@ -36,11 +37,10 @@
     "pg-cursor": "^2.15.3",
     "pg-query-stream": "^4.10.0",
     "superjson": "1.9.0-0",
-    "trpc-to-openapi": "^2.1.5",
+    "trpc-to-openapi": "^3.1.0",
     "tsconfig-paths": "^3.13.0",
-    "zod": "^3.23.8",
-    "@types/pg-cursor": "^2.7.2",
-    "zod-openapi": "^4.2.4"
+    "zod": "^4.1.12",
+    "zod-openapi": "^5.4.3"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.7",
@@ -57,6 +57,7 @@
     "eslint-import-resolver-typescript": "^4.3.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.5",
+    "fast-check": "^4.3.0",
     "globals": "^16.0.0",
     "kanel": "^3.14.1",
     "kanel-kysely": "^0.7.1",

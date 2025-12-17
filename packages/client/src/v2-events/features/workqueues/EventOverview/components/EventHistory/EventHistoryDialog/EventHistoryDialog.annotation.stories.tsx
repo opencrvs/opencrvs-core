@@ -42,7 +42,7 @@ const actionDefaults = {
     new Date('2024-04-01')
   ),
   createdBy: generator.user.id.localRegistrar,
-  createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+  createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
   createdAtLocation: generator.user.localRegistrar().v2.primaryOfficeId,
   transactionId: getUUID()
 } satisfies Partial<ActionDocument>
@@ -130,6 +130,7 @@ export default meta
 type Story = StoryObj<typeof EventHistoryDialog>
 export const AnnotationUpdateOnValidate: Story = {
   args: {
+    title: 'Updated',
     fullEvent: annotationUpdateOnValidateEvent,
     action: updateActionForValidate
   }
@@ -215,6 +216,7 @@ const updateActionForRegister = expandWithClientSpecificActions(
 
 export const AnnotationUpdateOnRegister: Story = {
   args: {
+    title: 'Updated',
     fullEvent: annotationUpdateOnRegisterEvent,
     action: updateActionForRegister
   }

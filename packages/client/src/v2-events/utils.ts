@@ -23,6 +23,8 @@ import {
   SystemVariables,
   Scope,
   ActionScopes,
+  ConfigurableActionScopes,
+  parseConfigurableScope,
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
@@ -232,7 +234,14 @@ export enum CoreWorkqueues {
 }
 
 export function hasOutboxWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => ActionScopes.safeParse(scope).success)
+  const hasLiteralActionScopes = scopes.some(
+    (scope) => ActionScopes.safeParse(scope).success
+  )
+  const parsedScopes = scopes.map(parseConfigurableScope)
+  const hasConfigurableActionScopes = parsedScopes.some(
+    (scope) => ConfigurableActionScopes.safeParse(scope).success
+  )
+  return hasLiteralActionScopes || hasConfigurableActionScopes
 }
 
 export function hasDraftWorkqueue(scopes: Scope[]) {
@@ -284,17 +293,17 @@ type OutputMode = 'withIds' | 'withNames'
 Function to traverse the administrative level hierarchy from an arbitrary / leaf point
 */
 export function getAdminLevelHierarchy(
-  locationId: string | undefined,
-  locations: Location[],
+  maybeLocationId: string | undefined,
+  locations: Map<UUID, Location>,
   adminStructure: string[],
   outputMode: OutputMode = 'withIds'
 ) {
   // Collect location objects from leaf to root
   const collectedLocations: Location[] = []
 
-  let current = locationId
-    ? locations.find((l) => l.id === locationId.toString())
-    : null
+  const locationId = maybeLocationId && UUID.safeParse(maybeLocationId).data
+
+  let current = locationId ? locations.get(locationId) : null
 
   while (current) {
     collectedLocations.push(current)
@@ -302,7 +311,7 @@ export function getAdminLevelHierarchy(
       break
     }
     const parentId = current.parentId
-    current = locations.find((l) => l.id === parentId)
+    current = locations.get(parentId)
   }
 
   // Reverse so root is first, leaf is last

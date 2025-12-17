@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useIntl } from 'react-intl'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'

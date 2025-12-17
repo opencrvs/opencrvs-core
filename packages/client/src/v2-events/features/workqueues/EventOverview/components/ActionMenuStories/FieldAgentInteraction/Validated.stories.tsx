@@ -16,9 +16,9 @@ import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
-  AssertType,
   Scenario,
-  UserRoles
+  UserRoles,
+  AssertType
 } from '../ActionMenu.common'
 
 export default {
@@ -39,7 +39,8 @@ const validatedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Edit']: AssertType.DISABLED
     }
   },
   {
@@ -55,7 +56,7 @@ const validatedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ['Edit']: AssertType.DISABLED
     }
   }
 ]

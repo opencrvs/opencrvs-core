@@ -171,7 +171,7 @@ export function Review() {
   const [users] = getUsers.useSuspenseQuery(userIds)
 
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
@@ -298,7 +298,6 @@ export function Review() {
         const printCertificate = await preparePdfCertificate(fullEvent)
 
         await onlineActions.printCertificate.mutateAsync({
-          fullEvent,
           eventId: fullEvent.id,
           declaration: {},
           annotation,
@@ -324,7 +323,7 @@ export function Review() {
 
         slug
           ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
-          : navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+          : navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console

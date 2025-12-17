@@ -11,7 +11,6 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
@@ -35,10 +34,10 @@ export function ActionMenu({
   onAction?: () => void
 }) {
   const intl = useIntl()
-  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
   const { searchEventById } = useEvents()
 
   const maybeAuth = useAuthentication()
@@ -62,11 +61,11 @@ export function ActionMenu({
   const assignedUserFullName = assignedToUser
     ? getUsersFullName(assignedToUser.name, intl.locale)
     : ''
-  const assignedOffice = assignedToUser?.primaryOfficeId || ''
+  const assignedOffice = assignedToUser?.primaryOfficeId
   const assignedOfficeName =
-    locations.find((l) => l.id === assignedOffice)?.name || ''
+    (assignedOffice && locations.get(assignedOffice)?.name) || ''
 
-  const [modal, actionMenuItems] = useAllowedActionConfigurations(
+  const [modals, actionMenuItems] = useAllowedActionConfigurations(
     eventState,
     auth
   )
@@ -81,6 +80,7 @@ export function ActionMenu({
           <PrimaryButton
             data-testid="action-dropdownMenu"
             icon={() => <CaretDown />}
+            size="medium"
           >
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
@@ -96,6 +96,11 @@ export function ActionMenu({
               </DropdownMenu.Label>
               <DropdownMenu.Separator />
             </>
+          )}
+          {!actionMenuItems.length && (
+            <DropdownMenu.Label>
+              <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
+            </DropdownMenu.Label>
           )}
           {actionMenuItems.map((action) => {
             return (
@@ -114,7 +119,7 @@ export function ActionMenu({
           })}
         </DropdownMenu.Content>
       </DropdownMenu>
-      {modal}
+      {modals}
     </>
   )
 }

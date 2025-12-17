@@ -3,7 +3,10 @@
 
 import type { default as EventActionDraftsTable } from './EventActionDrafts'
 import type { default as EventActionsTable } from './EventActions'
+import type { default as UsersTable } from './Users'
 import type { default as LocationsTable } from './Locations'
+import type { default as UserCredentialsTable } from './UserCredentials'
+import type { default as AdministrativeAreasTable } from './AdministrativeAreas'
 import type { default as EventsTable } from './Events'
 
 export default interface AppSchema {
@@ -11,7 +14,13 @@ export default interface AppSchema {
 
   eventActions: EventActionsTable
 
+  users: UsersTable
+
   locations: LocationsTable
+
+  userCredentials: UserCredentialsTable
+
+  administrativeAreas: AdministrativeAreasTable
 
   events: EventsTable
 }

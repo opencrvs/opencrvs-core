@@ -37,8 +37,7 @@ const notifiedScenariosForFieldAgent: Scenario[] = [
       ActionType.UNASSIGN
     ],
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   },
 
@@ -53,8 +52,7 @@ const notifiedScenariosForFieldAgent: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   }
 ]

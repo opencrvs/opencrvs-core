@@ -17,9 +17,10 @@ import {
   EventConfig,
   Location,
   LocationType,
-  generateUuid
+  generateUuid,
+  pickRandom
 } from '@opencrvs/commons'
-import { addLocations } from '@events/storage/postgres/events/locations'
+import { setLocations } from '../service/locations/locations'
 
 interface Name {
   use: string
@@ -37,6 +38,7 @@ export interface CreatedUser {
 
 interface CreateUser {
   primaryOfficeId: UUID
+  administrativeAreaId?: UUID | null
   role?: string
   name?: Array<Name>
   fullHonorificName?: string
@@ -51,9 +53,10 @@ export function payloadGenerator(
 ) {
   const user = {
     create: (input: CreateUser) => ({
-      role: input.role ?? TestUserRole.Enum.REGISTRATION_AGENT,
+      role: input.role ?? TestUserRole.enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId,
+      administrativeAreaId: input.administrativeAreaId,
       fullHonorificName: input.fullHonorificName
     })
   }
@@ -67,7 +70,7 @@ export function payloadGenerator(
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
-          locationType: LocationType.Enum.ADMIN_STRUCTURE
+          locationType: pickRandom(prng, LocationType.options)
         })) as Location[]
       }
 
@@ -76,7 +79,7 @@ export function payloadGenerator(
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,
-        locationType: LocationType.Enum.ADMIN_STRUCTURE
+        locationType: LocationType.enum.ADMIN_STRUCTURE
       })) as Location[]
     }
   }
@@ -89,17 +92,23 @@ export function payloadGenerator(
  * Use with payloadGenerator for creating test data.
  */
 export function seeder() {
-  const seedUser = (user: Omit<CreatedUser, 'id'>) => {
+  const seedUser = (
+    user: Omit<CreatedUser, 'id'> & {
+      id?: UUID
+      administrativeAreaId?: UUID | null
+    }
+  ) => {
     return {
       primaryOfficeId: user.primaryOfficeId,
+      administrativeAreaId: user.administrativeAreaId ?? null,
       name: user.name,
       fullHonorificName: user.fullHonorificName,
       role: user.role as TestUserRole,
-      id: getUUID()
+      id: user.id ?? getUUID()
     }
   }
   const seedLocations = async (locations: Location[]) =>
-    addLocations(
+    setLocations(
       locations.map((location) => ({
         ...location,
         validUntil: location.validUntil ? location.validUntil : null

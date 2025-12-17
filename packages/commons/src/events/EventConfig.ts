@@ -8,17 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { ActionConfig } from './ActionConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
 import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
-import { extendZodWithOpenApi } from 'zod-openapi'
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
-extendZodWithOpenApi(z)
+import { FlagConfig, InherentFlags } from './Flag'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -34,6 +33,9 @@ export const EventConfig = z
       ),
     dateOfEvent: FieldReference.optional().describe(
       'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
+    ),
+    placeOfEvent: FieldReference.optional().describe(
+      'Reference to the field capturing the place of the event (e.g. place of birth). Defaults to the meta.createdAtLocation if unspecified.'
     ),
     title: TranslationConfig.describe(
       'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
@@ -61,6 +63,13 @@ export const EventConfig = z
       .default([])
       .describe(
         'Configuration of fields available in the advanced search feature.'
+      ),
+    flags: z
+      .array(FlagConfig)
+      .optional()
+      .default([])
+      .describe(
+        'Configuration of flags associated with the actions of this event type.'
       )
   })
   .superRefine((event, ctx) => {
@@ -126,9 +135,45 @@ export const EventConfig = z
         })
       }
     }
+
+    if (event.placeOfEvent) {
+      const eventPlaceFieldId = getDeclarationFields(event).find(
+        ({ id }) => id === event.placeOfEvent?.$$field
+      )
+      if (!eventPlaceFieldId) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Place of event field id must match a field id in the event.declaration fields.
+            Invalid place of event field ID for event ${event.id}: ${event.placeOfEvent.$$field}`,
+          path: ['placeOfEvent']
+        })
+      }
+    }
+
+    const isInherentFlag = (value: unknown): value is InherentFlags =>
+      Object.values(InherentFlags).includes(value as InherentFlags)
+
+    // Validate that all referenced action flags are configured in the event flags array.
+    const configuredFlagIds = event.flags.map((flag) => flag.id)
+    const actionFlagIds = event.actions.flatMap((action) =>
+      action.flags.map((flag) => flag.id)
+    )
+
+    for (const actionFlagId of actionFlagIds) {
+      const isConfigured = configuredFlagIds.includes(actionFlagId)
+      const isInherent = isInherentFlag(actionFlagId)
+
+      if (!isConfigured && !isInherent) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Action flag id must match an inherent flag or a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
+          path: ['actions']
+        })
+      }
+    }
   })
-  .openapi({
-    ref: 'EventConfig'
+  .meta({
+    id: 'EventConfig'
   })
   .describe('Configuration defining an event type.')
 

@@ -32,7 +32,8 @@ import {
   LocationType,
   ValidatorContext,
   RequireConfig,
-  DomesticAddressFieldValue
+  DomesticAddressFieldValue,
+  UUID
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -239,7 +240,7 @@ function AddressInput(props: Props) {
   } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
@@ -249,8 +250,11 @@ function AddressInput(props: Props) {
   )
   const customAddressFields = props.configuration?.streetAddressForm
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  const adminStructureLocations = new Map(
+    [...locations].filter(
+      ([, location]) =>
+        location.locationType === LocationType.enum.ADMIN_STRUCTURE
+    )
   )
 
   const administrativeArea = getAdministrativeArea(value)
@@ -373,7 +377,7 @@ function AddressOutput({
 }) {
   const validatorContext = useValidatorContext()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const customAddressFields = configuration?.configuration
     ?.streetAddressForm as FieldConfigWithoutAddress[]
@@ -384,8 +388,12 @@ function AddressOutput({
   }
 
   const administrativeArea = getAdministrativeArea(value)
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === LocationType.enum.ADMIN_STRUCTURE
+
+  const adminStructureLocations = new Map(
+    [...locations].filter(
+      ([, location]) =>
+        location.locationType === LocationType.enum.ADMIN_STRUCTURE
+    )
   )
 
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
@@ -460,7 +468,7 @@ function toCertificateVariables(
   value: AddressFieldValue,
   context: {
     intl: IntlShape
-    locations: Location[]
+    locations: Map<UUID, Location>
     adminLevels?: AdminStructureItem[]
   }
 ) {
@@ -480,8 +488,11 @@ function toCertificateVariables(
   }
   const appConfigAdminLevels = adminLevels?.map((level) => level.id)
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  const adminStructureLocations = new Map(
+    [...locations].filter(
+      ([, location]) =>
+        location.locationType === LocationType.enum.ADMIN_STRUCTURE
+    )
   )
 
   const adminLevelHierarchy = getAdminLevelHierarchy(

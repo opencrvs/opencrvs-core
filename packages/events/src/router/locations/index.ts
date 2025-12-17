@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { Location, LocationType, SCOPES, UUID } from '@opencrvs/commons'
-import { router, systemProcedure } from '@events/router/trpc'
+import { router, userAndSystemProcedure } from '@events/router/trpc'
 import {
   getLocations,
   setLocations,
@@ -20,7 +20,7 @@ import {
 import { requiresAnyOfScopes } from '../middleware'
 
 export const locationRouter = router({
-  sync: systemProcedure
+  sync: userAndSystemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
     )
@@ -38,7 +38,7 @@ export const locationRouter = router({
     .mutation(async () => {
       await syncLocations()
     }),
-  list: systemProcedure
+  list: userAndSystemProcedure
     .input(
       z
         .object({
@@ -56,7 +56,7 @@ export const locationRouter = router({
         locationType: input?.locationType
       })
     ),
-  set: systemProcedure
+  set: userAndSystemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
     )

@@ -104,7 +104,7 @@ describe('stringifyEventMetadata', () => {
         modifiedAt: new Date(2000, 1, 2).toISOString(),
         copiesPrintedForTemplate: 1
       },
-      locations,
+      locations: new Map(locations.map((loc) => [loc.id, loc])),
       users,
       intl: createIntl({ locale: 'en' }),
       adminLevels
@@ -216,7 +216,7 @@ function expectRenderOutput(template: string, output: string) {
       }
     },
     review: false,
-    locations: [],
+    locations: new Map(),
     users: [registrar.v2],
     language: { lang: 'en', messages: {} },
     config: tennisClubMembershipEvent,

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { estypes } from '@elastic/elasticsearch'
+import { type estypes } from '@elastic/elasticsearch'
 import {
   EventConfig,
   FieldType,
@@ -21,7 +21,7 @@ import {
   SearchScopeAccessLevels,
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
-import { getOrThrow, UUID } from '@opencrvs/commons'
+import { getOrThrow, ResolvedRecordScopeV2, UUID } from '@opencrvs/commons'
 import { getChildLocations } from '../locations/locations'
 import {
   encodeFieldId,
@@ -238,7 +238,7 @@ async function buildClause(
       case 'data': {
         // @todo: The type for this comes out as "any"
         const value = clause[key]
-        const dataQuery = generateQuery(value, eventConfigs)
+        const dataQuery = generateQuery(value as QueryInputType, eventConfigs)
         const innerMust = dataQuery.bool?.must
         if (Array.isArray(innerMust)) {
           must.push(...innerMust)
@@ -342,11 +342,119 @@ export async function buildElasticQueryFromSearchPayload(
  * @param userOfficeId The ID of the user's office.
  * @returns The modified query with jurisdiction filters.
  */
-export function withJurisdictionFilters(
-  query: estypes.QueryDslQueryContainer,
-  options: Record<string, SearchScopeAccessLevels>,
+export function withJurisdictionFilters({
+  query,
+  options,
+  userOfficeId,
+  scopesV2
+}: {
+  query: estypes.QueryDslQueryContainer
+  options?: Record<string, SearchScopeAccessLevels>
   userOfficeId: string | undefined
-): estypes.QueryDslQueryContainer {
+  scopesV2?: ResolvedRecordScopeV2[]
+}): estypes.QueryDslQueryContainer {
+  // Scopes v2 take precedence over v1 options
+  if (scopesV2) {
+    const scopeQueries = scopesV2
+      .map((scope) => {
+        const must: estypes.QueryDslQueryContainer[] = []
+
+        for (const [filterProperty, value] of Object.entries(scope.options)) {
+          if (!value) {
+            continue
+          }
+
+          switch (filterProperty) {
+            case 'event':
+              must.push({
+                terms: {
+                  // @TODO: Clarify why V1 had 1-tuple.
+                  type: Array.isArray(value) ? value : [value]
+                }
+              })
+              break
+
+            case 'eventLocation':
+              // @TODO: Once event location specification is completed, update to include the configurable place of event.
+              must.push({
+                term: { createdAtLocation: value }
+              })
+              break
+            case 'declaredIn':
+              must.push({
+                term: {
+                  'legalStatuses.DECLARED.createdAtLocation': value
+                }
+              })
+              break
+
+            case 'registeredIn':
+              must.push({
+                term: {
+                  'legalStatuses.REGISTERED.createdAtLocation': value
+                }
+              })
+              break
+
+            case 'declaredBy':
+              must.push({
+                term: { 'legalStatuses.DECLARED.createdBy': value }
+              })
+              break
+
+            case 'registeredBy':
+              must.push({
+                term: {
+                  'legalStatuses.REGISTERED.createdBy': value
+                }
+              })
+              break
+
+            default:
+              throw new Error(`Unsupported filter property: ${filterProperty}`)
+          }
+        }
+
+        // If this scope had no active filters, ignore it
+        if (!must.length) {
+          return null
+        }
+
+        return {
+          bool: {
+            must
+          }
+        }
+      })
+      .filter((q) => q !== null)
+
+    if (!scopeQueries.length) {
+      return {
+        bool: {
+          must: [query],
+          should: undefined
+        }
+      }
+    }
+
+    return {
+      bool: {
+        must: [query],
+        filter: {
+          bool: {
+            should: scopeQueries,
+            minimum_should_match: 1
+          }
+        }
+      }
+    } as estypes.QueryDslQueryContainer
+  }
+
+  // This is transient check that will be removed once we have replaced all v1 scopes with v2.
+  if (!options) {
+    throw new Error('Either options or scopesV2 must be provided for filtering')
+  }
+
   const filteredQueries = Object.entries(options).map(
     ([eventType, accessLevel]) => {
       const must: estypes.QueryDslQueryContainer[] = [

@@ -9,47 +9,83 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useIntl, defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { getLocations } from '@client/offline/selectors'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { getUsersFullName } from '../utils'
+import { ActionType, TokenUserType } from '@opencrvs/commons/client'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { DECLARATION_ACTION_UPDATE } from '../features/events/actions/correct/useActionForHistory'
+
+const messages = defineMessages({
+  systemDefaultName: {
+    id: 'event.history.systemDefaultName',
+    defaultMessage: 'System integration',
+    description: 'Fallback for system integration name in the event history'
+  },
+  system: {
+    id: 'event.history.system',
+    defaultMessage: 'System',
+    description: 'Name for system initiated actions in the event history'
+  },
+  role: {
+    id: 'event.history.role',
+    defaultMessage:
+      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} HEALTH {Health integration} IMPORT_EXPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
+    description: 'Role of the user in the event history'
+  }
+})
 
 export function useUserDetails() {
-  const userDetails = useSelector(getUserDetails)
-  const locations = useSelector(getLocations)
+  const intl = useIntl()
+  const { getUser } = useUsers()
+  const users = getUser.getAllCached()
+  const { systems } = useSelector(getOfflineData)
 
-  const normalizedName =
-    userDetails &&
-    userDetails.name.map((n) => ({
-      use: n.use ?? 'official',
-      family: n.familyName ?? '',
-      given: n.firstNames ? [n.firstNames] : []
-    }))
+  const getUserDetails = ({
+    createdByUserType,
+    createdBy,
+    type,
+    createdByRole
+  }: {
+    createdByUserType: TokenUserType
+    createdBy: string
+    type: ActionType | DECLARATION_ACTION_UPDATE
+    createdByRole?: string
+  }): {
+    type: 'user' | 'system' | 'integration'
+    name: string
+    role: string | undefined
+  } => {
+    const role = intl.formatMessage(messages.role, {
+      role: createdByRole || ''
+    })
 
-  const name = normalizedName ? getUsersFullName(normalizedName, 'en') : ''
+    if (createdByUserType === 'system') {
+      const system = systems.find((s) => s._id === createdBy)
+      return {
+        type: 'integration',
+        name: system?.name ?? intl.formatMessage(messages.systemDefaultName),
+        role
+      } as const
+    }
 
-  const primaryOfficeId = userDetails?.primaryOffice.id
+    if (type === ActionType.DUPLICATE_DETECTED) {
+      return {
+        type: 'system',
+        name: intl.formatMessage(messages.system),
+        role
+      } as const
+    }
 
-  if (primaryOfficeId) {
-    const primaryOfficeLocation = locations[primaryOfficeId]
-
-    const districtId = primaryOfficeLocation?.partOf.split('/')[1]
-    const district = districtId ? locations[districtId] : undefined
-
-    const provinceId = district?.partOf.split('/')[1]
+    const user = users.find((u) => u.id === createdBy)
 
     return {
-      name,
-      role: userDetails.role.id,
-      district: districtId ?? '',
-      province: provinceId ?? ''
-    }
+      type: 'user',
+      name: user ? getUsersFullName(user.name, intl.locale) : 'Missing user',
+      role
+    } as const
   }
 
-  return {
-    name,
-    role: userDetails?.role.id,
-    district: '',
-    province: ''
-  }
+  return { getUserDetails }
 }

@@ -52,6 +52,7 @@ const COLUMNS = {
   ICON_WITH_NAME_EVENT: 'iconWithNameEvent',
   EVENT: 'type',
   DATE_OF_EVENT: 'dateOfEvent',
+  PLACE_OF_EVENT: 'placeOfEvent',
   SENT_FOR_REVIEW: 'sentForReview',
   SENT_FOR_UPDATES: 'sentForUpdates',
   SENT_FOR_APPROVAL: 'sentForApproval',
@@ -97,6 +98,9 @@ function changeSortedColumn(
       break
     case COLUMNS.DATE_OF_EVENT:
       newSortedCol = COLUMNS.DATE_OF_EVENT
+      break
+    case COLUMNS.PLACE_OF_EVENT:
+      newSortedCol = COLUMNS.PLACE_OF_EVENT
       break
     case COLUMNS.SENT_FOR_REVIEW:
       newSortedCol = COLUMNS.SENT_FOR_REVIEW
@@ -344,7 +348,7 @@ export const SearchResultComponent = ({
             type={type}
             onClick={() => {
               return navigate(
-                ROUTES.V2.EVENTS.OVERVIEW.buildPath(
+                ROUTES.V2.EVENTS.EVENT.buildPath(
                   {
                     eventId: event.id
                   },

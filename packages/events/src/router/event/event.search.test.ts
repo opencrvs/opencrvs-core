@@ -149,7 +149,11 @@ test('Throws when searching without payload', async () => {
     'search[event=tennis-club-membership,access=all]'
   ])
 
-  await expect(client.event.search({})).rejects.toMatchSnapshot()
+  await expect(
+    client.event.search({
+      query: undefined
+    })
+  ).rejects.toMatchSnapshot()
 })
 
 test('Throws when searching by unrelated properties', async () => {
@@ -900,6 +904,7 @@ test('Returns correctly based on registration location even when a parent locati
   const locationRng = createPrng(842)
   const parentLocation = {
     ...generator.locations.set(1, locationRng)[0],
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
     name: 'Parent location'
   }
 
@@ -953,6 +958,104 @@ test('Returns correctly based on registration location even when a parent locati
           'legalStatuses.DECLARED.createdAtLocation': {
             type: 'within',
             location: parentLocation.id
+          }
+        }
+      ]
+    }
+  })
+  expect(response).toHaveLength(1)
+})
+
+test('Search by legalStatuses.DECLARED.createdAtLocation when a redeclaration action is present', async () => {
+  const { user, generator, locations } = await setupTestCase(8918)
+
+  const client = createTestClient(user)
+
+  // 1. Let's first declare the event in the original user location
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+  await client.event.actions.declare.request(data)
+
+  // using different location id for a different user
+  const OTHER_OFFICE_ID = locations[1].id
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(8919)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: OTHER_OFFICE_ID
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=all]'
+  ])
+
+  const form = {
+    // Applicant dob updated
+    'applicant.dob': '2001-11-11',
+    'applicant.name': {
+      firstname: 'Unique',
+      surname: 'Lastname'
+    },
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  await otherClient.event.actions.assignment.assign(
+    otherGen.event.actions.assign(event.id, {
+      assignedTo: otherUser.id
+    })
+  )
+
+  // 2. Let's edit and redeclare event in other users location
+  const declaration = otherGen.event.actions.edit(event.id, {
+    declaration: form,
+    keepAssignment: true
+  })
+
+  await otherClient.event.actions.edit.request(declaration)
+
+  await otherClient.event.actions.declare.request(
+    otherGen.event.actions.declare(event.id, {
+      declaration: form
+    })
+  )
+
+  // 3. We should be able to search by the other users location
+  const { results: response } = await otherClient.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          'legalStatuses.DECLARED.createdAtLocation': {
+            type: 'within',
+            location: OTHER_OFFICE_ID
           }
         }
       ]
@@ -1245,9 +1348,9 @@ test('Returns relevant events in right order', async () => {
     }
   })
 
-  expect(declaredEvents).toHaveLength(1)
+  expect(declaredEvents).toHaveLength(3)
   expect(
-    sanitizeForSnapshot(declaredEvents[0], UNSTABLE_EVENT_FIELDS)
+    sanitizeForSnapshot(declaredEvents, UNSTABLE_EVENT_FIELDS)
   ).toMatchSnapshot()
 
   const { results: registeredEventsPendingCertification } =
@@ -1970,4 +2073,68 @@ test('Returns events using nested AND/OR query combinations', async () => {
   // Should match record1 (Bob with dob 1985-01-01) and record2 (John with bob@example.com and dob 1985-01-01)
   expect(matchingFirstnames).toContain('Bob')
   expect(matchingEmails).toContain('bob@example.com')
+})
+
+test('Search response contains single UUIDs for location fields, not arrays', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]'
+  ])
+  const initialData = {
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, {
+      declaration: initialData
+    })
+  )
+
+  const { results } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.name': { type: 'fuzzy', term: 'John' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(results).toHaveLength(1)
+  const result = results[0]
+
+  // --- ASSERTIONS ---
+
+  // createdAtLocation must be a string UUID
+  expect(typeof result.createdAtLocation).toBe('string')
+  expect(result.createdAtLocation).toMatch(/^[0-9a-fA-F-]{36}$/)
+
+  // updatedAtLocation must be a string UUID (or null if nothing updated)
+  if (result.updatedAtLocation) {
+    expect(typeof result.updatedAtLocation).toBe('string')
+    expect(result.updatedAtLocation).toMatch(/^[0-9a-fA-F-]{36}$/)
+  }
 })

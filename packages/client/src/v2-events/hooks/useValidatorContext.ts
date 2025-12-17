@@ -15,7 +15,6 @@ import {
   getOrThrow,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { useAuthentication } from '../../utils/userUtils'
 import { useSuspenseAdminLeafLevelLocations } from './useLocations'
 

@@ -153,14 +153,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "type": "ASSIGN",
     },
     {
-      "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": {
-          "originalFilename": "abcd.png",
-          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-          "type": "image/png",
-        },
-      },
+      "annotation": {},
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
@@ -243,14 +236,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "type": "ASSIGN",
     },
     {
-      "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": {
-          "originalFilename": "abcd.png",
-          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-          "type": "image/png",
-        },
-      },
+      "annotation": {},
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",

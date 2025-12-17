@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { v4 as uuidv4 } from 'uuid'
 
 export const EventInput = z
@@ -16,6 +16,6 @@ export const EventInput = z
     transactionId: z.string(),
     type: z.string()
   })
-  .openapi({ default: { transactionId: uuidv4(), type: 'birth' } })
+  .meta({ default: { transactionId: uuidv4(), type: 'birth' } })
 
 export type EventInput = z.infer<typeof EventInput>

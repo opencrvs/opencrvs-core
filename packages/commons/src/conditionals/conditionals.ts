@@ -16,6 +16,7 @@ import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
+import { EventStatus } from '../events/EventMetadata'
 
 /* eslint-disable max-lines */
 
@@ -68,10 +69,16 @@ export type FormConditionalParameters = CommonConditionalParameters & {
   $leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
 
+export type EventStateConditionalParameters = CommonConditionalParameters & {
+  $flags: string[]
+  $status: EventStatus
+}
+
 export type ConditionalParameters =
   | UserConditionalParameters
   | EventConditionalParameters
   | FormConditionalParameters
+  | EventStateConditionalParameters
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
@@ -384,6 +391,37 @@ function defineComparison(
       )
     },
     required: [field.$$field]
+  })
+}
+
+/** Check if an event flag is present */
+export function flag(flagvalue: string) {
+  return defineConditional({
+    type: 'object',
+    properties: {
+      $flags: {
+        type: 'array',
+        contains: {
+          type: 'string',
+          const: flagvalue
+        }
+      }
+    },
+    required: ['$flags']
+  })
+}
+
+/** Check if an event flag is present */
+export function status(statusValue: EventStatus) {
+  return defineConditional({
+    type: 'object',
+    properties: {
+      $status: {
+        type: 'string',
+        const: statusValue
+      }
+    },
+    required: ['$status']
   })
 }
 

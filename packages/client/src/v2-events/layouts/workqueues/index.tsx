@@ -25,6 +25,7 @@ import { useAllWorkqueueConfigurations } from '@client/v2-events/features/events
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { emptyMessage } from '@client/v2-events/utils'
+import { constantsMessages } from '@client/i18n/messages/constants'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
@@ -99,7 +100,9 @@ export function WorkqueueLayout({
         />
       }
       navigation={<Sidebar key={workqueueSlug} />}
-      skipToContentText="skip"
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       {children}
     </Frame>

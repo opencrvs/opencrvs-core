@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import {
   findScope,
@@ -19,7 +19,7 @@ import {
   WorkqueueCountInput,
   WorkqueueCountOutput
 } from '@opencrvs/commons'
-import { router, publicProcedure } from '@events/router/trpc'
+import { router, userOnlyProcedure } from '@events/router/trpc'
 import {
   getInMemoryEventConfigurations,
   getInMemoryWorkqueueConfigurations
@@ -29,14 +29,14 @@ import { requireScopeForWorkqueues } from '@events/router/middleware'
 
 export const workqueueRouter = router({
   config: router({
-    list: publicProcedure
+    list: userOnlyProcedure
       .input(z.void())
       .output(z.array(WorkqueueConfig))
       .query(async (options) => {
         return getInMemoryWorkqueueConfigurations(options.ctx.token)
       })
   }),
-  count: publicProcedure
+  count: userOnlyProcedure
     .input(WorkqueueCountInput)
     .use(requireScopeForWorkqueues)
     .output(WorkqueueCountOutput)
@@ -51,6 +51,7 @@ export const workqueueRouter = router({
         string,
         SearchScopeAccessLevels
       >
+
       return getEventCount(
         input,
         await getInMemoryEventConfigurations(ctx.token),

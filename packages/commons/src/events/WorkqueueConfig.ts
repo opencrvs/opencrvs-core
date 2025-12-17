@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
 import { event } from './event'
@@ -23,7 +23,7 @@ import {
 } from './CountryConfigQueryInput'
 import { AvailableIcons } from '../icons'
 import { QueryType } from './EventIndex'
-import { workqueueActions } from './ActionType'
+import { ActionType, workqueueActions } from './ActionType'
 
 export const mandatoryColumns = defineWorkqueuesColumns([
   {
@@ -46,7 +46,8 @@ export const mandatoryColumns = defineWorkqueuesColumns([
 
 export const WorkqueueActionsWithDefault = z.enum([
   ...workqueueActions.options,
-  'DEFAULT'
+  'DEFAULT',
+  ActionType.READ
 ] as const)
 
 export type WorkqueueActionsWithDefault = z.infer<
@@ -101,6 +102,7 @@ export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
 export type WorkqueueConfigWithoutQuery = z.infer<
   typeof WorkqueueConfigWithoutQuery
 >
+
 export type WorkqueueConfigInput = z.input<typeof WorkqueueConfigInput>
 
 export function defineWorkqueue(workqueueInput: WorkqueueConfigInput) {

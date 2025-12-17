@@ -39,12 +39,14 @@ import {
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
+  ActionType,
   Draft,
   EventDocument,
   tennisClubMembershipEvent,
   TestUserRole,
   TokenUserType,
-  UUID
+  UUID,
+  ChildOnboardingEvent
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventDocument,
@@ -165,6 +167,36 @@ export const parameters = {
 
 const generator = testDataGenerator()
 
+const tennisClubMembershipEventWithCustomAction = {
+  ...tennisClubMembershipEvent,
+  actions: tennisClubMembershipEvent.actions.concat([
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'Approve',
+      label: {
+        id: 'event.tennis-club-membership.action.confirm.label',
+        defaultMessage: 'Confirm',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      // @TODO: once action conditionals are implemented, add some conditional here?
+      form: [
+        {
+          id: 'notes',
+          type: 'TEXTAREA',
+          required: true,
+          label: {
+            defaultMessage: 'Notes',
+            description: 'This is the label for the field for a custom action',
+            id: 'event.birth.custom.action.approve.field.notes.label'
+          }
+        }
+      ],
+      flags: []
+    }
+  ])
+}
+
 const preview: Preview = {
   loaders: [
     mswLoader,
@@ -192,11 +224,11 @@ const preview: Preview = {
       queryClient.clear()
       const primaryOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 
-      if (options.parameters.userRole === TestUserRole.Enum.FIELD_AGENT) {
+      if (options.parameters.userRole === TestUserRole.enum.FIELD_AGENT) {
         window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
         addUserToQueryData(generator.user.fieldAgent().v2)
       } else if (
-        options.parameters.userRole === TestUserRole.Enum.REGISTRATION_AGENT
+        options.parameters.userRole === TestUserRole.enum.REGISTRATION_AGENT
       ) {
         window.localStorage.setItem(
           'opencrvs',
@@ -205,7 +237,7 @@ const preview: Preview = {
 
         addUserToQueryData(generator.user.registrationAgent().v2)
       } else if (
-        options.parameters.userRole === TestUserRole.Enum.LOCAL_SYSTEM_ADMIN
+        options.parameters.userRole === TestUserRole.enum.LOCAL_SYSTEM_ADMIN
       ) {
         window.localStorage.setItem(
           'opencrvs',
@@ -215,12 +247,12 @@ const preview: Preview = {
         addUserToQueryData({
           id: generator.user.id.localSystemAdmin,
           name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
-          role: TestUserRole.Enum.LOCAL_SYSTEM_ADMIN,
+          role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
           primaryOfficeId,
           type: TokenUserType.enum.user
         })
       } else if (
-        options.parameters.userRole === TestUserRole.Enum.NATIONAL_SYSTEM_ADMIN
+        options.parameters.userRole === TestUserRole.enum.NATIONAL_SYSTEM_ADMIN
       ) {
         window.localStorage.setItem(
           'opencrvs',
@@ -249,7 +281,10 @@ const preview: Preview = {
        */
 
       const offlineConfigs: Array<EventConfig> = options.parameters?.offline
-        ?.configs ?? [tennisClubMembershipEvent]
+        ?.configs ?? [
+        tennisClubMembershipEventWithCustomAction,
+        ChildOnboardingEvent
+      ]
 
       offlineConfigs.forEach((config) => {
         addLocalEventConfig(config)

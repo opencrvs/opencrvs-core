@@ -8,15 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
-import { extendZodWithOpenApi } from 'zod-openapi'
-
-extendZodWithOpenApi(z)
+import { ActionFlagConfig } from './Flag'
+import { ActionConditional } from './Conditional'
+import { AvailableIcons } from '../icons'
 
 export const DeclarationReviewConfig = z
   .object({
@@ -29,121 +29,100 @@ export const DeclarationReviewConfig = z
     'Configuration of the declaration review page for collecting event-related metadata.'
   )
 
-export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
-
 export const ActionConfigBase = z.object({
-  label: TranslationConfig.describe('Human readable description of the action')
+  label: TranslationConfig.describe('Human readable description of the action'),
+  flags: z
+    .array(ActionFlagConfig)
+    .optional()
+    .default([])
+    .describe('Flag actions which are executed when the action is performed.'),
+  auditHistoryLabel: TranslationConfig.describe(
+    'The label to show in audit history for this action. For example "Approved".'
+  ).optional(),
+  supportingCopy: TranslationConfig.optional().describe(
+    'Text displayed on the confirmation'
+  ),
+  icon: AvailableIcons.describe('Icon representing the action').optional(),
+  conditionals: z
+    .array(ActionConditional)
+    .optional()
+    .describe('Conditionals which can disable or hide actions.')
 })
 
-export const DeclarationActionBase = ActionConfigBase.extend({
-  review: DeclarationReviewConfig,
+const DeclarationActionBase = ActionConfigBase.extend({
   deduplication: DeduplicationConfig.optional()
 })
 
-const ReadActionConfig = ActionConfigBase.merge(
+const ReadActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.READ),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page for read-only view.'
+    ),
+    conditionals: z
+      .never()
+      .optional()
+      .describe('Read-action can not be disabled or hidden with conditionals.')
+  }).shape
+)
+
+const DeclareConfig = DeclarationActionBase.extend(
+  z.object({
+    type: z.literal(ActionType.DECLARE),
+    review: DeclarationReviewConfig.describe(
+      'Configuration of the review page fields.'
     )
-  })
+  }).shape
 )
 
-const DeclareConfig = DeclarationActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.DECLARE)
-  })
-)
-
-const ValidateConfig = DeclarationActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.VALIDATE)
-  })
-)
-
-const RegisterConfig = DeclarationActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.REGISTER)
-  })
-)
-
-const RejectDeclarationConfig = ActionConfigBase.merge(
+const RejectConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT)
-  })
+  }).shape
 )
 
-const ArchiveConfig = ActionConfigBase.merge(
+const ValidateConfig = DeclarationActionBase.extend(
   z.object({
-    type: z.literal(ActionType.ARCHIVE)
-  })
+    type: z.literal(ActionType.VALIDATE)
+  }).shape
 )
 
-const DeleteConfig = ActionConfigBase.merge(
+const RegisterConfig = DeclarationActionBase.extend(
   z.object({
-    type: z.literal(ActionType.DELETE)
-  })
+    type: z.literal(ActionType.REGISTER)
+  }).shape
 )
 
-const PrintCertificateActionConfig = ActionConfigBase.merge(
+const PrintCertificateActionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.PRINT_CERTIFICATE),
     printForm: ActionFormConfig
-  })
+  }).shape
 )
 
-const RequestCorrectionConfig = ActionConfigBase.merge(
+const RequestCorrectionConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
     correctionForm: ActionFormConfig
-  })
+  }).shape
 )
 
-const RejectCorrectionConfig = ActionConfigBase.merge(
+const CustomActionConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.REJECT_CORRECTION)
+    type: z.literal(ActionType.CUSTOM),
+    customActionType: z
+      .string()
+      .describe('Type identifier of the custom action.'),
+    /** Custom action form configuration supports a simple array of field configs, which should be rendered on the action modal. In the future, we might add support for pages etc. */
+    form: z
+      .array(FieldConfig)
+      .describe(
+        'Form configuration for the custom action. The form configured here will be used on the custom action confirmation modal.'
+      )
   })
 )
 
-const ApproveCorrectionConfig = ActionConfigBase.merge(
-  z.object({
-    type: z.literal(ActionType.APPROVE_CORRECTION)
-  })
-)
-
-/*
- * This needs to be exported so that Typescript can refer to the type in
- * the declaration output type. If it can't do that, you might start encountering
- * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
- * errors when compiling
- */
-/** @knipignore */
-export type AllActionConfigFields =
-  | typeof ReadActionConfig
-  | typeof DeclareConfig
-  | typeof ValidateConfig
-  | typeof RejectDeclarationConfig
-  | typeof ArchiveConfig
-  | typeof RegisterConfig
-  | typeof DeleteConfig
-  | typeof PrintCertificateActionConfig
-  | typeof RequestCorrectionConfig
-  | typeof RejectCorrectionConfig
-  | typeof ApproveCorrectionConfig
-
-/** @knipignore */
-export type InferredActionConfig =
-  | z.infer<typeof ReadActionConfig>
-  | z.infer<typeof DeclareConfig>
-  | z.infer<typeof ValidateConfig>
-  | z.infer<typeof RejectDeclarationConfig>
-  | z.infer<typeof ArchiveConfig>
-  | z.infer<typeof RegisterConfig>
-  | z.infer<typeof DeleteConfig>
-  | z.infer<typeof PrintCertificateActionConfig>
-  | z.infer<typeof RequestCorrectionConfig>
-  | z.infer<typeof RejectCorrectionConfig>
-  | z.infer<typeof ApproveCorrectionConfig>
+export type CustomActionConfig = z.infer<typeof CustomActionConfig>
 
 export const ActionConfig = z
   .discriminatedUnion('type', [
@@ -151,29 +130,37 @@ export const ActionConfig = z
      * OpenAPI references are defined here so our generated OpenAPI spec knows to reuse the models
      * and treat them as "models" instead of duplicating the data structure in each endpoint.
      */
-    ReadActionConfig.openapi({ ref: 'ReadActionConfig' }),
-    DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
-    ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
-    RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
-    ArchiveConfig.openapi({ ref: 'ArchiveActionConfig' }),
-    RegisterConfig.openapi({ ref: 'RegisterActionConfig' }),
-    DeleteConfig.openapi({ ref: 'DeleteActionConfig' }),
-    PrintCertificateActionConfig.openapi({
-      ref: 'PrintCertificateActionConfig'
+    ReadActionConfig.meta({ id: 'ReadActionConfig' }),
+    DeclareConfig.meta({ id: 'DeclareActionConfig' }),
+    RejectConfig.meta({ id: 'RejectActionConfig' }),
+    ValidateConfig.meta({ id: 'ValidateActionConfig' }),
+    RegisterConfig.meta({ id: 'RegisterActionConfig' }),
+    PrintCertificateActionConfig.meta({
+      id: 'PrintCertificateActionConfig'
     }),
-    RequestCorrectionConfig.openapi({ ref: 'RequestCorrectionActionConfig' }),
-    RejectCorrectionConfig.openapi({ ref: 'RejectCorrectionActionConfig' }),
-    ApproveCorrectionConfig.openapi({ ref: 'ApproveCorrectionActionConfig' })
+    RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
+    CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(
     'Configuration of an action available for an event. Data collected depends on the action type and is accessible through the annotation property in ActionDocument.'
   )
-  .openapi({ ref: 'ActionConfig' }) as unknown as z.ZodDiscriminatedUnion<
-  'type',
-  AllActionConfigFields[]
->
+  .meta({ id: 'ActionConfig' })
 
-export type ActionConfig = InferredActionConfig
+export type ActionConfig = z.infer<typeof ActionConfig>
+
+// Build a runtime set directly from the schema
+export const actionConfigTypes: Set<ActionConfigTypes> = new Set(
+  ActionConfig.options.map((opt) => opt.shape.type.value)
+)
+/**
+ * Action types that come specifically from the country configuration.
+ *
+ * These are not the same as the broader workflow `action.type` values.
+ * `ActionConfigTypes` includes only the action kinds that can be defined
+ * in the country configuration (e.g. DECLARE, VALIDATE, CUSTOM), and
+ * excludes workflow-only types such as CREATE or NOTIFY.
+ */
+export type ActionConfigTypes = ActionConfig['type']
 
 export const DeclarationActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,

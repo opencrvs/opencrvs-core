@@ -12,7 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import z from 'zod'
+import * as z from 'zod/v4'
 import { findLast } from 'lodash'
 import {
   ActionDocument,
@@ -34,7 +34,9 @@ import {
   canUserReadEvent,
   hasScope,
   SCOPES,
-  hasAnyOfScopes
+  hasAnyOfScopes,
+  AnyScope,
+  decodeScope
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -92,6 +94,7 @@ function getAuthorizedEntities(
 
 type CtxWithAuthorizedEntities = TrpcContext & {
   authorizedEntities?: { events?: string[] }
+  acceptedScopes?: AnyScope[]
 }
 
 function inScope(token: string, scopes: Scope[]) {
@@ -108,7 +111,11 @@ function inScope(token: string, scopes: Scope[]) {
  */
 export function requiresAnyOfScopes(
   scopes: Scope[],
-  configurableScopes?: ConfigurableScopeType[]
+  configurableScopes?: ConfigurableScopeType[],
+  /**
+   * Truly transient property. After complete migration to V2 scopes we should have a single parameter instead of 2-3.
+   */
+  v2ScopeTypes?: string[]
 ) {
   const fn: MiddlewareFunction<
     TrpcContext,
@@ -122,6 +129,28 @@ export function requiresAnyOfScopes(
     // If the user has any of the allowed plain scopes, allow access
     if (inScope(token, scopes)) {
       return opts.next()
+    }
+
+    if (v2ScopeTypes && v2ScopeTypes.length > 0) {
+      const tokenScopes = getScopes(token)
+      const acceptedScopes = tokenScopes
+        .map((scope) => {
+          const parsedScope = decodeScope(scope)
+          return parsedScope && v2ScopeTypes.includes(parsedScope.type)
+            ? parsedScope
+            : null
+        })
+        .filter((scope): scope is z.infer<typeof AnyScope> => scope !== null)
+
+      if (acceptedScopes.length > 0) {
+        return opts.next({
+          ...opts,
+          ctx: {
+            ...opts.ctx,
+            acceptedScopes
+          }
+        })
+      }
     }
 
     // If the user has any of the allowed configurable scopes, allow the user to continue
@@ -210,7 +239,7 @@ export const requireAssignment: MiddlewareFunction<
   )
 
   // System users can not perform action on assigned events
-  if (user.type === TokenUserType.Enum.system && assignedTo) {
+  if (user.type === TokenUserType.enum.system && assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       cause: 'System user can not perform action on assigned event'
@@ -218,7 +247,7 @@ export const requireAssignment: MiddlewareFunction<
   }
 
   // Normal users require assignment
-  if (user.type === TokenUserType.Enum.user && user.id !== assignedTo) {
+  if (user.type === TokenUserType.enum.user && user.id !== assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       message: 'You are not assigned to this event'
@@ -381,7 +410,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
   }
 
   // Not supported for system users
-  if (otherUser.type === TokenUserType.Enum.system) {
+  if (otherUser.type === TokenUserType.enum.system) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
