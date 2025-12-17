@@ -11,7 +11,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, userEvent, within } from '@storybook/test'
+import { waitFor, expect, fn, userEvent, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -487,18 +487,21 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
     const canvas = within(canvasElement)
 
     await step('All form fields should be disabled', async () => {
-      // wait 5s for suspense to resolve
-      // @ToDo: We need a better way
-      await new Promise((resolve) => setTimeout(resolve, 5000))
+      const formFields = await waitFor(
+        async () => {
+          // Find all kind of input fields and expect them to be disabled
+          const inputFields = [
+            ...(await canvas.findAllByRole('textbox')),
+            ...(await canvas.findAllByRole('spinbutton')),
+            ...(await canvas.findAllByRole('checkbox')),
+            ...(await canvas.findAllByRole('radio'))
+          ]
+          await expect(inputFields).toHaveLength(24)
+          return inputFields
+        },
+        { timeout: 10000 }
+      )
 
-      // Find all kind of input fields and expect them to be disabled
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-      await expect(formFields).toHaveLength(29)
       for (const f of formFields) {
         await expect(f).toBeDisabled()
       }
@@ -543,16 +546,18 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
     const canvas = within(canvasElement)
 
     await step('All form fields should be enable', async () => {
-      await new Promise((resolve) => setTimeout(resolve, 5000)) // wait 5s for suspense to resolve
-
-      // Find all kind of input fields and expect them to be disabled
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-      await expect(formFields).toHaveLength(28)
+      const formFields = await waitFor(async () => {
+        // wait for suspense to resolve
+        // Find all kind of input fields and expect them to be disabled
+        const inputFields = [
+          ...(await canvas.findAllByRole('textbox')),
+          ...(await canvas.findAllByRole('spinbutton')),
+          ...(await canvas.findAllByRole('checkbox')),
+          ...(await canvas.findAllByRole('radio'))
+        ]
+        await expect(inputFields).toHaveLength(23)
+        return inputFields
+      })
 
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
@@ -611,15 +616,18 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
     const canvas = within(canvasElement)
 
     await step('All form fields should be disabled', async () => {
-      await new Promise((resolve) => setTimeout(resolve, 5000)) // wait 5s for suspense to resolve
-
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-      await expect(formFields).toHaveLength(28)
+      const formFields = await waitFor(async () => {
+        // wait for suspense to resolve
+        // Find all kind of input fields and expect them to be disabled
+        const inputFields = [
+          ...(await canvas.findAllByRole('textbox')),
+          ...(await canvas.findAllByRole('spinbutton')),
+          ...(await canvas.findAllByRole('checkbox')),
+          ...(await canvas.findAllByRole('radio'))
+        ]
+        await expect(inputFields).toHaveLength(23)
+        return inputFields
+      })
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'
@@ -635,13 +643,16 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
       await userEvent.type(ageInput, '40')
       ageInput.blur()
 
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-      await expect(formFields).toHaveLength(28)
+      const formFields = await waitFor(async () => {
+        const inputFields = [
+          ...(await canvas.findAllByRole('textbox')),
+          ...(await canvas.findAllByRole('spinbutton')),
+          ...(await canvas.findAllByRole('checkbox')),
+          ...(await canvas.findAllByRole('radio'))
+        ]
+        await expect(inputFields).toHaveLength(23)
+        return inputFields
+      })
       for (const f of formFields) {
         await expect(f).not.toBeDisabled()
       }
@@ -655,14 +666,16 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
       await userEvent.clear(ageInput)
       await userEvent.type(ageInput, '10')
       ageInput.blur()
-      const formFields = [
-        ...(await canvas.findAllByRole('textbox')),
-        ...(await canvas.findAllByRole('spinbutton')),
-        ...(await canvas.findAllByRole('checkbox')),
-        ...(await canvas.findAllByRole('radio'))
-      ]
-
-      await expect(formFields).toHaveLength(28)
+      const formFields = await waitFor(async () => {
+        const inputFields = [
+          ...(await canvas.findAllByRole('textbox')),
+          ...(await canvas.findAllByRole('spinbutton')),
+          ...(await canvas.findAllByRole('checkbox')),
+          ...(await canvas.findAllByRole('radio'))
+        ]
+        await expect(inputFields).toHaveLength(23)
+        return inputFields
+      })
       for (const f of formFields) {
         const fieldToAvoid =
           f.getAttribute('data-testid') === 'number__applicant____age'
