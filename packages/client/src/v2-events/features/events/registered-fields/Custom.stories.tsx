@@ -30,7 +30,7 @@ const meta: Meta<FormFieldGeneratorProps> = {
     msw: {
       handlers: {
         module: [
-          http.get('http://localhost:6006/test.js?import', () => {
+          http.get('/test.js?import', () => {
             return HttpResponse.text(
               `
                import React from 'react';
