@@ -3649,6 +3649,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -11088,6 +11092,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -11430,6 +11438,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -11620,6 +11632,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -11824,6 +11840,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -12028,6 +12048,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -12328,6 +12352,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -12592,6 +12620,10 @@ components:
               - id
               - operation
             additionalProperties: false
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -12744,21 +12776,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
-        dialogTitle:
-          description: The title to show in the custom action confirmation modal.
-          $ref: "#/components/schemas/TranslationConfig"
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
         - type
         - customActionType
         - form
-        - dialogTitle
-        - auditHistoryLabel
       additionalProperties: false
     error.UNAUTHORIZED:
       title: Authorization not provided error (401)
