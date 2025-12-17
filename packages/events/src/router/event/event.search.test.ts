@@ -389,10 +389,7 @@ test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column',
     ...generator.event.actions.declare(event.id),
     keepAssignment: true
   })
-  await client.event.actions.validate.request({
-    ...generator.event.actions.validate(event.id),
-    keepAssignment: true
-  })
+
   await client.event.actions.register.request(
     generator.event.actions.register(event.id)
   )
@@ -966,6 +963,104 @@ test('Returns correctly based on registration location even when a parent locati
   expect(response).toHaveLength(1)
 })
 
+test('Search by legalStatuses.DECLARED.createdAtLocation when a redeclaration action is present', async () => {
+  const { user, generator, locations } = await setupTestCase(8918)
+
+  const client = createTestClient(user)
+
+  // 1. Let's first declare the event in the original user location
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+  await client.event.actions.declare.request(data)
+
+  // using different location id for a different user
+  const OTHER_OFFICE_ID = locations[1].id
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(8919)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: OTHER_OFFICE_ID
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=all]'
+  ])
+
+  const form = {
+    // Applicant dob updated
+    'applicant.dob': '2001-11-11',
+    'applicant.name': {
+      firstname: 'Unique',
+      surname: 'Lastname'
+    },
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  await otherClient.event.actions.assignment.assign(
+    otherGen.event.actions.assign(event.id, {
+      assignedTo: otherUser.id
+    })
+  )
+
+  // 2. Let's edit and redeclare event in other users location
+  const declaration = otherGen.event.actions.edit(event.id, {
+    declaration: form,
+    keepAssignment: true
+  })
+
+  await otherClient.event.actions.edit.request(declaration)
+
+  await otherClient.event.actions.declare.request(
+    otherGen.event.actions.declare(event.id, {
+      declaration: form
+    })
+  )
+
+  // 3. We should be able to search by the other users location
+  const { results: response } = await otherClient.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          'legalStatuses.DECLARED.createdAtLocation': {
+            type: 'within',
+            location: OTHER_OFFICE_ID
+          }
+        }
+      ]
+    }
+  })
+  expect(response).toHaveLength(1)
+})
+
 test('Returns no documents when search params are not matched', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
@@ -1220,16 +1315,10 @@ test('Returns relevant events in right order', async () => {
   // Since it is expensive and time consuming, we will run multiple checks against the same set of events.
   const actionCombinations = [
     [ActionType.DECLARE],
-    [ActionType.DECLARE, ActionType.VALIDATE],
-    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REJECT],
-    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.ARCHIVE],
-    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REGISTER],
-    [
-      ActionType.DECLARE,
-      ActionType.VALIDATE,
-      ActionType.REGISTER,
-      ActionType.PRINT_CERTIFICATE
-    ]
+    [ActionType.DECLARE, ActionType.REJECT],
+    [ActionType.DECLARE, ActionType.ARCHIVE],
+    [ActionType.DECLARE, ActionType.REGISTER],
+    [ActionType.DECLARE, ActionType.REGISTER, ActionType.PRINT_CERTIFICATE]
   ]
 
   // 1. Create events with all combinations of actions
@@ -1250,7 +1339,7 @@ test('Returns relevant events in right order', async () => {
     }
   })
 
-  expect(declaredEvents).toHaveLength(3)
+  expect(declaredEvents).toHaveLength(2)
   expect(
     sanitizeForSnapshot(declaredEvents, UNSTABLE_EVENT_FIELDS)
   ).toMatchSnapshot()

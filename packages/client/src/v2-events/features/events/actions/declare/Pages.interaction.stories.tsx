@@ -471,19 +471,6 @@ export const CanSubmitValidlyFilledForm: Story = {
               ]
             })
           }),
-          tRPCMsw.event.actions.validate.request.mutation(async (payload) => {
-            await expect(payload.declaration).not.toHaveProperty(
-              'recommender.name'
-            )
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                { type: ActionType.CREATE },
-                { type: ActionType.DECLARE },
-                { type: ActionType.VALIDATE }
-              ]
-            })
-          }),
           tRPCMsw.event.actions.register.request.mutation(async (payload) => {
             await expect(payload.declaration).not.toHaveProperty(
               'recommender.name'
@@ -493,7 +480,7 @@ export const CanSubmitValidlyFilledForm: Story = {
               actions: [
                 { type: ActionType.CREATE },
                 { type: ActionType.DECLARE },
-                { type: ActionType.VALIDATE },
+
                 { type: ActionType.REGISTER }
               ]
             })
@@ -507,7 +494,7 @@ export const CanSubmitValidlyFilledForm: Story = {
                     actions: [
                       { type: ActionType.CREATE },
                       { type: ActionType.DECLARE },
-                      { type: ActionType.VALIDATE },
+
                       { type: ActionType.REGISTER }
                     ]
                   }),

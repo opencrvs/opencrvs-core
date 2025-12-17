@@ -112,13 +112,6 @@ test('records are indexed with full location hierarchy', async () => {
     })
   })
 
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(createdEvent.id, {
-      declaration: event.declaration,
-      keepAssignment: true
-    })
-  )
-
   // --- Verify indexed ES document contains full hierarchy -------------------
   const searchResponse = await esClient.search({
     index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
@@ -1047,13 +1040,6 @@ describe('placeOfEvent location hierarchy handling', () => {
       })
     )
 
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(createdEvent.id, {
-        declaration: declarationWithHomeAddress,
-        keepAssignment: true
-      })
-    )
-
     // Verify: Elasticsearch document contains full location hierarchies
     const esSearchResponse = await esClient.search({
       index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
@@ -1163,13 +1149,6 @@ describe('placeOfEvent location hierarchy handling', () => {
 
       await client.event.actions.declare.request(
         generator.event.actions.declare(event.id, {
-          declaration: declarationWithHomeAddress,
-          keepAssignment: true
-        })
-      )
-
-      await client.event.actions.validate.request(
-        generator.event.actions.validate(event.id, {
           declaration: declarationWithHomeAddress,
           keepAssignment: true
         })
@@ -1302,13 +1281,6 @@ describe('placeOfEvent location hierarchy handling', () => {
       })
     )
 
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration: declarationWithInternationalAddress,
-        keepAssignment: true
-      })
-    )
-
     // Step 2: Verify events are indexed correctly BEFORE reindexing
     const initialSearchResponse = await esClient.search({
       index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
@@ -1372,13 +1344,6 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     await client.event.actions.declare.request(
       generator.event.actions.declare(event.id, {
-        declaration: declarationWithHomeAddress,
-        keepAssignment: true
-      })
-    )
-
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
         declaration: declarationWithHomeAddress,
         keepAssignment: true
       })
