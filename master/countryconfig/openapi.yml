@@ -9040,6 +9040,11 @@ components:
         title:
           $ref: "#/components/schemas/TranslationConfig"
           description: Header title of the page
+        requireCompletionToContinue:
+          type: boolean
+          default: false
+          description: If true, all required fields must be filled before continuing to
+            the next page
         fields:
           type: array
           items:
@@ -9052,6 +9057,7 @@ components:
       required:
         - id
         - title
+        - requireCompletionToContinue
         - fields
       description: Form page configuration
     VerificationActionConfig:

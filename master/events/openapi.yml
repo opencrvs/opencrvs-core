@@ -752,7 +752,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: c83932c1-d067-4603-938f-6eb7357b5795
+                transactionId: 9071013b-bf51-4864-b572-b55885e6e3fe
                 type: birth
       responses:
         "200":
@@ -838,7 +838,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: c1ec5f08-a902-43a2-b875-2f4d8cec66bb
+                transactionId: 2208adad-8cdc-48a8-8938-8e7b7a584eaf
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9819,6 +9819,11 @@ components:
           description: Header title of the page
           allOf:
             - $ref: "#/components/schemas/TranslationConfig"
+        requireCompletionToContinue:
+          type: boolean
+          default: false
+          description: If true, all required fields must be filled before continuing to
+            the next page
         fields:
           type: array
           items:
@@ -9832,6 +9837,7 @@ components:
       required:
         - id
         - title
+        - requireCompletionToContinue
         - fields
       description: Form page configuration
     VerificationActionConfig:
