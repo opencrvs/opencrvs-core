@@ -75,6 +75,7 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
   )
   // this is the root location
   locationNodeMap.set('0', { id: '0', children: [] })
+
   locations.forEach((loc) => {
     const parent = locationNodeMap.get(loc.partOf.split('/')[1])
     if (!parent) {
@@ -136,12 +137,15 @@ async function getLocations() {
       ({ locationType }) => locationType === 'ADMIN_STRUCTURE'
     )
   )
+
   parsedLocations.data
     .filter(({ locationType }) => locationType !== 'ADMIN_STRUCTURE')
     .forEach((facilityOrOffice) => {
-      if (!adminStructureMap.get(facilityOrOffice.partOf.split('/')[1])) {
+      const parent = facilityOrOffice.partOf.split('/')[1]
+
+      if (parent !== '0' && !adminStructureMap.get(parent)) {
         raise(
-          `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
+          `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name} kissa`
         )
       }
     })
