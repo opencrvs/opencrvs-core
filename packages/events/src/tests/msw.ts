@@ -26,6 +26,12 @@ const tennisClubMembershipEventWithCustomAction = {
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
       },
+      auditHistoryLabel: {
+        id: 'event.tennis-club-membership.action.confirm.audit-history-label',
+        defaultMessage: 'Confirmed senior membership',
+        description:
+          'This is the label to show in audit history for the confirm senior membership action'
+      },
       conditionals: [
         {
           type: ConditionalType.SHOW,
