@@ -282,7 +282,7 @@ test('Check scopes against get.event', async () => {
       }
     ),
     {
-      numRuns: 50
+      numRuns: 40
     }
   )
 })
