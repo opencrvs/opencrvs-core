@@ -139,7 +139,7 @@ function QuickActionModal({
       ]}
       id={`quick-action-modal-${config.label.id}`}
       isOpen={true}
-      title={intl.formatMessage(config.label)}
+      title={intl.formatMessage(config.label) + '?'}
       titleIcon={
         <Icon
           color="primary"
