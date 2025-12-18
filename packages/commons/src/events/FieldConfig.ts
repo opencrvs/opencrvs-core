@@ -863,6 +863,7 @@ export type FieldConfig =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof NumberField>
+  | z.infer<typeof NumberWithUnitField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
   | z.infer<typeof AgeField>
@@ -912,6 +913,7 @@ export type FieldConfigInput =
   | z.input<typeof ButtonField>
   | z.input<typeof AlphaPrintButton>
   | z.input<typeof NumberField>
+  | z.input<typeof NumberWithUnitField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
   | z.input<typeof AgeField>
