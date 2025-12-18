@@ -179,7 +179,7 @@ function useEditActions(event: EventDocument) {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const validatorContext = useValidatorContext()
-  const reviewConfig = getActionReview(eventConfiguration, ActionType.EDIT)
+  const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
