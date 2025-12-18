@@ -26,6 +26,11 @@ const INTERNAL_SEPARATOR = '___'
 
 // The __EMPTY__ is our common token for missing values, that can be used when configuring a message.
 export const EMPTY_TOKEN = '__EMPTY__'
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
 /**
  * Replaces dots with triple underscores in the object keys.
  * This is needed to support dot notation in the message variables.
@@ -51,7 +56,7 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
         }
       })
       /* @TODO: Check if the typing is correct or is there a case where null could come in */
-    } else if (typeof value === 'object' && value !== null) {
+    } else if (isRecord(value)) {
       if ('loading' in value) {
         // HTTP field with a `{ loading: boolean; data: any; error: any }` object will not contain any keys that we want to convert
         continue
@@ -59,7 +64,7 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
 
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {
-      result[newKey] = !value ? EMPTY_TOKEN : value
+      result[newKey] = (!value ? EMPTY_TOKEN : value) as PrimitiveType
     }
   }
 
