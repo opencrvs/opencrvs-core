@@ -2818,10 +2818,6 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -10745,10 +10741,6 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -11091,10 +11083,6 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -11285,10 +11273,6 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -11493,10 +11477,6 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -11797,10 +11777,6 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -12065,10 +12041,6 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
           description: Text displayed on the confirmation
           $ref: "#/components/schemas/TranslationConfig"
@@ -12221,12 +12193,17 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
         - type
         - customActionType
         - form
+        - auditHistoryLabel
       additionalProperties: false
     EventDocumentOutput:
       type: object
