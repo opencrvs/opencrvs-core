@@ -11,7 +11,7 @@
 
 import * as z from 'zod/v4'
 import { SearchScopeAccessLevels } from './events'
-export * from './scopes-v2'
+export { encodeScope, AnyScope } from './scopes-v2'
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
