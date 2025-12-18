@@ -101,6 +101,17 @@ function isTextField(field: FieldConfig): field is TextField {
 }
 
 /**
+ * Logs a deprecation warning for old template variable syntax
+ */
+function warnDeprecatedTemplateVariable(templateVariable: string) {
+  console.warn(
+    `[DEPRECATION WARNING] Template variable "${templateVariable}" uses deprecated syntax. ` +
+    `Please use the new user() function instead. For example: user('name'), user('fullHonorificName'), user('device'). ` +
+    `The old $user.* syntax will be removed in a future version.`
+  )
+}
+
+/**
  *
  * @param fieldType: The type of the field.
  * @param currentValue: The current value of the field.
@@ -133,7 +144,28 @@ export function replacePlaceholders({
   }
 
   if (isTemplateVariable(defaultValue)) {
+    // Emit deprecation warning for old template variable syntax
+    if (defaultValue.startsWith('$user.')) {
+      warnDeprecatedTemplateVariable(defaultValue)
+    }
+    
     const resolvedValue = get(systemVariables, defaultValue)
+    
+    // Special handling for NAME field when user name is referenced
+    if (field.type === FieldType.NAME && defaultValue === '$user.name') {
+      // Convert user name format to NameFieldValue format
+      const userName = systemVariables.$user.name
+      if (userName && userName.length > 0) {
+        const nameObj = userName[0]
+        const nameFieldValue = {
+          firstname: nameObj.given[0] ?? '',
+          surname: nameObj.family,
+          middlename: nameObj.given[1]
+        }
+        return nameFieldValue
+      }
+    }
+    
     const validator = mapFieldTypeToZod(field)
 
     const parsedValue = validator.safeParse(resolvedValue)

@@ -12,9 +12,10 @@
 import { useSelector } from 'react-redux'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { getUsersFullName } from '../utils'
+import type { User } from '@opencrvs/commons/client'
+import type { SystemVariables } from '@opencrvs/commons/client'
 
-export function useUserDetails() {
+export function useUserDetails(): SystemVariables['$user'] {
   const userDetails = useSelector(getUserDetails)
   const locations = useSelector(getLocations)
 
@@ -26,30 +27,29 @@ export function useUserDetails() {
       given: n.firstNames ? [n.firstNames] : []
     }))
 
-  const name = normalizedName ? getUsersFullName(normalizedName, 'en') : ''
-
   const primaryOfficeId = userDetails?.primaryOffice.id
+
+  let districtId = ''
+  let provinceId = ''
 
   if (primaryOfficeId) {
     const primaryOfficeLocation = locations[primaryOfficeId]
-
-    const districtId = primaryOfficeLocation?.partOf.split('/')[1]
+    districtId = primaryOfficeLocation?.partOf.split('/')[1] ?? ''
     const district = districtId ? locations[districtId] : undefined
-
-    const provinceId = district?.partOf.split('/')[1]
-
-    return {
-      name,
-      role: userDetails.role.id,
-      district: districtId ?? '',
-      province: provinceId ?? ''
-    }
+    provinceId = district?.partOf.split('/')[1] ?? ''
   }
 
   return {
-    name,
-    role: userDetails?.role.id,
-    district: '',
-    province: ''
+    id: userDetails?.id ?? '',
+    name: normalizedName ?? [],
+    role: userDetails?.role.id ?? '',
+    avatar: userDetails?.avatar?.data,
+    signature: userDetails?.signature?.data,
+    primaryOfficeId: primaryOfficeId ?? '',
+    fullHonorificName: userDetails?.localRegistrar?.name?.[0]?.use,
+    device: userDetails?.device,
+    type: 'user' as const,
+    district: districtId,
+    province: provinceId
   }
 }

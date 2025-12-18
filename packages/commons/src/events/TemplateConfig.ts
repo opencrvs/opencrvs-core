@@ -15,12 +15,13 @@
  */
 
 import { FieldValue } from './FieldValue'
+import { User } from '../users/User'
 
 /**
  * Available system variables for configuration.
  */
 export type SystemVariables = {
-  $user: {
+  $user: User & {
     province: string
     district: string
   }
@@ -44,6 +45,15 @@ export const window = () => ({
     }
   }
 })
+
+/**
+ * Resolves `user('name')` to `$user.name` to allow us to 1) type check system variables 2) change the implementation later if needed
+ */
+export function user(
+  key: 'name' | 'fullHonorificName' | 'device' | 'province' | 'district'
+) {
+  return `$user.${key}`
+}
 
 /**
  * Recursively flatten the keys of an object. Used to limit types when configuring default values in country config.
