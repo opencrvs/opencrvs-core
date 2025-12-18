@@ -62,8 +62,9 @@ import {
   isIdReaderFieldType,
   isQrReaderFieldType,
   isLoaderFieldType,
-  isHiddenFieldType,
-  isAgeFieldType
+  isAgeFieldType,
+  isCustomFieldType,
+  isHiddenFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -101,6 +102,7 @@ import { IdReader } from '@client/v2-events/features/events/registered-fields/Id
 import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
+import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
 import {
   makeFormFieldIdFormikCompatible,
@@ -799,6 +801,21 @@ export const GeneratedInputField = React.memo(
           configuration={field.config.configuration}
           id={field.config.id}
         />
+      )
+    }
+    if (isCustomFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Custom.Input
+            {...field.config}
+            configuration={field.config.configuration}
+            disabled={disabled}
+            id={field.config.id}
+            value={field.value}
+            onBlur={onBlur}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
 
