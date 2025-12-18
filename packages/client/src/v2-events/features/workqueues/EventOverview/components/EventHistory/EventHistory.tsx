@@ -379,7 +379,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
       // If a audit history label is configured in action config, use that!
       const title =
-        actionConfig && actionConfig.auditHistoryLabel
+        actionConfig && actionConfig.type === ActionType.CUSTOM
           ? intl.formatMessage(actionConfig.auditHistoryLabel)
           : intl.formatMessage(eventHistoryStatusMessage, {
               action: getActionTypeForHistory(history, action),
