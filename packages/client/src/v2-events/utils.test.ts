@@ -190,15 +190,40 @@ const AddressField = {
   }
 } satisfies InteractiveFieldType
 
+const mockUser = {
+  id: '123',
+  name: [
+    {
+      use: 'en',
+      given: ['John', 'Michael'],
+      family: 'Doe'
+    }
+  ],
+  role: 'LOCAL_REGISTRAR',
+  primaryOfficeId: 'office-123',
+  type: 'user' as const,
+  district: '',
+  province: ''
+}
+
+const NameField = {
+  id: 'informant.name',
+  type: FieldType.NAME,
+  required: true,
+  conditionals: [],
+  label: {
+    defaultMessage: "Informant's name",
+    description: 'This is the label for the field',
+    id: 'event.birth.action.declare.form.section.informant.field.name.label'
+  }
+} satisfies InteractiveFieldType
+
 const testCases = [
   {
     currentValue: undefined,
     defaultValue: undefined,
     systemVariables: {
-      $user: {
-        district: '',
-        province: ''
-      },
+      $user: mockUser,
       $window: {
         location: {
           href: 'http://example.com',
@@ -215,10 +240,7 @@ const testCases = [
     currentValue: undefined,
     defaultValue: 'Hello',
     systemVariables: {
-      $user: {
-        district: '',
-        province: ''
-      },
+      $user: mockUser,
       $window: {
         location: {
           href: 'http://example.com',
@@ -235,10 +257,7 @@ const testCases = [
     currentValue: undefined,
     defaultValue: '$user.district',
     systemVariables: {
-      $user: {
-        district: 'Ibombo',
-        province: ''
-      },
+      $user: { ...mockUser, district: 'Ibombo' },
       $window: {
         location: {
           href: 'http://example.com',
@@ -255,10 +274,7 @@ const testCases = [
     currentValue: 'Hello world',
     defaultValue: '$user.district',
     systemVariables: {
-      $user: {
-        district: 'Ibombo',
-        province: ''
-      },
+      $user: { ...mockUser, district: 'Ibombo' },
       $window: {
         location: {
           href: 'http://example.com',
@@ -278,10 +294,7 @@ const testCases = [
       addressType: AddressType.DOMESTIC
     },
     systemVariables: {
-      $user: {
-        district: 'Ibombo',
-        province: 'Central'
-      },
+      $user: { ...mockUser, district: 'Ibombo', province: 'Central' },
       $window: {
         location: {
           href: 'http://example.com',
@@ -296,6 +309,61 @@ const testCases = [
       addressType: AddressType.DOMESTIC
     },
     field: AddressField
+  },
+  {
+    currentValue: undefined,
+    defaultValue: '$user.name',
+    systemVariables: {
+      $user: mockUser,
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
+      }
+    },
+    expected: {
+      firstname: 'John',
+      surname: 'Doe',
+      middlename: 'Michael'
+    },
+    field: NameField
+  },
+  {
+    currentValue: undefined,
+    defaultValue: '$user.fullHonorificName',
+    systemVariables: {
+      $user: { ...mockUser, fullHonorificName: 'Dr. John Doe PhD' },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
+      }
+    },
+    expected: 'Dr. John Doe PhD',
+    field: TextField
+  },
+  {
+    currentValue: undefined,
+    defaultValue: '$user.device',
+    systemVariables: {
+      $user: { ...mockUser, device: 'Mobile Device 123' },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
+      }
+    },
+    expected: 'Mobile Device 123',
+    field: TextField
   }
 ] as const
 
@@ -308,6 +376,66 @@ describe('replacePlaceholders', () => {
     )} returns ${JSON.stringify(expected)}`, () => {
       const result = replacePlaceholders(props)
       expect(result).toEqual(expected)
+    })
+  })
+
+  describe('deprecation warnings', () => {
+    let consoleWarnSpy: jest.SpyInstance
+
+    beforeEach(() => {
+      consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation()
+    })
+
+    afterEach(() => {
+      consoleWarnSpy.mockRestore()
+    })
+
+    it('should log deprecation warning for $user.* template variables', () => {
+      replacePlaceholders({
+        field: TextField,
+        defaultValue: '$user.district',
+        systemVariables: {
+          $user: { ...mockUser, district: 'Ibombo' },
+          $window: {
+            location: {
+              href: 'http://example.com',
+              pathname: '/path',
+              originPathname: '/path',
+              hostname: 'example.com'
+            }
+          }
+        }
+      })
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[DEPRECATION WARNING]')
+      )
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('$user.district')
+      )
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining("user('name')")
+      )
+    })
+
+    it('should not log deprecation warning for non-$user template variables', () => {
+      replacePlaceholders({
+        field: TextField,
+        defaultValue: '$window.location.href',
+        systemVariables: {
+          $user: mockUser,
+          $window: {
+            location: {
+              href: 'http://example.com',
+              pathname: '/path',
+              originPathname: '/path',
+              hostname: 'example.com'
+            }
+          }
+        }
+      })
+
+      expect(consoleWarnSpy).not.toHaveBeenCalled()
     })
   })
 })
