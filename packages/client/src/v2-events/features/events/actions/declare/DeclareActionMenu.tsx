@@ -19,7 +19,8 @@ import {
   EventDocument,
   getCurrentEventState,
   InherentFlags,
-  getActionReview
+  getActionReview,
+  getAvailableActionsForEvent
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -92,7 +93,7 @@ function useDeclarationActions(event: EventDocument) {
     [ActionType.REGISTER]: events.customActions.registerOnDeclare.mutate
   }
 
-  const reviewConfig = getActionReview(eventConfiguration, ActionType.EDIT)
+  const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
   if (!reviewConfig) {
     throw new Error('Review config not found')
   }
@@ -145,11 +146,12 @@ function useDeclarationActions(event: EventDocument) {
         annotation,
         transactionId: uuid()
       })
-      closeActionView(slug)
+      return closeActionView(slug)
     }
   }
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const availableActions = getAvailableActionsForEvent(eventIndex)
 
   return {
     modals: [modal, rejectionModal, saveAndExitModal, deleteDeclarationModal],
@@ -172,16 +174,15 @@ function useDeclarationActions(event: EventDocument) {
         icon: 'UploadSimple' as const,
         label: actionLabels[ActionType.NOTIFY],
         onClick: async () => handleDeclaration(ActionType.NOTIFY),
-        hidden: !isActionAllowed(ActionType.NOTIFY),
-        disabled: false
+        hidden:
+          !availableActions.includes(ActionType.NOTIFY) ||
+          !isActionAllowed(ActionType.NOTIFY)
       },
       {
         icon: 'FileX' as const,
         label: actionLabels[ActionType.REJECT],
         onClick: async () => handleRejection(() => closeActionView(slug)),
-        hidden:
-          eventIndex.status !== EventStatus.enum.NOTIFIED ||
-          eventIndex.flags.includes(InherentFlags.REJECTED)
+        hidden: !availableActions.includes(ActionType.REJECT)
       },
       {
         icon: 'FloppyDisk' as const,
@@ -189,7 +190,7 @@ function useDeclarationActions(event: EventDocument) {
         onClick: async () =>
           handleSaveAndExit(() => {
             drafts.submitLocalDraft()
-            closeActionView(slug)
+            return closeActionView(slug)
           }),
         hidden: false
       },
@@ -197,7 +198,7 @@ function useDeclarationActions(event: EventDocument) {
         icon: 'Trash' as const,
         label: formHeaderMessages.deleteDeclaration,
         onClick: async () => onDelete(),
-        hidden: false
+        hidden: !availableActions.includes(ActionType.DELETE)
       }
     ].filter((a) => !a.hidden)
   }

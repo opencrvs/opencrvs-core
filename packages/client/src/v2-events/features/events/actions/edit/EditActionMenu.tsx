@@ -65,12 +65,12 @@ const messages = {
   },
   editAndRegisterLabel: {
     defaultMessage: 'Register with edits',
-    description: 'Label for "Register with edits" in edit action menu',
+    description: 'Label for Register with edits in edit action menu',
     id: 'event.edit.registerWithEdits.label'
   },
   editAndDeclareLabel: {
     defaultMessage: 'Declare with edits',
-    description: 'Label for "Declare with edits" in edit action menu',
+    description: 'Label for Declare with edits in edit action menu',
     id: 'event.edit.declareWithEdits.label'
   },
   editAndNotifyLabel: {
@@ -179,7 +179,7 @@ function useEditActions(event: EventDocument) {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const validatorContext = useValidatorContext()
-  const reviewConfig = getActionReview(eventConfiguration, ActionType.EDIT)
+  const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)

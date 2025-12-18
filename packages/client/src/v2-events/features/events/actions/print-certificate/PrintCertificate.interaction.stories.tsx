@@ -295,7 +295,6 @@ export const RedirectAfterPrint: Story = {
               configuration: tennisClubMembershipEvent,
               actions: [
                 { type: ActionType.DECLARE },
-                { type: ActionType.VALIDATE },
                 { type: ActionType.REGISTER },
                 { type: ActionType.PRINT_CERTIFICATE }
               ]

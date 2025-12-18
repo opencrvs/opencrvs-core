@@ -24,7 +24,7 @@ export const InherentFlags = {
    * This flag is set by the Edit-action and removed after the declaration or registration.
    * A record should never stay with the EDIT_IN_PROGRESS flag, since it should always be declared or registered right after.
    *
-   * We only use this flag to determine that a DECLARE or REGISTER action is allowed next.
+   * We only use this flag to determine that a NOTIFY, DECLARE or REGISTER action is allowed next.
    */
   EDIT_IN_PROGRESS: 'edit-in-progress'
 } as const
