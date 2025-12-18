@@ -93,7 +93,7 @@ function useDeclarationActions(event: EventDocument) {
     [ActionType.REGISTER]: events.customActions.registerOnDeclare.mutate
   }
 
-  const reviewConfig = getActionReview(eventConfiguration, ActionType.EDIT)
+  const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
   if (!reviewConfig) {
     throw new Error('Review config not found')
   }

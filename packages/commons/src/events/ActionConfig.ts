@@ -72,6 +72,12 @@ const DeclareConfig = DeclarationActionBase.extend(
   }).shape
 )
 
+const EditActionConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.EDIT)
+  }).shape
+)
+
 const RejectConfig = ActionConfigBase.extend(
   z.object({
     type: z.literal(ActionType.REJECT)
@@ -132,6 +138,7 @@ export const ActionConfig = z
       id: 'PrintCertificateActionConfig'
     }),
     RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
+    EditActionConfig.meta({ id: 'EditActionConfig' }),
     CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(
