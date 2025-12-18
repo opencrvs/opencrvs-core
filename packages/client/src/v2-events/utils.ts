@@ -148,9 +148,9 @@ export function replacePlaceholders({
     if (defaultValue.startsWith('$user.')) {
       warnDeprecatedTemplateVariable(defaultValue)
     }
-    
+
     const resolvedValue = get(systemVariables, defaultValue)
-    
+
     // Special handling for NAME field when user name is referenced
     if (field.type === FieldType.NAME && defaultValue === '$user.name') {
       // Convert user name format to NameFieldValue format
@@ -160,12 +160,12 @@ export function replacePlaceholders({
         const nameFieldValue = {
           firstname: nameObj.given[0] ?? '',
           surname: nameObj.family,
-          middlename: nameObj.given[1]
+          middlename: nameObj.given?.[1] ?? undefined
         }
         return nameFieldValue
       }
     }
-    
+
     const validator = mapFieldTypeToZod(field)
 
     const parsedValue = validator.safeParse(resolvedValue)

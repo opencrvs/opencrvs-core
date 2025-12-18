@@ -12,8 +12,7 @@
 import { useSelector } from 'react-redux'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import type { User } from '@opencrvs/commons/client'
-import type { SystemVariables } from '@opencrvs/commons/client'
+import type { User, SystemVariables } from '@opencrvs/commons/client'
 
 export function useUserDetails(): SystemVariables['$user'] {
   const userDetails = useSelector(getUserDetails)
