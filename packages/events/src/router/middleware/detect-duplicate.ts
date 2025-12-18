@@ -18,8 +18,7 @@ import {
   DeclarationActionConfig,
   EventDocument,
   getCurrentEventState,
-  RegisterActionInput,
-  ValidateActionInput
+  RegisterActionInput
 } from '@opencrvs/commons/events'
 import { getUUID } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
@@ -29,12 +28,8 @@ import { processAction, getEventById } from '@events/service/events/events'
 
 function requiresDedupCheck(
   input: ActionInputWithType
-): input is ValidateActionInput | RegisterActionInput {
-  const actionsRequiringCheck: ActionType[] = [
-    ActionType.VALIDATE,
-    ActionType.REGISTER
-  ]
-  return actionsRequiringCheck.includes(input.type)
+): input is RegisterActionInput {
+  return input.type === ActionType.REGISTER
 }
 
 export const detectDuplicate: MiddlewareFunction<

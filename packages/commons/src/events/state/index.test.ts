@@ -229,20 +229,6 @@ describe('getCurrentEventState()', () => {
         originalActionId: declareRequestAction.id
       }
     })
-    // Validate accepted directly by 3rd party API. Single action created.
-    const validateAcceptAction = generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.VALIDATE,
-      defaults: {
-        status: ActionStatus.Accepted,
-        createdAt: '2023-04-01T00:00:00.000Z',
-        createdBy: 'user2',
-        createdByUserType: TokenUserType.enum.user,
-        createdAtLocation: 'location3' as UUID,
-        createdBySignature: '/ocrvs/signature-2.png',
-        createdByRole: 'REGISTRATION_AGENT'
-      }
-    })
 
     const registerRequestAction = generateActionDocument({
       configuration: tennisClubMembershipEvent,
@@ -278,7 +264,6 @@ describe('getCurrentEventState()', () => {
       createAction,
       declareRequestAction,
       declareAcceptAction,
-      validateAcceptAction,
       registerRequestAction,
       registerAcceptAction
     ]
@@ -313,7 +298,7 @@ describe('getCurrentEventState()', () => {
       ) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
       placeOfEvent: createAction.createdAtLocation,
-      flags: [InherentFlags.PENDING_CERTIFICATION, 'validated'],
+      flags: [InherentFlags.PENDING_CERTIFICATION],
       potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
@@ -371,20 +356,6 @@ describe('getCurrentEventState()', () => {
       }
     })
 
-    const validateAcceptAction = generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.VALIDATE,
-      defaults: {
-        status: ActionStatus.Accepted,
-        createdAt: '2023-04-01T00:00:00.000Z',
-        createdByUserType: TokenUserType.enum.user,
-        createdBySignature: '/ocrvs/signature-2.png',
-        createdBy: 'user2',
-        createdAtLocation: 'location3' as UUID,
-        createdByRole: 'REGISTRATION_AGENT'
-      }
-    })
-
     const registerAcceptAction = generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.REGISTER,
@@ -400,12 +371,7 @@ describe('getCurrentEventState()', () => {
       }
     })
 
-    const actions = [
-      createAction,
-      declareAcceptAction,
-      validateAcceptAction,
-      registerAcceptAction
-    ]
+    const actions = [createAction, declareAcceptAction, registerAcceptAction]
 
     const event = {
       trackingId: getUUID(),
@@ -434,7 +400,7 @@ describe('getCurrentEventState()', () => {
       declaration: deepDropNulls(declareAcceptAction.declaration) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
       placeOfEvent: createAction.createdAtLocation,
-      flags: [InherentFlags.PENDING_CERTIFICATION, 'validated'],
+      flags: [InherentFlags.PENDING_CERTIFICATION],
       potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
@@ -578,14 +544,6 @@ describe('getCurrentEventState()', () => {
             'applicant.age': 20,
             'applicant.dob': '2000-01-01'
           }
-        },
-        {
-          type: ActionType.VALIDATE,
-          declarationOverrides: {
-            'applicant.dobUnknown': false,
-            'applicant.age': 20,
-            'applicant.dob': '2000-01-01'
-          }
         }
       ]
     })
@@ -603,14 +561,6 @@ describe('getCurrentEventState()', () => {
         { type: ActionType.CREATE },
         {
           type: ActionType.DECLARE,
-          declarationOverrides: {
-            'applicant.dobUnknown': true,
-            'applicant.age': 20,
-            'applicant.dob': '2000-01-01'
-          }
-        },
-        {
-          type: ActionType.VALIDATE,
           declarationOverrides: {
             'applicant.dobUnknown': true,
             'applicant.age': 20,

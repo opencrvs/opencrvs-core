@@ -521,9 +521,7 @@ test('combined registeredIn and declaredIn filters in scope', async () => {
     generator.event.create()
   )
 
-  const declareInput = generator.event.actions.declare(originalEvent.id, {
-    keepAssignment: true
-  })
+  const declareInput = generator.event.actions.declare(originalEvent.id)
 
   const leafLevelAdminAreas = administrativeAreas.filter((aa) =>
     administrativeAreas.every((other) => other.parentId !== aa.id)
@@ -544,12 +542,6 @@ test('combined registeredIn and declaredIn filters in scope', async () => {
       }
     }
   })
-
-  await userInDistrictAClient.event.actions.validate.request(
-    generator.event.actions.validate(originalEvent.id, {
-      declaration: {}
-    })
-  )
 
   await userInProvinceAClient.event.actions.assignment.assign(
     generator.event.actions.assign(originalEvent.id, {
@@ -633,9 +625,7 @@ test('combined registeredBy and declaredBy filters in scope', async () => {
     generator.event.create()
   )
 
-  const declareInput = generator.event.actions.declare(originalEvent.id, {
-    keepAssignment: true
-  })
+  const declareInput = generator.event.actions.declare(originalEvent.id)
 
   const leafLevelAdminAreas = administrativeAreas.filter((aa) =>
     administrativeAreas.every((other) => other.parentId !== aa.id)
@@ -656,12 +646,6 @@ test('combined registeredBy and declaredBy filters in scope', async () => {
       }
     }
   })
-
-  await userInDistrictAClient.event.actions.validate.request(
-    generator.event.actions.validate(originalEvent.id, {
-      declaration: {}
-    })
-  )
 
   await userInProvinceAClient.event.actions.assignment.assign(
     generator.event.actions.assign(originalEvent.id, {

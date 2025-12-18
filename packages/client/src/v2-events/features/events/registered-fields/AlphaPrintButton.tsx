@@ -47,7 +47,7 @@ const addedButtonLabel = { id: 'buttons.print', defaultMessage: 'Print' }
 /**
  * Indicates that declaration action changed declaration content. Satisfies V1 spec.
  */
-export const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
+const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
 type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
 
 export const AlphaPrintButton = {

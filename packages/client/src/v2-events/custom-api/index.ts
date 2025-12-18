@@ -82,16 +82,12 @@ export async function registerOnDeclare({
     return declaredEvent
   }
 
-  const latestResponse = await trpcClient.event.actions.register.request.mutate(
-    {
-      declaration: {},
-      annotation,
-      eventId,
-      transactionId
-    }
-  )
-
-  return latestResponse
+  return trpcClient.event.actions.register.request.mutate({
+    declaration: {},
+    annotation,
+    eventId,
+    transactionId
+  })
 }
 
 export async function editAndRegister({
@@ -111,18 +107,17 @@ export async function editAndRegister({
     content
   })
 
-  // TODO CIHAN: do declare only if its not been notified previously?
-  // const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
-  //   declaration,
-  //   annotation,
-  //   eventId,
-  //   transactionId,
-  //   keepAssignment: true
-  // })
+  const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
+    declaration,
+    annotation,
+    eventId,
+    transactionId,
+    keepAssignment: true
+  })
 
-  // if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
-  //   return declaredEvent
-  // }
+  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
+    return declaredEvent
+  }
 
   return trpcClient.event.actions.register.request.mutate({
     declaration,
@@ -180,82 +175,6 @@ export async function editAndNotify({
   })
 }
 
-/**
- * Runs a sequence of actions from declare to validate.
- *
- * Defining the function here, statically allows offline support.
- * Moving the function to one level up will break offline support since the definition needs to be static.
- */
-export async function validateOnDeclare({
-  eventId,
-  transactionId,
-  eventConfiguration,
-  declaration,
-  annotation
-}: CustomMutationParams) {
-  const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
-    declaration,
-    annotation,
-    eventId,
-    transactionId,
-    keepAssignment: true
-  })
-
-  if (hasPotentialDuplicates(declaredEvent, eventConfiguration)) {
-    return declaredEvent
-  }
-
-  const latestResponse = await trpcClient.event.actions.validate.request.mutate(
-    {
-      // update is a patch, no need to send again.
-      declaration: {},
-      annotation,
-      eventId,
-      transactionId
-    }
-  )
-
-  return latestResponse
-}
-
-/**
- * Runs a sequence of actions from  validate to register.
- *
- * Defining the function here, statically allows offline support.
- * Moving the function to one level up will break offline support since the definition needs to be static.
- */
-export async function registerOnValidate({
-  eventId,
-  transactionId,
-  eventConfiguration,
-  declaration,
-  annotation
-}: CustomMutationParams) {
-  const maybeDuplicateEvent =
-    await trpcClient.event.actions.validate.request.mutate({
-      declaration,
-      annotation,
-      eventId,
-      transactionId,
-      keepAssignment: true
-    })
-
-  if (hasPotentialDuplicates(maybeDuplicateEvent, eventConfiguration)) {
-    return maybeDuplicateEvent
-  }
-
-  const latestResponse = await trpcClient.event.actions.register.request.mutate(
-    {
-      // update is a patch, no need to send again.
-      declaration: {},
-      annotation,
-      eventId,
-      transactionId
-    }
-  )
-
-  return latestResponse
-}
 /**
  * Runs markAsDuplicate and then archive on sequence.
  */

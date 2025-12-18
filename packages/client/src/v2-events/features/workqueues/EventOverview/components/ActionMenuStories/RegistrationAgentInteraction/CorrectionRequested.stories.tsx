@@ -34,7 +34,6 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       ActionType.REQUEST_CORRECTION
@@ -52,7 +51,6 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.REQUEST_CORRECTION
     ],
@@ -69,7 +67,6 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS,

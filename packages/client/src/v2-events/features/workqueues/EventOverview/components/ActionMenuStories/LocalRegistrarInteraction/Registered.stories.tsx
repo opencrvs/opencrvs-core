@@ -34,7 +34,6 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN
     ],
@@ -52,7 +51,6 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER
     ],
     expected: {
@@ -69,7 +67,6 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS

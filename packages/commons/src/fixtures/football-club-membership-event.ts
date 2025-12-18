@@ -89,15 +89,6 @@ export const footballClubMembershipEvent = defineConfig({
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
     {
-      type: ActionType.VALIDATE,
-      label: {
-        defaultMessage: 'Validate',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.football-club-membership.action.validate.label'
-      }
-    },
-    {
       type: ActionType.REGISTER,
       label: {
         defaultMessage: 'Register',

@@ -35,7 +35,6 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   ],
   [EventStatus.enum.DECLARED]: [
     ActionType.READ,
-    ActionType.VALIDATE,
     ActionType.REGISTER,
     ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
@@ -81,9 +80,6 @@ const ACTION_FILTERS: {
   [ActionType.MARK_AS_DUPLICATE]: (flags) =>
     flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
     !flags.some((flag) => flag.endsWith(':requested')),
-  [ActionType.VALIDATE]: (flags) =>
-    !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
-    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.EDIT]: (flags) =>
     !flags.includes(InherentFlags.POTENTIAL_DUPLICATE) &&
     !flags.some((flag) => flag.endsWith(':requested')),
@@ -120,6 +116,11 @@ function getAvailableActionsWithoutFlagFilters(
   status: EventStatus,
   flags: Flag[]
 ): DisplayableAction[] {
+  // A record should never stay in the EDIT_IN_PROGRESS flag, since it should always be declared or registered right after
+  if (flags.includes(InherentFlags.EDIT_IN_PROGRESS)) {
+    return [ActionType.NOTIFY, ActionType.DECLARE, ActionType.REGISTER]
+  }
+
   switch (status) {
     case EventStatus.enum.CREATED: {
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
@@ -145,11 +146,6 @@ function getAvailableActionsWithoutFlagFilters(
           .filter((action) => action !== ActionType.DELETE)
           .concat(ActionType.EDIT)
           .concat(ActionType.ARCHIVE)
-      }
-
-      // A record should never stay in the EDIT_IN_PROGRESS flag, since it should always be declared or registered right after
-      if (flags.includes(InherentFlags.EDIT_IN_PROGRESS)) {
-        return [ActionType.DECLARE, ActionType.REGISTER]
       }
 
       return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]

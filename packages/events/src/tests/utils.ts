@@ -101,7 +101,6 @@ export const TEST_USER_DEFAULT_SCOPES = [
   'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.declared.validate[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.register[event=birth|death|tennis-club-membership|child-onboarding]',
@@ -305,11 +304,6 @@ function actionToClientAction(
       return async (eventId: string) =>
         client.event.actions.declare.request(
           generator.event.actions.declare(eventId, { keepAssignment: true })
-        )
-    case ActionType.VALIDATE:
-      return async (eventId: string) =>
-        client.event.actions.validate.request(
-          generator.event.actions.validate(eventId, { keepAssignment: true })
         )
     case ActionType.REJECT:
       return async (eventId: string) =>
