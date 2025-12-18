@@ -95,8 +95,8 @@ export function getActionConfig({
       return a.customActionType === customActionType
     }
 
-    // Notify and edit use the declare action config
-    if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
+    // Notify uses the declare action config
+    if (actionType === ActionType.NOTIFY) {
       return a.type === ActionType.DECLARE
     }
 
