@@ -28,9 +28,12 @@ export const JurisdictionFilter = z
   .describe(
     'Filters based on user jurisdiction relative to their office location in hierarchy.'
   )
+export type JurisdictionFilter = z.infer<typeof JurisdictionFilter>
+
 export const UserFilter = z
   .enum(['user'])
   .describe('Filters based on the user. Limits to self.')
+export type UserFilter = z.infer<typeof UserFilter>
 
 export const RecordAction = z.enum([
   'record.search',
@@ -53,7 +56,10 @@ export const ResolvedRecordScopeV2 = z
   .object({
     type: RecordAction,
     options: z.object({
-      event: z.array(z.string()).describe('Event type, e.g. birth, death'),
+      event: z
+        .array(z.string())
+        .describe('Event type, e.g. birth, death')
+        .optional(),
       eventLocation: UUID.nullish(),
       declaredIn: UUID.nullish(),
       declaredBy: z.string().or(z.undefined()).optional(),

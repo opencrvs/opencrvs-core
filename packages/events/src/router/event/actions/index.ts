@@ -202,7 +202,7 @@ export async function defaultRequestHandler(
   )
 
   const eventWithRequestedAction = await addAction(input, {
-    event,
+    eventId: event.id,
     user,
     token,
     status: ActionStatus.Requested,
@@ -292,7 +292,7 @@ export async function defaultRequestHandler(
       originalActionId: requestedAction.id,
       ...parsedBody
     },
-    { event, user, token, status, configuration }
+    { eventId: event.id, user, token, status, configuration }
   )
 
   return updatedEvent
@@ -443,7 +443,7 @@ export function getDefaultActionProcedures(
         return processAction(
           { ...input, originalActionId: actionId },
           {
-            event,
+            eventId: event.id,
             user,
             token,
             status: ActionStatus.Accepted,

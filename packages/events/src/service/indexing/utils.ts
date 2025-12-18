@@ -11,6 +11,7 @@
 import _ from 'lodash'
 import { type estypes } from '@elastic/elasticsearch'
 import {
+  ActionCreationMetadata,
   AddressFieldValue,
   AddressType,
   EventConfig,
@@ -21,6 +22,7 @@ import {
   isNameFieldType,
   NameFieldValue,
   QueryInputType,
+  RegistrationCreationMetadata,
   UUID
 } from '@opencrvs/commons/events'
 import {
@@ -177,6 +179,36 @@ export function getEventIndexWithoutLocationHierarchy(
   }
 
   return event
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type WrapArrayPreserveNullish<V> = V extends readonly any[]
+  ? V
+  : NonNullable<V>[] | Extract<V, null | undefined>
+
+/**
+ * For type T, convert fields K to arrays. If field is string, convert to string[].
+ */
+type ToArrayFields<T, K extends PropertyKey> = T extends unknown
+  ? T extends object
+    ? { [P in keyof T]: P extends K ? WrapArrayPreserveNullish<T[P]> : T[P] }
+    : T
+  : never
+
+/**
+ * Event index type where all location fields are arrays representing full location hierarchy.
+ */
+export type EventIndexWithLocationHierarchy = Omit<
+  ToArrayFields<EventIndex, 'createdAtLocation' | 'updatedAtLocation'>,
+  'legalStatuses'
+> & {
+  legalStatuses: {
+    DECLARED:
+      | ToArrayFields<ActionCreationMetadata, 'createdAtLocation'>
+      | undefined
+    REGISTERED:
+      | ToArrayFields<RegistrationCreationMetadata, 'createdAtLocation'>
+      | undefined
+  }
 }
 
 /**

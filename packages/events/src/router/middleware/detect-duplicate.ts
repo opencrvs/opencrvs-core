@@ -153,7 +153,7 @@ export const detectDuplicate: MiddlewareFunction<
         }
       },
       {
-        event: storedEvent,
+        eventId: storedEvent.id,
         user,
         token,
         status: ActionStatus.Accepted,
