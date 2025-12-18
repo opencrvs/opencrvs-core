@@ -17,7 +17,7 @@ import {
 } from '@tanstack/react-query-persist-client'
 import {
   createTRPCClient,
-  httpLink,
+  httpBatchLink,
   loggerLink,
   TRPCClientError
 } from '@trpc/client'
@@ -43,9 +43,10 @@ function getTrpcClient() {
       loggerLink({
         enabled: (op) => op.direction === 'down' && op.result instanceof Error
       }),
-      httpLink({
+      httpBatchLink({
         url: '/api/events',
         transformer: superjson,
+        methodOverride: 'POST',
         headers() {
           return {
             authorization: `Bearer ${getToken()}`
