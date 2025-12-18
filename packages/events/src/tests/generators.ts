@@ -148,7 +148,7 @@ function generateTestLocations(adminAreas: Location[], rng: () => number) {
 }
 
 function generateTestAdministrativeAreas() {
-  const rng = createPrng(1234)
+  const rng = createPrng(12345)
   // Generate Administrative areas with children, some "skipping" levels.
   const provinceA = {
     name: 'Province A',
