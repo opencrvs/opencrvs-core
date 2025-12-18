@@ -122,6 +122,9 @@ export function seeder() {
   }
 }
 
+/**
+ * Creates test locations (CRVS offices and Health Facilities) under each provided administrative area.
+ */
 export function generateTestLocations(
   adminAreas: Location[],
   rng: () => number
@@ -210,6 +213,10 @@ export function generateTestAdministrativeAreas() {
   return administrativeAreas
 }
 
+/**
+ * Creates a pair of test users for each provided location.
+ *
+ */
 export function generateTestUsersForLocations(
   locations: Location[],
   rng: () => number

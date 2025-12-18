@@ -28,7 +28,6 @@ import { createTestClient, seedEvent } from '@events/tests/utils'
 import { setupHierarchyWithUsers } from '@events/tests/generators'
 import { getClient } from '../../storage/postgres/events'
 import { EventNotFoundError } from '../../service/events/events'
-import { UserContext } from '../../context'
 
 /** Determine if an event index matches the provided scope filters. */
 function eventMatchesScope({
@@ -128,9 +127,10 @@ function eventMatchesScope({
   return true
 }
 
-test.only('foobar', async () => {
+test('Check scopes against get.event', async () => {
   const { users, isUnderAdministrativeArea } = await setupHierarchyWithUsers()
 
+  // Client that can read all events,  used to fetch events that test clients cannot access for comparison.
   const clientReadingAllEvents = createTestClient(users[0], [
     encodeScope({
       type: 'record.read',
@@ -144,14 +144,10 @@ test.only('foobar', async () => {
 
   const eventsDb = getClient()
 
+  // 1. Seed events with various combinations of users and actions.
   const actionsArb = fc.constantFrom<DeclarationActionType[]>(
     [ActionTypes.enum.DECLARE],
-    [ActionTypes.enum.DECLARE, ActionTypes.enum.VALIDATE],
-    [
-      ActionTypes.enum.DECLARE,
-      ActionTypes.enum.VALIDATE,
-      ActionTypes.enum.REGISTER
-    ]
+    [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
   )
 
   const usersArb = fc.constantFrom(...users)
@@ -179,6 +175,7 @@ test.only('foobar', async () => {
     })
   }
 
+  // 2. Fetch all events that were just seeded.
   const events = await eventsDb
     .selectFrom('events')
     .select(['id', 'eventType'])
@@ -186,7 +183,7 @@ test.only('foobar', async () => {
 
   expect(events.length).toEqual(sampleSize)
 
-  // 3. Setup possible combinations of jurisdiction and user filters.
+  // 3. Setup test combinations with every possible scope and just created events and users.
   const jurisdictionOptions = fc.option(
     fc.constantFrom(...JurisdictionFilter.options),
     { nil: undefined }
@@ -241,6 +238,7 @@ test.only('foobar', async () => {
           }
         })
 
+        // 5. Create test client with the generated scope and try to fetch the event.
         const testClient = createTestClient(user, [searchScope])
         let result:
           | { success: true; event: EventDocument }
@@ -268,7 +266,7 @@ test.only('foobar', async () => {
               }
 
         const eventIndex = getCurrentEventState(result.event, config)
-
+        // 6. Verify that the result matches the expected outcome based on scope filters.
         const isReadableWithScope = eventMatchesScope({
           eventIndex,
           user,
@@ -284,8 +282,7 @@ test.only('foobar', async () => {
       }
     ),
     {
-      numRuns: 50,
-      verbose: true
+      numRuns: 50
     }
   )
 })

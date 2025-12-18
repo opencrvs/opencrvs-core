@@ -23,16 +23,13 @@ import {
   generateActionDeclarationInput,
   generateRandomSignature,
   generateRegistrationNumber,
-  generateTrackingId,
   generateUuid,
   getUUID,
   Scope,
   SCOPES,
   SystemRole,
   TokenUserType,
-  TokenWithBearer,
-  User,
-  UUID
+  TokenWithBearer
 } from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
@@ -405,6 +402,12 @@ export async function createEvent(
   return createdEvent
 }
 
+/**
+ * Seeds an event with the specified actions directly into the database.
+ * Given set of action types, will create requested and accepted actions for each action type with CREATE and ASSIGN actions to resemble realistic event history.
+ *
+ * Useful for setting up test data quickly without going through the full API flow. NOTE: When testing search endpoints, remember to reindex after seeding.
+ */
 export async function seedEvent(
   dbClient: ReturnType<typeof getClient>,
   {

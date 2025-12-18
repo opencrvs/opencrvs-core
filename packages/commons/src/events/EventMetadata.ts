@@ -38,7 +38,7 @@ export const ActionCreationMetadata = z.object({
   createdBy: z
     .string()
     .describe('ID of the user who created the action request.'),
-  createdAtLocation: UUID.describe(
+  createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the action request.'
   ),
   createdByUserType: z

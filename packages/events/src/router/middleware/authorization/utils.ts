@@ -23,6 +23,9 @@ import { UserContext } from '../../../context'
 
 /**
  * Given indexed event and resolved scope, determine if the scope allows access to the event.
+ *
+ * All of the options within the scope must be satisfied for access to be granted.
+ *
  */
 function canAccessEventWithScope(
   event: Partial<EventIndexWithLocationHierarchy>,
@@ -50,8 +53,11 @@ function canAccessEventWithScope(
   }
 
   if (opts.declaredIn === JurisdictionFilter.enum.location) {
-    const locs = event.legalStatuses?.DECLARED?.createdAtLocation
-    if (!locs || !locs.includes(user.primaryOfficeId)) {
+    const locationIds = event.legalStatuses?.DECLARED?.createdAtLocation
+    if (
+      !locationIds ||
+      !locationIds.some((id) => id === user.primaryOfficeId)
+    ) {
       return false
     }
   }
@@ -68,7 +74,10 @@ function canAccessEventWithScope(
 
   if (opts.registeredIn === JurisdictionFilter.enum.location) {
     const locationIds = event.legalStatuses?.REGISTERED?.createdAtLocation
-    if (!locationIds || !locationIds.includes(user.primaryOfficeId)) {
+    if (
+      !locationIds ||
+      !locationIds.some((id) => id === user.primaryOfficeId)
+    ) {
       return false
     }
   }
@@ -88,6 +97,8 @@ function canAccessEventWithScope(
 
 /**
  * Given indexed event and list of resolved scopes, determine if any of the scopes allow access to the event.
+ *
+ * One of the scopes must allow access for the event to be accessible.
  */
 export function canAccessEventWithScopes(
   event: Partial<EventIndexWithLocationHierarchy>,

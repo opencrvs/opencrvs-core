@@ -56,7 +56,10 @@ export const ResolvedRecordScopeV2 = z
   .object({
     type: RecordAction,
     options: z.object({
-      event: z.array(z.string()).describe('Event type, e.g. birth, death'),
+      event: z
+        .array(z.string())
+        .describe('Event type, e.g. birth, death')
+        .optional(),
       eventLocation: UUID.nullish(),
       declaredIn: UUID.nullish(),
       declaredBy: z.string().or(z.undefined()).optional(),
