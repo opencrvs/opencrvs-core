@@ -46,7 +46,7 @@ export function useUserDetails(): SystemVariables['$user'] {
     avatar: userDetails?.avatar?.data,
     signature: userDetails?.signature?.data,
     primaryOfficeId: primaryOfficeId ?? '',
-    fullHonorificName: userDetails?.localRegistrar?.name?.[0]?.use,
+    fullHonorificName: userDetails?.fullHonorificName,
     device: userDetails?.device,
     type: 'user' as const,
     district: districtId,
