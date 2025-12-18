@@ -36,9 +36,6 @@ export const ActionConfigBase = z.object({
     .optional()
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
-  auditHistoryLabel: TranslationConfig.describe(
-    'The label to show in audit history for this action. For example "Approved".'
-  ).optional(),
   supportingCopy: TranslationConfig.optional().describe(
     'Text displayed on the confirmation'
   ),
@@ -72,6 +69,12 @@ const DeclareConfig = DeclarationActionBase.extend(
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
     )
+  }).shape
+)
+
+const EditActionConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.EDIT)
   }).shape
 )
 
@@ -112,7 +115,10 @@ const CustomActionConfig = ActionConfigBase.merge(
       .array(FieldConfig)
       .describe(
         'Form configuration for the custom action. The form configured here will be used on the custom action confirmation modal.'
-      )
+      ),
+    auditHistoryLabel: TranslationConfig.describe(
+      'The label to show in audit history for this action. For example "Approved".'
+    )
   })
 )
 
@@ -132,6 +138,7 @@ export const ActionConfig = z
       id: 'PrintCertificateActionConfig'
     }),
     RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
+    EditActionConfig.meta({ id: 'EditActionConfig' }),
     CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(
