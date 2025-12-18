@@ -10,12 +10,12 @@
  */
 
 import * as z from 'zod/v4'
-import * as qs from 'qs'
 import {
   ConfigurableScopeType,
+  encodeScope,
   parseConfigurableScope,
   parseLiteralScope
-} from './authentication'
+} from './scopes'
 import { UUID } from './uuid'
 
 /*
@@ -86,51 +86,6 @@ export const RecordScopeV2 = z
   )
 
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
-
-/**
- * Generic scope structure that can represent any scope.
- * Used for encoding/decoding scopes to/from strings.
- * We can then later refine to more specific scope types as needed.
- */
-export const AnyScope = z.object({
-  type: z.string(),
-  options: z
-    .record(z.string(), z.string().or(z.array(z.string()).or(z.undefined())))
-    .optional()
-})
-export type AnyScope = z.infer<typeof AnyScope>
-
-const flattenScope = (scope: AnyScope) => ({
-  type: scope.type,
-  ...scope.options
-})
-
-const unflattenScope = (input: Record<string, unknown>) => {
-  const { type, ...options } = input
-  return { type, options }
-}
-
-export const encodeScope = (scope: AnyScope): string => {
-  const flattened = flattenScope(scope)
-
-  return qs.stringify(flattened, {
-    arrayFormat: 'comma',
-    allowDots: true,
-    addQueryPrefix: false,
-    encode: false
-  })
-}
-
-export const decodeScope = (query: string) => {
-  const scope = qs.parse(query, {
-    ignoreQueryPrefix: true,
-    comma: true,
-    allowDots: true
-  })
-
-  const unflattenedScope = unflattenScope(scope)
-  return AnyScope.safeParse(unflattenedScope)?.data
-}
 
 type LegacyScopeType = ConfigurableScopeType
 
