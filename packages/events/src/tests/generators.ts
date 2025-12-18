@@ -125,10 +125,7 @@ export function seeder() {
 /**
  * Creates test locations (CRVS offices and Health Facilities) under each provided administrative area.
  */
-export function generateTestLocations(
-  adminAreas: Location[],
-  rng: () => number
-) {
+function generateTestLocations(adminAreas: Location[], rng: () => number) {
   return adminAreas.flatMap((admin) => {
     const crvs = {
       name: `${admin.name} CRVS Office`,
@@ -150,7 +147,7 @@ export function generateTestLocations(
   })
 }
 
-export function generateTestAdministrativeAreas() {
+function generateTestAdministrativeAreas() {
   const rng = createPrng(1234)
   // Generate Administrative areas with children, some "skipping" levels.
   const provinceA = {
@@ -217,7 +214,7 @@ export function generateTestAdministrativeAreas() {
  * Creates a pair of test users for each provided location.
  *
  */
-export function generateTestUsersForLocations(
+function generateTestUsersForLocations(
   locations: Location[],
   rng: () => number
 ) {

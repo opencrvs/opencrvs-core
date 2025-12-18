@@ -40,7 +40,7 @@ import {
   ResolvedRecordScopeV2
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
-import { TrpcContext } from '@events/context'
+import { TrpcContext, UserContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
 import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
@@ -334,24 +334,63 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   return next()
 }
 
-export const userCanReadEvent2: MiddlewareFunction<
+export const userCanReadEventV2: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
   TrpcContext & { eventId: UUID; eventType: string },
   UUID
 > = async ({ next, ctx, input }) => {
-  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+  const humanUser = UserContext.safeParse(ctx.user)
 
-  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, ['record.read'])
-
-  if (acceptedScopes.length === 0) {
+  if (!humanUser.success) {
     throw new EventNotFoundError(input)
   }
 
-  const event = await getEventById(input)
-  const eventConfig = eventConfigs.find((c) => c.id === event.type)
+  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
+  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, ['record.read'])
+  const event = await getEventById(input)
+
+  // 1. If no accepted scopes are found, fall back to V1 style check based on CREATE action.
+  // This will be removed once we have migrated countryconfigs to use V2 scopes only.
+  if (acceptedScopes.length === 0) {
+    const createAction = event.actions.find(
+      (action) => action.type === ActionType.CREATE
+    )
+
+    if (!createAction) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: `Event ${event.id} is missing ${ActionType.CREATE} action`
+      })
+    }
+
+    const canRead = canUserReadEvent(
+      {
+        createdBy: createAction.createdBy,
+        type: event.type
+      },
+      {
+        userId: ctx.user.id,
+        scopes: getScopes(ctx.token)
+      }
+    )
+
+    if (canRead) {
+      return next({
+        ctx: {
+          ...ctx,
+          eventId: input,
+          eventType: event.type
+        }
+      })
+    }
+
+    throw new EventNotFoundError(input)
+  }
+
+  const eventConfig = eventConfigs.find((c) => c.id === event.type)
   if (!eventConfig) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
@@ -366,7 +405,7 @@ export const userCanReadEvent2: MiddlewareFunction<
   const hasAccess = canAccessEventWithScopes(
     eventIndexWithLocationHierarchy,
     acceptedScopes as ResolvedRecordScopeV2[],
-    ctx.user
+    humanUser.data
   )
 
   if (!hasAccess) {
@@ -380,45 +419,6 @@ export const userCanReadEvent2: MiddlewareFunction<
       eventType: event.type
     }
   })
-}
-
-export const userCanReadEvent: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext & { event: EventDocument },
-  UUID
-> = async ({ next, ctx, input }) => {
-  const event = await getEventById(input)
-
-  const createAction = event.actions.find(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  if (!createAction) {
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: `Event ${event.id} is missing ${ActionType.CREATE} action`
-    })
-  }
-
-  const canRead = canUserReadEvent(
-    {
-      createdBy: createAction.createdBy,
-      type: event.type
-    },
-    {
-      userId: ctx.user.id,
-      scopes: getScopes(ctx.token)
-    }
-  )
-
-  if (canRead) {
-    return next({ ctx: { ...ctx, event } })
-  }
-
-  // Throw not found to avoid leaking the existence of the event
-  throw new EventNotFoundError(input)
 }
 
 export const userCanReadOtherUser: MiddlewareFunction<
