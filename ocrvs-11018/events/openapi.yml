@@ -754,7 +754,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: d8ab924f-533f-421b-919c-bb4311e8b935
+                transactionId: f5afb54c-d4b2-4208-867f-3708a7dd7302
                 type: birth
       responses:
         "200":
@@ -840,7 +840,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 12f4370a-d39e-4b2d-ab10-7ef8ae814154
+                transactionId: 3bf22613-b08d-423b-9f37-28235a58a520
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -11910,21 +11910,6 @@ components:
                   - type: number
                   - type: object
                     properties:
-                      numericValue:
-                        type: number
-                      unit:
-                        type: string
-                    required:
-                      - numericValue
-                      - unit
-                  - type: object
-                    properties:
-                      numericValue:
-                        type: number
-                      unit:
-                        type: string
-                  - type: object
-                    properties:
                       path:
                         type: string
                         description: A full absolute path with bucket name, starting from the root of
@@ -12017,6 +12002,21 @@ components:
                   - type: object
                     properties:
                       data: {}
+                  - type: object
+                    properties:
+                      numericValue:
+                        type: number
+                      unit:
+                        type: string
+                    required:
+                      - numericValue
+                      - unit
+                  - type: object
+                    properties:
+                      numericValue:
+                        type: number
+                      unit:
+                        type: string
               - type: object
                 nullable: true
                 properties:
@@ -12097,21 +12097,6 @@ components:
                           enum: *a10
                         - type: boolean
                         - type: number
-                        - type: object
-                          properties:
-                            numericValue:
-                              type: number
-                            unit:
-                              type: string
-                          required:
-                            - numericValue
-                            - unit
-                        - type: object
-                          properties:
-                            numericValue:
-                              type: number
-                            unit:
-                              type: string
                         - type: object
                           properties:
                             path:
@@ -12206,6 +12191,21 @@ components:
                         - type: object
                           properties:
                             data: {}
+                        - type: object
+                          properties:
+                            numericValue:
+                              type: number
+                            unit:
+                              type: string
+                          required:
+                            - numericValue
+                            - unit
+                        - type: object
+                          properties:
+                            numericValue:
+                              type: number
+                            unit:
+                              type: string
                 required:
                   - data
           description: Aggregate representation of event data after all actions have been
