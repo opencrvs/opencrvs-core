@@ -187,6 +187,10 @@ function mapFieldTypeToMockValue(
     case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
     case FieldType.NUMBER_WITH_UNIT:
+      return {
+        numericValue: 42,
+        unit: 'Hours'
+      }
     case FieldType.LOADER:
       return `${field.id}-${field.type}-${i}`
     case FieldType.VERIFICATION_STATUS:

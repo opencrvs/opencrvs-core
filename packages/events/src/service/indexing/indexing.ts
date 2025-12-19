@@ -90,6 +90,13 @@ function mapFieldTypeToElasticsearch(
       return { type: 'date' }
     case FieldType.DATE_RANGE:
     case FieldType.TEXT:
+    case FieldType.TEXTAREA:
+    case FieldType.PARAGRAPH:
+    case FieldType.BULLET_LIST:
+    case FieldType.PAGE_HEADER:
+    case FieldType.EMAIL:
+    case FieldType.TIME:
+      return { type: 'text' }
     case FieldType.NUMBER_WITH_UNIT:
       return {
         type: 'object',
@@ -98,13 +105,6 @@ function mapFieldTypeToElasticsearch(
           unit: { type: 'text' }
         }
       }
-    case FieldType.TEXTAREA:
-    case FieldType.PARAGRAPH:
-    case FieldType.BULLET_LIST:
-    case FieldType.PAGE_HEADER:
-    case FieldType.EMAIL:
-    case FieldType.TIME:
-      return { type: 'text' }
     case FieldType.EMAIL:
       return {
         type: 'keyword',
