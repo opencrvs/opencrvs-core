@@ -111,8 +111,6 @@ const FieldValuesWithoutDataField = z.union([
   SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
-  NumberWithUnitFieldValue,
-  NumberWithUnitFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
   NameFieldValue,
@@ -122,7 +120,9 @@ const FieldValuesWithoutDataField = z.union([
   VerificationStatusValue,
   QueryParamReaderFieldValue,
   QrReaderFieldValue,
-  IdReaderFieldValue
+  IdReaderFieldValue,
+  NumberWithUnitFieldValue,
+  NumberWithUnitFieldUpdateValue
 ])
 type FieldValuesWithoutDataField = z.infer<typeof FieldValuesWithoutDataField>
 
@@ -276,6 +276,7 @@ export type FieldUpdateValueSchema =
   | typeof CheckboxFieldValue
   | typeof AddressFieldUpdateValue
   | typeof NumberFieldValue
+  | typeof NumberWithUnitFieldValue
   | typeof NumberWithUnitFieldUpdateValue
   | typeof DataFieldValue
   | typeof NameFieldValue
