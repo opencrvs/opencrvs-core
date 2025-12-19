@@ -131,9 +131,9 @@ function mapFieldTypeToElasticsearch(
       const streetLevelDetails = Object.fromEntries(
         (field.configuration?.streetAddressForm ?? []).map((f) => [
           f.id,
-          { type: 'keyword' } as estypes.MappingProperty
+          mapFieldTypeToElasticsearch(f)
         ])
-      ) as Record<string, estypes.MappingProperty>
+      )
       const addressProperties = {
         country: { type: 'keyword' },
         addressType: { type: 'keyword' },
