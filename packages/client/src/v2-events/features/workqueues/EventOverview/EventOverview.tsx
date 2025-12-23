@@ -84,7 +84,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       titleColor={event.id ? 'copy' : 'grey600'}
     >
       <EventSummary
-        event={flattenedEventIndex}
+        event={event}
         eventConfiguration={eventConfiguration}
         eventIndex={eventIndex}
       />
@@ -139,7 +139,6 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
     >
       <EventSummary
         hideSecuredFields
-        event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
         eventIndex={eventIndex}
       />
