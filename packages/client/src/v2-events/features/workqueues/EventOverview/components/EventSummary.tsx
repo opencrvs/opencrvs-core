@@ -116,19 +116,19 @@ export const summaryMessages = messages
 
 export function EventSummary({
   event,
-  eventIndex,
   eventConfiguration,
   eventIndex,
-  hideSecuredFields = false
+  hideSecuredFields = false,
+  eventDocument
 }: {
-  event?: EventDocument
-  eventIndex: Record<string, FieldValue>
+  event: Record<string, FieldValue>
   eventConfiguration: EventConfig
   eventIndex: EventIndex
   hideSecuredFields?: boolean
+  eventDocument?: EventDocument
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const validationContext = useValidatorContext(event)
+  const validationContext = useValidatorContext(eventDocument)
   const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
@@ -141,7 +141,7 @@ export function EventSummary({
       field.conditionals &&
       !areConditionsMet(
         field.conditionals,
-        eventIndex,
+        event,
         validationContext,
         eventIndex
       )
@@ -151,7 +151,7 @@ export function EventSummary({
 
     if ('fieldId' in field) {
       const config = declarationFields.find((f) => f.id === field.fieldId)
-      const value = getMixedPath(eventIndex, field.fieldId, '')
+      const value = getMixedPath(event, field.fieldId, '')
 
       if (!config) {
         return null
@@ -182,7 +182,7 @@ export function EventSummary({
         securedFields.includes(fieldId)
       ),
       emptyValueMessage: field.emptyValueMessage,
-      value: intl.formatMessage(field.value, eventIndex)
+      value: intl.formatMessage(field.value, event)
     }
   })
 
@@ -196,13 +196,13 @@ export function EventSummary({
           placeholder={intl.formatMessage(
             messages.assignedTo.emptyValueMessage
           )}
-          value={intl.formatMessage(messages.assignedTo.value, eventIndex)}
+          value={intl.formatMessage(messages.assignedTo.value, event)}
         />
         <Summary.Row
           key="status"
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
-          value={intl.formatMessage(messages.status.value, eventIndex)}
+          value={intl.formatMessage(messages.status.value, event)}
         />
         <Summary.Row
           key="flags"
@@ -224,7 +224,7 @@ export function EventSummary({
           placeholder={intl.formatMessage(
             messages.trackingId.emptyValueMessage
           )}
-          value={intl.formatMessage(messages.trackingId.value, eventIndex)}
+          value={intl.formatMessage(messages.trackingId.value, event)}
         />
         <Summary.Row
           key="registrationNumber"
@@ -233,10 +233,7 @@ export function EventSummary({
           placeholder={intl.formatMessage(
             messages.registrationNumber.emptyValueMessage
           )}
-          value={intl.formatMessage(
-            messages.registrationNumber.value,
-            eventIndex
-          )}
+          value={intl.formatMessage(messages.registrationNumber.value, event)}
         />
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)
