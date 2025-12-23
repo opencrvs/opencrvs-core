@@ -26,7 +26,6 @@ const StyledInput = styled.input`
   flex-grow: 1;
 `
 
-// @todo move to @opencrvs/components lib
 export function Slider(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <SliderContainer>
