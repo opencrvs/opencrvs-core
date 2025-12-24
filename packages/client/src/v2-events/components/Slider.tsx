@@ -26,11 +26,38 @@ const StyledInput = styled.input`
   flex-grow: 1;
 `
 
-export function Slider(props: React.InputHTMLAttributes<HTMLInputElement>) {
+interface SliderProps {
+  value: number
+  onChange: (value: string) => void
+  max?: number
+  min?: number
+  step?: number
+}
+
+const DEFAULT_MIN_LIMIT = 1
+const DEFAULT_MAX_LIMIT = 3
+const DEFAULT_STEP = 0.02
+
+export function Slider({
+  value,
+  onChange,
+  max = DEFAULT_MAX_LIMIT,
+  min = DEFAULT_MIN_LIMIT,
+  step = DEFAULT_STEP
+}: SliderProps) {
   return (
     <SliderContainer>
       <Square color="grey400" height={12} width={12} />
-      <StyledInput {...props} />
+      <StyledInput
+        max={max}
+        min={min}
+        step={step}
+        type="range"
+        value={value}
+        onChange={({ target: { value: updatedValue } }) =>
+          onChange(updatedValue)
+        }
+      />
       <Square color="grey400" height={18} width={18} />
     </SliderContainer>
   )
