@@ -67,19 +67,26 @@ export type CustomFlag = z.infer<typeof CustomFlag>
 export const Flag = ActionFlag.or(z.enum(InherentFlags)).or(CustomFlag)
 export type Flag = z.infer<typeof Flag>
 
-/**
- * Configuration of a custom flag that can be associated with a certain event type.
- */
-export const FlagConfig = z.object({
+const InternalFlagConfig = z.object({
   id: CustomFlag,
-  requiresAction: z
-    .boolean()
-    .describe(
-      'Indicates if this flag expects an action to be performed to be cleared.'
-    ),
+  isInternal: z
+    .literal(true)
+    .describe('Indicates this is an internal flag. Not visible to end-users.')
+})
+
+const PublicFlagConfig = z.object({
+  id: CustomFlag,
+  isInternal: z.literal(false).describe('Indicates this is a visible flag.'),
   label: TranslationConfig.describe('Human readable label of the flag.')
 })
 
+/**
+ * Configuration of a custom flag that can be associated with a certain event type.
+ */
+export const FlagConfig = z.discriminatedUnion('isInternal', [
+  InternalFlagConfig,
+  PublicFlagConfig
+])
 export type FlagConfig = z.infer<typeof FlagConfig>
 
 /**
