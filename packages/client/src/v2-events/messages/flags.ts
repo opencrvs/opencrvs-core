@@ -72,7 +72,7 @@ export function useFlagLabelsString(
       }
 
       const flagConfig = eventConfiguration.flags.find(({ id }) => id === flag)
-      if (flagConfig) {
+      if (flagConfig && !flagConfig.isInternal) {
         return intl.formatMessage(flagConfig.label)
       }
 
