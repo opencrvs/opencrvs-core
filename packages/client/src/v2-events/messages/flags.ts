@@ -52,7 +52,7 @@ const flagMessages = {
 } satisfies Record<InherentFlags, TranslationConfig>
 
 /**
- * React hook that resolves and formats human-readable labels for event flags.
+ * React hook that resolves and formats human-readable labels for non-internal event flags.
  *
  * @param {EventConfig} eventConfiguration - The configuration for the event, used to look up custom flag labels.
  * @param {Flag[]} flags - The array of flag identifiers to resolve.
@@ -76,7 +76,8 @@ export function useFlagLabelsString(
         return intl.formatMessage(flagConfig.label)
       }
 
-      return flag
+      return undefined
     })
+    .filter((label) => !!label)
     .join(', ')
 }
