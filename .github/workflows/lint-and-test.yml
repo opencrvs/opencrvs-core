@@ -164,15 +164,15 @@ jobs:
       - name: Extract coverage summary
         if: matrix.package == 'packages/commons'
         run: |
-          SUMMARY=$(node -e "
-            const s = require('./coverage/coverage-summary.json').total;
+          SUMMARY=$(node -e '
+            const s = require("./coverage/coverage-summary.json").total;
             console.log(
-              `Statements: ${s.statements.pct}%\n` +
-              `Branches: ${s.branches.pct}%\n` +
-              `Functions: ${s.functions.pct}%\n` +
-              `Lines: ${s.lines.pct}%`
+              "Statements: " + s.statements.pct + "%\n" +
+              "Branches: " + s.branches.pct + "%\n" +
+              "Functions: " + s.functions.pct + "%\n" +
+              "Lines: " + s.lines.pct + "%"
             );
-          ")
+          ')
           echo "$SUMMARY" > coverage-summary.txt
 
   prepare-client-tests:
