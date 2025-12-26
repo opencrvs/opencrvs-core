@@ -159,7 +159,21 @@ jobs:
 
       - name: Run Unit Test
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
-        run: cd ${{ matrix.package }} && yarn test
+        run: cd ${{ matrix.package }} && yarn test --coverage
+
+      - name: Extract coverage summary
+        if: matrix.package == 'packages/commons'
+        run: |
+          SUMMARY=$(node -e "
+            const s = require('./coverage/coverage-summary.json').total;
+            console.log(
+              `Statements: ${s.statements.pct}%\n` +
+              `Branches: ${s.branches.pct}%\n` +
+              `Functions: ${s.functions.pct}%\n` +
+              `Lines: ${s.lines.pct}%`
+            );
+          ")
+          echo "$SUMMARY" > coverage-summary.txt
 
   prepare-client-tests:
     name: Prepare client tests
@@ -237,6 +251,7 @@ jobs:
             .
             !**/.git
             !**/node_modules
+
   lint-client:
     name: Lint client
     needs: prepare-client-tests
