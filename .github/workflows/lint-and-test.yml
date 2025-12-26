@@ -165,7 +165,7 @@ jobs:
         if: matrix.package == 'packages/commons'
         run: |
           SUMMARY=$(node -e '
-            const s = require("./coverage/coverage-summary.json").total;
+            const s = require("./packages/commons/coverage/coverage-summary.json").total;
             console.log(
               "Statements: " + s.statements.pct + "%\n" +
               "Branches: " + s.branches.pct + "%\n" +
