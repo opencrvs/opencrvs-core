@@ -13,10 +13,14 @@ import { useSelector } from 'react-redux'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUsersFullName } from '../utils'
+import { useUsers } from './useUsers'
 
 export function useUserDetails() {
   const userDetails = useSelector(getUserDetails)
   const locations = useSelector(getLocations)
+  const loggedInUser = useSelector(getUserDetails)
+  const { getUser } = useUsers()
+  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
 
   const normalizedName =
     userDetails &&
@@ -27,6 +31,7 @@ export function useUserDetails() {
     }))
 
   const name = normalizedName ? getUsersFullName(normalizedName, 'en') : ''
+  const { name: userName, role, ...rest } = user
 
   const primaryOfficeId = userDetails?.primaryOffice.id
 
@@ -42,7 +47,8 @@ export function useUserDetails() {
       name,
       role: userDetails.role.id,
       district: districtId ?? '',
-      province: provinceId ?? ''
+      province: provinceId ?? '',
+      ...rest
     }
   }
 
@@ -50,6 +56,7 @@ export function useUserDetails() {
     name,
     role: userDetails?.role.id,
     district: '',
-    province: ''
+    province: '',
+    ...rest
   }
 }
