@@ -14,6 +14,7 @@
  * They are currently used for providing default values in FieldConfig.
  */
 
+import { UUID } from '../uuid'
 import { FieldValue } from './FieldValue'
 
 /**
@@ -21,8 +22,12 @@ import { FieldValue } from './FieldValue'
  */
 export type SystemVariables = {
   $user: {
+    id: string
     province: string
     district: string
+    primaryOfficeId?: UUID
+    avatar?: string
+    signature?: string
   }
   $window: {
     location: {

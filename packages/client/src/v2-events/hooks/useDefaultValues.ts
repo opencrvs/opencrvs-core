@@ -14,10 +14,26 @@ import {
   SystemVariables,
   isFieldConfigDefaultValue,
   InteractiveFieldType,
-  isNonInteractiveFieldType
+  SerializedUserField,
+  isNonInteractiveFieldType,
+  User
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from '@client/v2-events/utils'
 import { useSystemVariables } from './useSystemVariables'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isSerializedUserField(value: any): value is SerializedUserField {
+  return !!value && typeof value === 'object' && '$userField' in value
+}
+
+function resolveUserFieldDefault(
+  defaultValue: SerializedUserField,
+  systemVariables: SystemVariables
+) {
+  const user = systemVariables.$user
+  const field = defaultValue.$userField
+  return user[field] // e.g., user['role'], user['fullHonorificName'], etc.
+}
 
 export function handleDefaultValue({
   field,
@@ -27,6 +43,10 @@ export function handleDefaultValue({
   systemVariables: SystemVariables
 }) {
   const defaultValue = field.defaultValue
+
+  if (isSerializedUserField(defaultValue)) {
+    return resolveUserFieldDefault(defaultValue, systemVariables)
+  }
 
   if (isFieldConfigDefaultValue(defaultValue)) {
     return replacePlaceholders({
