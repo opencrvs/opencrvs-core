@@ -4092,8 +4092,25 @@ components:
               type: string
               const: TEXT
             defaultValue:
-              type: string
-              minLength: 1
+              anyOf:
+                - type: string
+                  minLength: 1
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum:
+                        - id
+                        - name
+                        - role
+                        - signature
+                        - avatar
+                        - primaryOfficeId
+                    $location:
+                      type: string
+                  required:
+                    - $userField
+                  additionalProperties: false
             configuration:
               default:
                 type: text
