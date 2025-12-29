@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 import Cropper from 'react-easy-crop'
 import type { Area, Point, Size } from 'react-easy-crop'
@@ -62,10 +62,9 @@ const DefaultImage = styled.div<{ width: number; height: number }>`
   background-color: ${({ theme }) => theme.colors.grey100};
 `
 interface ImageEditorModalProps {
-  onClose: (result: boolean) => void
+  onClose: (result: IImage | null) => void
   imgSrc: IImage
-  onImgSrcChanged: (imgSrc: IImage) => void
-  onConfirmEdit: (img: IImage) => void
+  error: string
 }
 
 const DEFAULT_SIZE: Size = {
@@ -108,16 +107,24 @@ function useCropSize(breakpoint: number) {
 
 function ImageEditorModal({
   onClose,
-  imgSrc,
-  onImgSrcChanged: setImgSrc,
-  onConfirmEdit
+  imgSrc: imgSrcFromParent,
+  error: errorFromParent
 }: ImageEditorModalProps) {
   const intl = useIntl()
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [croppedArea, setCroppedArea] = useState(DEFAULT_AREA)
   const theme = useTheme()
-  const [error, setError] = useState('')
+  const [error, setError] = useState(errorFromParent)
+  const [imgSrc, setImgSrc] = useState<IImage>(imgSrcFromParent)
+
+  useEffect(() => {
+    setImgSrc(imgSrcFromParent)
+  }, [imgSrcFromParent])
+
+  useEffect(() => {
+    setError(errorFromParent)
+  }, [errorFromParent])
 
   const reset = () => {
     setCrop(DEFAULT_CROP)
@@ -129,9 +136,8 @@ function ImageEditorModal({
   const handleClickApply = async () => {
     const croppedImage = await getCroppedImage(imgSrc, croppedArea)
     if (croppedImage) {
-      onConfirmEdit(croppedImage)
+      onClose(croppedImage)
       reset()
-      onClose(true)
     }
   }
 
@@ -140,14 +146,14 @@ function ImageEditorModal({
     <ResponsiveModal
       autoHeight
       actions={[
-        <Button key="cancel" type="tertiary" onClick={() => onClose(false)}>
+        <Button key="cancel" type="tertiary" onClick={() => onClose(null)}>
           {intl.formatMessage(buttonMessages.cancel)}
         </Button>,
         <Button key="apply" type="primary" onClick={handleClickApply}>
           {intl.formatMessage(buttonMessages.apply)}
         </Button>
       ]}
-      handleClose={() => onClose(false)}
+      handleClose={() => onClose(null)}
       id="ImageEditorModal"
       show={true}
       title={intl.formatMessage(messages.title)}
@@ -195,23 +201,14 @@ function ImageEditorModal({
   )
 }
 
-export function useImageEditorModal({
-  imgSrc: imageSrc,
-  onImgSrcChanged,
-  onConfirmEdit
-}: Omit<ImageEditorModalProps, 'onClose'>) {
+export function useImageEditorModal() {
   const [modal, openModal] = useModal()
 
   return {
     modal,
-    openModal: async () =>
-      openModal((close) => (
-        <ImageEditorModal
-          imgSrc={imageSrc}
-          onClose={close}
-          onConfirmEdit={onConfirmEdit}
-          onImgSrcChanged={onImgSrcChanged}
-        />
+    openModal: async (imgSrc: IImage, error: string) =>
+      openModal<IImage | null>((close) => (
+        <ImageEditorModal error={error} imgSrc={imgSrc} onClose={close} />
       ))
   }
 }
