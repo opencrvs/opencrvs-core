@@ -62,7 +62,8 @@ import {
   isIdReaderFieldType,
   isQrReaderFieldType,
   isLoaderFieldType,
-  isAgeFieldType
+  isAgeFieldType,
+  isNumberWithUnitFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -100,6 +101,7 @@ import { IdReader } from '@client/v2-events/features/events/registered-fields/Id
 import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
+import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -422,6 +424,19 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             max={field.config.configuration?.max}
             min={field.config.configuration?.min}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+    if (isNumberWithUnitFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <NumberWithUnit.Input
+            {...inputProps}
+            configuration={field.config.configuration}
+            options={field.config.options}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />

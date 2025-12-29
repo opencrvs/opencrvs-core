@@ -2,6 +2,10 @@
 
 ## 1.9.4
 
+### New features
+
+- NUMBER_WITH_UNIT Input, which is a number input with a configurable selectable unit of measurement.
+
 ### Bug fixes
 
 - e-Signet authentication now populates print and correction forms. An issue with FieldConfig `parent` parameter not finding action annotation field references was fixed. [#11210](https://github.com/opencrvs/opencrvs-core/issues/11210)

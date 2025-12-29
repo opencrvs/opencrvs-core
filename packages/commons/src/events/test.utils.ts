@@ -194,6 +194,11 @@ function mapFieldTypeToMockValue(
       return generateRandomName(rng)
     case FieldType.NUMBER:
       return 19
+    case FieldType.NUMBER_WITH_UNIT:
+      return {
+        numericValue: 42,
+        unit: 'Hours'
+      }
     case FieldType.BUTTON:
       return 1
     case FieldType.EMAIL:

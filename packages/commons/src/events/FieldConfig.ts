@@ -32,6 +32,7 @@ import {
   FileFieldWithOptionValue,
   HttpFieldValue,
   IdReaderFieldValue,
+  NumberWithUnitFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
@@ -399,6 +400,23 @@ export const SelectOption = z.object({
     .union([z.string(), TranslationConfig])
     .describe('The label of the option')
 })
+
+const NumberWithUnitField = BaseField.extend({
+  type: z.literal(FieldType.NUMBER_WITH_UNIT),
+  defaultValue: NumberWithUnitFieldValue.optional(),
+  options: z
+    .array(SelectOption)
+    .describe('A list of options for the unit select'),
+  configuration: z
+    .object({
+      min: z.number().optional().describe('Minimum value of the number field'),
+      max: z.number().optional().describe('Maximum value of the number field'),
+      numberFieldPlaceholder: TranslationConfig.optional().describe(
+        'Placeholder for the number field'
+      )
+    })
+    .optional()
+}).describe('Number with unit input')
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
@@ -845,6 +863,7 @@ export type FieldConfig =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof NumberField>
+  | z.infer<typeof NumberWithUnitField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
   | z.infer<typeof AgeField>
@@ -894,6 +913,7 @@ export type FieldConfigInput =
   | z.input<typeof ButtonField>
   | z.input<typeof AlphaPrintButton>
   | z.input<typeof NumberField>
+  | z.input<typeof NumberWithUnitField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
   | z.input<typeof AgeField>
@@ -941,6 +961,7 @@ export const FieldConfig: z.ZodType<
     Address,
     TextField,
     NumberField,
+    NumberWithUnitField,
     TextAreaField,
     AgeField,
     DateField,
@@ -991,6 +1012,7 @@ export type LocationField = z.infer<typeof LocationInput>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
+export type NumberWithUnitField = z.infer<typeof NumberWithUnitField>
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
   Extract<FieldConfig, { type: T }>,
