@@ -30,6 +30,7 @@ interface Props {
   id: string
   onChange: (newValue: NameFieldValue) => void
   configuration?: NameField['configuration']
+  defaultValue?: NameField['defaultValue']
   validation: FieldConfig['validation']
   value?: NameFieldValue
   disabled?: boolean
@@ -122,6 +123,7 @@ function NameInput(props: Props) {
     disabled,
     value = {},
     configuration,
+    defaultValue,
     validatorContext
   } = props
 
@@ -145,10 +147,11 @@ function NameInput(props: Props) {
     switch (field) {
       case 'firstname':
         return {
-          id: 'firstname',
+          id: `${id}.firstname`,
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.firstname?.required,
+          defaultValue: defaultValue?.firstname,
           conditionals: [
             {
               type: ConditionalType.ENABLE,
@@ -164,10 +167,11 @@ function NameInput(props: Props) {
         } satisfies TextField
       case 'middlename':
         return {
-          id: 'middlename',
+          id: `${id}.middlename`,
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.middlename?.required,
+          defaultValue: defaultValue?.middlename,
           conditionals: [
             {
               type: ConditionalType.ENABLE,
@@ -183,9 +187,10 @@ function NameInput(props: Props) {
         }
       case 'surname':
         return {
-          id: 'surname',
+          id: `${id}.surname`,
           type: FieldType.TEXT,
           required: nameConfig.surname?.required,
+          defaultValue: defaultValue?.surname,
           conditionals: [
             {
               type: ConditionalType.ENABLE,
