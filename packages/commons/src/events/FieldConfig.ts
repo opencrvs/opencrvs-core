@@ -375,7 +375,9 @@ const File = BaseField.extend({
         .optional()
         .describe('List of allowed file formats for the signature'),
       maxImageSize: z
-        .object({ width: z.number(), height: z.number() })
+        .object({
+          targetSize: z.object({ width: z.number(), height: z.number() })
+        })
         .optional(),
       style: z
         .object({
