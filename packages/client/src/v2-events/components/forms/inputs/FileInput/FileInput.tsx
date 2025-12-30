@@ -20,6 +20,13 @@ import {
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { getFullDocumentPath } from '@client/v2-events/cache'
 import { buttonMessages } from '@client/i18n/messages'
+import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
+import {
+  fetchFileFromUrl,
+  getImageFromFile,
+  isImageBiggerThanMaxSize,
+  isImageFile
+} from '@client/utils/imageUtils'
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
 import { DocumentPreview } from './DocumentPreview'
 import { SingleDocumentPreview } from './SingleDocumentPreview'
@@ -35,7 +42,8 @@ function FileInput({
   label,
   error,
   touched,
-  disabled
+  disabled,
+  maxImageSize
 }: {
   width?: 'full' | 'auto'
   acceptedFileTypes?: MimeType[]
@@ -48,8 +56,10 @@ function FileInput({
   label: string
   touched?: boolean
   disabled?: boolean
+  maxImageSize?: FileConfig['configuration']['maxImageSize']
 }) {
   const [file, setFile] = React.useState(value)
+  const [modal, openModal] = useImageEditorModal()
 
   const { uploadFile } = useFileUpload(name, {
     onSuccess: ({ path, originalFilename, type }) => {
@@ -67,35 +77,69 @@ function FileInput({
     }
   })
 
-  return (
-    <SimpleDocumentUploader
-      acceptedFileTypes={acceptedFileTypes}
-      description={description}
-      disabled={disabled}
-      error={error}
-      file={file}
-      label={label}
-      maxFileSize={maxFileSize}
-      name={name}
-      touched={touched}
-      width={width}
-      onComplete={(newFile) => {
-        if (newFile) {
-          setFile({
-            path: getFullDocumentPath(newFile.name),
-            originalFilename: newFile.name,
-            type: newFile.type
-          })
+  const handleOnComplete = async (newFile: File | null) => {
+    if (!newFile) {
+      setFile(undefined)
+      onChange(null)
+      return
+    }
 
-          uploadFile(newFile)
+    if (isImageFile(newFile)) {
+      const image = await getImageFromFile(newFile)
+      if (
+        isImageBiggerThanMaxSize(
+          { width: image.width, height: image.height },
+          maxImageSize?.targetSize
+        )
+      ) {
+        const croppedImage = await openModal(image, error || '')
+        if (!croppedImage) {
+          // User cancelled the editing
+          return
         }
-        if (!newFile && file) {
-          setFile(undefined)
+        const croppedImageFile = await fetchFileFromUrl(
+          croppedImage.data,
+          newFile.name
+        )
+        if (!croppedImageFile) {
+          return
         }
-        setFile(undefined)
-        onChange(null)
-      }}
-    />
+        setFile({
+          path: getFullDocumentPath(croppedImageFile.name),
+          originalFilename: croppedImageFile.name,
+          type: croppedImageFile.type
+        })
+        uploadFile(croppedImageFile)
+        return
+      }
+    }
+
+    setFile({
+      path: getFullDocumentPath(newFile.name),
+      originalFilename: newFile.name,
+      type: newFile.type
+    })
+
+    uploadFile(newFile)
+  }
+
+  return (
+    <>
+      <SimpleDocumentUploader
+        acceptedFileTypes={acceptedFileTypes}
+        description={description}
+        disabled={disabled}
+        error={error}
+        file={file}
+        label={label}
+        maxFileSize={maxFileSize}
+        name={name}
+        touched={touched}
+        width={width}
+        onComplete={handleOnComplete}
+      />
+      {modal}
+    </>
   )
 }
 
