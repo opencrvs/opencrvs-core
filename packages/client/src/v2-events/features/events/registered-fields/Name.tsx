@@ -151,7 +151,6 @@ function NameInput(props: Props) {
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.firstname?.required,
-          defaultValue: defaultValue?.firstname,
           conditionals: [
             {
               type: ConditionalType.ENABLE,
@@ -171,7 +170,6 @@ function NameInput(props: Props) {
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.middlename?.required,
-          defaultValue: defaultValue?.middlename,
           conditionals: [
             {
               type: ConditionalType.ENABLE,
@@ -190,7 +188,6 @@ function NameInput(props: Props) {
           id: `${id}.surname`,
           type: FieldType.TEXT,
           required: nameConfig.surname?.required,
-          defaultValue: defaultValue?.surname,
           conditionals: [
             {
               type: ConditionalType.ENABLE,

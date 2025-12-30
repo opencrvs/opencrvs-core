@@ -15,7 +15,8 @@ import {
   isFieldConfigDefaultValue,
   InteractiveFieldType,
   SerializedUserField,
-  isNonInteractiveFieldType
+  isNonInteractiveFieldType,
+  FieldType
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from '@client/v2-events/utils'
 import { useSystemVariables } from './useSystemVariables'
@@ -34,6 +35,50 @@ function resolveUserFieldDefault(
   return user[field] // e.g., user('role'), user('fullHonorificName'), etc.
 }
 
+export function handleDefaultValueForNameField({
+  field,
+  systemVariables
+}: {
+  field: InteractiveFieldType
+  systemVariables: SystemVariables
+}) {
+  const defaultValue = field.defaultValue
+
+  if (
+    isSerializedUserField(defaultValue) &&
+    defaultValue.$userField === 'name'
+  ) {
+    const resolvedValue = resolveUserFieldDefault(defaultValue, systemVariables)
+
+    // If the resolved value is a string, we assume it's a full name and split it
+    if (typeof resolvedValue === 'string') {
+      const nameParts = resolvedValue.split(' ')
+
+      return {
+        firstname: nameParts[0] || '',
+        middlename: nameParts.length === 3 ? nameParts[1] : '',
+        surname: nameParts.length >= 2 ? nameParts[nameParts.length - 1] : ''
+        // [`${field.id}.firstname`]: nameParts[0] || '',
+        // [`${field.id}.middlename`]: nameParts.length === 3 ? nameParts[1] : '',
+        // [`${field.id}.surname`]:
+        //   nameParts.length >= 2 ? nameParts[nameParts.length - 1] : ''
+      }
+    }
+
+    // If it's not a string, return empty name parts
+    return {
+      firstname: '',
+      middlename: '',
+      surname: ''
+      // [`${field.id}.firstname`]: '',
+      // [`${field.id}.middlename`]: '',
+      // [`${field.id}.surname`]: ''
+    }
+  }
+
+  return undefined
+}
+
 export function handleDefaultValue({
   field,
   systemVariables
@@ -44,6 +89,13 @@ export function handleDefaultValue({
   const defaultValue = field.defaultValue
 
   if (isSerializedUserField(defaultValue)) {
+    if (field.type === FieldType.NAME) {
+      return handleDefaultValueForNameField({
+        field,
+        systemVariables
+      })
+    }
+
     return resolveUserFieldDefault(defaultValue, systemVariables)
   }
 
