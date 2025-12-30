@@ -203,12 +203,9 @@ function ImageEditorModal({
 
 export function useImageEditorModal() {
   const [modal, openModal] = useModal()
-
-  return {
-    modal,
-    openModal: async (imgSrc: IImage, error: string) =>
-      openModal<IImage | null>((close) => (
-        <ImageEditorModal error={error} imgSrc={imgSrc} onClose={close} />
-      ))
-  }
+  const openEditorModal = async (imgSrc: IImage, error: string) =>
+    openModal<IImage | null>((close) => (
+      <ImageEditorModal error={error} imgSrc={imgSrc} onClose={close} />
+    ))
+  return [modal, openEditorModal] as const
 }

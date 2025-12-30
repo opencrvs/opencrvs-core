@@ -13,6 +13,7 @@ import {
   ALLOWED_IMAGE_TYPE,
   ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE
 } from '@client/utils/constants'
+import { ImageMimeType } from '@opencrvs/commons/client'
 
 export type IImage = {
   type: string
@@ -155,4 +156,57 @@ export async function fetchFileFromUrl(
   const blob = await res.blob()
 
   return new File([blob], filename, { type: blob.type })
+}
+
+export async function getImageFromFile(
+  file: File
+): Promise<{ width: number; height: number; data: string; type: string }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+
+      if (!ctx) {
+        reject(new Error('Could not get canvas context'))
+        return
+      }
+
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+
+      ctx.drawImage(img, 0, 0)
+
+      const dataUrl = canvas.toDataURL('image/png')
+      resolve({
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+        data: dataUrl,
+        type: file.type
+      })
+    }
+    img.onerror = (error) => {
+      reject(error)
+    }
+    img.src = URL.createObjectURL(file)
+  })
+}
+
+export function isImageFile(file: File): boolean {
+  return Object.values(ImageMimeType.Enum).includes(
+    file.type as keyof typeof ImageMimeType.Enum
+  )
+}
+
+export function isImageBiggerThanMaxSize(
+  imageSize: { width: number; height: number },
+  maxImageSize?: { width: number; height: number }
+): boolean {
+  if (!maxImageSize) {
+    return false
+  }
+  return (
+    imageSize.width > maxImageSize.width ||
+    imageSize.height > maxImageSize.height
+  )
 }
