@@ -485,11 +485,14 @@ export type NameConfig = z.infer<typeof NameConfig>
 const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
   defaultValue: z
-    .object({
-      firstname: NonEmptyTextValue.optional(),
-      middlename: NonEmptyTextValue.optional(),
-      surname: NonEmptyTextValue.optional()
-    })
+    .union([
+      SerializedUserField,
+      z.object({
+        firstname: NonEmptyTextValue.optional(),
+        middlename: NonEmptyTextValue.optional(),
+        surname: NonEmptyTextValue.optional()
+      })
+    ])
     .optional(),
   configuration: z
     .object({
