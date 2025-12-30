@@ -25,6 +25,8 @@ export type SystemVariables = {
     id: string
     province: string
     district: string
+    name?: string
+    role?: string
     primaryOfficeId?: UUID
     avatar?: string
     signature?: string

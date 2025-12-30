@@ -12,7 +12,8 @@ import {
   AddressType,
   field,
   FieldType,
-  InteractiveFieldType
+  InteractiveFieldType,
+  SystemVariables
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from './utils'
 
@@ -196,6 +197,9 @@ const testCases = [
     defaultValue: undefined,
     systemVariables: {
       $user: {
+        name: '',
+        role: '',
+        id: '',
         district: '',
         province: ''
       },
@@ -207,9 +211,9 @@ const testCases = [
           hostname: 'example.com'
         }
       }
-    },
+    } satisfies SystemVariables,
     expected: undefined,
-    field: AddressField
+    field: AddressField satisfies InteractiveFieldType
   },
   {
     currentValue: undefined,
@@ -217,7 +221,10 @@ const testCases = [
     systemVariables: {
       $user: {
         district: '',
-        province: ''
+        province: '',
+        name: '',
+        role: '',
+        id: ''
       },
       $window: {
         location: {
@@ -227,7 +234,7 @@ const testCases = [
           hostname: 'example.com'
         }
       }
-    },
+    } satisfies SystemVariables,
     expected: 'Hello',
     field: TextField
   },
@@ -236,8 +243,11 @@ const testCases = [
     defaultValue: '$user.district',
     systemVariables: {
       $user: {
-        district: 'Ibombo',
-        province: ''
+        name: 'Jon Doe',
+        role: '',
+        district: '',
+        province: '',
+        id: ''
       },
       $window: {
         location: {
@@ -256,8 +266,11 @@ const testCases = [
     defaultValue: '$user.district',
     systemVariables: {
       $user: {
-        district: 'Ibombo',
-        province: ''
+        name: 'Jon Doe',
+        role: '',
+        district: '',
+        province: '',
+        id: ''
       },
       $window: {
         location: {
@@ -267,7 +280,7 @@ const testCases = [
           hostname: 'example.com'
         }
       }
-    },
+    } satisfies SystemVariables,
     expected: 'Hello world',
     field: TextField
   },
@@ -279,8 +292,11 @@ const testCases = [
     },
     systemVariables: {
       $user: {
-        district: 'Ibombo',
-        province: 'Central'
+        name: 'Jon Doe',
+        role: 'Field Agent',
+        district: '',
+        province: '',
+        id: ''
       },
       $window: {
         location: {
@@ -290,7 +306,7 @@ const testCases = [
           hostname: 'example.com'
         }
       }
-    },
+    } satisfies SystemVariables,
     expected: {
       country: 'FAR',
       addressType: AddressType.DOMESTIC
