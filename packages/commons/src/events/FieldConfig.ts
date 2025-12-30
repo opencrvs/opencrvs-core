@@ -587,7 +587,9 @@ const FileUploadWithOptions = BaseField.extend({
         .describe('Maximum file size in bytes')
         .default(DEFAULT_MAX_FILE_SIZE_BYTES),
       maxImageSize: z
-        .object({ width: z.number(), height: z.number() })
+        .object({
+          targetSize: z.object({ width: z.number(), height: z.number() })
+        })
         .optional(),
       acceptedFileTypes: MimeType.array()
         .optional()

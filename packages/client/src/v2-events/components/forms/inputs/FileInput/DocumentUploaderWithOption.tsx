@@ -24,6 +24,13 @@ import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
+import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
+import {
+  isImageFile,
+  getImageFromFile,
+  isImageBiggerThanMaxSize,
+  fetchFileFromUrl
+} from '@client/utils/imageUtils'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
@@ -75,7 +82,8 @@ function DocumentUploaderWithOption({
   error,
   hideOnEmptyOption,
   autoSelectOnlyOption,
-  maxFileSize
+  maxFileSize,
+  maxImageSize
 }: {
   name: string
   description?: string
@@ -88,6 +96,7 @@ function DocumentUploaderWithOption({
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number
+  maxImageSize?: FileUploadWithOptions['configuration']['maxImageSize']
 }) {
   const intl = useIntlWithFormData()
   const documentTypeRequiredErrorMessage = intl.formatMessage(
@@ -103,6 +112,7 @@ function DocumentUploaderWithOption({
     undefined
   )
   const [unselectedOptionError, setUnselectedOptionError] = useState('')
+  const [modal, openModal] = useImageEditorModal()
 
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
@@ -132,9 +142,38 @@ function DocumentUploaderWithOption({
     return typeof label === 'string' ? label : intl.formatMessage(label)
   }
 
-  const onComplete = (newFile: File | null) => {
+  const onComplete = async (newFile: File | null) => {
     if (newFile) {
       if (selectedOption) {
+        if (isImageFile(newFile)) {
+          const image = await getImageFromFile(newFile)
+          if (
+            isImageBiggerThanMaxSize(
+              { width: image.width, height: image.height },
+              maxImageSize?.targetSize
+            )
+          ) {
+            const croppedImage = await openModal(image, error || '')
+            if (!croppedImage) {
+              // User cancelled the editing
+              return
+            }
+            const croppedImageFile = await fetchFileFromUrl(
+              croppedImage.data,
+              newFile.name
+            )
+            if (!croppedImageFile) {
+              return
+            }
+            setFilesBeingProcessed((prev) => [
+              ...prev,
+              { label: selectedOption }
+            ])
+
+            uploadFile(croppedImageFile, selectedOption)
+            return
+          }
+        }
         setFilesBeingProcessed((prev) => [...prev, { label: selectedOption }])
 
         uploadFile(newFile, selectedOption)
@@ -258,6 +297,7 @@ function DocumentUploaderWithOption({
           }}
         />
       )}
+      {modal}
     </UploadWrapper>
   )
 }
