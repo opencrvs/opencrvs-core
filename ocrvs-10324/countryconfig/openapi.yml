@@ -4741,13 +4741,18 @@ components:
                 maxImageSize:
                   type: object
                   properties:
-                    width:
-                      type: number
-                    height:
-                      type: number
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
                   required:
-                    - width
-                    - height
+                    - targetSize
                 style:
                   type: object
                   properties:

@@ -752,7 +752,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2a692db3-bdb8-4abf-ba99-3d6c744ead7f
+                transactionId: cc4cfd24-84d4-4267-856d-771672a5961a
                 type: birth
       responses:
         "200":
@@ -838,7 +838,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 3dcf8e0d-f710-4779-94bf-073dce342160
+                transactionId: d7314ab8-f52c-4717-b195-6b57c16ed7de
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5422,13 +5422,18 @@ components:
                 maxImageSize:
                   type: object
                   properties:
-                    width:
-                      type: number
-                    height:
-                      type: number
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
                   required:
-                    - width
-                    - height
+                    - targetSize
                 style:
                   type: object
                   properties:
