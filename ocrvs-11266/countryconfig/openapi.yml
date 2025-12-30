@@ -3198,6 +3198,8 @@ components:
                             - role
                             - signature
                             - avatar
+                            - fullHonorificName
+                            - device
                             - primaryOfficeId
                         $location:
                           type: string
@@ -3370,6 +3372,8 @@ components:
                         - role
                         - signature
                         - avatar
+                        - fullHonorificName
+                        - device
                         - primaryOfficeId
                     $location:
                       type: string
