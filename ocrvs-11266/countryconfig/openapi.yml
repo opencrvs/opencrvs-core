@@ -5613,18 +5613,37 @@ components:
               type: string
               const: NAME
             defaultValue:
-              type: object
-              properties:
-                firstname:
-                  type: string
-                  minLength: 1
-                middlename:
-                  type: string
-                  minLength: 1
-                surname:
-                  type: string
-                  minLength: 1
-              additionalProperties: false
+              anyOf:
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum:
+                        - id
+                        - name
+                        - role
+                        - signature
+                        - avatar
+                        - fullHonorificName
+                        - device
+                        - primaryOfficeId
+                    $location:
+                      type: string
+                  required:
+                    - $userField
+                  additionalProperties: false
+                - type: object
+                  properties:
+                    firstname:
+                      type: string
+                      minLength: 1
+                    middlename:
+                      type: string
+                      minLength: 1
+                    surname:
+                      type: string
+                      minLength: 1
+                  additionalProperties: false
             configuration:
               default:
                 name:
