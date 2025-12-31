@@ -62,9 +62,7 @@ field('child.dob').isBefore().days(45).fromNow()
 
 - Toolkit now exports `window().location.get` to country config that can be used as a template variable e.g. in HttpField request body.
 
-## 1.9.1
-
-> > > > > > > > > Temporary merge branch 2
+## [1.9.1](https://github.com/opencrvs/opencrvs-core/compare/v1.9.0...v1.9.1)
 
 ### Breaking changes
 
