@@ -21,7 +21,7 @@ import { FieldValue } from './FieldValue'
  * Available system variables for configuration.
  */
 export type SystemVariables = {
-  $user: {
+  user: {
     id: string
     province: string
     district: string

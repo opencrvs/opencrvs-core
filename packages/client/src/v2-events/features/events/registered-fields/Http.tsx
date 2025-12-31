@@ -69,11 +69,9 @@ async function fetchHttpFieldValue(
 
   if (cfg.body) {
     for (const [k, v] of Object.entries(cfg.body)) {
-      // @TODO - remove after removing support for template variables
-      // if (isTemplateVariable(v)) {
-      //   cfg.body[k] = getMixedPath(systemVariables, v)
-      // } else
-      if (isFieldReference(v)) {
+      if (isTemplateVariable(v) && v) {
+        cfg.body[k] = getMixedPath(systemVariables, v)
+      } else if (isFieldReference(v)) {
         cfg.body[k] = parseFieldReferenceToValue(v, form)
       } else {
         cfg.body[k] = v
