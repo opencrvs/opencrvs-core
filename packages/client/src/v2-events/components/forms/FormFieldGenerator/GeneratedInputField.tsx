@@ -222,7 +222,6 @@ export const GeneratedInputField = React.memo(
         <InputField {...omit(field.inputFieldProps, 'error')}>
           <Name.Input
             configuration={field.config.configuration}
-            defaultValue={field.config.defaultValue}
             disabled={disabled}
             id={fieldDefinition.id}
             validation={validation}

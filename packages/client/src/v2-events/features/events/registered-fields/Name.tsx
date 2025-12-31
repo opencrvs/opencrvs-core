@@ -30,7 +30,6 @@ interface Props {
   id: string
   onChange: (newValue: NameFieldValue) => void
   configuration?: NameField['configuration']
-  defaultValue?: NameField['defaultValue']
   validation: FieldConfig['validation']
   value?: NameFieldValue
   disabled?: boolean
@@ -123,7 +122,6 @@ function NameInput(props: Props) {
     disabled,
     value = {},
     configuration,
-    defaultValue,
     validatorContext
   } = props
 
