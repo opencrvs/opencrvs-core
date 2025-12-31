@@ -3200,6 +3200,9 @@ components:
                             - avatar
                             - fullHonorificName
                             - device
+                            - firstname
+                            - middlename
+                            - surname
                             - primaryOfficeId
                         $location:
                           type: string
@@ -3374,6 +3377,9 @@ components:
                         - avatar
                         - fullHonorificName
                         - device
+                        - firstname
+                        - middlename
+                        - surname
                         - primaryOfficeId
                     $location:
                       type: string
@@ -5615,21 +5621,81 @@ components:
             defaultValue:
               type: object
               properties:
-                $userField:
-                  type: string
-                  enum:
-                    - id
-                    - name
-                    - role
-                    - signature
-                    - avatar
-                    - fullHonorificName
-                    - device
-                    - primaryOfficeId
-                $location:
-                  type: string
-              required:
-                - $userField
+                firstname:
+                  anyOf:
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum:
+                            - id
+                            - name
+                            - role
+                            - signature
+                            - avatar
+                            - fullHonorificName
+                            - device
+                            - firstname
+                            - middlename
+                            - surname
+                            - primaryOfficeId
+                        $location:
+                          type: string
+                      required:
+                        - $userField
+                      additionalProperties: false
+                    - type: string
+                      minLength: 1
+                middlename:
+                  anyOf:
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum:
+                            - id
+                            - name
+                            - role
+                            - signature
+                            - avatar
+                            - fullHonorificName
+                            - device
+                            - firstname
+                            - middlename
+                            - surname
+                            - primaryOfficeId
+                        $location:
+                          type: string
+                      required:
+                        - $userField
+                      additionalProperties: false
+                    - type: string
+                      minLength: 1
+                surname:
+                  anyOf:
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum:
+                            - id
+                            - name
+                            - role
+                            - signature
+                            - avatar
+                            - fullHonorificName
+                            - device
+                            - firstname
+                            - middlename
+                            - surname
+                            - primaryOfficeId
+                        $location:
+                          type: string
+                      required:
+                        - $userField
+                      additionalProperties: false
+                    - type: string
+                      minLength: 1
               additionalProperties: false
             configuration:
               default:
