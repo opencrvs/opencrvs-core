@@ -147,7 +147,7 @@ function NameInput(props: Props) {
     switch (field) {
       case 'firstname':
         return {
-          id: `${id}.firstname`,
+          id: 'firstname',
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.firstname?.required,
@@ -166,7 +166,7 @@ function NameInput(props: Props) {
         } satisfies TextField
       case 'middlename':
         return {
-          id: `${id}.middlename`,
+          id: 'middlename',
           type: FieldType.TEXT,
           configuration: { maxLength },
           required: nameConfig.middlename?.required,
@@ -185,7 +185,7 @@ function NameInput(props: Props) {
         }
       case 'surname':
         return {
-          id: `${id}.surname`,
+          id: 'surname',
           type: FieldType.TEXT,
           required: nameConfig.surname?.required,
           conditionals: [
@@ -224,6 +224,25 @@ function NameInput(props: Props) {
   )
 }
 
+function NameOutput({
+  value,
+  configuration
+}: {
+  value?: NameFieldValue
+  configuration?: NameField
+}) {
+  const defaultNameOrder = [
+    'firstname',
+    ...(configuration?.configuration?.name?.middlename ? ['middlename'] : []),
+    'surname'
+  ]
+  const order = configuration?.configuration?.order || defaultNameOrder
+
+  return joinValues(
+    order.map((field) => value?.[field as keyof NameFieldValue])
+  )
+}
+
 function stringify(value?: NameFieldValue) {
   return joinValues([value?.firstname, value?.middlename, value?.surname])
 }
@@ -239,24 +258,7 @@ function toCertificateVariables(value?: NameFieldValue) {
 
 export const Name = {
   Input: NameInput,
-  Output: ({
-    value,
-    configuration
-  }: {
-    value?: NameFieldValue
-    configuration?: NameField
-  }) => {
-    const defaultNameOrder = [
-      'firstname',
-      ...(configuration?.configuration?.name?.middlename ? ['middlename'] : []),
-      'surname'
-    ]
-    const order = configuration?.configuration?.order || defaultNameOrder
-
-    return joinValues(
-      order.map((field) => value?.[field as keyof NameFieldValue])
-    )
-  },
+  Output: NameOutput,
   stringify,
   toCertificateVariables
 }
