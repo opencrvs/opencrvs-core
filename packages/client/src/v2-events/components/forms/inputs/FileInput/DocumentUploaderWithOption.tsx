@@ -25,12 +25,7 @@ import { Select } from '@client/v2-events/features/events/registered-fields/Sele
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
-import {
-  isImageFile,
-  getImageFromFile,
-  isImageBiggerThanMaxSize,
-  fetchFileFromUrl
-} from '@client/utils/imageUtils'
+import { useImageProcessing } from '@client/utils/imageUtils'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
@@ -116,6 +111,7 @@ function DocumentUploaderWithOption({
 
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
+  const { processImageFile } = useImageProcessing()
 
   const { uploadFile } = useFileUpload(name, {
     onSuccess: ({ type, originalFilename, path, id }) => {
@@ -145,38 +141,19 @@ function DocumentUploaderWithOption({
   const onComplete = async (newFile: File | null) => {
     if (newFile) {
       if (selectedOption) {
-        if (isImageFile(newFile)) {
-          const image = await getImageFromFile(newFile)
-          if (
-            isImageBiggerThanMaxSize(
-              { width: image.width, height: image.height },
-              maxImageSize?.targetSize
-            )
-          ) {
-            const croppedImage = await openModal(image, error || '')
-            if (!croppedImage) {
-              // User cancelled the editing
-              return
-            }
-            const croppedImageFile = await fetchFileFromUrl(
-              croppedImage.data,
-              newFile.name
-            )
-            if (!croppedImageFile) {
-              return
-            }
-            setFilesBeingProcessed((prev) => [
-              ...prev,
-              { label: selectedOption }
-            ])
+        const processedFile = await processImageFile(
+          newFile,
+          openModal,
+          maxImageSize,
+          error
+        )
 
-            uploadFile(croppedImageFile, selectedOption)
-            return
-          }
+        if (!processedFile) {
+          return
         }
         setFilesBeingProcessed((prev) => [...prev, { label: selectedOption }])
 
-        uploadFile(newFile, selectedOption)
+        uploadFile(processedFile, selectedOption)
       } else {
         setUnselectedOptionError(documentTypeRequiredErrorMessage)
       }

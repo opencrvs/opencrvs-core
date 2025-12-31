@@ -14,6 +14,7 @@ import {
   ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE
 } from '@client/utils/constants'
 import { ImageMimeType } from '@opencrvs/commons/client'
+import type { File as FileConfig } from '@opencrvs/commons/client'
 
 export type IImage = {
   type: string
@@ -158,7 +159,7 @@ export async function fetchFileFromUrl(
   return new File([blob], filename, { type: blob.type })
 }
 
-export async function getImageFromFile(
+async function getImageFromFile(
   file: File
 ): Promise<{ width: number; height: number; data: string; type: string }> {
   return new Promise((resolve, reject) => {
@@ -192,13 +193,13 @@ export async function getImageFromFile(
   })
 }
 
-export function isImageFile(file: File): boolean {
+function isImageFile(file: File): boolean {
   return Object.values(ImageMimeType.Enum).includes(
     file.type as keyof typeof ImageMimeType.Enum
   )
 }
 
-export function isImageBiggerThanMaxSize(
+function isImageBiggerThanMaxSize(
   imageSize: { width: number; height: number },
   maxImageSize?: { width: number; height: number }
 ): boolean {
@@ -209,4 +210,40 @@ export function isImageBiggerThanMaxSize(
     imageSize.width > maxImageSize.width ||
     imageSize.height > maxImageSize.height
   )
+}
+
+export function useImageProcessing() {
+  const processImageFile = async (
+    newFile: File,
+    openModal: (image: IImage, error: string) => Promise<IImage | null>,
+    maxImageSize?: FileConfig['configuration']['maxImageSize'],
+    error?: string
+  ) => {
+    if (!isImageFile(newFile)) {
+      return newFile
+    }
+
+    const image = await getImageFromFile(newFile)
+    if (
+      !isImageBiggerThanMaxSize(
+        { width: image.width, height: image.height },
+        maxImageSize?.targetSize
+      )
+    ) {
+      return newFile
+    }
+
+    const croppedImage = await openModal(image, error || '')
+    if (!croppedImage) {
+      return null // User cancelled
+    }
+
+    const croppedImageFile = await fetchFileFromUrl(
+      croppedImage.data,
+      newFile.name
+    )
+    return croppedImageFile
+  }
+
+  return { processImageFile }
 }

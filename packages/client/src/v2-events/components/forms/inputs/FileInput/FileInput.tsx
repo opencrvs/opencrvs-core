@@ -21,12 +21,7 @@ import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { getFullDocumentPath } from '@client/v2-events/cache'
 import { buttonMessages } from '@client/i18n/messages'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
-import {
-  fetchFileFromUrl,
-  getImageFromFile,
-  isImageBiggerThanMaxSize,
-  isImageFile
-} from '@client/utils/imageUtils'
+import { useImageProcessing } from '@client/utils/imageUtils'
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
 import { DocumentPreview } from './DocumentPreview'
 import { SingleDocumentPreview } from './SingleDocumentPreview'
@@ -60,6 +55,7 @@ function FileInput({
 }) {
   const [file, setFile] = React.useState(value)
   const [modal, openModal] = useImageEditorModal()
+  const { processImageFile } = useImageProcessing()
 
   const { uploadFile } = useFileUpload(name, {
     onSuccess: ({ path, originalFilename, type }) => {
@@ -84,43 +80,23 @@ function FileInput({
       return
     }
 
-    if (isImageFile(newFile)) {
-      const image = await getImageFromFile(newFile)
-      if (
-        isImageBiggerThanMaxSize(
-          { width: image.width, height: image.height },
-          maxImageSize?.targetSize
-        )
-      ) {
-        const croppedImage = await openModal(image, error || '')
-        if (!croppedImage) {
-          // User cancelled the editing
-          return
-        }
-        const croppedImageFile = await fetchFileFromUrl(
-          croppedImage.data,
-          newFile.name
-        )
-        if (!croppedImageFile) {
-          return
-        }
-        setFile({
-          path: getFullDocumentPath(croppedImageFile.name),
-          originalFilename: croppedImageFile.name,
-          type: croppedImageFile.type
-        })
-        uploadFile(croppedImageFile)
-        return
-      }
+    const processedFile = await processImageFile(
+      newFile,
+      openModal,
+      maxImageSize,
+      error
+    )
+
+    if (!processedFile) {
+      return
     }
 
     setFile({
-      path: getFullDocumentPath(newFile.name),
-      originalFilename: newFile.name,
-      type: newFile.type
+      path: getFullDocumentPath(processedFile.name),
+      originalFilename: processedFile.name,
+      type: processedFile.type
     })
-
-    uploadFile(newFile)
+    uploadFile(processedFile)
   }
 
   return (
