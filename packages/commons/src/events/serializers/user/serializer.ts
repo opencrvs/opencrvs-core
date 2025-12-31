@@ -21,6 +21,9 @@ export const SerializedUserField = z.object({
     'avatar',
     'fullHonorificName',
     'device',
+    'firstname',
+    'middlename',
+    'surname',
     'primaryOfficeId'
   ]),
   $location: z.string().optional()

@@ -16,9 +16,10 @@ import {
   InteractiveFieldType,
   SerializedUserField,
   isNonInteractiveFieldType,
-  FieldType
+  FieldType,
+  NameField
 } from '@opencrvs/commons/client'
-import { replacePlaceholders } from '@client/v2-events/utils'
+import { replacePlaceholders, splitFullName } from '@client/v2-events/utils'
 import { useSystemVariables } from './useSystemVariables'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,48 +36,42 @@ function resolveUserFieldDefault(
   return user[field] // e.g., user('role'), user('fullHonorificName'), etc.
 }
 
-export function handleDefaultValueForNameField({
+function handleDefaultValueForNameField({
   field,
   systemVariables
 }: {
   field: InteractiveFieldType
   systemVariables: SystemVariables
 }) {
-  const defaultValue = field.defaultValue
+  const defaultValue = field.defaultValue as NameField['defaultValue']
 
-  if (
-    isSerializedUserField(defaultValue) &&
-    defaultValue.$userField === 'name'
-  ) {
-    const resolvedValue = resolveUserFieldDefault(defaultValue, systemVariables)
-
-    // If the resolved value is a string, we assume it's a full name and split it
-    if (typeof resolvedValue === 'string') {
-      const nameParts = resolvedValue.split(' ')
-
-      return {
-        firstname: nameParts[0] || '',
-        middlename: nameParts.length === 3 ? nameParts[1] : '',
-        surname: nameParts.length >= 2 ? nameParts[nameParts.length - 1] : ''
-        // [`${field.id}.firstname`]: nameParts[0] || '',
-        // [`${field.id}.middlename`]: nameParts.length === 3 ? nameParts[1] : '',
-        // [`${field.id}.surname`]:
-        //   nameParts.length >= 2 ? nameParts[nameParts.length - 1] : ''
-      }
-    }
-
-    // If it's not a string, return empty name parts
-    return {
-      firstname: '',
-      middlename: '',
-      surname: ''
-      // [`${field.id}.firstname`]: '',
-      // [`${field.id}.middlename`]: '',
-      // [`${field.id}.surname`]: ''
-    }
+  if (!defaultValue) {
+    return undefined
   }
 
-  return undefined
+  const resolvePart = (value?: string | SerializedUserField): string => {
+    if (!value) {
+      return ''
+    }
+
+    if (typeof value === 'string') {
+      return value
+    }
+
+    if (isSerializedUserField(value)) {
+      const resolved = resolveUserFieldDefault(value, systemVariables)
+      // console.log({ resolved, value })
+      return typeof resolved === 'string' ? resolved : ''
+    }
+
+    return ''
+  }
+
+  return {
+    firstname: resolvePart(defaultValue.firstname),
+    middlename: resolvePart(defaultValue.middlename),
+    surname: resolvePart(defaultValue.surname)
+  }
 }
 
 export function handleDefaultValue({
@@ -88,14 +83,14 @@ export function handleDefaultValue({
 }) {
   const defaultValue = field.defaultValue
 
-  if (isSerializedUserField(defaultValue)) {
-    if (field.type === FieldType.NAME) {
-      return handleDefaultValueForNameField({
-        field,
-        systemVariables
-      })
-    }
+  if (field.type === FieldType.NAME) {
+    return handleDefaultValueForNameField({
+      field,
+      systemVariables
+    })
+  }
 
+  if (isSerializedUserField(defaultValue)) {
     return resolveUserFieldDefault(defaultValue, systemVariables)
   }
 
