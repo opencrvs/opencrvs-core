@@ -40,6 +40,7 @@ export const User = z.object({
   ),
   primaryOfficeId: UUID,
   fullHonorificName: z.string().optional(),
+  device: z.string().optional(),
   type: TokenUserType.extract(['user'])
 })
 export type User = z.infer<typeof User>
@@ -61,7 +62,8 @@ export const System = z.object({
   primaryOfficeId: z.undefined().optional(),
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
-  fullHonorificName: z.string().optional()
+  fullHonorificName: z.string().optional(),
+  device: z.undefined().optional()
 })
 export type System = z.infer<typeof System>
 
