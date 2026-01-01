@@ -332,7 +332,23 @@ function DocumentWithOptionOutput({
   )
 }
 
+function toCertificateVariables(value: FileFieldWithOptionValue | undefined) {
+  const parsed = FileFieldWithOptionValue.safeParse(value)
+
+  if (parsed.success) {
+    return parsed.data.reduce(
+      (acc, file) => ({
+        ...acc,
+        [file.option]: new URL(file.path, window.config.MINIO_BASE_URL).href
+      }),
+      {}
+    )
+  }
+
+  return {}
+}
 export const FileWithOption = {
   Input: DocumentUploaderWithOption,
-  Output: DocumentWithOptionOutput
+  Output: DocumentWithOptionOutput,
+  toCertificateVariables
 }
