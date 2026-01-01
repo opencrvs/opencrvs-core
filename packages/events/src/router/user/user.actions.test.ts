@@ -266,12 +266,11 @@ test('Returns user actions', async () => {
   // CREATE + ASSIGN
   await createEvent(clientThatDoesThings, generator, [
     ActionType.DECLARE, // x2
-    ActionType.VALIDATE, // x2
     ActionType.REGISTER, // x2
     ActionType.PRINT_CERTIFICATE // x2
   ])
 
-  const expectedTotalActions = 12
+  const expectedTotalActions = 10
 
   const userActions = await clientThatSearchesUser.user.actions({
     userId: userThatDoesThings.id
@@ -292,12 +291,7 @@ test('Returns user actions', async () => {
   const userDeclarationActions = await clientThatSearchesUser.user.actions({
     userId: userThatDoesThings.id,
     count: 20,
-    actionTypes: [
-      ActionType.CREATE,
-      ActionType.DECLARE,
-      ActionType.VALIDATE,
-      ActionType.REGISTER
-    ]
+    actionTypes: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
   })
 
   const userOtherActions = await clientThatSearchesUser.user.actions({

@@ -47,7 +47,6 @@ export type AvailableActionTypes = Extract<
   ActionType,
   | 'NOTIFY'
   | 'DECLARE'
-  | 'VALIDATE'
   | 'REGISTER'
   | 'REQUEST_CORRECTION'
   | 'APPROVE_CORRECTION'
@@ -83,12 +82,8 @@ export function getPreviousDeclarationActionType(
       actionTypes = [ActionType.DECLARE]
       break
     }
-    case ActionType.VALIDATE: {
-      actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
-      break
-    }
     case ActionType.REGISTER: {
-      actionTypes = [ActionType.VALIDATE]
+      actionTypes = [ActionType.DECLARE]
       break
     }
     case ActionType.REQUEST_CORRECTION: {

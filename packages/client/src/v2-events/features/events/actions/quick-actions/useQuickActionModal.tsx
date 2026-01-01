@@ -39,12 +39,10 @@ import { useModal } from '../../../../hooks/useModal'
 import { useEvents } from '../../useEvents/useEvents'
 import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useEventConfiguration } from '../../useEventConfiguration'
-import { validate } from './validate'
 import { register } from './register'
 import { archive } from './archive'
 
 const quickActions = {
-  [ActionType.VALIDATE]: validate,
   [ActionType.REGISTER]: register,
   [ActionType.ARCHIVE]: archive
 } as const satisfies Partial<Record<ActionType, QuickActionConfig>>
@@ -82,7 +80,6 @@ interface ModalResult {
 }
 
 const DefaultIcons = {
-  [ActionType.VALIDATE]: 'PencilLine',
   [ActionType.REGISTER]: 'PencilLine',
   [ActionType.ARCHIVE]: 'Archive'
 } as const
@@ -142,7 +139,7 @@ function QuickActionModal({
       ]}
       id={`quick-action-modal-${config.label.id}`}
       isOpen={true}
-      title={intl.formatMessage(config.label)}
+      title={intl.formatMessage(config.label) + '?'}
       titleIcon={
         <Icon
           color="primary"
