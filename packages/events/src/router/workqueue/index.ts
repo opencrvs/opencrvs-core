@@ -12,8 +12,11 @@
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import {
+  AnyScope,
+  decodeScope,
   findScope,
   getScopes,
+  RecordScopeV2,
   SearchScopeAccessLevels,
   WorkqueueConfig,
   WorkqueueCountInput,
@@ -43,6 +46,25 @@ export const workqueueRouter = router({
     .query(async ({ ctx, input }) => {
       const scopes = getScopes(ctx.token)
       const searchScope = findScope(scopes, 'search')
+      // WIP code to allow writing E2E's against remote server. Should not be merged as is.
+      const v2Scopes = scopes
+        .map((scope) => {
+          const parsedScope = decodeScope(scope)
+          return parsedScope && ['record.search'].includes(parsedScope.type)
+            ? parsedScope
+            : null
+        })
+        .filter((scope): scope is z.infer<typeof AnyScope> => scope !== null)
+
+      if (v2Scopes.length > 0) {
+        return getEventCount({
+          queries: input,
+          eventConfigs: await getInMemoryEventConfigurations(ctx.token),
+          user: ctx.user,
+          acceptedScopes: v2Scopes as RecordScopeV2[]
+        })
+      }
+
       // Only to satisfy type checking, as findScope will return undefined if no scope is found
       if (!searchScope) {
         throw new TRPCError({ code: 'FORBIDDEN' })
@@ -52,11 +74,11 @@ export const workqueueRouter = router({
         SearchScopeAccessLevels
       >
 
-      return getEventCount(
-        input,
-        await getInMemoryEventConfigurations(ctx.token),
-        searchScopeOptions,
-        ctx.user.primaryOfficeId
-      )
+      return getEventCount({
+        queries: input,
+        eventConfigs: await getInMemoryEventConfigurations(ctx.token),
+        options: searchScopeOptions,
+        user: ctx.user
+      })
     })
 })

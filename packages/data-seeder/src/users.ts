@@ -14,7 +14,7 @@ import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
-import { EventConfig, joinUrl } from '@opencrvs/commons'
+import { decodeScope, EventConfig, joinUrl } from '@opencrvs/commons'
 import {
   parseLiteralScope,
   parseConfigurableScope
@@ -39,7 +39,9 @@ const RoleSchema = (eventIds: string[]) =>
           const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedLiteralScope = parseLiteralScope(scope)
 
-          if (!parsedConfigurableScope && !parsedLiteralScope) {
+          const v2Scope = decodeScope(scope)
+
+          if (!parsedConfigurableScope && !parsedLiteralScope && !v2Scope) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
