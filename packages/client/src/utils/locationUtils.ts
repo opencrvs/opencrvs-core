@@ -434,6 +434,7 @@ function getAssociatedLocationsAndOffices(
   return [office, ...associatedLocations]
 }
 
+// Returns all the ancestor locations and the office itself in no particular order
 function getAssociatedLocationsAndOfficesV2(
   officeId: string,
   locations: Location[]

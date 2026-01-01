@@ -13,6 +13,7 @@ import { createTestApp, flushPromises, getItem } from '@client/tests/util'
 import * as actions from '@client/notification/actions'
 import { AppStore } from '@client/store'
 import { createClient } from '@client/utils/apolloClient'
+import { referenceApi } from '@client/utils/referenceApi'
 import { ReactWrapper } from 'enzyme'
 import { vi } from 'vitest'
 import { waitFor } from './tests/wait-for-element'
@@ -108,5 +109,13 @@ describe('when user has a valid token in local storage', () => {
     createTestApp()
     await flushPromises()
     expect(assign.mock.calls).toHaveLength(0)
+  })
+
+  it('loads content on startup', async () => {
+    const loadContent = vi.spyOn(referenceApi, 'loadContent')
+
+    createTestApp()
+    await flushPromises()
+    expect(loadContent).toHaveBeenCalled()
   })
 })

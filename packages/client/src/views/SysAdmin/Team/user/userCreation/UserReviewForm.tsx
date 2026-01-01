@@ -317,10 +317,9 @@ const UserReviewFormComponent = ({
   const userRole = userRoles.find(({ id }) => id === formData.role)
 
   const parsedPrimaryOfficeId = UUID.safeParse(userDetails?.primaryOffice.id)
-  let jurisdictionId = null
-  if (parsedPrimaryOfficeId.success) {
-    jurisdictionId = locations.get(parsedPrimaryOfficeId.data)?.parentId ?? null
-  }
+  const jurisdictionId = parsedPrimaryOfficeId.success
+    ? (locations.get(parsedPrimaryOfficeId.data)?.parentId ?? null)
+    : null
 
   const isMultipleOfficeUnderJurisdiction =
     getOfficesUnderJurisdiction({
