@@ -10,6 +10,7 @@
  */
 
 import { useSelector } from 'react-redux'
+import { FullNameV1, personNameFromV1ToV2 } from '@opencrvs/commons/client'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUsersFullName } from '../utils'
@@ -24,14 +25,22 @@ export function useUserDetails() {
 
   const normalizedName =
     userDetails &&
-    userDetails.name.map((n) => ({
+    (userDetails.name.map((n) => ({
       use: n.use ?? 'official',
       family: n.familyName ?? '',
       given: n.firstNames ? [n.firstNames] : []
-    }))
+    })) satisfies FullNameV1)
 
   const name = normalizedName ? getUsersFullName(normalizedName, 'en') : ''
   const { name: userName, role, ...rest } = user
+
+  const splitNames = normalizedName
+    ? personNameFromV1ToV2(normalizedName)
+    : {
+        firstname: '',
+        middlename: '',
+        surname: ''
+      }
 
   const primaryOfficeId = userDetails?.primaryOffice.id
 
@@ -48,6 +57,7 @@ export function useUserDetails() {
       role: userDetails.role.id,
       district: districtId ?? '',
       province: provinceId ?? '',
+      ...splitNames,
       ...rest
     }
   }
@@ -57,6 +67,7 @@ export function useUserDetails() {
     role: userDetails?.role.id,
     district: '',
     province: '',
+    ...splitNames,
     ...rest
   }
 }
