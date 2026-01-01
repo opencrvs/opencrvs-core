@@ -111,15 +111,11 @@ describe('when user has a valid token in local storage', () => {
     expect(assign.mock.calls).toHaveLength(0)
   })
 
-  it('loads languages, facilities and locations on startup', async () => {
-    const loadFacilities = vi.spyOn(referenceApi, 'loadFacilities')
+  it('loads content on startup', async () => {
     const loadContent = vi.spyOn(referenceApi, 'loadContent')
-    const loadLocations = vi.spyOn(referenceApi, 'loadLocations')
 
     createTestApp()
     await flushPromises()
-    expect(loadFacilities).toHaveBeenCalled()
     expect(loadContent).toHaveBeenCalled()
-    expect(loadLocations).toHaveBeenCalled()
   })
 })

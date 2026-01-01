@@ -93,9 +93,6 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
           userDetails.primaryOffice.id,
           true
         )
-        for (const query of queriesToPrefetch) {
-          client.query(query)
-        }
       }
     }
   }

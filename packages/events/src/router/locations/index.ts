@@ -14,6 +14,7 @@ import { Location, LocationType, SCOPES, UUID } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import {
   getChildLocations,
+  getLocationHierarchy,
   getLocations,
   setLocations,
   syncLocations
@@ -45,7 +46,8 @@ export const locationRouter = router({
         .object({
           isActive: z.boolean().optional(),
           locationIds: z.array(UUID).optional(),
-          locationType: LocationType.optional()
+          locationType: LocationType.optional(),
+          externalId: z.string().optional()
         })
         .optional()
     )
@@ -54,7 +56,8 @@ export const locationRouter = router({
       getLocations({
         isActive: input?.isActive,
         locationIds: input?.locationIds,
-        locationType: input?.locationType
+        locationType: input?.locationType,
+        externalId: input?.externalId
       })
     ),
   getChild: userAndSystemProcedure
@@ -73,5 +76,12 @@ export const locationRouter = router({
     .output(z.void())
     .mutation(async ({ input }) => {
       await setLocations(input)
+    }),
+  getLocationHierarchy: userAndSystemProcedure
+
+    .input(z.object({ locationId: UUID }))
+    .output(z.array(UUID))
+    .query(async ({ input }) => {
+      return getLocationHierarchy(input.locationId)
     })
 })

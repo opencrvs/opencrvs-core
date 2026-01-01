@@ -8,12 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ServerRoute } from '@hapi/hapi'
-import { resolveLocationParents } from './locationTreeSolver'
-import { UUID } from '@opencrvs/commons'
 
-export const locationHierarchyHandler: ServerRoute['handler'] = async (req) => {
-  const { locationId } = req.params as { locationId: UUID }
+import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from "@client/tests/v2-events/locations-mock";
 
-  return await resolveLocationParents(locationId)
+export { getLeafLocationIds } from "@client/v2-events/hooks/useLocations"
+
+export function useLocations() {
+  return {
+    getLocations: {
+      useSuspenseQuery: () => V2_DEFAULT_MOCK_LOCATIONS_MAP
+    }
+  }
 }
