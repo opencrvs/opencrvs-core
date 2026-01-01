@@ -24,7 +24,11 @@ import { countries } from '@client/utils/countries'
 import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { camelCase } from 'lodash'
-import { Location, UUID } from '@opencrvs/commons/client'
+import {
+  Location,
+  UUID,
+  LocationType as V2LocationType
+} from '@opencrvs/commons/client'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -133,7 +137,7 @@ export function generateSearchableLocations(
       if (
         location.partOf &&
         location.partOf !== 'Location/0' &&
-        location.type !== 'CRVS_OFFICE'
+        location.type !== V2LocationType.enum.CRVS_OFFICE
       ) {
         const locRef = location.partOf.split('/')[1]
         let parent
@@ -185,7 +189,10 @@ export function generateSearchableLocationsV2(
     (location: Location) => {
       let locationName = location.name
 
-      if (location.parentId && location.locationType !== 'CRVS_OFFICE') {
+      if (
+        location.parentId &&
+        location.locationType !== V2LocationType.enum.CRVS_OFFICE
+      ) {
         const parentLocation = offlineLocations.get(location.parentId)
         if (parentLocation) {
           locationName += `, ${parentLocation.name}`
@@ -251,7 +258,7 @@ export function getOfficesUnderJurisdiction({
 }): Location[] {
   return [...locations.values()].filter(
     ({ id, locationType }) =>
-      locationType === 'CRVS_OFFICE' &&
+      locationType === V2LocationType.enum.CRVS_OFFICE &&
       isLocationUnderJurisdiction({ locations, locationId: id, jurisdictionId })
   )
 }
@@ -399,7 +406,9 @@ function getAssociatedLocationsAndOffices(
   locations: ILocation[]
 ): ILocation[] {
   const office = locations.find(
-    (location) => location.id === officeId && location.type === 'CRVS_OFFICE'
+    (location) =>
+      location.id === officeId &&
+      location.type === V2LocationType.enum.CRVS_OFFICE
   )
 
   if (!office) {
@@ -431,7 +440,8 @@ function getAssociatedLocationsAndOfficesV2(
 ): Location[] {
   const office = locations.find(
     (location) =>
-      location.id === officeId && location.locationType === 'CRVS_OFFICE'
+      location.id === officeId &&
+      location.locationType === V2LocationType.enum.CRVS_OFFICE
   )
 
   if (!office) {

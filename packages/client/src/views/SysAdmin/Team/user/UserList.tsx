@@ -70,7 +70,7 @@ import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { Location, UUID } from '@opencrvs/commons/client'
+import { Location, LocationType, UUID } from '@opencrvs/commons/client'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -218,7 +218,7 @@ function UserListComponent(props: IProps) {
   const locations = getLocations.useSuspenseQuery()
 
   const offlineOffices = [...locations.values()].filter(
-    ({ locationType }) => locationType === 'CRVS_OFFICE'
+    ({ locationType }) => locationType === LocationType.enum.CRVS_OFFICE
   )
 
   const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)
@@ -619,7 +619,8 @@ function UserListComponent(props: IProps) {
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
           locationFilter={(location) =>
-            location.locationType === 'CRVS_OFFICE' && canAccessOffice(location)
+            location.locationType === LocationType.enum.CRVS_OFFICE &&
+            canAccessOffice(location)
           }
         />
       )

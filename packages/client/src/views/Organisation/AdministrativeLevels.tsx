@@ -36,7 +36,7 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { Location, UUID } from '@opencrvs/commons/client'
+import { Location, LocationType, UUID } from '@opencrvs/commons/client'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -104,7 +104,7 @@ export function AdministrativeLevels({
   const getNewLevel = (
     currentlySelectedLocation: UUID | null
   ): IGetNewLevel => {
-    const location = currentlySelectedLocation ?? null
+    const location = currentlySelectedLocation
 
     const locations = getLocations.useSuspenseQuery()
 
@@ -112,8 +112,8 @@ export function AdministrativeLevels({
       ({ parentId, validUntil, locationType }) =>
         (validUntil === null || new Date(validUntil) > new Date()) &&
         parentId === location &&
-        locationType &&
-        ['ADMIN_STRUCTURE', 'CRVS_OFFICE'].includes(locationType)
+        (locationType === LocationType.enum.ADMIN_STRUCTURE ||
+          locationType === LocationType.enum.CRVS_OFFICE)
     )
 
     let dataOfBreadCrumb: IBreadCrumbData[] = [
@@ -125,12 +125,12 @@ export function AdministrativeLevels({
 
     if (currentlySelectedLocation) {
       let currentLocationId: UUID | null = currentlySelectedLocation
-      const LocationBreadCrumb: IBreadCrumbData[] | null = []
+      const locationBreadCrumb: IBreadCrumbData[] | null = []
       do {
         const currentOffice = locations.get(currentLocationId)
 
         if (currentOffice) {
-          LocationBreadCrumb.push({
+          locationBreadCrumb.push({
             label: currentOffice.name,
             paramId: currentOffice.id
           })
@@ -140,7 +140,7 @@ export function AdministrativeLevels({
         }
       } while (currentLocationId !== null)
 
-      dataOfBreadCrumb = [...dataOfBreadCrumb, ...LocationBreadCrumb.reverse()]
+      dataOfBreadCrumb = [...dataOfBreadCrumb, ...locationBreadCrumb.reverse()]
     }
 
     return {
@@ -192,7 +192,8 @@ export function AdministrativeLevels({
                   <ListViewItemSimplified
                     key={index}
                     label={
-                      level.locationType === 'ADMIN_STRUCTURE' ? (
+                      level.locationType ===
+                      LocationType.enum.ADMIN_STRUCTURE ? (
                         <Link
                           onClick={(e) => {
                             setCurrentPageNumber(1)
@@ -201,7 +202,8 @@ export function AdministrativeLevels({
                         >
                           {level.name}
                         </Link>
-                      ) : level.locationType === 'CRVS_OFFICE' ? (
+                      ) : level.locationType ===
+                        LocationType.enum.CRVS_OFFICE ? (
                         <Link
                           disabled={!canAccessOffice(level)}
                           onClick={() =>

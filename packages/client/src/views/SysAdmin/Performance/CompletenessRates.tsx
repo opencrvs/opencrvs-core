@@ -47,6 +47,7 @@ import format from '@client/utils/date-formatting'
 import { SegmentedControl } from '@client/components/SegmentedControl'
 import { useQuery } from '@apollo/client'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { LocationType } from '@opencrvs/commons/client'
 const { useState } = React
 
 export enum COMPLETENESS_RATE_REPORT_BASE {
@@ -163,7 +164,7 @@ function Filter({
         additionalLocations={getAdditionalLocations(intl)}
         selectedLocationId={locationId}
         locationFilter={({ locationType }) =>
-          locationType === 'ADMIN_STRUCTURE'
+          locationType === LocationType.enum.ADMIN_STRUCTURE
         }
         onChangeLocation={(newLocationId) => {
           navigate(
