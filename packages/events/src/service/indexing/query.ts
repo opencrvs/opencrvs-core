@@ -210,16 +210,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       case 'updatedAtLocation':
       case 'legalStatuses.DECLARED.createdAtLocation':
       case 'legalStatuses.REGISTERED.createdAtLocation': {
-        const value = clause[key]
-
-        /**
-         * If value.location === '', it represents the root location,
-         * so no additional restriction needs to be applied.
-         */
-        if (value.location !== '') {
-          must.push({ term: { [key]: value.location } })
-        }
-
+        must.push({ term: { [key]: clause[key].location } })
         break
       }
 
