@@ -129,6 +129,7 @@ export const Output: StoryObj<typeof FormFieldGenerator> = {
                   defaultMessage: 'Page with a custom output',
                   description: ''
                 },
+                requireCompletionToContinue: false,
                 fields: [
                   {
                     id: 'storybook.data',

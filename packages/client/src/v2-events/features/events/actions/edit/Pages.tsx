@@ -31,12 +31,12 @@ export function Pages() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.EDIT.PAGES)
   const events = useEvents()
   const navigate = useNavigate()
-  const { modal, closeActionView } = useEventFormNavigation()
+  const { modal } = useEventFormNavigation()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
-  const validatorContext = useValidatorContext()
   const event = events.getEvent.getFromCache(eventId)
 
+  const validatorContext = useValidatorContext(event)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
