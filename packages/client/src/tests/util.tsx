@@ -66,12 +66,10 @@ import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
 import * as actions from '@client/profile/profileActions'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
-import { mockOfflineData } from './mock-offline-data'
+import { mockOfflineData, validImageB64String } from './mock-offline-data'
 
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
-export const validImageB64String =
-  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 export const inValidImageB64String =
   'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
@@ -96,25 +94,6 @@ export const REGISTRAR_DEFAULT_SCOPES = [
   SCOPES.RECORD_DECLARATION_REINSTATE,
   SCOPES.RECORD_REGISTER,
   SCOPES.RECORD_REGISTRATION_CORRECT,
-  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-  SCOPES.PERFORMANCE_READ,
-  SCOPES.PERFORMANCE_READ_DASHBOARDS,
-  SCOPES.ORGANISATION_READ_LOCATIONS,
-  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_MARRIAGE
-] satisfies Scope[]
-
-export const REGISTRATION_AGENT_DEFAULT_SCOPES = [
-  SCOPES.RECORD_DECLARE_BIRTH,
-  SCOPES.RECORD_DECLARE_DEATH,
-  SCOPES.RECORD_DECLARE_MARRIAGE,
-  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-  SCOPES.RECORD_DECLARATION_ARCHIVE,
-  SCOPES.RECORD_DECLARATION_REINSTATE,
-  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
   SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
@@ -375,12 +354,6 @@ export const userDetails: UserDetails = {
         __typename: 'HumanName'
       }
     ]
-  }
-}
-
-export const mockUserResponseWithName = {
-  data: {
-    getUser: userDetails
   }
 }
 
@@ -1108,41 +1081,6 @@ export const getFileFromBase64String = (
   })
 }
 
-export async function goToSection(component: ReactWrapper, nth: number) {
-  for (let i = 0; i < nth; i++) {
-    await flushPromises()
-    await waitForElement(component, '#next_section')
-    component.find('#next_section').hostNodes().simulate('click')
-    await flushPromises()
-    component.update()
-  }
-}
-
-export async function goToEndOfForm(component: ReactWrapper) {
-  await goToSection(component, 6)
-  await waitForElement(component, '#review_header')
-}
-
-export async function goToDocumentsSection(component: ReactWrapper) {
-  await goToSection(component, 4)
-  await waitForElement(component, '#form_section_id_documents-view-group')
-}
-
-export async function goToFatherSection(component: ReactWrapper) {
-  await goToSection(component, 3)
-  await waitForElement(component, '#form_section_id_father-view-group')
-}
-
-export async function goToMotherSection(component: ReactWrapper) {
-  await goToSection(component, 2)
-  await waitForElement(component, '#form_section_id_mother-view-group')
-}
-
-export async function goToChildSection(component: ReactWrapper) {
-  await goToSection(component, 1)
-  await waitForElement(component, '#form_section_id_child-view-group')
-}
-
 export async function getRegisterFormFromStore(
   store: Store<IStoreState, AnyAction>,
   event: EventType
@@ -1159,14 +1097,6 @@ export async function getReviewFormFromStore(
   store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
   return getReviewForm(state)![event]
-}
-
-export function setPageVisibility(isVisible: boolean) {
-  // @ts-ignore
-  document.hidden = !isVisible
-  const evt = document.createEvent('HTMLEvents')
-  evt.initEvent('visibilitychange', false, true)
-  document.dispatchEvent(evt)
 }
 
 export function loginAsFieldAgent(store: AppStore) {

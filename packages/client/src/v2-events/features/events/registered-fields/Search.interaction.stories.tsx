@@ -178,24 +178,27 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement)
 
-      await userEvent.type(
-        await canvas.findByTestId('text__firstname'),
-        'firstname'
-      )
+      const firstname = await canvas.findByTestId('text__firstname')
+      const surname = await canvas.findByTestId('text__surname')
 
-      await userEvent.type(
-        await canvas.findByTestId('text__surname'),
-        'surname'
-      )
+      await userEvent.type(firstname, 'firstname')
 
-      await userEvent.type(
-        await canvas.findByTestId('search-input'),
-        '456988542'
-      )
+      firstname.blur()
+
+      await userEvent.type(surname, 'surname')
+
+      const searchInput = await canvas.findByTestId('search-input')
+
+      await userEvent.type(searchInput, '456988542')
+
+      searchInput.blur()
 
       await canvas.findByTestId('search-input-error')
 
-      await userEvent.type(await canvas.findByTestId('search-input'), '1')
+      await userEvent.type(searchInput, '1')
+
+      searchInput.blur()
+
       await waitFor(async () =>
         expect(
           canvas.queryByTestId('search-input-error')
@@ -212,13 +215,9 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
         { timeout: 3000 }
       )
 
-      // names should not clear because search was not successfull
-      await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
-        'firstname'
-      )
-      await expect(await canvas.findByTestId('text__surname')).toHaveValue(
-        'surname'
-      )
+      // names should not clear because search was not successful
+      await expect(firstname).toHaveValue('firstname')
+      await expect(surname).toHaveValue('surname')
     },
     render: function Component(args) {
       return (

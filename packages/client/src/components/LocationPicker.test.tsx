@@ -8,12 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+import { vi, beforeEach, afterEach, describe, it, expect } from 'vitest'
 import { AppStore, createStore } from '@client/store'
 import { createTestComponent, flushPromises } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import React from 'react'
-import { vi } from 'vitest'
 import { LocationPicker } from './LocationPicker'
 
 describe('location picker tests', () => {
@@ -29,7 +30,7 @@ describe('location picker tests', () => {
   beforeEach(async () => {
     const { component: testComponent } = await createTestComponent(
       <LocationPicker
-        selectedLocationId="bfe8306c-0910-48fe-8bf5-0db906cf3155"
+        selectedLocationId="028d2c85-ca31-426d-b5d1-2cef545a4902"
         onChangeLocation={onChangeLocationMock}
       />,
       { store },
@@ -48,7 +49,7 @@ describe('location picker tests', () => {
       '#location-range-picker-action'
     )
 
-    expect(actionElement.hostNodes().text()).toBe('Baniajan Union')
+    expect(actionElement.hostNodes().text()).toBe('Ibombo District Office')
   })
 
   it('focuses input on click action', async () => {
