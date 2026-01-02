@@ -25,11 +25,11 @@ import {
   isNonInteractiveFieldType,
   InteractiveFieldType,
   FieldReference,
-  getAllUniqueFields,
   omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
-  isFieldVisible
+  isFieldVisible,
+  findAllFields
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -186,7 +186,7 @@ export function FormSectionComponent({
   }))
 
   const allFieldsWithDotSeparator = eventConfig
-    ? getAllUniqueFields(eventConfig)
+    ? findAllFields(eventConfig)
     : fieldsWithDotSeparator
   const listenerFieldsByParentId = getParentsOfListenerFields(
     allFieldsWithDotSeparator
