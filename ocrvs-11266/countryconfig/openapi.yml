@@ -1778,6 +1778,8 @@ components:
                             - firstname
                             - middlename
                             - surname
+                            - district
+                            - province
                             - primaryOfficeId
                         $location:
                           type: string

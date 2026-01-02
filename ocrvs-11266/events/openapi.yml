@@ -752,7 +752,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: e4ff4d2b-e3c4-4785-8d6b-43d5e9de0a68
+                transactionId: b7f5a902-4a0b-423e-9572-e9c95e214b05
                 type: birth
       responses:
         "200":
@@ -838,7 +838,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 3b80aa4e-6b3b-4dac-b9dd-fc75d9a647b0
+                transactionId: 8eb78d45-fe03-4c81-ad09-cced54058ac5
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2399,6 +2399,8 @@ components:
                             - firstname
                             - middlename
                             - surname
+                            - district
+                            - province
                             - primaryOfficeId
                         $location:
                           type: string
