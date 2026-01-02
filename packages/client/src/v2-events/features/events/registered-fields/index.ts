@@ -10,6 +10,8 @@
  */
 import { FieldConfig, FieldType } from '@opencrvs/commons/client'
 
+import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { Address } from './Address'
 import { AdministrativeArea } from './AdministrativeArea'
 import { BulletList } from './BulletList'
@@ -119,6 +121,10 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return QueryParamReader
     case FieldType.AGE:
       return AgeField
+    case FieldType.FILE:
+      return File
+    case FieldType.FILE_WITH_OPTIONS:
+      return FileWithOption
     default:
       return undefined
   }
