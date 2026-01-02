@@ -6,6 +6,11 @@
 
 - Fix quick search failing when configured with a large number of events and many searchable fields [#11397](https://github.com/opencrvs/opencrvs-core/issues/11397)
 
+### New features
+
+
+### Improvements
+
 ## 1.9.4
 
 ### Bug fixes
