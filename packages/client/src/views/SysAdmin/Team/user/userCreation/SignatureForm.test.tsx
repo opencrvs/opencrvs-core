@@ -15,7 +15,6 @@ import {
   flushPromises,
   getFileFromBase64String,
   mockOfflineData,
-  validImageB64String,
   mockOfflineDataDispatch,
   mockFetchRoleGraphqlOperation,
   mockDataWithRegistarRoleSelected,
@@ -23,6 +22,7 @@ import {
   mockUserGraphqlOperation,
   setScopes
 } from '@client/tests/util'
+import { validImageB64String } from '@client/tests/mock-offline-data'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'

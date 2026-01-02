@@ -2,6 +2,17 @@
 
 ## 2.0.0 Release Candidate
 
+### Breaking changes
+
+- **Removed following endpoints from gateway:**
+  | Path | Method |
+  |--------------------|--------|
+  | `/location` | `*` |
+  | `/location/{id}` | `*` |
+  | `/locations` | `GET` |
+  | `/locations` | `POST` |
+  | `/locations/{id}` | `*` |
+
 ### New features
 
 #### HTTP Input
