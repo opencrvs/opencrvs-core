@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.5
+
+### New features
+
+
+### Improvements
+
+
 ## 1.9.4
 
 ### Bug fixes
