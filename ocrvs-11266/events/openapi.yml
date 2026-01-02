@@ -752,7 +752,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 5f0220fb-927e-4ee3-8aad-ab67c2c367dc
+                transactionId: d590548d-3dfb-4904-8ccd-896b5c2038dd
                 type: birth
       responses:
         "200":
@@ -838,7 +838,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 615ad290-7c3d-4723-86e1-8267fd108d0b
+                transactionId: 593e75c3-c0ce-4a09-8ff7-4f7b35539f75
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2391,11 +2391,8 @@ components:
                         $userField:
                           type: string
                           enum: &a10
-                            - id
                             - name
                             - role
-                            - signature
-                            - avatar
                             - fullHonorificName
                             - device
                             - firstname
