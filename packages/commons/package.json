@@ -126,7 +126,8 @@
       "json",
       "lcov",
       "text",
-      "html"
+      "html",
+      "json-summary"
     ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "setupFiles": [
