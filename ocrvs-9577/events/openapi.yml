@@ -2911,6 +2911,11 @@ components:
                   title:
                     description: Header title of the page
                     $ref: "#/components/schemas/TranslationConfig"
+                  requireCompletionToContinue:
+                    description: If true, all required fields must be filled before continuing to
+                      the next page
+                    default: false
+                    type: boolean
                   fields:
                     description: Fields to be rendered on the page
                     type: array
@@ -2927,6 +2932,7 @@ components:
                 required:
                   - id
                   - title
+                  - requireCompletionToContinue
                   - fields
                   - type
                 additionalProperties: false
@@ -12043,6 +12049,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -12059,6 +12070,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                     additionalProperties: false
@@ -12070,6 +12082,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -12087,6 +12104,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                       - actions
@@ -12343,6 +12361,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -12359,6 +12382,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                     additionalProperties: false
@@ -12370,6 +12394,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -12387,6 +12416,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                       - actions
