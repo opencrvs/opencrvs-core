@@ -1770,6 +1770,7 @@ components:
                           type: string
                           enum:
                             &a9
+                            - id
                             - name
                             - role
                             - fullHonorificName
