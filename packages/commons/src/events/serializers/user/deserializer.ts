@@ -51,8 +51,6 @@ function userDeserializer(
   }
   if (
     serializedUserField.$userField === 'name' ||
-    serializedUserField.$userField === 'signature' ||
-    serializedUserField.$userField === 'avatar' ||
     serializedUserField.$userField === 'fullHonorificName' ||
     serializedUserField.$userField === 'device' ||
     serializedUserField.$userField === 'firstname' ||
