@@ -10,23 +10,37 @@
  */
 
 import { useSelector } from 'react-redux'
+import { FullNameV1, personNameFromV1ToV2 } from '@opencrvs/commons/client'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUsersFullName } from '../utils'
+import { useUsers } from './useUsers'
 
 export function useUserDetails() {
   const userDetails = useSelector(getUserDetails)
   const locations = useSelector(getLocations)
+  const loggedInUser = useSelector(getUserDetails)
+  const { getUser } = useUsers()
+  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
 
   const normalizedName =
     userDetails &&
-    userDetails.name.map((n) => ({
+    (userDetails.name.map((n) => ({
       use: n.use ?? 'official',
       family: n.familyName ?? '',
-      given: n.firstNames ? [n.firstNames] : []
-    }))
+      given: n.firstNames ? n.firstNames.split(' ') : []
+    })) satisfies FullNameV1)
 
   const name = normalizedName ? getUsersFullName(normalizedName, 'en') : ''
+  const { name: userName, role, ...rest } = user
+
+  const splitNames = normalizedName
+    ? personNameFromV1ToV2(normalizedName)
+    : {
+        firstname: '',
+        middlename: '',
+        surname: ''
+      }
 
   const primaryOfficeId = userDetails?.primaryOffice.id
 
@@ -42,7 +56,9 @@ export function useUserDetails() {
       name,
       role: userDetails.role.id,
       district: districtId ?? '',
-      province: provinceId ?? ''
+      province: provinceId ?? '',
+      ...splitNames,
+      ...rest
     }
   }
 
@@ -50,6 +66,8 @@ export function useUserDetails() {
     name,
     role: userDetails?.role.id,
     district: '',
-    province: ''
+    province: '',
+    ...splitNames,
+    ...rest
   }
 }

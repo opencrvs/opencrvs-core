@@ -222,6 +222,25 @@ function NameInput(props: Props) {
   )
 }
 
+function NameOutput({
+  value,
+  configuration
+}: {
+  value?: NameFieldValue
+  configuration?: NameField
+}) {
+  const defaultNameOrder = [
+    'firstname',
+    ...(configuration?.configuration?.name?.middlename ? ['middlename'] : []),
+    'surname'
+  ]
+  const order = configuration?.configuration?.order || defaultNameOrder
+
+  return joinValues(
+    order.map((field) => value?.[field as keyof NameFieldValue])
+  )
+}
+
 function stringify(value?: NameFieldValue) {
   return joinValues([value?.firstname, value?.middlename, value?.surname])
 }
@@ -237,24 +256,7 @@ function toCertificateVariables(value?: NameFieldValue) {
 
 export const Name = {
   Input: NameInput,
-  Output: ({
-    value,
-    configuration
-  }: {
-    value?: NameFieldValue
-    configuration?: NameField
-  }) => {
-    const defaultNameOrder = [
-      'firstname',
-      ...(configuration?.configuration?.name?.middlename ? ['middlename'] : []),
-      'surname'
-    ]
-    const order = configuration?.configuration?.order || defaultNameOrder
-
-    return joinValues(
-      order.map((field) => value?.[field as keyof NameFieldValue])
-    )
-  },
+  Output: NameOutput,
   stringify,
   toCertificateVariables
 }
