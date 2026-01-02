@@ -260,29 +260,6 @@ const testCases = [
     field: TextField
   },
   {
-    currentValue: undefined,
-    defaultValue: '$user.district',
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        role: '',
-        district: '',
-        province: '',
-        id: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    },
-    expected: 'Ibombo',
-    field: TextField
-  },
-  {
     currentValue: 'Hello world',
     defaultValue: '$user.district',
     systemVariables: {
