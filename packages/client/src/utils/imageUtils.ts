@@ -219,7 +219,7 @@ export function useImageProcessing() {
     maxImageSize?: FileConfig['configuration']['maxImageSize'],
     error?: string
   ) => {
-    if (!isImageFile(newFile)) {
+    if (!isImageFile(newFile) || !maxImageSize) {
       return newFile
     }
 
