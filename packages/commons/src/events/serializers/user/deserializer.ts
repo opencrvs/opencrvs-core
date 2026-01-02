@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { deepDropNulls, QueryExpression, QueryType } from '../../../events'
+import { QueryExpression, QueryType } from '../../../events'
 import { User } from '../../../users/User'
 import {
   CountryConfigQueryType,
@@ -109,7 +109,9 @@ function deserializeQueryExpression(
       )
     : undefined
 
-  return deepDropNulls({
+  return {
+    ...expression,
+
     assignedTo:
       expression.assignedTo && isDefined(assignedTo)
         ? { ...expression.assignedTo, term: assignedTo }
@@ -152,7 +154,7 @@ function deserializeQueryExpression(
             location: registeredLocation
           }
         : undefined
-  })
+  }
 }
 
 export function deserializeQuery(
