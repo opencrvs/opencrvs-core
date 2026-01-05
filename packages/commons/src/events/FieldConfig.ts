@@ -156,7 +156,7 @@ export type Divider = z.infer<typeof Divider>
 
 export const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: z.union([NonEmptyTextValue, SerializedUserField]).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
