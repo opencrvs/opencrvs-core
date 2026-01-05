@@ -484,7 +484,13 @@ export type NameConfig = z.infer<typeof NameConfig>
 
 const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
-  defaultValue: SerializedUserField.optional(),
+  defaultValue: z
+    .object({
+      firstname: SerializedUserField.or(NonEmptyTextValue).optional(),
+      middlename: SerializedUserField.or(NonEmptyTextValue).optional(),
+      surname: SerializedUserField.or(NonEmptyTextValue).optional()
+    })
+    .optional(),
   configuration: z
     .object({
       name: NameConfig.default({
