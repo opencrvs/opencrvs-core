@@ -159,21 +159,22 @@ jobs:
 
       - name: Run Unit Test
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
-        run: cd ${{ matrix.package }} && yarn test --coverage
+        run: cd ${{ matrix.package }} && yarn test
 
-      - name: Extract coverage summary
-        if: matrix.package == 'packages/commons'
+      - name: Commons test coverage summary
+        if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
         run: |
           SUMMARY=$(node -e '
             const s = require("./packages/commons/coverage/coverage-summary.json").total;
             console.log(
-              "Statements: " + s.statements.pct + "%\n" +
-              "Branches: " + s.branches.pct + "%\n" +
-              "Functions: " + s.functions.pct + "%\n" +
-              "Lines: " + s.lines.pct + "%"
+              "## 📊 Commons test coverage\n\n" +
+              "- Statements: " + s.statements.pct + "%\n" +
+              "- Branches: " + s.branches.pct + "%\n" +
+              "- Functions: " + s.functions.pct + "%\n" +
+              "- Lines: " + s.lines.pct + "%\n"
             );
           ')
-          echo "$SUMMARY" > coverage-summary.txt
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
   prepare-client-tests:
     name: Prepare client tests
