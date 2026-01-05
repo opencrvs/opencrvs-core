@@ -35,8 +35,6 @@ Legacy string-based user template variables (e.g. $user.name) are now deprecated
 
 ### New features
 
-### Improvements
-
 ## 1.9.4
 
 ### Bug fixes
