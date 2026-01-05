@@ -4,9 +4,7 @@
 
 ### New features
 
-
 ### Improvements
-
 
 ## 1.9.4
 
@@ -72,7 +70,8 @@ defaultValue: {
 }
 ```
 
-Using user('name') as a default value for FieldType.NAME is not recommended, as user names may contain multiple words and cannot be reliably mapped to individual name parts.
+Using user('name') as a default value is only supported for FieldType.TEXT.
+It represents the user’s full name and should not be used with FieldType.NAME, since full names may contain multiple words and cannot be reliably split into individual name parts.
 
 Legacy string-based user template variables (e.g. $user.name) are now deprecated in favour of user(...) references.
 
