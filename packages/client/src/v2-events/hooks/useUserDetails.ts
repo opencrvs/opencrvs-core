@@ -28,7 +28,7 @@ export function useUserDetails() {
     (userDetails.name.map((n) => ({
       use: n.use ?? 'official',
       family: n.familyName ?? '',
-      given: n.firstNames ? [n.firstNames] : []
+      given: n.firstNames ? n.firstNames.split(' ') : []
     })) satisfies FullNameV1)
 
   const name = normalizedName ? getUsersFullName(normalizedName, 'en') : ''
