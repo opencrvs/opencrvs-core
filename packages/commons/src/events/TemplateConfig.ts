@@ -28,6 +28,8 @@ export type SystemVariables = {
     name?: string
     role?: string
     primaryOfficeId?: UUID
+    fullHonorificName?: string
+    device?: string
     avatar?: string
     signature?: string
   }
