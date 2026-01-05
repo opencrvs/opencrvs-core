@@ -190,7 +190,7 @@ describe('serializeSearchParams and deserializeSearchParams (full roundtrip)', (
 
 describe('buildQuickSearchQuery', () => {
   it('should build a quick search query', () => {
-    const searchParams = { key: 'abc@gmail.com' }
+    const searchParams = { key: 'abcdefg' }
     const resultQuery = buildQuickSearchQuery(searchParams, [
       tennisClubMembershipEvent
     ])
@@ -202,7 +202,7 @@ describe('buildQuickSearchQuery', () => {
           data: {
             'applicant.name': {
               type: 'fuzzy',
-              term: 'abc@gmail.com'
+              term: 'abcdefg'
             }
           }
         },
@@ -210,7 +210,7 @@ describe('buildQuickSearchQuery', () => {
           data: {
             'applicant.email': {
               type: 'exact',
-              term: 'abc@gmail.com'
+              term: 'abcdefg'
             }
           }
         },
@@ -218,20 +218,41 @@ describe('buildQuickSearchQuery', () => {
           data: {
             'recommender.name': {
               type: 'fuzzy',
-              term: 'abc@gmail.com'
+              term: 'abcdefg'
             }
           }
         },
         {
           trackingId: {
-            term: 'abc@gmail.com',
+            term: 'abcdefg',
             type: 'exact'
           }
         },
         {
           'legalStatuses.REGISTERED.registrationNumber': {
-            term: 'abc@gmail.com',
+            term: 'abcdefg',
             type: 'exact'
+          }
+        }
+      ]
+    })
+  })
+
+  it('emails are searched only in email fields', () => {
+    const searchParams = { key: 'abc@gmail.com' }
+    const resultQuery = buildQuickSearchQuery(searchParams, [
+      tennisClubMembershipEvent
+    ])
+
+    expect(resultQuery).toEqual({
+      type: 'or',
+      clauses: [
+        {
+          data: {
+            'applicant.email': {
+              type: 'exact',
+              term: 'abc@gmail.com'
+            }
           }
         }
       ]
