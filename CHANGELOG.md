@@ -2,6 +2,37 @@
 
 ## 1.9.5
 
+## Improvements
+
+### User default values in form fields
+
+Form fields now support typed user(...) references as default values, replacing legacy string-based $user.\* template variables.
+
+TEXT fields can use the following user references as default values:
+
+- user('name')
+- user('fullHonorificName')
+- user('device')
+- user('firstname')
+- user('middlename')
+- user('surname')
+- user('role')
+
+NAME fields now support user-based default values by assigning user references per name part. The recommended approach is:
+
+```ts
+defaultValue: {
+  firstname: user('firstname'),
+  middlename: user('middlename'), // optional
+  surname: user('surname')
+}
+```
+
+Using user('name') as a default value is only supported for FieldType.TEXT.
+It represents the user’s full name and should not be used with FieldType.NAME, since full names may contain multiple words and cannot be reliably split into individual name parts.
+
+Legacy string-based user template variables (e.g. $user.name) are now deprecated in favour of user(...) references.
+
 ### New features
 
 ### Improvements
@@ -41,39 +72,6 @@ field('child.dob').isBefore().days(45).fromNow()
 ### Bug fixes
 
 - Fixes an issue where `event.hasAction` was not working in form configurations [#11074](https://github.com/opencrvs/opencrvs-core/issues/11074)
-
-## 1.9.5
-
-## Improvements
-
-### User default values in form fields
-
-Form fields now support typed user(...) references as default values, replacing legacy string-based $user.\* template variables.
-
-TEXT fields can use the following user references as default values:
-
-- user('name')
-- user('fullHonorificName')
-- user('device')
-- user('firstname')
-- user('middlename')
-- user('surname')
-- user('role')
-
-NAME fields now support user-based default values by assigning user references per name part. The recommended approach is:
-
-```ts
-defaultValue: {
-  firstname: user('firstname'),
-  middlename: user('middlename'), // optional
-  surname: user('surname')
-}
-```
-
-Using user('name') as a default value is only supported for FieldType.TEXT.
-It represents the user’s full name and should not be used with FieldType.NAME, since full names may contain multiple words and cannot be reliably split into individual name parts.
-
-Legacy string-based user template variables (e.g. $user.name) are now deprecated in favour of user(...) references.
 
 ## 1.9.2
 
