@@ -55,6 +55,8 @@ function userDeserializer(
     serializedUserField.$userField === 'device' ||
     serializedUserField.$userField === 'firstname' ||
     serializedUserField.$userField === 'middlename' ||
+    serializedUserField.$userField === 'province' ||
+    serializedUserField.$userField === 'district' ||
     serializedUserField.$userField === 'surname'
   ) {
     throw new Error(

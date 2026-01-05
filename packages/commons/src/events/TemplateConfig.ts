@@ -23,8 +23,8 @@ import { FieldValue } from './FieldValue'
 export type SystemVariables = {
   user: {
     id: string
-    province: string
-    district: string
+    province?: string
+    district?: string
     name?: string
     role?: string
     firstname?: string
