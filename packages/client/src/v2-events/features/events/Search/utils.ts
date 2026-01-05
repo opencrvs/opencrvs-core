@@ -12,6 +12,7 @@
 import { isArray, isNil, isPlainObject, isString } from 'lodash'
 import { parse as parseQuery, stringify } from 'query-string'
 import { useSelector } from 'react-redux'
+import { validate as validateEmail } from 'email-validator'
 import {
   EventConfig,
   FieldConfig,
@@ -696,6 +697,10 @@ function buildQueryFromQuickSearchFields(
       searchFieldTypeMapping[field.type as keyof typeof searchFieldTypeMapping]
 
     for (const term of terms) {
+      if (validateEmail(term) && field.type !== FieldType.EMAIL) {
+        // Skip email terms for non-email fields https://github.com/opencrvs/opencrvs-core/issues/11199
+        continue
+      }
       const queryClause: QueryExpression = Object.keys(
         searchFieldTypeMapping
       ).includes(field.type) // Check if the field type is in the mapping to determine if it's a declaration field
@@ -706,7 +711,10 @@ function buildQueryFromQuickSearchFields(
     }
   }
 
-  clauses = addMetadataFieldsInQuickSearchQuery(clauses, terms)
+  clauses = addMetadataFieldsInQuickSearchQuery(
+    clauses,
+    terms.filter((term) => !validateEmail(term))
+  )
 
   return {
     type: OR_SEARCH_KEY,
