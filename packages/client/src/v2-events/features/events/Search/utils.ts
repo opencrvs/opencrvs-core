@@ -670,51 +670,39 @@ function metadataFieldTypeMapping(value: string) {
 
 function addMetadataFieldsInQuickSearchQuery(
   clauses: QueryExpression[],
-  terms: string[]
+  term: string
 ): QueryExpression[] {
-  const metadataClauses = terms.reduce<QueryExpression[]>((acc, term) => {
-    const mappings = metadataFieldTypeMapping(term)
+  const mappings = metadataFieldTypeMapping(term)
 
-    for (const mapping of mappings) {
-      for (const [field, config] of Object.entries(mapping)) {
-        acc.push({ [field]: config })
-      }
-    }
-
-    return acc
-  }, [])
+  const metadataClauses = mappings.flatMap((mapping) =>
+    Object.entries(mapping).map(([field, config]) => ({ [field]: config }))
+  )
 
   return [...clauses, ...metadataClauses]
 }
 
 function buildQueryFromQuickSearchFields(
   searchableFields: FieldConfig[],
-  terms: string[]
+  term: string
 ): QueryType {
   let clauses: QueryExpression[] = []
   for (const field of searchableFields) {
     const matchType =
       searchFieldTypeMapping[field.type as keyof typeof searchFieldTypeMapping]
 
-    for (const term of terms) {
-      if (validateEmail(term) && field.type !== FieldType.EMAIL) {
-        // Skip email terms for non-email fields https://github.com/opencrvs/opencrvs-core/issues/11199
-        continue
-      }
-      const queryClause: QueryExpression = Object.keys(
-        searchFieldTypeMapping
-      ).includes(field.type) // Check if the field type is in the mapping to determine if it's a declaration field
-        ? { data: { [field.id]: { type: matchType, term } } }
-        : { [field.id]: { type: matchType, term } }
+    const queryClause: QueryExpression = Object.keys(
+      searchFieldTypeMapping
+    ).includes(field.type) // Check if the field type is in the mapping to determine if it's a declaration field
+      ? { data: { [field.id]: { type: matchType, term } } }
+      : { [field.id]: { type: matchType, term } }
 
-      clauses.push(queryClause)
-    }
+    clauses.push(queryClause)
   }
 
-  clauses = addMetadataFieldsInQuickSearchQuery(
-    clauses,
-    terms.filter((term) => !validateEmail(term))
-  )
+  if (!validateEmail(term)) {
+    // Add metadata fields for non-email terms only
+    clauses = addMetadataFieldsInQuickSearchQuery(clauses, term)
+  }
 
   return {
     type: OR_SEARCH_KEY,
@@ -737,7 +725,7 @@ function buildQueryFromQuickSearchFields(
  * @returns QueryType - A structured query used to hit Elasticsearch.
  */
 export function buildQuickSearchQuery(
-  searchParams: Record<string, string>,
+  term: string,
   events: EventConfig[]
 ): QueryType {
   // Flatten all searchable fields from the selected events
@@ -746,15 +734,18 @@ export function buildQuickSearchQuery(
     return [...acc, ...fields]
   }, [])
 
+  const isEmailTerm = validateEmail(term)
+
   // Filter fields to only include those that are supported in quick search
-  const fieldsToSearch = fieldsOfEvents.filter((field) =>
-    searchFields.includes(field.type as keyof typeof searchFieldTypeMapping)
-  )
-  // Get all non-empty search terms from user input
-  const terms = Object.values(searchParams).filter(Boolean)
+  const fieldsToSearch = fieldsOfEvents
+    .filter((field) =>
+      searchFields.includes(field.type as keyof typeof searchFieldTypeMapping)
+    )
+    // Skip email terms for non-email fields https://github.com/opencrvs/opencrvs-core/issues/11199
+    .filter((field) => !isEmailTerm || field.type === FieldType.EMAIL)
 
   // Delegate to the actual query builder
-  return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
+  return buildQueryFromQuickSearchFields(fieldsToSearch, term)
 }
 
 /**
