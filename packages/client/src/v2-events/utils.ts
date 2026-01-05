@@ -334,12 +334,3 @@ export function hasStringFilename(
     typeof field.filename === 'string'
   )
 }
-
-export function splitFullName(fullname: string) {
-  const nameParts = fullname.split(' ')
-  return {
-    firstname: nameParts[0] || '',
-    middlename: nameParts.length === 3 ? nameParts[1] : '',
-    surname: nameParts.length >= 2 ? nameParts[nameParts.length - 1] : ''
-  }
-}

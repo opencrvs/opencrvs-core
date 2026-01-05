@@ -16,7 +16,7 @@ import {
   SystemVariables,
   user
 } from '@opencrvs/commons/client'
-import { replacePlaceholders, splitFullName } from './utils'
+import { replacePlaceholders } from './utils'
 import { handleDefaultValue } from './hooks/useDefaultValues'
 
 const TextField = {
@@ -407,56 +407,6 @@ describe('handleDefaultValue', () => {
     )} returns ${JSON.stringify(expected)}`, () => {
       const result = handleDefaultValue(props)
       expect(result).toEqual(expected)
-    })
-  })
-})
-
-describe('splitFullName', () => {
-  it('splits a single-word name into firstname only', () => {
-    expect(splitFullName('John')).toEqual({
-      firstname: 'John',
-      middlename: '',
-      surname: ''
-    })
-  })
-
-  it('splits a two-word name into firstname and surname', () => {
-    expect(splitFullName('John Doe')).toEqual({
-      firstname: 'John',
-      middlename: '',
-      surname: 'Doe'
-    })
-  })
-
-  it('splits a three-word name into firstname, middlename, and surname', () => {
-    expect(splitFullName('John Michael Doe')).toEqual({
-      firstname: 'John',
-      middlename: 'Michael',
-      surname: 'Doe'
-    })
-  })
-
-  it('uses the last word as surname when there are more than three parts', () => {
-    expect(splitFullName('John Michael Andrew Doe')).toEqual({
-      firstname: 'John',
-      middlename: '',
-      surname: 'Doe'
-    })
-  })
-
-  it('handles extra spaces by producing empty parts', () => {
-    expect(splitFullName('John  Doe')).toEqual({
-      firstname: 'John',
-      middlename: '',
-      surname: 'Doe'
-    })
-  })
-
-  it('returns empty strings for an empty input', () => {
-    expect(splitFullName('')).toEqual({
-      firstname: '',
-      middlename: '',
-      surname: ''
     })
   })
 })
