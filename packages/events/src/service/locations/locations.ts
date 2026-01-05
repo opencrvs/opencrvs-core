@@ -28,14 +28,17 @@ export async function setLocations(locations: Location[]) {
   await locationsRepo.addAdministrativeAreas(administrativeAreas)
 
   await locationsRepo.setLocations(
-    locations.map(({ id, name, parentId, validUntil, locationType }) => ({
-      id,
-      name,
-      parentId,
-      administrativeAreaId: parentId,
-      validUntil: validUntil ? new Date(validUntil).toISOString() : null,
-      locationType
-    }))
+    locations.map(
+      ({ id, name, parentId, validUntil, locationType, externalId }) => ({
+        id,
+        name,
+        parentId,
+        administrativeAreaId: parentId,
+        validUntil: validUntil ? new Date(validUntil).toISOString() : null,
+        locationType,
+        externalId
+      })
+    )
   )
 }
 
@@ -57,10 +60,21 @@ export async function getLocations(params?: {
   locationType?: LocationType
   locationIds?: UUID[]
   isActive?: boolean
+  externalId?: string
 }) {
   const locations = await locationsRepo.getLocations(params)
 
   return locations
+}
+
+export async function getLocationById(locationId: UUID) {
+  const location = await locationsRepo.getLocationById(locationId)
+
+  if (!location) {
+    throw new Error(`Location with id ${locationId} not found`)
+  }
+
+  return location
 }
 
 export const getChildLocations = async (parentIdToSearch: UUID) => {
@@ -73,4 +87,8 @@ export const getChildLocations = async (parentIdToSearch: UUID) => {
     parentId,
     locationType
   }))
+}
+
+export const getLocationHierarchy = async (locationId: UUID) => {
+  return locationsRepo.getLocationHierarchyRaw(locationId)
 }

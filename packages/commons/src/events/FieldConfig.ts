@@ -27,6 +27,7 @@ import {
   VerificationStatusValue
 } from './FieldValue'
 import {
+  CustomFieldValue,
   DomesticAddressFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
@@ -87,6 +88,8 @@ const requiredSchema = z
   ])
   .default(false)
   .optional()
+
+export type RequireConfig = z.infer<typeof requiredSchema>
 
 const BaseField = z
   .object({
@@ -833,6 +836,15 @@ const IdReaderField = BaseField.extend({
 
 export type IdReaderField = z.infer<typeof IdReaderField>
 
+const CustomField = BaseField.extend({
+  type: z.literal(FieldType._EXPERIMENTAL_CUSTOM),
+  defaultValue: CustomFieldValue.optional(),
+  src: z.string().describe('Module source path for the custom field component'),
+  configuration: z.unknown().optional()
+})
+
+export type CustomField = z.infer<typeof CustomField>
+
 const LoaderField = BaseField.extend({
   type: z.literal(FieldType.LOADER),
   configuration: z.object({
@@ -843,6 +855,16 @@ const LoaderField = BaseField.extend({
 )
 
 export type LoaderField = z.infer<typeof LoaderField>
+
+const HiddenField = BaseField.extend({
+  type: z.literal(FieldType.ALPHA_HIDDEN),
+  required: z.boolean().default(false).optional(),
+  defaultValue: TextValue.optional()
+}).describe(
+  'A non-interactive, hidden field that only hold a value in the form'
+)
+
+export type HiddenField = z.infer<typeof HiddenField>
 
 export const FieldConfig = z
   .discriminatedUnion('type', [
@@ -884,7 +906,9 @@ export const FieldConfig = z
     IdReaderField,
     QueryParamReaderField,
     LoaderField,
-    SearchField
+    SearchField,
+    CustomField,
+    HiddenField
   ])
   .meta({
     description: 'Form field configuration',

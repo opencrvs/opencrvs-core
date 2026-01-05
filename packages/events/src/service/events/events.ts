@@ -315,10 +315,10 @@ export function buildAction(
     case ActionType.CREATE:
     case ActionType.NOTIFY:
     case ActionType.DECLARE:
-    case ActionType.VALIDATE:
     case ActionType.DUPLICATE_DETECTED:
     case ActionType.MARK_AS_NOT_DUPLICATE:
     case ActionType.MARK_AS_DUPLICATE:
+    case ActionType.EDIT:
     case ActionType.REQUEST_CORRECTION: {
       return commonAttributes
     }

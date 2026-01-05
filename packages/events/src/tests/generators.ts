@@ -18,7 +18,8 @@ import {
   Location,
   LocationType,
   generateUuid,
-  pickRandom
+  pickRandom,
+  generateTrackingId
 } from '@opencrvs/commons'
 import { setLocations } from '../service/locations/locations'
 
@@ -38,6 +39,7 @@ export interface CreatedUser {
 
 interface CreateUser {
   primaryOfficeId: UUID
+  administrativeAreaId?: UUID | null
   role?: string
   name?: Array<Name>
   fullHonorificName?: string
@@ -55,6 +57,7 @@ export function payloadGenerator(
       role: input.role ?? TestUserRole.enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId,
+      administrativeAreaId: input.administrativeAreaId,
       fullHonorificName: input.fullHonorificName
     })
   }
@@ -68,6 +71,7 @@ export function payloadGenerator(
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
+          externalId: generateTrackingId(prng) + generateTrackingId(prng),
           locationType: pickRandom(prng, LocationType.options)
         })) as Location[]
       }
@@ -77,6 +81,9 @@ export function payloadGenerator(
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,
+        externalId:
+          location.externalId ??
+          generateTrackingId(prng) + generateTrackingId(prng),
         locationType: LocationType.enum.ADMIN_STRUCTURE
       })) as Location[]
     }
@@ -90,13 +97,19 @@ export function payloadGenerator(
  * Use with payloadGenerator for creating test data.
  */
 export function seeder() {
-  const seedUser = (user: Omit<CreatedUser, 'id'>) => {
+  const seedUser = (
+    user: Omit<CreatedUser, 'id'> & {
+      id?: UUID
+      administrativeAreaId?: UUID | null
+    }
+  ) => {
     return {
       primaryOfficeId: user.primaryOfficeId,
+      administrativeAreaId: user.administrativeAreaId ?? null,
       name: user.name,
       fullHonorificName: user.fullHonorificName,
       role: user.role as TestUserRole,
-      id: getUUID()
+      id: user.id ?? getUUID()
     }
   }
   const seedLocations = async (locations: Location[]) =>

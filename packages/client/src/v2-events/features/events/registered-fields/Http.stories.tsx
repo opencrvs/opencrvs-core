@@ -22,7 +22,9 @@ import {
   ConditionalType,
   never,
   user,
-  FieldConfig
+  FieldConfig,
+  digitalIdentityEvent,
+  PRINT_DIGITAL_ID_CERTIFICATE_FORM
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -252,6 +254,50 @@ export const HttpJsonResponseInCopy: StoryObj<typeof Review> = {
         </p>
         <pre>{JSON.stringify(stringifier(allFields, FORM_DATA), null, 2)}</pre>
       </div>
+    )
+  }
+}
+export const HttpPopulatesWithNonDeclarationFields: StoryObj<
+  typeof FormFieldGenerator
+> = {
+  name: 'HTTP Field type populates correctly with fields not in EventConfig.declaration',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered',
+    msw: {
+      handlers: {
+        brnApi: [
+          http.post('/api/digital-identity/certificate', () =>
+            HttpResponse.json({ certificateId: '123456' })
+          )
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(
+      await canvas.findByRole('button', { name: /fetch certificate/i })
+    )
+    await waitFor(async () => {
+      await expect(
+        canvas.queryByTestId('text__identity____certificateId')
+      ).toHaveValue('123456')
+    })
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        eventConfig={digitalIdentityEvent}
+        fields={PRINT_DIGITAL_ID_CERTIFICATE_FORM.pages[0].fields}
+        id="my-form"
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
     )
   }
 }

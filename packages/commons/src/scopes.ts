@@ -279,7 +279,7 @@ export const RecordScopeType = z.enum([
   'record.read',
   'record.declare',
   'record.notify',
-  'record.declared.validate',
+  'record.declared.edit',
   'record.declared.reject',
   'record.declared.archive',
   'record.declared.review-duplicates',
@@ -333,7 +333,7 @@ export const ConfigurableActionScopes = z.discriminatedUnion('type', [
   CustomActionScope
 ])
 
-type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
+export type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
 export type ConfigurableScopeType = ConfigurableRawScopes['type']
 
 type FlattenedSearchScope = {
@@ -384,6 +384,21 @@ export function findScope<T extends ConfigurableScopeType>(
   const mergedSearchScope = flattenAndMergeScopes(searchScopes)
 
   return [...otherScopes, mergedSearchScope].find(
+    (scope): scope is Extract<ConfigurableScopes, { type: T }> =>
+      scope?.type === scopeType
+  )
+}
+
+export function findScopes<T extends ConfigurableScopeType>(
+  scopes: string[],
+  scopeType: T
+) {
+  const parsedScopes = scopes.map(parseConfigurableScope)
+  const searchScopes = parsedScopes.filter((scope) => scope?.type === 'search')
+  const otherScopes = parsedScopes.filter((scope) => scope?.type !== 'search')
+  const mergedSearchScope = flattenAndMergeScopes(searchScopes)
+
+  return [...otherScopes, mergedSearchScope].filter(
     (scope): scope is Extract<ConfigurableScopes, { type: T }> =>
       scope?.type === scopeType
   )

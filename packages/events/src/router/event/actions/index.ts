@@ -24,7 +24,6 @@ import {
   ArchiveActionInput,
   PrintCertificateActionInput,
   DeclareActionInput,
-  ValidateActionInput,
   ACTION_SCOPE_MAP,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
@@ -32,7 +31,8 @@ import {
   getPendingAction,
   ActionInputWithType,
   EventConfig,
-  CustomActionInput
+  CustomActionInput,
+  EditActionInput
 } from '@opencrvs/commons/events'
 import {
   TokenUserType,
@@ -79,6 +79,10 @@ const defaultConfig = {
 } as const
 
 const ACTION_PROCEDURE_CONFIG = {
+  [ActionType.EDIT]: {
+    ...defaultConfig,
+    inputSchema: EditActionInput
+  },
   [ActionType.CUSTOM]: {
     ...defaultConfig,
     inputSchema: CustomActionInput
@@ -99,10 +103,6 @@ const ACTION_PROCEDURE_CONFIG = {
   [ActionType.DECLARE]: {
     ...defaultConfig,
     inputSchema: DeclareActionInput
-  },
-  [ActionType.VALIDATE]: {
-    ...defaultConfig,
-    inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
     ...defaultConfig,

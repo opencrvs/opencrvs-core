@@ -46,8 +46,7 @@ import { getUUID, UUID } from '../uuid'
 import {
   ActionConfig,
   actionConfigTypes,
-  ActionConfigTypes,
-  DeclarationActionConfig
+  ActionConfigTypes
 } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
@@ -198,9 +197,14 @@ export function getActionReview(
   configuration: EventConfig,
   actionType: ActionType
 ) {
-  const [actionConfig] = configuration.actions.filter(
-    (a): a is DeclarationActionConfig => a.type === actionType
-  )
+  const actionConfig = getActionConfig({
+    eventConfiguration: configuration,
+    actionType
+  })
+
+  if (!actionConfig) {
+    throw 'Tried to get action review for an action that is not a declaration action'
+  }
 
   if ('review' in actionConfig) {
     return actionConfig.review
@@ -665,10 +669,12 @@ export function aggregateActionDeclarations(event: EventDocument): EventState {
   }, {})
 }
 
-export function aggregateActionAnnotations(
-  actions: ActionDocument[]
-): EventState {
-  return actions.reduce((ann, sortedAction) => {
-    return deepMerge(ann, sortedAction.annotation ?? {})
+export function aggregateActionAnnotations(event: EventDocument): EventState {
+  return event.actions.reduce((ann, sortedAction) => {
+    if (!('annotation' in sortedAction) || !sortedAction.annotation) {
+      return ann
+    }
+
+    return deepMerge(ann, sortedAction.annotation)
   }, {} as EventState)
 }

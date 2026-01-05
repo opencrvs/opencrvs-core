@@ -112,14 +112,16 @@ test('Finds user in nested location with my jurisdiction scope', async () => {
       parentId: userOnParentLocation.primaryOfficeId,
       locationType: LocationType.enum.ADMIN_STRUCTURE,
       id: childLocationId,
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz457'
     },
     {
       name: 'Grandchild office',
       parentId: childLocationId,
       locationType: LocationType.enum.CRVS_OFFICE,
       id: grandchildLocationId,
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz458'
     }
   ])
 
@@ -170,7 +172,8 @@ test('Find user with appropriate scopes', async () => {
       parentId: userOnParentLocation.primaryOfficeId,
       locationType: LocationType.enum.CRVS_OFFICE,
       id: userToSearchLocationId,
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz459'
     }
   ])
 
@@ -263,12 +266,11 @@ test('Returns user actions', async () => {
   // CREATE + ASSIGN
   await createEvent(clientThatDoesThings, generator, [
     ActionType.DECLARE, // x2
-    ActionType.VALIDATE, // x2
     ActionType.REGISTER, // x2
     ActionType.PRINT_CERTIFICATE // x2
   ])
 
-  const expectedTotalActions = 12
+  const expectedTotalActions = 10
 
   const userActions = await clientThatSearchesUser.user.actions({
     userId: userThatDoesThings.id
@@ -289,12 +291,7 @@ test('Returns user actions', async () => {
   const userDeclarationActions = await clientThatSearchesUser.user.actions({
     userId: userThatDoesThings.id,
     count: 20,
-    actionTypes: [
-      ActionType.CREATE,
-      ActionType.DECLARE,
-      ActionType.VALIDATE,
-      ActionType.REGISTER
-    ]
+    actionTypes: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
   })
 
   const userOtherActions = await clientThatSearchesUser.user.actions({

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -50,7 +51,9 @@ import {
   QrReaderField,
   IdReaderField,
   LoaderField,
-  AgeField
+  AgeField,
+  CustomField,
+  HiddenField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -82,7 +85,8 @@ import {
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
   IdReaderFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  CustomFieldValue
 } from './CompositeFieldValue'
 import {
   getDynamicNameValue,
@@ -159,6 +163,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.VERIFICATION_STATUS:
     case FieldType.ID:
     case FieldType.LOADER:
+    case FieldType.ALPHA_HIDDEN:
       schema = field.required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -205,6 +210,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ID_READER:
       schema = IdReaderFieldValue
       break
+    case FieldType._EXPERIMENTAL_CUSTOM:
+      schema = CustomFieldValue
+      break
   }
 
   return field.required ? schema : schema.nullish()
@@ -250,6 +258,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.QR_READER:
     case FieldType.ID_READER:
     case FieldType.LOADER:
+    case FieldType.ALPHA_HIDDEN:
       return null
     case FieldType.ADDRESS:
       return {
@@ -267,6 +276,9 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
+    case FieldType._EXPERIMENTAL_CUSTOM:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return undefined as any as CustomFieldValue
   }
 }
 
@@ -553,6 +565,20 @@ export const isLoaderFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: LoaderField } => {
   return field.config.type === FieldType.LOADER
+}
+
+export const isCustomFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: CustomFieldValue; config: CustomField } => {
+  return field.config.type === FieldType._EXPERIMENTAL_CUSTOM
+}
+
+export const isHiddenFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: undefined; config: HiddenField } => {
+  return field.config.type === FieldType.ALPHA_HIDDEN
 }
 
 export type NonInteractiveFieldType =

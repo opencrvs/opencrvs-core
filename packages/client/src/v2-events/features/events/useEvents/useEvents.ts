@@ -195,7 +195,6 @@ export function useEvents() {
     },
     actions: {
       custom: useEventAction(trpc.event.actions.custom.request),
-      validate: useEventAction(trpc.event.actions.validate.request),
       reject: useEventAction(trpc.event.actions.reject.request),
       archive: useEventAction(trpc.event.actions.archive.request),
       notify: useEventAction(trpc.event.actions.notify.request),
@@ -250,10 +249,11 @@ export function useEvents() {
     },
     customActions: {
       registerOnDeclare: useEventCustomAction('registerOnDeclare'),
-      validateOnDeclare: useEventCustomAction('validateOnDeclare'),
-      registerOnValidate: useEventCustomAction('registerOnValidate'),
       archiveOnDuplicate: useEventCustomAction('archiveOnDuplicate'),
-      makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest')
+      makeCorrectionOnRequest: useEventCustomAction('makeCorrectionOnRequest'),
+      editAndRegister: useEventCustomAction('editAndRegister'),
+      editAndDeclare: useEventCustomAction('editAndDeclare'),
+      editAndNotify: useEventCustomAction('editAndNotify')
     }
   }
 }

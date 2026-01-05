@@ -21,7 +21,8 @@ import {
   QueryParamReaderFieldValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
-  IdReaderFieldValue
+  IdReaderFieldValue,
+  CustomFieldValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -37,6 +38,7 @@ import {
  */
 
 export const TextValue = z.string()
+export const HiddenFieldValue = z.string()
 export const NonEmptyTextValue = TextValue.min(1)
 
 export const DateValue = z.iso.date().describe('Date in the format YYYY-MM-DD')
@@ -115,7 +117,8 @@ const FieldValuesWithoutDataField = z.union([
   VerificationStatusValue,
   QueryParamReaderFieldValue,
   QrReaderFieldValue,
-  IdReaderFieldValue
+  IdReaderFieldValue,
+  CustomFieldValue
 ])
 type FieldValuesWithoutDataField = z.infer<typeof FieldValuesWithoutDataField>
 
@@ -229,6 +232,8 @@ export type FieldUpdateValue =
   | z.infer<typeof NameFieldUpdateValue>
   | z.infer<typeof HttpFieldUpdateValue>
   | z.infer<typeof QueryParamReaderFieldUpdateValue>
+  | z.infer<typeof CustomFieldValue>
+  | z.infer<typeof HiddenFieldValue>
 
 // All schemas are tagged using .describe() so we can identify them later
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
@@ -247,7 +252,9 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   DataFieldValue.describe('DataFieldValue'),
   NameFieldUpdateValue.describe('NameFieldUpdateValue'),
   HttpFieldUpdateValue.describe('HttpFieldUpdateValue'),
-  QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue')
+  QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue'),
+  CustomFieldValue.describe('CustomFieldValue'),
+  HiddenFieldValue.describe('HiddenFieldValue')
 ])
 
 /**
@@ -287,5 +294,6 @@ export type FieldUpdateValueSchema =
   | typeof IdReaderFieldValue
   | typeof DateValue
   | typeof EmailValue
+  | typeof CustomFieldValue
   | z.ZodString
   | z.ZodBoolean

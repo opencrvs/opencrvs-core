@@ -10,7 +10,14 @@
  */
 
 import * as z from 'zod/v4'
-import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
+import {
+  getScopes,
+  getUUID,
+  SCOPES,
+  UUID,
+  findScope,
+  RecordScopeV2
+} from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -219,7 +226,7 @@ export const eventRouter = router({
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     declare: router(declareActionProcedures()),
-    validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
+    edit: router(getDefaultActionProcedures(ActionType.EDIT)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
     register: router(getDefaultActionProcedures(ActionType.REGISTER)),
@@ -299,7 +306,9 @@ export const eventRouter = router({
       }
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
-    .use(requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search']))
+    .use(
+      requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search'], ['record.search'])
+    )
     .input(SearchQuery)
     .output(
       z.object({
@@ -310,32 +319,44 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes(ctx.token)
+
       const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
-      const allAccessForEveryEventType = Object.fromEntries(
-        eventConfigs.map(({ id }) => [id, 'all' as const])
-      )
 
       if (isRecordSearchSystemClient) {
-        return findRecordsByQuery(
-          input,
-          eventConfigs,
-          allAccessForEveryEventType,
-          ctx.user.primaryOfficeId
+        const allAccessForEveryEventType = Object.fromEntries(
+          eventConfigs.map(({ id }) => [id, 'all' as const])
         )
+
+        return findRecordsByQuery({
+          search: input,
+          eventConfigs,
+          options: allAccessForEveryEventType,
+          user: ctx.user
+        })
       }
 
-      const searchScope = findScope(scopes, 'search')
+      if (ctx.acceptedScopes) {
+        return findRecordsByQuery({
+          search: input,
+          eventConfigs,
+          user: ctx.user,
+          acceptedScopes: ctx.acceptedScopes as RecordScopeV2[]
+        })
+      }
+
+      const searchScopeV1 = findScope(scopes, 'search')
 
       // Only to satisfy type checking, as findScope will return undefined if no scope is found
-      if (!searchScope) {
+      if (!searchScopeV1) {
         throw new Error('No search scope provided')
       }
-      return findRecordsByQuery(
-        input,
+
+      return findRecordsByQuery({
+        search: input,
         eventConfigs,
-        searchScope.options,
-        ctx.user.primaryOfficeId
-      )
+        options: searchScopeV1.options,
+        user: ctx.user
+      })
     }),
   bulkImport: userAndSystemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))

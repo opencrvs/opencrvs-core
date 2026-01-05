@@ -36,9 +36,6 @@ export const ActionConfigBase = z.object({
     .optional()
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
-  auditHistoryLabel: TranslationConfig.describe(
-    'The label to show in audit history for this action. For example "Approved".'
-  ).optional(),
   supportingCopy: TranslationConfig.optional().describe(
     'Text displayed on the confirmation'
   ),
@@ -75,15 +72,15 @@ const DeclareConfig = DeclarationActionBase.extend(
   }).shape
 )
 
-const RejectConfig = ActionConfigBase.extend(
+const EditActionConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.REJECT)
+    type: z.literal(ActionType.EDIT)
   }).shape
 )
 
-const ValidateConfig = DeclarationActionBase.extend(
+const RejectConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.VALIDATE)
+    type: z.literal(ActionType.REJECT)
   }).shape
 )
 
@@ -118,9 +115,13 @@ const CustomActionConfig = ActionConfigBase.merge(
       .array(FieldConfig)
       .describe(
         'Form configuration for the custom action. The form configured here will be used on the custom action confirmation modal.'
-      )
+      ),
+    auditHistoryLabel: TranslationConfig.describe(
+      'The label to show in audit history for this action. For example "Approved".'
+    )
   })
 )
+
 export type CustomActionConfig = z.infer<typeof CustomActionConfig>
 
 export const ActionConfig = z
@@ -132,12 +133,12 @@ export const ActionConfig = z
     ReadActionConfig.meta({ id: 'ReadActionConfig' }),
     DeclareConfig.meta({ id: 'DeclareActionConfig' }),
     RejectConfig.meta({ id: 'RejectActionConfig' }),
-    ValidateConfig.meta({ id: 'ValidateActionConfig' }),
     RegisterConfig.meta({ id: 'RegisterActionConfig' }),
     PrintCertificateActionConfig.meta({
       id: 'PrintCertificateActionConfig'
     }),
     RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
+    EditActionConfig.meta({ id: 'EditActionConfig' }),
     CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(
@@ -163,7 +164,6 @@ export type ActionConfigTypes = ActionConfig['type']
 
 export const DeclarationActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,
-  ValidateConfig,
   RegisterConfig
 ])
 

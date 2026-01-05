@@ -172,12 +172,18 @@ const tennisClubMembershipEventWithCustomAction = {
   actions: tennisClubMembershipEvent.actions.concat([
     {
       type: ActionType.CUSTOM,
-      customActionType: 'CONFIRM',
+      customActionType: 'Approve',
       label: {
         id: 'event.tennis-club-membership.action.confirm.label',
         defaultMessage: 'Confirm',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      auditHistoryLabel: {
+        id: 'event.tennis-club-membership.action.confirm.audit-history-label',
+        defaultMessage: 'Confirmed',
+        description:
+          'This is the label to show in audit history for the confirm action'
       },
       // @TODO: once action conditionals are implemented, add some conditional here?
       form: [
