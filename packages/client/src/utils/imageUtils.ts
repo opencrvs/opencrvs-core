@@ -178,7 +178,7 @@ async function getImageFromFile(
 
       ctx.drawImage(img, 0, 0)
 
-      const dataUrl = canvas.toDataURL('image/png')
+      const dataUrl = canvas.toDataURL(file.type)
       resolve({
         width: img.naturalWidth,
         height: img.naturalHeight,

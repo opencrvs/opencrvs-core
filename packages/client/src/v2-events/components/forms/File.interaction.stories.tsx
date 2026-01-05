@@ -19,6 +19,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { noop } from '@client/v2-events'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
+import { FormFieldGeneratorProps } from './FormFieldGenerator/FormFieldGenerator'
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
@@ -269,6 +270,110 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
       })
 
       await userEvent.upload(input, validFile)
+
+      await canvas.findByRole('button', { name: 'Uploaded photo' })
+    })
+  }
+}
+
+async function createImageFile(name: string, width: number, height: number) {
+  return new Promise<File>((resolve, reject) => {
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d')
+    if (ctx) {
+      ctx.fillStyle = '#000'
+      ctx.fillRect(0, 0, width, height)
+    }
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const file = new File([blob], name, { type: blob.type })
+        resolve(file)
+      } else {
+        reject(new Error('Could not create blob from canvas'))
+      }
+    }, 'image/jpeg')
+  })
+}
+
+export const FileInputButtonMaxImage: StoryObj<FormFieldGeneratorProps> = {
+  name: 'File input without option with maxImageSize configuration',
+  parameters: {
+    layout: 'centered',
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <StyledFormFieldGenerator
+            fields={[
+              {
+                id: 'storybook.file',
+                type: FieldType.FILE,
+                configuration: {
+                  maxFileSize: 1 * 1024 * 1024,
+                  acceptedFileTypes: ['image/jpeg'],
+                  maxImageSize: {
+                    targetSize: {
+                      width: 200,
+                      height: 200
+                    }
+                  },
+                  fileName: {
+                    defaultMessage: 'Uploaded photo',
+                    description: 'The title for the file input',
+                    id: 'storybook.file.label'
+                  }
+                },
+                label: {
+                  id: 'storybook.file.label',
+                  defaultMessage: 'Upload your captured photo',
+                  description: 'The title for the file input'
+                }
+              }
+            ]}
+            id="my-form"
+            validatorContext={getTestValidatorContext(
+              TestUserRole.Enum.LOCAL_REGISTRAR
+            )}
+            onChange={(data) => {
+              meta.args?.onChange(data) ?? noop()
+            }}
+          />
+        )
+      },
+      initialPath: '/event/123-kalsnk-213'
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await canvas.findByText('Upload your captured photo')
+
+    const fileInput = await canvas.findByRole('button', {
+      name: /upload/i
+    })
+
+    const input = canvasElement.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+
+    await step(
+      'Opens up image resizing when image exceeds maxImageSize',
+      async () => {
+        await userEvent.click(fileInput)
+
+        const largeImageFile = await createImageFile('largeImage.jpg', 400, 400)
+
+        await userEvent.upload(input, largeImageFile)
+        await canvas.findByText('Crop & resize image')
+      }
+    )
+
+    await step('Clicking apply button adds the cropped image', async () => {
+      const applyButton = await canvas.findByRole('button', {
+        name: 'Apply'
+      })
+      await userEvent.click(applyButton)
 
       await canvas.findByRole('button', { name: 'Uploaded photo' })
     })
