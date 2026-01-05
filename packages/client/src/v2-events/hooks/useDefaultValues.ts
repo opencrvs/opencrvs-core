@@ -19,7 +19,7 @@ import {
   FieldType,
   NameField
 } from '@opencrvs/commons/client'
-import { replacePlaceholders, splitFullName } from '@client/v2-events/utils'
+import { replacePlaceholders } from '@client/v2-events/utils'
 import { useSystemVariables } from './useSystemVariables'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,7 +60,6 @@ function handleDefaultValueForNameField({
 
     if (isSerializedUserField(value)) {
       const resolved = resolveUserFieldDefault(value, systemVariables)
-      // console.log({ resolved, value })
       return typeof resolved === 'string' ? resolved : ''
     }
 
