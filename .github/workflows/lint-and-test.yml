@@ -165,23 +165,29 @@ jobs:
 
       - name: Commons test coverage summary
         if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
+        run: |
+          COMMENT=$(node -e '
+            const s = require("./packages/commons/coverage/coverage-summary.json").total;
+            console.log(
+              "## 📊 Commons test coverage\n\n" +
+              "```text\n" +
+              "Statements: " + s.statements.pct + "%\n" +
+              "Branches:   " + s.branches.pct + "%\n" +
+              "Functions:  " + s.functions.pct + "%\n" +
+              "Lines:      " + s.lines.pct + "%\n" +
+              "```"
+            );
+          ')
+          echo "COMMENT<<EOF" >> $GITHUB_ENV
+          echo "$COMMENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post Commons coverage to PR
+        if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
         uses: mshick/add-pr-comment@v2
         with:
           message-id: commons-test-coverage
-          message: |
-            ## 📊 Commons test coverage
-
-            ```text
-            $(node -e "
-              const s = require('./packages/commons/coverage/coverage-summary.json').total;
-              console.log(
-                'Statements: ' + s.statements.pct + '%\\n' +
-                'Branches:   ' + s.branches.pct + '%\\n' +
-                'Functions:  ' + s.functions.pct + '%\\n' +
-                'Lines:      ' + s.lines.pct + '%'
-              );
-            ")
-            ```
+          message: ${{ env.COMMENT }}
 
   prepare-client-tests:
     name: Prepare client tests
