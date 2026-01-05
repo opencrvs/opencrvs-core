@@ -528,7 +528,7 @@ export function createDeclaration(event: EventType, initialData?: IFormData) {
   }
 }
 
-export function makeDeclarationReadyToDownload(
+function makeDeclarationReadyToDownload(
   event: EventType,
   compositionId: string,
   action: DeclarationAction
@@ -597,7 +597,7 @@ export function setInitialDeclarations() {
   return { type: SET_INITIAL_DECLARATION }
 }
 
-export const getStorageDeclarationsSuccess = (
+const getStorageDeclarationsSuccess = (
   response: string
 ): IGetStorageDeclarationsSuccessAction => ({
   type: GET_DECLARATIONS_SUCCESS,
@@ -704,7 +704,7 @@ export function mergeDeclaredDeclarations(
   declarations.push(...transformedDeclaredDeclarations)
 }
 
-export async function getDeclarationsOfCurrentUser(): Promise<string> {
+async function getDeclarationsOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IUserData
   const storageTable = await storage.getItem('USER_DATA')
   if (!storageTable) {
@@ -882,7 +882,7 @@ export async function updateWorkqueueData(
   }
 }
 
-export async function writeDeclarationByUser(
+async function writeDeclarationByUser(
   getState: () => IStoreState,
   userId: string,
   declaration: IDeclaration
@@ -1004,7 +1004,7 @@ export async function writeDeclarationByUserWithoutStateUpdate(
   return declaration
 }
 
-export async function deleteDeclarationByUser(
+async function deleteDeclarationByUser(
   userId: string,
   declarationId: string,
   state: IDeclarationsState

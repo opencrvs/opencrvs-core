@@ -2,6 +2,17 @@
 
 ## 2.0.0 Release Candidate
 
+### Breaking changes
+
+- **Removed following endpoints from gateway:**
+  | Path | Method |
+  |--------------------|--------|
+  | `/location` | `*` |
+  | `/location/{id}` | `*` |
+  | `/locations` | `GET` |
+  | `/locations` | `POST` |
+  | `/locations/{id}` | `*` |
+
 ### New features
 
 #### HTTP Input
@@ -19,6 +30,42 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Remove legacy mongo migration status outputs and skip typecheck which reduced the migration service startup time by 66%.
 - The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
 - Added experimental ALPHA_HIDDEN form field type, allowing configurable default/derived values and conditional inclusion in form submissions.
+
+## 1.9.4
+
+### Bug fixes
+
+- e-Signet authentication now populates print and correction forms. An issue with FieldConfig `parent` parameter not finding action annotation field references was fixed. [#11210](https://github.com/opencrvs/opencrvs-core/issues/11210)
+
+## 1.9.3
+
+### New features
+
+- Introduced form page level config - `requireCompletionToContinue` to enforce full completion of the form page before moving to the next page.
+
+### Improvements
+
+- Add support for validating dates before/after another date field using `isBefore` and `isAfter` validators. [#11194](https://github.com/opencrvs/opencrvs-core/issues/11194)
+
+Usage example:
+
+```ts
+// 6570 days before another field
+field('mother.dob').isBefore().days(6570).fromDate(field('child.dob'))
+
+// 6570 days after another field
+field('mother.dateOfMarriage')
+  .isAfter()
+  .days(6570)
+  .fromDate(field('mother.dob'))
+
+// 45 days before now
+field('child.dob').isBefore().days(45).fromNow()
+```
+
+### Bug fixes
+
+- Fixes an issue where `event.hasAction` was not working in form configurations [#11074](https://github.com/opencrvs/opencrvs-core/issues/11074)
 
 ## 1.9.2
 
@@ -519,6 +566,17 @@ To see Events V2 in action, check out the example configurations in the **countr
 - Fix the informant column on the Perfomance page showing "Other family member" when `Someone else` is selected for a registration [#6157](https://github.com/opencrvs/opencrvs-core/issues/6157)
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 - Fix the "email all users" feature by setting the _To_ email to the logged user's email [#8343](https://github.com/opencrvs/opencrvs-core/issues/8343)
+
+## [1.6.5](https://github.com/opencrvs/opencrvs-core/compare/v1.6.4...v1.6.5)
+
+### Bug fixes
+
+- Reconfigured Content Security Policy (CSP) to be more restrictive, enhancing protection against unauthorized content sources [#9594](https://github.com/opencrvs/opencrvs-core/issues/9584)
+- Ensure that place of birth/death only shows active facilities/offices on the form [#9311](https://github.com/opencrvs/opencrvs-core/issues/9311)
+
+### Breaking changes
+
+- Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
 
 ## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.3...v1.6.4)
 
