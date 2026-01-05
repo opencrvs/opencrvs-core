@@ -40,10 +40,10 @@ function handleDefaultValueForNameField({
   field,
   systemVariables
 }: {
-  field: InteractiveFieldType
+  field: NameField
   systemVariables: SystemVariables
 }) {
-  const defaultValue = field.defaultValue as NameField['defaultValue']
+  const defaultValue = field.defaultValue
 
   if (!defaultValue) {
     return undefined
