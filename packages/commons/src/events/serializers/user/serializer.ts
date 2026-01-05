@@ -13,11 +13,8 @@ import { z } from 'zod'
 
 export const SerializedUserField = z.object({
   $userField: z.enum([
-    'id',
     'name',
     'role',
-    'signature',
-    'avatar',
     'fullHonorificName',
     'device',
     'firstname',
