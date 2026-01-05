@@ -446,8 +446,6 @@ export async function findRecordsByQuery(
     userOfficeId
   )
 
-  console.log(JSON.stringify({ query, esQuery }))
-
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     size: limit,
