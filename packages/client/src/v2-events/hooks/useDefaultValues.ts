@@ -15,8 +15,7 @@ import {
   isFieldConfigDefaultValue,
   InteractiveFieldType,
   SerializedUserField,
-  isNonInteractiveFieldType,
-  User
+  isNonInteractiveFieldType
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from '@client/v2-events/utils'
 import { useSystemVariables } from './useSystemVariables'
