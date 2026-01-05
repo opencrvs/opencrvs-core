@@ -94,7 +94,6 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
-    case FieldType.EMAIL:
     case FieldType.TIME:
       return { type: 'text' }
     case FieldType.EMAIL:
@@ -446,6 +445,8 @@ export async function findRecordsByQuery(
     options,
     userOfficeId
   )
+
+  console.log(JSON.stringify({ query, esQuery }))
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
