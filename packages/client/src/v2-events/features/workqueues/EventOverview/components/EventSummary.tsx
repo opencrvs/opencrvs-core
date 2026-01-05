@@ -17,7 +17,8 @@ import {
   areConditionsMet,
   getMixedPath,
   Flag,
-  EventIndex
+  EventIndex,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -117,15 +118,17 @@ export function EventSummary({
   event,
   eventConfiguration,
   eventIndex,
-  hideSecuredFields = false
+  hideSecuredFields = false,
+  eventDocument
 }: {
   event: Record<string, FieldValue>
   eventConfiguration: EventConfig
   eventIndex: EventIndex
   hideSecuredFields?: boolean
+  eventDocument?: EventDocument
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const validationContext = useValidatorContext()
+  const validationContext = useValidatorContext(eventDocument)
   const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)

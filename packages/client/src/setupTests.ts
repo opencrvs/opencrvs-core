@@ -119,6 +119,8 @@ vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
   createUserForm: mockOfflineData.userForms
 }))
 
+vi.mock('@client/v2-events/hooks/useLocations')
+
 vi.mock('@client/forms/handlebarHelpers', async () => {
   return {
     initHandlebarHelpers: () => Promise.resolve(),

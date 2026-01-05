@@ -12,6 +12,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { Checkbox as CheckboxComponent } from '@opencrvs/components'
 import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
+import { buttonMessages } from '@client/i18n/messages'
 
 function CheckboxInput({
   label,
@@ -48,14 +49,10 @@ function CheckboxOutput({
   value?: boolean
   required?: boolean
 }) {
-  // If a checkbox is required, we always show it
-  if (required) {
-    // We explicity check for boolean true, so that e.g. string values are not interpreted as true.
-    return value === true ? 'Yes' : 'No'
-  }
-
-  // If a checkbox is not required, we only show it if it is true
-  return value === true ? 'Yes' : null
+  const intl = useIntl()
+  return value === true
+    ? intl.formatMessage(buttonMessages.yes)
+    : intl.formatMessage(buttonMessages.no)
 }
 
 export const Checkbox = {

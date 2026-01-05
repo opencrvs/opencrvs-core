@@ -12,7 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { TestUserRole } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
-import { V2_DEFAULT_MOCK_LOCATIONS } from '../../../../.storybook/default-request-handlers'
+import { V2_DEFAULT_MOCK_LOCATIONS } from '@client/tests/v2-events/locations-mock'
 import { TeamPage } from './Team'
 
 const meta: Meta<typeof TeamPage> = {
