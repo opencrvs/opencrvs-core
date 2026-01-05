@@ -53,6 +53,8 @@ jobs:
     name: Test
     needs: setup
     runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -163,18 +165,23 @@ jobs:
 
       - name: Commons test coverage summary
         if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
-        run: |
-          SUMMARY=$(node -e '
-            const s = require("./packages/commons/coverage/coverage-summary.json").total;
-            console.log(
-              "## 📊 Commons test coverage\n\n" +
-              "- Statements: " + s.statements.pct + "%\n" +
-              "- Branches: " + s.branches.pct + "%\n" +
-              "- Functions: " + s.functions.pct + "%\n" +
-              "- Lines: " + s.lines.pct + "%\n"
-            );
-          ')
-          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: commons-test-coverage
+          message: |
+            ## 📊 Commons test coverage
+
+            ```text
+            $(node -e "
+              const s = require('./packages/commons/coverage/coverage-summary.json').total;
+              console.log(
+                'Statements: ' + s.statements.pct + '%\\n' +
+                'Branches:   ' + s.branches.pct + '%\\n' +
+                'Functions:  ' + s.functions.pct + '%\\n' +
+                'Lines:      ' + s.lines.pct + '%'
+              );
+            ")
+            ```
 
   prepare-client-tests:
     name: Prepare client tests
