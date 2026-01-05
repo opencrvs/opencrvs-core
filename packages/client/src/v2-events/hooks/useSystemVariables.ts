@@ -19,7 +19,7 @@ export function useSystemVariables() {
   const user = useUserDetails()
 
   const variables = {
-    $user: user,
+    user,
     $window: {
       location: {
         href: window.location.href,

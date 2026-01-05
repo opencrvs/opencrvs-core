@@ -31,7 +31,7 @@ function resolveUserFieldDefault(
   defaultValue: SerializedUserField,
   systemVariables: SystemVariables
 ) {
-  const user = systemVariables.$user
+  const user = systemVariables.user
   const field = defaultValue.$userField
   return user[field] // e.g., user('role'), user('fullHonorificName'), etc.
 }
