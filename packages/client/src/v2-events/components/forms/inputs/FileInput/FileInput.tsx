@@ -54,7 +54,9 @@ function FileInput({
   maxImageSize?: FileConfig['configuration']['maxImageSize']
 }) {
   const [file, setFile] = React.useState(value)
-  const [modal, openModal] = useImageEditorModal()
+  const [modal, openModal] = useImageEditorModal({
+    targetSize: maxImageSize?.targetSize
+  })
   const { processImageFile } = useImageProcessing()
 
   const { uploadFile } = useFileUpload(name, {

@@ -121,6 +121,44 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
   }
 }
 
+export async function getCroppedImageWithTargetSize(
+  imageSrc: IImage,
+  croppedArea: Area,
+  targetSize?: { width: number; height: number }
+): Promise<IImage | null> {
+  const image: HTMLImageElement = await createImage(imageSrc.data)
+
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+
+  const outputWidth = targetSize?.width ?? croppedArea.width
+  const outputHeight = targetSize?.height ?? croppedArea.height
+
+  canvas.width = outputWidth
+  canvas.height = outputHeight
+
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = 'high'
+
+  ctx.drawImage(
+    image,
+    croppedArea.x,
+    croppedArea.y,
+    croppedArea.width,
+    croppedArea.height,
+    0,
+    0,
+    outputWidth,
+    outputHeight
+  )
+
+  return {
+    type: 'image/jpeg',
+    data: canvas.toDataURL('image/jpeg', 0.9)
+  }
+}
+
 export async function fetchImageAsBase64(url: string): Promise<string> {
   const response = await fetch(url)
   const blob = await response.blob()

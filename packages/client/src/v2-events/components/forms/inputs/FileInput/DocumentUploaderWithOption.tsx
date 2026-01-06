@@ -107,7 +107,9 @@ function DocumentUploaderWithOption({
     undefined
   )
   const [unselectedOptionError, setUnselectedOptionError] = useState('')
-  const [modal, openModal] = useImageEditorModal()
+  const [modal, openModal] = useImageEditorModal({
+    targetSize: maxImageSize?.targetSize
+  })
 
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)

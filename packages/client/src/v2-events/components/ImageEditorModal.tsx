@@ -17,7 +17,7 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Button, Link } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { useModal } from '@client/hooks/useModal'
-import { getCroppedImage, IImage } from '@client/utils/imageUtils'
+import { getCroppedImageWithTargetSize, IImage } from '@client/utils/imageUtils'
 import { ImageLoader } from '@client/views/Settings/ImageLoader'
 import { Slider } from './Slider'
 
@@ -65,6 +65,10 @@ interface ImageEditorModalProps {
   onClose: (result: IImage | null) => void
   imgSrc: IImage
   error: string
+  targetSize?: {
+    height: number
+    width: number
+  }
 }
 
 const DEFAULT_SIZE: Size = {
@@ -108,7 +112,8 @@ function useCropSize(breakpoint: number) {
 function ImageEditorModal({
   onClose,
   imgSrc: imgSrcFromParent,
-  error: errorFromParent
+  error: errorFromParent,
+  targetSize
 }: ImageEditorModalProps) {
   const intl = useIntl()
   const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -134,7 +139,11 @@ function ImageEditorModal({
   }
 
   const handleClickApply = async () => {
-    const croppedImage = await getCroppedImage(imgSrc, croppedArea)
+    const croppedImage = await getCroppedImageWithTargetSize(
+      imgSrc,
+      croppedArea,
+      targetSize
+    )
     if (croppedImage) {
       onClose(croppedImage)
       reset()
@@ -201,11 +210,18 @@ function ImageEditorModal({
   )
 }
 
-export function useImageEditorModal() {
+export function useImageEditorModal(options?: {
+  targetSize: ImageEditorModalProps['targetSize']
+}) {
   const [modal, openModal] = useModal()
   const openEditorModal = async (imgSrc: IImage, error: string) =>
     openModal<IImage | null>((close) => (
-      <ImageEditorModal error={error} imgSrc={imgSrc} onClose={close} />
+      <ImageEditorModal
+        error={error}
+        imgSrc={imgSrc}
+        targetSize={options?.targetSize}
+        onClose={close}
+      />
     ))
   return [modal, openEditorModal] as const
 }
