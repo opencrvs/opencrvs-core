@@ -1769,11 +1769,17 @@ components:
                         $userField:
                           type: string
                           enum:
+                            &a9
                             - id
                             - name
                             - role
-                            - signature
-                            - avatar
+                            - fullHonorificName
+                            - device
+                            - firstname
+                            - middlename
+                            - surname
+                            - district
+                            - province
                             - primaryOfficeId
                         $location:
                           type: string
@@ -1924,8 +1930,18 @@ components:
               type: string
               const: TEXT
             defaultValue:
-              type: string
-              minLength: 1
+              anyOf:
+                - type: string
+                  minLength: 1
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum: *a9
+                    $location:
+                      type: string
+                  required:
+                    - $userField
             configuration:
               type: object
               properties:
@@ -3044,7 +3060,7 @@ components:
             defaultValue:
               type: string
               enum:
-                &a9
+                &a10
                 - last7Days
                 - last30Days
                 - last90Days
@@ -3056,7 +3072,7 @@ components:
                 properties:
                   value:
                     type: string
-                    enum: *a9
+                    enum: *a10
                     description: The value of the option
                   label:
                     $ref: "#/components/schemas/TranslationConfig"
@@ -3219,7 +3235,7 @@ components:
                     fontVariant:
                       type: string
                       enum:
-                        &a10
+                        &a11
                         - reg12
                         - reg14
                         - reg16
@@ -3562,7 +3578,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a10
+                      enum: *a11
               default: {}
           required:
             - id
@@ -4039,14 +4055,44 @@ components:
               type: object
               properties:
                 firstname:
-                  type: string
-                  minLength: 1
+                  anyOf:
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum: *a9
+                        $location:
+                          type: string
+                      required:
+                        - $userField
+                    - type: string
+                      minLength: 1
                 middlename:
-                  type: string
-                  minLength: 1
+                  anyOf:
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum: *a9
+                        $location:
+                          type: string
+                      required:
+                        - $userField
+                    - type: string
+                      minLength: 1
                 surname:
-                  type: string
-                  minLength: 1
+                  anyOf:
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum: *a9
+                        $location:
+                          type: string
+                      required:
+                        - $userField
+                    - type: string
+                      minLength: 1
             configuration:
               type: object
               properties:
@@ -4728,7 +4774,7 @@ components:
                   items:
                     type: string
                     enum:
-                      &a11
+                      &a12
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -5808,7 +5854,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a11
+                    enum: *a12
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -6157,7 +6203,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a11
+                    enum: *a12
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -8314,7 +8360,7 @@ components:
                         status:
                           type: anyOf
                           terms:
-                            &a12
+                            &a13
                             - CREATED
                             - NOTIFIED
                             - DECLARED
@@ -8449,7 +8495,7 @@ components:
             - eventType: tennis-club-membership
               status:
                 type: anyOf
-                terms: *a12
+                terms: *a13
               updatedAt:
                 type: range
                 gte: 2025-05-22
@@ -8517,7 +8563,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a12
+            enum: *a13
       required:
         - type
         - terms
@@ -8529,7 +8575,7 @@ components:
           const: exact
         term:
           type: string
-          enum: *a12
+          enum: *a13
       required:
         - type
         - term
@@ -8594,7 +8640,7 @@ components:
           const: timePeriod
         term:
           type: string
-          enum: *a9
+          enum: *a10
       required:
         - type
         - term
@@ -8618,7 +8664,7 @@ components:
         term:
           type: string
           enum:
-            &a13
+            &a14
             - user
             - system
       required:
@@ -9198,7 +9244,7 @@ components:
                     description: Unique identifier of the transaction.
                   createdByUserType:
                     type: string
-                    enum: *a13
+                    enum: *a14
                     description: Indicates whether the action was created by a human-user or by a
                       system-user.
                   createdAt:
@@ -9316,7 +9362,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9354,7 +9400,7 @@ components:
         status:
           type: string
           enum:
-            &a14
+            &a15
             - Requested
             - Accepted
             - Rejected
@@ -9392,7 +9438,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9429,7 +9475,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -9464,7 +9510,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9501,7 +9547,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -9546,7 +9592,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9583,7 +9629,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -9637,7 +9683,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9674,7 +9720,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -9709,7 +9755,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9746,7 +9792,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -9789,7 +9835,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9826,7 +9872,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -9871,7 +9917,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9908,7 +9954,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -9943,7 +9989,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -9980,7 +10026,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10019,7 +10065,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10056,7 +10102,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10091,7 +10137,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10128,7 +10174,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10167,7 +10213,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10204,7 +10250,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10239,7 +10285,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10276,7 +10322,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10314,7 +10360,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10351,7 +10397,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10399,7 +10445,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10436,7 +10482,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10471,7 +10517,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10508,7 +10554,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10550,7 +10596,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a13
+          enum: *a14
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10587,7 +10633,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a14
+          enum: *a15
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
