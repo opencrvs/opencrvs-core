@@ -39,6 +39,7 @@ export const User = z.object({
     'Storage key for the user signature. e.g. /ocrvs/signature.png'
   ),
   primaryOfficeId: UUID,
+  device: z.string().optional(),
   fullHonorificName: z.string().optional(),
   type: TokenUserType.extract(['user'])
 })
