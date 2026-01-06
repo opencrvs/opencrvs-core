@@ -4,7 +4,7 @@
 
 ### New features
 
-- Introduced new configuration option `maxImageSize` for `FILE` and `FILE_WITH_OPTIONS` type of form fields to limit the maximum size of uploaded images. If the uploaded image exceeds provide size in pixels, a crop and resize tool will be shown to the user to adjust the image before uploading. [#10324](https://github.com/opencrvs/opencrvs-core/issues/10324) 
+- Introduced new configuration option `maxImageSize` for `FILE` and `FILE_WITH_OPTIONS` type of form fields to limit the maximum size of uploaded images. If the uploaded image exceeds provide size in pixels, a crop and resize tool will be shown to the user to adjust the image before uploading. [#10324](https://github.com/opencrvs/opencrvs-core/issues/10324)
 
 Usage example:
 
@@ -20,6 +20,7 @@ A file field that allows uploading an image with maximum size of 600x600 pixels:
   }
 }
 ```
+
 Uploaded image files can now be rendered in certificate svg templates using the `$lookup` Handlebars helper. Below is an example of rendering the uploaded applicant image added in declaration form through a `FILE` field in a certificate template:
 
 ```hbs
@@ -34,9 +35,40 @@ Also for `FILE_WITH_OPTIONS` fields, the selected option can be accessed using t
 
 Annotation data from actions can also be accessed in a similar way using the `$action` or `$actions` helpers. For example, to access an uploaded image in the `PRINT_CERTIFICATE` action annotation data:
 
-```hbs  
+```hbs
 <image x="50" y="100" height="50" width="100" xlink:href="{{ $lookup ($action "PRINT_CERTIFICATE") "annotation.collector.OTHER.signedAffidavit" }}" />
 ```
+
+## Improvements
+
+### User default values in form fields
+
+Form fields now support typed user(...) references as default values, replacing legacy string-based $user.\* template variables.
+
+TEXT fields can use the following user references as default values:
+
+- user('name')
+- user('fullHonorificName')
+- user('device')
+- user('firstname')
+- user('middlename')
+- user('surname')
+- user('role')
+
+NAME fields now support user-based default values by assigning user references per name part. The recommended approach is:
+
+```ts
+defaultValue: {
+  firstname: user('firstname'),
+  middlename: user('middlename'), // optional
+  surname: user('surname')
+}
+```
+
+Using user('name') as a default value is only supported for FieldType.TEXT.
+It represents the user’s full name and should not be used with FieldType.NAME, since full names may contain multiple words and cannot be reliably split into individual name parts.
+
+Legacy string-based user template variables (e.g. $user.name) are now deprecated in favour of user(...) references.
 
 ## 1.9.4
 
