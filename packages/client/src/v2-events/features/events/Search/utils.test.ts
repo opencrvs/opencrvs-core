@@ -190,8 +190,8 @@ describe('serializeSearchParams and deserializeSearchParams (full roundtrip)', (
 
 describe('buildQuickSearchQuery', () => {
   it('should build a quick search query', () => {
-    const searchParams = { key: 'abcdefg' }
-    const resultQuery = buildQuickSearchQuery(searchParams, [
+    const searchTerm = 'abcdefg'
+    const resultQuery = buildQuickSearchQuery(searchTerm, [
       tennisClubMembershipEvent
     ])
 
@@ -239,8 +239,8 @@ describe('buildQuickSearchQuery', () => {
   })
 
   it('emails are searched only in email fields', () => {
-    const searchParams = { key: 'abc@gmail.com' }
-    const resultQuery = buildQuickSearchQuery(searchParams, [
+    const searchTerm = 'abc@gmail.com'
+    const resultQuery = buildQuickSearchQuery(searchTerm, [
       tennisClubMembershipEvent
     ])
 
