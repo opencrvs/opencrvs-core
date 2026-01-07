@@ -166,7 +166,7 @@ jobs:
       - name: Commons test coverage summary
         if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
         run: |
-          COMMENT=$(node -e '
+          COMMONS_TEST_REPORT=$(node -e '
             const s = require("./packages/commons/coverage/coverage-summary.json").total;
             console.log(
               "## 📊 Commons test coverage\n\n" +
@@ -178,16 +178,42 @@ jobs:
               "```"
             );
           ')
-          echo "COMMENT<<EOF" >> $GITHUB_ENV
-          echo "$COMMENT" >> $GITHUB_ENV
+          echo "COMMONS_TEST_REPORT<<EOF" >> $GITHUB_ENV
+          echo "$COMMONS_TEST_REPORT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Post Commons coverage to PR
+      - name: Post commons coverage to PR
         if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
         uses: mshick/add-pr-comment@v2
         with:
           message-id: commons-test-coverage
-          message: ${{ env.COMMENT }}
+          message: ${{ env.COMMONS_TEST_REPORT }}
+
+      - name: Events test coverage summary
+        if: github.event_name == 'pull_request' && matrix.package == 'packages/events'
+        run: |
+          EVENTS_TEST_REPORT=$(node -e '
+            const s = require("./packages/events/coverage/coverage-summary.json").total;
+            console.log(
+              "## 📊 Events test coverage\n\n" +
+              "```text\n" +
+              "Statements: " + s.statements.pct + "%\n" +
+              "Branches:   " + s.branches.pct + "%\n" +
+              "Functions:  " + s.functions.pct + "%\n" +
+              "Lines:      " + s.lines.pct + "%\n" +
+              "```"
+            );
+          ')
+          echo "EVENTS_TEST_REPORT<<EOF" >> $GITHUB_ENV
+          echo "$EVENTS_TEST_REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post events coverage to PR
+        if: github.event_name == 'pull_request' && matrix.package == 'packages/events'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: events-test-coverage
+          message: ${{ env.EVENTS_TEST_REPORT }}
 
   prepare-client-tests:
     name: Prepare client tests

@@ -14,7 +14,8 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     coverage: {
-      provider: 'v8' // or 'istanbul'
+      provider: 'v8', // or 'istanbul'
+      reporter: ['text', 'json', 'json-summary']
     },
     globals: true,
     testTimeout: 60000,
