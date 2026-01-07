@@ -687,6 +687,7 @@ paths:
                                         - event.status
                                         - event.legalStatuses.REGISTERED.acceptedAt
                                         - event.legalStatuses.REGISTERED.createdAtLocation
+                                        - event.legalStatuses.REGISTERED.registrationNumber
                                         - event.updatedAt
                                     fieldType:
                                       type: string
@@ -752,7 +753,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 73e0377e-51a8-45a2-aeb9-72e5a9914620
+                transactionId: 1084bf7a-3e89-4bcb-a576-409f17d7d381
                 type: birth
       responses:
         "200":
@@ -838,7 +839,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 1891a57a-c006-456c-ad23-a8fa45a52eb1
+                transactionId: 6b3fef52-6b58-4b30-a857-600a3b6087d2
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
