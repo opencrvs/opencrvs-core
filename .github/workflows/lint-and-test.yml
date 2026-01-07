@@ -163,59 +163,41 @@ jobs:
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
 
-      - name: Commons test coverage summary
-        if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
+      - name: Generate test coverage summary
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
         run: |
-          COMMONS_TEST_REPORT=$(node -e '
-            const s = require("./packages/commons/coverage/coverage-summary.json").total;
-            console.log(
-              "## 📊 Commons test coverage\n\n" +
-              "```text\n" +
-              "Statements: " + s.statements.pct + "%\n" +
-              "Branches:   " + s.branches.pct + "%\n" +
-              "Functions:  " + s.functions.pct + "%\n" +
-              "Lines:      " + s.lines.pct + "%\n" +
-              "Updated at: " + new Date().toISOString() + "\n" +
-              "```"
-            );
-          ')
-          echo "COMMONS_TEST_REPORT<<EOF" >> $GITHUB_ENV
-          echo "$COMMONS_TEST_REPORT" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          PACKAGE_NAME=$(basename ${{ matrix.package }})
+          COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
 
-      - name: Post commons coverage to PR
-        if: github.event_name == 'pull_request' && matrix.package == 'packages/commons'
+          REPORT=$(node -e "
+            const s = require('${COVERAGE_FILE}').total;
+            const title = '## 📊 ' + process.env.PACKAGE_NAME + ' test coverage';
+            console.log(
+              title + '\\n\\n' +
+              '```text\\n' +
+              'Statements: ' + s.statements.pct + '%\\n' +
+              'Branches:   ' + s.branches.pct + '%\\n' +
+              'Functions:  ' + s.functions.pct + '%\\n' +
+              'Lines:      ' + s.lines.pct + '%\\n' +
+              'Updated at: ' + new Date().toISOString() + '\\n' +
+              '```'
+            );
+          ")
+
+          echo "TEST_COVERAGE_REPORT<<EOF" >> $GITHUB_ENV
+          echo "$REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env:
+          PACKAGE_NAME: ${{ matrix.package }}
+
+      - name: Post test coverage to PR
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
         uses: mshick/add-pr-comment@v2
         with:
-          message-id: commons-test-coverage
-          message: ${{ env.COMMONS_TEST_REPORT }}
-
-      - name: Events test coverage summary
-        if: github.event_name == 'pull_request' && matrix.package == 'packages/events'
-        run: |
-          EVENTS_TEST_REPORT=$(node -e '
-            const s = require("./packages/events/coverage/coverage-summary.json").total;
-            console.log(
-              "## 📊 Events test coverage\n\n" +
-              "```text\n" +
-              "Statements: " + s.statements.pct + "%\n" +
-              "Branches:   " + s.branches.pct + "%\n" +
-              "Functions:  " + s.functions.pct + "%\n" +
-              "Lines:      " + s.lines.pct + "%\n" +
-              "Updated at: " + new Date().toISOString() + "\n" +
-              "```"
-            );
-          ')
-          echo "EVENTS_TEST_REPORT<<EOF" >> $GITHUB_ENV
-          echo "$EVENTS_TEST_REPORT" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Post events coverage to PR
-        if: github.event_name == 'pull_request' && matrix.package == 'packages/events'
-        uses: mshick/add-pr-comment@v2
-        with:
-          message-id: events-test-coverage
-          message: ${{ env.EVENTS_TEST_REPORT }}
+          message-id: ${{ matrix.package }}-test-coverage
+          message: ${{ env.TEST_COVERAGE_REPORT }}
 
   prepare-client-tests:
     name: Prepare client tests
