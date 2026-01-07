@@ -165,7 +165,7 @@ jobs:
 
       - name: Generate test coverage summary
         if: github.event_name == 'pull_request'
-          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events' || matrix.package == 'packages/client')
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
         run: |
           export PACKAGE_NAME=$(basename "${{ matrix.package }}")
           export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
@@ -442,9 +442,9 @@ jobs:
       - name: Run Unit Test
         run: cd packages/client && yarn test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
-      - name: Generate test coverage summary
+      - name: Generate client test coverage summary
         run: |
-          export COVERAGE_FILE="./client/coverage/coverage-summary.json"
+          export COVERAGE_FILE="./packages/client/coverage/coverage-summary.json"
 
           REPORT=$(node -e '
             const s = require(process.env.COVERAGE_FILE).total;
