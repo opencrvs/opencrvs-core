@@ -39,9 +39,13 @@ Annotation data from actions can also be accessed in a similar way using the `$a
 <image x="50" y="100" height="50" width="100" xlink:href="{{ $lookup ($action "PRINT_CERTIFICATE") "annotation.collector.OTHER.signedAffidavit" }}" />
 ```
 
-## Improvements
+### Bug fixes
 
-### User default values in form fields
+- Fix quick search failing when configured with a large number of events and many searchable fields [#11397](https://github.com/opencrvs/opencrvs-core/issues/11397)
+
+### Improvements
+
+#### User default values in form fields
 
 Form fields now support typed user(...) references as default values, replacing legacy string-based $user.\* template variables.
 
