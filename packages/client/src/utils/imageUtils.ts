@@ -239,11 +239,8 @@ function isImageFile(file: File): boolean {
 
 function isImageBiggerThanMaxSize(
   imageSize: { width: number; height: number },
-  maxImageSize?: { width: number; height: number }
+  maxImageSize: { width: number; height: number }
 ): boolean {
-  if (!maxImageSize) {
-    return false
-  }
   return (
     imageSize.width > maxImageSize.width ||
     imageSize.height > maxImageSize.height
@@ -265,7 +262,7 @@ export function useImageProcessing() {
     if (
       !isImageBiggerThanMaxSize(
         { width: image.width, height: image.height },
-        maxImageSize?.targetSize
+        maxImageSize.targetSize
       )
     ) {
       return newFile
