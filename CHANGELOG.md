@@ -39,6 +39,8 @@ Legacy string-based user template variables (e.g. $user.name) are now deprecated
 
 ### New features
 
+- Add registration number field to advanced search configuration so that documents can be searched by their `Registration Number`. [#10760](https://github.com/opencrvs/opencrvs-core/issues/10760)
+
 ## 1.9.4
 
 ### Bug fixes
