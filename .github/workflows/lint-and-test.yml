@@ -165,7 +165,7 @@ jobs:
 
       - name: Generate test coverage summary
         if: github.event_name == 'pull_request'
-          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events' || matrix.package == 'packages/client')
         run: |
           export PACKAGE_NAME=$(basename "${{ matrix.package }}")
           export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
