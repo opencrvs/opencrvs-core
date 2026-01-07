@@ -181,7 +181,7 @@ jobs:
               `Branches:   ${s.branches.pct}%\n` +
               `Functions:  ${s.functions.pct}%\n` +
               `Lines:      ${s.lines.pct}%\n` +
-              `Updated at: ${new Date().toISOString()}\n` +
+              `Updated at: ${new Date().toUTCString()}\n` +
               "```"
             );
           ')
