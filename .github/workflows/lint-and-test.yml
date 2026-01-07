@@ -167,29 +167,28 @@ jobs:
         if: github.event_name == 'pull_request'
           && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
         run: |
-          PACKAGE_NAME=$(basename ${{ matrix.package }})
+          PACKAGE_NAME=$(basename "${{ matrix.package }}")
           COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
 
-          REPORT=$(node -e "
-            const s = require('${COVERAGE_FILE}').total;
-            const title = '## 📊 ' + process.env.PACKAGE_NAME + ' test coverage';
+          REPORT=$(node -e '
+            const s = require(process.env.COVERAGE_FILE).total;
+            const title = `## 📊 ${process.env.PACKAGE_NAME} test coverage`;
+
             console.log(
-              title + '\\n\\n' +
-              '```text\\n' +
-              'Statements: ' + s.statements.pct + '%\\n' +
-              'Branches:   ' + s.branches.pct + '%\\n' +
-              'Functions:  ' + s.functions.pct + '%\\n' +
-              'Lines:      ' + s.lines.pct + '%\\n' +
-              'Updated at: ' + new Date().toISOString() + '\\n' +
-              '```'
+              title + "\n\n" +
+              "```text\n" +
+              `Statements: ${s.statements.pct}%\n` +
+              `Branches:   ${s.branches.pct}%\n` +
+              `Functions:  ${s.functions.pct}%\n` +
+              `Lines:      ${s.lines.pct}%\n` +
+              `Updated at: ${new Date().toISOString()}\n` +
+              "```"
             );
-          ")
+          ')
 
           echo "TEST_COVERAGE_REPORT<<EOF" >> $GITHUB_ENV
           echo "$REPORT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-        env:
-          PACKAGE_NAME: ${{ matrix.package }}
 
       - name: Post test coverage to PR
         if: github.event_name == 'pull_request'
