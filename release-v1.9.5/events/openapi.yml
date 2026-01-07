@@ -753,7 +753,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: a0b035f0-acb1-4aa6-9e81-2e6447ad8859
+                transactionId: de5ecc6a-bf08-4680-a1e5-08d5e47babea
                 type: birth
       responses:
         "200":
@@ -839,7 +839,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ac984366-febf-4a47-a25d-cb8a70f98f9b
+                transactionId: 42fd48c9-e192-48a4-b2f5-5fd54b378cf2
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5465,6 +5465,21 @@ components:
                       - application/vnd.openxmlformats-officedocument.wordprocessingml.document
                       - application/vnd.oasis.opendocument.text
                   description: List of allowed file formats for the signature
+                maxImageSize:
+                  type: object
+                  properties:
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
+                  required:
+                    - targetSize
                 style:
                   type: object
                   properties:
@@ -6908,6 +6923,21 @@ components:
                   type: number
                   description: Maximum file size in bytes
                   default: 5242880
+                maxImageSize:
+                  type: object
+                  properties:
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
+                  required:
+                    - targetSize
                 acceptedFileTypes:
                   type: array
                   items:

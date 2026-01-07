@@ -4785,6 +4785,21 @@ components:
                       - application/vnd.openxmlformats-officedocument.wordprocessingml.document
                       - application/vnd.oasis.opendocument.text
                   description: List of allowed file formats for the signature
+                maxImageSize:
+                  type: object
+                  properties:
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
+                  required:
+                    - targetSize
                 style:
                   type: object
                   properties:
@@ -6200,6 +6215,21 @@ components:
                   type: number
                   description: Maximum file size in bytes
                   default: 5242880
+                maxImageSize:
+                  type: object
+                  properties:
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
+                  required:
+                    - targetSize
                 acceptedFileTypes:
                   type: array
                   items:
