@@ -20,6 +20,8 @@ import {
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { getFullDocumentPath } from '@client/v2-events/cache'
 import { buttonMessages } from '@client/i18n/messages'
+import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
+import { useImageProcessing } from '@client/utils/imageUtils'
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
 import { DocumentPreview } from './DocumentPreview'
 import { SingleDocumentPreview } from './SingleDocumentPreview'
@@ -35,7 +37,8 @@ function FileInput({
   label,
   error,
   touched,
-  disabled
+  disabled,
+  maxImageSize
 }: {
   width?: 'full' | 'auto'
   acceptedFileTypes?: MimeType[]
@@ -48,8 +51,13 @@ function FileInput({
   label: string
   touched?: boolean
   disabled?: boolean
+  maxImageSize?: FileConfig['configuration']['maxImageSize']
 }) {
   const [file, setFile] = React.useState(value)
+  const [modal, openModal] = useImageEditorModal({
+    targetSize: maxImageSize?.targetSize
+  })
+  const { processImageFile } = useImageProcessing()
 
   const { uploadFile } = useFileUpload(name, {
     onSuccess: ({ path, originalFilename, type }) => {
@@ -67,35 +75,49 @@ function FileInput({
     }
   })
 
-  return (
-    <SimpleDocumentUploader
-      acceptedFileTypes={acceptedFileTypes}
-      description={description}
-      disabled={disabled}
-      error={error}
-      file={file}
-      label={label}
-      maxFileSize={maxFileSize}
-      name={name}
-      touched={touched}
-      width={width}
-      onComplete={(newFile) => {
-        if (newFile) {
-          setFile({
-            path: getFullDocumentPath(newFile.name),
-            originalFilename: newFile.name,
-            type: newFile.type
-          })
+  const handleOnComplete = async (newFile: File | null) => {
+    if (!newFile) {
+      setFile(undefined)
+      onChange(null)
+      return
+    }
 
-          uploadFile(newFile)
-        }
-        if (!newFile && file) {
-          setFile(undefined)
-        }
-        setFile(undefined)
-        onChange(null)
-      }}
-    />
+    const processedFile = await processImageFile(
+      newFile,
+      openModal,
+      maxImageSize,
+      error
+    )
+
+    if (!processedFile) {
+      return
+    }
+
+    setFile({
+      path: getFullDocumentPath(processedFile.name),
+      originalFilename: processedFile.name,
+      type: processedFile.type
+    })
+    uploadFile(processedFile)
+  }
+
+  return (
+    <>
+      <SimpleDocumentUploader
+        acceptedFileTypes={acceptedFileTypes}
+        description={description}
+        disabled={disabled}
+        error={error}
+        file={file}
+        label={label}
+        maxFileSize={maxFileSize}
+        name={name}
+        touched={touched}
+        width={width}
+        onComplete={handleOnComplete}
+      />
+      {modal}
+    </>
   )
 }
 
@@ -139,7 +161,18 @@ function FileOutput({
   )
 }
 
+function stringify(value: FileFieldValue | undefined) {
+  const parsed = FileFieldValue.safeParse(value)
+
+  if (parsed.success) {
+    return new URL(parsed.data.path, window.config.MINIO_BASE_URL).href
+  }
+
+  return ''
+}
+
 export const File = {
   Input: FileInput,
-  Output: FileOutput
+  Output: FileOutput,
+  stringify
 }
