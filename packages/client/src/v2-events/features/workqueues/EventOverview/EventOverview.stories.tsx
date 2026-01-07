@@ -14,7 +14,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
-import { userEvent, within, waitFor } from '@storybook/test'
+import { userEvent, within } from '@storybook/test'
 import addDays from 'date-fns/addDays'
 import {
   ActionType,
@@ -787,12 +787,10 @@ export const HideEventHistoryAfterUnassign: Story = {
 
     await userEvent.click(await canvas.findByText('Unassign'))
 
-    await waitFor(async () =>
-      userEvent.click(
-        await canvas.findByRole('button', {
-          name: 'Unassign'
-        })
-      )
+    await userEvent.click(
+      await canvas.findByRole('button', {
+        name: 'Unassign'
+      })
     )
   }
 }
