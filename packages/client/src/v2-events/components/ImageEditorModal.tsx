@@ -123,14 +123,6 @@ function ImageEditorModal({
   const [error, setError] = useState(errorFromParent)
   const [imgSrc, setImgSrc] = useState<IImage>(imgSrcFromParent)
 
-  useEffect(() => {
-    setImgSrc(imgSrcFromParent)
-  }, [imgSrcFromParent])
-
-  useEffect(() => {
-    setError(errorFromParent)
-  }, [errorFromParent])
-
   const reset = () => {
     setCrop(DEFAULT_CROP)
     setCroppedArea(DEFAULT_AREA)
