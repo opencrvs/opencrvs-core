@@ -167,8 +167,8 @@ jobs:
         if: github.event_name == 'pull_request'
           && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
         run: |
-          PACKAGE_NAME=$(basename "${{ matrix.package }}")
-          COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
+          export PACKAGE_NAME=$(basename "${{ matrix.package }}")
+          export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
 
           REPORT=$(node -e '
             const s = require(process.env.COVERAGE_FILE).total;
