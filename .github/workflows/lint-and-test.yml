@@ -442,36 +442,6 @@ jobs:
       - name: Run Unit Test
         run: cd packages/client && yarn test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
-      - name: Generate client test coverage summary
-        run: |
-          export COVERAGE_FILE="./packages/client/coverage/coverage-summary.json"
-
-          REPORT=$(node -e '
-            const s = require(process.env.COVERAGE_FILE).total;
-            const title = `## 📊 client test coverage`;
-
-            console.log(
-              title + "\n\n" +
-              "```text\n" +
-              `Statements: ${s.statements.pct}%\n` +
-              `Branches:   ${s.branches.pct}%\n` +
-              `Functions:  ${s.functions.pct}%\n` +
-              `Lines:      ${s.lines.pct}%\n` +
-              `Updated at: ${new Date().toUTCString()}\n` +
-              "```"
-            );
-          ')
-
-          echo "CLIENT_TEST_COVERAGE_REPORT<<EOF" >> $GITHUB_ENV
-          echo "$REPORT" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Post test coverage to PR
-        uses: mshick/add-pr-comment@v2
-        with:
-          message-id: client-test-coverage
-          message: ${{ env.CLIENT_TEST_COVERAGE_REPORT }}
-
   lint-knip:
     name: Lint unused exports with Knip
     runs-on: ubuntu-24.04
