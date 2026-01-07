@@ -39,6 +39,8 @@ Annotation data from actions can also be accessed in a similar way using the `$a
 <image x="50" y="100" height="50" width="100" xlink:href="{{ $lookup ($action "PRINT_CERTIFICATE") "annotation.collector.OTHER.signedAffidavit" }}" />
 ```
 
+- Add registration number field to advanced search configuration so that documents can be searched by their `Registration Number`. [#10760](https://github.com/opencrvs/opencrvs-core/issues/10760)
+
 ### Bug fixes
 
 - Fix quick search failing when configured with a large number of events and many searchable fields [#11397](https://github.com/opencrvs/opencrvs-core/issues/11397)
