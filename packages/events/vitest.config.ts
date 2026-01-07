@@ -13,6 +13,9 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
+    coverage: {
+      provider: 'v8' // or 'istanbul'
+    },
     globals: true,
     testTimeout: 60000,
     hookTimeout: 60000,
