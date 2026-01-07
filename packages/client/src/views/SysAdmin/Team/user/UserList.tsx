@@ -17,7 +17,7 @@ import {
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import { formatUrl } from '@client/navigation'
-import { ILocation, IOfflineData } from '@client/offline/reducer'
+import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
@@ -25,7 +25,7 @@ import { SEARCH_USERS } from '@client/user/queries'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap, getLocalisedName } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { getAddressName, UserStatus } from '@client/views/SysAdmin/Team/utils'
+import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Pill } from '@opencrvs/components/lib/Pill'
@@ -69,6 +69,8 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
 import { stringify } from 'querystring'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { Location, LocationType, UUID } from '@opencrvs/commons/client'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -166,7 +168,6 @@ type IOnlineStatusProps = {
 
 type BaseProps = {
   theme: ITheme
-  offlineOffices: ILocation[]
   userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
 }
@@ -213,6 +214,13 @@ function UserListComponent(props: IProps) {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
+
+  const offlineOffices = [...locations.values()].filter(
+    ({ locationType }) => locationType === LocationType.enum.CRVS_OFFICE
+  )
+
   const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)
   const [showUsernameReminderSuccess, setShowUsernameReminderSuccess] =
     useState(false)
@@ -225,8 +233,7 @@ function UserListComponent(props: IProps) {
   const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
     usePermissions()
 
-  const { intl, userDetails, offlineOffices, isOnline, offlineCountryConfig } =
-    props
+  const { intl, userDetails, isOnline, offlineCountryConfig } = props
 
   const { locationId } = parse(location.search, {
     ignoreQueryPrefix: true
@@ -248,18 +255,17 @@ function UserListComponent(props: IProps) {
   const [currentPageNumber, setCurrentPageNumber] =
     useState<number>(DEFAULT_PAGE_NUMBER)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
-  const searchedLocation: ILocation | undefined = offlineOffices.find(
-    ({ id }) => locationId === id
-  )
+
+  const parsedId = UUID.safeParse(locationId)
+
+  const searchedLocation: Location | undefined = parsedId.success
+    ? locations.get(parsedId.data)
+    : undefined
+
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
   const isMultipleOfficeUnderJurisdiction =
     offlineOffices.filter(canAccessOffice).length > 1
-
-  const getParentLocation = ({ partOf }: ILocation) => {
-    const parentLocationId = partOf.split('/')[1]
-    return offlineCountryConfig.locations[parentLocationId]
-  }
 
   const toggleUserActivationModal = useCallback(
     function toggleUserActivationModal(user?: User) {
@@ -321,7 +327,11 @@ function UserListComponent(props: IProps) {
         const res = await userMutations.resendInvite(userId, [
           {
             query: SEARCH_USERS,
-            variables: { primaryOfficeId: locationId, count: recordCount }
+            variables: {
+              primaryOfficeId: locationId,
+              count: recordCount,
+              status: 'active'
+            }
           }
         ])
         if (res && res.data && res.data.resendInvite) {
@@ -340,7 +350,11 @@ function UserListComponent(props: IProps) {
         const res = await userMutations.usernameReminderSend(userId, [
           {
             query: SEARCH_USERS,
-            variables: { primaryOfficeId: locationId, count: recordCount }
+            variables: {
+              primaryOfficeId: locationId,
+              count: recordCount,
+              status: 'active'
+            }
           }
         ])
         if (res && res.data && res.data.usernameReminder) {
@@ -359,7 +373,11 @@ function UserListComponent(props: IProps) {
         const res = await userMutations.sendResetPasswordInvite(userId, [
           {
             query: SEARCH_USERS,
-            variables: { primaryOfficeId: locationId, count: recordCount }
+            variables: {
+              primaryOfficeId: locationId,
+              count: recordCount,
+              status: 'active'
+            }
           }
         ])
         if (res && res.data && res.data.resetPasswordInvite) {
@@ -601,7 +619,8 @@ function UserListComponent(props: IProps) {
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
           locationFilter={(location) =>
-            location.type === 'CRVS_OFFICE' && canAccessOffice(location)
+            location.locationType === LocationType.enum.CRVS_OFFICE &&
+            canAccessOffice(location)
           }
         />
       )
@@ -673,7 +692,8 @@ function UserListComponent(props: IProps) {
                   query: SEARCH_USERS,
                   variables: {
                     primaryOfficeId: locationId,
-                    count: recordCount
+                    count: recordCount,
+                    status: 'active'
                   }
                 }
               ]}
@@ -809,7 +829,8 @@ function UserListComponent(props: IProps) {
           variables={{
             primaryOfficeId: locationId,
             count: DEFAULT_FIELD_AGENT_LIST_SIZE,
-            skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE
+            skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE,
+            status: 'active'
           }}
           fetchPolicy={'cache-and-network'}
         >
@@ -818,9 +839,7 @@ function UserListComponent(props: IProps) {
               <Content
                 title={
                   !loading && !error
-                    ? searchedLocation
-                      ? getLocalizedLocationName(intl, searchedLocation)
-                      : ''
+                    ? searchedLocation?.name || ''
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
                 size={ContentSize.NORMAL}
@@ -841,17 +860,15 @@ function UserListComponent(props: IProps) {
                   </Loading>
                 ) : data ? (
                   <>
-                    <Header id="header">
-                      {(searchedLocation &&
-                        getLocalizedLocationName(intl, searchedLocation)) ||
-                        ''}
-                    </Header>
+                    <Header id="header">{searchedLocation?.name || ''}</Header>
                     <LocationInfo>
                       {searchedLocation && (
                         <LocationInfoValue>
-                          {getAddressName(
-                            offlineCountryConfig,
-                            getParentLocation(searchedLocation)
+                          {getAddressNameV2(
+                            locations,
+                            searchedLocation.parentId
+                              ? locations.get(searchedLocation.parentId)
+                              : undefined
                           )}
                         </LocationInfoValue>
                       )}
@@ -952,7 +969,6 @@ function UserListComponent(props: IProps) {
 }
 
 export const UserList = connect((state: IStoreState) => ({
-  offlineOffices: Object.values(getOfflineData(state).offices),
   userDetails: getUserDetails(state),
   offlineCountryConfig: getOfflineData(state)
 }))(withTheme(injectIntl(withOnlineStatus(UserListComponent))))

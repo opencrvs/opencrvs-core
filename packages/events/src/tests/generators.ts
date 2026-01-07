@@ -19,7 +19,8 @@ import {
   LocationType,
   generateUuid,
   pickRandom,
-  createPrng
+  createPrng,
+  generateTrackingId
 } from '@opencrvs/commons'
 import { setLocations } from '../service/locations/locations'
 
@@ -71,6 +72,7 @@ export function payloadGenerator(
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
+          externalId: generateTrackingId(prng) + generateTrackingId(prng),
           locationType: pickRandom(prng, LocationType.options)
         })) as Location[]
       }
@@ -80,6 +82,9 @@ export function payloadGenerator(
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,
+        externalId:
+          location.externalId ??
+          generateTrackingId(prng) + generateTrackingId(prng),
         locationType: LocationType.enum.ADMIN_STRUCTURE
       })) as Location[]
     }
@@ -132,7 +137,8 @@ function generateTestLocations(adminAreas: Location[], rng: () => number) {
       locationType: LocationType.enum.CRVS_OFFICE,
       parentId: admin.id,
       id: generateUuid(rng),
-      validUntil: null
+      validUntil: null,
+      externalId: generateUuid(rng)
     } satisfies Location
 
     const health = {
@@ -140,7 +146,8 @@ function generateTestLocations(adminAreas: Location[], rng: () => number) {
       locationType: LocationType.enum.HEALTH_FACILITY,
       parentId: admin.id,
       id: generateUuid(rng),
-      validUntil: null
+      validUntil: null,
+      externalId: generateUuid(rng)
     } satisfies Location
 
     return [crvs, health]
@@ -155,7 +162,8 @@ function generateTestAdministrativeAreas() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     id: generateUuid(rng),
-    validUntil: null
+    validUntil: null,
+    externalId: generateUuid(rng)
   } satisfies Location
 
   const provinceB = {
@@ -163,7 +171,8 @@ function generateTestAdministrativeAreas() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     id: generateUuid(rng),
-    validUntil: null
+    validUntil: null,
+    externalId: generateUuid(rng)
   } satisfies Location
 
   const districtC = {
@@ -171,7 +180,8 @@ function generateTestAdministrativeAreas() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     id: generateUuid(rng),
-    validUntil: null
+    validUntil: null,
+    externalId: generateUuid(rng)
   } satisfies Location
 
   const districtA = {
@@ -179,7 +189,8 @@ function generateTestAdministrativeAreas() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: provinceA.id,
     id: generateUuid(rng),
-    validUntil: null
+    validUntil: null,
+    externalId: generateUuid(rng)
   } satisfies Location
 
   const villageA = {
@@ -187,7 +198,8 @@ function generateTestAdministrativeAreas() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: districtA.id,
     id: generateUuid(rng),
-    validUntil: null
+    validUntil: null,
+    externalId: generateUuid(rng)
   } satisfies Location
 
   const villageB = {
@@ -195,7 +207,8 @@ function generateTestAdministrativeAreas() {
     locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: provinceB.id,
     id: generateUuid(rng),
-    validUntil: null
+    validUntil: null,
+    externalId: generateUuid(rng)
   } satisfies Location
 
   const administrativeAreas = [

@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { OPENCRVS_SPECIFICATION_URL } from './constants'
 import { env } from './environment'
 import { TypeOf, z } from 'zod'
 import { raise } from './utils'
 import { fromZodError } from 'zod-validation-error'
+import { getUUID } from '@opencrvs/commons'
+import { createClient } from '@opencrvs/toolkit/api'
 
 const LOCATION_TYPES = [
   'ADMIN_STRUCTURE',
@@ -145,94 +146,25 @@ async function getLocations() {
         )
       }
     })
-  return parsedLocations.data
+  const locations = parsedLocations.data
+
+  const locationIdMap = new Map(locations.map(({ id }) => [id, getUUID()]))
+
+  return locations.map((loc) => ({
+    id: locationIdMap.get(loc.id)!,
+    name: loc.name,
+    parentId: locationIdMap.get(loc.partOf.split('/')[1]) || null,
+    locationType: loc.locationType,
+    externalId: loc.id,
+    validUntil: null
+  }))
 }
-
-const bundleToLocationEntries = (bundle: fhir3.Bundle<fhir3.Location>) =>
-  (bundle.entry ?? [])
-    .map((bundleEntry) => bundleEntry.resource)
-    .filter((maybeLocation): maybeLocation is fhir3.Location =>
-      Boolean(maybeLocation)
-    )
-
-function locationBundleToIdentifier(
-  bundle: fhir3.Bundle<fhir3.Location>
-): string[] {
-  return bundleToLocationEntries(bundle)
-    .map((location) => getExternalIdFromIdentifier(location.identifier))
-    .filter((maybeId): maybeId is string => Boolean(maybeId))
-}
-
-/**
- * Get the externally defined id for location. Defined in country-config.
- */
-
-const getExternalIdFromIdentifier = (
-  identifiers: fhir3.Location['identifier']
-) =>
-  identifiers
-    ?.find(({ system }) =>
-      [
-        `${OPENCRVS_SPECIFICATION_URL}id/statistical-code`,
-        `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
-      ].some((identifierSystem) => identifierSystem === system)
-    )
-    ?.value?.split('_')
-    .pop()
 
 export async function seedLocations(token: string) {
-  const savedLocations = (
-    await Promise.all(
-      LOCATION_TYPES.map((type) =>
-        getLocationsByType(type)
-          .then((res) => res.json())
-          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
-            locationBundleToIdentifier(bundle)
-          )
-      )
-    )
-  ).flat()
+  const locations = await getLocations()
 
-  const savedLocationsSet = new Set(savedLocations)
-  const locations = (await getLocations()).filter((location) => {
-    return !savedLocationsSet.has(location.id)
-  })
-  const res = await fetch(`${env.GATEWAY_HOST}/locations?`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/fhir+json'
-    },
-    body: JSON.stringify(
-      locations
-        // statisticalID & code are legacy properties
-        .map(({ id, locationType, ...loc }) => ({
-          statisticalID: id,
-          code: locationType,
-          ...loc
-        }))
-    )
-  })
+  const url = new URL('events', env.GATEWAY_HOST).toString()
+  const client = createClient(url, `Bearer ${token}`)
 
-  if (!res.ok) {
-    raise(await res.text())
-  }
-
-  const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
-  response.entry?.forEach((res, index) => {
-    if (res.response?.status !== '201') {
-      // eslint-disable-next-line no-console
-      console.log(
-        `Failed to create location resource for: "${locations[index].name}"`
-      )
-    }
-  })
-}
-
-function getLocationsByType(type: string) {
-  return fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  })
+  return await client.locations.set.mutate(locations)
 }

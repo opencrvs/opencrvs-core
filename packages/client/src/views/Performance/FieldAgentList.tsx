@@ -407,17 +407,6 @@ function FieldAgentListComponent(props: IProps) {
                   })
                 })
               }}
-              locationFilter={
-                window.config.FIELD_AGENT_AUDIT_LOCATIONS
-                  ? ({ jurisdictionType }) =>
-                      Boolean(
-                        jurisdictionType &&
-                          window.config.FIELD_AGENT_AUDIT_LOCATIONS.split(
-                            ','
-                          ).includes(jurisdictionType)
-                      )
-                  : undefined
-              }
             />
             <PerformanceSelect
               onChange={(option) => {

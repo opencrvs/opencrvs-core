@@ -28,6 +28,8 @@ export default interface LocationsTable {
   validUntil: ColumnType<string | null, string | null, string | null>
 
   administrativeAreaId: ColumnType<UUID | null, UUID | null, UUID | null>
+
+  externalId: ColumnType<string | null, string | null, string | null>
 }
 
 export type Locations = Selectable<LocationsTable>

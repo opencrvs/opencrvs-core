@@ -39,7 +39,6 @@ interface PagesProps {
   validatorContext: ValidatorContext
   continueButtonText?: string
   eventConfig?: EventConfig
-  validateBeforeNextPage?: boolean
   isCorrection?: boolean
 }
 
@@ -66,7 +65,6 @@ export function Pages({
   setFormData,
   eventConfig,
   declaration,
-  validateBeforeNextPage = false,
   // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
   isCorrection = false,
   validatorContext
@@ -125,9 +123,9 @@ export function Pages({
       }, initialTouchedFields)
     )
 
-    // If we are in validateBeforeNextPage mode, we need to validate all fields before moving to the next page.
+    // If we are in requireCompletionToContinue mode, we need to validate all fields before moving to the next page.
     // In this case, the actual switching of the page is done on the 'onAllFieldsValidated' callback.
-    if (validateBeforeNextPage) {
+    if (page.requireCompletionToContinue) {
       setValidateAllFields(true)
       return
     }

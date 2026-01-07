@@ -24,7 +24,11 @@ import { countries } from '@client/utils/countries'
 import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { camelCase } from 'lodash'
-import { UUID } from '@opencrvs/commons/client'
+import {
+  Location,
+  UUID,
+  LocationType as V2LocationType
+} from '@opencrvs/commons/client'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -133,7 +137,7 @@ export function generateSearchableLocations(
       if (
         location.partOf &&
         location.partOf !== 'Location/0' &&
-        location.type !== 'CRVS_OFFICE'
+        location.type !== V2LocationType.enum.CRVS_OFFICE
       ) {
         const locRef = location.partOf.split('/')[1]
         let parent
@@ -169,6 +173,94 @@ export function generateLocations(
   }
 
   return generateSearchableLocations(locationArray, locations, intl, officeId)
+}
+
+export function generateSearchableLocationsV2(
+  locations: Location[],
+  offlineLocations: Map<UUID, Location>,
+  intl: IntlShape,
+  officeId?: UUID
+) {
+  const filteredLocations = officeId
+    ? getAssociatedLocationsAndOfficesV2(officeId, locations)
+    : locations
+
+  const generated: ISearchLocation[] = filteredLocations.map(
+    (location: Location) => {
+      let locationName = location.name
+
+      if (
+        location.parentId &&
+        location.locationType !== V2LocationType.enum.CRVS_OFFICE
+      ) {
+        const parentLocation = offlineLocations.get(location.parentId)
+        if (parentLocation) {
+          locationName += `, ${parentLocation.name}`
+        }
+      }
+
+      return {
+        id: location.id,
+        searchableText: location.name,
+        displayLabel: locationName
+      }
+    }
+  )
+  return generated
+}
+
+export function generateLocationsV2(
+  locations: Map<UUID, Location>,
+  intl: IntlShape,
+  filter?: (location: Location) => boolean,
+  officeId?: UUID
+) {
+  let locationArray = [...locations.values()]
+
+  if (filter) {
+    locationArray = locationArray.filter(filter)
+  }
+
+  return generateSearchableLocationsV2(locationArray, locations, intl, officeId)
+}
+
+function isLocationUnderJurisdiction({
+  locations,
+  locationId,
+  jurisdictionId
+}: {
+  locations: Map<UUID, Location>
+  locationId: UUID | null | undefined
+  jurisdictionId: UUID | null
+}): boolean {
+  if (!jurisdictionId) {
+    return true
+  }
+  if (!locationId) {
+    return false
+  }
+  if (jurisdictionId === locationId) {
+    return true
+  }
+  return isLocationUnderJurisdiction({
+    locations,
+    locationId: locations.get(locationId)?.parentId,
+    jurisdictionId
+  })
+}
+
+export function getOfficesUnderJurisdiction({
+  locations,
+  jurisdictionId
+}: {
+  locations: Map<UUID, Location>
+  jurisdictionId: UUID | null
+}): Location[] {
+  return [...locations.values()].filter(
+    ({ id, locationType }) =>
+      locationType === V2LocationType.enum.CRVS_OFFICE &&
+      isLocationUnderJurisdiction({ locations, locationId: id, jurisdictionId })
+  )
 }
 
 export function getJurisidictionType(
@@ -252,6 +344,23 @@ export function getLocationHierarchy(
   })
 }
 
+export function getLocationHierarchyV2(
+  locationId: UUID,
+  locations: Map<UUID, Location>
+): UUID[] {
+  const parentLocation = locations.get(locationId)
+  if (!parentLocation) {
+    return [locationId]
+  }
+  const { parentId } = parentLocation
+
+  if (!parentId) {
+    return [locationId]
+  }
+
+  return [locationId, ...getLocationHierarchyV2(parentId, locations)]
+}
+
 export function isOfficeUnderJurisdiction(
   officeId: string,
   otherOfficeId: string,
@@ -272,13 +381,34 @@ export function isOfficeUnderJurisdiction(
   const hierarchy = getLocationHierarchy(otherOfficeLocationId, locations)
   return Object.values(hierarchy).includes(parentLocation.id)
 }
+export function isOfficeUnderJurisdictionV2(
+  officeId: string,
+  otherOfficeId: string,
+  locations: Map<UUID, Location>
+) {
+  const office = locations.get(UUID.parse(officeId))
+  const otherOffice = locations.get(UUID.parse(otherOfficeId))
+  const officeLocationId = office?.parentId
+  const otherOfficeLocationId = otherOffice?.parentId
+  if (!officeLocationId || !otherOfficeLocationId) {
+    return false
+  }
+  const parentLocation = locations.get(officeLocationId)
+  if (!parentLocation) {
+    return false
+  }
+  const hierarchy = getLocationHierarchyV2(otherOfficeLocationId, locations)
+  return hierarchy.includes(parentLocation.id)
+}
 
 function getAssociatedLocationsAndOffices(
   officeId: string,
   locations: ILocation[]
 ): ILocation[] {
   const office = locations.find(
-    (location) => location.id === officeId && location.type === 'CRVS_OFFICE'
+    (location) =>
+      location.id === officeId &&
+      location.type === V2LocationType.enum.CRVS_OFFICE
   )
 
   if (!office) {
@@ -296,6 +426,40 @@ function getAssociatedLocationsAndOffices(
 
       const nextLocation = locations.find((loc) => loc.id === targetLocationId)
       currentLocationId = nextLocation?.partOf.split('/').at(1)
+    }
+
+    return false
+  })
+
+  return [office, ...associatedLocations]
+}
+
+// Returns all the ancestor locations and the office itself in no particular order
+function getAssociatedLocationsAndOfficesV2(
+  officeId: string,
+  locations: Location[]
+): Location[] {
+  const office = locations.find(
+    (location) =>
+      location.id === officeId &&
+      location.locationType === V2LocationType.enum.CRVS_OFFICE
+  )
+
+  if (!office) {
+    return []
+  }
+
+  const associatedLocations: Location[] = locations.filter((location) => {
+    let currentLocationId = office.parentId
+
+    while (currentLocationId) {
+      const targetLocationId = currentLocationId
+      if (location.id === currentLocationId) {
+        return true
+      }
+
+      const nextLocation = locations.find((loc) => loc.id === targetLocationId)
+      currentLocationId = nextLocation?.parentId ?? null
     }
 
     return false
