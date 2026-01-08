@@ -16,7 +16,11 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { getOrThrow } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  getOrThrow,
+  workqueueActions
+} from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { useAuthentication } from '@client/utils/userUtils'
@@ -24,7 +28,36 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
-import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  ActionMenuItem,
+  useAllowedActionConfigurations
+} from './useAllowedActionConfigurations'
+
+/**
+ * This is the default order of actions if no actionOrder is defined in event configuration.
+ * By default, custom actions will be after core actions.
+ * */
+const DEFAULT_ACTION_ORDER = [
+  workqueueActions.enum.ASSIGN,
+  workqueueActions.enum.UNASSIGN,
+  workqueueActions.enum.DECLARE,
+  workqueueActions.enum.EDIT,
+  workqueueActions.enum.REGISTER,
+  workqueueActions.enum.PRINT_CERTIFICATE,
+  workqueueActions.enum.REQUEST_CORRECTION,
+  workqueueActions.enum.REJECT,
+  workqueueActions.enum.MARK_AS_DUPLICATE,
+  workqueueActions.enum.ARCHIVE,
+  workqueueActions.enum.DELETE
+]
+
+export function sortActions(
+  actionMenuItems: ActionMenuItem,
+  eventConfiguration: EventConfig
+) {
+  return actionMenuItems
+}
 
 export function ActionMenu({
   eventId,
@@ -70,8 +103,18 @@ export function ActionMenu({
     auth
   )
 
+  const { eventConfiguration } = useEventConfiguration(eventState.type)
+
   const assignedToOther =
     eventState.assignedTo && eventState.assignedTo !== auth.sub
+
+  console.log('fooo')
+  console.log(actionMenuItems)
+
+  const sortedActions = sortActions(actionMenuItems, eventConfiguration)
+
+  console.log('sortedActions')
+  console.log(sortedActions)
 
   return (
     <>
