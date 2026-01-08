@@ -692,21 +692,17 @@ components:
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         updatedAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         assignedTo:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
@@ -3940,6 +3936,7 @@ components:
                             - signature
                             - avatar
                             - primaryOfficeId
+                            - administrativeAreaId
                         $location:
                           type: string
                       required:
@@ -13820,21 +13817,17 @@ components:
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+            - type: "null"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+            - type: "null"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/ExactOutput"
         createdAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+          $ref: "#/components/schemas/WithinOutput"
         updatedAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+          $ref: "#/components/schemas/WithinOutput"
         assignedTo:
           $ref: "#/components/schemas/ExactOutput"
         createdByUserType:
