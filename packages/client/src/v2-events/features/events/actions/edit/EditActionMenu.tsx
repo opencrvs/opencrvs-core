@@ -83,13 +83,13 @@ const messages = {
     id: 'event.edit.registerWithEdits.description',
     description: 'Description for "Register with edits" in edit action menu',
     defaultMessage:
-      'Are you sure you want to register this event with these edits?'
+      'You are about to register this event with your edits. Registering this event will create an official civil registration record.'
   },
   editAndDeclareDescription: {
     id: 'event.edit.declareWithEdits.description',
     description: 'Description for "Declare with edits" in edit action menu',
     defaultMessage:
-      'Are you sure you want to edit this declaration? By confirming you are redeclaring this event and override past changes...'
+      'You are about to redeclare this event with your edits. This will permanently update the declaration.'
   },
   editAndNotifyDescription: {
     id: 'event.edit.notifyWithEdits.description',
@@ -144,7 +144,7 @@ function EditActionModal({
         </Button>
       ]}
       handleClose={() => close({ confirmed: false })}
-      title={intl.formatMessage(title)}
+      title={intl.formatMessage(title) + '?'}
       width={800}
     >
       <Stack>
