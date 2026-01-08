@@ -17,7 +17,8 @@ import gql from 'graphql-tag'
 import { EventConfig, joinUrl } from '@opencrvs/commons'
 import {
   parseLiteralScope,
-  parseConfigurableScope
+  parseConfigurableScope,
+  decodeScope
 } from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 import { createClient } from '@opencrvs/toolkit/api'
@@ -38,8 +39,13 @@ const RoleSchema = (eventIds: string[]) =>
         z.string().superRefine((scope, ctx) => {
           const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedLiteralScope = parseLiteralScope(scope)
+          const decodedScope = decodeScope(scope)
 
-          if (!parsedConfigurableScope && !parsedLiteralScope) {
+          if (
+            !parsedConfigurableScope &&
+            !parsedLiteralScope &&
+            !decodedScope
+          ) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
