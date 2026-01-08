@@ -18,7 +18,9 @@ import {
   Location,
   LocationType,
   generateUuid,
-  pickRandom
+  pickRandom,
+  createPrng,
+  generateTrackingId
 } from '@opencrvs/commons'
 import { setLocations } from '../service/locations/locations'
 
@@ -70,6 +72,7 @@ export function payloadGenerator(
           name: `Location name ${i}`,
           parentId: null,
           validUntil: null,
+          externalId: generateTrackingId(prng) + generateTrackingId(prng),
           locationType: pickRandom(prng, LocationType.options)
         })) as Location[]
       }
@@ -79,6 +82,9 @@ export function payloadGenerator(
         name: location.name ?? `Location name ${i}`,
         parentId: location.parentId ?? null,
         validUntil: null,
+        externalId:
+          location.externalId ??
+          generateTrackingId(prng) + generateTrackingId(prng),
         locationType: LocationType.enum.ADMIN_STRUCTURE
       })) as Location[]
     }
@@ -118,5 +124,198 @@ export function seeder() {
   return {
     user: seedUser,
     locations: seedLocations
+  }
+}
+
+/**
+ * Creates test locations (CRVS offices and Health Facilities) under each provided administrative area.
+ */
+function generateTestLocations(adminAreas: Location[], rng: () => number) {
+  return adminAreas.flatMap((admin) => {
+    const crvs = {
+      name: `${admin.name} CRVS Office`,
+      locationType: LocationType.enum.CRVS_OFFICE,
+      parentId: admin.id,
+      id: generateUuid(rng),
+      validUntil: null,
+      externalId: generateUuid(rng)
+    } satisfies Location
+
+    const health = {
+      name: `${admin.name} Health Facility`,
+      locationType: LocationType.enum.HEALTH_FACILITY,
+      parentId: admin.id,
+      id: generateUuid(rng),
+      validUntil: null,
+      externalId: generateUuid(rng)
+    } satisfies Location
+
+    return [crvs, health]
+  })
+}
+
+function generateTestAdministrativeAreas() {
+  const rng = createPrng(12345)
+  // Generate Administrative areas with children, some "skipping" levels.
+  const provinceA = {
+    name: 'Province A',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    id: generateUuid(rng),
+    validUntil: null,
+    externalId: generateUuid(rng)
+  } satisfies Location
+
+  const provinceB = {
+    name: 'Province B',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    id: generateUuid(rng),
+    validUntil: null,
+    externalId: generateUuid(rng)
+  } satisfies Location
+
+  const districtC = {
+    name: 'District C',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: null,
+    id: generateUuid(rng),
+    validUntil: null,
+    externalId: generateUuid(rng)
+  } satisfies Location
+
+  const districtA = {
+    name: 'District A',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: provinceA.id,
+    id: generateUuid(rng),
+    validUntil: null,
+    externalId: generateUuid(rng)
+  } satisfies Location
+
+  const villageA = {
+    name: 'Village A',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: districtA.id,
+    id: generateUuid(rng),
+    validUntil: null,
+    externalId: generateUuid(rng)
+  } satisfies Location
+
+  const villageB = {
+    name: 'Village B',
+    locationType: LocationType.enum.ADMIN_STRUCTURE,
+    parentId: provinceB.id,
+    id: generateUuid(rng),
+    validUntil: null,
+    externalId: generateUuid(rng)
+  } satisfies Location
+
+  const administrativeAreas = [
+    provinceA,
+    provinceB,
+    districtC,
+    districtA,
+    villageA,
+    villageB
+  ]
+
+  return administrativeAreas
+}
+
+/**
+ * Creates a pair of test users for each provided location.
+ *
+ */
+function generateTestUsersForLocations(
+  locations: Location[],
+  rng: () => number
+) {
+  // 3. Create two users for each office to test 'user' scope limitations.
+  const users = locations.flatMap((location, i) => {
+    const base = {
+      administrativeAreaId: location.parentId,
+      primaryOfficeId: location.id,
+      fullHonorificName: `${location.name} full honorific name`
+    }
+
+    return [
+      {
+        ...base,
+        name: [{ use: 'en', given: [`Mirella-${i}`], family: location.name }],
+        role: pickRandom(rng, TestUserRole.options),
+        id: generateUuid(rng)
+      },
+      {
+        ...base,
+        name: [{ use: 'en', given: [`Jonathan-${i}`], family: location.name }],
+        role: pickRandom(rng, TestUserRole.options),
+        id: generateUuid(rng)
+      }
+    ]
+  })
+
+  return users
+}
+/**
+ * Sets up a realistic hierarchy of administrative areas, offices, and users for testing scopes.
+ * Each location has two users assigned to it. Hiearchies include cases where some levels are skipped or do not exist.
+ *
+ */
+export async function setupHierarchyWithUsers() {
+  const rng = createPrng(1234)
+  const seed = seeder()
+
+  // Generate Administrative areas with children, some "skipping" levels.
+  const administrativeAreas = generateTestAdministrativeAreas()
+
+  await seed.locations(administrativeAreas)
+
+  //2. Setup offices/health facilities under each admin area.
+  const locations = generateTestLocations(administrativeAreas, rng)
+  await seed.locations(locations)
+
+  expect(administrativeAreas.length).toBe(6)
+  expect(locations.length).toBe(12) // 6 admin areas x 2 offices each
+
+  const locationById = new Map(locations.map((o) => [o.id, o]))
+  const administrativeAreaById = new Map(
+    administrativeAreas.map((a) => [a.id, a])
+  )
+
+  // 3. Create two users for each office to test 'user' scope limitations.
+  const users = generateTestUsersForLocations(locations, rng)
+
+  // Helper to check if an office is under a given administrative area. Used for testing propositions.
+  function isUnderAdministrativeArea(
+    locationId: UUID,
+    administrativeAreaId: UUID | null | undefined
+  ): boolean {
+    const current = locationById.get(locationId)
+    if (!current) {
+      return false
+    }
+
+    let parentId: UUID | null | undefined = current.parentId
+
+    while (parentId) {
+      if (parentId === administrativeAreaId) {
+        return true
+      }
+
+      const parent = administrativeAreaById.get(parentId)
+      parentId = parent?.parentId ?? null
+    }
+
+    return false
+  }
+
+  return {
+    users,
+    locations,
+    administrativeAreas,
+    isUnderAdministrativeArea,
+    administrativeAreaById,
+    locationById
   }
 }

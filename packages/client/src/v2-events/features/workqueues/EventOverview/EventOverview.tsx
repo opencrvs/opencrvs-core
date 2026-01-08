@@ -86,6 +86,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        eventDocument={event}
         eventIndex={eventIndex}
       />
     </Content>

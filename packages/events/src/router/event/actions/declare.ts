@@ -110,7 +110,7 @@ export function declareActionProcedures() {
               }
             },
             {
-              event: updatedEvent,
+              eventId: updatedEvent.id,
               user,
               token,
               status: ActionStatus.Accepted,
