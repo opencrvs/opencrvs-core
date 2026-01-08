@@ -190,6 +190,23 @@ jobs:
           echo "$GENERATED_REPORT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
+      - name: Prepare coverage explanation
+        run: |
+          echo "COVERAGE_EXPLANATION<<EOF" >> $GITHUB_ENV
+          echo "_ℹ️ Coverage metrics explained:_" >> $GITHUB_ENV
+          echo "• *Statements* — Executed code statements (basic logic lines)" >> $GITHUB_ENV
+          echo "• *Branches* — Tested decision paths (if/else, switch, ternaries)" >> $GITHUB_ENV
+          echo "• *Functions* — Functions invoked during tests" >> $GITHUB_ENV
+          echo "• *Lines* — Source lines executed" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post coverage explanation to PR
+        if: github.event_name == 'pull_request'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: test-coverage-explanation
+          message: ${{ env.COVERAGE_EXPLANATION }}
+
       - name: Post test coverage to PR
         if: github.event_name == 'pull_request'
           && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
