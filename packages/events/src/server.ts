@@ -25,6 +25,8 @@ function stringifyRequest(req: IncomingMessage) {
 
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
+  allowBatching: true,
+  allowMethodOverride: true,
   middleware: (req, _, next) => {
     logger.info(`Request: ${stringifyRequest(req)}`)
     return next()
@@ -46,7 +48,9 @@ function isTrpcRequest(req: IncomingMessage): boolean {
   const trpcProcedurePaths = Object.keys(appRouter._def.procedures)
 
   return (
-    url.search.startsWith('?input') || trpcProcedurePaths.includes(pathName)
+    url.search.startsWith('?batch') ||
+    url.search.startsWith('?input') ||
+    trpcProcedurePaths.includes(pathName)
   )
 }
 
