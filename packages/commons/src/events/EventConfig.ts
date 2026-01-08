@@ -18,6 +18,7 @@ import { DeclarationFormConfig } from './FormConfig'
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
 import { FlagConfig, InherentFlags } from './Flag'
+import { ActionType, workqueueActions } from './ActionType'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -53,6 +54,12 @@ export const EventConfig = z
       .array(ActionConfig)
       .describe(
         'Configuration of system-defined actions associated with the event.'
+      ),
+    actionOrder: z
+      .array(z.string())
+      .optional()
+      .describe(
+        'Order of actions in the action menu. Use either the action type for core actions or the customActionType for custom actions.'
       ),
     declaration: DeclarationFormConfig.describe(
       'Configuration of the form used to gather event data.'
@@ -169,6 +176,28 @@ export const EventConfig = z
           message: `Action flag id must match an inherent flag or a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
           path: ['actions']
         })
+      }
+    }
+
+    // Validate that action order contains only valid core or custom action types.
+    if (event.actionOrder) {
+      const customActionTypes = event.actions
+        .filter((action) => action.type === ActionType.CUSTOM)
+        .map((action) => action.customActionType)
+
+      const validActionTypes: string[] = [
+        ...workqueueActions.options,
+        ...customActionTypes
+      ]
+
+      for (const actionType of event.actionOrder) {
+        if (!validActionTypes.includes(actionType)) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Invalid action type in action order: ${actionType}`,
+            path: ['actionOrder']
+          })
+        }
       }
     }
   })
