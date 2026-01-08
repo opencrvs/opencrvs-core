@@ -14,7 +14,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { setupServer } from 'msw/node'
 import { renderHook, waitFor } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { FieldConfig } from '@opencrvs/commons/client'
+import { AddressType, FieldConfig, user } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider, queryClient } from '../trpc'
 import { testDataGenerator } from '../../tests/test-data-generators'
 import { createTestStore } from '../../tests/util'
@@ -146,11 +146,9 @@ const fields: FieldConfig[] = [
     },
     defaultValue: {
       country: 'FAR',
-      addressType: 'DOMESTIC',
-      administrativeArea: {
-        $userField: 'primaryOfficeId',
-        $location: 'district'
-      }
+      addressType: AddressType.DOMESTIC,
+      // @ts-ignore
+      administrativeArea: user('primaryOfficeId').locationLevel('district')
     },
     type: 'ADDRESS'
   }
