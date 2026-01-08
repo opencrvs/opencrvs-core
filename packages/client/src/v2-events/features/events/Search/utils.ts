@@ -139,6 +139,15 @@ const defaultSearchFieldGenerator: Record<
       id: 'advancedSearch.status'
     },
     options: statusOptions
+  }),
+  'event.legalStatuses.REGISTERED.registrationNumber': (_) => ({
+    id: 'event.legalStatuses.REGISTERED.registrationNumber',
+    type: FieldType.TEXT,
+    label: {
+      defaultMessage: 'Registration number',
+      description: 'Label for registration number field',
+      id: 'advancedSearch.registrationNumber'
+    }
   })
 } satisfies Record<EventFieldId, (config: AdvancedSearchField) => FieldConfig>
 
