@@ -167,12 +167,17 @@ async function getUsers(token: string) {
 
   let isConfigUpdateAllScopeAvailable = false
   const configScope = 'config.update:all' as const
+  const configScopeV2 = 'type=config.update:all' as const
 
   for (const userRole of userRoles) {
     const currRole = allRoles.find((role) => role.id === userRole)
     if (!currRole)
       raise(`Role with id ${userRole} is not found in roles.ts file`)
-    if (currRole.scopes.includes(configScope))
+
+    if (
+      currRole.scopes.includes(configScope) ||
+      currRole.scopes.includes(configScopeV2)
+    )
       isConfigUpdateAllScopeAvailable = true
   }
 
