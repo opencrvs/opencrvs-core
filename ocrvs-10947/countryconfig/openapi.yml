@@ -3211,6 +3211,7 @@ components:
                             - signature
                             - avatar
                             - primaryOfficeId
+                            - administrativeAreaId
                         $location:
                           type: string
                       required:
@@ -10438,21 +10439,17 @@ components:
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         updatedAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         assignedTo:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
