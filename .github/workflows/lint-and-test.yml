@@ -170,7 +170,7 @@ jobs:
           export PACKAGE_NAME=$(basename "${{ matrix.package }}")
           export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
 
-          REPORT=$(node -e '
+          GENERATED_REPORT=$(node -e '
             const s = require(process.env.COVERAGE_FILE).total;
             const title = `## 📊 ${process.env.PACKAGE_NAME} test coverage`;
 
@@ -186,8 +186,8 @@ jobs:
             );
           ')
 
-          echo "TEST_COVERAGE_REPORT<<EOF" >> $GITHUB_ENV
-          echo "$REPORT" >> $GITHUB_ENV
+          echo "PR_COMMENT_BODY<<EOF" >> $GITHUB_ENV
+          echo "$GENERATED_REPORT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Post test coverage to PR
@@ -196,7 +196,7 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
           message-id: ${{ matrix.package }}-test-coverage
-          message: ${{ env.TEST_COVERAGE_REPORT }}
+          message: ${{ env.PR_COMMENT_BODY }}
 
   prepare-client-tests:
     name: Prepare client tests
