@@ -114,7 +114,7 @@ function EditActionModal({
   close
 }: {
   title: MessageDescriptor
-  description: MessageDescriptor
+  description: string
   close: (result: EditActionModalResult) => void
 }) {
   const intl = useIntl()
@@ -149,7 +149,7 @@ function EditActionModal({
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(description)}
+          {description}
         </Text>
       </Stack>
       <CommentLabel element="h3" variant="bold16">
@@ -166,6 +166,7 @@ function EditActionModal({
 
 function useEditActions(event: EventDocument) {
   const eventType = event.type
+  const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(eventType)
   const { isActionAllowed } = useUserAllowedActions(eventType)
   const [{ workqueue: slug }] = useTypedSearchParams(
@@ -209,6 +210,10 @@ function useEditActions(event: EventDocument) {
     reviewFields: reviewConfig.fields
   })
 
+  const eventTypeLabel = intl
+    .formatMessage(eventConfiguration.label)
+    .toLowerCase()
+
   return {
     modals: [modal],
     actions: [
@@ -218,10 +223,14 @@ function useEditActions(event: EventDocument) {
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
             (close) => {
+              const description = intl.formatMessage(
+                messages.editAndRegisterDescription,
+                { eventType: eventTypeLabel }
+              )
               return (
                 <EditActionModal
                   close={close}
-                  description={messages.editAndRegisterDescription}
+                  description={description}
                   title={messages.editAndRegisterLabel}
                 />
               )
@@ -248,12 +257,18 @@ function useEditActions(event: EventDocument) {
         icon: 'PaperPlaneTilt' as const,
         label: messages.editAndDeclareLabel,
         onClick: async () => {
+          const description = intl.formatMessage(
+            messages.editAndDeclareDescription,
+            {
+              eventType: eventTypeLabel
+            }
+          )
           const { confirmed, comment } = await openModal<EditActionModalResult>(
             (close) => {
               return (
                 <EditActionModal
                   close={close}
-                  description={messages.editAndDeclareDescription}
+                  description={description}
                   title={messages.editAndDeclareLabel}
                 />
               )
