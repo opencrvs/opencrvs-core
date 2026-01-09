@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/commons",
-  "version": "1.9.2",
+  "version": "1.9.4",
   "description": "OpenCRVS common modules and utils",
   "license": "MPL-2.0",
   "main": "./build/dist/common/index.js",
@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "yarn build:watch",
-    "test": "yarn test:compilation && jest",
+    "test": "yarn test:compilation && jest --coverage",
     "test:watch": "jest --watch",
     "test:compilation": "wireit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
@@ -126,7 +126,8 @@
       "json",
       "lcov",
       "text",
-      "html"
+      "html",
+      "json-summary"
     ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "setupFiles": [
