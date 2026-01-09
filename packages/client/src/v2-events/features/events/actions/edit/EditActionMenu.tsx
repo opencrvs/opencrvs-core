@@ -294,12 +294,16 @@ function useEditActions(event: EventDocument) {
         icon: 'PaperPlaneTilt' as const,
         label: messages.editAndNotifyLabel,
         onClick: async () => {
+          const description = intl.formatMessage(
+            messages.editAndNotifyDescription,
+            { eventType: eventTypeLabel }
+          )
           const { confirmed, comment } = await openModal<EditActionModalResult>(
             (close) => {
               return (
                 <EditActionModal
                   close={close}
-                  description={messages.editAndNotifyDescription}
+                  description={description}
                   title={messages.editAndNotifyLabel}
                 />
               )
