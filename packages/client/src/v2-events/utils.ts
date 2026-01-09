@@ -118,7 +118,7 @@ export function handleDefaultValueForAddressField({
   defaultValue?: DefaultAddressFieldValue
   systemVariables: SystemVariables
 }) {
-  if (!defaultValue || defaultValue.addressType !== AddressType.DOMESTIC) {
+  if (!defaultValue) {
     return defaultValue
   }
 
