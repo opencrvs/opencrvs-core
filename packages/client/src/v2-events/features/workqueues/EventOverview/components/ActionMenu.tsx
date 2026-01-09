@@ -40,22 +40,23 @@ import {
  * */
 const DEFAULT_ACTION_ORDER = [
   workqueueActions.enum.ASSIGN,
-  workqueueActions.enum.UNASSIGN,
+  workqueueActions.enum.REGISTER,
   workqueueActions.enum.DECLARE,
   workqueueActions.enum.EDIT,
-  workqueueActions.enum.REGISTER,
+  workqueueActions.enum.REJECT,
+  workqueueActions.enum.ARCHIVE,
+  workqueueActions.enum.DELETE,
+  workqueueActions.enum.MARK_AS_DUPLICATE,
   workqueueActions.enum.PRINT_CERTIFICATE,
   workqueueActions.enum.REQUEST_CORRECTION,
-  workqueueActions.enum.REJECT,
-  workqueueActions.enum.MARK_AS_DUPLICATE,
-  workqueueActions.enum.ARCHIVE,
-  workqueueActions.enum.DELETE
+  workqueueActions.enum.UNASSIGN
 ]
 
 export function sortActions(
   actionMenuItems: ActionMenuItem,
   eventConfiguration: EventConfig
 ) {
+  const configuredActionOrder = eventConfiguration.actionOrder
   return actionMenuItems
 }
 
