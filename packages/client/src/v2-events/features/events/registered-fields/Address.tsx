@@ -287,14 +287,6 @@ function AddressInput(props: Props) {
   const resolvedAdministrativeArea =
     resolveAdministrativeArea(administrativeArea)
 
-  if (
-    value &&
-    value.addressType === AddressType.DOMESTIC &&
-    resolvedAdministrativeArea
-  ) {
-    value.administrativeArea = resolvedAdministrativeArea
-  }
-
   const resolvedValue = {
     ...value,
     ...value?.streetLevelDetails,
