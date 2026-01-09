@@ -35,7 +35,9 @@ import {
   isActionVisible,
   getActionConfig,
   ValidatorContext,
-  EventConfig
+  EventConfig,
+  findV2Scope,
+  ActionToScopeTypeMap
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -520,9 +522,27 @@ export function useUserAllowedActions(eventType: string) {
   const scopes = useSelector(getScope)
   const allowedActions = useMemo(
     () =>
-      ALL_ACTIONS.filter((action) =>
-        isActionInScope(scopes ?? [], action, eventType)
-      ),
+      ALL_ACTIONS.filter((action) => {
+        if (isActionInScope(scopes ?? [], action, eventType)) {
+          return true
+        }
+
+        if (action in ActionToScopeTypeMap) {
+          const scopeType =
+            ActionToScopeTypeMap[action as keyof typeof ActionToScopeTypeMap]
+          if (scopeType) {
+            const v2Scope = findV2Scope(scopes ?? [], scopeType)
+            if (!v2Scope?.options?.event) {
+              return true // No event restriction
+            }
+            if (v2Scope.options.event.includes(eventType)) {
+              return true
+            }
+          }
+        }
+
+        return false
+      }),
     [scopes, eventType]
   )
 

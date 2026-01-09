@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { logger, UUID } from '@opencrvs/commons'
+import { logger, UUID, ActionToScopeTypeMap } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -337,7 +337,8 @@ export function getDefaultActionProcedures(
 
   const requireScopesForRequestMiddleware = requiresAnyOfScopes(
     [],
-    ACTION_SCOPE_MAP[actionType]
+    ACTION_SCOPE_MAP[actionType],
+    ActionToScopeTypeMap[actionType] ? [ActionToScopeTypeMap[actionType]] : []
   )
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
