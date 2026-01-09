@@ -37,7 +37,8 @@ import {
   hasAnyOfScopes,
   AnyScope,
   getCurrentEventState,
-  ResolvedRecordScopeV2
+  ResolvedRecordScopeV2,
+  getV2Workqueues
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext, UserContext } from '@events/context'
@@ -276,12 +277,13 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   const scopes = getScopes(ctx.token)
   const workqueueScope = findScope(scopes, 'workqueue')
 
-  if (!workqueueScope) {
+  const v2Workqueues = getV2Workqueues(scopes)
+
+  if (!workqueueScope && v2Workqueues.length === 0) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  const availableWorkqueues = workqueueScope.options.id
-
+  const availableWorkqueues = workqueueScope?.options.id || v2Workqueues
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }

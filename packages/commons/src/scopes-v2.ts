@@ -12,6 +12,7 @@
 import * as z from 'zod/v4'
 import {
   ConfigurableScopeType,
+  decodeScope,
   encodeScope,
   parseConfigurableScope,
   parseLiteralScope
@@ -92,6 +93,7 @@ export const RecordScopeV2 = z
   )
 
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
+export type RecordScopeV2Options = z.infer<typeof RecordScopeV2>['options']
 
 type LegacyScopeType = ConfigurableScopeType
 
@@ -166,4 +168,14 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
     })
   }
   throw new Error(`Unsupported V1 scope type: ${v1Scope}`)
+}
+
+export const findV2Scope = (scopes: string[], type: string) => {
+  return scopes
+    .map((scope) => decodeScope(scope))
+    .find((scope) => scope?.type === type)
+}
+
+export const getV2Workqueues = (scopes: string[]) => {
+  return findV2Scope(scopes, 'workqueue')?.options?.id ?? []
 }

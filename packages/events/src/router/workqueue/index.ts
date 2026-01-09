@@ -14,6 +14,8 @@ import { TRPCError } from '@trpc/server'
 import {
   findScope,
   getScopes,
+  RecordScopeV2,
+  SCOPES,
   SearchScopeAccessLevels,
   WorkqueueConfig,
   WorkqueueCountInput,
@@ -25,7 +27,10 @@ import {
   getInMemoryWorkqueueConfigurations
 } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
-import { requireScopeForWorkqueues } from '@events/router/middleware'
+import {
+  requiresAnyOfScopes,
+  requireScopeForWorkqueues
+} from '@events/router/middleware'
 
 export const workqueueRouter = router({
   config: router({
@@ -37,10 +42,24 @@ export const workqueueRouter = router({
       })
   }),
   count: userOnlyProcedure
+    .use(
+      requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search'], ['record.search'])
+    )
     .input(WorkqueueCountInput)
     .use(requireScopeForWorkqueues)
     .output(WorkqueueCountOutput)
     .query(async ({ ctx, input }) => {
+      const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+
+      if (ctx.acceptedScopes) {
+        return getEventCount({
+          queries: input,
+          eventConfigs,
+          user: ctx.user,
+          acceptedScopes: ctx.acceptedScopes as RecordScopeV2[]
+        })
+      }
+
       const scopes = getScopes(ctx.token)
       const searchScope = findScope(scopes, 'search')
       // Only to satisfy type checking, as findScope will return undefined if no scope is found
@@ -52,11 +71,11 @@ export const workqueueRouter = router({
         SearchScopeAccessLevels
       >
 
-      return getEventCount(
-        input,
-        await getInMemoryEventConfigurations(ctx.token),
-        searchScopeOptions,
-        ctx.user.primaryOfficeId
-      )
+      return getEventCount({
+        queries: input,
+        eventConfigs,
+        options: searchScopeOptions,
+        user: ctx.user
+      })
     })
 })

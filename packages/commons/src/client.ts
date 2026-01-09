@@ -11,6 +11,7 @@
 export * from './search'
 export * from './events'
 export * from './scopes'
+export * from './scopes-v2'
 export * from './documents'
 export * from './uuid'
 export * from './utils'

@@ -565,7 +565,7 @@ const unflattenScope = (input: Record<string, unknown>) => {
   return { type, options }
 }
 
-export const decodeScope = (query: string) => {
+export const decodeScope = (query: string): AnyScope | undefined => {
   const scope = qs.parse(query, {
     ignoreQueryPrefix: true,
     comma: true,
