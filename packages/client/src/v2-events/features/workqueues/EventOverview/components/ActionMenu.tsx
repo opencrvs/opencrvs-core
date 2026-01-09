@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -19,7 +19,8 @@ import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import {
   EventConfig,
   getOrThrow,
-  workqueueActions
+  ActionType,
+  ClientSpecificAction
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
@@ -34,30 +35,52 @@ import {
   useAllowedActionConfigurations
 } from './useAllowedActionConfigurations'
 
-/**
- * This is the default order of actions if no actionOrder is defined in event configuration.
- * By default, custom actions will be after core actions.
- * */
+/** This is the default order of actions if no actionOrder is defined in event configuration. */
 const DEFAULT_ACTION_ORDER = [
-  workqueueActions.enum.ASSIGN,
-  workqueueActions.enum.REGISTER,
-  workqueueActions.enum.DECLARE,
-  workqueueActions.enum.EDIT,
-  workqueueActions.enum.REJECT,
-  workqueueActions.enum.ARCHIVE,
-  workqueueActions.enum.DELETE,
-  workqueueActions.enum.MARK_AS_DUPLICATE,
-  workqueueActions.enum.PRINT_CERTIFICATE,
-  workqueueActions.enum.REQUEST_CORRECTION,
-  workqueueActions.enum.UNASSIGN
+  ActionType.ASSIGN,
+  ActionType.REGISTER,
+  ActionType.DECLARE,
+  ActionType.EDIT,
+  ActionType.REJECT,
+  ActionType.ARCHIVE,
+  ActionType.DELETE,
+  ActionType.MARK_AS_DUPLICATE,
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION,
+  ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
+  ActionType.CUSTOM,
+  ActionType.UNASSIGN
 ]
 
 export function sortActions(
-  actionMenuItems: ActionMenuItem,
+  actionMenuItems: ActionMenuItem[],
   eventConfiguration: EventConfig
 ) {
-  const configuredActionOrder = eventConfiguration.actionOrder
-  return actionMenuItems
+  const sortedByDefault = actionMenuItems.sort(
+    (a, b) =>
+      DEFAULT_ACTION_ORDER.indexOf(a.type) -
+      DEFAULT_ACTION_ORDER.indexOf(b.type)
+  )
+
+  const actionOrder = eventConfiguration.actionOrder
+
+  if (!actionOrder) {
+    return sortedByDefault
+  }
+
+  return sortedByDefault.sort((a, b) => {
+    const aIndex =
+      'customActionType' in a && a.customActionType
+        ? actionOrder.indexOf(a.customActionType)
+        : actionOrder.indexOf(a.type)
+
+    const bIndex =
+      'customActionType' in b && b.customActionType
+        ? actionOrder.indexOf(b.customActionType)
+        : actionOrder.indexOf(b.type)
+
+    return aIndex - bIndex
+  })
 }
 
 export function ActionMenu({
@@ -109,13 +132,10 @@ export function ActionMenu({
   const assignedToOther =
     eventState.assignedTo && eventState.assignedTo !== auth.sub
 
-  console.log('fooo')
-  console.log(actionMenuItems)
-
-  const sortedActions = sortActions(actionMenuItems, eventConfiguration)
-
-  console.log('sortedActions')
-  console.log(sortedActions)
+  const sortedActions = useMemo(
+    () => sortActions(actionMenuItems, eventConfiguration),
+    [actionMenuItems, eventConfiguration]
+  )
 
   return (
     <>
@@ -141,12 +161,12 @@ export function ActionMenu({
               <DropdownMenu.Separator />
             </>
           )}
-          {!actionMenuItems.length && (
+          {!sortedActions.length && (
             <DropdownMenu.Label>
               <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
             </DropdownMenu.Label>
           )}
-          {actionMenuItems.map((action) => {
+          {sortedActions.map((action) => {
             return (
               <DropdownMenu.Item
                 key={action.type}
