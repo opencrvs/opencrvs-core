@@ -24,19 +24,40 @@ A file field that allows uploading an image with maximum size of 600x600 pixels:
 Uploaded image files can now be rendered in certificate svg templates using the `$lookup` Handlebars helper. Below is an example of rendering the uploaded applicant image added in declaration form through a `FILE` field in a certificate template:
 
 ```hbs
-<image x="50" y="100" height="50" width="50" xlink:href="{{ $lookup $declaration "applicant.image" }}" />
+<image
+  x='50'
+  y='100'
+  height='50'
+  width='50'
+  xlink:href='{{$lookup $declaration "applicant.image"}}'
+/>
 ```
 
 Also for `FILE_WITH_OPTIONS` fields, the selected option can be accessed using the following syntax, you just need to provide the option value as the last part of the path:
 
 ```hbs
-<image x="50" y="100" height="50" width="100" xlink:href="{{ $lookup $declaration "applicant.idImage.ID_FRONT" }}" />
+<image
+  x='50'
+  y='100'
+  height='50'
+  width='100'
+  xlink:href='{{$lookup $declaration "applicant.idImage.ID_FRONT"}}'
+/>
 ```
 
 Annotation data from actions can also be accessed in a similar way using the `$action` or `$actions` helpers. For example, to access an uploaded image in the `PRINT_CERTIFICATE` action annotation data:
 
 ```hbs
-<image x="50" y="100" height="50" width="100" xlink:href="{{ $lookup ($action "PRINT_CERTIFICATE") "annotation.collector.OTHER.signedAffidavit" }}" />
+<image
+  x='50'
+  y='100'
+  height='50'
+  width='100'
+  xlink:href='{{$lookup
+    ($action "PRINT_CERTIFICATE")
+    "annotation.collector.OTHER.signedAffidavit"
+  }}'
+/>
 ```
 
 - Add registration number field to advanced search configuration so that documents can be searched by their `Registration Number`. [#10760](https://github.com/opencrvs/opencrvs-core/issues/10760)
@@ -44,6 +65,8 @@ Annotation data from actions can also be accessed in a similar way using the `$a
 ### Bug fixes
 
 - Fix quick search failing when configured with a large number of events and many searchable fields [#11397](https://github.com/opencrvs/opencrvs-core/issues/11397)
+
+- In quick search, when searching with a valid email address, the search is performed only against email fields [[#11199](https://github.com/opencrvs/opencrvs-core/issues/11199)]
 
 ### Improvements
 
