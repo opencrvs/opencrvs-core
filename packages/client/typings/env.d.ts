@@ -13,6 +13,7 @@
 
 interface ImportMetaEnv {
   readonly COUNTRY_CONFIG_URL?: string
+  readonly STORYBOOK?: 'true'
   // more env variables...
 }
 

@@ -18,6 +18,7 @@ import {
 import {
   createTRPCClient,
   httpLink,
+  httpBatchLink,
   loggerLink,
   TRPCClientError
 } from '@trpc/client'
@@ -38,14 +39,34 @@ const { TRPCProvider: TRPCProviderRaw, useTRPC } =
 export { AppRouter, useTRPC }
 
 function getTrpcClient() {
+  // In storybook tests, we use httpLink as msw-trpc does not support httpBatchLink
+  if (import.meta.env.STORYBOOK === 'true') {
+    return createTRPCClient<AppRouter>({
+      links: [
+        loggerLink({
+          enabled: (op) => op.direction === 'down' && op.result instanceof Error
+        }),
+        httpLink({
+          url: '/api/events',
+          transformer: superjson,
+          headers() {
+            return {
+              authorization: `Bearer ${getToken()}`
+            }
+          }
+        })
+      ]
+    })
+  }
   return createTRPCClient<AppRouter>({
     links: [
       loggerLink({
         enabled: (op) => op.direction === 'down' && op.result instanceof Error
       }),
-      httpLink({
+      httpBatchLink({
         url: '/api/events',
         transformer: superjson,
+        methodOverride: 'POST',
         headers() {
           return {
             authorization: `Bearer ${getToken()}`

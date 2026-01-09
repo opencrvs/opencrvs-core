@@ -29,6 +29,7 @@ type UserAPIResult = {
     type: string
   }
   signature?: FullDocumentPath
+  device?: string
   name: IUserName[]
   username: string
   email: string
@@ -111,6 +112,7 @@ export async function getUserOrSystem(
       signature: user.signature ? user.signature : undefined,
       avatar: user.avatar?.data ? user.avatar.data : undefined,
       primaryOfficeId: user.primaryOfficeId,
+      device: user.device ? user.device : undefined,
       fullHonorificName: user.fullHonorificName
         ? user.fullHonorificName
         : undefined

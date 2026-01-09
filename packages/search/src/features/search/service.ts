@@ -53,7 +53,8 @@ export async function formatSearchParams(
     from,
     size,
     query,
-    sort
+    sort,
+    track_total_hits: true
   } satisfies SearchRequest
 }
 

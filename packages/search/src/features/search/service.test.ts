@@ -166,7 +166,8 @@ describe('elasticsearch params formatter', () => {
           ]
         }
       },
-      sort: [{ dateOfDeclaration: { order: 'asc', unmapped_type: 'keyword' } }]
+      sort: [{ dateOfDeclaration: { order: 'asc', unmapped_type: 'keyword' } }],
+      track_total_hits: true
     })
   })
 
@@ -265,7 +266,8 @@ describe('elasticsearch params formatter', () => {
           ]
         }
       },
-      sort: []
+      sort: [],
+      track_total_hits: true
     })
   })
 })

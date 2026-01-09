@@ -452,9 +452,9 @@ export const SearchResultComponent = ({
       title: contentTitle.toLowerCase()
     })
   } else {
-    if (params.keys) {
+    if (params.term) {
       noResultText = intl.formatMessage(messages.noResultFor, {
-        searchTerm: params.keys
+        searchTerm: params.term
       })
     } else {
       noResultText = intl.formatMessage(messages.noResult)
