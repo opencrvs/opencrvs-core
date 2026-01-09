@@ -33,7 +33,9 @@ import {
   UserOrSystem,
   InteractiveFieldType,
   FieldConfig,
-  TextField
+  TextField,
+  ActionToScopeTypeMap,
+  findV2Scope
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -241,11 +243,22 @@ export function hasOutboxWorkqueue(scopes: Scope[]) {
   const hasConfigurableActionScopes = parsedScopes.some(
     (scope) => ConfigurableActionScopes.safeParse(scope).success
   )
-  return hasLiteralActionScopes || hasConfigurableActionScopes
+
+  const hasV2ActionScopes = Object.values(ActionToScopeTypeMap).some(
+    (actionScope) => Boolean(findV2Scope(scopes, actionScope))
+  )
+
+  return (
+    hasLiteralActionScopes || hasConfigurableActionScopes || hasV2ActionScopes
+  )
 }
 
 export function hasDraftWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => scope.startsWith('record.declare'))
+  const hasDeclareScope = scopes.some((scope) =>
+    scope.startsWith('record.declare')
+  )
+  const hasV2DeclareScope = Boolean(findV2Scope(scopes, 'record.declare'))
+  return hasDeclareScope || hasV2DeclareScope
 }
 
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
