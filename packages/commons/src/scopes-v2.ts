@@ -18,6 +18,7 @@ import {
   parseLiteralScope
 } from './scopes'
 import { UUID } from './uuid'
+import { ActionType } from './client'
 
 /*
  * V2 file will be unified with the scopes during 2.0 development.
@@ -52,6 +53,22 @@ export const RecordAction = z.enum([
   'record.correct',
   'record.unassign-others'
 ])
+
+export const ActionToScopeTypeMap: Partial<Record<ActionType, string>> = {
+  [ActionType.CREATE]: 'record.create',
+  [ActionType.READ]: 'record.read',
+  [ActionType.DECLARE]: 'record.declare',
+  [ActionType.NOTIFY]: 'record.notify',
+  [ActionType.REJECT]: 'record.reject',
+  [ActionType.ARCHIVE]: 'record.archive',
+  [ActionType.REGISTER]: 'record.register',
+  [ActionType.REQUEST_CORRECTION]: 'record.request-correction',
+  [ActionType.APPROVE_CORRECTION]: 'record.correct',
+  [ActionType.REJECT_CORRECTION]: 'record.correct',
+  [ActionType.EDIT]: 'record.edit',
+  [ActionType.CUSTOM]: 'record.custom-action',
+  [ActionType.PRINT_CERTIFICATE]: 'record.print-certified-copies'
+}
 
 export const ResolvedRecordScopeV2 = z
   .object({

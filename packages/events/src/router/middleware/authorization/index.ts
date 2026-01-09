@@ -136,8 +136,6 @@ export function requiresAnyOfScopes(
       return opts.next()
     }
 
-    console.log({ v2ScopeTypes })
-
     if (v2ScopeTypes && v2ScopeTypes.length > 0) {
       const acceptedScopes = getAcceptedScopesFromToken(token, v2ScopeTypes)
 
