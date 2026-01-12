@@ -73,6 +73,34 @@ export function ActionMenu({
   const assignedToOther =
     eventState.assignedTo && eventState.assignedTo !== auth.sub
 
+  function ActionMenuItems() {
+    if (actionMenuItems.length === 0) {
+      return (
+        <DropdownMenu.Label>
+          <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
+        </DropdownMenu.Label>
+      )
+    }
+
+    return actionMenuItems.map((action) => {
+      return (
+        <DropdownMenu.Item
+          key={
+            'customActionType' in action ? action.customActionType : action.type
+          }
+          disabled={'disabled' in action ? action.disabled : false}
+          onClick={async () => {
+            await action.onClick(workqueue)
+            onAction?.()
+          }}
+        >
+          <Icon color="currentColor" name={action.icon} size="small" />
+          {intl.formatMessage(action.label)}
+        </DropdownMenu.Item>
+      )
+    })
+  }
+
   return (
     <>
       <DropdownMenu id="action">
@@ -97,26 +125,7 @@ export function ActionMenu({
               <DropdownMenu.Separator />
             </>
           )}
-          {!actionMenuItems.length && (
-            <DropdownMenu.Label>
-              <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
-            </DropdownMenu.Label>
-          )}
-          {actionMenuItems.map((action) => {
-            return (
-              <DropdownMenu.Item
-                key={action.type}
-                disabled={'disabled' in action ? action.disabled : false}
-                onClick={async () => {
-                  await action.onClick(workqueue)
-                  onAction?.()
-                }}
-              >
-                <Icon color="currentColor" name={action.icon} size="small" />
-                {intl.formatMessage(action.label)}
-              </DropdownMenu.Item>
-            )
-          })}
+          <ActionMenuItems />
         </DropdownMenu.Content>
       </DropdownMenu>
       {modals}
