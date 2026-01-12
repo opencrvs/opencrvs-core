@@ -687,6 +687,7 @@ paths:
                                         - event.status
                                         - event.legalStatuses.REGISTERED.acceptedAt
                                         - event.legalStatuses.REGISTERED.createdAtLocation
+                                        - event.legalStatuses.REGISTERED.registrationNumber
                                         - event.updatedAt
                                     fieldType:
                                       type: string
@@ -752,7 +753,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 8ef99194-6545-44aa-b87b-f7ad6158c28d
+                transactionId: d914cc66-dbc5-46b1-b54e-30c3d42f7494
                 type: birth
       responses:
         "200":
@@ -838,7 +839,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ff5157fb-0031-4196-a632-99237e12f3b8
+                transactionId: 1507a46d-52ee-4f25-9f8e-cfddd96cb234
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5464,6 +5465,21 @@ components:
                       - application/vnd.openxmlformats-officedocument.wordprocessingml.document
                       - application/vnd.oasis.opendocument.text
                   description: List of allowed file formats for the signature
+                maxImageSize:
+                  type: object
+                  properties:
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
+                  required:
+                    - targetSize
                 style:
                   type: object
                   properties:
@@ -6907,6 +6923,21 @@ components:
                   type: number
                   description: Maximum file size in bytes
                   default: 5242880
+                maxImageSize:
+                  type: object
+                  properties:
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
+                  required:
+                    - targetSize
                 acceptedFileTypes:
                   type: array
                   items:
