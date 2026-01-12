@@ -24,7 +24,7 @@ describe('EventConfig', () => {
     expect(res.success).toBe(false)
   })
 
-  describe('actionOrder validation', () => {
+  describe('validateActionOrder()', () => {
     it('should successfully validate an action order with valid core actions', () => {
       const res = EventConfig.safeParse({
         ...tennisClubMembershipEvent,
@@ -34,13 +34,16 @@ describe('EventConfig', () => {
       expect(res.success).toBe(true)
     })
 
-    it('should unsuccessfully validate an action order with actions', () => {
+    it('should unsuccessfully validate an action order with invalid action', () => {
       const res = EventConfig.safeParse({
         ...tennisClubMembershipEvent,
         actionOrder: ['DECLARE', 'INVALID_ACTION', 'REGISTER']
       })
 
       expect(res.success).toBe(false)
+      expect(res.error?.issues[0].message).toBe(
+        'Invalid action type in action order: INVALID_ACTION'
+      )
     })
 
     it('should successfully validate an action order with custom actions', () => {
