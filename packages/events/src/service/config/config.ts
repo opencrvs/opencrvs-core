@@ -12,10 +12,12 @@
 import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
+  AdministrativeArea,
   EventConfig,
   getOrThrow,
   Location,
   LocationType,
+  LocationTypeV1,
   logger,
   TokenWithBearer,
   WorkqueueConfig
@@ -140,35 +142,52 @@ function parsePartOf(partOf: string | undefined): string | null {
   return partOf === 'Location/0' ? null : partOf.split('/')[1]
 }
 
+async function fetchLocationV1(type: LocationTypeV1) {
+  const url = new URL('/locations', env.CONFIG_URL)
+  url.searchParams.set('type', type)
+  url.searchParams.set('_count', '0')
+
+  return fetch(url, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
+export async function fetchAdministrativeAreas() {
+  const res = await fetchLocationV1(LocationTypeV1.enum.ADMIN_STRUCTURE)
+  if (!res.ok) {
+    throw new Error('Failed to fetch administrative areas')
+  }
+
+  const result = (await res.json()) as Bundle<SavedLocation>
+  const administrativeAreas = result.entry.map(({ resource }) => ({
+    id: resource.id,
+    name: resource.name,
+    parentId: parsePartOf(resource.partOf?.reference),
+    validUntil: resource.status === 'inactive' ? new Date().toISOString() : null
+  }))
+
+  return array(AdministrativeArea).parse(administrativeAreas)
+}
+
 export async function getLocations() {
-  const requests = [
-    // Even though these are defined in the same order in the commons, we want to be explicit here.
-    // Admin structures must be seeded first in order for the parent-child relationships to be valid.
-    LocationType.enum.ADMIN_STRUCTURE,
+  const locationRequests = [
     LocationType.enum.CRVS_OFFICE,
     LocationType.enum.HEALTH_FACILITY
-  ].map(async (type) => {
-    const url = new URL('/locations', env.CONFIG_URL)
-    url.searchParams.set('type', type)
-    url.searchParams.set('_count', '0')
+  ].map(fetchLocationV1)
 
-    return fetch(url, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-  })
-
-  const responses = await Promise.all(requests)
-
-  for (const res of responses) {
+  const locationResponses = await Promise.all(locationRequests)
+  for (const res of locationResponses) {
     if (!res.ok) {
       throw new Error('Failed to fetch locations')
     }
   }
 
   const results = await Promise.all(
-    responses.map(async (res) => res.json() as Promise<Bundle<SavedLocation>>)
+    locationResponses.map(
+      async (res) => res.json() as Promise<Bundle<SavedLocation>>
+    )
   )
   const locations = results
     .flatMap((result) => result.entry.map(({ resource }) => resource))
@@ -176,7 +195,7 @@ export async function getLocations() {
       return {
         id: entry.id,
         name: entry.name,
-        parentId: parsePartOf(entry.partOf?.reference),
+        administrativeAreaId: parsePartOf(entry.partOf?.reference),
         validUntil:
           entry.status === 'inactive' ? new Date().toISOString() : null,
         locationType: entry.type?.coding ? entry.type.coding[0]?.code : null

@@ -10,49 +10,36 @@
  */
 
 import * as z from 'zod/v4'
-import { Location, SCOPES, UUID } from '@opencrvs/commons'
+import { AdministrativeArea, SCOPES, UUID } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import {
-  getLocationHierarchy,
-  getLocations,
-  setLocations
-} from '@events/service/locations/locations'
+  getAdministrativeAreas,
+  setAdministrativeAreas
+} from '../../service/administrative-areas'
 import { requiresAnyOfScopes } from '../middleware'
 
-export const locationRouter = router({
+export const administrativeAreaRouter = router({
   list: userAndSystemProcedure
     .input(
       z
         .object({
           isActive: z.boolean().optional(),
-          locationIds: z.array(UUID).optional(),
-          locationType: z.string().optional(),
-          externalId: z.string().optional()
+          ids: z.array(UUID).optional()
         })
         .optional()
     )
-    .output(z.array(Location))
+    .output(z.array(AdministrativeArea))
     .query(async ({ input }) =>
-      getLocations({
+      getAdministrativeAreas({
         isActive: input?.isActive,
-        locationIds: input?.locationIds,
-        locationType: input?.locationType,
-        externalId: input?.externalId
+        ids: input?.ids
       })
     ),
   set: userAndSystemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
     )
-    .input(z.array(Location).min(1))
+    .input(z.array(AdministrativeArea).min(1))
     .output(z.void())
-    .mutation(async ({ input }) => {
-      await setLocations(input)
-    }),
-  getLocationHierarchy: userAndSystemProcedure
-    .input(z.object({ locationId: UUID }))
-    .output(z.array(UUID))
-    .query(async ({ input }) => {
-      return getLocationHierarchy(input.locationId)
-    })
+    .mutation(async ({ input }) => setAdministrativeAreas(input))
 })

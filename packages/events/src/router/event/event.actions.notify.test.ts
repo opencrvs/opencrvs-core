@@ -26,7 +26,7 @@ import {
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
-import { getLocations } from '@events/storage/postgres/events/locations'
+import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
 
 describe('event.actions.notify', () => {
   describe('authorization', () => {

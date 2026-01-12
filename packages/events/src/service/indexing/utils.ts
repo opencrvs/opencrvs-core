@@ -31,7 +31,7 @@ import {
   UserFilter,
   ResolvedRecordScopeV2
 } from '@opencrvs/commons'
-import { getLocationHierarchyRaw } from '@events/storage/postgres/events/locations'
+import { getLocationHierarchyRaw } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcUserContext } from '../../context'
 
 export type EncodedEventIndex = EventIndex

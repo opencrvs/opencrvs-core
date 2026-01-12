@@ -9,17 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { sql } from 'kysely'
+import { Kysely, sql } from 'kysely'
 import { chunk } from 'lodash'
-import { Location, LocationType, logger, UUID } from '@opencrvs/commons'
+import { Location, logger, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
-import { Locations, NewLocations } from './schema/app/Locations'
+import { NewLocations } from '../events/schema/app/Locations'
+import Schema from '../events/schema/Database'
 
 const INSERT_MAX_CHUNK_SIZE = 10000
 
-async function addLocations(locations: NewLocations[]) {
-  const db = getClient()
-
+export async function setLocationsInTrx(
+  trx: Kysely<Schema>,
+  locations: NewLocations[]
+) {
   // Insert new locations in chunks to avoid exceeding max query size
   for (const [index, batch] of chunk(
     locations,
@@ -28,7 +30,7 @@ async function addLocations(locations: NewLocations[]) {
     logger.info(
       `Processing ${Math.min((index + 1) * INSERT_MAX_CHUNK_SIZE, locations.length)}/${locations.length} locations`
     )
-    await db
+    await trx
       .insertInto('locations')
       .values(batch.map((loc) => ({ ...loc, deletedAt: null })))
       .onConflict((oc) =>
@@ -39,7 +41,6 @@ async function addLocations(locations: NewLocations[]) {
              THEN excluded.name
              ELSE locations.name
            END`,
-          parentId: (eb) => eb.ref('excluded.parentId'),
           administrativeAreaId: (eb) => eb.ref('excluded.administrativeAreaId'),
           locationType: (eb) => eb.ref('excluded.locationType'),
           updatedAt: () => sql`now()`,
@@ -56,53 +57,10 @@ async function addLocations(locations: NewLocations[]) {
   }
 }
 
-export async function addAdministrativeAreas(administrativeAreas: Location[]) {
+export async function setLocations(locations: NewLocations[]) {
   const db = getClient()
 
-  // Insert new locations in chunks to avoid exceeding max query size
-  for (const [index, batch] of chunk(
-    administrativeAreas,
-    INSERT_MAX_CHUNK_SIZE
-  ).entries()) {
-    logger.info(
-      `Processing ${Math.min((index + 1) * INSERT_MAX_CHUNK_SIZE, administrativeAreas.length)}/${administrativeAreas.length} administrative areas`
-    )
-    await db
-      .insertInto('administrativeAreas')
-      .values(
-        batch.map((loc) => ({
-          id: loc.id,
-          name: loc.name,
-          parentId: loc.parentId,
-          validUntil: loc.validUntil,
-          deletedAt: null
-        }))
-      )
-      .onConflict((oc) =>
-        oc.column('id').doUpdateSet({
-          name: () =>
-            sql`CASE
-             WHEN excluded.name IS NOT NULL
-             THEN excluded.name
-             ELSE administrative_areas.name
-           END`,
-          parentId: (eb) => eb.ref('excluded.parentId'),
-          updatedAt: () => sql`now()`,
-          validUntil: () =>
-            sql`CASE
-             WHEN excluded.valid_until IS NOT NULL
-             THEN excluded.valid_until
-             ELSE administrative_areas.valid_until
-           END`,
-          deletedAt: null
-        })
-      )
-      .execute()
-  }
-}
-
-export async function setLocations(locations: NewLocations[]) {
-  return addLocations(locations)
+  await setLocationsInTrx(db, locations)
 }
 
 export async function getLocations({
@@ -111,7 +69,7 @@ export async function getLocations({
   isActive,
   externalId
 }: {
-  locationType?: LocationType
+  locationType?: string
   locationIds?: UUID[]
   isActive?: boolean
   externalId?: string
@@ -122,13 +80,8 @@ export async function getLocations({
     .selectFrom('locations')
     .select([
       'id',
-
       'name',
-
-      'parentId',
-
       'validUntil',
-
       'locationType',
       'externalId',
       'administrativeAreaId'
@@ -175,16 +128,6 @@ function childLocationsCte(parentId: UUID) {
   `
 }
 
-function getChildLocationsQuery(parentId: UUID) {
-  return sql<Locations>`
-    ${childLocationsCte(parentId)}
-    SELECT l.*
-    FROM app.locations l
-    JOIN r ON r.id = l.id
-    WHERE l.id <> ${parentId} AND l.deleted_at IS NULL;
-  `
-}
-
 function isLocationChildOfQuery(parentId: UUID, givenId: UUID) {
   return sql<{ isChild: boolean }>`
     ${childLocationsCte(parentId)}
@@ -194,63 +137,19 @@ function isLocationChildOfQuery(parentId: UUID, givenId: UUID) {
   `
 }
 
-export async function getChildLocations(parentId: UUID) {
-  const db = getClient()
-
-  const { rows } = await getChildLocationsQuery(parentId).execute(db)
-  return rows
-}
-
-// Check if a location is a leaf location, i.e. it has no children
-export async function isLeafLocation(id: UUID) {
+export async function locationExists(locationId: UUID) {
   const db = getClient()
 
   const result = await db
     .selectFrom('locations')
     .select('id')
-    .where('parentId', '=', id)
+    .where('id', '=', locationId)
+    .where('deletedAt', 'is', null)
+    // should validUntil be considered here?
     .limit(1)
     .executeTakeFirst()
 
-  return !result
-}
-
-/**
- * Get the leaf location IDs from a list of locations.
- *
- * A leaf location is defined as a location that does not have any children in the provided list.
- * e.g. if a location is a parent of another location in the list, it is not considered a leaf. ADMIN_STRUCTURE might have CRVS_OFFICE children, but can be a leaf if we only consider ADMIN_STRUCTURE locations.
- *
- * @param locationTypes - The types of locations to include.
- * @returns The list of leaf location IDs.
- */
-export async function getLeafLocationIds({
-  locationTypes
-}: { locationTypes?: LocationType[] } = {}) {
-  const db = getClient()
-
-  const query = db
-    .selectFrom('locations as l')
-    .select(['l.id'])
-    .where(({ not, exists, selectFrom }) =>
-      not(
-        exists(
-          selectFrom('locations as c')
-            .select('c.id')
-            .whereRef('c.parentId', '=', 'l.id')
-            .$if(!!locationTypes && !!locationTypes.length, (qb) =>
-              // @ts-expect-error -- query builder cannot infer the type from the condition above.
-              qb.where('c.locationType', 'in', locationTypes)
-            )
-        )
-      )
-    )
-
-  if (locationTypes && locationTypes.length > 0) {
-    query.where('locationType', 'in', locationTypes)
-  }
-
-  return query.execute()
+  return !!result
 }
 
 /**
