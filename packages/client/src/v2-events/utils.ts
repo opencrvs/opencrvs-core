@@ -34,10 +34,10 @@ import {
   InteractiveFieldType,
   FieldConfig,
   TextField,
-  ActionToScopeTypeMap,
   findV2Scope,
   AddressType,
-  DefaultAddressFieldValue
+  DefaultAddressFieldValue,
+  ACTION_SCOPE_MAP_V2
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -290,8 +290,12 @@ export function hasOutboxWorkqueue(scopes: Scope[]) {
     (scope) => ConfigurableActionScopes.safeParse(scope).success
   )
 
-  const hasV2ActionScopes = Object.values(ActionToScopeTypeMap).some(
-    (actionScope) => Boolean(findV2Scope(scopes, actionScope))
+  const hasV2ActionScopes = Object.values(ACTION_SCOPE_MAP_V2).some(
+    (actionScopes) =>
+      actionScopes === null ||
+      actionScopes.some((actionScope) =>
+        Boolean(findV2Scope(scopes, actionScope))
+      )
   )
 
   return (

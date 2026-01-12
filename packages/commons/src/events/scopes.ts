@@ -9,19 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { intersection } from 'lodash'
-import {
-  ConfigurableScopeType,
-  getAuthorizedEventsFromScopes,
-  Scope,
-  RecordScopeType,
-  findScopes
-} from '../scopes'
+import { ConfigurableScopeType, Scope, RecordScopeType } from '../scopes'
 import {
   ClientSpecificAction,
   ActionType,
   DisplayableAction
 } from './ActionType'
 import { EventIndex } from './EventIndex'
+import { findV2Scope, RecordAction } from '../scopes-v2'
 
 type AlwaysAllowed = null
 
@@ -54,6 +49,33 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.CUSTOM]: []
 } satisfies Record<DisplayableAction, RecordScopeType[] | AlwaysAllowed>
 
+// This defines the mapping between event actions and the v2 scopes required to perform them.
+export const ACTION_SCOPE_MAP_V2 = {
+  [ActionType.READ]: ['record.read'],
+  [ActionType.CREATE]: ['record.create'],
+  [ActionType.NOTIFY]: ['record.notify'],
+  [ActionType.DECLARE]: ['record.declare', 'record.register'],
+  [ActionType.EDIT]: ['record.edit'],
+  [ActionType.DELETE]: ['record.declare'],
+  [ActionType.REGISTER]: ['record.register'],
+  [ActionType.PRINT_CERTIFICATE]: ['record.print-certified-copies'],
+  [ActionType.REQUEST_CORRECTION]: [
+    'record.request-correction',
+    'record.correct'
+  ],
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: ['record.correct'],
+  [ActionType.REJECT_CORRECTION]: ['record.correct'],
+  [ActionType.APPROVE_CORRECTION]: ['record.correct'],
+  [ActionType.MARK_AS_DUPLICATE]: ['record.review-duplicates'],
+  [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.review-duplicates'],
+  [ActionType.ARCHIVE]: ['record.archive'],
+  [ActionType.REJECT]: ['record.reject'],
+  [ActionType.ASSIGN]: null,
+  [ActionType.UNASSIGN]: null,
+  [ActionType.DUPLICATE_DETECTED]: [],
+  [ActionType.CUSTOM]: []
+} satisfies Record<DisplayableAction, RecordAction[] | AlwaysAllowed>
+
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
 }
@@ -64,27 +86,30 @@ export function configurableEventScopeAllowed(
   eventType: string,
   customActionType?: string
 ) {
-  // Find the scopes that are authorized for the given action
-  const parsedScopes = allowedConfigurableScopes.flatMap((scope) =>
-    findScopes(scopes, scope)
-  )
+  return allowedConfigurableScopes.some((scope) => {
+    const configuredScope = findV2Scope(scopes, scope)
+    if (!configuredScope) {
+      return false
+    }
+    if (configuredScope.options?.event) {
+      if (!configuredScope.options.event.includes(eventType)) {
+        return false
+      }
+    }
+    if (
+      configuredScope.type === 'record.custom-action' &&
+      customActionType &&
+      configuredScope.options?.customActionType
+    ) {
+      if (
+        !configuredScope.options.customActionType.includes(customActionType)
+      ) {
+        return false
+      }
+    }
 
-  if (!customActionType) {
-    const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-    return authorizedEvents.includes(eventType)
-  }
-
-  const scopesWithCorrectCustomActionType = parsedScopes.filter(
-    ({ options }) =>
-      'customActionType' in options &&
-      options.customActionType.includes(customActionType as string)
-  )
-
-  const authorizedEvents = getAuthorizedEventsFromScopes(
-    scopesWithCorrectCustomActionType
-  )
-
-  return authorizedEvents.includes(eventType)
+    return true
+  })
 }
 
 /**
