@@ -137,6 +137,34 @@ export function ActionMenu({
     [actionMenuItems, eventConfiguration]
   )
 
+  function ActionMenuItems() {
+    if (sortedActions.length === 0) {
+      return (
+        <DropdownMenu.Label>
+          <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
+        </DropdownMenu.Label>
+      )
+    }
+
+    return sortedActions.map((action) => {
+      return (
+        <DropdownMenu.Item
+          key={
+            'customActionType' in action ? action.customActionType : action.type
+          }
+          disabled={'disabled' in action ? action.disabled : false}
+          onClick={async () => {
+            await action.onClick(workqueue)
+            onAction?.()
+          }}
+        >
+          <Icon color="currentColor" name={action.icon} size="small" />
+          {intl.formatMessage(action.label)}
+        </DropdownMenu.Item>
+      )
+    })
+  }
+
   return (
     <>
       <DropdownMenu id="action">
@@ -161,26 +189,7 @@ export function ActionMenu({
               <DropdownMenu.Separator />
             </>
           )}
-          {!sortedActions.length && (
-            <DropdownMenu.Label>
-              <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
-            </DropdownMenu.Label>
-          )}
-          {sortedActions.map((action) => {
-            return (
-              <DropdownMenu.Item
-                key={action.type}
-                disabled={'disabled' in action ? action.disabled : false}
-                onClick={async () => {
-                  await action.onClick(workqueue)
-                  onAction?.()
-                }}
-              >
-                <Icon color="currentColor" name={action.icon} size="small" />
-                {intl.formatMessage(action.label)}
-              </DropdownMenu.Item>
-            )
-          })}
+          <ActionMenuItems />
         </DropdownMenu.Content>
       </DropdownMenu>
       {modals}

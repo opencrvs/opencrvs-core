@@ -14,9 +14,14 @@ import {
   SystemVariables,
   isFieldConfigDefaultValue,
   InteractiveFieldType,
-  isNonInteractiveFieldType
+  isNonInteractiveFieldType,
+  DefaultAddressFieldValue
 } from '@opencrvs/commons/client'
-import { replacePlaceholders } from '@client/v2-events/utils'
+import { FieldType } from '@opencrvs/commons/client'
+import {
+  replacePlaceholders,
+  handleDefaultValueForAddressField
+} from '@client/v2-events/utils'
 import { useSystemVariables } from './useSystemVariables'
 
 export function handleDefaultValue({
@@ -29,6 +34,15 @@ export function handleDefaultValue({
   const defaultValue = field.defaultValue
 
   if (isFieldConfigDefaultValue(defaultValue)) {
+    if (field.type === FieldType.ADDRESS) {
+      const { success, data } = DefaultAddressFieldValue.safeParse(defaultValue)
+      if (success) {
+        return handleDefaultValueForAddressField({
+          defaultValue: data,
+          systemVariables
+        })
+      }
+    }
     return replacePlaceholders({
       field,
       defaultValue,
