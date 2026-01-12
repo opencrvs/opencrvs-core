@@ -29,9 +29,11 @@ import {
   EventStatus,
   DEFAULT_DATE_OF_EVENT_PROPERTY,
   ActionDocument,
-  ActionStatus,
   Location,
-  UserOrSystem
+  UserOrSystem,
+  getActionAnnotationFields,
+  FieldUpdateValue,
+  FieldConfig
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -51,6 +53,19 @@ interface FontFamilyTypes {
 type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
+
+function omitFieldValuesFromDeclaration(
+  annotationFields: FieldConfig[],
+  values: Record<string, FieldUpdateValue>
+) {
+  const fieldsInAnnotation = new Set(annotationFields.map((field) => field.id))
+  return Object.keys(values).reduce((acc, fieldId) => {
+    if (!fieldsInAnnotation.has(fieldId)) {
+      return acc
+    }
+    return { ...acc, [fieldId]: values[fieldId] }
+  }, {})
+}
 
 function findUserById(userId: string, users: UserOrSystem[]) {
   const user = users.find((u) => u.id === userId)
@@ -284,9 +299,7 @@ export function compileSvg({
    * @example {{ $actions "PRINT_CERTIFICATE" }}
    */
   function $actionsFn(actionType: string) {
-    return $actions
-      .filter((a) => a.status === ActionStatus.Accepted)
-      .filter((a) => a.type === actionType)
+    return $actions.filter((a) => a.type === actionType)
   }
 
   Handlebars.registerHelper('$actions', $actionsFn)
@@ -303,9 +316,7 @@ export function compileSvg({
    */
 
   function $action(actionType: string) {
-    return $actions
-      .filter((a) => a.status === ActionStatus.Accepted)
-      .findLast((a) => a.type === actionType)
+    return $actions.findLast((a) => a.type === actionType)
   }
 
   Handlebars.registerHelper('$action', $action)
@@ -344,6 +355,27 @@ export function compileSvg({
 
       const action = ActionDocument.safeParse(obj)
       if (action.success) {
+        const actionConfig = config.actions.find(
+          (a) => a.type === action.data.type
+        )
+        if (!actionConfig) {
+          throw new Error(
+            'Action config not found for action type ' + action.data.type
+          )
+        }
+        const annotationFields = getActionAnnotationFields(actionConfig)
+
+        const annotation =
+          action.data.annotation != null
+            ? stringifyDeclaration(
+                annotationFields,
+                omitFieldValuesFromDeclaration(
+                  annotationFields,
+                  action.data.annotation
+                )
+              )
+            : {}
+
         const resolvedAction = {
           id: action.data.id,
           type: action.data.type,
@@ -362,7 +394,8 @@ export function compileSvg({
               adminLevels
             }
           ),
-          createdByRole: action.data.createdByRole
+          createdByRole: action.data.createdByRole,
+          annotation
         }
 
         return getMixedPath(resolvedAction, propertyPath)

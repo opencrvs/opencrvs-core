@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/client",
-  "version": "1.9.4",
+  "version": "1.9.5",
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
@@ -20,10 +20,10 @@
     "extract:translations": "bash extract-translations.sh",
     "generate-gateway-types": "NODE_OPTIONS=--dns-result-order=ipv4first graphql-codegen --config codegen.ts && prettier --write src/utils/gateway.ts",
     "build:clean": "rm -rf build",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "test-storybook": "test-storybook --maxWorkers=2",
-    "test-storybook:watch": "test-storybook --watch",
+    "storybook": "STORYBOOK=true storybook dev -p 6006",
+    "build-storybook": "STORYBOOK=true storybook build",
+    "test-storybook": "STORYBOOK=true test-storybook --maxWorkers=2",
+    "test-storybook:watch": "STORYBOOK=true test-storybook --watch",
     "chromatic": "chromatic --exit-zero-on-changes --only-changed"
   },
   "lint-staged": {

@@ -70,6 +70,7 @@ export type FieldType = (typeof fieldTypes)[number]
  * Composite field types are field types that consist of multiple field values.
  */
 export const compositeFieldTypes = [
+  FieldType.NAME,
   FieldType.DATE_RANGE,
   FieldType.ADDRESS,
   FieldType.FILE_WITH_OPTIONS,
