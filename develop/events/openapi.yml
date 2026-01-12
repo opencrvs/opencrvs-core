@@ -2893,6 +2893,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionConfig"
+        actionOrder:
+          description: Order of actions in the action menu. Use either the action type for
+            core actions or the customActionType for custom actions.
+          type: array
+          items:
+            type: string
         declaration:
           description: Configuration of the form used to gather event data.
           type: object
