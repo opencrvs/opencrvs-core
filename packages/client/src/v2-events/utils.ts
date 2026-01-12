@@ -205,7 +205,7 @@ export function replacePlaceholders({
 
     // @TODO: This resolves template variables in the first level of the object. In the future, we might need to extend it to arbitrary depth.
     for (const [key, val] of Object.entries(result)) {
-      if (isTemplateVariable(val) && isTextField(field)) {
+      if (val && isTemplateVariable(val) && isTextField(field)) {
         const resolvedValue = get(systemVariables, val)
         // For now, we only support resolving template variables for text fields.
         const validator = mapFieldTypeToZod(field)

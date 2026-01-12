@@ -157,7 +157,7 @@ export type Divider = z.infer<typeof Divider>
 
 export const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: z.union([NonEmptyTextValue, SerializedUserField]).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -375,6 +375,11 @@ const File = BaseField.extend({
       acceptedFileTypes: MimeType.array()
         .optional()
         .describe('List of allowed file formats for the signature'),
+      maxImageSize: z
+        .object({
+          targetSize: z.object({ width: z.number(), height: z.number() })
+        })
+        .optional(),
       style: z
         .object({
           width: z
@@ -487,9 +492,9 @@ const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
   defaultValue: z
     .object({
-      firstname: NonEmptyTextValue.optional(),
-      middlename: NonEmptyTextValue.optional(),
-      surname: NonEmptyTextValue.optional()
+      firstname: SerializedUserField.or(NonEmptyTextValue).optional(),
+      middlename: SerializedUserField.or(NonEmptyTextValue).optional(),
+      surname: SerializedUserField.or(NonEmptyTextValue).optional()
     })
     .optional(),
   configuration: z
@@ -582,6 +587,11 @@ const FileUploadWithOptions = BaseField.extend({
         .number()
         .describe('Maximum file size in bytes')
         .default(DEFAULT_MAX_FILE_SIZE_BYTES),
+      maxImageSize: z
+        .object({
+          targetSize: z.object({ width: z.number(), height: z.number() })
+        })
+        .optional(),
       acceptedFileTypes: MimeType.array()
         .optional()
         .describe('List of allowed file formats for the signature')
