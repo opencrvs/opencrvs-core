@@ -35,7 +35,9 @@ import {
   FieldConfig,
   TextField,
   ActionToScopeTypeMap,
-  findV2Scope
+  findV2Scope,
+  AddressType,
+  DefaultAddressFieldValue
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -102,6 +104,50 @@ export function createTemporaryId() {
 
 function isTextField(field: FieldConfig): field is TextField {
   return field.type === FieldType.TEXT
+}
+
+/**
+ *
+ * @param defaultValue: Configured default value from the country configuration for address field.
+ * @param systemVariables: systemVariables fields such as '$user', '$event', and others.
+ *
+ * @returns Resolves administrativeArea reference in the default value
+ */
+export function handleDefaultValueForAddressField({
+  defaultValue,
+  systemVariables
+}: {
+  defaultValue?: DefaultAddressFieldValue
+  systemVariables: SystemVariables
+}) {
+  if (!defaultValue) {
+    return defaultValue
+  }
+
+  const { administrativeArea } = defaultValue
+
+  // Check if administrativeArea is a dynamic reference to user's primary office
+  const isDynamicReference =
+    administrativeArea &&
+    typeof administrativeArea === 'object' &&
+    administrativeArea.$userField === 'primaryOfficeId' &&
+    typeof administrativeArea.$location === 'string'
+
+  if (isDynamicReference) {
+    const locationKey =
+      administrativeArea.$location as keyof typeof systemVariables.$user
+    // Resolve administrativeArea from systemVariables.$user where
+    // locationKey field (ex: 'district') is pre-populated from
+    // user's primary office (see useCurrentUser hook)
+    if (locationKey in systemVariables.$user) {
+      return {
+        ...defaultValue,
+        administrativeArea: systemVariables.$user[locationKey]
+      }
+    }
+  }
+
+  return defaultValue
 }
 
 /**
