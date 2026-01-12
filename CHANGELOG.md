@@ -2,9 +2,75 @@
 
 ## 1.9.5
 
-## Improvements
+### New features
 
-### User default values in form fields
+- Introduced new configuration option `maxImageSize` for `FILE` and `FILE_WITH_OPTIONS` type of form fields to limit the maximum size of uploaded images. If the uploaded image exceeds provide size in pixels, a crop and resize tool will be shown to the user to adjust the image before uploading. [#10324](https://github.com/opencrvs/opencrvs-core/issues/10324)
+
+Usage example:
+
+A file field that allows uploading an image with maximum size of 600x600 pixels:
+
+```ts
+{
+  id: 'applicant.image',
+  type: 'FILE', // or 'FILE_WITH_OPTIONS'
+  ...
+  configuration: {
+    maxImageSize: { targetSize: { height: 600, width: 600 } }
+  }
+}
+```
+
+Uploaded image files can now be rendered in certificate svg templates using the `$lookup` Handlebars helper. Below is an example of rendering the uploaded applicant image added in declaration form through a `FILE` field in a certificate template:
+
+```hbs
+<image
+  x='50'
+  y='100'
+  height='50'
+  width='50'
+  xlink:href='{{$lookup $declaration "applicant.image"}}'
+/>
+```
+
+Also for `FILE_WITH_OPTIONS` fields, the selected option can be accessed using the following syntax, you just need to provide the option value as the last part of the path:
+
+```hbs
+<image
+  x='50'
+  y='100'
+  height='50'
+  width='100'
+  xlink:href='{{$lookup $declaration "applicant.idImage.ID_FRONT"}}'
+/>
+```
+
+Annotation data from actions can also be accessed in a similar way using the `$action` or `$actions` helpers. For example, to access an uploaded image in the `PRINT_CERTIFICATE` action annotation data:
+
+```hbs
+<image
+  x='50'
+  y='100'
+  height='50'
+  width='100'
+  xlink:href='{{$lookup
+    ($action "PRINT_CERTIFICATE")
+    "annotation.collector.OTHER.signedAffidavit"
+  }}'
+/>
+```
+
+- Add registration number field to advanced search configuration so that documents can be searched by their `Registration Number`. [#10760](https://github.com/opencrvs/opencrvs-core/issues/10760)
+
+### Bug fixes
+
+- Fix quick search failing when configured with a large number of events and many searchable fields [#11397](https://github.com/opencrvs/opencrvs-core/issues/11397)
+
+- In quick search, when searching with a valid email address, the search is performed only against email fields [[#11199](https://github.com/opencrvs/opencrvs-core/issues/11199)]
+
+### Improvements
+
+#### User default values in form fields
 
 Form fields now support typed user(...) references as default values, replacing legacy string-based $user.\* template variables.
 
@@ -32,8 +98,6 @@ Using user('name') as a default value is only supported for FieldType.TEXT.
 It represents the user’s full name and should not be used with FieldType.NAME, since full names may contain multiple words and cannot be reliably split into individual name parts.
 
 Legacy string-based user template variables (e.g. $user.name) are now deprecated in favour of user(...) references.
-
-### New features
 
 ## 1.9.4
 
