@@ -89,7 +89,7 @@ const messages = {
     id: 'event.edit.declareWithEdits.description',
     description: 'Description for "Declare with edits" in edit action menu',
     defaultMessage:
-      'You are about to redeclare this event with your edits. This will permanently update the declaration.'
+      'You are about to redeclare this {eventType} event with your edits. This will permanently update the declaration.'
   },
   editAndNotifyDescription: {
     id: 'event.edit.notifyWithEdits.description',
