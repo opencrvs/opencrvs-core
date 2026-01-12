@@ -83,7 +83,9 @@ export function WorkqueueLayout({
 
   const scopes = useSelector(getScope) ?? []
 
-  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
+  const hasSearchScope =
+    scopes.some((scope) => scope.startsWith('search')) ||
+    Boolean(findV2Scope(scopes, 'record.search'))
 
   return (
     <Frame
