@@ -10,6 +10,7 @@
  */
 import React, { useState } from 'react'
 import { useIntl, MessageDescriptor } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
 import {
@@ -82,13 +83,13 @@ const messages = {
     id: 'event.edit.registerWithEdits.description',
     description: 'Description for "Register with edits" in edit action menu',
     defaultMessage:
-      'Are you sure you want to register this event with these edits?'
+      'You are about to register this event with your edits. Registering this event will create an official civil registration record.'
   },
   editAndDeclareDescription: {
     id: 'event.edit.declareWithEdits.description',
     description: 'Description for "Declare with edits" in edit action menu',
     defaultMessage:
-      'Are you sure you want to edit this declaration? By confirming you are redeclaring this event and override past changes...'
+      'You are about to redeclare this {eventType} event with your edits. This will permanently update the declaration.'
   },
   editAndNotifyDescription: {
     id: 'event.edit.notifyWithEdits.description',
@@ -113,7 +114,7 @@ function EditActionModal({
   close
 }: {
   title: MessageDescriptor
-  description: MessageDescriptor
+  description: string
   close: (result: EditActionModalResult) => void
 }) {
   const intl = useIntl()
@@ -143,12 +144,12 @@ function EditActionModal({
         </Button>
       ]}
       handleClose={() => close({ confirmed: false })}
-      title={intl.formatMessage(title)}
+      title={intl.formatMessage(title) + '?'}
       width={800}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(description)}
+          {description}
         </Text>
       </Stack>
       <CommentLabel element="h3" variant="bold16">
@@ -165,11 +166,13 @@ function EditActionModal({
 
 function useEditActions(event: EventDocument) {
   const eventType = event.type
+  const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(eventType)
   const { isActionAllowed } = useUserAllowedActions(eventType)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.EDIT.REVIEW
   )
+  const navigate = useNavigate()
   const canDirectlyRegister = useCanDirectlyRegister(event)
   const { closeActionView } = useEventFormNavigation()
   const [modal, openModal] = useModal()
@@ -207,6 +210,10 @@ function useEditActions(event: EventDocument) {
     reviewFields: reviewConfig.fields
   })
 
+  const eventTypeLabel = intl
+    .formatMessage(eventConfiguration.label)
+    .toLowerCase()
+
   return {
     modals: [modal],
     actions: [
@@ -216,10 +223,14 @@ function useEditActions(event: EventDocument) {
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
             (close) => {
+              const description = intl.formatMessage(
+                messages.editAndRegisterDescription,
+                { eventType: eventTypeLabel }
+              )
               return (
                 <EditActionModal
                   close={close}
-                  description={messages.editAndRegisterDescription}
+                  description={description}
                   title={messages.editAndRegisterLabel}
                 />
               )
@@ -246,12 +257,18 @@ function useEditActions(event: EventDocument) {
         icon: 'PaperPlaneTilt' as const,
         label: messages.editAndDeclareLabel,
         onClick: async () => {
+          const description = intl.formatMessage(
+            messages.editAndDeclareDescription,
+            {
+              eventType: eventTypeLabel
+            }
+          )
           const { confirmed, comment } = await openModal<EditActionModalResult>(
             (close) => {
               return (
                 <EditActionModal
                   close={close}
-                  description={messages.editAndDeclareDescription}
+                  description={description}
                   title={messages.editAndDeclareLabel}
                 />
               )
@@ -277,12 +294,16 @@ function useEditActions(event: EventDocument) {
         icon: 'PaperPlaneTilt' as const,
         label: messages.editAndNotifyLabel,
         onClick: async () => {
+          const description = intl.formatMessage(
+            messages.editAndNotifyDescription,
+            { eventType: eventTypeLabel }
+          )
           const { confirmed, comment } = await openModal<EditActionModalResult>(
             (close) => {
               return (
                 <EditActionModal
                   close={close}
-                  description={messages.editAndNotifyDescription}
+                  description={description}
                   title={messages.editAndNotifyLabel}
                 />
               )
@@ -313,7 +334,8 @@ function useEditActions(event: EventDocument) {
           description: 'Label for "Cancel edits" in edit action menu',
           id: 'event.edit.cancelEdits'
         },
-        onClick: () => closeActionView(slug)
+        onClick: () =>
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id }))
       }
     ].filter((a) => !a.hidden)
   }
