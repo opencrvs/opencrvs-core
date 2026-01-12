@@ -692,21 +692,17 @@ components:
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         updatedAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         assignedTo:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
@@ -2915,6 +2911,11 @@ components:
                   title:
                     description: Header title of the page
                     $ref: "#/components/schemas/TranslationConfig"
+                  requireCompletionToContinue:
+                    description: If true, all required fields must be filled before continuing to
+                      the next page
+                    default: false
+                    type: boolean
                   fields:
                     description: Fields to be rendered on the page
                     type: array
@@ -2931,6 +2932,7 @@ components:
                 required:
                   - id
                   - title
+                  - requireCompletionToContinue
                   - fields
                   - type
                 additionalProperties: false
@@ -3934,6 +3936,7 @@ components:
                             - signature
                             - avatar
                             - primaryOfficeId
+                            - administrativeAreaId
                         $location:
                           type: string
                       required:
@@ -12046,6 +12049,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -12062,6 +12070,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                     additionalProperties: false
@@ -12073,6 +12082,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -12090,6 +12104,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                       - actions
@@ -12346,6 +12361,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -12362,6 +12382,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                     additionalProperties: false
@@ -12373,6 +12394,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -12390,6 +12416,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                       - actions
@@ -13790,21 +13817,17 @@ components:
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+            - type: "null"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+            - type: "null"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/ExactOutput"
         createdAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+          $ref: "#/components/schemas/WithinOutput"
         updatedAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+          $ref: "#/components/schemas/WithinOutput"
         assignedTo:
           $ref: "#/components/schemas/ExactOutput"
         createdByUserType:
