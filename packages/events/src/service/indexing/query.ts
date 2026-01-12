@@ -210,16 +210,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       case 'updatedAtLocation':
       case 'legalStatuses.DECLARED.createdAtLocation':
       case 'legalStatuses.REGISTERED.createdAtLocation': {
-        const value = clause[key]
-
-        if (value.type === 'exact') {
-          // @TODO: Check if having 'exact' makes sense. Since we persist the whole hierarchy in the event index, we should look for the 'last' item in array.
-          must.push({ term: { [key]: value.term } })
-        } else {
-          // 1. Locations do not have hierarchy, so searching 'within' a location is the same as searching for that location.
-          // 2. Administrative areas have children, and each location is linked to an administrative area.
-          must.push({ term: { [key]: value.location } })
-        }
+        must.push({ term: { [key]: clause[key].location } })
         break
       }
 

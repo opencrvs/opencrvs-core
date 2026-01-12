@@ -196,7 +196,7 @@ interface ActionConfig {
 
 type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
 
-interface ActionMenuItem extends ActionConfig {
+export interface ActionMenuItem extends ActionConfig {
   type: ActionMenuActionType | (typeof ActionTypes.enum)['CUSTOM']
 }
 
