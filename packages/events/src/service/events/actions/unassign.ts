@@ -61,7 +61,7 @@ export async function unassignRecord({
   }
 
   return processAction(input, {
-    event,
+    eventId: event.id,
     user,
     token,
     status: ActionStatus.Accepted,

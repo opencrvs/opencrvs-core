@@ -11,6 +11,7 @@
 import React from 'react'
 import type { Decorator } from '@storybook/react'
 import {
+  EventDocument,
   getOrThrow,
   getTokenPayload,
   LocationType,
@@ -19,7 +20,7 @@ import {
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { getLeafLocationIds } from '@client/v2-events/hooks/useLocations'
-import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from '../.storybook/default-request-handlers'
+import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from '@client/tests/v2-events/locations-mock'
 
 const generator = testDataGenerator()
 
@@ -57,7 +58,10 @@ export const withValidatorContext: Decorator = (Story, context) => {
     />
   )
 }
-export function getTestValidatorContext(userRole?: TestUserRole) {
+export function getTestValidatorContext(
+  userRole?: TestUserRole,
+  event?: EventDocument
+) {
   let token
 
   if (userRole === TestUserRole.enum.FIELD_AGENT) {
@@ -82,6 +86,7 @@ export function getTestValidatorContext(userRole?: TestUserRole) {
 
   return {
     user,
-    leafAdminStructureLocationIds
+    leafAdminStructureLocationIds,
+    event
   }
 }
