@@ -2835,7 +2835,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -10755,7 +10755,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -11114,7 +11114,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -11304,7 +11304,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -11508,7 +11508,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -11820,7 +11820,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -12096,7 +12096,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -12304,7 +12304,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -12494,7 +12494,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
