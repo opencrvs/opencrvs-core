@@ -11,14 +11,11 @@
 
 import { createIntl } from 'react-intl'
 import createFetchMock from 'vitest-fetch-mock'
-import { Content, ContentSvg } from 'pdfmake/interfaces'
+import { ContentSvg } from 'pdfmake/interfaces'
 import {
   ActionDocument,
   eventQueryDataGenerator,
-  Location,
-  LocationType,
   tennisClubMembershipEvent,
-  User,
   UUID
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -26,6 +23,11 @@ import {
   tennisClubMembershipEventDocument,
   tennisClubMembershipEventIndex
 } from '../../fixtures'
+import {
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+  V2_DEFAULT_MOCK_LOCATIONS,
+  V2_DEFAULT_MOCK_LOCATIONS_MAP
+} from '../../../../../tests/v2-events/administrative-hierarchy-mock'
 import {
   svgToPdfTemplate,
   stringifyEventMetadata,
@@ -35,29 +37,6 @@ import {
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
 
-const locations = [
-  {
-    id: '35391063-7dca-4e57-abd3-20dcc8538a64' as UUID,
-    name: 'HQ Office',
-    parentId: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
-    validUntil: null,
-    locationType: LocationType.enum.ADMIN_STRUCTURE
-  },
-  {
-    id: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
-    name: 'Embe',
-    parentId: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
-    validUntil: null,
-    locationType: LocationType.enum.ADMIN_STRUCTURE
-  },
-  {
-    id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
-    name: 'Pualula',
-    parentId: null,
-    validUntil: null,
-    locationType: LocationType.enum.ADMIN_STRUCTURE
-  }
-] as Location[]
 const adminLevels = [
   {
     id: 'province',
@@ -91,8 +70,8 @@ describe('stringifyEventMetadata', () => {
       trackingId: 'B77FF6',
       createdAt: new Date(2000, 1, 1).toISOString(),
       updatedAt: new Date(2000, 1, 2).toISOString(),
-      updatedAtLocation: locations[0].id,
-      createdAtLocation: locations[0].id,
+      updatedAtLocation: V2_DEFAULT_MOCK_LOCATIONS[0].id,
+      createdAtLocation: V2_DEFAULT_MOCK_LOCATIONS[0].id,
       updatedBy: generator.user.id.localRegistrar
     })
 
@@ -104,7 +83,8 @@ describe('stringifyEventMetadata', () => {
         modifiedAt: new Date(2000, 1, 2).toISOString(),
         copiesPrintedForTemplate: 1
       },
-      locations: new Map(locations.map((loc) => [loc.id, loc])),
+      locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+      administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
       users,
       intl: createIntl({ locale: 'en' }),
       adminLevels
@@ -216,7 +196,9 @@ function expectRenderOutput(template: string, output: string) {
       }
     },
     review: false,
+    // @TODO: CHECK if these should have actual values
     locations: new Map(),
+    administrativeAreas: new Map(),
     users: [registrar.v2],
     language: { lang: 'en', messages: {} },
     config: tennisClubMembershipEvent,

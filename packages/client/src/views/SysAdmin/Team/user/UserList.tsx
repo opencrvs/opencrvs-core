@@ -64,13 +64,13 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { SearchUsersQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
-import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { Location, LocationType, UUID } from '@opencrvs/commons/client'
+import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -215,6 +215,8 @@ function UserListComponent(props: IProps) {
   const navigate = useNavigate()
 
   const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const locations = getLocations.useSuspenseQuery()
 
   const offlineOffices = [...locations.values()].filter(
@@ -862,12 +864,15 @@ function UserListComponent(props: IProps) {
                   <>
                     <Header id="header">{searchedLocation?.name || ''}</Header>
                     <LocationInfo>
+                      {/* @TODO: check that this makes sense. We do the same thing inline as the fn does? */}
                       {searchedLocation && (
                         <LocationInfoValue>
                           {getAddressNameV2(
-                            locations,
-                            searchedLocation.parentId
-                              ? locations.get(searchedLocation.parentId)
+                            administrativeAreas,
+                            searchedLocation.administrativeAreaId
+                              ? administrativeAreas.get(
+                                  searchedLocation.administrativeAreaId
+                                )
                               : undefined
                           )}
                         </LocationInfoValue>

@@ -35,7 +35,8 @@ import {
   FieldConfig,
   TextField,
   AddressType,
-  DefaultAddressFieldValue
+  DefaultAddressFieldValue,
+  AdministrativeArea
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -336,20 +337,23 @@ export function mergeWithoutNullsOrUndefined<T>(
 
 type OutputMode = 'withIds' | 'withNames'
 /*
-Function to traverse the administrative level hierarchy from an arbitrary / leaf point
+  Function to traverse the administrative level hierarchy from an arbitrary / leaf point
 */
 export function getAdminLevelHierarchy(
-  maybeLocationId: string | undefined,
-  locations: Map<UUID, Location>,
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>,
   adminStructure: string[],
   outputMode: OutputMode = 'withIds'
 ) {
   // Collect location objects from leaf to root
-  const collectedLocations: Location[] = []
+  const collectedLocations: AdministrativeArea[] = []
 
-  const locationId = maybeLocationId && UUID.safeParse(maybeLocationId).data
+  const parsedAdministrativeAreaId =
+    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
 
-  let current = locationId ? locations.get(locationId) : null
+  let current = parsedAdministrativeAreaId
+    ? administrativeAreas.get(parsedAdministrativeAreaId)
+    : null
 
   while (current) {
     collectedLocations.push(current)
@@ -357,7 +361,7 @@ export function getAdminLevelHierarchy(
       break
     }
     const parentId = current.parentId
-    current = locations.get(parentId)
+    current = administrativeAreas.get(parentId)
   }
 
   // Reverse so root is first, leaf is last
@@ -377,6 +381,34 @@ export function getAdminLevelHierarchy(
   }
 
   return hierarchy
+}
+
+// @TODO: Check if the one with the hiearchy arg is needed
+export function getAdminLevelHierarchyV2(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>
+) {
+  // Collect location objects from leaf to root
+  const collectedLocations: AdministrativeArea[] = []
+
+  const parsedAdministrativeAreaId =
+    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
+
+  let current = parsedAdministrativeAreaId
+    ? administrativeAreas.get(parsedAdministrativeAreaId)
+    : null
+
+  while (current) {
+    collectedLocations.push(current)
+    if (!current.parentId) {
+      break
+    }
+    const parentId = current.parentId
+    current = administrativeAreas.get(parentId)
+  }
+
+  // Reverse so root is first, leaf is last
+  return collectedLocations.reverse()
 }
 
 export function hasStringFilename(

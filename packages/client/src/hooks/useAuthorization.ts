@@ -26,6 +26,7 @@ import {
 import { isOfficeUnderJurisdictionV2 } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
 export const RECORD_ALLOWED_SCOPES = {
   UPDATE: [
@@ -74,6 +75,8 @@ export function usePermissions() {
   const userPrimaryOffice = currentUser?.primaryOffice
 
   const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const locations = getLocations.useSuspenseQuery()
 
   const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
@@ -116,7 +119,8 @@ export function usePermissions() {
       return isOfficeUnderJurisdictionV2(
         userPrimaryOffice.id,
         user.primaryOffice.id,
-        locations
+        locations,
+        administrativeAreas
       )
     }
     if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
@@ -148,7 +152,8 @@ export function usePermissions() {
       return isOfficeUnderJurisdictionV2(
         userPrimaryOffice.id,
         user.primaryOffice.id,
-        locations
+        locations,
+        administrativeAreas
       )
     }
 
@@ -176,7 +181,8 @@ export function usePermissions() {
       return isOfficeUnderJurisdictionV2(
         userPrimaryOffice.id,
         office.id,
-        locations
+        locations,
+        administrativeAreas
       )
     }
     return false
@@ -193,7 +199,8 @@ export function usePermissions() {
       return isOfficeUnderJurisdictionV2(
         userPrimaryOffice.id,
         office.id,
-        locations
+        locations,
+        administrativeAreas
       )
     }
     return false

@@ -12,7 +12,6 @@ import React, { useMemo } from 'react'
 import {
   Location,
   FieldPropsWithoutReferenceValue,
-  LocationType,
   UUID
 } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -20,37 +19,27 @@ import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
+import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 import { LocationSearch } from './LocationSearch'
 
-function useAdministrativeArea(
-  searchableLocationType: LocationType,
-  parentId?: string | null
-) {
-  const { getLocations } = useLocations()
-  const allLocations = getLocations.useSuspenseQuery({})
+function useAdministrativeAreaOptions(parentId?: string | null) {
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
 
   return React.useMemo(() => {
-    return [...allLocations.values()]
-      .filter((location) => {
-        if (!location.locationType) {
-          return false
-        }
-
-        if (searchableLocationType !== location.locationType) {
-          return false
-        }
-
+    return [...administrativeAreas.values()]
+      .filter((administrativeArea) => {
         if (parentId === undefined) {
           return true
         }
 
-        return location.parentId === parentId
+        return administrativeArea.parentId === parentId
       })
       .map((location) => ({
         label: location.name,
         value: location.id
       }))
-  }, [searchableLocationType, allLocations, parentId])
+  }, [administrativeAreas, parentId])
 }
 
 function AdministrativeAreaInput({
@@ -65,10 +54,7 @@ function AdministrativeAreaInput({
   value?: string | null
   disabled?: boolean
 }) {
-  const options = useAdministrativeArea(
-    LocationType.enum.ADMIN_STRUCTURE,
-    partOf
-  )
+  const options = useAdministrativeAreaOptions(partOf)
 
   const selectedLocation = useMemo(
     () => options.find((o) => o.value === value) ?? null,

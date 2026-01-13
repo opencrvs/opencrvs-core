@@ -32,7 +32,10 @@ import {
   Location
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { V2_DEFAULT_MOCK_LOCATIONS } from '@client/tests/v2-events/locations-mock'
+import {
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
+  V2_DEFAULT_MOCK_LOCATIONS
+} from '@client/tests/v2-events/administrative-hierarchy-mock'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -80,6 +83,9 @@ export const handlers = {
   eventLocations: [
     tRPCMsw.locations.list.query(() => {
       return V2_DEFAULT_MOCK_LOCATIONS
+    }),
+    tRPCMsw.administrativeAreas.list.query(() => {
+      return V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
     })
   ],
   getUserRoles: [

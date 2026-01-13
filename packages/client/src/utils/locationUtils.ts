@@ -25,10 +25,16 @@ import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { camelCase } from 'lodash'
 import {
+  AdministrativeArea,
+  joinValues,
   Location,
   UUID,
   LocationType as V2LocationType
 } from '@opencrvs/commons/client'
+import {
+  getAdminLevelHierarchy,
+  getAdminLevelHierarchyV2
+} from '../v2-events/utils'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -178,39 +184,59 @@ export function generateLocations(
 export function generateSearchableLocationsV2(
   locations: Location[],
   offlineLocations: Map<UUID, Location>,
+  administrativeAreas: Map<UUID, AdministrativeArea>,
   intl: IntlShape,
   officeId?: UUID
 ) {
-  const filteredLocations = officeId
-    ? getAssociatedLocationsAndOfficesV2(officeId, locations)
-    : locations
+  const office = officeId ? offlineLocations.get(officeId) : null
 
-  const generated: ISearchLocation[] = filteredLocations.map(
-    (location: Location) => {
-      let locationName = location.name
+  if (!office) {
+    const generated: ISearchLocation[] = locations.map((location: Location) => {
+      let fullLocationName = location.name
 
-      if (
-        location.parentId &&
-        location.locationType !== V2LocationType.enum.CRVS_OFFICE
-      ) {
-        const parentLocation = offlineLocations.get(location.parentId)
-        if (parentLocation) {
-          locationName += `, ${parentLocation.name}`
-        }
+      const administrativeArea = location.administrativeAreaId
+        ? administrativeAreas.get(location.administrativeAreaId)
+        : null
+      if (administrativeArea) {
+        fullLocationName += `, ${administrativeArea.name}`
       }
 
       return {
         id: location.id,
         searchableText: location.name,
-        displayLabel: locationName
+        displayLabel: fullLocationName
       }
-    }
-  )
-  return generated
+    })
+
+    return generated
+  }
+
+  const administrativeAreaHierarchy = getAdminLevelHierarchyV2(
+    office.administrativeAreaId,
+    administrativeAreas
+  ).map((area) => ({
+    id: area.id,
+    searchableText: area.name,
+    displayLabel: area.name
+  }))
+
+  const administrativeArea = office.administrativeAreaId
+    ? administrativeAreas.get(office.administrativeAreaId)
+    : null
+
+  return [
+    {
+      id: office.id,
+      searchableText: office.name,
+      displayLabel: joinValues([office.name, administrativeArea?.name, ', '])
+    },
+    ...administrativeAreaHierarchy
+  ]
 }
 
 export function generateLocationsV2(
   locations: Map<UUID, Location>,
+  administrativeAreas: Map<UUID, AdministrativeArea>,
   intl: IntlShape,
   filter?: (location: Location) => boolean,
   officeId?: UUID
@@ -221,45 +247,13 @@ export function generateLocationsV2(
     locationArray = locationArray.filter(filter)
   }
 
-  return generateSearchableLocationsV2(locationArray, locations, intl, officeId)
-}
-
-function isLocationUnderJurisdiction({
-  locations,
-  locationId,
-  jurisdictionId
-}: {
-  locations: Map<UUID, Location>
-  locationId: UUID | null | undefined
-  jurisdictionId: UUID | null
-}): boolean {
-  if (!jurisdictionId) {
-    return true
-  }
-  if (!locationId) {
-    return false
-  }
-  if (jurisdictionId === locationId) {
-    return true
-  }
-  return isLocationUnderJurisdiction({
+  return generateSearchableLocationsV2(
+    locationArray,
     locations,
-    locationId: locations.get(locationId)?.parentId,
-    jurisdictionId
-  })
-}
-
-export function getOfficesUnderJurisdiction({
-  locations,
-  jurisdictionId
-}: {
-  locations: Map<UUID, Location>
-  jurisdictionId: UUID | null
-}): Location[] {
-  return [...locations.values()].filter(
-    ({ id, locationType }) =>
-      locationType === V2LocationType.enum.CRVS_OFFICE &&
-      isLocationUnderJurisdiction({ locations, locationId: id, jurisdictionId })
+    // @todo: filter these if needed
+    administrativeAreas,
+    intl,
+    officeId
   )
 }
 
@@ -344,23 +338,6 @@ export function getLocationHierarchy(
   })
 }
 
-export function getLocationHierarchyV2(
-  locationId: UUID,
-  locations: Map<UUID, Location>
-): UUID[] {
-  const parentLocation = locations.get(locationId)
-  if (!parentLocation) {
-    return [locationId]
-  }
-  const { parentId } = parentLocation
-
-  if (!parentId) {
-    return [locationId]
-  }
-
-  return [locationId, ...getLocationHierarchyV2(parentId, locations)]
-}
-
 export function isOfficeUnderJurisdiction(
   officeId: string,
   otherOfficeId: string,
@@ -381,24 +358,38 @@ export function isOfficeUnderJurisdiction(
   const hierarchy = getLocationHierarchy(otherOfficeLocationId, locations)
   return Object.values(hierarchy).includes(parentLocation.id)
 }
+
+// @TODO: Check that changes are sensible. Or if it even worked before.
 export function isOfficeUnderJurisdictionV2(
   officeId: string,
   otherOfficeId: string,
-  locations: Map<UUID, Location>
+  locations: Map<UUID, Location>,
+  administrativeAreas: Map<UUID, AdministrativeArea>
 ) {
   const office = locations.get(UUID.parse(officeId))
   const otherOffice = locations.get(UUID.parse(otherOfficeId))
-  const officeLocationId = office?.parentId
-  const otherOfficeLocationId = otherOffice?.parentId
-  if (!officeLocationId || !otherOfficeLocationId) {
+
+  const officeAdministrativeAreaId = office?.administrativeAreaId
+  const otherOfficeAdministrativeAreaId = otherOffice?.administrativeAreaId
+
+  if (!officeAdministrativeAreaId || !otherOfficeAdministrativeAreaId) {
     return false
   }
-  const parentLocation = locations.get(officeLocationId)
-  if (!parentLocation) {
+
+  const parentAdministrativeArea = administrativeAreas.get(
+    officeAdministrativeAreaId
+  )
+  if (!parentAdministrativeArea) {
     return false
   }
-  const hierarchy = getLocationHierarchyV2(otherOfficeLocationId, locations)
-  return hierarchy.includes(parentLocation.id)
+
+  const hierarchy = getAdminLevelHierarchyV2(
+    otherOfficeAdministrativeAreaId,
+    administrativeAreas
+  )
+
+  // @TODO: this does not make sense?
+  return hierarchy.some(({ id }) => id === parentAdministrativeArea.id)
 }
 
 function getAssociatedLocationsAndOffices(
@@ -436,36 +427,20 @@ function getAssociatedLocationsAndOffices(
 
 // Returns all the ancestor locations and the office itself in no particular order
 function getAssociatedLocationsAndOfficesV2(
-  officeId: string,
-  locations: Location[]
-): Location[] {
-  const office = locations.find(
-    (location) =>
-      location.id === officeId &&
-      location.locationType === V2LocationType.enum.CRVS_OFFICE
-  )
-
+  office: Location,
+  administrativeAreas: Map<UUID, AdministrativeArea>
+): [Location, ...AdministrativeArea[]] {
   if (!office) {
-    return []
+    return [office]
   }
 
-  const associatedLocations: Location[] = locations.filter((location) => {
-    let currentLocationId = office.parentId
-
-    while (currentLocationId) {
-      const targetLocationId = currentLocationId
-      if (location.id === currentLocationId) {
-        return true
-      }
-
-      const nextLocation = locations.find((loc) => loc.id === targetLocationId)
-      currentLocationId = nextLocation?.parentId ?? null
-    }
-
-    return false
-  })
-
-  return [office, ...associatedLocations]
+  return [
+    office,
+    ...getAdminLevelHierarchyV2(
+      office.administrativeAreaId,
+      administrativeAreas
+    )
+  ]
 }
 
 export function generateFullAddress(

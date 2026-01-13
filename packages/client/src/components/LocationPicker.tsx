@@ -38,6 +38,7 @@ import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { Location } from '@opencrvs/commons/client'
+import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
 const { useState, useEffect } = React
 
@@ -117,10 +118,14 @@ function LocationPickerComponent(props: LocationPickerProps) {
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 
   const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
   const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const offlineSearchableLocations = generateLocationsV2(
     locations,
+    administrativeAreas,
     intl,
     locationFilter
   )

@@ -163,9 +163,10 @@ function Filter({
       <LocationPicker
         additionalLocations={getAdditionalLocations(intl)}
         selectedLocationId={locationId}
-        locationFilter={({ locationType }) =>
-          locationType === LocationType.enum.ADMIN_STRUCTURE
-        }
+        // @TODO:
+        // locationFilter={({ locationType }) =>
+        //   locationType === LocationType.enum.ADMIN_STRUCTURE
+        // }
         onChangeLocation={(newLocationId) => {
           navigate(
             generateCompletenessRatesUrl({

@@ -21,7 +21,7 @@ import { AdministrativeLevels } from './AdministrativeLevels'
 import { setUserDetails } from '@client/profile/profileActions'
 import { ORGANISATIONS_INDEX } from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
-import { V2_DEFAULT_MOCK_LOCATIONS } from '@client/tests/v2-events/locations-mock'
+import { V2_DEFAULT_MOCK_LOCATIONS } from '@client/tests/v2-events/administrative-hierarchy-mock'
 
 describe('for user with read organisation in my jurisdiction scope', () => {
   let store: AppStore

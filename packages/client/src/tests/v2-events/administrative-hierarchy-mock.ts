@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID, LocationType, Location } from '@opencrvs/commons/client'
+import {
+  UUID,
+  LocationType,
+  Location,
+  AdministrativeArea
+} from '@opencrvs/commons/client'
 
 /*
  * Central
@@ -39,11 +44,11 @@ import { UUID, LocationType, Location } from '@opencrvs/commons/client'
  * Pualula
  * Chuminga
  */
-export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
+
+export const V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS: AdministrativeArea[] = [
   {
     id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     name: 'Central',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     validUntil: null,
     externalId: 'ydyJb1RAy4U1'
@@ -51,7 +56,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
     name: 'Sulaka',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     validUntil: null,
     externalId: 'pQ8nGxWmZ2Q3'
@@ -59,7 +63,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
     name: 'Pualula',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     validUntil: null,
     externalId: 'Aq91DweLmT8k'
@@ -67,7 +70,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: '6d1a59df-988c-4021-a846-ccbc021931a7' as UUID,
     name: 'Chuminga',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: null,
     validUntil: null,
     externalId: 'Rw0fYNh2Xk9a'
@@ -75,7 +77,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     name: 'Ibombo',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     validUntil: null,
     externalId: 'k7DsP4vbN1Qe'
@@ -83,7 +84,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
     name: 'Isango',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     validUntil: null,
     externalId: 'Gm3Z9eQpHw4L'
@@ -91,7 +91,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
     name: 'Isamba',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     validUntil: null,
     externalId: 'sT0xVu1KqJ7r'
@@ -99,7 +98,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
     name: 'Itambo',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     validUntil: null,
     externalId: 'Nq6Bv2HpL9Te'
@@ -107,7 +105,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250' as UUID,
     name: 'Ezhi',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     validUntil: null,
     externalId: 'xK8cQ0ZRy5Wd'
@@ -115,16 +112,17 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: '8fbd09d2-212b-47f4-beb3-5e1694931d9f' as UUID,
     name: 'Ilanga',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
     parentId: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
     validUntil: null,
     externalId: 'Cq4Jm1XvN8Ls'
-  },
+  }
+]
+export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
     name: 'Chamakubi Health Post',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'M1nFr8LbC2Qy'
   },
@@ -132,7 +130,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '4d3279be-d026-420c-88f7-f0a4ae986973' as UUID,
     name: 'Ibombo Rural Health Centre',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'bT7pV6YrW0Xc'
   },
@@ -140,7 +138,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '190902f4-1d77-476a-8947-41145af1db7d' as UUID,
     name: 'Chikobo Rural Health Centre',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'zE4qPn2SgJ5d'
   },
@@ -148,7 +146,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71' as UUID,
     name: 'Chilochabalenje Health Post',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'H8vDs1MqR4Uf'
   },
@@ -156,7 +154,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: 'dbfc178f-7295-4b90-b28d-111c95b03127' as UUID,
     name: 'Chipeso Rural Health Centre',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'Qw3uZ9KfX6Lm'
   },
@@ -164,7 +162,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '09862bfe-c7ac-46cd-987b-668681533c80' as UUID,
     name: 'Chisamba Rural Health Centre',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'Yr0pCg8LdM2s'
   },
@@ -172,7 +170,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '834ce389-e95b-4fb0-96a0-33e9ab323059' as UUID,
     name: 'Chitanda Rural Health Centre',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'tS9gJ4PwB1Qx'
   },
@@ -180,7 +178,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '0431c433-6062-4a4c-aee9-25271aec61ee' as UUID,
     name: 'Golden Valley Rural Health Centre',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'Ld7Qm3XsA8Vr'
   },
@@ -188,7 +186,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2' as UUID,
     name: 'Ipongo Rural Health Centre',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'kF2sW9DmH0Bt'
   },
@@ -196,7 +194,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '4cf1f53b-b730-41d2-8649-dff7eeed970d' as UUID,
     name: 'Itumbwe Health Post',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'Ue5Xb3VaC7Pq'
   },
@@ -204,7 +202,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0' as UUID,
     name: 'Kabangalala Rural Health Centre',
     locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'Pz8Kc1TqH6Jn'
   },
@@ -212,7 +210,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID,
     name: 'Central Provincial Office',
     locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    administrativeAreaId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     validUntil: null,
     externalId: 'Xr3Df8WpK6Ys'
   },
@@ -220,7 +218,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
     name: 'Ibombo District Office',
     locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'Sm4Nw7GrD2Vy'
   },
@@ -228,7 +226,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
     name: 'Isamba District Office',
     locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    administrativeAreaId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
     validUntil: null,
     externalId: 'Vg1Bq5XeH9Lt'
   },
@@ -236,7 +234,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '954c93e1-13f7-4435-bb82-35e0e215e07d' as UUID,
     name: 'Isango District Office',
     locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+    administrativeAreaId: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
     validUntil: null,
     externalId: 'Je7Lm2XqN9Vz'
   },
@@ -244,7 +242,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '2884f5b9-17b4-49ce-bf4d-f538228935df' as UUID,
     name: 'Sulaka Provincial Office',
     locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
+    administrativeAreaId: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
     validUntil: null,
     externalId: 'Ht2Wp9KcX5Qv'
   },
@@ -252,7 +250,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     id: '030358c6-54af-44be-821b-8e4af963a49c' as UUID,
     name: 'Ilanga District Office',
     locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: '8fbd09d2-212b-47f4-beb3-5e1694931d9f' as UUID,
+    administrativeAreaId: '8fbd09d2-212b-47f4-beb3-5e1694931d9f' as UUID,
     validUntil: null,
     externalId: 'Yp6Ds1WqN3Xz'
   }
@@ -260,4 +258,8 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
 
 export const V2_DEFAULT_MOCK_LOCATIONS_MAP = new Map(
   V2_DEFAULT_MOCK_LOCATIONS.map((l) => [l.id, l])
+)
+
+export const V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP = new Map(
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS.map((a) => [a.id, a])
 )

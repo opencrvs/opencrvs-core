@@ -15,9 +15,9 @@ import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import {
   FieldPropsWithoutReferenceValue,
   Location,
-  LocationType,
   UUID,
-  joinValues
+  joinValues,
+  AdministrativeArea
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -25,6 +25,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 interface SearchLocation {
   id: string
@@ -32,16 +33,14 @@ interface SearchLocation {
   displayLabel: string
 }
 
-const resourceTypeMap: Record<
-  'locations' | 'facilities' | 'offices',
-  LocationType
-> = {
-  locations: 'ADMIN_STRUCTURE',
-  facilities: 'HEALTH_FACILITY',
-  offices: 'CRVS_OFFICE'
-}
+const resourceTypeMap: Record<'locations' | 'facilities' | 'offices', string> =
+  {
+    locations: 'ADMIN_STRUCTURE',
+    facilities: 'HEALTH_FACILITY',
+    offices: 'CRVS_OFFICE'
+  }
 
-function useAdministrativeAreas(
+function useAdministrativeAreas123(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const { getLocations } = useLocations()
@@ -87,7 +86,7 @@ function LocationSearchInput({
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
 }) {
-  const locationList = useAdministrativeAreas(searchableResource)
+  const locationList = useAdministrativeAreas123(searchableResource)
   const selectedLocation = locationList.find(
     (location) => location.id === value
   )
@@ -122,10 +121,11 @@ function toCertificateVariables(
   context: {
     intl: IntlShape
     locations: Map<UUID, Location>
+    administrativeAreas: Map<UUID, AdministrativeArea>
     adminLevels?: AdminStructureItem[]
   }
 ) {
-  const { intl, locations, adminLevels = [] } = context
+  const { intl, locations, administrativeAreas, adminLevels = [] } = context
   const appConfigAdminLevels = adminLevels.map((level) => level.id)
 
   if (!value) {
@@ -146,8 +146,8 @@ function toCertificateVariables(
   const location = locationId ? locations.get(locationId) : undefined
 
   const adminLevelHierarchy = getAdminLevelHierarchy(
-    locationId,
-    locations,
+    location?.administrativeAreaId,
+    administrativeAreas,
     appConfigAdminLevels,
     'withNames'
   )
@@ -162,13 +162,18 @@ function toCertificateVariables(
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
   const { config } = useSelector(getOfflineData)
+
   const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const adminLevels = config.ADMIN_STRUCTURE
 
   const certificateVars = toCertificateVariables(value, {
     intl,
     locations,
+    administrativeAreas,
     adminLevels
   })
 
@@ -179,13 +184,17 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     .filter(Boolean)
     .reverse()
 
+  // @TODO: Check where this component is used
   const locationId = UUID.safeParse(value.toString()).data
 
-  const location = locationId && locations.get(locationId)
+  const administrativeArea = locationId
+    ? administrativeAreas.get(locationId)
+    : undefined
 
-  if (location?.locationType === LocationType.enum.ADMIN_STRUCTURE) {
+  if (administrativeArea) {
     return joinValues([...resolvedAdminLevels, country], ', ')
   }
+
   return joinValues([name, ...resolvedAdminLevels, country], ', ')
 }
 
