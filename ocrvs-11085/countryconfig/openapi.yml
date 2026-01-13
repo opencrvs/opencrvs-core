@@ -2773,21 +2773,8 @@ components:
               type: string
               const: DATE
             defaultValue:
-              anyOf:
-                - type: object
-                  properties:
-                    $$date:
-                      type: string
-                      const: now
-                    $$time:
-                      type: string
-                      const: now
-                  required:
-                    - $$date
-                    - $$time
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
+              type: string
+              description: A single time input (HH-mm)
             configuration:
               type: object
               properties:
@@ -2936,20 +2923,8 @@ components:
               type: string
               const: TIME
             defaultValue:
-              anyOf:
-                - type: object
-                  properties:
-                    $$date:
-                      type: string
-                      const: now
-                    $$time:
-                      type: string
-                      const: now
-                  required:
-                    - $$date
-                    - $$time
-                - type: string
-                  pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              type: string
+              description: A single time input (HH-mm)
             configuration:
               type: object
               properties:

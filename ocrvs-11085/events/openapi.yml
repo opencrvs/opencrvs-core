@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 414b8b88-dc64-415b-9e2b-c9269dbff456
+                transactionId: f6e4e4b1-c9fc-4f11-8ecf-eae850f629b9
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: d7fe022c-92f4-45e9-a5f9-afc138fb87d1
+                transactionId: 0c4fa8b6-5f62-40e0-a717-0e863b3c3058
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -3413,23 +3413,8 @@ components:
               enum:
                 - DATE
             defaultValue:
-              anyOf:
-                - type: object
-                  properties:
-                    $$date:
-                      type: string
-                      enum:
-                        - now
-                    $$time:
-                      type: string
-                      enum:
-                        - now
-                  required:
-                    - $$date
-                    - $$time
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
+              type: string
+              description: A single time input (HH-mm)
             configuration:
               type: object
               properties:
@@ -3582,22 +3567,8 @@ components:
               enum:
                 - TIME
             defaultValue:
-              anyOf:
-                - type: object
-                  properties:
-                    $$date:
-                      type: string
-                      enum:
-                        - now
-                    $$time:
-                      type: string
-                      enum:
-                        - now
-                  required:
-                    - $$date
-                    - $$time
-                - type: string
-                  pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              type: string
+              description: A single time input (HH-mm)
             configuration:
               type: object
               properties:
