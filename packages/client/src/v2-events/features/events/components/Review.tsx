@@ -19,8 +19,6 @@ import {
   Accordion,
   Button,
   Checkbox,
-  Icon,
-  IconProps,
   Link,
   ListReview,
   ResponsiveModal,
@@ -42,6 +40,7 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { buttonMessages } from '@client/i18n/messages'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -151,38 +150,6 @@ const reviewMessages = defineMessages({
     defaultMessage: 'Change',
     description: 'The label for the change button'
   },
-  actionModalCancel: {
-    id: 'actionModal.cancel',
-    defaultMessage: 'Cancel',
-    description: 'The label for cancel button of action modal'
-  },
-  actionModalPrimaryAction: {
-    id: 'actionModal.PrimaryAction',
-    defaultMessage: '{action, select, declare{Declare} other{{action}}}',
-    description: 'The label for primary action button of action modal'
-  },
-  actionModalTitle: {
-    id: 'actionModal.title',
-    defaultMessage:
-      '{action, select, declare{Declare} other{{action}}} the member?',
-    description: 'The title for action modal'
-  },
-  actionModalDescription: {
-    id: 'actionModal.description',
-    defaultMessage:
-      'The declarant will be notified of this action and a record of this decision will be recorded',
-    description: 'The description for action modal'
-  },
-  actionModalIncompleteDescription: {
-    id: 'actionModal.description.incomplete',
-    defaultMessage: 'This incomplete declaration will be sent for review.',
-    description: 'The description for action modal when incomplete'
-  },
-  changeModalCancel: {
-    id: 'changeModal.cancel',
-    defaultMessage: 'Cancel',
-    description: 'The label for cancel button of change modal'
-  },
   changeModalContinue: {
     id: 'changeModal.continue',
     defaultMessage: 'Continue',
@@ -202,21 +169,6 @@ const reviewMessages = defineMessages({
     id: 'review.header.title.govtName',
     defaultMessage: 'Government',
     description: 'Header title that shows govt name'
-  },
-  zeroDocumentsTextForAnySection: {
-    defaultMessage: 'No supporting documents',
-    description: 'Zero documents text',
-    id: 'review.documents.zeroDocumentsTextForAnySection'
-  },
-  editDocuments: {
-    defaultMessage: 'Add attachement',
-    description: 'Edit documents text',
-    id: 'review.documents.editDocuments'
-  },
-  rejectModalCancel: {
-    id: 'rejectModal.cancel',
-    defaultMessage: 'Cancel',
-    description: 'The label for cancel button of reject modal'
   },
   rejectModalArchive: {
     id: 'rejectModal.archive',
@@ -550,128 +502,11 @@ function ReviewComponent({
   )
 }
 
-const Container = styled.div`
-  position: relative;
-  margin-top: 48px;
-  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    max-width: 100vw;
-  }
-`
-const Content = styled.div`
-  z-index: 1;
-  padding: 32px;
-  position: relative;
-  white-space: pre-wrap;
-  color: ${({ theme }) => theme.colors.copy};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px;
-    padding-bottom: 32px;
-  }
-`
-const UnderLayBackground = styled.div<{ background: string }>`
-  background-color: ${({ background, theme }) => {
-    if (background === 'error') {
-      return theme.colors.redLighter
-    }
-
-    return theme.colors.greenLighter
-  }};
-`
-
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2}
-  margin-bottom: 12px;
-`
-const Description = styled.div`
-  ${({ theme }) => theme.fonts.reg18};
-  margin-bottom: 32px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.reg16}
-  }
-`
-
-const ActionContainer = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-
-  button:first-child {
-    margin-right: 16px;
-  }
-
-  & > button {
-    margin-bottom: 8px;
-  }
-`
-
-function ReviewActionComponent({
-  incomplete,
-  onConfirm,
-  onReject,
-  messages,
-  primaryButtonType,
-  canSendIncomplete,
-  icon
-}: {
-  incomplete: boolean
-  onConfirm: () => void
-  onReject?: () => void
-  messages: {
-    title: MessageDescriptor
-    description: MessageDescriptor
-    onConfirm: MessageDescriptor
-    onReject?: MessageDescriptor
-  }
-  primaryButtonType?: 'positive' | 'primary'
-  canSendIncomplete?: boolean
-  icon: IconProps['name']
-}) {
-  const intl = useIntl()
-
-  const background = incomplete ? 'error' : 'success'
-
-  return (
-    <Container>
-      <UnderLayBackground background={background}>
-        <Content>
-          <Title>{intl.formatMessage(messages.title)}</Title>
-          <Description>{intl.formatMessage(messages.description)}</Description>
-          <ActionContainer>
-            <Button
-              disabled={!!incomplete && !canSendIncomplete}
-              id="validateDeclarationBtn"
-              size="large"
-              type={primaryButtonType ?? 'positive'}
-              onClick={onConfirm}
-            >
-              <Icon color="white" name={icon} />
-              {intl.formatMessage(messages.onConfirm)}
-            </Button>
-            {onReject && messages.onReject && (
-              <Button
-                id="review-reject"
-                size="large"
-                type={'negative'}
-                onClick={onReject}
-              >
-                <Icon name="X" />
-                {intl.formatMessage(messages.onReject)}
-              </Button>
-            )}
-          </ActionContainer>
-        </Content>
-      </UnderLayBackground>
-    </Container>
-  )
-}
-
 function EditModal({
   copy,
   close
 }: {
   copy?: {
-    cancel?: MessageDescriptor
     continue?: MessageDescriptor
     title?: MessageDescriptor
     description?: MessageDescriptor
@@ -692,7 +527,7 @@ function EditModal({
             close(null)
           }}
         >
-          {intl.formatMessage(copy?.cancel || reviewMessages.changeModalCancel)}
+          {intl.formatMessage(buttonMessages.cancel)}
         </Button>,
         <Button
           key="confirm_edit"
@@ -729,10 +564,9 @@ function AcceptActionModal({
   action
 }: {
   copy: {
-    onCancel: MessageDescriptor
     onConfirm: MessageDescriptor
     title: MessageDescriptor
-    description: MessageDescriptor
+    supportingCopy?: MessageDescriptor
     eventLabel: MessageDescriptor
   }
   close: (result: boolean | null) => void
@@ -756,7 +590,7 @@ function AcceptActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(copy.onCancel)}
+          {intl.formatMessage(buttonMessages.cancel)}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -779,7 +613,7 @@ function AcceptActionModal({
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(copy.description)}
+          {copy.supportingCopy ? intl.formatMessage(copy.supportingCopy) : null}
         </Text>
       </Stack>
     </ResponsiveModal>
@@ -821,7 +655,7 @@ function RejectActionModal({
         close(null)
       }}
     >
-      {intl.formatMessage(reviewMessages.rejectModalCancel)}
+      {intl.formatMessage(buttonMessages.cancel)}
     </Button>,
     ...(allowArchive
       ? [
@@ -896,7 +730,6 @@ function RejectActionModal({
 
 export const Review = {
   Body: withSuspense(ReviewComponent),
-  Actions: ReviewActionComponent,
   EditModal,
   ActionModal: {
     Accept: AcceptActionModal,
