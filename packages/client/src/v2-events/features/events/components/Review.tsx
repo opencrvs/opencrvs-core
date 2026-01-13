@@ -188,7 +188,7 @@ const reviewMessages = defineMessages({
   rejectModalDescription: {
     id: 'rejectModal.description',
     defaultMessage:
-      'Please describe the updates required to this record for follow up action.',
+      'Rejecting this declaration will return it to the submitter for updates. Please ensure a valid reason for rejection has been recorded.',
     description: 'The description for reject modal'
   },
   rejectModalMarkAsDuplicate: {
