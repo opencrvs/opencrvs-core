@@ -610,6 +610,7 @@ function AcceptActionModal({
         // currently it seems we are arbitrarily deciding which ones do.
         { event: eventName }
       )}
+      width={600}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">

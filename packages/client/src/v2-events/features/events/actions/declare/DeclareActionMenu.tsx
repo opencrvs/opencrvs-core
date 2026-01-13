@@ -87,11 +87,6 @@ function useDeclarationActions(event: EventDocument) {
       ? actionConfig.dialogCopy
       : null
 
-  console.log('actionConfig')
-  console.log(actionConfig)
-  console.log('dialogCopy')
-  console.log(dialogCopy)
-
   const actions = {
     [ActionType.NOTIFY]: {
       mutate: events.actions.notify.mutate,
