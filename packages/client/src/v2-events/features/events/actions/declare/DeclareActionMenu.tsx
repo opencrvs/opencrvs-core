@@ -155,8 +155,7 @@ function useDeclarationActions(event: EventDocument) {
           copy={{
             supportingCopy: action.supportingCopy,
             title: action.title,
-            onConfirm: actionLabels[actionType],
-            eventLabel: eventConfiguration.label
+            onConfirm: actionLabels[actionType]
           }}
         />
       )
