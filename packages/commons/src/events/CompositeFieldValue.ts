@@ -159,3 +159,16 @@ export type QrReaderFieldValue = z.infer<typeof QrReaderFieldValue>
 
 export const IdReaderFieldValue = ReadDataValue
 export type IdReaderFieldValue = z.infer<typeof IdReaderFieldValue>
+
+export const NumberWithUnitFieldValue = z.object({
+  numericValue: z.number(),
+  unit: z.string()
+})
+export const NumberWithUnitFieldUpdateValue = z.object({
+  numericValue: z.number().optional(),
+  unit: z.string().optional()
+})
+export type NumberWithUnitFieldValue = z.infer<typeof NumberWithUnitFieldValue>
+export type NumberWithUnitFieldUpdateValue = z.infer<
+  typeof NumberWithUnitFieldUpdateValue
+>

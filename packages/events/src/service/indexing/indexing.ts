@@ -96,6 +96,14 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PAGE_HEADER:
     case FieldType.TIME:
       return { type: 'text' }
+    case FieldType.NUMBER_WITH_UNIT:
+      return {
+        type: 'object',
+        properties: {
+          numericValue: { type: 'double' },
+          unit: { type: 'text' }
+        }
+      }
     case FieldType.EMAIL:
       return {
         type: 'keyword',

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.6
+
+### New features
+
+- NUMBER_WITH_UNIT Input, which is a number input with a configurable selectable unit of measurement.
+
 ## 1.9.5
 
 ### New features
