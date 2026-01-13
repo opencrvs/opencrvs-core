@@ -229,6 +229,7 @@ paths:
                                         - ADDRESS
                                         - TEXT
                                         - NUMBER
+                                        - NUMBER_WITH_UNIT
                                         - TEXTAREA
                                         - EMAIL
                                         - DATE
@@ -481,6 +482,7 @@ paths:
                                         - ADDRESS
                                         - TEXT
                                         - NUMBER
+                                        - NUMBER_WITH_UNIT
                                         - TEXTAREA
                                         - EMAIL
                                         - DATE
@@ -753,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: b1d2f0fd-3ed3-4915-a504-bfe71eed6861
+                transactionId: c430ed53-0110-4190-971b-15b6c7e7dcd6
                 type: birth
       responses:
         "200":
@@ -839,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: c486c85e-d994-459f-8c6d-66d383c51fbe
+                transactionId: 2135b485-f850-4b0b-a943-a6cd102e7b70
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1650,6 +1652,7 @@ components:
                             - ADDRESS
                             - TEXT
                             - NUMBER
+                            - NUMBER_WITH_UNIT
                             - TEXTAREA
                             - EMAIL
                             - DATE
@@ -1880,6 +1883,7 @@ components:
                             - ADDRESS
                             - TEXT
                             - NUMBER
+                            - NUMBER_WITH_UNIT
                             - TEXTAREA
                             - EMAIL
                             - DATE
@@ -2748,6 +2752,191 @@ components:
             - label
             - type
           description: Number input
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier of the field.
+            label:
+              description: Human-readable label of the field.
+              allOf:
+                - $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                    description: Reference to a field by its ID
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+              description: Indicates whether the field is mandatory.
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a8
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+            secured:
+              type: boolean
+              default: false
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a9
+              description: Additional validation rules applied to the field.
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates whether the field can be modified during record
+                correction.
+            value:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                    description: Reference to a field by its ID
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+            analytics:
+              type: boolean
+              default: false
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+            type:
+              type: string
+              enum:
+                - NUMBER_WITH_UNIT
+            defaultValue:
+              type: object
+              properties:
+                numericValue:
+                  type: number
+                unit:
+                  type: string
+              required:
+                - numericValue
+                - unit
+            options:
+              type: array
+              items:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    description: The value of the option
+                  label:
+                    anyOf:
+                      - type: string
+                      - $ref: "#/components/schemas/TranslationConfig"
+                    description: The label of the option
+                required:
+                  - value
+                  - label
+              description: A list of options for the unit select
+            configuration:
+              type: object
+              properties:
+                min:
+                  type: number
+                  description: Minimum value of the number field
+                max:
+                  type: number
+                  description: Maximum value of the number field
+                numberFieldPlaceholder:
+                  description: Placeholder for the number field
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+          required:
+            - id
+            - label
+            - type
+            - options
+          description: Number with unit input
         - type: object
           properties:
             id:
@@ -11889,6 +12078,21 @@ components:
                   - type: object
                     properties:
                       data: {}
+                  - type: object
+                    properties:
+                      numericValue:
+                        type: number
+                      unit:
+                        type: string
+                    required:
+                      - numericValue
+                      - unit
+                  - type: object
+                    properties:
+                      numericValue:
+                        type: number
+                      unit:
+                        type: string
               - type: object
                 nullable: true
                 properties:
@@ -12063,6 +12267,21 @@ components:
                         - type: object
                           properties:
                             data: {}
+                        - type: object
+                          properties:
+                            numericValue:
+                              type: number
+                            unit:
+                              type: string
+                          required:
+                            - numericValue
+                            - unit
+                        - type: object
+                          properties:
+                            numericValue:
+                              type: number
+                            unit:
+                              type: string
                 required:
                   - data
           description: Aggregate representation of event data after all actions have been
