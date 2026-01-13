@@ -91,7 +91,7 @@
     "patch-package": "^6.1.2",
     "pdfmake": "^0.2.5",
     "postinstall-postinstall": "^2.0.0",
-    "qs": "6.14.0",
+    "qs": "6.14.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-easy-crop": "^4.0.1",
