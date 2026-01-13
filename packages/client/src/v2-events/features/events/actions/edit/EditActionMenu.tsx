@@ -314,9 +314,7 @@ function useEditActions(event: EventDocument) {
   }
 }
 
-/**
- * Menu component available on the edit review page.
- * */
+/** Menu component available on the Edit-action review page. */
 export function EditActionMenu({ event }: { event: EventDocument }) {
   const intl = useIntl()
   const { actions, modals } = useEditActions(event)
