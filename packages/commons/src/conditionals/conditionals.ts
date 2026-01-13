@@ -16,6 +16,7 @@ import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
+import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 
 /* eslint-disable max-lines */
 
@@ -176,6 +177,11 @@ function wrapToPathOptional(
     }
   }, condition)
 }
+
+/**
+ * Generate conditional rules for current date
+ */
+export const now = Object.assign(todayDateTimeValueSerializer, {})
 
 /**
  *
