@@ -37,7 +37,7 @@ export const ActionConfigBase = z.object({
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
   supportingCopy: TranslationConfig.optional().describe(
-    'Text displayed on the confirmation'
+    'Text displayed on the confirmation dialog'
   ),
   icon: AvailableIcons.describe('Icon representing the action').optional(),
   conditionals: z

@@ -69,7 +69,10 @@ function useDeclarationActions(event: EventDocument) {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const [modal, openModal] = useModal()
-  const { rejectionModal, handleRejection } = useRejectionModal(event.id)
+  const { rejectionModal, handleRejection } = useRejectionModal(
+    event.id,
+    eventType
+  )
   const canDirectlyRegister = useCanDirectlyRegister(event)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.DECLARE.REVIEW

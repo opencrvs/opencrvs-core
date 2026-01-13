@@ -185,12 +185,6 @@ const reviewMessages = defineMessages({
     defaultMessage: 'Reason for rejection?',
     description: 'The title for reject modal'
   },
-  rejectModalDescription: {
-    id: 'rejectModal.description',
-    defaultMessage:
-      'Rejecting this declaration will return it to the submitter for updates. Please ensure a valid reason for rejection has been recorded.',
-    description: 'The description for reject modal'
-  },
   rejectModalMarkAsDuplicate: {
     id: 'rejectModal.markAsDuplicate',
     defaultMessage: 'Mark as a duplicate',
@@ -626,10 +620,12 @@ export interface RejectionState {
 
 function RejectActionModal({
   close,
-  allowArchive = true
+  allowArchive = true,
+  supportingCopy
 }: {
   close: (result: RejectionState | null) => void
   allowArchive?: boolean
+  supportingCopy?: MessageDescriptor
 }) {
   const [state, setState] = useState<RejectionState>({
     rejectAction: REJECT_ACTIONS.ARCHIVE,
@@ -697,7 +693,7 @@ function RejectActionModal({
     >
       <Stack alignItems="left" direction="column">
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(reviewMessages.rejectModalDescription)}
+          {supportingCopy ? intl.formatMessage(supportingCopy) : null}
         </Text>
         <TextArea
           data-testid="reject-reason"
