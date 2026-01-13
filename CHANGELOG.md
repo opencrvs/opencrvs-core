@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.6
+
+### New features
+
+- NUMBER_WITH_UNIT Input, which is a number input with a configurable selectable unit of measurement.
+
 ## 1.9.5
 
 ### New features
@@ -100,10 +106,6 @@ It represents the user’s full name and should not be used with FieldType.NAME,
 Legacy string-based user template variables (e.g. $user.name) are now deprecated in favour of user(...) references.
 
 ## 1.9.4
-
-### New features
-
-- NUMBER_WITH_UNIT Input, which is a number input with a configurable selectable unit of measurement.
 
 ### Bug fixes
 
