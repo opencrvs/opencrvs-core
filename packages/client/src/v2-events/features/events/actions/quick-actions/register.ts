@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuid } from 'uuid'
-import { EventStatus } from '@opencrvs/commons/client'
 import { QuickActionConfig } from './useQuickActionModal'
 
 export const register: QuickActionConfig = {
