@@ -12,6 +12,7 @@ import React, { useState } from 'react'
 import { useIntl, MessageDescriptor } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
   EventDocument,
@@ -148,6 +149,7 @@ function EditActionModal({
 
 function useEditActions(event: EventDocument) {
   const { eventConfiguration } = useEventConfiguration(event.type)
+  const navigate = useNavigate()
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.EDIT.REVIEW
@@ -305,7 +307,8 @@ function useEditActions(event: EventDocument) {
           description: 'Label for "Cancel edits" in edit action menu',
           id: 'event.edit.cancelEdits'
         },
-        onClick: () => closeActionView(slug)
+        onClick: () =>
+          navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id }))
       }
     ].filter((a) => !a.hidden)
   }
