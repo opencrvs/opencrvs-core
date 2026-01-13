@@ -13,17 +13,17 @@ import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
-import {
-  defineActionForm,
-  defineDeclarationForm
-} from '../events/EventConfigInput'
 import { user, and, never, not } from '../conditionals/conditionals'
 import { ConditionalType } from '../events/Conditional'
+import {
+  ActionFormConfigInput,
+  DeclarationFormConfigInput
+} from '../events/FormConfig'
 
 /**
  * @knipignore
  */
-export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
+export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = {
   label: {
     id: 'event.digital-identity.action.certificate.form.label',
     defaultMessage: 'Digital identity certificate printer',
@@ -169,9 +169,9 @@ export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
       ]
     }
   ]
-})
+} satisfies ActionFormConfigInput
 
-const digitalIdentityForm = defineDeclarationForm({
+const digitalIdentityForm = {
   label: {
     id: 'event.digital-identity.action.declare.form.label',
     defaultMessage: 'Digital identity issuance',
@@ -211,7 +211,7 @@ const digitalIdentityForm = defineDeclarationForm({
       ]
     }
   ]
-})
+} satisfies DeclarationFormConfigInput
 
 /**
  * @knipignore

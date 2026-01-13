@@ -262,7 +262,13 @@ export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: SerializedNowDateTime.or(DateValue).optional(),
+  defaultValue: SerializedNowDateTime.transform(() => ({
+    $$date: 'now' as const
+  }))
+    .or(DateValue)
+    .optional()
+    .openapi({ effectType: 'input', type: 'string' })
+    .describe('A single time input (HH-mm)'),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
@@ -288,7 +294,13 @@ export type AgeField = z.infer<typeof AgeField>
 
 const TimeField = BaseField.extend({
   type: z.literal(FieldType.TIME),
-  defaultValue: SerializedNowDateTime.or(TimeValue).optional(),
+  defaultValue: SerializedNowDateTime.transform(() => ({
+    $$time: 'now' as const
+  }))
+    .or(TimeValue)
+    .optional()
+    .openapi({ effectType: 'input', type: 'string' })
+    .describe('A single time input (HH-mm)'),
   configuration: z
     .object({
       use12HourFormat: z
@@ -302,6 +314,7 @@ const TimeField = BaseField.extend({
     .optional()
 }).describe('A single date input (HH-mm)')
 
+// defaultValue?: string | { $$time: "now"; } | undefined;
 export type TimeField = z.infer<typeof TimeField>
 
 const DateRangeField = BaseField.extend({

@@ -15,10 +15,6 @@ import {
   not,
   user
 } from '../conditionals/conditionals'
-import {
-  defineActionForm,
-  defineDeclarationForm
-} from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
@@ -26,9 +22,13 @@ import { field } from '../events/field'
 import { AddressType } from '../events/CompositeFieldValue'
 import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
 import { EventStatus } from '../events/EventMetadata'
+import {
+  ActionFormConfigInput,
+  DeclarationFormConfigInput
+} from '../events/FormConfig'
 
 /** @knipignore */
-export const PRINT_CERTIFICATE_FORM = defineActionForm({
+export const PRINT_CERTIFICATE_FORM = {
   label: {
     id: 'event.tennis-club-membership.action.certificate.form.label',
     defaultMessage: 'Tennis club membership certificate collector',
@@ -691,7 +691,7 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
       }
     }
   ]
-})
+} satisfies ActionFormConfigInput
 
 export const TENNIS_CLUB_DECLARATION_REVIEW = {
   title: {
@@ -742,7 +742,7 @@ function isDomesticAddress() {
     field('addressType').isEqualTo(AddressType.DOMESTIC)
   )
 }
-export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
+export const TENNIS_CLUB_DECLARATION_FORM = {
   label: {
     id: 'event.tennis-club-membership.action.declare.form.label',
     defaultMessage: 'Tennis club membership application',
@@ -1230,7 +1230,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
       conditional: not(never()) // Intentional always-true page conditional to exercise interactions between page-level and field-level conditionals in tests
     }
   ]
-})
+} satisfies DeclarationFormConfigInput
 
 export const statusOptions = [
   {
