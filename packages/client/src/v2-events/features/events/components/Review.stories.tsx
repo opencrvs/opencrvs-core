@@ -134,8 +134,7 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
             copy={{
               supportingCopy: generateTranslationConfig('description'),
               title: generateTranslationConfig('title'),
-              onConfirm: generateTranslationConfig('onConfirm'),
-              eventLabel: tennisClubMembershipEvent.label
+              onConfirm: generateTranslationConfig('onConfirm')
             }}
           />
         )

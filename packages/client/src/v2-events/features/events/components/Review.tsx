@@ -567,14 +567,11 @@ function AcceptActionModal({
     onConfirm: MessageDescriptor
     title: MessageDescriptor
     supportingCopy?: MessageDescriptor
-    eventLabel: MessageDescriptor
   }
   close: (result: boolean | null) => void
   action: string
 }) {
   const intl = useIntl()
-  // @TODO: Revisit this. There must be a better way to have the event name as part of string.
-  const eventName = intl.formatMessage(copy.eventLabel).toLocaleLowerCase()
 
   return (
     <ResponsiveModal
@@ -604,12 +601,7 @@ function AcceptActionModal({
         </Button>
       ]}
       handleClose={() => close(null)}
-      title={intl.formatMessage(
-        copy.title,
-        // @TODO: Consider whether every formatted message should have access to global variables
-        // currently it seems we are arbitrarily deciding which ones do.
-        { event: eventName }
-      )}
+      title={intl.formatMessage(copy.title)}
       width={600}
     >
       <Stack>
