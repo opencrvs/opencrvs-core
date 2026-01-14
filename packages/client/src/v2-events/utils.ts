@@ -142,6 +142,8 @@ export function replacePlaceholders({
 
   if (isTemplateObject(defaultValue)) {
     const templateKeys = Object.keys(defaultValue)
+
+    // We only support resolving one template variable at a time in an object.
     const resolvedValue = get(systemVariables, templateKeys[0])
     const validator = mapFieldTypeToZod(field)
 
