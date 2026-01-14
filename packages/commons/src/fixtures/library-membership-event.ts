@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { defineDeclarationForm } from '../events/EventConfigInput'
 import { defineConfig } from '../events/defineConfig'
 import { FieldType } from '../events/FieldType'
-import { DeclarationFormConfigInput } from '../events/FormConfig'
 
-const libraryMembershipForm = {
+const libraryMembershipForm = defineDeclarationForm({
   label: {
     id: 'event.library-membership.action.declare.form.label',
     defaultMessage: 'Library membership application',
@@ -52,7 +52,7 @@ const libraryMembershipForm = {
       ]
     }
   ]
-} satisfies DeclarationFormConfigInput
+})
 
 /**
  * @knipignore

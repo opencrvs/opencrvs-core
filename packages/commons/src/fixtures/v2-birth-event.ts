@@ -9,13 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { defineConfig } from '../events/defineConfig'
-import { FormPageConfigInput, PageTypes } from '../events/PageConfig'
+import {
+  defineFormPage,
+  defineDeclarationForm
+} from '../events/EventConfigInput'
+import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { BIRTH_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { createFieldConditionals } from '../conditionals/conditionals'
-import { DeclarationFormConfigInput } from '../events/FormConfig'
 
 function generateTranslationConfig(message: string): TranslationConfig {
   return {
@@ -24,7 +27,7 @@ function generateTranslationConfig(message: string): TranslationConfig {
     id: message
   }
 }
-const child = {
+const child = defineFormPage({
   id: 'child',
   type: PageTypes.enum.FORM,
   title: generateTranslationConfig("Child's details"),
@@ -47,9 +50,9 @@ const child = {
       label: generateTranslationConfig('Date of birth')
     }
   ]
-} satisfies FormPageConfigInput
+})
 
-const mother = {
+const mother = defineFormPage({
   id: 'mother',
   type: PageTypes.enum.FORM,
   title: generateTranslationConfig("Mother's details"),
@@ -122,7 +125,7 @@ const mother = {
       validation: []
     }
   ]
-} satisfies FormPageConfigInput
+})
 
 const BIRTH_DECLARATION_REVIEW = {
   title: generateTranslationConfig(
@@ -145,11 +148,11 @@ const BIRTH_DECLARATION_REVIEW = {
   ]
 }
 
-const BIRTH_DECLARATION_FORM = {
+const BIRTH_DECLARATION_FORM = defineDeclarationForm({
   label: generateTranslationConfig('Birth decalration form'),
 
   pages: [child, mother]
-} satisfies DeclarationFormConfigInput
+})
 
 export const v2BirthEvent = defineConfig({
   id: BIRTH_EVENT,
