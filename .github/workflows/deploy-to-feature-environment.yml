@@ -37,6 +37,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Validate branch name
+        id: validate
+        uses: ./.github/actions/validate-branch
+        with:
+          pattern: '^[a-z][a-z0-9\/\-]{1,29}$'
+
       - name: Check for skip-e2e label
         id: set_skip_flag
         run: |

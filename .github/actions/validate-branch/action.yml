@@ -1,0 +1,43 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+name: 'Validate Branch Name'
+
+inputs:
+  pattern:
+    description: 'Regex pattern for branch name validation'
+    required: false
+    default: '^[a-z][a-z0-9\/\-]{1,29}$'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate branch name
+      shell: bash
+      env:
+        pattern: ${{ inputs.pattern }}
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          branch="${{ github.head_ref }}"
+        else
+          branch="${GITHUB_REF#refs/heads/}"
+        fi
+        if [[ ! "$branch" =~ $pattern ]]; then
+          echo "Branch name: $branch"
+          echo """
+          ❌ Invalid branch name: '$branch'
+          ➡️  Branch names must match regex: $pattern
+              - Start with a lowercase letter
+              - Can contain lowercase letters, numbers, and hyphens
+              - Length between 2 and 30 characters
+              - Slashes '/' are allowed for hierarchical branch names
+            Example: ocrvs-12345, feature-login, fix-bug123, refactor-api
+            """
+          exit 1
+        fi
