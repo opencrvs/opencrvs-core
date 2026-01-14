@@ -21,7 +21,8 @@ import {
   getActionReview,
   getCurrentEventState,
   EventStatus,
-  getActionConfig
+  getActionConfig,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -46,7 +47,12 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
-import { hasDeclarationFieldChanged } from '../correct/utils'
+import {
+  aggregateAnnotations,
+  getReviewFormFields,
+  hasDeclarationFieldChanged,
+  hasFieldChanged
+} from '../correct/utils'
 
 export const commentLabel = {
   id: 'event.edit.comment.label',
@@ -154,14 +160,13 @@ function useEditActions(event: EventDocument) {
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.EDIT.REVIEW
   )
+  const { getAnnotation } = useActionAnnotation()
   const canDirectlyRegister = useCanDirectlyRegister(event)
   const { closeActionView } = useEventFormNavigation()
   const [modal, openModal] = useModal()
   const events = useEvents()
   const formConfig = getDeclaration(eventConfiguration)
   const declaration = useEventFormData((state) => state.getFormValues())
-  const { getAnnotation } = useActionAnnotation()
-  const annotation = getAnnotation()
   const validatorContext = useValidatorContext()
   const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
@@ -177,7 +182,17 @@ function useEditActions(event: EventDocument) {
     )
   )
 
-  const anyValuesHaveChanged = changedFields.length > 0
+  const annotation = getAnnotation()
+  const acceptedActions = getAcceptedActions(event)
+  const originalAnnotation = aggregateAnnotations(acceptedActions)
+  const reviewFormFields = getReviewFormFields(eventConfiguration)
+
+  const changedAnnotationFields = reviewFormFields.filter((f) =>
+    hasFieldChanged(f, originalAnnotation, annotation, validatorContext)
+  )
+
+  const anyValuesHaveChanged =
+    changedFields.length > 0 || changedAnnotationFields.length > 0
 
   if (!reviewConfig) {
     throw new Error('Review config not found')
