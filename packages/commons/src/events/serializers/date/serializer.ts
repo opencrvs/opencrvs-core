@@ -12,8 +12,8 @@
 import { z } from 'zod'
 
 export const SerializedNowDateTime = z.object({
-  $$date: z.literal('now'),
-  $$time: z.literal('now')
+  $$date: z.literal('now').optional(),
+  $$time: z.literal('now').optional()
 })
 
 export type SerializedNowDateTime = z.infer<typeof SerializedNowDateTime>

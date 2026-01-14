@@ -267,8 +267,8 @@ const DateField = BaseField.extend({
   }))
     .or(DateValue)
     .optional()
-    .openapi({ effectType: 'input', type: 'string' })
-    .describe('A single time input (HH-mm)'),
+    .openapi({ effectType: 'input', type: 'object' })
+    .describe('Default date value(yyyy-MM-dd)'),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
@@ -299,8 +299,8 @@ const TimeField = BaseField.extend({
   }))
     .or(TimeValue)
     .optional()
-    .openapi({ effectType: 'input', type: 'string' })
-    .describe('A single time input (HH-mm)'),
+    .openapi({ effectType: 'input', type: 'object' })
+    .describe('Default time value (HH-mm)'),
   configuration: z
     .object({
       use12HourFormat: z
@@ -314,8 +314,16 @@ const TimeField = BaseField.extend({
     .optional()
 }).describe('A single date input (HH-mm)')
 
-// defaultValue?: string | { $$time: "now"; } | undefined;
+// defaultValue?: string | {
+//         $$time: "now";
+//     } | undefined;
 export type TimeField = z.infer<typeof TimeField>
+
+// defaultValue?: string | {
+//         $$date: "now";
+//         $$time: "now";
+//     } | undefined;
+export type TimeField2 = z.input<typeof TimeField>
 
 const DateRangeField = BaseField.extend({
   type: z.literal(FieldType.DATE_RANGE),
