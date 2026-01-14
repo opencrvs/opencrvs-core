@@ -10,10 +10,19 @@
  */
 
 import * as React from 'react'
-import * as pdfjsLib from 'pdfjs-dist'
 import { useIntl } from 'react-intl'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.min.mjs'
+let pdfjsLib: typeof import('pdfjs-dist') | null = null
+async function loadPdfJs() {
+  if (!('document' in globalThis)) {
+    return
+  }
+  if (!pdfjsLib) {
+    pdfjsLib = await import('pdfjs-dist')
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.min.mjs'
+  }
+  return pdfjsLib
+}
 
 const pdfLoadErrorMessage = {
   id: 'error.pdf',
@@ -49,6 +58,14 @@ export function usePreviewPdf(pdfUrl: string) {
       }
 
       const arrayBuffer = await res.arrayBuffer()
+      const pdfjsLib = await loadPdfJs()
+      if (!pdfjsLib) {
+        {
+          setError(i18n.formatMessage(pdfLoadErrorMessage))
+          setLoading(false)
+          throw new Error(`Failed to load pdfjsLib`)
+        }
+      }
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
       if (cancelled) {
         return
