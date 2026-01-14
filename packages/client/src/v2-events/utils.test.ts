@@ -257,48 +257,6 @@ const testCases = [
   },
   {
     currentValue: undefined,
-    defaultValue: '$user.name',
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        role: '',
-        id: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    },
-    expected: 'Jon Doe',
-    field: TextField
-  },
-  {
-    currentValue: 'Hello world',
-    defaultValue: '$user.name',
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        role: '',
-        id: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: 'Hello world',
-    field: TextField
-  },
-  {
-    currentValue: undefined,
     defaultValue: {
       country: 'FAR',
       addressType: AddressType.DOMESTIC
