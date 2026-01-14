@@ -231,7 +231,9 @@ const testCases = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      }
+      },
+      $$date: '2024-10-10',
+      $$time: '14:08'
     } satisfies SystemVariables,
     expected: undefined,
     field: AddressField satisfies InteractiveFieldType
@@ -254,7 +256,9 @@ const testCases = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      }
+      },
+      $$date: '2024-10-10',
+      $$time: '14:08'
     } satisfies SystemVariables,
     expected: 'Hello',
     field: TextField
@@ -277,7 +281,9 @@ const testCases = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      }
+      },
+      $$date: '2024-10-10',
+      $$time: '14:08'
     } satisfies SystemVariables,
     expected: 'Hello world',
     field: TextField
@@ -303,7 +309,9 @@ const testCases = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      }
+      },
+      $$date: '2024-10-10',
+      $$time: '14:08'
     } satisfies SystemVariables,
     expected: {
       country: 'FAR',
@@ -343,7 +351,9 @@ const testCasesForDefaultValue = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      }
+      },
+      $$date: '2024-10-10',
+      $$time: '14:08'
     } satisfies SystemVariables,
     expected: 'Jon Doe',
     field: TextField
@@ -366,7 +376,9 @@ const testCasesForDefaultValue = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      }
+      },
+      $$date: '2024-10-10',
+      $$time: '14:08'
     } satisfies SystemVariables,
     expected: {
       firstname: 'Jon',
