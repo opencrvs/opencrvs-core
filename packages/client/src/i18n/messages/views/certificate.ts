@@ -10,85 +10,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ICertificateMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  certificateCollectionTitle: MessageDescriptor
-  addAnotherSignature: MessageDescriptor
-  certificateTemplateSelectLabel: MessageDescriptor
-  certificateConfirmationTxt: MessageDescriptor
-  certificateIsCorrect: MessageDescriptor
-  certificateReceiptHeader: MessageDescriptor
-  certificateReceiptSubHeader: MessageDescriptor
-  collectPayment: MessageDescriptor
-  correctorIDCheckDialogDescription: MessageDescriptor
-  dateOfBirth: MessageDescriptor
-  familyName: MessageDescriptor
-  familyNameInEng: MessageDescriptor
-  father: MessageDescriptor
-  firstName: MessageDescriptor
-  firstNameInEng: MessageDescriptor
-  idCheckDialogCancel: MessageDescriptor
-  idCheckDialogConfirm: MessageDescriptor
-  idCheckDialogDescription: MessageDescriptor
-  idCheckDialogTitle: MessageDescriptor
-  idCheckForCorrectionTitle: MessageDescriptor
-  idCheckTitle: MessageDescriptor
-  idCheckVerify: MessageDescriptor
-  idCheckWithoutVerify: MessageDescriptor
-  informant: MessageDescriptor
-  informantHasReviewedInformaiton: MessageDescriptor
-  manualPaymentMethod: MessageDescriptor
-  mother: MessageDescriptor
-  nationality: MessageDescriptor
-  age: MessageDescriptor
-  next: MessageDescriptor
-  noLabel: MessageDescriptor
-  number: MessageDescriptor
-  other: MessageDescriptor
-  payment: MessageDescriptor
-  noPayment: MessageDescriptor
-  paymentInstruction: MessageDescriptor
-  paymentAmount: MessageDescriptor
-  paymentMethod: MessageDescriptor
-  preview: MessageDescriptor
-  print: MessageDescriptor
-  printCertificate: MessageDescriptor
-  printReceipt: MessageDescriptor
-  receiptIssuedAt: MessageDescriptor
-  receiptIssuer: MessageDescriptor
-  receiptPaidAmount: MessageDescriptor
-  receiptService: MessageDescriptor
-  selectSignature: MessageDescriptor
-  selectedCertificateTemplateLabel: MessageDescriptor
-  service: MessageDescriptor
-  amountDue: MessageDescriptor
-  typeOfID: MessageDescriptor
-  whoToCollect: MessageDescriptor
-  confirmAndPrint: MessageDescriptor
-  reviewTitle: MessageDescriptor
-  reviewDescription: MessageDescriptor
-  printModalTitle: MessageDescriptor
-  printAndIssueModalTitle: MessageDescriptor
-  printModalBody: MessageDescriptor
-  printAndIssueModalBody: MessageDescriptor
-  toastMessage: MessageDescriptor
-  otherCollectorFormTitle: MessageDescriptor
-  certificateCollectorError: MessageDescriptor
-  certificateCollectorTemplateError: MessageDescriptor
-  certificateOtherCollectorInfoError: MessageDescriptor
-  certificateOtherCollectorAffidavitFormTitle: MessageDescriptor
-  certificateOtherCollectorAffidavitError: MessageDescriptor
-  certificateOtherCollectorAffidavitFormParagraph: MessageDescriptor
-  noSignedAffidavitAvailable: MessageDescriptor
-  noAffidavitModalTitle: MessageDescriptor
-  noAffidavitModalDescription: MessageDescriptor
-  signedAffidavitFileLabel: MessageDescriptor
-  printedOnCollection: MessageDescriptor
-  printedOnAdvance: MessageDescriptor
-  collectorIDCheck: MessageDescriptor
-}
-
-const messagesToDefine: ICertificateMessages = {
+const messagesToDefine = {
   addAnotherSignature: {
     defaultMessage: 'Add another',
     id: 'print.certificate.addAnotherSignature'
@@ -543,7 +465,7 @@ const dynamicMessagesToDefine = {
   }
 }
 
-export const messages: ICertificateMessages = defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)
 export const dynamicMessages: IDynamicCertificateMessages = defineMessages(
   dynamicMessagesToDefine
 )

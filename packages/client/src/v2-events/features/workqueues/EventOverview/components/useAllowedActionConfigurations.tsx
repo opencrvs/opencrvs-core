@@ -243,7 +243,11 @@ function useViewableActionConfigurations(
     },
     [event, deleteDeclaration]
   )
-  const { rejectionModal, handleRejection } = useRejectionModal(event.id, false)
+  const { rejectionModal, handleRejection } = useRejectionModal(
+    event.id,
+    event.type,
+    false
+  )
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
