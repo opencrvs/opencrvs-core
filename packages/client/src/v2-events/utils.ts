@@ -108,6 +108,25 @@ function isTemplateObject(value: FieldConfigDefaultValue) {
   )
 }
 
+function resolveAndValidateFieldValue({
+  field,
+  resolvedValue,
+  context
+}: {
+  field: InteractiveFieldType
+  resolvedValue: unknown
+  context: string
+}): FieldValue {
+  const validator = mapFieldTypeToZod(field)
+  const parsed = validator.safeParse(resolvedValue)
+
+  if (parsed.success) {
+    return parsed.data as FieldValue
+  }
+
+  throw new Error(`Could not resolve ${context}: ${parsed.error}`)
+}
+
 /**
  *
  * @param fieldType: The type of the field.
@@ -141,32 +160,24 @@ export function replacePlaceholders({
   }
 
   if (isTemplateObject(defaultValue)) {
-    const templateKeys = Object.keys(defaultValue)
-
     // We only support resolving one template variable at a time in an object.
-    const resolvedValue = get(systemVariables, templateKeys[0])
-    const validator = mapFieldTypeToZod(field)
+    const templateKey = Object.keys(defaultValue)[0]
+    const resolvedValue = get(systemVariables, templateKey)
 
-    const parsedValue = validator.safeParse(resolvedValue)
-
-    if (parsedValue.success) {
-      return parsedValue.data as FieldValue
-    }
-
-    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
+    return resolveAndValidateFieldValue({
+      field,
+      resolvedValue,
+      context: JSON.stringify(defaultValue)
+    })
   }
 
   if (isTemplateVariable(defaultValue)) {
     const resolvedValue = get(systemVariables, defaultValue)
-    const validator = mapFieldTypeToZod(field)
-
-    const parsedValue = validator.safeParse(resolvedValue)
-
-    if (parsedValue.success) {
-      return parsedValue.data as FieldValue
-    }
-
-    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
+    return resolveAndValidateFieldValue({
+      field,
+      resolvedValue,
+      context: defaultValue
+    })
   }
 
   if (
@@ -184,26 +195,19 @@ export function replacePlaceholders({
       if (val && isTemplateVariable(val) && isTextField(field)) {
         const resolvedValue = get(systemVariables, val)
         // For now, we only support resolving template variables for text fields.
-        const validator = mapFieldTypeToZod(field)
-        const parsedValue = validator.safeParse(resolvedValue)
-        if (parsedValue.success && parsedValue.data) {
-          result[key] = resolvedValue
-        } else {
-          throw new Error(`Could not resolve ${key}: ${parsedValue.error}`)
-        }
+        result[key] = resolveAndValidateFieldValue({
+          field,
+          resolvedValue,
+          context: key
+        })
       }
     }
 
-    const resultValidator = mapFieldTypeToZod(field)
-    const parsedResult = resultValidator.safeParse(result)
-    if (parsedResult.success) {
-      return result as FieldValue
-    }
-    throw new Error(
-      `Could not resolve ${field.type}: ${JSON.stringify(
-        defaultValue
-      )}. Error: ${parsedResult.error}`
-    )
+    return resolveAndValidateFieldValue({
+      field,
+      resolvedValue: result,
+      context: JSON.stringify(defaultValue)
+    })
   }
   throw new Error(
     `Could not resolve ${field.type}: ${JSON.stringify(defaultValue)}`
