@@ -13,12 +13,6 @@ import { QuickActionConfig } from './useQuickActionModal'
 
 export const archive: QuickActionConfig = {
   modal: {
-    description: {
-      id: 'recordAudit.archive.confirmation.body',
-      defaultMessage:
-        'This will remove the declaration from the workqueue and change the status to Archive. To revert this change you will need to search for the declaration.',
-      description: 'Confirmation body for archiving a declaration'
-    },
     confirmButtonType: 'danger',
     confirmButtonLabel: {
       id: 'buttons.archive',
