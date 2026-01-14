@@ -24,7 +24,6 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
@@ -51,13 +50,13 @@ export function Review() {
   const actionConfiguration = config.actions.find(
     (a) => a.type === ActionType.DECLARE
   )
+
   if (!actionConfiguration) {
     throw new Error('Action configuration not found')
   }
 
   const reviewConfig = actionConfiguration.review
   const form = useEventFormData((state) => state.getFormValues())
-
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
