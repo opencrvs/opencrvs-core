@@ -133,14 +133,14 @@ export function handleDefaultValueForAddressField({
 
   if (isDynamicReference) {
     const locationKey =
-      administrativeArea.$location as keyof typeof systemVariables.$user
+      administrativeArea.$location as keyof typeof systemVariables.user
     // Resolve administrativeArea from systemVariables.$user where
     // locationKey field (ex: 'district') is pre-populated from
     // user's primary office (see useCurrentUser hook)
-    if (locationKey in systemVariables.$user) {
+    if (locationKey in systemVariables.user) {
       return {
         ...defaultValue,
-        administrativeArea: systemVariables.$user[locationKey]
+        administrativeArea: systemVariables.user[locationKey]
       }
     }
   }

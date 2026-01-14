@@ -21,7 +21,7 @@ import { FieldValue } from './FieldValue'
  * Available system variables for configuration.
  */
 export type SystemVariables = {
-  $user: {
+  user: {
     id: string
     name?: string
     role?: string
@@ -30,6 +30,7 @@ export type SystemVariables = {
     surname?: string
     primaryOfficeId?: UUID
     fullHonorificName?: string
+    administrativeAreaId?: UUID
     device?: string
     avatar?: string
     signature?: string

@@ -20,7 +20,6 @@ import {
   FieldType,
   NameField
 } from '@opencrvs/commons/client'
-import { FieldType } from '@opencrvs/commons/client'
 import {
   replacePlaceholders,
   handleDefaultValueForAddressField

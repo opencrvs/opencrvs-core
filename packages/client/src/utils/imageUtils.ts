@@ -232,8 +232,8 @@ async function getImageFromFile(
 }
 
 function isImageFile(file: File): boolean {
-  return Object.values(ImageMimeType.Enum).includes(
-    file.type as keyof typeof ImageMimeType.Enum
+  return Object.values(ImageMimeType.enum).includes(
+    file.type as keyof typeof ImageMimeType.enum
   )
 }
 

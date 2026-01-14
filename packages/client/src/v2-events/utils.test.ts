@@ -217,7 +217,7 @@ const testCases = [
     currentValue: undefined,
     defaultValue: undefined,
     systemVariables: {
-      $user: {
+      user: {
         name: '',
         role: '',
         id: ''
@@ -238,7 +238,7 @@ const testCases = [
     currentValue: undefined,
     defaultValue: 'Hello',
     systemVariables: {
-      $user: {
+      user: {
         name: '',
         role: '',
         id: ''
@@ -259,7 +259,7 @@ const testCases = [
     currentValue: undefined,
     defaultValue: '$user.name',
     systemVariables: {
-      $user: {
+      user: {
         name: 'Jon Doe',
         role: '',
         id: ''
@@ -280,7 +280,7 @@ const testCases = [
     currentValue: 'Hello world',
     defaultValue: '$user.name',
     systemVariables: {
-      $user: {
+      user: {
         name: 'Jon Doe',
         role: '',
         id: ''
@@ -304,7 +304,7 @@ const testCases = [
       addressType: AddressType.DOMESTIC
     },
     systemVariables: {
-      $user: {
+      user: {
         name: 'Jon Doe',
         role: 'Field Agent',
         id: ''
@@ -342,7 +342,7 @@ describe('replacePlaceholders', () => {
 const testCasesForDefaultValue = [
   {
     systemVariables: {
-      $user: {
+      user: {
         name: 'Jon Doe',
         role: '',
         id: ''
@@ -361,7 +361,7 @@ const testCasesForDefaultValue = [
   },
   {
     systemVariables: {
-      $user: {
+      user: {
         name: 'Jon Doe',
         firstname: 'Jon',
         surname: 'Doe',

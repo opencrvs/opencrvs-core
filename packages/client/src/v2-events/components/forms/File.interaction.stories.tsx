@@ -334,7 +334,7 @@ export const FileInputButtonMaxImage: StoryObj<FormFieldGeneratorProps> = {
             ]}
             id="my-form"
             validatorContext={getTestValidatorContext(
-              TestUserRole.Enum.LOCAL_REGISTRAR
+              TestUserRole.enum.LOCAL_REGISTRAR
             )}
             onChange={(data) => {
               meta.args?.onChange(data) ?? noop()
