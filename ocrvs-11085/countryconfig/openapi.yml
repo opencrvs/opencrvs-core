@@ -2773,8 +2773,8 @@ components:
               type: string
               const: DATE
             defaultValue:
-              type: string
-              description: A single time input (HH-mm)
+              type: object
+              description: Default date value(yyyy-MM-dd)
             configuration:
               type: object
               properties:
@@ -2923,8 +2923,8 @@ components:
               type: string
               const: TIME
             defaultValue:
-              type: string
-              description: A single time input (HH-mm)
+              type: object
+              description: Default time value (HH-mm)
             configuration:
               type: object
               properties:
