@@ -17,6 +17,7 @@ import { IntlProvider } from 'react-intl'
 import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { padZero } from '@client/v2-events/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const messages24Hour = {
@@ -81,9 +82,8 @@ export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
     await step('Accept input time', async () => {
       const canvas = within(canvasElement)
       const today = new Date()
-      const pad = (n: number) => n.toString().padStart(2, '0')
-      const hour = pad(today.getHours())
-      const minute = pad(today.getMinutes())
+      const hour = padZero(today.getHours())
+      const minute = padZero(today.getMinutes())
 
       const hourInput = (await canvas.findByTestId(
         'storybook____time-hh-twentyfour'

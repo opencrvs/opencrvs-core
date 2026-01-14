@@ -11,13 +11,13 @@
 
 import { z } from 'zod'
 import { TimeValue } from '@opencrvs/commons/client'
+import { padZero } from '../utils'
 
 export function useTodaysDateTime(): {
   $$date: string
   $$time: z.infer<typeof TimeValue>
 } {
   const today = new Date()
-  const padZero = (num: number) => num.toString().padStart(2, '0')
 
   const year = today.getFullYear()
   const month = padZero(today.getMonth() + 1)

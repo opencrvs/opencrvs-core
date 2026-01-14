@@ -15,15 +15,15 @@ import {
   not,
   user
 } from '../conditionals/conditionals'
+import {
+  defineActionForm,
+  defineDeclarationForm
+} from '../events/EventConfigInput'
 import { ConditionalType } from '../events/Conditional'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
 import { AddressType } from '../events/CompositeFieldValue'
-import {
-  defineActionForm,
-  defineDeclarationForm
-} from '../events/EventConfigInput'
 import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
 import { EventStatus } from '../events/EventMetadata'
 

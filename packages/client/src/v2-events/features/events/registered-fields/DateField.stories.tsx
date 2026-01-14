@@ -16,6 +16,7 @@ import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { padZero } from '@client/v2-events/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
@@ -46,10 +47,9 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
       const canvas = within(canvasElement)
 
       const today = new Date()
-      const pad = (n: number) => n.toString().padStart(2, '0')
       const year = today.getFullYear()
-      const month = pad(today.getMonth() + 1)
-      const day = pad(today.getDate())
+      const month = padZero(today.getMonth() + 1)
+      const day = padZero(today.getDate())
 
       const dayInput = (await canvas.findByTestId(
         'storybook____date-dd'

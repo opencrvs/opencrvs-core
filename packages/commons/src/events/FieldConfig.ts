@@ -314,16 +314,7 @@ const TimeField = BaseField.extend({
     .optional()
 }).describe('A single date input (HH-mm)')
 
-// defaultValue?: string | {
-//         $$time: "now";
-//     } | undefined;
 export type TimeField = z.infer<typeof TimeField>
-
-// defaultValue?: string | {
-//         $$date: "now";
-//         $$time: "now";
-//     } | undefined;
-export type TimeField2 = z.input<typeof TimeField>
 
 const DateRangeField = BaseField.extend({
   type: z.literal(FieldType.DATE_RANGE),
