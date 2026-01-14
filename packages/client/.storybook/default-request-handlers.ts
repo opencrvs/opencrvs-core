@@ -27,9 +27,7 @@ import {
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
   libraryMembershipEvent,
-  LocationType,
-  TestUserRole,
-  Location
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
