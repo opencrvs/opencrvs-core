@@ -16,7 +16,6 @@ import {
 } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
@@ -76,14 +75,15 @@ function AdministrativeAreaInput({
 }
 
 function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
-  const { getLocations } = useLocations()
-  const locations = getLocations.useSuspenseQuery()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  const locationId = UUID.safeParse(value.toString()).data
+  const administrativeAreaId = UUID.safeParse(value.toString()).data
 
-  const location = locationId && locations.get(locationId)
+  const location =
+    administrativeAreaId && administrativeAreas.get(administrativeAreaId)
 
-  return location ? location.name : ''
+  return location?.name ?? ''
 }
 
 function stringify(value: string, context: { locations: Map<UUID, Location> }) {
