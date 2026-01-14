@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import * as React from 'react'
-import { useMemo } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
+import * as pdfjsLib from 'pdfjs-dist'
+import { useIntl } from 'react-intl'
 import {
   FileFieldValue,
   FileFieldValueWithOption
@@ -22,6 +22,7 @@ import { DividerVertical } from '@opencrvs/components/lib/Divider'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.min.mjs'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -33,79 +34,176 @@ const ViewerWrapper = styled.div`
   width: 100%;
   height: 100%;
   background: ${({ theme }) => theme.colors.white};
+  display: flex;
+  flex-direction: column;
 `
 
 const ViewerContainer = styled.div`
   position: relative;
-  width: 100%;
-  height: calc(100% - 56px); /* subtract AppBar height */
-  overflow: hidden;
+  flex: 1;
+  overflow-y: auto; /* vertical scrolling */
+  overflow-x: hidden; /* hide horizontal scroll */
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column; /* stack pages vertically */
+  align-items: center; /* center pages horizontally */
+  background: ${({ theme }) => theme.colors.white};
 
-  & img {
-    max-height: 90%;
-    max-width: 90%;
-  }
-
-  & embed {
-    width: 100%;
-    height: 100%;
-    border: none;
+  & canvas {
+    margin-bottom: 16px; /* spacing between pages */
+    max-width: 90%; /* prevent overflow */
+    height: auto; /* maintain aspect ratio */
+    display: block;
   }
 `
+
+const LoadingOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: ${({ theme }) => theme.colors.white};
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+`
+
+const ErrorBox = styled.div`
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  padding: 16px;
+  border-radius: 8px;
+  z-index: 20;
+  ${({ theme }) => theme.fonts.bold12};
+`
+
+const SpinnerAnimation = keyframes`
+  to { transform: rotate(360deg); }
+`
+
+const Spinner = styled.div`
+  width: 32px;
+  height: 32px;
+  border: 4px solid ${({ theme }) => theme.colors.redLight};
+  border-top-color: ${({ theme }) => theme.colors.supportingCopy};
+  border-radius: 50%;
+  animation: ${SpinnerAnimation} 1s linear infinite;
+  margin-bottom: 8px;
+`
+
+const pdfLoadErrorMessage = {
+  id: 'error.pdf',
+  defaultMessage: 'Failed to load PDF',
+  description: 'PDF loading error message'
+}
+
 function PdfViewer({ pdfUrl, title }: { pdfUrl: string; title?: string }) {
-  const [blobUrl, setBlobUrl] = React.useState<string | null>(null)
+  const i18n = useIntl()
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+  const renderedRef = React.useRef(false)
 
   React.useEffect(() => {
-    let revokeUrl: string | null = null
+    if (renderedRef.current) {
+      return
+    } // skip if already rendered
+    renderedRef.current = true
+
+    let cancelled = false
+    const canvases: HTMLCanvasElement[] = []
 
     async function loadPdf() {
       try {
-        const res = await fetch(pdfUrl, { cache: 'force-cache' })
+        setLoading(true)
+        setError(null)
+
+        const res = await fetch(pdfUrl)
         if (!res.ok) {
-          throw new Error('Failed to fetch PDF')
+          setError(i18n.formatMessage(pdfLoadErrorMessage))
+          setLoading(false)
+          return
         }
 
-        const blob = await res.blob()
-        const url = URL.createObjectURL(blob)
+        const arrayBuffer = await res.arrayBuffer()
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+        if (cancelled) {
+          return
+        }
 
-        setBlobUrl(url)
-        revokeUrl = url
+        const container = containerRef.current
+        if (!container) {
+          return
+        }
+
+        // Clear previous canvases safely
+        canvases.forEach((c) => container.removeChild(c))
+        canvases.length = 0
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          if (cancelled) {
+            break
+          }
+
+          const page = await pdf.getPage(pageNum)
+          const viewport = page.getViewport({ scale: 1.5 })
+          const canvas = document.createElement('canvas')
+          const context = canvas.getContext('2d')
+
+          if (!context) {
+            continue
+          }
+
+          canvas.width = viewport.width
+          canvas.height = viewport.height
+          canvas.style.display = 'block'
+          canvas.style.margin = '0 auto 16px'
+
+          container.appendChild(canvas)
+          canvases.push(canvas)
+
+          page.render({ canvasContext: context, viewport, canvas })
+        }
+
+        if (!cancelled) {
+          setLoading(false)
+        }
       } catch (err) {
-        console.error('PDF load error:', err)
+        if (!cancelled) {
+          /* eslint-disable no-console */
+          console.error(err)
+          setError(i18n.formatMessage(pdfLoadErrorMessage))
+          setLoading(false)
+        }
       }
     }
 
-    loadPdf().catch((error) => {
-      console.error('Error loading PDF:', error)
-    })
+    void loadPdf()
 
     return () => {
-      if (revokeUrl) {
-        URL.revokeObjectURL(revokeUrl)
-      }
+      cancelled = true
     }
-  }, [pdfUrl])
-
-  if (!blobUrl) {
-    return <div>Loading PDF…</div>
-  }
+  }, [pdfUrl, i18n])
 
   return (
-    <iframe
-      src={blobUrl}
-      style={{
-        width: '100%',
-        height: '100%',
-        border: 'none'
-      }}
-      title={title}
-    />
+    <ViewerContainer ref={containerRef} aria-label={title}>
+      {loading && (
+        <LoadingOverlay>
+          <Spinner />
+          {'Loading...'}
+        </LoadingOverlay>
+      )}
+      {error && <ErrorBox>{error}</ErrorBox>}
+    </ViewerContainer>
   )
 }
 
+// === PdfPreview Component ===
 interface IProps {
   previewImage:
     | NonNullable<FileFieldValue>
@@ -184,9 +282,7 @@ export function PdfPreview({
         mobileTitle={title}
       />
 
-      <ViewerContainer>
-        <PdfViewer pdfUrl={fileUrl} title={title} />
-      </ViewerContainer>
+      <PdfViewer pdfUrl={fileUrl} title={title} />
     </ViewerWrapper>
   )
 }
