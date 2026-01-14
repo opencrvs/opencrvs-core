@@ -11,6 +11,10 @@
 
 import { z } from 'zod'
 
+/**
+ * Represents a date-time value indicating the current date and time.
+ * Note: Values of $$date and $$time are not used for any computation; their presence indicates 'now'
+ */
 export const SerializedNowDateTime = z.object({
   $$date: z.literal('now').optional(),
   $$time: z.literal('now').optional()
