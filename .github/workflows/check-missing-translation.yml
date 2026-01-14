@@ -42,26 +42,21 @@ jobs:
           echo "working_branch=$working_branch" >> $GITHUB_OUTPUT
           git checkout $working_branch
 
-          # Sync countryconfig with develop, so we get both the newest changes from develop and the changes from working branch
-          if [ "$working_branch" != "develop" ]; then
-          
-            echo "Syncing countryconfig branch '$working_branch' with 'develop'"
+          # Sync countryconfig with base branch, so we get both the newest changes from the base branch and the changes from working branch
+          echo "Syncing countryconfig branch '$working_branch' with base branch"
 
-            # Unfortunately the merge requires user.name and email to be set here
-            git config --local user.name "OpenCRVS Bot"
-            git config --local user.email "bot@opencrvs.org"
+          # Unfortunately the merge requires user.name and email to be set here
+          git config --local user.name "OpenCRVS Bot"
+          git config --local user.email "bot@opencrvs.org"
+          git merge origin/${{ github.base_ref }} --no-commit --no-ff; then
 
-            if git merge origin/develop --no-commit --no-ff; then
-              echo "Successfully synced countryconfig branch '$working_branch' with 'develop'"
-            else
-              # If there are merge conflicts in the translation file, abort the merge
-              if git diff --name-only --diff-filter=U | grep -q "src/translations/client.csv"; then
-                echo "Found merge conflicts in src/translations/client.csv, aborting merge"
-                git merge --abort
-              else
-                echo "No conflicts in translations file, continuing"
-              fi
-            fi
+          echo "Successfully synced countryconfig branch '$working_branch' with 'develop'"
+
+          if git diff --name-only --diff-filter=U | grep -q "src/translations/client.csv"; then
+            echo "Found merge conflicts in src/translations/client.csv, aborting merge"
+            git merge --abort
+          else
+            echo "No conflicts in translations file, continuing"
           fi
           echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
 
