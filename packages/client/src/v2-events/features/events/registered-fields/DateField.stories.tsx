@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within } from '@storybook/test'
+import { fn, userEvent, within, expect } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
@@ -42,8 +42,35 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   play: async ({ canvasElement, step }) => {
-    await step('Shows errors based on field state', async () => {
+    await step('Shows default value & errors based on state', async () => {
       const canvas = within(canvasElement)
+
+      const today = new Date()
+      const pad = (n: number) => n.toString().padStart(2, '0')
+      const year = today.getFullYear()
+      const month = pad(today.getMonth() + 1)
+      const day = pad(today.getDate())
+
+      const dayInput = (await canvas.findByTestId(
+        'storybook____date-dd'
+      )) as HTMLInputElement
+
+      const monthInput = (await canvas.findByTestId(
+        'storybook____date-mm'
+      )) as HTMLInputElement
+
+      const yearInput = (await canvas.findByTestId(
+        'storybook____date-yyyy'
+      )) as HTMLInputElement
+
+      void expect(dayInput.value).toBe(day)
+      void expect(monthInput.value).toBe(month)
+      void expect(yearInput.value).toBe(String(year))
+
+      await userEvent.clear(dayInput)
+      await userEvent.clear(monthInput)
+      await userEvent.clear(yearInput)
+
       await userEvent.type(
         await canvas.findByTestId('storybook____date-dd'),
         '1'
@@ -71,6 +98,10 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
           {
             id: 'storybook.date',
             type: FieldType.DATE,
+            // value of now() will be resolve to { $$date: 'now' } after zod parsing
+            defaultValue: {
+              $$date: 'now'
+            },
             label: {
               id: 'storybook.date.label',
               defaultMessage: 'Date input',

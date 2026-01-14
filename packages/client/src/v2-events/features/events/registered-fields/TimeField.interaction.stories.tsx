@@ -80,6 +80,25 @@ export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
   play: async ({ canvasElement, step }) => {
     await step('Accept input time', async () => {
       const canvas = within(canvasElement)
+      const today = new Date()
+      const pad = (n: number) => n.toString().padStart(2, '0')
+      const hour = pad(today.getHours())
+      const minute = pad(today.getMinutes())
+
+      const hourInput = (await canvas.findByTestId(
+        'storybook____time-hh-twentyfour'
+      )) as HTMLInputElement
+
+      const minuteInput = (await canvas.findByTestId(
+        'storybook____time-mm-twentyfour'
+      )) as HTMLInputElement
+
+      void expect(hourInput.value).toBe(hour)
+      void expect(minuteInput.value).toBe(minute)
+
+      await userEvent.clear(hourInput)
+      await userEvent.clear(minuteInput)
+
       await userEvent.type(await canvas.findByPlaceholderText('hh'), '9')
 
       await userEvent.click(await canvas.findByText('Time input (24-hour)'))
@@ -97,6 +116,10 @@ export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
           {
             id: 'storybook.time',
             type: FieldType.TIME,
+            // value of now() will be resolve to { $$time: 'now' } after zod parsing
+            defaultValue: {
+              $$time: 'now'
+            },
             label: {
               id: 'storybook.time.label',
               defaultMessage: 'Time input (24-hour)',
