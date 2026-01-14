@@ -108,7 +108,9 @@ export function isFieldValueWithoutTemplates(
   if (
     typeof value === 'object' &&
     value !== null &&
-    Object.values(value).some((val) => isTemplateVariable(val))
+    // template variable can exist in both keys and values of an object
+    (Object.values(value).some((val) => isTemplateVariable(val)) ||
+      Object.keys(value).some((val) => isTemplateVariable(val)))
   ) {
     return false
   }

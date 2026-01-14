@@ -100,6 +100,14 @@ function isTextField(field: FieldConfig): field is TextField {
   return field.type === FieldType.TEXT
 }
 
+function isTemplateObject(value: FieldConfigDefaultValue) {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    Object.keys(value).every((key) => key.startsWith('$'))
+  )
+}
+
 /**
  *
  * @param fieldType: The type of the field.
@@ -130,6 +138,20 @@ export function replacePlaceholders({
 
   if (isFieldValueWithoutTemplates(defaultValue)) {
     return defaultValue
+  }
+
+  if (isTemplateObject(defaultValue)) {
+    const templateKeys = Object.keys(defaultValue)
+    const resolvedValue = get(systemVariables, templateKeys[0])
+    const validator = mapFieldTypeToZod(field)
+
+    const parsedValue = validator.safeParse(resolvedValue)
+
+    if (parsedValue.success) {
+      return parsedValue.data as FieldValue
+    }
+
+    throw new Error(`Could not resolve ${defaultValue}: ${parsedValue.error}`)
   }
 
   if (isTemplateVariable(defaultValue)) {
