@@ -30,7 +30,7 @@ runs:
         fi
         if [[ ! "$branch" =~ $pattern ]]; then
           echo "Branch name: $branch"
-          echo """
+          echo """::error::
           ❌ Invalid branch name: '$branch'
           ➡️  Branch names must match regex: $pattern
               - Start with a lowercase letter
