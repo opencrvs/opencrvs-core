@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { v4 as uuid } from 'uuid'
-import { UUID } from '@opencrvs/commons/client'
+import { UUID, getActionConfig, ActionType } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import {
@@ -19,10 +19,22 @@ import {
   RejectionState,
   Review as ReviewComponent
 } from '@client/v2-events/features/events/components/Review'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
-export function useRejectionModal(eventId: UUID, allowArchive = true) {
+export function useRejectionModal(
+  eventId: UUID,
+  eventType: string,
+  allowArchive = true
+) {
   const [modal, openModal] = useModal()
   const events = useEvents()
+  const { eventConfiguration } = useEventConfiguration(eventType)
+  const rejectActionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.REJECT
+  })
+
+  const supportingCopy = rejectActionConfig?.supportingCopy
 
   async function handleRejection(onClose: () => void) {
     const confirmedRejection = await openModal<RejectionState | null>(
@@ -30,6 +42,7 @@ export function useRejectionModal(eventId: UUID, allowArchive = true) {
         <ReviewComponent.ActionModal.Reject
           allowArchive={allowArchive}
           close={close}
+          supportingCopy={supportingCopy}
         />
       )
     )
