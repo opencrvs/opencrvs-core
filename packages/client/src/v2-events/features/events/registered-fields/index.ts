@@ -10,6 +10,8 @@
  */
 import { FieldConfig, FieldType } from '@opencrvs/commons/client'
 
+import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { Address } from './Address'
 import { AdministrativeArea } from './AdministrativeArea'
 import { BulletList } from './BulletList'
@@ -21,6 +23,7 @@ import { Http } from './Http'
 import { LocationSearch } from './LocationSearch'
 import { Name } from './Name'
 import { Number } from './Number'
+import { NumberWithUnit } from './NumberWithUnit'
 import { PageHeader } from './PageHeader'
 import { AgeField } from './AgeField'
 import { Paragraph } from './Paragraph'
@@ -49,6 +52,7 @@ export * from './Http'
 export * from './LocationSearch'
 export * from './Name'
 export * from './Number'
+export * from './NumberWithUnit'
 export * from './PageHeader'
 export * from './Paragraph'
 export * from './RadioGroup'
@@ -97,6 +101,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return Text
     case FieldType.NUMBER:
       return Number
+    case FieldType.NUMBER_WITH_UNIT:
+      return NumberWithUnit
     case FieldType.DIVIDER:
       return Divider
     case FieldType.PAGE_HEADER:
@@ -119,6 +125,10 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return QueryParamReader
     case FieldType.AGE:
       return AgeField
+    case FieldType.FILE:
+      return File
+    case FieldType.FILE_WITH_OPTIONS:
+      return FileWithOption
     default:
       return undefined
   }

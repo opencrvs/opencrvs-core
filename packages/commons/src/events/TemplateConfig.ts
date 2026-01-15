@@ -14,15 +14,27 @@
  * They are currently used for providing default values in FieldConfig.
  */
 
+import { UUID } from '../uuid'
 import { FieldValue } from './FieldValue'
 
 /**
  * Available system variables for configuration.
  */
 export type SystemVariables = {
-  $user: {
-    province: string
-    district: string
+  user: {
+    id: string
+    province?: string
+    district?: string
+    name?: string
+    role?: string
+    firstname?: string
+    middlename?: string
+    surname?: string
+    primaryOfficeId?: UUID
+    fullHonorificName?: string
+    device?: string
+    avatar?: string
+    signature?: string
   }
   $window: {
     location: {

@@ -20,17 +20,13 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { ROUTES } from '@client/v2-events/routes'
 import { buildQuickSearchQuery, deserializeSearchParams } from './utils'
 
-function QuickSearchComponent({
-  searchParams
-}: {
-  searchParams: Record<string, string>
-}) {
+function QuickSearchComponent({ term }: { term: string }) {
   const intl = useIntl()
   const [typedSearchParams] = useTypedSearchParams(ROUTES.V2.SEARCH)
   const { searchEvent } = useEvents()
   const eventConfigurations = useEventConfigurations()
 
-  const query = buildQuickSearchQuery(searchParams, eventConfigurations)
+  const query = buildQuickSearchQuery(term, eventConfigurations)
   const queryData = searchEvent.useSuspenseQuery({
     query,
     ...typedSearchParams
@@ -49,7 +45,7 @@ function QuickSearchComponent({
           defaultMessage: 'Search result for “{searchTerm}”'
         },
         {
-          searchTerm: searchParams.keys
+          searchTerm: term
         }
       )}
       totalResults={queryData.total}
@@ -65,11 +61,10 @@ function QuickSearch() {
     string
   >
 
-  if (!('keys' in searchParams)) {
+  if (!('term' in searchParams)) {
     return null
   }
-
-  return <QuickSearchComponent searchParams={searchParams} />
+  return <QuickSearchComponent term={searchParams.term} />
 }
 
 export const QuickSearchIndex = withSuspense(QuickSearch)
