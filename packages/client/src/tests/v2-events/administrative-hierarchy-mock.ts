@@ -119,6 +119,54 @@ export const V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS: AdministrativeArea[] = [
 ]
 export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
+    id: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID,
+    name: 'Central Provincial Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    administrativeAreaId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    validUntil: null,
+    externalId: 'Xr3Df8WpK6Ys'
+  },
+  {
+    id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+    name: 'Ibombo District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null,
+    externalId: 'Sm4Nw7GrD2Vy'
+  },
+  {
+    id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
+    name: 'Isamba District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    administrativeAreaId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    validUntil: null,
+    externalId: 'Vg1Bq5XeH9Lt'
+  },
+  {
+    id: '954c93e1-13f7-4435-bb82-35e0e215e07d' as UUID,
+    name: 'Isango District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    administrativeAreaId: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+    validUntil: null,
+    externalId: 'Je7Lm2XqN9Vz'
+  },
+  {
+    id: '2884f5b9-17b4-49ce-bf4d-f538228935df' as UUID,
+    name: 'Sulaka Provincial Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    administrativeAreaId: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
+    validUntil: null,
+    externalId: 'Ht2Wp9KcX5Qv'
+  },
+  {
+    id: '030358c6-54af-44be-821b-8e4af963a49c' as UUID,
+    name: 'Ilanga District Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    administrativeAreaId: '8fbd09d2-212b-47f4-beb3-5e1694931d9f' as UUID,
+    validUntil: null,
+    externalId: 'Yp6Ds1WqN3Xz'
+  },
+  {
     id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
     name: 'Chamakubi Health Post',
     locationType: LocationType.enum.HEALTH_FACILITY,
@@ -205,54 +253,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'Pz8Kc1TqH6Jn'
-  },
-  {
-    id: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID,
-    name: 'Central Provincial Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    administrativeAreaId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null,
-    externalId: 'Xr3Df8WpK6Ys'
-  },
-  {
-    id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
-    name: 'Ibombo District Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null,
-    externalId: 'Sm4Nw7GrD2Vy'
-  },
-  {
-    id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
-    name: 'Isamba District Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    administrativeAreaId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
-    validUntil: null,
-    externalId: 'Vg1Bq5XeH9Lt'
-  },
-  {
-    id: '954c93e1-13f7-4435-bb82-35e0e215e07d' as UUID,
-    name: 'Isango District Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    administrativeAreaId: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
-    validUntil: null,
-    externalId: 'Je7Lm2XqN9Vz'
-  },
-  {
-    id: '2884f5b9-17b4-49ce-bf4d-f538228935df' as UUID,
-    name: 'Sulaka Provincial Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    administrativeAreaId: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
-    validUntil: null,
-    externalId: 'Ht2Wp9KcX5Qv'
-  },
-  {
-    id: '030358c6-54af-44be-821b-8e4af963a49c' as UUID,
-    name: 'Ilanga District Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    administrativeAreaId: '8fbd09d2-212b-47f4-beb3-5e1694931d9f' as UUID,
-    validUntil: null,
-    externalId: 'Yp6Ds1WqN3Xz'
   }
 ]
 

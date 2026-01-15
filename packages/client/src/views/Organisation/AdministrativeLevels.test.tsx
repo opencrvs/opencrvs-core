@@ -21,7 +21,10 @@ import { AdministrativeLevels } from './AdministrativeLevels'
 import { setUserDetails } from '@client/profile/profileActions'
 import { ORGANISATIONS_INDEX } from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
-import { V2_DEFAULT_MOCK_LOCATIONS } from '@client/tests/v2-events/administrative-hierarchy-mock'
+import {
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
+  V2_DEFAULT_MOCK_LOCATIONS
+} from '@client/tests/v2-events/administrative-hierarchy-mock'
 
 describe('for user with read organisation in my jurisdiction scope', () => {
   let store: AppStore
@@ -35,7 +38,8 @@ describe('for user with read organisation in my jurisdiction scope', () => {
     const centralProvincialOffice = V2_DEFAULT_MOCK_LOCATIONS.find(
       (location) => location.name === 'Central Provincial Office'
     )
-    const ibomboDistrict = V2_DEFAULT_MOCK_LOCATIONS.find(
+
+    const ibomboDistrict = V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS.find(
       (location) => location.name === 'Ibombo'
     )
 
@@ -74,7 +78,7 @@ describe('for user with read organisation in my jurisdiction scope', () => {
     const centralProvincialOffice = V2_DEFAULT_MOCK_LOCATIONS.find(
       (location) => location.name === 'Central Provincial Office'
     )
-    const ilangaDistrict = V2_DEFAULT_MOCK_LOCATIONS.find(
+    const ilangaDistrict = V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS.find(
       (location) => location.name === 'Ilanga'
     )
 
@@ -122,7 +126,7 @@ describe('for user with read organisation scope', () => {
     const centralProvincialOffice = V2_DEFAULT_MOCK_LOCATIONS.find(
       (location) => location.name === 'Central Provincial Office'
     )
-    const ibomboDistrict = V2_DEFAULT_MOCK_LOCATIONS.find(
+    const ibomboDistrict = V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS.find(
       (location) => location.name === 'Ibombo'
     )
 
