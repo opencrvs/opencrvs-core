@@ -33,7 +33,11 @@ import {
   METADATA_FIELD_PREFIX,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { findScope, getAllUniqueFields } from '@opencrvs/commons/client'
+import {
+  findScope,
+  findV2Scope,
+  getAllUniqueFields
+} from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
@@ -769,7 +773,13 @@ export function checkScopeForEventSearch(eventId: string) {
     searchScopes &&
     Object.keys(searchScopes.options).some((id) => eventId === id)
 
-  return isEventSearchAllowed
+  const v2SearchScope = findV2Scope(scopes ?? [], 'record.search')
+
+  const hasV2SearchScope = Boolean(
+    v2SearchScope?.options?.event?.includes(eventId)
+  )
+
+  return isEventSearchAllowed || hasV2SearchScope
 }
 
 function serializeValue(value: unknown) {
