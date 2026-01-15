@@ -11,8 +11,7 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
   "createdAt": "1 February 2000",
   "createdAtLocation": {
     "country": "Farajaland",
-    "district": "Ibombo",
-    "name": "Chamakubi Health Post",
+    "name": "Central Provincial Office",
     "province": "Central",
   },
   "createdBy": {
@@ -34,8 +33,8 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
   "updatedAt": "2 February 2000",
   "updatedAtLocation": {
     "country": "Farajaland",
-    "district": "Ibombo",
-    "name": "Chamakubi Health Post",
+    "district": "Isamba",
+    "name": "Isamba District Office",
     "province": "Central",
   },
   "updatedBy": {

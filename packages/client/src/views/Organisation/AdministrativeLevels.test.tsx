@@ -165,7 +165,7 @@ describe('for user with read organisation scope', () => {
     const centralProvincialOffice = V2_DEFAULT_MOCK_LOCATIONS.find(
       (location) => location.name === 'Central Provincial Office'
     )
-    const ilangaDistrict = V2_DEFAULT_MOCK_LOCATIONS.find(
+    const ilangaDistrict = V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS.find(
       (location) => location.name === 'Ilanga'
     )
 
@@ -213,7 +213,7 @@ describe('for user with read organisation my office scope', () => {
     const ibomboDistrictOffice = V2_DEFAULT_MOCK_LOCATIONS.find(
       (location) => location.name === 'Ibombo District Office'
     )
-    const ibomboDistrict = V2_DEFAULT_MOCK_LOCATIONS.find(
+    const ibomboDistrict = V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS.find(
       (location) => location.name === 'Ibombo'
     )
 
@@ -252,7 +252,7 @@ describe('for user with read organisation my office scope', () => {
     const ibomboDistrictOffice = V2_DEFAULT_MOCK_LOCATIONS.find(
       (location) => location.name === 'Ibombo District Office'
     )
-    const isangoDistrict = V2_DEFAULT_MOCK_LOCATIONS.find(
+    const isangoDistrict = V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS.find(
       (location) => location.name === 'Isango'
     )
 

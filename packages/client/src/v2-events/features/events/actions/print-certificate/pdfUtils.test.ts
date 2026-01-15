@@ -60,8 +60,6 @@ describe('stringifyEventMetadata', () => {
   test('Resolves event metadata', () => {
     const generator = testDataGenerator()
 
-    generator.user.id.localRegistrar
-
     const { declaration, ...metadata } = eventQueryDataGenerator({
       id: 'seabeast-clad-stad-elia-oleocellosis' as UUID,
       assignedTo: generator.user.id.localRegistrar,
@@ -70,7 +68,9 @@ describe('stringifyEventMetadata', () => {
       trackingId: 'B77FF6',
       createdAt: new Date(2000, 1, 1).toISOString(),
       updatedAt: new Date(2000, 1, 2).toISOString(),
-      updatedAtLocation: V2_DEFAULT_MOCK_LOCATIONS[0].id,
+      updatedAtLocation: V2_DEFAULT_MOCK_LOCATIONS.find(
+        (loc) => loc.name === 'Isamba District Office'
+      )?.id,
       createdAtLocation: V2_DEFAULT_MOCK_LOCATIONS[0].id,
       updatedBy: generator.user.id.localRegistrar
     })
