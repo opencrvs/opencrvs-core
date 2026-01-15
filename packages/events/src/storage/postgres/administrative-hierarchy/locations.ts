@@ -152,27 +152,6 @@ export async function locationExists(locationId: UUID) {
   return !!result
 }
 
-/**
- * Recursive check to see if a location is descendant of a jurisdiction location.
- * @returns is the location **under** the jurisdiction of another location.
- */
-export async function isLocationUnderJurisdiction({
-  jurisdictionLocationId,
-  locationToSearchId
-}: {
-  jurisdictionLocationId: UUID
-  locationToSearchId: UUID
-}) {
-  const db = getClient()
-
-  const result = await isLocationChildOfQuery(
-    jurisdictionLocationId,
-    locationToSearchId
-  ).execute(db)
-
-  return !!result.rows[0].isChild
-}
-
 export async function getLocationById(locationId: UUID) {
   const db = getClient()
 
@@ -194,6 +173,41 @@ export async function getLocationById(locationId: UUID) {
     .executeTakeFirst()
 }
 
+function getAdministrativeHierarchyByIdCte(id: string) {
+  return sql`
+    WITH RECURSIVE area_chain AS (
+        -- 1a: Start with location and get its administrative area
+        SELECT
+            l.id,
+            l.administrative_area_id AS parent_id,
+            0 AS depth
+        FROM app.locations l
+        WHERE l.id = ${id}
+
+        UNION ALL
+
+        -- 1b: If location does not exist, start with administrative area directly
+        SELECT
+            aa.id,
+            aa.parent_id,
+            0 AS depth
+        FROM app.administrative_areas aa
+        WHERE aa.id = ${id}
+        AND NOT EXISTS (SELECT 1 FROM app.locations WHERE id = ${id})
+
+        UNION ALL
+
+        -- 2: Get administrative area hierarchy recursively
+        SELECT
+            aa.id,
+            aa.parent_id,
+            ac.depth + 1
+        FROM app.administrative_areas aa
+        JOIN area_chain ac ON ac.parent_id = aa.id
+    )
+  `
+}
+
 /**
  * Given a location ID, this function retrieves the full chain of parent administrative areas
  * from `administrative_areas` corresponding to the location's `administrative_area_id`.
@@ -202,36 +216,34 @@ export async function getLocationById(locationId: UUID) {
  * @param locationId
  * @returns The list of location hierarchy ids, ex: [admin_area_1_id, admin_area_2_id, locationId]
  */
-export async function getLocationHierarchyRaw(locationId: string) {
+export async function getAdministrativeHierarchyById(id: string) {
   const db = getClient()
 
   const query = sql<{ ids: UUID[] }>`
-    WITH RECURSIVE area_chain AS (
-        -- Base case: Start with the location itself
-        SELECT
-            l.id,
-            l.administrative_area_id AS parent_id,
-            0 AS depth
-
-        FROM app.locations l
-        WHERE l.id = ${locationId}
-
-        UNION ALL
-
-        -- Recursive case: Get administrative areas
-        SELECT
-            aa.id,
-            aa.parent_id,
-            ac.depth + 1
-
-        FROM app.administrative_areas aa
-        JOIN area_chain ac
-            ON ac.parent_id = aa.id
-    )
+    ${getAdministrativeHierarchyByIdCte(id)}
     SELECT array_agg(id ORDER BY depth DESC) AS ids FROM area_chain;
   `
 
   const result = await db.executeQuery(query.compile(db))
-
   return result.rows.length > 0 ? result.rows[0].ids : []
+}
+
+export async function isLocationUnderAdministrativeArea({
+  locationId,
+  administrativeAreaId
+}: {
+  locationId: UUID
+  administrativeAreaId: UUID
+}): Promise<boolean> {
+  const db = getClient()
+
+  const query = sql<{ exists: boolean }>`
+    ${getAdministrativeHierarchyByIdCte(locationId)}
+    SELECT EXISTS (
+        SELECT 1 FROM area_chain WHERE id = ${administrativeAreaId}
+    ) AS exists;
+  `
+
+  const result = await db.executeQuery(query.compile(db))
+  return result.rows[0]?.exists ?? false
 }

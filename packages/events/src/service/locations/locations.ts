@@ -65,5 +65,5 @@ export async function getLocationById(locationId: UUID) {
 }
 
 export const getLocationHierarchy = async (locationId: UUID) => {
-  return locationsRepo.getLocationHierarchyRaw(locationId)
+  return locationsRepo.getAdministrativeHierarchyById(locationId)
 }

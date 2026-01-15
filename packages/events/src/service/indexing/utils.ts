@@ -31,7 +31,7 @@ import {
   UserFilter,
   ResolvedRecordScopeV2
 } from '@opencrvs/commons'
-import { getLocationHierarchyRaw } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { getAdministrativeHierarchyById } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcUserContext } from '../../context'
 
 export type EncodedEventIndex = EventIndex
@@ -197,7 +197,7 @@ type ToArrayFields<T, K extends PropertyKey> = T extends unknown
 /**
  * Event index type where all location fields are arrays representing full location hierarchy.
  */
-export type EventIndexWithLocationHierarchy = Omit<
+export type EventIndexWithAdministrativeHierarchy = Omit<
   ToArrayFields<EventIndex, 'createdAtLocation' | 'updatedAtLocation'>,
   'legalStatuses'
 > & {
@@ -224,60 +224,62 @@ export type EventIndexWithLocationHierarchy = Omit<
  *
  * @param eventConfig Event configuration containing field definitions
  * @param event Event index with leaf-level location UUIDs
- * @param locationHierarchyCache Optional in-memory cache for location hierarchies, to avoid redundant lookups
+ * @param administrativeHierarchy Optional in-memory cache for location hierarchies, to avoid redundant lookups
  * @returns Event index with full location hierarchies (arrays of UUIDs from top to leaf)
  */
-export async function getEventIndexWithLocationHierarchy(
+export async function getEventIndexWithAdministrativeHierarchy(
   eventConfig: EventConfig,
   event: EventIndex,
-  locationHierarchyCache?: Map<string, string[]>
+  administrativeHierarchy?: Map<string, string[]>
 ) {
-  const buildFullLocationHierarchy = async (
-    locationId: UUID
+  const buildAdministrativeHierarchyById = async (
+    id: UUID
   ): Promise<string[]> => {
-    if (!locationId) {
+    if (!id) {
       return []
     }
-    if (locationHierarchyCache && locationHierarchyCache.has(locationId)) {
-      return locationHierarchyCache.get(locationId) || [locationId]
+
+    if (administrativeHierarchy && administrativeHierarchy.has(id)) {
+      return administrativeHierarchy.get(id) || [id]
     }
-    const hierarchyRows = await getLocationHierarchyRaw(locationId)
-    if (locationHierarchyCache) {
-      locationHierarchyCache.set(locationId, hierarchyRows)
+
+    const hierarchy = await getAdministrativeHierarchyById(id)
+    if (administrativeHierarchy) {
+      administrativeHierarchy.set(id, hierarchy)
     }
-    return hierarchyRows
+    return hierarchy
   }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const tempEvent = { ...event, declaration: { ...event.declaration } } as any
   // Normalize top-level locations
   if (event.createdAtLocation) {
-    tempEvent.createdAtLocation = await buildFullLocationHierarchy(
+    tempEvent.createdAtLocation = await buildAdministrativeHierarchyById(
       event.createdAtLocation
     )
   }
 
   if (event.placeOfEvent) {
-    tempEvent.placeOfEvent = await buildFullLocationHierarchy(
+    tempEvent.placeOfEvent = await buildAdministrativeHierarchyById(
       event.placeOfEvent
     )
   }
 
   if (event.updatedAtLocation) {
-    tempEvent.updatedAtLocation = await buildFullLocationHierarchy(
+    tempEvent.updatedAtLocation = await buildAdministrativeHierarchyById(
       event.updatedAtLocation
     )
   }
 
   if (event.legalStatuses.DECLARED?.createdAtLocation) {
     tempEvent.legalStatuses.DECLARED.createdAtLocation =
-      await buildFullLocationHierarchy(
+      await buildAdministrativeHierarchyById(
         event.legalStatuses.DECLARED.createdAtLocation
       )
   }
 
   if (event.legalStatuses.REGISTERED?.createdAtLocation) {
     tempEvent.legalStatuses.REGISTERED.createdAtLocation =
-      await buildFullLocationHierarchy(
+      await buildAdministrativeHierarchyById(
         event.legalStatuses.REGISTERED.createdAtLocation
       )
   }
@@ -299,9 +301,10 @@ export async function getEventIndexWithLocationHierarchy(
       if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const address: Record<string, any> = parsed.data
-        address.administrativeArea = await buildFullLocationHierarchy(
+        address.administrativeArea = await buildAdministrativeHierarchyById(
           address.administrativeArea
         )
+
         tempEvent.declaration[k] = address
         continue
       }
@@ -311,7 +314,9 @@ export async function getEventIndexWithLocationHierarchy(
     const uuid = UUID.safeParse(value)
 
     if (uuid.success) {
-      tempEvent.declaration[k] = await buildFullLocationHierarchy(uuid.data)
+      tempEvent.declaration[k] = await buildAdministrativeHierarchyById(
+        uuid.data
+      )
     }
   }
 

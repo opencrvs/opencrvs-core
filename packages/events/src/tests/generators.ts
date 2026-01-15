@@ -79,7 +79,7 @@ export function payloadGenerator(
             LocationType.enum.CRVS_OFFICE,
             LocationType.enum.HEALTH_FACILITY
           ])
-        })) as Location[]
+        })) satisfies Location[]
       }
 
       return input.map((location, i) => ({
@@ -108,7 +108,7 @@ export function payloadGenerator(
           parentId: null,
           validUntil: null,
           externalId: generateTrackingId(prng) + generateTrackingId(prng)
-        })) as AdministrativeArea[]
+        })) satisfies AdministrativeArea[]
       }
 
       return input.map((administrativeArea, i) => ({
@@ -119,7 +119,7 @@ export function payloadGenerator(
         externalId:
           administrativeArea.externalId ??
           generateTrackingId(prng) + generateTrackingId(prng)
-      })) as AdministrativeArea[]
+      })) satisfies AdministrativeArea[]
     }
   }
 
@@ -151,23 +151,11 @@ export function seeder() {
       id: user.id ?? getUUID()
     }
   }
-  const seedLocations = async (locations: Location[]) =>
-    setLocations(
-      locations.map((location) => ({
-        ...location,
-        validUntil: location.validUntil ? location.validUntil : null
-      }))
-    )
+  const seedLocations = async (locations: Location[]) => setLocations(locations)
 
   const seedAdministrativeAreas = async (
     administrativeAreas: AdministrativeArea[]
-  ) =>
-    setAdministrativeAreas(
-      administrativeAreas.map((area) => ({
-        ...area,
-        validUntil: area.validUntil ? area.validUntil : null
-      }))
-    )
+  ) => setAdministrativeAreas(administrativeAreas)
   return {
     user: seedUser,
     locations: seedLocations,

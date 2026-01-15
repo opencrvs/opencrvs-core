@@ -30,7 +30,8 @@ import {
   LocationType,
   QueryType,
   TENNIS_CLUB_MEMBERSHIP,
-  TestUserRole
+  TestUserRole,
+  UUID
 } from '@opencrvs/commons/events'
 import { SCOPES } from '@opencrvs/commons'
 import {
@@ -78,23 +79,33 @@ test('records are indexed with full location hierarchy', async () => {
   ])
   const esClient = getOrCreateClient()
 
-  // --- Setup locations -------------------------------------------------------
   const locationRng = createPrng(842)
 
-  const administrativeArea = {
+  const parentAdministrativeArea = {
     ...generator.administrativeAreas.set(1, locationRng)[0],
     name: 'Administrative Area'
+  }
+
+  const childAdministrativeArea = {
+    validUntil: null,
+    externalId: null,
+    name: 'Child Administrative Area',
+    id: user.administrativeAreaId as UUID,
+    parentId: parentAdministrativeArea.id
   }
 
   const childLocation = {
     ...generator.locations.set(1, locationRng)[0],
     id: user.primaryOfficeId,
-    administrativeAreaId: administrativeArea.id,
+    administrativeAreaId: childAdministrativeArea.id,
     name: 'Child location',
     locationType: LocationType.enum.CRVS_OFFICE
-  }
+  } satisfies Location
 
-  await seed.administrativeAreas([administrativeArea])
+  await seed.administrativeAreas([
+    parentAdministrativeArea,
+    childAdministrativeArea
+  ])
   await seed.locations([childLocation])
 
   // --- Create & move event through lifecycle --------------------------------
@@ -125,17 +136,37 @@ test('records are indexed with full location hierarchy', async () => {
     id: createdEvent.id,
     type: TENNIS_CLUB_MEMBERSHIP,
     status: 'DECLARED',
-    createdAtLocation: [administrativeArea.id, childLocation.id],
-    updatedAtLocation: [administrativeArea.id, childLocation.id],
-    placeOfEvent: [administrativeArea.id, childLocation.id],
+    createdAtLocation: [
+      parentAdministrativeArea.id,
+      childAdministrativeArea.id,
+      childLocation.id
+    ],
+    updatedAtLocation: [
+      parentAdministrativeArea.id,
+      childAdministrativeArea.id,
+      childLocation.id
+    ],
+    placeOfEvent: [
+      parentAdministrativeArea.id,
+      childAdministrativeArea.id,
+      childLocation.id
+    ],
     legalStatuses: {
       DECLARED: {
-        createdAtLocation: [administrativeArea.id, childLocation.id]
+        createdAtLocation: [
+          parentAdministrativeArea.id,
+          childAdministrativeArea.id,
+          childLocation.id
+        ]
       }
     },
     declaration: {
       applicant____address: {
-        administrativeArea: [administrativeArea.id, childLocation.id]
+        administrativeArea: [
+          parentAdministrativeArea.id,
+          childAdministrativeArea.id
+          // administrative area should not include location id
+        ]
       }
     }
   })
