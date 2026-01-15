@@ -12,15 +12,16 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 
-let pdfjsLib: typeof import('pdfjs-dist') | null = null
 async function loadPdfJs() {
   if (!('document' in globalThis)) {
     return
   }
-  if (!pdfjsLib) {
-    pdfjsLib = await import('pdfjs-dist')
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.min.mjs'
-  }
+
+  const pdfjsLib: typeof import('pdfjs-dist') | null = await import(
+    'pdfjs-dist'
+  )
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.min.mjs'
+
   return pdfjsLib
 }
 
@@ -81,10 +82,6 @@ export function usePreviewPdf(pdfUrl: string) {
       canvases.length = 0
 
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        if (cancelled) {
-          break
-        }
-
         const page = await pdf.getPage(pageNum)
         const viewport = page.getViewport({ scale: 1.5 })
         const canvas = document.createElement('canvas')
@@ -104,9 +101,7 @@ export function usePreviewPdf(pdfUrl: string) {
         page.render({ canvasContext: context, viewport, canvas })
       }
 
-      if (!cancelled) {
-        setLoading(false)
-      }
+      setLoading(false)
     }
 
     loadPdf().catch((err) => {
