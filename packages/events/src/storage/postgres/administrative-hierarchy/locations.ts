@@ -113,30 +113,6 @@ export async function getLocations({
   return query.execute()
 }
 
-/** @returns a recursive CTE that can be used to get all child locations of a given location */
-function childLocationsCte(parentId: UUID) {
-  return sql`
-    WITH RECURSIVE r AS (
-      SELECT id, parent_id
-      FROM app.locations
-      WHERE id = ${parentId} AND deleted_at IS NULL
-      UNION ALL
-      SELECT l.id, l.parent_id
-      FROM app.locations l
-      JOIN r ON l.parent_id = r.id
-    )
-  `
-}
-
-function isLocationChildOfQuery(parentId: UUID, givenId: UUID) {
-  return sql<{ isChild: boolean }>`
-    ${childLocationsCte(parentId)}
-    SELECT EXISTS (
-      SELECT 1 FROM r WHERE id = ${givenId} AND id <> ${parentId}
-    ) AS "isChild";
-  `
-}
-
 export async function locationExists(locationId: UUID) {
   const db = getClient()
 
