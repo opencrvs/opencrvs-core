@@ -33,7 +33,8 @@ module.exports = [
       'build/**/*',
       'eslint*',
       '**/*.js',
-      '**/__mocks__/**/*'
+      '**/__mocks__/**/*',
+      'public/pdfjs/**'
     ]
   },
   ...compat.extends(

@@ -18,6 +18,7 @@
     "**/coverage",
     "packages/client/public/robots.txt",
     "packages/client/public/mockServiceWorker.js",
+    "packages/client/public/pdfjs/pdf.worker.min.mjs",
     "packages/login/public/robots.txt",
     ".env*",
     ".vs",

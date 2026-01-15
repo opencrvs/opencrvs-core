@@ -10,20 +10,13 @@
  */
 
 import * as React from 'react'
-import { useState } from 'react'
 import styled from 'styled-components'
 import {
   FileFieldValue,
   FileFieldValueWithOption
 } from '@opencrvs/commons/client'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Button } from '@opencrvs/components/lib/Button'
-import { DividerVertical } from '@opencrvs/components/lib/Divider'
-import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
-import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
+import { ImagePreview } from './ImagePreview'
+import { PdfPreview } from './PdfPreview'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -70,95 +63,29 @@ export function DocumentPreview({
   disableDelete,
   id
 }: IProps) {
-  const [zoom, setZoom] = useState(1)
-  const [rotation, setRotation] = useState(0)
-
-  function zoomIn() {
-    setZoom((prevState) => prevState + 0.2)
-  }
-  function zoomOut() {
-    setZoom((prevState) => (prevState >= 1 ? prevState - 0.2 : prevState))
-  }
-  function rotateLeft() {
-    setRotation((prevState) => (prevState - 90) % 360)
-  }
-
-  return (
-    <ViewerWrapper id={id ?? 'preview_image_field'}>
-      <AppBar
-        desktopLeft={<Icon name="Paperclip" size="large" />}
-        desktopRight={
-          <Stack gap={8}>
-            <PanControls
-              rotateLeft={rotateLeft}
-              zoomIn={zoomIn}
-              zoomOut={zoomOut}
-            />
-            {!disableDelete && (
-              <>
-                <DividerVertical />
-                <Button
-                  id="preview_delete"
-                  type="icon"
-                  onClick={() => onDelete(previewImage)}
-                >
-                  <Icon color="red" name="Trash" />
-                </Button>
-              </>
-            )}
-            <DividerVertical />
-            <Button
-              aria-label="Go close"
-              id="preview_close"
-              size="medium"
-              type="icon"
-              onClick={goBack}
-            >
-              <Icon name="X" size="medium" />
-            </Button>
-          </Stack>
-        }
-        desktopTitle={title}
-        mobileLeft={<Icon name="Paperclip" size="large" />}
-        mobileRight={
-          <Stack gap={8}>
-            <PanControls
-              rotateLeft={rotateLeft}
-              zoomIn={zoomIn}
-              zoomOut={zoomOut}
-            />
-            {!disableDelete && (
-              <Button
-                id="preview_delete"
-                type="icon"
-                onClick={() => onDelete(previewImage)}
-              >
-                <Icon color="red" name="Trash" />
-              </Button>
-            )}
-            <Button
-              aria-label="Go back"
-              id="preview_close"
-              size="medium"
-              type="icon"
-              onClick={goBack}
-            >
-              <Icon name="X" size="medium" />
-            </Button>
-          </Stack>
-        }
-        mobileTitle={title}
+  if (previewImage.type.startsWith('image/')) {
+    return (
+      <ImagePreview
+        disableDelete={disableDelete}
+        goBack={goBack}
+        id={id}
+        previewImage={previewImage}
+        title={title}
+        onDelete={onDelete}
       />
-
-      <ViewerContainer>
-        <PanViewer
-          key={Math.random()}
-          id="document_image"
-          image={getUnsignedFileUrl(previewImage.path)}
-          rotation={rotation}
-          zoom={zoom}
-        />
-      </ViewerContainer>
-    </ViewerWrapper>
-  )
+    )
+  }
+  if (previewImage.type.startsWith('application/pdf')) {
+    return (
+      <PdfPreview
+        disableDelete={disableDelete}
+        goBack={goBack}
+        id={id}
+        previewImage={previewImage}
+        title={title}
+        onDelete={onDelete}
+      />
+    )
+  }
+  return null
 }
