@@ -11,12 +11,7 @@
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
-import {
-  AdministrativeArea,
-  joinValues,
-  Location,
-  UUID
-} from '@opencrvs/commons/client'
+import { AdministrativeArea, joinValues, UUID } from '@opencrvs/commons/client'
 
 export enum UserStatus {
   ACTIVE,
@@ -95,8 +90,8 @@ export const getAddressNameV2 = (
 
   // @TODO: this was recursive previously.
   return joinValues([
-    parentAdministrativeArea?.name,
     administrativeArea?.name,
+    parentAdministrativeArea?.name,
     ', '
   ])
 }

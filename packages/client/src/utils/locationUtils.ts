@@ -181,80 +181,50 @@ export function generateLocations(
   return generateSearchableLocations(locationArray, locations, intl, officeId)
 }
 
-export function generateSearchableLocationsV2(
-  locations: Location[],
-  offlineLocations: Map<UUID, Location>,
-  administrativeAreas: Map<UUID, AdministrativeArea>,
-  intl: IntlShape,
-  officeId?: UUID
-) {
-  const office = officeId ? offlineLocations.get(officeId) : null
-
-  if (!office) {
-    const generated: ISearchLocation[] = locations.map((location: Location) => {
-      let fullLocationName = location.name
-
-      const administrativeArea = location.administrativeAreaId
-        ? administrativeAreas.get(location.administrativeAreaId)
-        : null
-      if (administrativeArea) {
-        fullLocationName += `, ${administrativeArea.name}`
-      }
-
-      return {
-        id: location.id,
-        searchableText: location.name,
-        displayLabel: fullLocationName
-      }
-    })
-
-    return generated
-  }
-
-  const administrativeAreaHierarchy = getAdminLevelHierarchyV2(
-    office.administrativeAreaId,
-    administrativeAreas
-  ).map((area) => ({
-    id: area.id,
-    searchableText: area.name,
-    displayLabel: area.name
-  }))
-
-  const administrativeArea = office.administrativeAreaId
-    ? administrativeAreas.get(office.administrativeAreaId)
-    : null
-
-  return [
-    {
-      id: office.id,
-      searchableText: office.name,
-      displayLabel: joinValues([office.name, administrativeArea?.name, ', '])
-    },
-    ...administrativeAreaHierarchy
-  ]
-}
-
-export function generateLocationsV2(
+// @TODO: We probably want to optimise this one if we can't get rid of it.
+export function generateSearchOptions(
   locations: Map<UUID, Location>,
   administrativeAreas: Map<UUID, AdministrativeArea>,
-  intl: IntlShape,
-  filter?: (location: Location) => boolean,
-  officeId?: UUID
+  filter?: (location: Location | AdministrativeArea) => boolean
 ) {
-  let locationArray = [...locations.values()]
+  let locationsArr = Array.from(locations.values())
+  let administrativeAreasArr = Array.from(administrativeAreas.values())
 
   if (filter) {
-    locationArray = locationArray.filter(filter)
+    locationsArr = locationsArr.filter(filter)
+    administrativeAreasArr = administrativeAreasArr.filter(filter)
   }
 
-  return generateSearchableLocationsV2(
-    locationArray,
-    locations,
-    // @todo: filter these if needed
-    administrativeAreas,
-    intl,
-    officeId
+  const generated: ISearchLocation[] = locationsArr.map((location) => {
+    const administrativeArea = location.administrativeAreaId
+      ? administrativeAreas.get(location.administrativeAreaId)
+      : null
+
+    return {
+      id: location.id,
+      searchableText: location.name,
+      displayLabel: joinValues([location.name, administrativeArea?.name], ', ')
+    }
+  })
+
+  const adminAreasGenerated: ISearchLocation[] = administrativeAreasArr.map(
+    (administrativeArea) => {
+      const parentAdministrativeArea = administrativeArea.parentId
+        ? administrativeAreas.get(administrativeArea.parentId)
+        : null
+
+      return {
+        id: administrativeArea.id,
+        searchableText: administrativeArea.name,
+        displayLabel: joinValues(
+          [administrativeArea.name, parentAdministrativeArea?.name],
+          ', '
+        )
+      }
+    }
   )
+
+  return [...generated, ...adminAreasGenerated]
 }
 
 export function getJurisidictionType(
