@@ -212,15 +212,21 @@ describe('event.actions.notify', () => {
         SCOPES.USER_DATA_SEEDING
       ])
 
-      const parentId = generateUuid(rng)
+      const administrativeAreaId = generateUuid(rng)
 
       const locationRng = createPrng(843)
 
-      const locationPayload = generator.locations.set(
-        [{ id: parentId }, { parentId: parentId }, { parentId: parentId }],
+      const administrativeAreaPayload = generator.administrativeAreas.set(
+        [{ id: administrativeAreaId }],
         locationRng
       )
 
+      const locationPayload = generator.locations.set(
+        [{ administrativeAreaId }, { administrativeAreaId }],
+        locationRng
+      )
+
+      await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
       await dataSeedingClient.locations.set(locationPayload)
 
       const locations = await dataSeedingClient.locations.list()
@@ -258,11 +264,13 @@ describe('event.actions.notify', () => {
       await expect(
         client.event.actions.notify.request({
           ...payload,
-          createdAtLocation: parentId
+          createdAtLocation: administrativeAreaId
         })
       ).rejects.toMatchSnapshot()
 
-      const childLocation = locations.find((l) => l.parentId === parentId)
+      const childLocation = locations.find(
+        (l) => l.administrativeAreaId === administrativeAreaId
+      )
 
       if (!childLocation) {
         throw new Error('Child location not found')
