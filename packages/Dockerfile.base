@@ -1,4 +1,7 @@
 FROM node:22-slim
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 RUN apt-get update && apt-get upgrade -y
 
@@ -10,13 +13,16 @@ USER node
 WORKDIR /app
 
 COPY --chown=node:node *.json .
-COPY --chown=node:node yarn.lock .
+COPY --chown=node:node pnpm-lock.yaml .
+COPY --chown=node:node pnpm-workspace.yaml .
+COPY --chown=node:node patches ./patches
 
-RUN yarn install --production --frozen-lockfile
+RUN pnpm fetch --filter ./packages/commons... --filter-prod .
+
+ADD --chown=node:node . ./
+RUN pnpm install -r --offline --filter ./packages/commons... --filter-prod .
 
 COPY --chown=node:node packages/commons /app/packages/commons
 
 WORKDIR /app/packages/commons
-
-RUN yarn install --frozen-lockfile
-RUN yarn build
+RUN pnpm build

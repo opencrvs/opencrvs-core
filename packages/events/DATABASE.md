@@ -52,7 +52,7 @@ See [@opencrvs/migration](/packages/migration/README.md) for more information ar
         import.ts
       # Database client and type configuration
       events.ts
-# `yarn generate-db-types` configuration
+# `pnpm generate-db-types` configuration
 .kanelrc.js
 
 ```
@@ -61,8 +61,8 @@ See [@opencrvs/migration](/packages/migration/README.md) for more information ar
 
 We're using [Kysely](https://kysely.dev/) to interact with PostgreSQL. It provides TypeScript IntelliSense through [Kanel](https://kristiandupont.github.io/kanel/) and `kanel-kysely`.
 
-The schema directory is generated with `yarn generate-db-types`, but runs automatically when @opencrvs/migration runs.
+The schema directory is generated with `pnpm generate-db-types`, but runs automatically when @opencrvs/migration runs.
 
 ## Tests
 
-Tests use a migration file that is essentially a dump of the database schema. You can create it with `yarn generate-db-schema`, requires a running Postgres instance. The tests spin up a testcontainer for Postgres and create a new database for each test.
+Tests use a migration file that is essentially a dump of the database schema. You can create it with `pnpm generate-db-schema`, requires a running Postgres instance. The tests spin up a testcontainer for Postgres and create a new database for each test.

@@ -64,7 +64,7 @@ echo "Schema 'app' dropped and recreated."
 echo "Running migrations"
 echo
 
-yarn --cwd="$DIR/packages/migration" start
+pnpm --dir "$DIR/packages/migration" start
 echo
-yarn reindex
+pnpm reindex
 echo

@@ -37,6 +37,12 @@ jobs:
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v4.1.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
       - name: Checking out the country config repo
         run: |
           git clone -b ${{ github.event.inputs.farajaland }} https://github.com/opencrvs/opencrvs-farajaland.git
@@ -87,12 +93,12 @@ jobs:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         run: |
-          yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          pnpm deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
       - name: Summarise deployment
         run: echo "### Staging deployment\nCore version **$CORE_VERSION**\nFarajaland version **$COUNTRY_CONFIG_VERSION**" >> $GITHUB_STEP_SUMMARY
       - name: Run Cypress tests
         run: |
           cd opencrvs-farajaland
           rm -rf .git
-          yarn install
-          yarn cypress run --headless --browser chrome --record --key e0fc7a26-f292-4e48-9716-2009137fe646
+          pnpm install
+          pnpm cypress run --headless --browser chrome --record --key e0fc7a26-f292-4e48-9716-2009137fe646

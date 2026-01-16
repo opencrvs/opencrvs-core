@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { practitioner } from './mocks/practitioner'
 import { practitionerRoleBundle } from './mocks/practitionerRole'
 import { user } from './mocks/user'
@@ -18,93 +18,83 @@ import { TransactionResponse } from '@opencrvs/commons/types'
 import * as fixtures from '@opencrvs/commons/fixtures'
 import { UUID } from '@opencrvs/commons'
 
-const userHandler = rest.post(
-  'http://localhost:3030/getUser',
-  (_, res, ctx) => {
-    return res(ctx.json(user))
-  }
-)
+const userHandler = http.post('http://localhost:3030/getUser', () => {
+  return HttpResponse.json(user)
+})
 
-const practitionerHandler = rest.get(
+const practitionerHandler = http.get(
   'http://localhost:3447/fhir/Practitioner/:practitionerId',
-  (_, res, ctx) => {
-    return res(ctx.json(practitioner))
+  () => {
+    return HttpResponse.json(practitioner)
   }
 )
 
-const practitionerRoleHandler = rest.get(
+const practitionerRoleHandler = http.get(
   'http://localhost:3447/fhir/PractitionerRole',
-  (_, res, ctx) => {
-    return res(ctx.json(practitionerRoleBundle))
+  () => {
+    return HttpResponse.json(practitionerRoleBundle)
   }
 )
 
-const practitionerRoleHistoryHandler = rest.get(
+const practitionerRoleHistoryHandler = http.get(
   'http://localhost:3447/fhir/PractitionerRole/:practitionerId/_history',
-  (_, res, ctx) => {
-    return res(
-      ctx.json({
-        resourceType: 'Bundle',
-        type: 'history',
-        entry: []
-      })
-    )
+  () => {
+    return HttpResponse.json({
+      resourceType: 'Bundle',
+      type: 'history',
+      entry: []
+    })
   }
 )
 
-const hierarchyHandler = rest.get(
+const hierarchyHandler = http.get(
   'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
-  (_req, res, ctx) => {
-    return res(
-      ctx.json([
-        fixtures.savedAdministrativeLocation({
-          id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
-          name: 'Ibombo',
-          partOf: { reference: 'Location/0' as `Location/${UUID}` }
-        }),
-        fixtures.savedAdministrativeLocation({
-          id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
-          name: 'Ibombo District Office',
-          partOf: {
-            reference:
-              'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb' as `Location/${UUID}`
-          }
-        })
-      ])
-    )
+  () => {
+    return HttpResponse.json([
+      fixtures.savedAdministrativeLocation({
+        id: '0f7684aa-8c65-4901-8318-bf1e22c247cb' as UUID,
+        name: 'Ibombo',
+        partOf: { reference: 'Location/0' as `Location/${UUID}` }
+      }),
+      fixtures.savedAdministrativeLocation({
+        id: 'ce73938d-a188-4a78-9d19-35dfd4ca6957' as UUID,
+        name: 'Ibombo District Office',
+        partOf: {
+          reference:
+            'Location/0f7684aa-8c65-4901-8318-bf1e22c247cb' as `Location/${UUID}`
+        }
+      })
+    ])
   }
 )
 
-const locationHandler = rest.get(
+const locationHandler = http.get(
   'http://localhost:3447/fhir/Location/:locationId',
-  (req, res, ctx) => {
-    const { locationId } = req.params
+  ({ params }) => {
+    const { locationId } = params
     const officeId = 'ce73938d-a188-4a78-9d19-35dfd4ca6957'
     const districtId = '0f7684aa-8c65-4901-8318-bf1e22c247cb'
     const stateId = 'ed6195ff-0f83-4852-832e-dc9db07151ff'
 
     if (locationId === officeId) {
-      return res(ctx.json(office))
+      return HttpResponse.json(office)
     } else if (locationId === districtId) {
-      return res(ctx.json(district))
+      return HttpResponse.json(district)
     } else if (locationId === stateId) {
-      return res(ctx.json(state))
+      return HttpResponse.json(state)
     }
     throw new Error(`no mock set for ${locationId}`)
   }
 )
 
-const indexBundleHandler = rest.post(
-  'http://localhost:9090/record',
-  (_, res, ctx) => {
-    return res(ctx.status(200))
-  }
-)
+const indexBundleHandler = http.post('http://localhost:9090/record', () => {
+  return HttpResponse.json(null, { status: 200 })
+})
 
-const auditEventHandler = rest.post(
+const auditEventHandler = http.post(
   'http://localhost:1050/events/birth/:action',
-  (req, res, ctx) => {
-    const { action } = req.params
+  ({ params }) => {
+    const { action } = params
     const knownActions = [
       'sent-notification-for-review',
       'sent-for-approval',
@@ -121,47 +111,47 @@ const auditEventHandler = rest.post(
     if (!knownActions.includes(action as (typeof knownActions)[number])) {
       throw new Error(`no mock set for "${action}" audit action`)
     }
-    return res(ctx.status(200))
+    return HttpResponse.json(null, { status: 200 })
   }
 )
 
-const sendNotificationHandler = rest.post(
+const sendNotificationHandler = http.post(
   'http://localhost:2020/birth/:event',
-  (req, res, ctx) => {
-    const { event } = req.params
+  ({ params }) => {
+    const { event } = params
     const knownActions = ['ready-for-review', 'sent-for-updates']
     if (!knownActions.includes(event as string)) {
       throw new Error(`no mock set for "${event}" notification event`)
     }
-    return res(ctx.status(200))
+    return HttpResponse.json(null, { status: 200 })
   }
 )
 
-const notificationFlagsHandler = rest.get(
+const notificationFlagsHandler = http.get(
   'http://localhost:2021/informantSMSNotification',
-  (_, res, ctx) => {
-    return res(ctx.json([]))
+  () => {
+    return HttpResponse.json([])
   }
 )
 
-const duplicatesHandler = rest.post(
+const duplicatesHandler = http.post(
   'http://localhost:9090/search/duplicates/:event',
-  (req, res, ctx) => {
-    const { event } = req.params
+  ({ params }) => {
+    const { event } = params
     if (event === 'birth' || event === 'death') {
-      return res(ctx.json([]))
+      return HttpResponse.json([])
     }
     throw new Error(`no mock set for ${event} duplicates`)
   }
 )
-const hearthHandler = rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+const hearthHandler = http.post('http://localhost:3447/fhir', () => {
   const responseBundle: TransactionResponse = {
     resourceType: 'Bundle',
     type: 'batch-response',
     entry: []
   }
 
-  return res(ctx.json(responseBundle))
+  return HttpResponse.json(responseBundle)
 })
 
 const handlers = [

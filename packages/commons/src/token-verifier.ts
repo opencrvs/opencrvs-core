@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import * as Hapi from '@hapi/hapi'
 
 export const verifyToken = async (token: string, authUrl: string) => {
@@ -21,7 +20,7 @@ export const verifyToken = async (token: string, authUrl: string) => {
     }
   })
 
-  const body = await res.json()
+  const body: any = await res.json()
 
   if (body.valid === true) {
     return true

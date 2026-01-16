@@ -28,7 +28,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - uses: mskelton/changelog-reminder-action@v3
         # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
         # to fail
@@ -81,6 +83,12 @@ jobs:
       - name: Checking out git repo
         uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          run_install: false
+
       - name: Check package.json and scripts
         id: check-scripts
         run: |
@@ -105,11 +113,27 @@ jobs:
             fi
           fi
 
-      - name: Use Node.js from .nvmrc
+      - name: Use Node.js from .nvmrc and cache dependencies
         if: steps.check-scripts.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+
+      - name: Get pnpm store directory
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Runs dependency installation
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: CI="" pnpm install
 
       - name: Extract dependencies for ${{ matrix.package }}
         if: steps.check-scripts.outputs.skip != 'true'
@@ -117,17 +141,39 @@ jobs:
         run: |
           DEPENDENCIES=$(node -e "
             const { execSync } = require('child_process');
-            const output = execSync('yarn --silent workspaces info', { encoding: 'utf-8' });
-            const json = JSON.parse(output.replaceAll('@opencrvs', 'packages'));
+            const path = require('path');
 
-            const getDependencies = (pkg) =>
-              json[pkg].workspaceDependencies.concat(
-                json[pkg].workspaceDependencies.flatMap(getDependencies)
-              );
+            // Get all workspace data
+            const output = execSync('pnpm m ls --json', { encoding: 'utf-8' });
+            const allPackagesWithRoot = JSON.parse(output);
+            const allPackages = allPackagesWithRoot.filter((pkg) => !!pkg.name);
 
-            console.log(
-              getDependencies('${{ matrix.package }}').join(' ')
+            const normalize = name => name.replace(/^@opencrvs\//, 'packages/');
+
+            // Convert to map for quick lookup
+            const pkgMap = Object.fromEntries(
+              allPackages.map(pkg => [normalize(pkg.name), pkg])
             );
+
+            const visited = new Set();
+
+            function getDeps(pkgName) {
+              if (visited.has(pkgName)) return [];
+              visited.add(pkgName);
+
+              const pkg = pkgMap[pkgName];
+              if (!pkg || !pkg.dependencies) return [];
+
+              const workspaceDeps = Object.keys(pkg.dependencies)
+                .filter(name => pkgMap[normalize(name)]); // is workspace package?
+
+              return workspaceDeps.flatMap(dep =>
+                [normalize(dep), ...getDeps(normalize(dep))]
+              );
+            }
+
+            const root = normalize('${{ matrix.package }}');
+            console.log(getDeps(root).join(' '));
           ")
           echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
           echo "Found dependencies: $DEPENDENCIES"
@@ -144,41 +190,27 @@ jobs:
             fi
           done
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}',matrix.package,'package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Verify every file has a license header
         if: steps.check-scripts.outputs.skip != 'true'
         run: npx license-check-and-add check -f license-config.json
 
-      - name: Runs dependency installation
-        if: steps.check-scripts.outputs.skip != 'true'
-        run: CI="" yarn install --frozen-lockfile
-
       - name: Build common package
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
-        run: cd packages/commons && yarn build
+        run: cd packages/commons && pnpm build
 
       - name: Build components
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
         run: |
-          cd packages/components && yarn build
+          cd packages/components && pnpm build
 
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
-        run: cd ${{ matrix.package }} && yarn lint
+        run: cd ${{ matrix.package }} && pnpm lint
 
       - name: Run Unit Test
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
-        run: cd ${{ matrix.package }} && yarn test
+        run: cd ${{ matrix.package }} && pnpm test
 
       - name: Generate test coverage summary
         if: github.event_name == 'pull_request'
@@ -226,27 +258,79 @@ jobs:
         with:
           fetch-depth: 0 # Fetch history to compare PR changes against the base branch
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          run_install: false
+
+      - name: Detect changes in v2-events
+        id: detect-changes
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q 'packages/client/src/v2-events/'; then
+            echo "chromatic_required=true" >> $GITHUB_OUTPUT
+          else
+            echo "chromatic_required=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+
+      - name: Get pnpm store directory
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: CI="" pnpm install
 
       - name: Extract dependencies for client
         id: extract-dependencies
         run: |
           DEPENDENCIES=$(node -e "
             const { execSync } = require('child_process');
-            const output = execSync('yarn --silent workspaces info', { encoding: 'utf-8' });
-            const json = JSON.parse(output.replaceAll('@opencrvs', 'packages'));
+            const path = require('path');
 
-            const getDependencies = (pkg) =>
-              json[pkg].workspaceDependencies.concat(
-                json[pkg].workspaceDependencies.flatMap(getDependencies)
-              );
+            // Get all workspace data
+            const output = execSync('pnpm m ls --json', { encoding: 'utf-8' });
+            const allPackagesWithRoot = JSON.parse(output);
+            const allPackages = allPackagesWithRoot.filter((pkg) => !!pkg.name);
 
-            console.log(
-              getDependencies('packages/client').join(' ')
+            const normalize = name => name.replace(/^@opencrvs\//, 'packages/');
+
+            // Create a map of workspace packages by normalized name
+            const pkgMap = Object.fromEntries(
+              allPackages.map(pkg => [normalize(pkg.name), pkg])
             );
+
+            const visited = new Set();
+
+            function getDeps(pkgName) {
+              if (visited.has(pkgName)) return [];
+              visited.add(pkgName);
+
+              const pkg = pkgMap[pkgName];
+              if (!pkg || !pkg.dependencies) return [];
+
+              const workspaceDeps = Object.keys(pkg.dependencies)
+                .filter(name => pkgMap[normalize(name)]); // keep only internal workspaces
+
+              return workspaceDeps.flatMap(dep =>
+                [normalize(dep), ...getDeps(normalize(dep))]
+              );
+            }
+
+            const root = 'packages/client';
+            console.log(getDeps(root).join(' '));
           ")
           echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
           echo "Found dependencies: $DEPENDENCIES"
@@ -262,25 +346,12 @@ jobs:
             fi
           done
 
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: CI="" yarn install --frozen-lockfile
-
       - name: Build common package
-        run: cd packages/commons && yarn build
+        run: cd packages/commons && pnpm build
 
       - name: Build components
         run: |
-          cd packages/components && yarn build
+          cd packages/components && pnpm build
 
       - name: Upload filesystem as artifact
         uses: actions/upload-artifact@v4.5.0
@@ -304,29 +375,37 @@ jobs:
           name: client
           path: .
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
+      - name: Get pnpm store directory
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: CI="" yarn install --frozen-lockfile
+        run: CI="" pnpm install
 
       - name: Compile
-        run: cd packages/client && yarn test:compilation
+        run: cd packages/client && pnpm test:compilation
 
       - name: Run linting
-        run: cd packages/client && yarn lint
+        run: cd packages/client && pnpm lint
 
   chromatic:
     name: Run chromatic visual tests
@@ -340,23 +419,31 @@ jobs:
           name: client
           path: .
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
+      - name: Get pnpm store directory
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: CI="" yarn install --frozen-lockfile
+        run: CI="" pnpm install
 
       - name: Fetch full Git history
         run: |
@@ -371,7 +458,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Chromatic
-        run: yarn run chromatic
+        run: pnpm run chromatic
         working-directory: packages/client
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
@@ -388,39 +475,47 @@ jobs:
           name: client
           path: .
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
+      - name: Get pnpm store directory
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: CI="" yarn install --frozen-lockfile
+        run: CI="" pnpm install
 
       - name: Install Playwright
         # Playwright is required since @storybook/test-runner depends on it
-        run: npx playwright install --with-deps
+        run: pnpm --dir packages/client add -D playwright && pnpm --filter ./packages/client exec playwright install --with-deps
 
       - name: Build Storybook
         working-directory: packages/client
-        run: yarn run build-storybook
+        run: pnpm run build-storybook
 
       - name: Serve Storybook and run tests
         working-directory: packages/client
         # based on https://storybook.js.org/docs/writing-tests/test-runner#run-against-non-deployed-storybooks
         run: |
-          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
-            "npx http-server storybook-static --port 6006 --silent" \
-            "npx wait-on tcp:127.0.0.1:6006 && yarn test-storybook"
+          pnpm dlx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "pnpm dlx http-server storybook-static --port 6006 --silent" \
+            "pnpm dlx wait-on tcp:127.0.0.1:6006 && pnpm test-storybook"
 
   test-client:
     name: Test client
@@ -437,27 +532,34 @@ jobs:
         with:
           name: client
           path: .
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          run_install: false
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
 
-      - name: Cache Node.js dependencies
+      - name: Get pnpm store directory
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: CI="" yarn install --frozen-lockfile
+        run: CI="" pnpm install
 
       - name: Run Unit Test
-        run: cd packages/client && yarn test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
+        run: cd packages/client && pnpm test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
   lint-knip:
     name: Lint unused exports with Knip
@@ -469,21 +571,28 @@ jobs:
         with:
           ref: ${{ github.base_ref }}
           path: base
-
-      - name: Checkout the PR branch
-        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
         with:
-          ref: ${{ github.head_ref }}
-          path: pr
-
+          version: 10
       - name: Use Node.js from .nvmrc from base branch
         uses: actions/setup-node@v4
         with:
           node-version-file: base/.nvmrc
 
       - name: Install base dependencies
-        run: yarn install --ignore-scripts
+        run: pnpm install --ignore-scripts
         working-directory: base
+
+      - name: Checkout the PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          path: pr
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
 
       - name: Use Node.js from .nvmrc from PR branch
         uses: actions/setup-node@v4
@@ -491,7 +600,7 @@ jobs:
           node-version-file: pr/.nvmrc
 
       - name: Install PR dependencies
-        run: yarn install --ignore-scripts
+        run: pnpm install --ignore-scripts
         working-directory: pr
 
       - name: Run knip on base branch
@@ -530,6 +639,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
@@ -540,16 +653,16 @@ jobs:
         with:
           timeout_minutes: 10
           max_attempts: 3
-          command: yarn install --frozen-lockfile
+          command: pnpm install
 
       - name: Build commons
-        run: yarn build
+        run: pnpm build
         working-directory: packages/commons
 
       - name: Build events
-        run: yarn build
+        run: pnpm build
         working-directory: packages/events
 
       - name: Build toolkit
-        run: yarn build
+        run: pnpm build
         working-directory: packages/toolkit

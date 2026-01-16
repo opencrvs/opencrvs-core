@@ -51,6 +51,8 @@
     "packages/toolkit/tsconfig.tsbuildinfo",
     "packages/commons/src/events/EventConfig.mermaid",
     "packages/commons/src/events/EventUpdateFlow.mermaid",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
     "packages/events/src/storage/postgres/events/schema/**/*.ts",
     "packages/events/.kanelrc.js",
     "packages/dashboards/data/metabase/*",

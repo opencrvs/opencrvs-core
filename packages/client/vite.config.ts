@@ -76,6 +76,7 @@ export default defineConfig(({ mode }) => {
      */
     define: {
       'process.env': {},
+      global: 'globalThis',
       APP_VERSION: JSON.stringify(process.env.npm_package_version)
     },
     // This changes the output dir from dist to build

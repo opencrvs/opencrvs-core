@@ -8,15 +8,12 @@
     "linux"
   ],
   "engines": {
-    "node": "22.x.x"
+    "node": "22.x.x",
+    "yarn": "Please use pnpm. Install pnpm with 'npm install -g pnpm'."
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "postinstall": "patch-package",
     "start": "lerna run build --scope @opencrvs/commons && lerna run build --scope @opencrvs/components && lerna run --stream --parallel --ignore @opencrvs/mobile-proxy $OTHER_LERNA_FLAGS start",
-    "start:prod": "yarn build && lerna run --stream --parallel --ignore @opencrvs/components --ignore @opencrvs/mobile-proxy $OTHER_LERNA_FLAGS start:prod",
+    "start:prod": "pnpm build && lerna run --stream --parallel --ignore @opencrvs/components --ignore @opencrvs/mobile-proxy $OTHER_LERNA_FLAGS start:prod",
     "dev": "bash development-environment/dev.sh",
     "dev:secrets:gen": "openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem",
     "open": "opener 'http://localhost:6060/' && opener 'http://localhost:3020/'",
@@ -26,8 +23,8 @@
     "compose:deps": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up",
     "compose:deps:detached": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up -d",
     "compose:down:deps": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
-    "cov:client": "cd packages/client && yarn open:cov",
-    "cov:login": "cd packages/login && yarn open:cov",
+    "cov:client": "cd packages/client && pnpm open:cov",
+    "cov:login": "cd packages/login && pnpm open:cov",
     "db:clear:all": "bash development-environment/clear-all-data.sh",
     "reindex": "bash development-environment/reindex.sh",
     "build": "lerna run build --stream && lerna run build-storybook",
@@ -43,22 +40,52 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@types/dotenv": "^6.1.0",
+    "@typescript-eslint/parser": "^8.33.1",
     "concurrently": "^8.0.0",
+    "globals": "^16.2.0",
     "husky": "^9.1.6",
     "lerna": "^8.0.0",
     "lint-staged": "^15.2.10",
-    "prettier": "3.5.3"
+    "prettier": "3.5.3",
+    "typescript": "5.6.3"
   },
   "dependencies": {
-    "@types/react-signature-canvas": "^1.0.2",
     "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
-    "patch-package": "^6.1.2",
-    "postinstall-postinstall": "^2.0.0",
-    "react-signature-canvas": "^1.0.6"
+    "postinstall-postinstall": "^2.0.0"
   },
   "resolutions": {
     "@types/react": "18.3.1",
     "fast-xml-parser": "4.4.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "enzyme@^3.4.4>cheerio@1.0.0": "1.0.0-rc.12",
+      "zod": "^4.1.13"
+    },
+    "onlyBuiltDependencies": [
+      "@apollo/protobufjs",
+      "@swc/core",
+      "core-js",
+      "core-js-pure",
+      "cpu-features",
+      "dtrace-provider",
+      "ejs",
+      "es5-ext",
+      "esbuild",
+      "iframe-resizer",
+      "mongodb-memory-server",
+      "msgpackr-extract",
+      "msw",
+      "ngrok",
+      "nx",
+      "postinstall-postinstall",
+      "protobufjs",
+      "ssh2",
+      "unrs-resolver"
+    ],
+    "patchedDependencies": {
+      "pdfmake@0.2.20": "patches/pdfmake@0.2.20.patch"
+    }
   }
 }

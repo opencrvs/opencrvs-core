@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [This package is not regularly maintained or supported. It is included for reference.](#this-package-is-not-regularly-maintained-or-supported-it-is-included-for-reference)
 
@@ -18,7 +19,7 @@ You can run a PWA on an Android device and connect to OpenCRVS running on your l
 AUTH_TOKEN=THE_AUTH_TOKEN_YOU_GOT_HERE
 ```
 
-4. Start the opencrvs-core development environment as you normally would, but add `--ignore @opencrvs/client` to the start command in the root package.json file. E.G. `yarn start --ignore @opencrvs/client`
+4. Start the opencrvs-core development environment as you normally would, but add `--ignore @opencrvs/client` to the start command in the root package.json file. E.G. `pnpm start --ignore @opencrvs/client`
 
-5. Run `yarn start` in this mobile-proxy package
+5. Run `pnpm start` in this mobile-proxy package
 6. You should now have an ngrok url that can be used remotely on any device. It's still required to be in the same network as the host machine, as some services (login) aren't used through ngrok.

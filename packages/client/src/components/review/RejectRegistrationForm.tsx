@@ -27,8 +27,8 @@ import { UserDetails } from '@client/utils/userUtils'
 import {
   IRejectRegistrationForm,
   rejectRegistration
-} from '@opencrvs/client/src/review/reject-registration'
-import { IStoreState } from '@opencrvs/client/src/store'
+} from '@client/review/reject-registration'
+import { IStoreState } from '@client/store'
 import { Button } from '@opencrvs/components/lib/Button'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { isEmpty } from 'lodash'

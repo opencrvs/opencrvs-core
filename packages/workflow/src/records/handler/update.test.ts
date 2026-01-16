@@ -12,7 +12,7 @@ import { updateBirthRegistrationPayload } from '@test/mocks/updateBirthRecord'
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import {
@@ -53,16 +53,16 @@ describe('Update record endpoint', () => {
 
     // Gets record by id via getRecordById endpoint
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
-        (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+        () => {
+          return HttpResponse.json(READY_FOR_REVIEW_BIRTH_RECORD)
         }
       )
     )
 
     mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+      http.post('http://localhost:3447/fhir', () => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
           entry: [
@@ -161,7 +161,7 @@ describe('Update record endpoint', () => {
           type: 'transaction-response'
         }
 
-        return res(ctx.json(responseBundle))
+        return HttpResponse.json(responseBundle)
       })
     )
 

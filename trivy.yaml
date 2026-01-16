@@ -18,8 +18,7 @@ scan:
     - data
     - development-environment
     - sequence-diagrams
-    - usr/local/share/.cache/yarn/v6/
-    - home/node/.cache/yarn/v6
+    - usr/local/share/pnpm/store
   skip-files:
     - '**/*.dockerignore'
   scanners:

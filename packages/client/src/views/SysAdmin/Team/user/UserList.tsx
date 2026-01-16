@@ -68,7 +68,7 @@ import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
-import { stringify } from 'querystring'
+import { stringify } from '@client/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { Location, LocationType, UUID } from '@opencrvs/commons/client'
 

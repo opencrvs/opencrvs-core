@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
 import {
   fhirUrl,
@@ -114,7 +113,7 @@ export async function fetchChildLocationsWithTypeByParentId(
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
 
-export function fetchFromResource(
+export function fetchFromResource<T = any>(
   suffix: string,
   authHeader: IAuthHeader,
   method = 'GET',
@@ -129,7 +128,7 @@ export function fetchFromResource(
     body
   })
     .then((response) => {
-      return response.json()
+      return response.json() as Promise<T>
     })
     .catch((error) => {
       return Promise.reject(
@@ -204,7 +203,7 @@ export async function countRegistrarsByLocation(
       locationId
     })
   })
-  return res.json()
+  return res.json() as Promise<{ registrars: number }>
 }
 
 export async function uploadFileToMinio(fileData: Buffer): Promise<string> {
@@ -216,7 +215,7 @@ export async function uploadFileToMinio(fileData: Buffer): Promise<string> {
       },
       body: fileData
     })
-    const res = await result.json()
+    const res = (await result.json()) as { refUrl: string }
     return res.refUrl
   } catch (err) {
     logger.error(err)

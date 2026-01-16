@@ -92,11 +92,7 @@ test('Returns both normal users and system users', async () => {
         return HttpResponse.json(foundUser)
       }
 
-      return HttpResponse.json(
-        null,
-        // @ts-expect-error - MSW does not have a type for this?
-        { status: 401 }
-      )
+      return HttpResponse.json(null, { status: 401 })
     })
   )
 
@@ -119,11 +115,7 @@ test('Returns both normal users and system users', async () => {
         })
       }
 
-      return HttpResponse.json(
-        null,
-        // @ts-expect-error - MSW does not have a type for this?
-        { status: 401 }
-      )
+      return HttpResponse.json(null, { status: 401 })
     })
   )
 
@@ -145,7 +137,7 @@ test('Does not return users or systems which are not found', async () => {
 
       return HttpResponse.json(
         null,
-        // @ts-expect-error - MSW does not have a type for this?
+
         { status: 401 }
       )
     })

@@ -20,12 +20,12 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   RegisterForm,
   FullProps
-} from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+} from '@client/views/RegisterForm/RegisterForm'
 
-import { IStoreState } from '@opencrvs/client/src/store'
+import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
-import { getReviewForm } from '@opencrvs/client/src/forms/register/review-selectors'
-import { IDeclaration } from '@opencrvs/client/src/declarations'
+import { getReviewForm } from '@client/forms/register/review-selectors'
+import { IDeclaration } from '@client/declarations'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'

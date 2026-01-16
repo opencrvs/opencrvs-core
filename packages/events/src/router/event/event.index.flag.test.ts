@@ -52,11 +52,7 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
     http.post(
       `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
-        return HttpResponse.json(
-          {},
-          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
-          { status: 202 }
-        )
+        return HttpResponse.json({}, { status: 202 })
       }
     )
   )
@@ -104,7 +100,7 @@ test('Does not add any flags when accepted form countryconfig', async () => {
       () => {
         return HttpResponse.json(
           { registrationNumber: 'SOME0REG0NUM' },
-          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
+
           { status: 200 }
         )
       }
@@ -152,11 +148,7 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
     http.post(
       `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/REGISTER`,
       () => {
-        return HttpResponse.json(
-          {},
-          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
-          { status: 400 }
-        )
+        return HttpResponse.json({}, { status: 400 })
       }
     )
   )

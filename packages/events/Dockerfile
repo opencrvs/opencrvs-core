@@ -3,10 +3,13 @@ FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
 USER node
 
-WORKDIR /app/packages/events
+WORKDIR /app
 COPY --chown=node:node packages/events/*.json /app/packages/events/
-RUN NODE_ENV=production yarn install --frozen-lockfile
-COPY --chown=node:node packages/events /app/packages/events
-RUN yarn build
+RUN pnpm fetch --filter ./packages/events... 
+RUN pnpm install -r --offline --filter ./packages/events...
 
-CMD [ "yarn", "start:prod" ]
+WORKDIR /app/packages/events
+COPY --chown=node:node packages/events /app/packages/events
+RUN pnpm build
+
+CMD [ "pnpm", "start:prod" ]

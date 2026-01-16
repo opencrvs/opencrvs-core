@@ -21,8 +21,8 @@ CLICKATELL_PASSWORD=<password>
 CLICKATELL_API_ID=<api_id>
 ```
 
-Start the service with `yarn start`
+Start the service with `pnpm start`
 
-Watch the tests with `yarn test:watch`
+Watch the tests with `pnpm test:watch`
 
 When in dev mode swagger API docs are available at `http://localhost:2020/documentation`

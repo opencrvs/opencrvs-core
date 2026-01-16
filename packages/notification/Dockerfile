@@ -3,8 +3,14 @@ FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
 USER node
 
-WORKDIR /app/packages/notification
-COPY --chown=node:node packages/notification /app/packages/notification
-RUN yarn install --frozen-lockfile && yarn build
+WORKDIR /app
 
-CMD [ "yarn", "start:prod" ]
+COPY --chown=node:node packages/notification /app/packages/notification
+
+RUN pnpm fetch --filter ./packages/notification... 
+RUN pnpm install -r --offline --filter ./packages/notification...
+
+WORKDIR /app/packages/notification
+RUN pnpm build
+
+CMD [ "pnpm", "start:prod" ]

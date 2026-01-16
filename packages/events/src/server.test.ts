@@ -142,7 +142,6 @@ test('Server will accept requests after error', async () => {
     http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
       return HttpResponse.json(
         { message: 'Invalid credentials' },
-        // @ts-expect-error - MSW does not have a type for this?
         { status: 401 }
       )
     })

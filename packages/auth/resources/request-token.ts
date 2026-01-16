@@ -10,7 +10,6 @@
  */
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
-import fetch from 'node-fetch'
 import * as readline from 'readline'
 
 const rl = readline.createInterface({
@@ -68,7 +67,7 @@ if (options.help) {
       throw new Error(`Received ${authRes.status} when trying to authenticate`)
     }
 
-    const authResJson = await authRes.json()
+    const authResJson: any = await authRes.json()
 
     let code = '000000'
     if (options.code) {
@@ -94,7 +93,7 @@ if (options.help) {
       throw new Error(`Received ${verifyRes.status} when trying to verify code`)
     }
 
-    const verifyResJson = await verifyRes.json()
+    const verifyResJson: any = await verifyRes.json()
 
     // eslint-disable-next-line no-console
     console.log('Token:\n')

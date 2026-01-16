@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { env } from './environment'
-import fetch from 'node-fetch'
 import { seedLocations } from './locations'
 import { seedUsers } from './users'
 import { parseGQLResponse, raise } from './utils'
@@ -36,7 +35,7 @@ async function getToken(): Promise<string> {
       res.statusText
     )
   }
-  const body = await res.json()
+  const body = (await res.json()) as { token: string }
   return body.token
 }
 
@@ -89,7 +88,7 @@ async function deactivateSuperuser(token: string) {
     })
   })
 
-  parseGQLResponse(await res.json())
+  parseGQLResponse((await res.json()) as { data: unknown })
 }
 
 async function main() {
