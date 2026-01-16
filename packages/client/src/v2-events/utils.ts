@@ -100,14 +100,6 @@ function isTextField(field: FieldConfig): field is TextField {
   return field.type === FieldType.TEXT
 }
 
-function isTemplateObject(value: FieldConfigDefaultValue) {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    Object.keys(value).every((key) => key.startsWith('$'))
-  )
-}
-
 function resolveAndValidateFieldValue({
   field,
   resolvedValue,
@@ -157,18 +149,6 @@ export function replacePlaceholders({
 
   if (isFieldValueWithoutTemplates(defaultValue)) {
     return defaultValue
-  }
-
-  if (isTemplateObject(defaultValue)) {
-    // We only support resolving one template variable at a time in an object.
-    const templateKey = Object.keys(defaultValue)[0]
-    const resolvedValue = get(systemVariables, templateKey)
-
-    return resolveAndValidateFieldValue({
-      field,
-      resolvedValue,
-      context: JSON.stringify(defaultValue)
-    })
   }
 
   if (isTemplateVariable(defaultValue)) {

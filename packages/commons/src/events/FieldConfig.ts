@@ -262,9 +262,7 @@ export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: SerializedNowDateTime.transform(() => ({
-    $$date: 'now' as const
-  }))
+  defaultValue: SerializedNowDateTime.transform(() => '$$date' as const)
     .or(DateValue)
     .optional()
     .openapi({ effectType: 'input', type: 'object' })
@@ -294,9 +292,7 @@ export type AgeField = z.infer<typeof AgeField>
 
 const TimeField = BaseField.extend({
   type: z.literal(FieldType.TIME),
-  defaultValue: SerializedNowDateTime.transform(() => ({
-    $$time: 'now' as const
-  }))
+  defaultValue: SerializedNowDateTime.transform(() => '$$time' as const)
     .or(TimeValue)
     .optional()
     .openapi({ effectType: 'input', type: 'object' })
