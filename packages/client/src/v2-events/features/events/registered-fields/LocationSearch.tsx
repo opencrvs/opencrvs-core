@@ -156,8 +156,8 @@ function toCertificateVariables(
     : undefined
 
   const parentAdministrativeAreaId =
-    (location as Location).administrativeAreaId ??
-    (location as AdministrativeArea).parentId
+    (location as Location | undefined)?.administrativeAreaId ??
+    (location as AdministrativeArea | undefined)?.parentId
 
   const adminLevelHierarchy = getAdminLevelHierarchy(
     parentAdministrativeAreaId,
