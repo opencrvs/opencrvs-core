@@ -14,7 +14,7 @@ import {
   Location as LocationIcon,
   Cross
 } from '@opencrvs/components/lib/icons'
-import { generateSearchOptions } from '@client/utils/locationUtils'
+import { createSearchOptions } from '@client/utils/locationUtils'
 import {
   ISearchLocation,
   LocationSearch
@@ -94,6 +94,9 @@ const StyledLocationSearch = styled(LocationSearch)`
   }
 `
 
+/**
+ * @deprecated - replace with SearchableSelect from v2.0 onwards
+ */
 export function LocationPicker({
   locationFilter,
   selectedLocationId,
@@ -110,11 +113,11 @@ export function LocationPicker({
   const locations = getLocations.useSuspenseQuery()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  const offlineSearchableLocations = generateSearchOptions(
+  const offlineSearchableLocations = createSearchOptions({
     locations,
     administrativeAreas,
-    locationFilter
-  )
+    filter: locationFilter
+  })
 
   const searchableLocations = [
     ...additionalLocations,

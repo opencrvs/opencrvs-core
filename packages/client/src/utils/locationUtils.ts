@@ -178,12 +178,15 @@ export function generateLocations(
   return generateSearchableLocations(locationArray, locations, intl, officeId)
 }
 
-// @TODO: We probably want to optimise this one if we can't get rid of it.
-export function createSearchOptions(
-  locations: Map<UUID, Location>,
-  administrativeAreas: Map<UUID, AdministrativeArea>,
+export function createSearchOptions({
+  locations,
+  administrativeAreas,
+  filter
+}: {
+  locations: Map<UUID, Location>
+  administrativeAreas: Map<UUID, AdministrativeArea>
   filter?: (location: Location | AdministrativeArea) => boolean
-) {
+}) {
   let locationsArr = Array.from(locations.values())
   let administrativeAreasArr = Array.from(administrativeAreas.values())
 
@@ -394,24 +397,6 @@ function getAssociatedLocationsAndOffices(
   })
 
   return [office, ...associatedLocations]
-}
-
-// Returns all the ancestor locations and the office itself in no particular order
-function getAssociatedLocationsAndOfficesV2(
-  office: Location,
-  administrativeAreas: Map<UUID, AdministrativeArea>
-): [Location, ...AdministrativeArea[]] {
-  if (!office) {
-    return [office]
-  }
-
-  return [
-    office,
-    ...getAdminLevelHierarchyV2(
-      office.administrativeAreaId,
-      administrativeAreas
-    )
-  ]
 }
 
 export function generateFullAddress(

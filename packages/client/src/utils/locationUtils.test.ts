@@ -17,10 +17,15 @@ import {
   generateLocationName,
   getJurisidictionType,
   isOfficeUnderJurisdiction,
-  getLocationNameMapOfFacility
+  getLocationNameMapOfFacility,
+  createSearchOptions
 } from '@client/utils/locationUtils'
 import { createIntl } from 'react-intl'
 import { ILanguage } from '@client/i18n/reducer'
+import {
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+  V2_DEFAULT_MOCK_LOCATIONS_MAP
+} from '../tests/v2-events/administrative-hierarchy-mock'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {
@@ -208,5 +213,28 @@ describe('isOfficeUnderJurisdiction', () => {
         mockOfflineData.offices
       )
     ).toEqual(false)
+  })
+})
+
+describe('createSearchOptions', () => {
+  it('creates search options for locations and administrative areas', () => {
+    const options = createSearchOptions({
+      locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+      administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+    })
+
+    expect(options).toMatchSnapshot()
+  })
+
+  it('filters search options for both locations and administrative areas', () => {
+    const options = createSearchOptions({
+      locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+      administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+      filter: (f) => f.name.includes('Ibombo')
+    })
+
+    console.log('options', options)
+
+    expect(options).toMatchSnapshot()
   })
 })
