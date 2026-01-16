@@ -44,6 +44,7 @@
     "@types/boom": "^7.3.1",
     "@types/fhir": "^0.0.30",
     "@types/hapi__hapi": "^20.0.13",
+    "@types/jest": "^26.0.14",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.126",

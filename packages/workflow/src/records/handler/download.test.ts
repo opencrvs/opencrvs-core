@@ -62,7 +62,7 @@ describe('download record endpoint', () => {
       })
     )
 
-    const res = await server.server.inject({
+    const res = (await server.server.inject({
       method: 'POST',
       url: '/download-record',
       payload: {
@@ -71,7 +71,7 @@ describe('download record endpoint', () => {
       headers: {
         Authorization: `Bearer ${token}`
       }
-    })
+    })) as { payload: any; statusCode: number }
 
     // The download process schedules the callback of hearth and search
     // for later, before that the server is stopped and when two callbacks
@@ -100,10 +100,10 @@ describe('download record endpoint', () => {
 
     // Fetches a record from search
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
-        (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+        () => {
+          return HttpResponse.json(READY_FOR_REVIEW_BIRTH_RECORD)
         }
       )
     )

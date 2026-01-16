@@ -60,7 +60,8 @@
   },
   "pnpm": {
     "overrides": {
-      "enzyme@^3.4.4>cheerio@1.0.0": "1.0.0-rc.12"
+      "enzyme@^3.4.4>cheerio@1.0.0": "1.0.0-rc.12",
+      "zod": "^4.1.13"
     },
     "onlyBuiltDependencies": [
       "@apollo/protobufjs",
