@@ -100,7 +100,6 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
-    case FieldType.EMAIL:
     case FieldType.TIME:
     case FieldType.ALPHA_HIDDEN:
       return { type: 'text' }

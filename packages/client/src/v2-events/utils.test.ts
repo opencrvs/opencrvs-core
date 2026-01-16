@@ -12,13 +12,17 @@ import {
   AddressType,
   field,
   FieldType,
-  InteractiveFieldType
+  InteractiveFieldType,
+  SystemVariables,
+  user
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from './utils'
+import { handleDefaultValue } from './hooks/useDefaultValues'
 
 const TextField = {
   id: 'recommender.id',
   type: FieldType.TEXT,
+  defaultValue: user('name'),
   required: true,
   conditionals: [],
   label: {
@@ -26,6 +30,24 @@ const TextField = {
     description: 'This is the label for the field',
     id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
   }
+} satisfies InteractiveFieldType
+
+const NameField = {
+  id: 'applicant.name',
+  type: FieldType.NAME,
+  label: {
+    defaultMessage: 'Name of applicant',
+    description: 'This is the title for the name field',
+    id: 'event.tennis-club-membership.action.declare.form.section.who.field.name.label'
+  },
+  hideLabel: true,
+  required: true,
+  defaultValue: {
+    firstname: user('firstname'),
+    middlename: user('middlename'),
+    surname: user('surname')
+  },
+  validation: []
 } satisfies InteractiveFieldType
 
 const AddressField = {
@@ -195,9 +217,10 @@ const testCases = [
     currentValue: undefined,
     defaultValue: undefined,
     systemVariables: {
-      $user: {
+      user: {
         name: '',
-        role: ''
+        role: '',
+        id: ''
       },
       $window: {
         location: {
@@ -207,17 +230,18 @@ const testCases = [
           hostname: 'example.com'
         }
       }
-    },
+    } satisfies SystemVariables,
     expected: undefined,
-    field: AddressField
+    field: AddressField satisfies InteractiveFieldType
   },
   {
     currentValue: undefined,
     defaultValue: 'Hello',
     systemVariables: {
-      $user: {
+      user: {
         name: '',
-        role: ''
+        role: '',
+        id: ''
       },
       $window: {
         location: {
@@ -227,48 +251,8 @@ const testCases = [
           hostname: 'example.com'
         }
       }
-    },
+    } satisfies SystemVariables,
     expected: 'Hello',
-    field: TextField
-  },
-  {
-    currentValue: undefined,
-    defaultValue: '$user.name',
-    systemVariables: {
-      $user: {
-        name: 'Jon Doe',
-        role: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    },
-    expected: 'Jon Doe',
-    field: TextField
-  },
-  {
-    currentValue: 'Hello world',
-    defaultValue: '$user.name',
-    systemVariables: {
-      $user: {
-        name: 'Jon Doe',
-        role: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    },
-    expected: 'Hello world',
     field: TextField
   },
   {
@@ -278,9 +262,10 @@ const testCases = [
       addressType: AddressType.DOMESTIC
     },
     systemVariables: {
-      $user: {
+      user: {
         name: 'Jon Doe',
-        role: 'Field Agent'
+        role: 'Field Agent',
+        id: ''
       },
       $window: {
         location: {
@@ -290,7 +275,7 @@ const testCases = [
           hostname: 'example.com'
         }
       }
-    },
+    } satisfies SystemVariables,
     expected: {
       country: 'FAR',
       addressType: AddressType.DOMESTIC
@@ -307,6 +292,64 @@ describe('replacePlaceholders', () => {
       props.defaultValue
     )} returns ${JSON.stringify(expected)}`, () => {
       const result = replacePlaceholders(props)
+      expect(result).toEqual(expected)
+    })
+  })
+})
+
+const testCasesForDefaultValue = [
+  {
+    systemVariables: {
+      user: {
+        name: 'Jon Doe',
+        role: '',
+        id: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
+      }
+    } satisfies SystemVariables,
+    expected: 'Jon Doe',
+    field: TextField
+  },
+  {
+    systemVariables: {
+      user: {
+        name: 'Jon Doe',
+        firstname: 'Jon',
+        surname: 'Doe',
+        role: '',
+        id: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
+      }
+    } satisfies SystemVariables,
+    expected: {
+      firstname: 'Jon',
+      middlename: '',
+      surname: 'Doe'
+    },
+    field: NameField
+  }
+]
+
+describe('handleDefaultValue', () => {
+  testCasesForDefaultValue.forEach(({ expected, ...props }) => {
+    it(`When field type is ${JSON.stringify(
+      props.field.type
+    )} returns ${JSON.stringify(expected)}`, () => {
+      const result = handleDefaultValue(props)
       expect(result).toEqual(expected)
     })
   })

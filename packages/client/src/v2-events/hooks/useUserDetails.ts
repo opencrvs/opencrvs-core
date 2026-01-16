@@ -11,6 +11,7 @@
 
 import { useIntl, defineMessages } from 'react-intl'
 import { useSelector } from 'react-redux'
+import { personNameFromV1ToV2 } from '@opencrvs/commons/client'
 import { ActionType, TokenUserType } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUsersFullName } from '@client/v2-events/utils'
@@ -79,11 +80,19 @@ export function useUserDetails() {
     }
 
     const user = users.find((u) => u.id === createdBy)
+    const splitNames = user?.name
+      ? personNameFromV1ToV2(user.name)
+      : {
+          firstname: '',
+          middlename: '',
+          surname: ''
+        }
 
     return {
       type: 'user',
       name: user ? getUsersFullName(user.name, intl.locale) : 'Missing user',
-      role
+      role,
+      ...splitNames
     } as const
   }
 
