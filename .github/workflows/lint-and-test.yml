@@ -51,10 +51,29 @@ jobs:
           echo "Found packages: $PACKAGES"
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
 
+      - name: Prepare coverage explanation
+        run: |
+          echo "COVERAGE_EXPLANATION<<EOF" >> $GITHUB_ENV
+          echo "_ℹ️ Coverage metrics explained:_" >> $GITHUB_ENV
+          echo "• *Statements* — Executed code statements (basic logic lines)" >> $GITHUB_ENV
+          echo "• *Branches* — Tested decision paths (if/else, switch, ternaries)" >> $GITHUB_ENV
+          echo "• *Functions* — Functions invoked during tests" >> $GITHUB_ENV
+          echo "• *Lines* — Source lines executed" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post coverage explanation to PR
+        if: github.event_name == 'pull_request'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: test-coverage-explanation
+          message: ${{ env.COVERAGE_EXPLANATION }}
+
   test:
     name: Test
     needs: setup
     runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -193,6 +212,41 @@ jobs:
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && pnpm test
 
+      - name: Generate test coverage summary
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        run: |
+          export PACKAGE_NAME=$(basename "${{ matrix.package }}")
+          export COVERAGE_FILE="./${{ matrix.package }}/coverage/coverage-summary.json"
+
+          GENERATED_REPORT=$(node -e '
+            const s = require(process.env.COVERAGE_FILE).total;
+            const title = `## 📊 ${process.env.PACKAGE_NAME} test coverage`;
+
+            console.log(
+              title + "\n\n" +
+              "```text\n" +
+              `Statements: ${s.statements.pct}%\n` +
+              `Branches:   ${s.branches.pct}%\n` +
+              `Functions:  ${s.functions.pct}%\n` +
+              `Lines:      ${s.lines.pct}%\n` +
+              `Updated at: ${new Date().toUTCString()}\n` +
+              "```"
+            );
+          ')
+
+          echo "PR_COMMENT_BODY<<EOF" >> $GITHUB_ENV
+          echo "$GENERATED_REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post test coverage to PR
+        if: github.event_name == 'pull_request'
+          && (matrix.package == 'packages/commons' || matrix.package == 'packages/events')
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: ${{ matrix.package }}-test-coverage
+          message: ${{ env.PR_COMMENT_BODY }}
+
   prepare-client-tests:
     name: Prepare client tests
     runs-on: ubuntu-24.04
@@ -308,6 +362,7 @@ jobs:
             .
             !**/.git
             !**/node_modules
+
   lint-client:
     name: Lint client
     needs: prepare-client-tests

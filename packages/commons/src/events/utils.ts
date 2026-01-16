@@ -46,8 +46,7 @@ import { getUUID, UUID } from '../uuid'
 import {
   ActionConfig,
   actionConfigTypes,
-  ActionConfigTypes,
-  DeclarationActionConfig
+  ActionConfigTypes
 } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
@@ -81,6 +80,7 @@ export function isActionConfigType(
   return actionConfigTypes.has(type as any)
 }
 
+// @TODO: refactor this function to return typed ActionConfig depending on given actionType. Perhaps this function should also throw an error if the action config is not found.
 export function getActionConfig({
   eventConfiguration,
   actionType,
@@ -198,9 +198,14 @@ export function getActionReview(
   configuration: EventConfig,
   actionType: ActionType
 ) {
-  const [actionConfig] = configuration.actions.filter(
-    (a): a is DeclarationActionConfig => a.type === actionType
-  )
+  const actionConfig = getActionConfig({
+    eventConfiguration: configuration,
+    actionType
+  })
+
+  if (!actionConfig) {
+    throw 'Tried to get action review for an action that is not a declaration action'
+  }
 
   if ('review' in actionConfig) {
     return actionConfig.review
@@ -663,4 +668,14 @@ export function aggregateActionDeclarations(event: EventDocument): EventState {
 
     return getCompleteActionDeclaration(declaration, event, action)
   }, {})
+}
+
+export function aggregateActionAnnotations(event: EventDocument): EventState {
+  return event.actions.reduce((ann, sortedAction) => {
+    if (!('annotation' in sortedAction) || !sortedAction.annotation) {
+      return ann
+    }
+
+    return deepMerge(ann, sortedAction.annotation)
+  }, {} as EventState)
 }

@@ -34,13 +34,19 @@ import {
   canUserReadEvent,
   hasScope,
   SCOPES,
-  hasAnyOfScopes
+  hasAnyOfScopes,
+  AnyScope,
+  getCurrentEventState,
+  ResolvedRecordScopeV2
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
-import { TrpcContext } from '@events/context'
+import { TrpcContext, UserContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
 import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
+import { getInMemoryEventConfigurations } from '../../../service/config/config'
+import { getEventIndexWithLocationHierarchy } from '../../../service/indexing/utils'
+import { canAccessEventWithScopes, getAcceptedScopesFromToken } from './utils'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -92,6 +98,7 @@ function getAuthorizedEntities(
 
 type CtxWithAuthorizedEntities = TrpcContext & {
   authorizedEntities?: { events?: string[] }
+  acceptedScopes?: AnyScope[]
 }
 
 function inScope(token: string, scopes: Scope[]) {
@@ -108,7 +115,11 @@ function inScope(token: string, scopes: Scope[]) {
  */
 export function requiresAnyOfScopes(
   scopes: Scope[],
-  configurableScopes?: ConfigurableScopeType[]
+  configurableScopes?: ConfigurableScopeType[],
+  /**
+   * Truly transient property. After complete migration to V2 scopes we should have a single parameter instead of 2-3.
+   */
+  v2ScopeTypes?: string[]
 ) {
   const fn: MiddlewareFunction<
     TrpcContext,
@@ -122,6 +133,20 @@ export function requiresAnyOfScopes(
     // If the user has any of the allowed plain scopes, allow access
     if (inScope(token, scopes)) {
       return opts.next()
+    }
+
+    if (v2ScopeTypes && v2ScopeTypes.length > 0) {
+      const acceptedScopes = getAcceptedScopesFromToken(token, v2ScopeTypes)
+
+      if (acceptedScopes.length > 0) {
+        return opts.next({
+          ...opts,
+          ctx: {
+            ...opts.ctx,
+            acceptedScopes
+          }
+        })
+      }
     }
 
     // If the user has any of the allowed configurable scopes, allow the user to continue
@@ -309,43 +334,91 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   return next()
 }
 
-export const userCanReadEvent: MiddlewareFunction<
+export const userCanReadEventV2: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
   TrpcContext,
-  TrpcContext & { event: EventDocument },
+  TrpcContext & { eventId: UUID; eventType: string },
   UUID
 > = async ({ next, ctx, input }) => {
+  const humanUser = UserContext.safeParse(ctx.user)
+
+  if (!humanUser.success) {
+    throw new EventNotFoundError(input)
+  }
+
+  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+
+  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, ['record.read'])
   const event = await getEventById(input)
 
-  const createAction = event.actions.find(
-    (action) => action.type === ActionType.CREATE
-  )
+  // 1. If no accepted scopes are found, fall back to V1 style check based on CREATE action.
+  // This will be removed once we have migrated countryconfigs to use V2 scopes only.
+  if (acceptedScopes.length === 0) {
+    const createAction = event.actions.find(
+      (action) => action.type === ActionType.CREATE
+    )
 
-  if (!createAction) {
+    if (!createAction) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: `Event ${event.id} is missing ${ActionType.CREATE} action`
+      })
+    }
+
+    const canRead = canUserReadEvent(
+      {
+        createdBy: createAction.createdBy,
+        type: event.type
+      },
+      {
+        userId: ctx.user.id,
+        scopes: getScopes(ctx.token)
+      }
+    )
+
+    if (canRead) {
+      return next({
+        ctx: {
+          ...ctx,
+          eventId: input,
+          eventType: event.type
+        }
+      })
+    }
+
+    throw new EventNotFoundError(input)
+  }
+
+  const eventConfig = eventConfigs.find((c) => c.id === event.type)
+  if (!eventConfig) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: `Event ${event.id} is missing ${ActionType.CREATE} action`
+      message: `Event configuration not found with type: ${event.type}`
     })
   }
 
-  const canRead = canUserReadEvent(
-    {
-      createdBy: createAction.createdBy,
-      type: event.type
-    },
-    {
-      userId: ctx.user.id,
-      scopes: getScopes(ctx.token)
-    }
+  const eventIndex = getCurrentEventState(event, eventConfig)
+  const eventIndexWithLocationHierarchy =
+    await getEventIndexWithLocationHierarchy(eventConfig, eventIndex)
+
+  const hasAccess = canAccessEventWithScopes(
+    eventIndexWithLocationHierarchy,
+    acceptedScopes as ResolvedRecordScopeV2[],
+    humanUser.data
   )
 
-  if (canRead) {
-    return next({ ctx: { ...ctx, event } })
+  if (!hasAccess) {
+    throw new EventNotFoundError(input)
   }
 
-  // Throw not found to avoid leaking the existence of the event
-  throw new EventNotFoundError(input)
+  return next({
+    ctx: {
+      ...ctx,
+      eventId: input,
+      eventType: event.type
+    }
+  })
 }
 
 export const userCanReadOtherUser: MiddlewareFunction<

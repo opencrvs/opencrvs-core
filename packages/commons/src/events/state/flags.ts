@@ -18,6 +18,7 @@ import { EventStatus } from '../EventMetadata'
 import { InherentFlags, Flag, CustomFlag } from '../Flag'
 import { EventConfig } from '../EventConfig'
 import {
+  aggregateActionAnnotations,
   aggregateActionDeclarations,
   getAcceptedActions,
   getActionConfig,
@@ -27,6 +28,10 @@ import { formatISO, parseISO, isValid } from 'date-fns'
 import { EventDocument } from '../EventDocument'
 import { JSONSchema } from '../../conditionals/conditionals'
 import { validate } from '../../conditionals/validate'
+
+function isEditInProgress(actions: Action[]) {
+  return actions.at(-1)?.type === ActionType.EDIT
+}
 
 function isPendingCertification(actions: Action[]) {
   if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
@@ -126,8 +131,7 @@ export function resolveEventCustomFlags(
   event: EventDocument,
   eventConfiguration: EventConfig
 ): CustomFlag[] {
-  const acceptedActions = getAcceptedActions(event)
-  const actions = acceptedActions
+  const actions = getAcceptedActions(event)
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
@@ -152,7 +156,7 @@ export function resolveEventCustomFlags(
     }
 
     const declaration = aggregateActionDeclarations(eventUpToThisAction)
-    const annotation = aggregateActionDeclarations(eventUpToThisAction)
+    const annotation = aggregateActionAnnotations(eventUpToThisAction)
     const form = { ...declaration, ...annotation }
 
     const flagsWithMetConditions = actionConfig.flags.filter(
@@ -222,6 +226,9 @@ export function getEventFlags(
   }
   if (isPotentialDuplicate(sortedActions)) {
     flags.push(InherentFlags.POTENTIAL_DUPLICATE)
+  }
+  if (isEditInProgress(sortedActions)) {
+    flags.push(InherentFlags.EDIT_IN_PROGRESS)
   }
 
   return [...flags, ...resolveEventCustomFlags(event, config)]

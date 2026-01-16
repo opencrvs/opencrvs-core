@@ -126,12 +126,6 @@ const DeclareAction = ActionBase.extend(
   }).shape
 )
 
-const ValidateAction = ActionBase.extend(
-  z.object({
-    type: z.literal(ActionType.VALIDATE)
-  }).shape
-)
-
 export const ReasonContent = z.object({
   reason: z
     .string()
@@ -200,6 +194,16 @@ const NotifiedAction = ActionBase.extend(
   }).shape
 )
 
+const EditAction = ActionBase.extend(
+  z.object({
+    type: z.literal(ActionType.EDIT),
+    content: z.object({
+      comment: z.string().describe('Comment for the edit action.').optional()
+    })
+  }).shape
+)
+export type EditAction = z.infer<typeof EditAction>
+
 export const PrintContent = z.object({
   templateId: z.string().optional()
 })
@@ -257,7 +261,6 @@ export type CustomAction = z.infer<typeof CustomAction>
 export const ActionDocument = z
   .discriminatedUnion('type', [
     CreatedAction.meta({ id: 'CreatedAction' }),
-    ValidateAction.meta({ id: 'ValidateAction' }),
     RejectAction.meta({ id: 'RejectAction' }),
     DuplicateDetectedAction.meta({ id: 'DuplicateDetectedAction' }),
     MarkNotDuplicateAction.meta({ id: 'MarkNotDuplicateAction' }),
@@ -273,6 +276,7 @@ export const ActionDocument = z
     UnassignedAction.meta({ id: 'UnassignedAction' }),
     PrintCertificateAction.meta({ id: 'PrintCertificateAction' }),
     ReadAction.meta({ id: 'ReadAction' }),
+    EditAction.meta({ id: 'EditAction' }),
     CustomAction.meta({ id: 'CustomAction' })
   ])
   .meta({

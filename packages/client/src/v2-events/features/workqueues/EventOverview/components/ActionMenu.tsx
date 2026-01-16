@@ -9,15 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useIntl } from 'react-intl'
-
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { getOrThrow } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  getOrThrow,
+  ActionType,
+  ClientSpecificAction
+} from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { useAuthentication } from '@client/utils/userUtils'
@@ -25,7 +29,59 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
-import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  ActionMenuItem,
+  useAllowedActionConfigurations
+} from './useAllowedActionConfigurations'
+
+/** This is the default order of actions if no actionOrder is defined in event configuration. */
+const DEFAULT_ACTION_ORDER = [
+  ActionType.ASSIGN,
+  ActionType.REGISTER,
+  ActionType.DECLARE,
+  ActionType.EDIT,
+  ActionType.REJECT,
+  ActionType.ARCHIVE,
+  ActionType.DELETE,
+  ActionType.MARK_AS_DUPLICATE,
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION,
+  ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
+  ActionType.CUSTOM,
+  ActionType.UNASSIGN
+]
+
+export function sortActions(
+  actionMenuItems: ActionMenuItem[],
+  eventConfiguration: EventConfig
+) {
+  const sortedByDefault = actionMenuItems.sort(
+    (a, b) =>
+      DEFAULT_ACTION_ORDER.indexOf(a.type) -
+      DEFAULT_ACTION_ORDER.indexOf(b.type)
+  )
+
+  const actionOrder = eventConfiguration.actionOrder
+
+  if (!actionOrder) {
+    return sortedByDefault
+  }
+
+  return sortedByDefault.sort((a, b) => {
+    const aIndex =
+      'customActionType' in a && a.customActionType
+        ? actionOrder.indexOf(a.customActionType)
+        : actionOrder.indexOf(a.type)
+
+    const bIndex =
+      'customActionType' in b && b.customActionType
+        ? actionOrder.indexOf(b.customActionType)
+        : actionOrder.indexOf(b.type)
+
+    return aIndex - bIndex
+  })
+}
 
 export function ActionMenu({
   eventId,
@@ -71,8 +127,43 @@ export function ActionMenu({
     auth
   )
 
+  const { eventConfiguration } = useEventConfiguration(eventState.type)
+
   const assignedToOther =
     eventState.assignedTo && eventState.assignedTo !== auth.sub
+
+  const sortedActions = useMemo(
+    () => sortActions(actionMenuItems, eventConfiguration),
+    [actionMenuItems, eventConfiguration]
+  )
+
+  function ActionMenuItems() {
+    if (sortedActions.length === 0) {
+      return (
+        <DropdownMenu.Label>
+          <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
+        </DropdownMenu.Label>
+      )
+    }
+
+    return sortedActions.map((action) => {
+      return (
+        <DropdownMenu.Item
+          key={
+            'customActionType' in action ? action.customActionType : action.type
+          }
+          disabled={'disabled' in action ? action.disabled : false}
+          onClick={async () => {
+            await action.onClick(workqueue)
+            onAction?.()
+          }}
+        >
+          <Icon color="currentColor" name={action.icon} size="small" />
+          {intl.formatMessage(action.label)}
+        </DropdownMenu.Item>
+      )
+    })
+  }
 
   return (
     <>
@@ -98,21 +189,7 @@ export function ActionMenu({
               <DropdownMenu.Separator />
             </>
           )}
-          {actionMenuItems.map((action) => {
-            return (
-              <DropdownMenu.Item
-                key={action.type}
-                disabled={'disabled' in action ? action.disabled : false}
-                onClick={async () => {
-                  await action.onClick(workqueue)
-                  onAction?.()
-                }}
-              >
-                <Icon color="currentColor" name={action.icon} size="small" />
-                {intl.formatMessage(action.label)}
-              </DropdownMenu.Item>
-            )
-          })}
+          <ActionMenuItems />
         </DropdownMenu.Content>
       </DropdownMenu>
       {modals}

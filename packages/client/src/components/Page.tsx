@@ -113,7 +113,7 @@ class Component extends React.Component<IFullProps> {
       children
     } = this.props
 
-    if (offlineDataLoaded && initialDeclarationsLoaded && registerFormLoaded) {
+    if (offlineDataLoaded && initialDeclarationsLoaded) {
       return (
         <div id="readyDeclaration">
           <StyledPage {...this.props}>{children}</StyledPage>

@@ -35,8 +35,8 @@ import {
 } from '@client/v2-events/cache'
 import { ROUTES } from '@client/v2-events/routes'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { storage } from '@client/storage'
 import { useDrafts } from '../../drafts/useDrafts'
-import { clearStorage } from '../../../../../.storybook/preview'
 import { useEvents } from './useEvents'
 
 const meta: Meta<unknown> = {
@@ -62,7 +62,7 @@ const router = {
         /*
          * Explicitly trigger the download of the event
          */
-        const event = getEvent.findFromCache(createdEvent.id)
+        const event = getEvent.useFindEventFromCache(createdEvent.id)
 
         /*
          * Explicitly call the hook to trigger draft fetching
@@ -144,7 +144,7 @@ export const GetEventHook: Story = {
     actionType: ActionType.DECLARE
   },
   loaders: [
-    clearStorage,
+    storage.clearStorage,
     async () => {
       spies.draftList = 0
       spies.eventGet = 0

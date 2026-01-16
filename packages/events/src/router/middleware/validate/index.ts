@@ -380,11 +380,11 @@ export const validateAction: MiddlewareFunction<
     token: ctx.token
   })
 
-  const context = await getValidatorContext(ctx.token)
+  const context = { ...(await getValidatorContext(ctx.token)), event }
 
   const declaration = getCurrentEventState(event, eventConfig).declaration
 
-  if (actionType === ActionType.NOTIFY) {
+  if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
     const errors = validateNotifyAction({
       eventConfig,
       annotation: input.annotation,

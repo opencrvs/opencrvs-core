@@ -16,6 +16,7 @@ import { ActionFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
 import { ActionConditional } from './Conditional'
+import { AvailableIcons } from '../icons'
 
 export const DeclarationReviewConfig = z
   .object({
@@ -35,12 +36,10 @@ export const ActionConfigBase = z.object({
     .optional()
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
-  auditHistoryLabel: TranslationConfig.describe(
-    'The label to show in audit history for this action. For example "Approved".'
-  ).optional(),
   supportingCopy: TranslationConfig.optional().describe(
-    'Text displayed on the confirmation'
+    'Text displayed on the confirmation dialog'
   ),
+  icon: AvailableIcons.describe('Icon representing the action').optional(),
   conditionals: z
     .array(ActionConditional)
     .optional()
@@ -69,13 +68,49 @@ const DeclareConfig = DeclarationActionBase.extend(
     type: z.literal(ActionType.DECLARE),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
-    )
+    ),
+    dialogCopy: z
+      .object({
+        notify: TranslationConfig.describe(
+          'Confirmation text for the notify action'
+        ),
+        declare: TranslationConfig.describe(
+          'Confirmation text for the declare action'
+        ),
+        register: TranslationConfig.describe(
+          'Confirmation text for the register action'
+        )
+      })
+      .optional()
   }).shape
 )
 
-const ValidateConfig = DeclarationActionBase.extend(
+const ArchiveConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.VALIDATE)
+    type: z.literal(ActionType.ARCHIVE)
+  }).shape
+)
+
+const EditActionConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.EDIT),
+    dialogCopy: z.object({
+      notify: TranslationConfig.describe(
+        'Confirmation text for the notify with edits action'
+      ),
+      declare: TranslationConfig.describe(
+        'Confirmation text for the declare with edits action'
+      ),
+      register: TranslationConfig.describe(
+        'Confirmation text for the register with edits action'
+      )
+    })
+  }).shape
+)
+
+const RejectConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.REJECT)
   }).shape
 )
 
@@ -110,9 +145,13 @@ const CustomActionConfig = ActionConfigBase.merge(
       .array(FieldConfig)
       .describe(
         'Form configuration for the custom action. The form configured here will be used on the custom action confirmation modal.'
-      )
+      ),
+    auditHistoryLabel: TranslationConfig.describe(
+      'The label to show in audit history for this action. For example "Approved".'
+    )
   })
 )
+
 export type CustomActionConfig = z.infer<typeof CustomActionConfig>
 
 export const ActionConfig = z
@@ -123,12 +162,14 @@ export const ActionConfig = z
      */
     ReadActionConfig.meta({ id: 'ReadActionConfig' }),
     DeclareConfig.meta({ id: 'DeclareActionConfig' }),
-    ValidateConfig.meta({ id: 'ValidateActionConfig' }),
+    RejectConfig.meta({ id: 'RejectActionConfig' }),
     RegisterConfig.meta({ id: 'RegisterActionConfig' }),
     PrintCertificateActionConfig.meta({
       id: 'PrintCertificateActionConfig'
     }),
     RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
+    EditActionConfig.meta({ id: 'EditActionConfig' }),
+    ArchiveConfig.meta({ id: 'ArchiveActionConfig' }),
     CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(
@@ -154,7 +195,6 @@ export type ActionConfigTypes = ActionConfig['type']
 
 export const DeclarationActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,
-  ValidateConfig,
   RegisterConfig
 ])
 

@@ -12,13 +12,17 @@ import * as z from 'zod/v4'
 import { ActionConfig } from './ActionConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
-import { findAllFields, getDeclarationFields } from './utils'
+import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { DeclarationFormConfig } from './FormConfig'
-
-import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
 import { FlagConfig } from './Flag'
+import {
+  validateActionOrder,
+  validateActionFlags,
+  validatePlaceOfEvent,
+  validateAdvancedSearchConfig,
+  validateDateOfEvent
+} from './eventConfigValidation'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -34,6 +38,9 @@ export const EventConfig = z
       ),
     dateOfEvent: FieldReference.optional().describe(
       'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
+    ),
+    placeOfEvent: FieldReference.optional().describe(
+      'Reference to the field capturing the place of the event (e.g. place of birth). Defaults to the meta.createdAtLocation if unspecified.'
     ),
     title: TranslationConfig.describe(
       'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
@@ -51,6 +58,12 @@ export const EventConfig = z
       .array(ActionConfig)
       .describe(
         'Configuration of system-defined actions associated with the event.'
+      ),
+    actionOrder: z
+      .array(z.string())
+      .optional()
+      .describe(
+        'Order of actions in the action menu. Use either the action type for core actions or the customActionType for custom actions.'
       ),
     declaration: DeclarationFormConfig.describe(
       'Configuration of the form used to gather event data.'
@@ -71,84 +84,11 @@ export const EventConfig = z
       )
   })
   .superRefine((event, ctx) => {
-    const allFields = findAllFields(event)
-    const fieldIds = allFields.map((field) => field.id)
-
-    const advancedSearchFields = event.advancedSearch.flatMap((section) =>
-      section.fields.flatMap((field) => field.fieldId)
-    )
-
-    const advancedSearchFieldsSet = new Set(advancedSearchFields)
-
-    if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Advanced search field ids must be unique',
-        path: ['advancedSearch']
-      })
-    }
-
-    const invalidFields = event.advancedSearch.flatMap((section) =>
-      // Check if the fieldId is not in the fieldIds array
-      // and also not in the metadataFields array
-      section.fields.filter(
-        (field) =>
-          !(
-            fieldIds.includes(field.fieldId) ||
-            (EventFieldId.options as string[]).includes(field.fieldId) ||
-            (field.config.searchFields &&
-              field.config.searchFields.length > 0 &&
-              field.config.searchFields.every((sf) => fieldIds.includes(sf)))
-          )
-      )
-    )
-
-    if (invalidFields.length > 0) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Advanced search id must match a field id of form fields or pre-defined metadata fields.
-    Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
-      .map((f) => f.fieldId)
-      .join(', ')}`,
-        path: ['advancedSearch']
-      })
-    }
-
-    if (event.dateOfEvent) {
-      const eventDateFieldId = getDeclarationFields(event).find(
-        ({ id }) => id === event.dateOfEvent?.$$field
-      )
-      if (!eventDateFieldId) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Date of event field id must match a field id in fields array.
-          Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.$$field}`,
-          path: ['dateOfEvent']
-        })
-      } else if (eventDateFieldId.type !== FieldType.DATE) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Field specified for date of event is of type: ${eventDateFieldId.type}, but it needs to be of type: ${FieldType.DATE}`,
-          path: ['dateOfEvent.fieldType']
-        })
-      }
-    }
-
-    // Validate that all referenced action flags are configured in the event flags array.
-    const configuredFlagIds = event.flags.map((flag) => flag.id)
-    const actionFlagIds = event.actions.flatMap((action) =>
-      action.flags.map((flag) => flag.id)
-    )
-
-    for (const actionFlagId of actionFlagIds) {
-      if (!configuredFlagIds.includes(actionFlagId)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Action flag id must match a configured flag in the flags array. Invalid action flag ID for event '${event.id}': '${actionFlagId}'`,
-          path: ['actions']
-        })
-      }
-    }
+    validateAdvancedSearchConfig(event, ctx)
+    validateDateOfEvent(event, ctx)
+    validatePlaceOfEvent(event, ctx)
+    validateActionFlags(event, ctx)
+    validateActionOrder(event, ctx)
   })
   .meta({
     id: 'EventConfig'

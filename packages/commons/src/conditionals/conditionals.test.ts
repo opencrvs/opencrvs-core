@@ -312,6 +312,32 @@ describe('date comparisons', () => {
       })
     ).toBe(false)
   })
+
+  it('validates comparisons to where date is expected to be certain days before certain date reference', () => {
+    expect(
+      validate(
+        field('mother.dob').isBefore().days(6570).fromDate(field('child.dob')),
+        {
+          ...getFieldParams({
+            'child.dob': '1990-01-01',
+            'mother.dob': '1969-12-31' // needs to be before 1972-12-31 ✅
+          })
+        }
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('mother.dob').isBefore().days(6570).fromDate(field('child.dob')),
+        {
+          ...getFieldParams({
+            'child.dob': '1990-01-01',
+            'mother.dob': '1973-01-01' // needs to be before 1972-12-31 ❌
+          })
+        }
+      )
+    ).toBe(false)
+  })
 })
 
 describe('age asDob comparisons', () => {
@@ -1048,6 +1074,9 @@ describe('"flag" conditionals', () => {
     expect(validate(flag(InherentFlags.CORRECTION_REQUESTED), params)).toBe(
       false
     )
+    expect(
+      validate(not(flag(InherentFlags.CORRECTION_REQUESTED)), params)
+    ).toBe(true)
   })
 
   it('validation fails if params dont include flags', () => {
@@ -1073,7 +1102,6 @@ describe('"status" conditionals', () => {
       $online: true
     } satisfies EventStateConditionalParameters
 
-    expect(validate(status('VALIDATED'), params)).toBe(false)
     expect(validate(status('REGISTERED'), params)).toBe(true)
   })
 

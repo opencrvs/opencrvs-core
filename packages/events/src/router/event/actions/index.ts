@@ -24,7 +24,6 @@ import {
   ArchiveActionInput,
   PrintCertificateActionInput,
   DeclareActionInput,
-  ValidateActionInput,
   ACTION_SCOPE_MAP,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
@@ -32,7 +31,8 @@ import {
   getPendingAction,
   ActionInputWithType,
   EventConfig,
-  CustomActionInput
+  CustomActionInput,
+  EditActionInput
 } from '@opencrvs/commons/events'
 import {
   TokenUserType,
@@ -43,7 +43,7 @@ import {
   requiresAnyOfScopes,
   setBearerForToken
 } from '@events/router/middleware'
-import { systemProcedure } from '@events/router/trpc'
+import { userAndSystemProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
@@ -79,6 +79,10 @@ const defaultConfig = {
 } as const
 
 const ACTION_PROCEDURE_CONFIG = {
+  [ActionType.EDIT]: {
+    ...defaultConfig,
+    inputSchema: EditActionInput
+  },
   [ActionType.CUSTOM]: {
     ...defaultConfig,
     inputSchema: CustomActionInput
@@ -99,10 +103,6 @@ const ACTION_PROCEDURE_CONFIG = {
   [ActionType.DECLARE]: {
     ...defaultConfig,
     inputSchema: DeclareActionInput
-  },
-  [ActionType.VALIDATE]: {
-    ...defaultConfig,
-    inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
     ...defaultConfig,
@@ -202,7 +202,7 @@ export async function defaultRequestHandler(
   )
 
   const eventWithRequestedAction = await addAction(input, {
-    event,
+    eventId: event.id,
     user,
     token,
     status: ActionStatus.Requested,
@@ -292,7 +292,7 @@ export async function defaultRequestHandler(
       originalActionId: requestedAction.id,
       ...parsedBody
     },
-    { event, user, token, status, configuration }
+    { eventId: event.id, user, token, status, configuration }
   )
 
   return updatedEvent
@@ -343,7 +343,7 @@ export function getDefaultActionProcedures(
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
   return {
-    request: systemProcedure
+    request: userAndSystemProcedure
       .meta(meta)
       .use(requireScopesForRequestMiddleware)
       .input(actionConfig.inputSchema.strict())
@@ -381,7 +381,7 @@ export function getDefaultActionProcedures(
         )
       }),
 
-    accept: systemProcedure
+    accept: userAndSystemProcedure
       .input(
         actionConfig.inputSchema.extend(asyncAcceptInputFields.shape).strict()
       )
@@ -443,7 +443,7 @@ export function getDefaultActionProcedures(
         return processAction(
           { ...input, originalActionId: actionId },
           {
-            event,
+            eventId: event.id,
             user,
             token,
             status: ActionStatus.Accepted,
@@ -452,7 +452,7 @@ export function getDefaultActionProcedures(
         )
       }),
 
-    reject: systemProcedure
+    reject: userAndSystemProcedure
       .input(AsyncActionConfirmationResponseSchema)
       .use(middleware.requireActionConfirmationAuthorization)
       .mutation(async ({ input, ctx }) => {

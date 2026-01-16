@@ -28,7 +28,7 @@ import {
 } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import type { GQLMonthWiseEstimationMetric } from '@client/utils/gateway-deprecated-do-not-use'
-import { parse } from 'query-string'
+import { parse } from 'qs'
 import * as React from 'react'
 import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
 import {
@@ -47,6 +47,7 @@ import format from '@client/utils/date-formatting'
 import { SegmentedControl } from '@client/components/SegmentedControl'
 import { useQuery } from '@apollo/client'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { LocationType } from '@opencrvs/commons/client'
 const { useState } = React
 
 export enum COMPLETENESS_RATE_REPORT_BASE {
@@ -162,7 +163,9 @@ function Filter({
       <LocationPicker
         additionalLocations={getAdditionalLocations(intl)}
         selectedLocationId={locationId}
-        locationFilter={({ type }) => type === 'ADMIN_STRUCTURE'}
+        locationFilter={({ locationType }) =>
+          locationType === LocationType.enum.ADMIN_STRUCTURE
+        }
         onChangeLocation={(newLocationId) => {
           navigate(
             generateCompletenessRatesUrl({
@@ -244,9 +247,9 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
 
   const { intl } = props
 
-  const { locationId, timeStart, timeEnd, time } = parse(
-    location.search
-  ) as unknown as ISearchParams
+  const { locationId, timeStart, timeEnd, time } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
 
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)

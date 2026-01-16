@@ -25,10 +25,12 @@ import {
   System
 } from '@opencrvs/commons'
 import { getSystem, getUser } from './service/users/api'
+import { getLocationById } from './service/locations/locations'
 
 export const UserContext = User.pick({
   id: true,
   primaryOfficeId: true,
+  administrativeAreaId: true,
   role: true,
   signature: true,
   type: true
@@ -40,6 +42,7 @@ export const SystemContext = System.pick({
   role: true,
   type: true,
   primaryOfficeId: true,
+  administrativeAreaId: true,
   signature: true
 })
 type SystemContext = z.infer<typeof SystemContext>
@@ -145,10 +148,13 @@ async function resolveUserDetails(
       })
     }
 
+    // @TODO: We should get this from a single source. Waiting for user migration.
+    const location = await getLocationById(primaryOfficeId)
     return UserContext.parse({
       type: userType,
       id: userId,
       primaryOfficeId,
+      administrativeAreaId: location.administrativeAreaId,
       signature,
       role
     })
@@ -163,18 +169,10 @@ async function resolveUserDetails(
 
 export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
-  let token: TokenWithBearer
+  const token = TokenWithBearer.safeParse(normalizedHeaders.authorization).data
 
-  try {
-    token = TokenWithBearer.parse(normalizedHeaders.authorization)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Authorization token is missing'
-    })
+  return {
+    token,
+    user: token && (await resolveUserDetails(token).catch(() => undefined))
   }
-
-  const user = await resolveUserDetails(token)
-  return { token, user }
 }

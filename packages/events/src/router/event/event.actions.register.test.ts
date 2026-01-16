@@ -93,10 +93,6 @@ test('Validation error message contains all the offending fields', async () => {
 
   await client.event.actions.assignment.assign(assignmentInput)
 
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(event.id)
-  )
-
   /** Partial payload is accepted, so it should not complain about fields already send during declaration. */
   const data = generator.event.actions.register(event.id, {
     declaration: {
@@ -167,8 +163,7 @@ test('Skips required field validation when they are conditionally hidden', async
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
   const { id: eventId } = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE
+    ActionType.DECLARE
   ])
 
   const data = generator.event.actions.register(eventId)
@@ -247,8 +242,7 @@ describe('Request and confirmation flow', () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
     const originalEvent = await createEvent(client, generator, [
-      ActionType.DECLARE,
-      ActionType.VALIDATE
+      ActionType.DECLARE
     ])
 
     const { id: eventId } = originalEvent
@@ -292,8 +286,7 @@ describe('Request and confirmation flow', () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
       const { id: eventId } = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       mockNotifyApi(200)
@@ -318,8 +311,7 @@ describe('Request and confirmation flow', () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
       const { id: eventId } = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       mswServer.use(
@@ -355,8 +347,7 @@ describe('Request and confirmation flow', () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
       const { id: eventId } = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       mockNotifyApi(400)
@@ -385,8 +376,7 @@ describe('Request and confirmation flow', () => {
       const client = createTestClient(user)
 
       const { id: eventId } = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
+        ActionType.DECLARE
       ])
 
       mockNotifyApi(500)
@@ -415,10 +405,7 @@ describe('Request and confirmation flow', () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
 
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
-      ])
+      const event = await createEvent(client, generator, [ActionType.DECLARE])
 
       mockNotifyApi(202)
 
@@ -441,10 +428,7 @@ describe('Request and confirmation flow', () => {
       test('should not be able to accept the action if action is not first requested', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
-        ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         mockNotifyApi(202)
 
@@ -474,8 +458,7 @@ describe('Request and confirmation flow', () => {
         const client = createTestClient(user)
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -537,8 +520,7 @@ describe('Request and confirmation flow', () => {
         const client = createTestClient(user)
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -604,8 +586,7 @@ describe('Request and confirmation flow', () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -682,8 +663,7 @@ describe('Request and confirmation flow', () => {
         const client = createTestClient(user)
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -750,8 +730,7 @@ describe('Request and confirmation flow', () => {
         const client = createTestClient(user)
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -804,10 +783,7 @@ describe('Request and confirmation flow', () => {
       test('should not be able to reject the action if action is not first requested', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
-        ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         mockNotifyApi(202)
 
@@ -834,10 +810,7 @@ describe('Request and confirmation flow', () => {
       test('should not be able to reject the action if action is already accepted', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
-        ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
         const eventId = event.id
 
         mockNotifyApi(202)
@@ -892,10 +865,7 @@ describe('Request and confirmation flow', () => {
       test('should be able to call reject multiple times, without creating duplicate reject actions', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
-        ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         const { id: eventId } = event
 
@@ -960,10 +930,7 @@ describe('Request and confirmation flow', () => {
       test('should successfully reject a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
-        ])
+        const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         const { id: eventId } = event
         mockNotifyApi(202)
@@ -1020,8 +987,7 @@ describe('Request and confirmation flow', () => {
         const client = createTestClient(user)
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -1083,8 +1049,7 @@ describe('Request and confirmation flow', () => {
         const client = createTestClient(user)
 
         const originalEvent = await createEvent(client, generator, [
-          ActionType.DECLARE,
-          ActionType.VALIDATE
+          ActionType.DECLARE
         ])
 
         const { id: eventId } = originalEvent
@@ -1170,16 +1135,6 @@ test('deduplication check is performed before register when configured', async (
       assignedTo: user.id
     })
   )
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(duplicateEvent.id, {
-      declaration: declarationPayload
-    })
-  )
-  await client.event.actions.assignment.assign(
-    generator.event.actions.assign(duplicateEvent.id, {
-      assignedTo: user.id
-    })
-  )
   const stillValidated = await client.event.actions.register.request(
     generator.event.actions.register(duplicateEvent.id, {
       declaration: declarationPayload
@@ -1189,7 +1144,7 @@ test('deduplication check is performed before register when configured', async (
   expect(
     getCurrentEventState(stillValidated, tennisClubMembershipEvent)
   ).toMatchObject({
-    status: 'VALIDATED',
+    status: 'DECLARED',
     potentialDuplicates: [
       { id: existingEvent.id, trackingId: existingEvent.trackingId }
     ]

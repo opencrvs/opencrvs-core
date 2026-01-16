@@ -59,7 +59,7 @@ import {
   withRouter
 } from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import { useHasAccessToNavigationItem } from './useHasAccessToNavigationItem'
 import { SCOPES } from '@opencrvs/commons/client'
 import { usePermissions } from '@client/hooks/useAuthorization'

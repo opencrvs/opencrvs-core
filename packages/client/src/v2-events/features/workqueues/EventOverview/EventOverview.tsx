@@ -17,27 +17,20 @@ import {
   dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftToEventIndex,
-  deepDropNulls,
-  getOrThrow
+  deepDropNulls
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import {
-  AssignmentStatus,
-  getAssignmentStatus,
-  flattenEventIndex,
-  getUsersFullName
-} from '@client/v2-events/utils'
+import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
-import { useAuthentication } from '@client/utils/userUtils'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventSummary } from './components/EventSummary'
+import { useEventOverviewInfo } from './components/useEventOverviewInfo'
 
 /**
  * Renders the event overview page which shows a summary of the event.
@@ -93,6 +86,7 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        eventDocument={event}
         eventIndex={eventIndex}
       />
     </Content>
@@ -156,26 +150,8 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
 
 function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
-  const { searchEventById } = useEvents()
-  const { getEvent } = useEvents()
-  const maybeAuth = useAuthentication()
-  const authentication = getOrThrow(
-    maybeAuth,
-    'Authentication is not available but is required'
-  )
-
-  // Suspense query is not used here because we want to refetch when an event action is performed
-  const getEventQuery = searchEventById.useQuery(params.eventId)
-  const eventIndex = getEventQuery.data?.results[0]
-  const fullEvent = getEvent.findFromCache(params.eventId).data
-
-  if (!eventIndex) {
-    return
-  }
-  const assignmentStatus = getAssignmentStatus(eventIndex, authentication.sub)
-
-  const shouldShowFullOverview =
-    fullEvent && assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
+  const { eventIndex, fullEvent, shouldShowFullOverview } =
+    useEventOverviewInfo(params.eventId)
 
   return (
     <>

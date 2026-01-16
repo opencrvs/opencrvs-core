@@ -23,7 +23,6 @@ export const EventStatus = z.enum([
   'CREATED',
   'NOTIFIED',
   'DECLARED',
-  'VALIDATED',
   'REGISTERED',
   'ARCHIVED'
 ])
@@ -96,6 +95,7 @@ export const EventMetadata = z.object({
     .datetime()
     .describe('The timestamp when the event was first created and saved.'),
   dateOfEvent: ZodDate.nullish(),
+  placeOfEvent: CreatedAtLocation,
   createdBy: z.string().describe('ID of the user who created the event.'),
   createdByUserType: z
     .enum(['user', 'system'])
@@ -148,6 +148,7 @@ export const EventMetadataKeysArray = [
   'status',
   'createdAt',
   'dateOfEvent',
+  'placeOfEvent',
   'createdBy',
   'createdByUserType',
   'updatedByUserRole',
@@ -192,6 +193,11 @@ export const eventMetadataLabelMap: Record<
     id: 'event.dateOfEvent.label',
     defaultMessage: 'Date of Event',
     description: 'Date of Event'
+  },
+  'event.placeOfEvent': {
+    id: 'event.placeOfEvent.label',
+    defaultMessage: 'Place of Event',
+    description: 'Place of Event'
   },
   'event.createdAtLocation': {
     id: 'event.createdAtLocation.label',

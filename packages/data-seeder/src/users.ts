@@ -19,6 +19,7 @@ import {
   parseConfigurableScope
 } from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
+import { createClient } from '@opencrvs/toolkit/api'
 
 const MAX_RETRY = 5
 const RETRY_DELAY_IN_MILLISECONDS = 5000
@@ -216,28 +217,6 @@ async function userAlreadyExists(
   return Boolean(parsedSearchResponse.searchUsers.totalItems)
 }
 
-async function getOfficeIdFromIdentifier(identifier: string) {
-  const response = await fetch(
-    `${env.GATEWAY_HOST}/location?identifier=${identifier}`,
-    {
-      headers: {
-        'Content-Type': 'application/fhir+json'
-      }
-    }
-  )
-  if (!response.ok) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Error fetching location with identifier ${identifier}`,
-      response.statusText
-    )
-    throw new Error('Error fetching location')
-  }
-  const locationBundle = (await response.json()) as fhir3.Bundle<fhir3.Location>
-
-  return locationBundle.entry?.[0]?.resource?.id
-}
-
 async function callCreateUserMutation(token: string, userPayload: unknown) {
   return fetch(`${env.GATEWAY_HOST}/graphql`, {
     method: 'POST',
@@ -274,14 +253,13 @@ export async function seedUsers(token: string) {
       continue
     }
 
-    const primaryOffice = await getOfficeIdFromIdentifier(officeIdentifier)
-    if (!primaryOffice) {
-      // eslint-disable-next-line no-console
-      console.log(
-        `No office found with id ${officeIdentifier}. Skipping user "${username}"`
-      )
-      continue
-    }
+    const externalId = officeIdentifier.split('_').at(-1)
+
+    const url = new URL('events', env.GATEWAY_HOST).toString()
+    const client = createClient(url, `Bearer ${token}`)
+    const [primaryOffice] = await client.locations.list.query({
+      externalId
+    })
 
     const userPayload = {
       ...user,
@@ -293,7 +271,7 @@ export async function seedUsers(token: string) {
         }
       ],
       ...(env.ACTIVATE_USERS && { status: 'active' }),
-      primaryOffice,
+      primaryOffice: primaryOffice.id,
       username
     }
     let tryNumber = 0

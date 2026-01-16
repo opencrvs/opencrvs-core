@@ -47,7 +47,7 @@ import { SortArrow } from '@opencrvs/components/lib/icons'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
 import { orderBy } from 'lodash'
-import { parse } from 'query-string'
+import { parse } from 'qs'
 import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -151,7 +151,9 @@ function RegistrationListComponent(props: IProps) {
     event = EVENT_OPTIONS.BIRTH,
     filterBy = FILTER_BY_OPTIONS.BY_TIME,
     currentPageNumber = '1'
-  } = parse(location.search) as unknown as ISearchParams
+  } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
 
   const isOfficeSelected = isLocationOffice(locationId)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)

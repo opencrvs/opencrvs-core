@@ -91,6 +91,8 @@ export {
   Users,
   WarningCircle,
   Webcam,
-  X
+  X,
+  Stamp,
+  ChatText
 } from 'phosphor-react'
 export * from './custom-icons'

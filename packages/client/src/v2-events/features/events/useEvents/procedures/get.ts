@@ -10,7 +10,6 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-
 import { useIntl } from 'react-intl'
 import { EventDocument, UUID } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -111,7 +110,7 @@ export function useGetEvent() {
    * an event has been downloaded and to get its data
    * from the cache without making a network request.
    */
-  const findFromCache = (id: string) => {
+  const useFindEventFromCache = (id: string) => {
     const eventConfig = useEventConfigurations()
     // Skip the queryFn defined by tRPC and use our own default defined above
     const { queryFn, ...options } = trpc.event.get.queryOptions(id)
@@ -135,7 +134,7 @@ export function useGetEvent() {
   }
 
   return {
-    findFromCache,
+    useFindEventFromCache,
     /*
      * This downloads the event document from the server without caching it
      */

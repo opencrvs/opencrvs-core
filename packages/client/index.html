@@ -8,7 +8,7 @@ OpenCRVS is also distributed under the terms of the Civil Registration
 Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" translate="no">
   <head>
     <meta charset="utf-8" />
@@ -17,6 +17,15 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <meta name="theme-color" content="#4c68c1" />
+
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "/src/externals.ts",
+          "react-dom": "/src/externals.ts"
+        }
+      }
+    </script>
 
     <!--
     Inject configuration values from public/config.js into window

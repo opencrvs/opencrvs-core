@@ -30,7 +30,7 @@ import { Table } from '@opencrvs/components/lib/Table'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { orderBy } from 'lodash'
-import { parse, stringify } from 'query-string'
+import { parse, stringify } from 'qs'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -155,7 +155,9 @@ function FieldAgentListComponent(props: IProps) {
     locationId,
     timeStart,
     timeEnd
-  } = parse(location.search) as unknown as ISearchParams
+  } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
 
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
@@ -405,17 +407,6 @@ function FieldAgentListComponent(props: IProps) {
                   })
                 })
               }}
-              locationFilter={
-                window.config.FIELD_AGENT_AUDIT_LOCATIONS
-                  ? ({ jurisdictionType }) =>
-                      Boolean(
-                        jurisdictionType &&
-                          window.config.FIELD_AGENT_AUDIT_LOCATIONS.split(
-                            ','
-                          ).includes(jurisdictionType)
-                      )
-                  : undefined
-              }
             />
             <PerformanceSelect
               onChange={(option) => {

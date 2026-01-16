@@ -18,7 +18,7 @@ import {
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
-import { systemProcedure } from '@events/router/trpc'
+import { userAndSystemProcedure } from '@events/router/trpc'
 import { getEventById, processAction } from '@events/service/events/events'
 import {
   defaultRequestHandler,
@@ -35,7 +35,7 @@ export function declareActionProcedures() {
 
   return {
     ...getDefaultActionProcedures(ActionType.DECLARE),
-    request: systemProcedure
+    request: userAndSystemProcedure
       .use(requireScopesMiddleware)
       .input(DeclareActionInput)
       .use(middleware.eventTypeAuthorization)
@@ -110,7 +110,7 @@ export function declareActionProcedures() {
               }
             },
             {
-              event: updatedEvent,
+              eventId: updatedEvent.id,
               user,
               token,
               status: ActionStatus.Accepted,
