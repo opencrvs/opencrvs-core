@@ -233,8 +233,6 @@ describe('createSearchOptions', () => {
       filter: (f) => f.name.includes('Ibombo')
     })
 
-    console.log('options', options)
-
     expect(options).toMatchSnapshot()
   })
 })
