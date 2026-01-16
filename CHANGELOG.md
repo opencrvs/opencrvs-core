@@ -30,6 +30,7 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Remove legacy mongo migration status outputs and skip typecheck which reduced the migration service startup time by 66%.
 - The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
 - Added experimental ALPHA_HIDDEN form field type, allowing configurable default/derived values and conditional inclusion in form submissions.
+- Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
 
 ## 1.9.5
 

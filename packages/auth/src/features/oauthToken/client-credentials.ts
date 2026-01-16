@@ -21,13 +21,14 @@ import {
 } from '@auth/constants'
 import * as oauthResponse from './responses'
 import { SCOPES, TokenUserType } from '@opencrvs/commons/authentication'
+import { getParam } from './utils'
 
 export async function clientCredentialsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const clientId = request.query.client_id
-  const clientSecret = request.query.client_secret
+  const clientId = getParam(request, 'client_id')
+  const clientSecret = getParam(request, 'client_secret')
 
   if (!clientId || !clientSecret) {
     return oauthResponse.invalidRequest(h)
