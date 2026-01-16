@@ -63,13 +63,16 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
 
     const missingEventsToDownload = drafts
       .filter((event) => !findLocalEventDocument(event.eventId))
-      .map(async (draft) =>
-        queryClient.prefetchQuery({
+      .map(async (draft) => {
+        console.log('Prefetching draft', {
+          queryKey: trpcOptionsProxy.event.get.queryKey(draft.eventId)
+        })
+        return queryClient.prefetchQuery({
           queryKey: trpcOptionsProxy.event.get.queryKey(draft.eventId),
           queryFn: trpcOptionsProxy.event.get.queryOptions(draft.eventId)
             .queryFn
         })
-      )
+      })
 
     await Promise.all(missingEventsToDownload)
 

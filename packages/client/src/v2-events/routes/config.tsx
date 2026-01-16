@@ -68,6 +68,7 @@ function PrefetchQueries() {
 
       // only fetch if we don't already have it cached
       if (!queryClient.getQueryData(queryKey)) {
+        console.log('Prefetching Locations', { queryKey })
         void queryClient.prefetchQuery({ queryKey, queryFn })
       }
     }

@@ -18,6 +18,8 @@ async function cacheUsers(userIds: string[]) {
   const { queryFn, ...options } =
     trpcOptionsProxy.user.list.queryOptions(userIds)
 
+  console.log('Querying users', { options })
+
   const users = await queryClient.fetchQuery(options)
 
   for (const user of users) {

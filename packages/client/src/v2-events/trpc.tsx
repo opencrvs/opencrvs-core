@@ -60,9 +60,7 @@ function getTrpcClient() {
   }
   return createTRPCClient<AppRouter>({
     links: [
-      loggerLink({
-        enabled: (op) => op.direction === 'down' && op.result instanceof Error
-      }),
+      loggerLink(),
       httpBatchLink({
         url: '/api/events',
         transformer: superjson,
