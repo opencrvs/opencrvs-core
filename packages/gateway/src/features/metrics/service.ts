@@ -67,7 +67,7 @@ export const getMetrics = (
       return Promise.reject(
         new Error(`Metrics request failed: ${error.message}`)
       )
-    })
+    }) as Promise<{ total: number; results: any[] }>
 }
 
 export const postMetrics = (

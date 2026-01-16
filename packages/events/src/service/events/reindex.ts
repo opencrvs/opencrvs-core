@@ -61,6 +61,10 @@ async function reindexSearch(token: TokenWithBearer) {
   })
 }
 
+interface PolyfilledRequestInit extends RequestInit {
+  agent: Agent
+}
+
 export async function reindex(token: TokenWithBearer) {
   const configurations = await getEventConfigurations(token)
   for (const configuration of configurations) {
@@ -101,8 +105,9 @@ export async function reindex(token: TokenWithBearer) {
       body: new JsonStreamStringify(eventDocumentStreamForCountryConfig),
       // Ensure HTTP socket of previous GET /events request is not reused
       // to avoid connections being closed preemptively by Node.js
-      agent: new Agent({ keepAlive: false })
-    }
+      agent: new Agent({ keepAlive: false }),
+      duplex: 'half'
+    } as PolyfilledRequestInit
   ).then((response) => {
     if (!response.ok && response.status === 404) {
       logger.warn(
