@@ -21,13 +21,13 @@ import { padZero } from '@client/v2-events/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const messages24Hour = {
-  'configuration.timeFormat': 'HH:mm',
+  'configuration.timeField.outputFormat': 'HH:mm',
   'storybook.time.label': 'Time input (24-hour)',
   'storybook.time.label.description': 'The title for the time input'
 }
 
 const messages12Hour = {
-  'configuration.timeFormat': 'hh:mm a',
+  'configuration.timeField.outputFormat': 'hh:mm a',
   'storybook.time.label': 'Time input (12-hour)',
   'storybook.time.label.description': 'The title for the time input'
 }
