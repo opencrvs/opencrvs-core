@@ -41,11 +41,6 @@ self.addEventListener('message', async (event) => {
   }
 })
 
-precacheAndRoute([
-  { url: '/manifest.json', revision: '1' },
-  { url: '/api/countryconfig/client-config.js', revision: '1' }
-])
-
 precacheAndRoute(self.__WB_MANIFEST as PrecacheEntry[])
 
 cleanupOutdatedCaches()
