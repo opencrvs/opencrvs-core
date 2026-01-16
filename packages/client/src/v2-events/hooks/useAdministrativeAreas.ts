@@ -48,7 +48,7 @@ export function useAdministrativeAreas() {
         const { queryFn, ...rest } =
           trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
-        const locationArray = useSuspenseQuery({
+        const administrativeAreas = useSuspenseQuery({
           ...rest,
           queryKey: trpc.administrativeAreas.list.queryKey({
             isActive,
@@ -56,10 +56,13 @@ export function useAdministrativeAreas() {
           })
         }).data
 
-        const locationMap = new Map<UUID, AdministrativeArea>(
-          locationArray.map((location) => [location.id, location])
+        const administrativeAreasMap = new Map<UUID, AdministrativeArea>(
+          administrativeAreas.map((administrativeArea) => [
+            administrativeArea.id,
+            administrativeArea
+          ])
         )
-        return locationMap
+        return administrativeAreasMap
       }
     }
   }
@@ -69,7 +72,7 @@ export function useAdministrativeAreas() {
  * Get the leaf administrative area IDs from a list of administrative areas.
  *
  * A leaf administrative area is defined as an administrative area that does not have any children in the provided list.
- * ADMIN_STRUCTURE might have CRVS_OFFICE children, but is still considered to be a leaf administrative area.
+ * AdministrativeArea  might have a CRVS_OFFICE as children, but is still considered to be a leaf administrative area.
  *
  * @param administrativeAreas - The list of administrative areas to search.
  * @returns The list of leaf administrative area IDs.
@@ -97,25 +100,28 @@ export function getLeafAdministrativeAreaIds(
 
 // Ref works since arrays are compared by reference.
 let cachedAdministrativeAreasRef: unknown = null
-/** In-memory cache of leaf location IDs */
-let cachedLeafIds: { id: UUID }[] | null = null
+/** In-memory cache of leaf administrative area IDs */
+let cachedLeafAdministrativeAreaIds: { id: UUID }[] | null = null
 
 /**
  * Uses in-memory caching to avoid recomputation on re-renders. Becomes costly with large datasets.
  *
- * @returns array of leaf location IDs within the specified types. When no types are provided, returns leaf locations based on all types.
+ * @returns array of leaf administrative area IDs.
  */
-export function useSuspenseAdminLeafLevelLocations() {
+export function useSuspenseGetLeafAdministrativeAreaIds() {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  if (cachedLeafIds && cachedAdministrativeAreasRef === administrativeAreas) {
-    return cachedLeafIds
+  if (
+    cachedLeafAdministrativeAreaIds &&
+    cachedAdministrativeAreasRef === administrativeAreas
+  ) {
+    return cachedLeafAdministrativeAreaIds
   }
 
   const leafIds = getLeafAdministrativeAreaIds(administrativeAreas)
   cachedAdministrativeAreasRef = administrativeAreas
-  cachedLeafIds = leafIds
+  cachedLeafAdministrativeAreaIds = leafIds
 
   return leafIds
 }

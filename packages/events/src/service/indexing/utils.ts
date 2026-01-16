@@ -212,20 +212,23 @@ export type EventIndexWithAdministrativeHierarchy = Omit<
 }
 
 /**
- * Expands leaf-level location UUIDs into full administrative hierarchies for Elasticsearch indexing.
+ * Expands leaf-level hierarchy UUIDs into full administrative hierarchies for Elasticsearch indexing.
  *
- * It takes an event with single location UUIDs (leaf-level) (ex: event.createdAtLocation) and expands each into an array representing the
+ * Takes an event with single location UUIDs (leaf-level) (ex: event.createdAtLocation) and expands each into an array representing the
  * complete administrative hierarchy from top to bottom.
  *
  * Example: { locationId: location_uuid }
  *       → { locationId: [province_uuid, district_uuid, location_uuid] }
  *
- * Uses an in-memory cache to avoid redundant database lookups for the same location hierarchies.
+ * Example: { administrativeArea: admin_area_uuid }
+ *      → { administrativeArea: [parent_uuid, admin_area_uuid] }
+ *
+ * Uses an in-memory cache to avoid redundant database lookups for the same administrative hierarchies.
  *
  * @param eventConfig Event configuration containing field definitions
- * @param event Event index with leaf-level location UUIDs
- * @param administrativeHierarchy Optional in-memory cache for location hierarchies, to avoid redundant lookups
- * @returns Event index with full location hierarchies (arrays of UUIDs from top to leaf)
+ * @param event Event index with leaf-level UUIDs
+ * @param administrativeHierarchy Optional in-memory cache for administrative hierarchies, to avoid redundant lookups
+ * @returns Event index with resolved hierarchies (arrays of UUIDs from top to leaf)
  */
 export async function getEventIndexWithAdministrativeHierarchy(
   eventConfig: EventConfig,

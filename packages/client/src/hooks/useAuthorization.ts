@@ -116,12 +116,12 @@ export function usePermissions() {
       return user.primaryOffice.id === userPrimaryOffice?.id
     }
     if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdictionV2(
-        userPrimaryOffice.id,
-        user.primaryOffice.id,
+      return isOfficeUnderJurisdictionV2({
+        officeId: userPrimaryOffice.id,
+        otherOfficeId: user.primaryOffice.id,
         locations,
         administrativeAreas
-      )
+      })
     }
     if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
       return user.id === currentUser?.id
@@ -149,12 +149,12 @@ export function usePermissions() {
       if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
         return false
       }
-      return isOfficeUnderJurisdictionV2(
-        userPrimaryOffice.id,
-        user.primaryOffice.id,
+      return isOfficeUnderJurisdictionV2({
+        officeId: userPrimaryOffice.id,
+        otherOfficeId: user.primaryOffice.id,
         locations,
         administrativeAreas
-      )
+      })
     }
 
     return false
@@ -178,12 +178,12 @@ export function usePermissions() {
     }
 
     if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdictionV2(
-        userPrimaryOffice.id,
-        office.id,
+      return isOfficeUnderJurisdictionV2({
+        officeId: userPrimaryOffice.id,
+        otherOfficeId: office.id,
         locations,
         administrativeAreas
-      )
+      })
     }
     return false
   }
@@ -196,12 +196,12 @@ export function usePermissions() {
       return true
     }
     if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdictionV2(
-        userPrimaryOffice.id,
-        office.id,
+      return isOfficeUnderJurisdictionV2({
+        officeId: userPrimaryOffice.id,
+        otherOfficeId: office.id,
         locations,
         administrativeAreas
-      )
+      })
     }
     return false
   }

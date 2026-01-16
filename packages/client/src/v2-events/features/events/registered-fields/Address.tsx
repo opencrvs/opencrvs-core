@@ -215,7 +215,7 @@ function getLeafAdministrativeLevel(
   return undefined
 }
 
-function getAdministrativeArea(value?: AddressFieldValue) {
+function getAdministrativeAreaIdFromAddress(value?: AddressFieldValue) {
   return value?.addressType === AddressType.DOMESTIC
     ? value.administrativeArea
     : undefined
@@ -254,7 +254,7 @@ function AddressInput(props: Props) {
   )
   const customAddressFields = props.configuration?.streetAddressForm
 
-  const administrativeAreaId = getAdministrativeArea(value)
+  const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
 
   const resolveAdministrativeArea = (
     adminArea:
@@ -383,7 +383,7 @@ function AddressOutput({
     return ''
   }
 
-  const administrativeAreaId = getAdministrativeArea(value)
+  const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
 
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
@@ -477,7 +477,7 @@ function toCertificateVariables(
   const stringifiedResult = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
   const { streetLevelDetails } = value
 
-  const administrativeAreaId = getAdministrativeArea(value)
+  const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
   if (value.addressType === AddressType.INTERNATIONAL) {
     return { ...stringifiedResult, streetLevelDetails }
   }

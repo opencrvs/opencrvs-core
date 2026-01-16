@@ -17,7 +17,7 @@ import {
   AdminStructure
 } from '@client/offline/reducer'
 import { Address } from '@client/utils/gateway'
-import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import { ISearchLocation as SearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/utils/countries'
@@ -31,10 +31,7 @@ import {
   UUID,
   LocationType as V2LocationType
 } from '@opencrvs/commons/client'
-import {
-  getAdminLevelHierarchy,
-  getAdminLevelHierarchyV2
-} from '../v2-events/utils'
+import { getAdminLevelHierarchyV2 } from '../v2-events/utils'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -136,7 +133,7 @@ export function generateSearchableLocations(
     ? getAssociatedLocationsAndOffices(officeId, locations)
     : locations
 
-  const generated: ISearchLocation[] = filteredLocations.map(
+  const generated: SearchLocation[] = filteredLocations.map(
     (location: ILocation) => {
       let locationName = generateLocationName(location, intl)
 
@@ -182,7 +179,7 @@ export function generateLocations(
 }
 
 // @TODO: We probably want to optimise this one if we can't get rid of it.
-export function generateSearchOptions(
+export function createSearchOptions(
   locations: Map<UUID, Location>,
   administrativeAreas: Map<UUID, AdministrativeArea>,
   filter?: (location: Location | AdministrativeArea) => boolean
@@ -195,7 +192,7 @@ export function generateSearchOptions(
     administrativeAreasArr = administrativeAreasArr.filter(filter)
   }
 
-  const generated: ISearchLocation[] = locationsArr.map((location) => {
+  const locationOptions: SearchLocation[] = locationsArr.map((location) => {
     const administrativeArea = location.administrativeAreaId
       ? administrativeAreas.get(location.administrativeAreaId)
       : null
@@ -207,8 +204,8 @@ export function generateSearchOptions(
     }
   })
 
-  const adminAreasGenerated: ISearchLocation[] = administrativeAreasArr.map(
-    (administrativeArea) => {
+  const administrativeAreaOptions: SearchLocation[] =
+    administrativeAreasArr.map((administrativeArea) => {
       const parentAdministrativeArea = administrativeArea.parentId
         ? administrativeAreas.get(administrativeArea.parentId)
         : null
@@ -221,10 +218,9 @@ export function generateSearchOptions(
           ', '
         )
       }
-    }
-  )
+    })
 
-  return [...generated, ...adminAreasGenerated]
+  return [...locationOptions, ...administrativeAreaOptions]
 }
 
 export function getJurisidictionType(
@@ -330,12 +326,17 @@ export function isOfficeUnderJurisdiction(
 }
 
 // @TODO: Check that changes are sensible. Or if it even worked before.
-export function isOfficeUnderJurisdictionV2(
-  officeId: string,
-  otherOfficeId: string,
-  locations: Map<UUID, Location>,
+export function isOfficeUnderJurisdictionV2({
+  officeId,
+  otherOfficeId,
+  locations,
+  administrativeAreas
+}: {
+  officeId: string
+  otherOfficeId: string
+  locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
-) {
+}) {
   const office = locations.get(UUID.parse(officeId))
   const otherOffice = locations.get(UUID.parse(otherOfficeId))
 
