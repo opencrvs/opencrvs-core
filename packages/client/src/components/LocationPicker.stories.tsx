@@ -10,7 +10,6 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { testDataGenerator } from '@client/tests/test-data-generators'
 import { LocationPicker } from './LocationPicker'
 import { TRPCProvider } from '../v2-events/trpc'
 import { noop } from 'lodash'
@@ -18,8 +17,6 @@ import {
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
   V2_DEFAULT_MOCK_LOCATIONS
 } from '../tests/v2-events/administrative-hierarchy-mock'
-
-const generator = testDataGenerator()
 
 const meta: Meta<typeof LocationPicker> = {
   title: 'LocationPicker',

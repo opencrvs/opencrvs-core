@@ -80,10 +80,10 @@ function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
 
   const administrativeAreaId = UUID.safeParse(value.toString()).data
 
-  const location =
+  const administrativeArea =
     administrativeAreaId && administrativeAreas.get(administrativeAreaId)
 
-  return location?.name ?? ''
+  return administrativeArea?.name ?? ''
 }
 
 function stringify(value: string, context: { locations: Map<UUID, Location> }) {

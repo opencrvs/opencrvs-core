@@ -383,8 +383,8 @@ export function getAdminLevelHierarchy(
   return hierarchy
 }
 
-// @TODO: Check if the one with the hiearchy arg is needed
-export function getAdminLevelHierarchyV2(
+// Given an administrative area id, return the full hierarchy from root to leaf.
+export function getAdministrativeAreaHierarchy(
   administrativeAreaId: string | undefined | null,
   administrativeAreas: Map<UUID, AdministrativeArea>
 ) {

@@ -31,7 +31,7 @@ import {
   UUID,
   LocationType as V2LocationType
 } from '@opencrvs/commons/client'
-import { getAdminLevelHierarchyV2 } from '../v2-events/utils'
+import { getAdministrativeAreaHierarchy } from '../v2-events/utils'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -328,7 +328,6 @@ export function isOfficeUnderJurisdiction(
   return Object.values(hierarchy).includes(parentLocation.id)
 }
 
-// @TODO: Check that changes are sensible. Or if it even worked before.
 export function isOfficeUnderJurisdictionV2({
   officeId,
   otherOfficeId,
@@ -357,12 +356,11 @@ export function isOfficeUnderJurisdictionV2({
     return false
   }
 
-  const hierarchy = getAdminLevelHierarchyV2(
+  const hierarchy = getAdministrativeAreaHierarchy(
     otherOfficeAdministrativeAreaId,
     administrativeAreas
   )
 
-  // @TODO: this does not make sense?
   return hierarchy.some(({ id }) => id === parentAdministrativeArea.id)
 }
 

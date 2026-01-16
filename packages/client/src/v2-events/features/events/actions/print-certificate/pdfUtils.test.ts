@@ -196,7 +196,6 @@ function expectRenderOutput(template: string, output: string) {
       }
     },
     review: false,
-    // @TODO: CHECK if these should have actual values
     locations: new Map(),
     administrativeAreas: new Map(),
     users: [registrar.v2],

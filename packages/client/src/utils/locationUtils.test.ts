@@ -18,14 +18,17 @@ import {
   getJurisidictionType,
   isOfficeUnderJurisdiction,
   getLocationNameMapOfFacility,
-  createSearchOptions
+  createSearchOptions,
+  isOfficeUnderJurisdictionV2
 } from '@client/utils/locationUtils'
 import { createIntl } from 'react-intl'
 import { ILanguage } from '@client/i18n/reducer'
 import {
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+  V2_DEFAULT_MOCK_LOCATIONS,
   V2_DEFAULT_MOCK_LOCATIONS_MAP
 } from '../tests/v2-events/administrative-hierarchy-mock'
+import { UUID } from '@opencrvs/commons/client'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {
@@ -183,6 +186,49 @@ describe('locationUtil tests', () => {
         facility: 'ARK Private Clinic'
       })
     })
+  })
+})
+
+describe('isOfficeUnderJurisdictionV2', () => {
+  it('returns true if the other office is under jurisdiction of the given office', () => {
+    const officeId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find(
+        (l) => l.name === 'Central Provincial Office'
+      )?.id
+    )
+    const otherOfficeId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Ibombo District Office')
+        ?.id
+    )
+
+    expect(
+      isOfficeUnderJurisdictionV2({
+        officeId,
+        otherOfficeId,
+        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+      })
+    ).toEqual(true)
+  })
+
+  it('returns false if the given other office is not under the jurisdiction of the given office', () => {
+    const officeId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Isango District Office')
+        ?.id
+    )
+    const otherOfficeId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Ibombo District Office')
+        ?.id
+    )
+
+    expect(
+      isOfficeUnderJurisdictionV2({
+        officeId,
+        otherOfficeId,
+        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+      })
+    ).toEqual(false)
   })
 })
 

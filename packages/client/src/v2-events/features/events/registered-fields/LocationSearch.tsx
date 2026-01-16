@@ -81,7 +81,7 @@ function useCreateSearchOptions(
 }
 
 /**
- * @deprecated -- Use/replace with SearchableSelect 1.10 onwards.
+ * @deprecated -- Replace internals using SearchableSelect 1.10 onwards.
  */
 function LocationSearchInput({
   onChange,

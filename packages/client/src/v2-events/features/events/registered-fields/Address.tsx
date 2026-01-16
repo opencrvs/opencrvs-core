@@ -275,17 +275,14 @@ function AddressInput(props: Props) {
 
       const hierarchy = getAdminLevelHierarchy(
         officeAdminAreaId,
-        // @TODO: Can I limit locations to only ADMIN_STRUCTURE type if I figure out office's location?
         administrativeAreas,
         adminLevelIds
       )
 
-      // @TODO: Maybe the function can be removed?
       return hierarchy[adminArea.$location]
     }
   }
 
-  // @TODO: Can I just read the administrativeAreaId from value?
   const resolvedAdministrativeArea =
     resolveAdministrativeArea(administrativeAreaId)
 
@@ -468,7 +465,6 @@ function toCertificateVariables(
    */
 
   const { intl, locations, adminLevels, administrativeAreas } = context
-  // @todo: check why no admin levels passed
   const stringifier = getFormDataStringifier(
     intl,
     locations,
