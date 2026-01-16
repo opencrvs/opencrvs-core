@@ -6,15 +6,15 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Release - Start a new release 
+name: Release - Start a new release
 on:
   workflow_dispatch:
     inputs:
       version:
         type: string
         required: true
-        description: "Version to release"
-  
+        description: 'Version to release'
+
 jobs:
   release_workflow:
     runs-on: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
           fi
           echo "target_branch=master" >> $GITHUB_OUTPUT
           echo "base_branch=$base_branch" >> $GITHUB_OUTPUT
-                 
+
       - name: Start a new release ${{ inputs.version }} from ${{ steps.get_base_branch.outputs.base_branch }}
         uses: hoangvvo/gitflow-workflow-action@0.3.8
         with:
@@ -64,7 +64,7 @@ jobs:
                 version: '${{ inputs.version }}'
               }
             })
-      
+
       - name: Trigger workflow in opencrvs-farajaland
         uses: actions/github-script@v7
         with:
@@ -83,7 +83,7 @@ jobs:
       - name: Checkout the release branch
         uses: actions/checkout@v4
         with:
-          ref: "release/${{ inputs.version }}"
+          ref: 'release/${{ inputs.version }}'
 
       - name: Clear auto-generated PR comment
         run: |
@@ -105,14 +105,14 @@ jobs:
           rm body.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
+
       - name: Update version numbers and CHANGELOG
         run: |
           cd "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          npx lerna exec 'yarn version --new-version ${{ inputs.version }} --no-git-tag-version'
+          npx lerna exec 'pnpm version --new-version ${{ inputs.version }} --no-git-tag-version'
           git add .
           git commit -m "chore: update version to ${{ inputs.version }}"
 
@@ -140,13 +140,12 @@ jobs:
           gh release create "$TAG_NAME" \
             --title "$TITLE" \
             --notes "$NOTES" \
-            --draft 
+            --draft
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Delete the tag
-        run: | 
+        run: |
           TAG_NAME="v${{ inputs.version }}"
           git tag -d "$TAG_NAME"
           git push origin ":refs/tags/$TAG_NAME"
-          

@@ -14,14 +14,14 @@ src/
 
 ## Getting started
 
-### Development using yarn link
+### Development using pnpm link
 
 ```
 # tsconfig.json references commons. when `tsc --build` is run, both are built.
-> yarn build:all
+> pnpm build:all
 # If you miss this part you might face issues with types.
 > cd dist
-> yarn link
+> pnpm link
 ```
 
 ### Internal dependencies
@@ -44,7 +44,7 @@ Toolkit "re-exports" common definitions (e.g. events, conditionals) and make the
 #### While developing
 
 1. Update version number in `package.json`
-2. `yarn build:all`
+2. `pnpm build:all`
 3. `npm publish`
 
 #### Through version control

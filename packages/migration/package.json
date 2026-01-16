@@ -12,8 +12,8 @@
     "migrate:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events",
     "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "create:hearth": "./create-mongo-migrations.sh hearth",
-    "create:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/events --migration-file-language=sql",
-    "create:migrate-legacy-users": "DATABASE_URL=postgres://postgres:postgres@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/migrate-legacy-users --migration-file-language=sql --migrations-table=pgmigrations_legacy_users",
+    "create:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events pnpm node-pg-migrate create --migrations-dir=./src/migrations/events --migration-file-language=sql",
+    "create:migrate-legacy-users": "DATABASE_URL=postgres://postgres:postgres@localhost:5432/events pnpm node-pg-migrate create --migrations-dir=./src/migrations/migrate-legacy-users --migration-file-language=sql --migrations-table=pgmigrations_legacy_users",
     "create:openhim": "./create-mongo-migrations.sh openhim",
     "create:performance": "./create-mongo-migrations.sh performance",
     "create:user-mgnt": "./create-mongo-migrations.sh user-mgnt",
@@ -25,7 +25,7 @@
     "status:application-config": "migrate-mongo status -f ./src/migrate-mongo-config-application-config.js",
     "lint": "eslint -c eslint.config.cjs --max-warnings=0",
     "test:compilation": "tsc --noEmit",
-    "test": "yarn test:compilation",
+    "test": "pnpm test:compilation",
     "build": "rimraf build && tsc --noCheck"
   },
   "dependencies": {
