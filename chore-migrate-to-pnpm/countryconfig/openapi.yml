@@ -39,7 +39,7 @@ paths:
               - CREATE
               - NOTIFY
               - DECLARE
-              - VALIDATE
+              - EDIT
               - REGISTER
               - DUPLICATE_DETECTED
               - REJECT
@@ -157,7 +157,7 @@ components:
                     enum:
                       - NOTIFY
                       - DECLARE
-                      - VALIDATE
+                      - EDIT
                       - REGISTER
                       - REJECT
                       - ARCHIVE
@@ -188,7 +188,6 @@ components:
     ActionDocument:
       oneOf:
         - $ref: "#/components/schemas/CreatedAction"
-        - $ref: "#/components/schemas/ValidateAction"
         - $ref: "#/components/schemas/RejectAction"
         - $ref: "#/components/schemas/DuplicateDetectedAction"
         - $ref: "#/components/schemas/MarkNotDuplicateAction"
@@ -204,13 +203,13 @@ components:
         - $ref: "#/components/schemas/UnassignedAction"
         - $ref: "#/components/schemas/PrintCertificateAction"
         - $ref: "#/components/schemas/ReadAction"
+        - $ref: "#/components/schemas/EditAction"
         - $ref: "#/components/schemas/CustomAction"
       type: object
       discriminator:
         propertyName: type
         mapping:
           CREATE: "#/components/schemas/CreatedAction"
-          VALIDATE: "#/components/schemas/ValidateAction"
           REJECT: "#/components/schemas/RejectAction"
           DUPLICATE_DETECTED: "#/components/schemas/DuplicateDetectedAction"
           MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
@@ -226,6 +225,7 @@ components:
           UNASSIGN: "#/components/schemas/UnassignedAction"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateAction"
           READ: "#/components/schemas/ReadAction"
+          EDIT: "#/components/schemas/EditAction"
           CUSTOM: "#/components/schemas/CustomAction"
     CreatedAction:
       type: object
@@ -310,99 +310,6 @@ components:
         type:
           type: string
           const: CREATE
-      required:
-        - id
-        - transactionId
-        - createdByUserType
-        - createdAt
-        - createdBy
-        - createdByRole
-        - declaration
-        - status
-        - type
-    ValidateAction:
-      type: object
-      properties:
-        id:
-          description: Unique identifier of the action.
-          type: string
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-        transactionId:
-          description: Unique identifier of the transaction.
-          type: string
-        createdByUserType:
-          description: Indicates whether the action was created by a human-user or by a
-            system-user.
-          type: string
-          enum:
-            - user
-            - system
-        createdAt:
-          description: Timestamp indicating when the action was created.
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        createdBy:
-          description: Identifier of the user who created the action.
-          type: string
-        createdByRole:
-          description: Role of the user who created the action.
-          type: string
-        createdBySignature:
-          description: Reference to the signature of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
-        createdAtLocation:
-          description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
-        declaration:
-          description: Declaration data defined by the ActionConfig. Supports partial
-            updates.
-          type: object
-          propertyNames:
-            type: string
-          additionalProperties:
-            description: Value that matches exactly one of the possible schema types
-              (TextValue, DateValue, DateRangeFieldValue). The best matching
-              schema is chosen by priority.
-        annotation:
-          description: Action-specific metadata used to annotate the event.
-          anyOf:
-            - description: Record of field-level changes made by an action. Supports partial
-                updates and nullable values.
-              type: object
-              propertyNames:
-                type: string
-              additionalProperties:
-                description: Value that matches exactly one of the possible schema types
-                  (TextValue, DateValue, DateRangeFieldValue). The best matching
-                  schema is chosen by priority.
-            - type: "null"
-        status:
-          description: Current status of the action. Actions may be validated
-            asynchronously by third-party integrations.
-          type: string
-          enum:
-            - Requested
-            - Accepted
-            - Rejected
-        originalActionId:
-          description: Reference to the original action asynchronously accepted or
-            rejected by a third-party integration.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
-        type:
-          type: string
-          const: VALIDATE
       required:
         - id
         - transactionId
@@ -1888,6 +1795,106 @@ components:
         - declaration
         - status
         - type
+    EditAction:
+      type: object
+      properties:
+        id:
+          description: Unique identifier of the action.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        transactionId:
+          description: Unique identifier of the transaction.
+          type: string
+        createdByUserType:
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+          type: string
+          enum:
+            - user
+            - system
+        createdAt:
+          description: Timestamp indicating when the action was created.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          description: Identifier of the user who created the action.
+          type: string
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+        annotation:
+          description: Action-specific metadata used to annotate the event.
+          anyOf:
+            - description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+              type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+            - type: "null"
+        status:
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+        originalActionId:
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        type:
+          type: string
+          const: EDIT
+        content:
+          type: object
+          properties:
+            comment:
+              description: Comment for the edit action.
+              type: string
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
+        - content
     CustomAction:
       type: object
       properties:
@@ -2007,6 +2014,23 @@ components:
           required:
             - $$field
           additionalProperties: false
+        placeOfEvent:
+          description: Reference to the field capturing the place of the event (e.g. place
+            of birth). Defaults to the meta.createdAtLocation if unspecified.
+          type: object
+          properties:
+            $$field:
+              description: Unique identifier for the field
+              type: string
+            $$subfield:
+              description: 'If the FieldValue is an object, subfield can be used to refer to
+                e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              type: array
+              items:
+                type: string
+          required:
+            - $$field
+          additionalProperties: false
         title:
           description: Title template for the singular event, supporting variables (e.g.
             "{applicant.name.firstname} {applicant.name.surname}").
@@ -2104,6 +2128,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionConfig"
+        actionOrder:
+          description: Order of actions in the action menu. Use either the action type for
+            core actions or the customActionType for custom actions.
+          type: array
+          items:
+            type: string
         declaration:
           description: Configuration of the form used to gather event data.
           type: object
@@ -2122,6 +2152,11 @@ components:
                   title:
                     description: Header title of the page
                     $ref: "#/components/schemas/TranslationConfig"
+                  requireCompletionToContinue:
+                    description: If true, all required fields must be filled before continuing to
+                      the next page
+                    default: false
+                    type: boolean
                   fields:
                     description: Fields to be rendered on the page
                     type: array
@@ -2138,6 +2173,7 @@ components:
                 required:
                   - id
                   - title
+                  - requireCompletionToContinue
                   - fields
                   - type
                 additionalProperties: false
@@ -2254,6 +2290,8 @@ components:
                             - QR_READER
                             - ID_READER
                             - LOADER
+                            - ALPHA_HIDDEN
+                            - CUSTOM
                         label:
                           description: "
 
@@ -2487,6 +2525,8 @@ components:
                             - QR_READER
                             - ID_READER
                             - LOADER
+                            - ALPHA_HIDDEN
+                            - CUSTOM
                         label:
                           description: "
 
@@ -2623,6 +2663,7 @@ components:
                             - event.status
                             - event.legalStatuses.REGISTERED.acceptedAt
                             - event.legalStatuses.REGISTERED.createdAtLocation
+                            - event.legalStatuses.REGISTERED.registrationNumber
                             - event.updatedAt
                         fieldType:
                           type: string
@@ -2697,10 +2738,12 @@ components:
       oneOf:
         - $ref: "#/components/schemas/ReadActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
-        - $ref: "#/components/schemas/ValidateActionConfig"
+        - $ref: "#/components/schemas/RejectActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
         - $ref: "#/components/schemas/PrintCertificateActionConfig"
         - $ref: "#/components/schemas/RequestCorrectionActionConfig"
+        - $ref: "#/components/schemas/EditActionConfig"
+        - $ref: "#/components/schemas/ArchiveActionConfig"
         - $ref: "#/components/schemas/CustomActionConfig"
       type: object
       discriminator:
@@ -2708,10 +2751,12 @@ components:
         mapping:
           READ: "#/components/schemas/ReadActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
-          VALIDATE: "#/components/schemas/ValidateActionConfig"
+          REJECT: "#/components/schemas/RejectActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateActionConfig"
           REQUEST_CORRECTION: "#/components/schemas/RequestCorrectionActionConfig"
+          EDIT: "#/components/schemas/EditActionConfig"
+          ARCHIVE: "#/components/schemas/ArchiveActionConfig"
           CUSTOM: "#/components/schemas/CustomActionConfig"
     ReadActionConfig:
       type: object
@@ -2727,8 +2772,20 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -2743,13 +2800,114 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Read-action can not be disabled or hidden with conditionals.
           not: {}
@@ -3021,6 +3179,7 @@ components:
                             - signature
                             - avatar
                             - primaryOfficeId
+                            - administrativeAreaId
                         $location:
                           type: string
                       required:
@@ -9615,7 +9774,6 @@ components:
                             - CREATED
                             - NOTIFIED
                             - DECLARED
-                            - VALIDATED
                             - REGISTERED
                             - ARCHIVED
                         updatedAt:
@@ -9686,6 +9844,299 @@ components:
             - label
             - type
             - configuration
+          additionalProperties: false
+        - type: object
+          properties:
+            id:
+              description: Unique identifier of the field.
+              type: string
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                    additionalProperties: false
+            required:
+              description: Indicates whether the field is mandatory.
+              default: false
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+                  additionalProperties: false
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                    additionalProperties: false
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
+              const: CUSTOM
+            defaultValue: {}
+            src:
+              description: Module source path for the custom field component
+              type: string
+            configuration: {}
+          required:
+            - id
+            - label
+            - type
+            - src
+          additionalProperties: false
+        - description: A non-interactive, hidden field that only hold a value in the form
+          type: object
+          properties:
+            id:
+              description: Unique identifier of the field.
+              type: string
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                    additionalProperties: false
+            required:
+              default: false
+              type: boolean
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                    additionalProperties: false
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
+              const: ALPHA_HIDDEN
+            defaultValue:
+              type: string
+          required:
+            - id
+            - label
+            - type
           additionalProperties: false
       type: object
     FieldConditional:
@@ -9919,7 +10370,6 @@ components:
                   - CREATED
                   - NOTIFIED
                   - DECLARED
-                  - VALIDATED
                   - REGISTERED
                   - ARCHIVED
               updatedAt:
@@ -9957,21 +10407,17 @@ components:
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         updatedAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         assignedTo:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
@@ -10001,7 +10447,6 @@ components:
               - CREATED
               - NOTIFIED
               - DECLARED
-              - VALIDATED
               - REGISTERED
               - ARCHIVED
       required:
@@ -10020,7 +10465,6 @@ components:
             - CREATED
             - NOTIFIED
             - DECLARED
-            - VALIDATED
             - REGISTERED
             - ARCHIVED
       required:
@@ -10142,7 +10586,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - pending-certification
@@ -10150,6 +10594,7 @@ components:
                       - rejected
                       - correction-requested
                       - potential-duplicate
+                      - edit-in-progress
               - description: Custom flag identifier defined by the country config.
                 type: string
         noneOf:
@@ -10158,7 +10603,7 @@ components:
             anyOf:
               - anyOf:
                   - type: string
-                    pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                    pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
                       - pending-certification
@@ -10166,6 +10611,7 @@ components:
                       - rejected
                       - correction-requested
                       - potential-duplicate
+                      - edit-in-progress
               - description: Custom flag identifier defined by the country config.
                 type: string
       additionalProperties: false
@@ -10246,8 +10692,20 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10262,13 +10720,114 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -10333,6 +10892,23 @@ components:
           required:
             - title
             - fields
+          additionalProperties: false
+        dialogCopy:
+          type: object
+          properties:
+            notify:
+              description: Confirmation text for the notify action
+              $ref: "#/components/schemas/TranslationConfig"
+            declare:
+              description: Confirmation text for the declare action
+              $ref: "#/components/schemas/TranslationConfig"
+            register:
+              description: Confirmation text for the register action
+              $ref: "#/components/schemas/TranslationConfig"
+          required:
+            - notify
+            - declare
+            - register
           additionalProperties: false
       required:
         - label
@@ -10461,7 +11037,7 @@ components:
             - type
           additionalProperties: false
       type: object
-    ValidateActionConfig:
+    RejectActionConfig:
       type: object
       properties:
         label:
@@ -10475,8 +11051,20 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10491,13 +11079,114 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -10530,23 +11219,9 @@ components:
                   - conditional
                 additionalProperties: false
             type: object
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
-          additionalProperties: false
         type:
           type: string
-          const: VALIDATE
+          const: REJECT
       required:
         - label
         - flags
@@ -10566,8 +11241,20 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10582,13 +11269,114 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -10657,8 +11445,20 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10673,13 +11473,114 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -10735,6 +11636,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -10751,6 +11657,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                     additionalProperties: false
@@ -10762,6 +11669,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -10779,6 +11691,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                       - actions
@@ -10844,8 +11757,20 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -10860,13 +11785,114 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -10922,6 +11948,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -10938,6 +11969,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                     additionalProperties: false
@@ -10949,6 +11981,11 @@ components:
                       title:
                         description: Header title of the page
                         $ref: "#/components/schemas/TranslationConfig"
+                      requireCompletionToContinue:
+                        description: If true, all required fields must be filled before continuing to
+                          the next page
+                        default: false
+                        type: boolean
                       fields:
                         description: Fields to be rendered on the page
                         type: array
@@ -10966,6 +12003,7 @@ components:
                     required:
                       - id
                       - title
+                      - requireCompletionToContinue
                       - fields
                       - type
                       - actions
@@ -10981,7 +12019,7 @@ components:
         - type
         - correctionForm
       additionalProperties: false
-    CustomActionConfig:
+    EditActionConfig:
       type: object
       properties:
         label:
@@ -10995,8 +12033,20 @@ components:
             type: object
             properties:
               id:
-                description: Custom flag identifier defined by the country config.
-                type: string
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
               operation:
                 description: Operation to perform on the flag.
                 type: string
@@ -11011,13 +12061,512 @@ components:
               - id
               - operation
             additionalProperties: false
-        auditHistoryLabel:
-          description: The label to show in audit history for this action. For example
-            "Approved".
-          $ref: "#/components/schemas/TranslationConfig"
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
+        type:
+          type: string
+          const: EDIT
+        dialogCopy:
+          type: object
+          properties:
+            notify:
+              description: Confirmation text for the notify with edits action
+              $ref: "#/components/schemas/TranslationConfig"
+            declare:
+              description: Confirmation text for the declare with edits action
+              $ref: "#/components/schemas/TranslationConfig"
+            register:
+              description: Confirmation text for the register with edits action
+              $ref: "#/components/schemas/TranslationConfig"
+          required:
+            - notify
+            - declare
+            - register
+          additionalProperties: false
+      required:
+        - label
+        - flags
+        - type
+        - dialogCopy
+      additionalProperties: false
+    ArchiveActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          description: Flag actions which are executed when the action is performed.
+          default: []
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
+              operation:
+                description: Operation to perform on the flag.
+                type: string
+                enum:
+                  - add
+                  - remove
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+            additionalProperties: false
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
+        type:
+          type: string
+          const: ARCHIVE
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+    CustomActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          description: Flag actions which are executed when the action is performed.
+          default: []
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - pending-certification
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
+              operation:
+                description: Operation to perform on the flag.
+                type: string
+                enum:
+                  - add
+                  - remove
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+            additionalProperties: false
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -11062,12 +12611,17 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FieldConfig"
+        auditHistoryLabel:
+          description: The label to show in audit history for this action. For example
+            "Approved".
+          $ref: "#/components/schemas/TranslationConfig"
       required:
         - label
         - flags
         - type
         - customActionType
         - form
+        - auditHistoryLabel
       additionalProperties: false
     EventDocumentOutput:
       type: object
@@ -11152,7 +12706,7 @@ components:
                     enum:
                       - NOTIFY
                       - DECLARE
-                      - VALIDATE
+                      - EDIT
                       - REGISTER
                       - REJECT
                       - ARCHIVE
@@ -11185,7 +12739,6 @@ components:
     ActionDocumentOutput:
       oneOf:
         - $ref: "#/components/schemas/CreatedActionOutput"
-        - $ref: "#/components/schemas/ValidateActionOutput"
         - $ref: "#/components/schemas/RejectActionOutput"
         - $ref: "#/components/schemas/DuplicateDetectedActionOutput"
         - $ref: "#/components/schemas/MarkNotDuplicateActionOutput"
@@ -11201,13 +12754,13 @@ components:
         - $ref: "#/components/schemas/UnassignedActionOutput"
         - $ref: "#/components/schemas/PrintCertificateActionOutput"
         - $ref: "#/components/schemas/ReadActionOutput"
+        - $ref: "#/components/schemas/EditActionOutput"
         - $ref: "#/components/schemas/CustomActionOutput"
       type: object
       discriminator:
         propertyName: type
         mapping:
           CREATE: "#/components/schemas/CreatedActionOutput"
-          VALIDATE: "#/components/schemas/ValidateActionOutput"
           REJECT: "#/components/schemas/RejectActionOutput"
           DUPLICATE_DETECTED: "#/components/schemas/DuplicateDetectedActionOutput"
           MARK_AS_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateActionOutput"
@@ -11223,6 +12776,7 @@ components:
           UNASSIGN: "#/components/schemas/UnassignedActionOutput"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateActionOutput"
           READ: "#/components/schemas/ReadActionOutput"
+          EDIT: "#/components/schemas/EditActionOutput"
           CUSTOM: "#/components/schemas/CustomActionOutput"
     CreatedActionOutput:
       type: object
@@ -11307,100 +12861,6 @@ components:
         type:
           type: string
           const: CREATE
-      required:
-        - id
-        - transactionId
-        - createdByUserType
-        - createdAt
-        - createdBy
-        - createdByRole
-        - declaration
-        - status
-        - type
-      additionalProperties: false
-    ValidateActionOutput:
-      type: object
-      properties:
-        id:
-          description: Unique identifier of the action.
-          type: string
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-        transactionId:
-          description: Unique identifier of the transaction.
-          type: string
-        createdByUserType:
-          description: Indicates whether the action was created by a human-user or by a
-            system-user.
-          type: string
-          enum:
-            - user
-            - system
-        createdAt:
-          description: Timestamp indicating when the action was created.
-          type: string
-          format: date-time
-          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-        createdBy:
-          description: Identifier of the user who created the action.
-          type: string
-        createdByRole:
-          description: Role of the user who created the action.
-          type: string
-        createdBySignature:
-          description: Reference to the signature of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
-        createdAtLocation:
-          description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
-        declaration:
-          description: Declaration data defined by the ActionConfig. Supports partial
-            updates.
-          type: object
-          propertyNames:
-            type: string
-          additionalProperties:
-            description: Value that matches exactly one of the possible schema types
-              (TextValue, DateValue, DateRangeFieldValue). The best matching
-              schema is chosen by priority.
-        annotation:
-          description: Action-specific metadata used to annotate the event.
-          anyOf:
-            - description: Record of field-level changes made by an action. Supports partial
-                updates and nullable values.
-              type: object
-              propertyNames:
-                type: string
-              additionalProperties:
-                description: Value that matches exactly one of the possible schema types
-                  (TextValue, DateValue, DateRangeFieldValue). The best matching
-                  schema is chosen by priority.
-            - type: "null"
-        status:
-          description: Current status of the action. Actions may be validated
-            asynchronously by third-party integrations.
-          type: string
-          enum:
-            - Requested
-            - Accepted
-            - Rejected
-        originalActionId:
-          description: Reference to the original action asynchronously accepted or
-            rejected by a third-party integration.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
-        type:
-          type: string
-          const: VALIDATE
       required:
         - id
         - transactionId
@@ -12908,6 +14368,108 @@ components:
         - declaration
         - status
         - type
+      additionalProperties: false
+    EditActionOutput:
+      type: object
+      properties:
+        id:
+          description: Unique identifier of the action.
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        transactionId:
+          description: Unique identifier of the transaction.
+          type: string
+        createdByUserType:
+          description: Indicates whether the action was created by a human-user or by a
+            system-user.
+          type: string
+          enum:
+            - user
+            - system
+        createdAt:
+          description: Timestamp indicating when the action was created.
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        createdBy:
+          description: Identifier of the user who created the action.
+          type: string
+        createdByRole:
+          description: Role of the user who created the action.
+          type: string
+        createdBySignature:
+          description: Reference to the signature of the user who created the action.
+          anyOf:
+            - type: string
+            - type: "null"
+        createdAtLocation:
+          description: Reference to the location of the user who created the action.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        declaration:
+          description: Declaration data defined by the ActionConfig. Supports partial
+            updates.
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            description: Value that matches exactly one of the possible schema types
+              (TextValue, DateValue, DateRangeFieldValue). The best matching
+              schema is chosen by priority.
+        annotation:
+          description: Action-specific metadata used to annotate the event.
+          anyOf:
+            - description: Record of field-level changes made by an action. Supports partial
+                updates and nullable values.
+              type: object
+              propertyNames:
+                type: string
+              additionalProperties:
+                description: Value that matches exactly one of the possible schema types
+                  (TextValue, DateValue, DateRangeFieldValue). The best matching
+                  schema is chosen by priority.
+            - type: "null"
+        status:
+          description: Current status of the action. Actions may be validated
+            asynchronously by third-party integrations.
+          type: string
+          enum:
+            - Requested
+            - Accepted
+            - Rejected
+        originalActionId:
+          description: Reference to the original action asynchronously accepted or
+            rejected by a third-party integration.
+          anyOf:
+            - type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+            - type: "null"
+        type:
+          type: string
+          const: EDIT
+        content:
+          type: object
+          properties:
+            comment:
+              description: Comment for the edit action.
+              type: string
+          additionalProperties: false
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
+        - content
       additionalProperties: false
     CustomActionOutput:
       type: object
