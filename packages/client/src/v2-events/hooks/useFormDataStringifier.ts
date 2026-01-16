@@ -11,6 +11,7 @@
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import {
+  AdministrativeArea,
   EventState,
   FieldConfig,
   FieldValue,
@@ -21,6 +22,7 @@ import { getRegisteredFieldByFieldConfig } from '@client/v2-events/features/even
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from './useLocations'
+import { useAdministrativeAreas } from './useAdministrativeAreas'
 interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }
@@ -60,6 +62,7 @@ function formDataStringifierFactory(stringifier: FieldStringifier) {
 export const getFormDataStringifier = (
   intl: IntlShape,
   locations: Map<UUID, Location>,
+  administrativeAreas: Map<UUID, AdministrativeArea>,
   adminLevels?: AdminStructureItem[]
 ) => {
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
@@ -72,6 +75,7 @@ export const getFormDataStringifier = (
       return field.toCertificateVariables(value, {
         intl,
         locations,
+        administrativeAreas,
         config: fieldConfig,
         adminLevels
       })
@@ -80,6 +84,7 @@ export const getFormDataStringifier = (
       return field.stringify(value, {
         intl,
         locations,
+        administrativeAreas,
         config: fieldConfig
       })
     }
@@ -92,9 +97,17 @@ export const getFormDataStringifier = (
 export function useFormDataStringifier() {
   const intl = useIntl()
   const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
   const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const adminLevels = config.ADMIN_STRUCTURE
 
-  return getFormDataStringifier(intl, locations, adminLevels)
+  return getFormDataStringifier(
+    intl,
+    locations,
+    administrativeAreas,
+    adminLevels
+  )
 }

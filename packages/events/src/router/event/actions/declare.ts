@@ -85,6 +85,7 @@ export function declareActionProcedures() {
         if (!dedupConfig) {
           return declaredEvent
         }
+
         const declaredEventState = getCurrentEventState(declaredEvent, config)
         const duplicates = await searchForDuplicates(
           declaredEventState,
@@ -118,6 +119,7 @@ export function declareActionProcedures() {
             }
           )
         }
+
         return declaredEvent
       })
   }

@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { intersectionBy } from 'lodash'
 import {
   createPrng,
   generateUuid,
@@ -56,10 +55,10 @@ test('Creates single location', async () => {
   const locationPayload: Location[] = [
     {
       id: generateUuid(),
-      parentId: null,
+      administrativeAreaId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: LocationType.enum.ADMIN_STRUCTURE,
+      locationType: LocationType.enum.CRVS_OFFICE,
       externalId: 'abc123xyz456'
     }
   ]
@@ -72,20 +71,25 @@ test('Creates single location', async () => {
   expect(locations).toMatchObject(initialLocations.concat(locationPayload))
 })
 
-test('Creates multiple locations', async () => {
+test('Creates multiple locations under administrative area', async () => {
   const { user, generator, rng } = await setupTestCase()
 
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const initialLocations = await dataSeedingClient.locations.list()
 
-  const parentId = generateUuid(rng)
+  const administrativeAreaId = generateUuid(rng)
 
+  const administrativeAreaPayload = generator.administrativeAreas.set(
+    [{ id: administrativeAreaId }],
+    rng
+  )
   const locationPayload = generator.locations.set(
-    [{ id: parentId }, { parentId: parentId }, { parentId: parentId }, {}],
+    [{ administrativeAreaId }, { administrativeAreaId }, {}],
     rng
   )
 
+  await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
   await dataSeedingClient.locations.set(locationPayload)
 
   const locations = await dataSeedingClient.locations.list()
@@ -119,111 +123,4 @@ test('seeding locations is additive, not destructive', async () => {
   expect(remainingLocationsAfterDeletion).toStrictEqual(
     locationAfterInitialSeed
   )
-})
-
-/** Intermediary test until we clean up locations table */
-test('administrative areas are seeded on both tables', async () => {
-  const {
-    user,
-    generator,
-    locations: initialLocations,
-    eventsDb
-  } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
-
-  const locationRng = createPrng(847)
-  const locationsPayload = generator.locations.set(20, locationRng)
-
-  await dataSeedingClient.locations.set(locationsPayload)
-
-  const locationsAfterSeeding = await dataSeedingClient.locations.list()
-  expect(locationsAfterSeeding).toHaveLength(
-    initialLocations.length + locationsPayload.length
-  )
-
-  const adminAreas = await eventsDb
-    .selectFrom('administrativeAreas')
-    .selectAll()
-    .execute()
-
-  expect(adminAreas.length).toBeLessThan(locationsAfterSeeding.length)
-
-  const adminAreasInLocationTable = locationsAfterSeeding.filter(
-    (loc) => loc.locationType === LocationType.enum.ADMIN_STRUCTURE
-  )
-
-  expect(adminAreas).toHaveLength(
-    locationsAfterSeeding.filter(
-      (loc) => loc.locationType === LocationType.enum.ADMIN_STRUCTURE
-    ).length
-  )
-
-  expect(
-    intersectionBy(adminAreas, adminAreasInLocationTable, 'id')
-  ).toHaveLength(adminAreas.length)
-})
-
-/** Intermediary test until we clean up locations table */
-test('parent id is a duplicate of administrative area id in locations', async () => {
-  const { user, eventsDb } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
-
-  const locationRng = createPrng(123142)
-
-  const parentAdminAreaId = generateUuid(locationRng)
-
-  const locationsPayload: Location[] = [
-    {
-      id: parentAdminAreaId,
-      parentId: null,
-      locationType: LocationType.enum.ADMIN_STRUCTURE,
-      name: 'Parent Admin Area',
-      validUntil: null,
-      externalId: 'abc123xyz456'
-    },
-    {
-      id: generateUuid(locationRng),
-      parentId: parentAdminAreaId,
-      locationType: LocationType.enum.ADMIN_STRUCTURE,
-      name: 'Child Admin Area',
-      validUntil: null,
-      externalId: 'abc123xyz467'
-    },
-    {
-      id: generateUuid(locationRng),
-      parentId: parentAdminAreaId,
-      locationType: LocationType.enum.HEALTH_FACILITY,
-      name: 'Child Health Facility',
-      validUntil: null,
-      externalId: 'abc123xyz468'
-    },
-    {
-      id: generateUuid(locationRng),
-      parentId: parentAdminAreaId,
-      locationType: LocationType.enum.CRVS_OFFICE,
-      name: 'Child CRVS Office',
-      validUntil: null,
-      externalId: 'abc123xyz469'
-    }
-  ]
-
-  await dataSeedingClient.locations.set(locationsPayload)
-  const adminAreas = await eventsDb
-    .selectFrom('administrativeAreas')
-    .select(['id', 'name', 'parentId', 'validUntil'])
-    .execute()
-
-  const locationsAfterSeeding = await eventsDb
-    .selectFrom('locations')
-    .select([
-      'id',
-      'name',
-      'parentId',
-      'validUntil',
-      'administrativeAreaId',
-      'locationType'
-    ])
-    .execute()
-
-  expect({ adminAreas, locations: locationsAfterSeeding }).toMatchSnapshot()
 })

@@ -41,7 +41,7 @@ describe('render system integration', () => {
     }))
   })
 
-  it('Render system integrations properly ', async () => {
+  it('Render system integrations properly', async () => {
     expect(component.exists('SystemList')).toBeTruthy()
   })
 })

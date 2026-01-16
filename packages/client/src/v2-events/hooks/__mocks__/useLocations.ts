@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from "@client/tests/v2-events/locations-mock";
-
-export { getLeafLocationIds } from "@client/v2-events/hooks/useLocations"
+import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from '@client/tests/v2-events/administrative-hierarchy-mock'
 
 export function useLocations() {
   return {

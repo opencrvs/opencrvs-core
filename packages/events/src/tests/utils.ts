@@ -257,18 +257,33 @@ export const setupTestCase = async (
 
   const seed = seeder()
   const locationRng = createPrng(10123)
-  await seed.locations(generator.locations.set(5, locationRng))
+
+  const administrativeAreaPayload = generator.administrativeAreas.set(
+    5,
+    locationRng
+  )
+  await seed.administrativeAreas(administrativeAreaPayload)
+  await seed.locations(
+    generator.locations.set(
+      administrativeAreaPayload.map((area) => ({
+        administrativeAreaId: area.id
+      })),
+      locationRng
+    )
+  )
 
   const locations = await getLocations()
 
   const defaultUser = seed.user(
     generator.user.create({
-      primaryOfficeId: locations[0].id
+      primaryOfficeId: locations[0].id,
+      administrativeAreaId: locations[0].administrativeAreaId
     })
   )
   const secondaryUser = seed.user(
     generator.user.create({
-      primaryOfficeId: locations[1].id
+      primaryOfficeId: locations[1].id,
+      administrativeAreaId: locations[1].administrativeAreaId
     })
   )
 

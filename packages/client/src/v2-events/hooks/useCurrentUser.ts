@@ -10,12 +10,12 @@
  */
 
 import { useSelector } from 'react-redux'
-import { LocationType } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { getAdminLevelHierarchy, getUsersFullName } from '../utils'
 import { useLocations } from './useLocations'
 import { useUsers } from './useUsers'
+import { useAdministrativeAreas } from './useAdministrativeAreas'
 
 export function useCurrentUser() {
   const { config } = useSelector(getOfflineData)
@@ -26,25 +26,23 @@ export function useCurrentUser() {
   const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
 
   const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
   const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const name = getUsersFullName(user.name, 'en')
 
   if (user.primaryOfficeId) {
     const primaryOfficeLocation = locations.get(user.primaryOfficeId)
-
-    const adminStructureLocations = new Map(
-      [...locations].filter(
-        ([, location]) =>
-          location.locationType === LocationType.enum.ADMIN_STRUCTURE
-      )
-    )
+    const officeAdministrativeAreaId =
+      primaryOfficeLocation?.administrativeAreaId
 
     const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
     const adminLevels = getAdminLevelHierarchy(
-      primaryOfficeLocation?.parentId ?? undefined,
-      adminStructureLocations,
+      officeAdministrativeAreaId,
+      administrativeAreas,
       adminLevelIds
     )
     return {

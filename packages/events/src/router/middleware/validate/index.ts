@@ -49,7 +49,7 @@ import {
 import { getEventConfigurationById } from '@events/service/config/config'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
-import { isLeafLocation } from '@events/storage/postgres/events/locations'
+import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcContext } from '@events/context'
 import {
   getValidatorContext,
@@ -483,16 +483,15 @@ export const requireLocationForSystemUserAction: MiddlewareFunction<
   if (!input.createdAtLocation) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'createdAtLocation is required and must be a valid office id'
+      message: 'createdAtLocation is required and must be a valid location id'
     })
   }
 
-  // Ensure given location is a leaf location, i.e. an office location
-  const isLeaf = await isLeafLocation(input.createdAtLocation)
-  if (!isLeaf) {
+  const isLocationId = await locationExists(input.createdAtLocation)
+  if (!isLocationId) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'createdAtLocation must be an office location'
+      message: 'createdAtLocation must be a valid location id'
     })
   }
 

@@ -26,7 +26,6 @@ import {
   getUUID,
   InherentFlags,
   Location,
-  LocationType,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   TEST_SYSTEM_IANA_TIMEZONE
@@ -895,27 +894,25 @@ test('Returns multiple documents after creation', async () => {
   expect(response).toHaveLength(2)
 })
 
-test('Returns correctly based on registration location even when a parent location level is used for searching', async () => {
+test('Returns correctly based on registration location even when a parent administrative area level is used for searching', async () => {
   const { user, generator, seed, locations } = await setupTestCase()
 
   const locationRng = createPrng(842)
-  const parentLocation = {
-    ...generator.locations.set(1, locationRng)[0],
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    name: 'Parent location'
+  const administrativeArea = {
+    ...generator.administrativeAreas.set(1, locationRng)[0],
+    name: 'Administrative Area'
   }
 
   const newLocations: Location[] = [
-    parentLocation,
     {
       ...locations[0],
       id: user.primaryOfficeId,
       name: 'Child location',
-      parentId: parentLocation.id,
-      locationType: LocationType.enum.ADMIN_STRUCTURE
+      administrativeAreaId: administrativeArea.id
     }
   ]
 
+  await seed.administrativeAreas([administrativeArea])
   await seed.locations(newLocations)
 
   const client = createTestClient(user, [
@@ -946,7 +943,7 @@ test('Returns correctly based on registration location even when a parent locati
   })
   await client.event.actions.declare.request(data)
 
-  // search with parent id
+  // search with administrative area id
   const { results: response } = await client.event.search({
     query: {
       type: 'and',
@@ -954,7 +951,7 @@ test('Returns correctly based on registration location even when a parent locati
         {
           'legalStatuses.DECLARED.createdAtLocation': {
             type: 'within',
-            location: parentLocation.id
+            location: administrativeArea.id
           }
         }
       ]

@@ -95,7 +95,8 @@ test('Find user by id outside of jurisdiction with global scope', async () => {
   })
 })
 
-test('Finds user in nested location with my jurisdiction scope', async () => {
+test('Finds user in nested location using administrative area id with my jurisdiction scope', async () => {
+  // @TODO: Probably wont work
   const { user: userOnParentLocation, seed } = await setupTestCase()
   const parentLocationClient = createTestClient(userOnParentLocation, [
     SCOPES.USER_READ_MY_JURISDICTION
@@ -103,21 +104,23 @@ test('Finds user in nested location with my jurisdiction scope', async () => {
 
   const rng = createPrng(44444)
 
-  const childLocationId = generateUuid(rng)
+  const childAdministrativeAreaId = generateUuid(rng)
   const grandchildLocationId = generateUuid(rng)
+
+  await seed.administrativeAreas([
+    {
+      name: 'Child office',
+      parentId: userOnParentLocation.administrativeAreaId,
+      id: childAdministrativeAreaId,
+      validUntil: null,
+      externalId: 'abc123xyz457'
+    }
+  ])
 
   await seed.locations([
     {
-      name: 'Child office',
-      parentId: userOnParentLocation.primaryOfficeId,
-      locationType: LocationType.enum.ADMIN_STRUCTURE,
-      id: childLocationId,
-      validUntil: null,
-      externalId: 'abc123xyz457'
-    },
-    {
       name: 'Grandchild office',
-      parentId: childLocationId,
+      administrativeAreaId: childAdministrativeAreaId,
       locationType: LocationType.enum.CRVS_OFFICE,
       id: grandchildLocationId,
       validUntil: null,
@@ -169,7 +172,7 @@ test('Find user with appropriate scopes', async () => {
   await seed.locations([
     {
       name: 'Child office',
-      parentId: userOnParentLocation.primaryOfficeId,
+      administrativeAreaId: userOnParentLocation.administrativeAreaId,
       locationType: LocationType.enum.CRVS_OFFICE,
       id: userToSearchLocationId,
       validUntil: null,

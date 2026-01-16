@@ -15,6 +15,7 @@ import { within, expect, fn } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import { TRPCProvider } from '@client/v2-events/trpc'
 // NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization
+import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS } from '../../../../tests/v2-events/administrative-hierarchy-mock'
 import { LocationSearch } from '.'
 
 const meta: Meta<typeof LocationSearch.Output> = {
@@ -40,6 +41,19 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
     id: 'location-search',
     searchableResource: ['locations', 'facilities', 'offices'],
     value: ''
+  }
+}
+
+export const LocationSearchInputWithAdministrativeAreaId: StoryObj<
+  typeof LocationSearch.Input
+> = {
+  render: (props) => {
+    return <LocationSearch.Input {...props} />
+  },
+  args: {
+    id: 'location-search',
+    searchableResource: ['locations', 'facilities', 'offices'],
+    value: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS[0].id
   }
 }
 

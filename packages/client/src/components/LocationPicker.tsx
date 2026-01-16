@@ -14,15 +14,11 @@ import {
   Location as LocationIcon,
   Cross
 } from '@opencrvs/components/lib/icons'
-import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
-import { generateLocationsV2 } from '@client/utils/locationUtils'
+import { createSearchOptions } from '@client/utils/locationUtils'
 import {
   ISearchLocation,
   LocationSearch
 } from '@opencrvs/components/lib/LocationSearch'
-import { connect } from 'react-redux'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { colors } from '@opencrvs/components/lib/colors'
@@ -35,26 +31,20 @@ import {
   CancelableArea
 } from '@client/components/DateRangePicker'
 import styled from 'styled-components'
-import { ILocation } from '@client/offline/reducer'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { Location } from '@opencrvs/commons/client'
+import { AdministrativeArea, Location } from '@opencrvs/commons/client'
+import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
+import { useIntl } from 'react-intl'
 
 const { useState, useEffect } = React
 
-interface IConnectProps {
-  offlineLocations: { [key: string]: ILocation }
-  offlineOffices: { [key: string]: ILocation }
-}
-
-interface IBaseProps {
+interface LocationPickerProps {
   additionalLocations?: ISearchLocation[]
   selectedLocationId?: string
   disabled?: boolean
   onChangeLocation: (locationId: string) => void
-  locationFilter?: (location: Location) => boolean
+  locationFilter?: (location: Location | AdministrativeArea) => boolean
 }
-
-type LocationPickerProps = IBaseProps & IConnectProps & WrappedComponentProps
 
 const ModalContainer = styled(CommonModalContainer)`
   width: 400px;
@@ -104,26 +94,30 @@ const StyledLocationSearch = styled(LocationSearch)`
   }
 `
 
-function LocationPickerComponent(props: LocationPickerProps) {
-  const {
-    offlineLocations,
-    offlineOffices,
-    locationFilter,
-    selectedLocationId,
-    disabled,
-    additionalLocations = [],
-    intl
-  } = props
+/**
+ * @deprecated - replace with SearchableSelect from v2.0 onwards
+ */
+export function LocationPicker({
+  locationFilter,
+  selectedLocationId,
+  disabled,
+  onChangeLocation,
+  additionalLocations = []
+}: LocationPickerProps) {
+  const intl = useIntl()
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 
   const { getLocations } = useLocations()
-  const locations = getLocations.useSuspenseQuery()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
 
-  const offlineSearchableLocations = generateLocationsV2(
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+
+  const offlineSearchableLocations = createSearchOptions({
     locations,
-    intl,
-    locationFilter
-  )
+    administrativeAreas,
+    filter: locationFilter
+  })
 
   const searchableLocations = [
     ...additionalLocations,
@@ -162,7 +156,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
               selectedSearchedLocation.displayLabel) ||
               ''}
           </span>
-          <MapPin color={props.disabled ? colors.grey200 : undefined} />
+          <MapPin color={disabled ? colors.grey200 : undefined} />
         </ContentWrapper>
       </PickerButton>
       {modalVisible && (
@@ -187,7 +181,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
                 selectedLocation={selectedSearchedLocation}
                 locationList={searchableLocations}
                 searchHandler={({ id }) => {
-                  props.onChangeLocation(id)
+                  onChangeLocation(id)
                   setModalVisible(false)
                 }}
               />
@@ -202,16 +196,3 @@ function LocationPickerComponent(props: LocationPickerProps) {
     </div>
   )
 }
-
-function mapStateToProps(state: IStoreState): IConnectProps {
-  const offlineLocations = getOfflineData(state).locations
-  const offlineOffices = getOfflineData(state).offices
-  return {
-    offlineLocations,
-    offlineOffices
-  }
-}
-
-export const LocationPicker = connect(mapStateToProps)(
-  injectIntl(LocationPickerComponent)
-)

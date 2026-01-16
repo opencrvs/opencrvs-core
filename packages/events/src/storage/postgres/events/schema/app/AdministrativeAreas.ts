@@ -19,6 +19,8 @@ export default interface AdministrativeAreasTable {
   deletedAt: ColumnType<string | null, string | null, string | null>
 
   validUntil: ColumnType<string | null, string | null, string | null>
+
+  externalId: ColumnType<string | null, string | null, string | null>
 }
 
 export type AdministrativeAreas = Selectable<AdministrativeAreasTable>

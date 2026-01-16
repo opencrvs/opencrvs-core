@@ -688,7 +688,7 @@ describe('Conditionals based on user role', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: locations[0].id,
+        administrativeArea: locations[0].administrativeAreaId,
         streetLevelDetails: {
           town: 'Example Village',
           state: 'State',
@@ -700,6 +700,7 @@ describe('Conditionals based on user role', () => {
     const users = TestUserRole.options.map((role) => {
       return seed.user({
         primaryOfficeId: locations[0].id,
+        administrativeAreaId: locations[0].administrativeAreaId,
         name: [
           {
             use: 'en',
@@ -747,6 +748,7 @@ describe('Conditionals based on user role', () => {
     const { generator, seed, locations } = await setupTestCase()
     const fieldAgent = seed.user({
       primaryOfficeId: locations[0].id,
+      administrativeAreaId: locations[0].administrativeAreaId,
       name: [
         {
           use: 'en',
@@ -761,7 +763,7 @@ describe('Conditionals based on user role', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: locations[0].id,
+        administrativeArea: locations[0].administrativeAreaId,
         streetLevelDetails: {
           town: 'Example Village',
           state: 'State',

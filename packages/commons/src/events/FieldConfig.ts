@@ -554,13 +554,13 @@ const AdministrativeAreaConfiguration = z
   })
   .describe('Administrative area options')
 
-const AdministrativeArea = BaseField.extend({
+const AdministrativeAreaField = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: AdministrativeAreaConfiguration
 }).describe('Administrative area input field e.g. facility, office')
 
-export type AdministrativeArea = z.infer<typeof AdministrativeArea>
+export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
 
 const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
@@ -888,7 +888,7 @@ export const FieldConfig = z
     Checkbox,
     File,
     Country,
-    AdministrativeArea,
+    AdministrativeAreaField,
     Divider,
     LocationInput,
     Facility,

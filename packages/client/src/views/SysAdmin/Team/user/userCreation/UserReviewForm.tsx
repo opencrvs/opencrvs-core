@@ -80,7 +80,6 @@ import {
 import { getListOfLocations } from '@client/utils/validate'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { UUID } from '@opencrvs/commons/client'
-import { getOfficesUnderJurisdiction } from '@client/utils/locationUtils'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -317,15 +316,16 @@ const UserReviewFormComponent = ({
   const userRole = userRoles.find(({ id }) => id === formData.role)
 
   const parsedPrimaryOfficeId = UUID.safeParse(userDetails?.primaryOffice.id)
-  const jurisdictionId = parsedPrimaryOfficeId.success
-    ? (locations.get(parsedPrimaryOfficeId.data)?.parentId ?? null)
+  const administrativeAreaId = parsedPrimaryOfficeId.success
+    ? (locations.get(parsedPrimaryOfficeId.data)?.administrativeAreaId ?? null)
     : null
 
-  const isMultipleOfficeUnderJurisdiction =
-    getOfficesUnderJurisdiction({
-      locations,
-      jurisdictionId
-    }).length > 1
+  // stop early since there are a lot of locations.
+  const isMultipleOfficeUnderJurisdiction = [...locations.values()].some(
+    (location) =>
+      location.administrativeAreaId === administrativeAreaId &&
+      location.id !== parsedPrimaryOfficeId.data
+  )
 
   const handleSubmit = () => {
     const variables = draftToGqlTransformer(
