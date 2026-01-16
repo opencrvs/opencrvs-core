@@ -60,6 +60,19 @@ function getTrpcClient() {
   }
   return createTRPCClient<AppRouter>({
     links: [
+      () => {
+        return ({ op, next }) => {
+          if (!navigator.onLine) {
+            console.group('🚨 tRPC call while OFFLINE')
+            console.log('Procedure:', op.path)
+            console.log('Type:', op.type)
+            console.trace('Call stack')
+            console.groupEnd()
+          }
+
+          return next(op)
+        }
+      },
       loggerLink({
         enabled: (op) => op.direction === 'down' && op.result instanceof Error
       }),
