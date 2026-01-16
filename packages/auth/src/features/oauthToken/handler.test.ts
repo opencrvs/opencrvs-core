@@ -51,4 +51,27 @@ describe('authenticate handler receives a request', () => {
       expect(JSON.parse(res.payload).access_token).toBe('789')
     })
   })
+  describe('form-encoded payload support', () => {
+    it('returns a token when using form-encoded payload', async () => {
+      jest
+        .spyOn(authService, 'createToken')
+        .mockReturnValue(Promise.resolve('789'))
+      fetch.mockResponse(
+        JSON.stringify({
+          systemId: '1',
+          status: 'active',
+          scope: ['nationalId']
+        })
+      )
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/token',
+        payload:
+          'client_id=123&client_secret=456&grant_type=client_credentials',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      })
+
+      expect(JSON.parse(res.payload).access_token).toBe('789')
+    })
+  })
 })

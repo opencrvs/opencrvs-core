@@ -10,9 +10,9 @@
  */
 import React, { useState } from 'react'
 import { useIntl, MessageDescriptor } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import {
   ActionType,
   EventDocument,
@@ -20,7 +20,9 @@ import {
   getDeclaration,
   getActionReview,
   getCurrentEventState,
-  EventStatus
+  EventStatus,
+  getActionConfig,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -45,7 +47,12 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
-import { hasDeclarationFieldChanged } from '../correct/utils'
+import {
+  aggregateAnnotations,
+  getReviewFormFields,
+  hasDeclarationFieldChanged,
+  hasFieldChanged
+} from '../correct/utils'
 
 export const commentLabel = {
   id: 'event.edit.comment.label',
@@ -78,24 +85,6 @@ const messages = {
     defaultMessage: 'Notify with edits',
     description: 'Label for "Notify with edits" in edit action menu',
     id: 'event.edit.notifyWithEdits.label'
-  },
-  editAndRegisterDescription: {
-    id: 'event.edit.registerWithEdits.description',
-    description: 'Description for "Register with edits" in edit action menu',
-    defaultMessage:
-      'You are about to register this event with your edits. Registering this event will create an official civil registration record.'
-  },
-  editAndDeclareDescription: {
-    id: 'event.edit.declareWithEdits.description',
-    description: 'Description for "Declare with edits" in edit action menu',
-    defaultMessage:
-      'You are about to redeclare this {eventType} event with your edits. This will permanently update the declaration.'
-  },
-  editAndNotifyDescription: {
-    id: 'event.edit.notifyWithEdits.description',
-    description: 'Description for "Notify with edits" in edit action menu',
-    defaultMessage:
-      'Are you sure you want to notify this event with these edits?'
   }
 }
 
@@ -110,11 +99,11 @@ const CommentLabel = styled(Text)`
 
 function EditActionModal({
   title,
-  description,
+  supportingCopy,
   close
 }: {
   title: MessageDescriptor
-  description: string
+  supportingCopy?: MessageDescriptor
   close: (result: EditActionModalResult) => void
 }) {
   const intl = useIntl()
@@ -144,12 +133,12 @@ function EditActionModal({
         </Button>
       ]}
       handleClose={() => close({ confirmed: false })}
-      title={intl.formatMessage(title) + '?'}
+      title={intl.formatMessage(title)}
       width={800}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {description}
+          {supportingCopy ? intl.formatMessage(supportingCopy) : null}
         </Text>
       </Stack>
       <CommentLabel element="h3" variant="bold16">
@@ -165,22 +154,19 @@ function EditActionModal({
 }
 
 function useEditActions(event: EventDocument) {
-  const eventType = event.type
-  const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(eventType)
-  const { isActionAllowed } = useUserAllowedActions(eventType)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const navigate = useNavigate()
+  const { isActionAllowed } = useUserAllowedActions(event.type)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.EDIT.REVIEW
   )
-  const navigate = useNavigate()
+  const { getAnnotation } = useActionAnnotation()
   const canDirectlyRegister = useCanDirectlyRegister(event)
   const { closeActionView } = useEventFormNavigation()
   const [modal, openModal] = useModal()
   const events = useEvents()
   const formConfig = getDeclaration(eventConfiguration)
   const declaration = useEventFormData((state) => state.getFormValues())
-  const { getAnnotation } = useActionAnnotation()
-  const annotation = getAnnotation()
   const validatorContext = useValidatorContext()
   const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
@@ -196,11 +182,26 @@ function useEditActions(event: EventDocument) {
     )
   )
 
-  const anyValuesHaveChanged = changedFields.length > 0
+  const annotation = getAnnotation()
+  const acceptedActions = getAcceptedActions(event)
+  const originalAnnotation = aggregateAnnotations(acceptedActions)
+  const reviewFormFields = getReviewFormFields(eventConfiguration)
+
+  const changedAnnotationFields = reviewFormFields.filter((f) =>
+    hasFieldChanged(f, originalAnnotation, annotation, validatorContext)
+  )
+
+  const anyValuesHaveChanged =
+    changedFields.length > 0 || changedAnnotationFields.length > 0
 
   if (!reviewConfig) {
     throw new Error('Review config not found')
   }
+
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.EDIT
+  })
 
   const hasValidationErrors = validationErrorsInActionFormExist({
     formConfig,
@@ -210,9 +211,10 @@ function useEditActions(event: EventDocument) {
     reviewFields: reviewConfig.fields
   })
 
-  const eventTypeLabel = intl
-    .formatMessage(eventConfiguration.label)
-    .toLowerCase()
+  const dialogCopy =
+    actionConfig && 'dialogCopy' in actionConfig
+      ? actionConfig.dialogCopy
+      : null
 
   return {
     modals: [modal],
@@ -223,14 +225,10 @@ function useEditActions(event: EventDocument) {
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
             (close) => {
-              const description = intl.formatMessage(
-                messages.editAndRegisterDescription,
-                { eventType: eventTypeLabel }
-              )
               return (
                 <EditActionModal
                   close={close}
-                  description={description}
+                  supportingCopy={dialogCopy?.register}
                   title={messages.editAndRegisterLabel}
                 />
               )
@@ -257,18 +255,12 @@ function useEditActions(event: EventDocument) {
         icon: 'PaperPlaneTilt' as const,
         label: messages.editAndDeclareLabel,
         onClick: async () => {
-          const description = intl.formatMessage(
-            messages.editAndDeclareDescription,
-            {
-              eventType: eventTypeLabel
-            }
-          )
           const { confirmed, comment } = await openModal<EditActionModalResult>(
             (close) => {
               return (
                 <EditActionModal
                   close={close}
-                  description={description}
+                  supportingCopy={dialogCopy?.declare}
                   title={messages.editAndDeclareLabel}
                 />
               )
@@ -294,16 +286,12 @@ function useEditActions(event: EventDocument) {
         icon: 'PaperPlaneTilt' as const,
         label: messages.editAndNotifyLabel,
         onClick: async () => {
-          const description = intl.formatMessage(
-            messages.editAndNotifyDescription,
-            { eventType: eventTypeLabel }
-          )
           const { confirmed, comment } = await openModal<EditActionModalResult>(
             (close) => {
               return (
                 <EditActionModal
                   close={close}
-                  description={description}
+                  supportingCopy={dialogCopy?.notify}
                   title={messages.editAndNotifyLabel}
                 />
               )
@@ -341,9 +329,7 @@ function useEditActions(event: EventDocument) {
   }
 }
 
-/**
- * Menu component available on the edit review page.
- * */
+/** Menu component available on the Edit-action review page. */
 export function EditActionMenu({ event }: { event: EventDocument }) {
   const intl = useIntl()
   const { actions, modals } = useEditActions(event)
