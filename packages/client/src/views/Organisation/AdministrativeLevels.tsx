@@ -34,7 +34,7 @@ import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'querystring'
+import { stringify } from '@client/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { Location, LocationType, UUID } from '@opencrvs/commons/client'
 
