@@ -17,7 +17,6 @@ import {
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import { formatUrl } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
@@ -42,11 +41,7 @@ import {
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { parse } from 'qs'
-import {
-  injectIntl,
-  useIntl,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
+import { useIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
@@ -55,10 +50,7 @@ import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
 import React, { useCallback, useMemo, useState } from 'react'
-import {
-  withOnlineStatus,
-  LoadingIndicator
-} from '@client/views/OfficeHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { SearchUsersQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -68,8 +60,9 @@ import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { Location, LocationType, UUID } from '@opencrvs/commons/client'
+import { Location, UUID } from '@opencrvs/commons/client'
 import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
+import { useOnlineStatus } from '../../../../utils'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -157,26 +150,14 @@ const LinkButtonModified = styled(LinkButton)`
   height: 24px;
 `
 
-interface ISearchParams {
+interface SearchParams {
   locationId?: string
 }
 
-type IOnlineStatusProps = {
-  isOnline: boolean
-}
-
-type BaseProps = {
+type UserListProps = {
+  hideNavigation?: boolean
   theme: ITheme
   userDetails: UserDetails | null
-  offlineCountryConfig: IOfflineData
-}
-
-type IProps = BaseProps &
-  IntlShapeProps &
-  IOnlineStatusProps & { hideNavigation?: boolean }
-
-interface IStatusProps {
-  status: string
 }
 
 interface ToggleModal {
@@ -184,7 +165,7 @@ interface ToggleModal {
   selectedUser: User | null
 }
 
-export const Status = (statusProps: IStatusProps) => {
+export const Status = (statusProps: { status: string }) => {
   const status = statusProps.status
   const intl = useIntl()
   switch (status) {
@@ -209,9 +190,12 @@ export const Status = (statusProps: IStatusProps) => {
   }
 }
 
-function UserListComponent(props: IProps) {
+function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
   const location = useLocation()
   const navigate = useNavigate()
+
+  const intl = useIntl()
+  const isOnline = useOnlineStatus()
 
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -230,11 +214,9 @@ function UserListComponent(props: IProps) {
   const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
     usePermissions()
 
-  const { intl, userDetails, isOnline } = props
-
   const { locationId } = parse(location.search, {
     ignoreQueryPrefix: true
-  }) as unknown as ISearchParams
+  }) as unknown as SearchParams
   const [toggleUsernameReminder, setToggleUsernameReminder] =
     useState<ToggleModal>({
       modalVisible: false,
@@ -817,7 +799,7 @@ function UserListComponent(props: IProps) {
       }
       isCertificatesConfigPage={true}
       hideBackground={true}
-      isHidden={props.hideNavigation}
+      isHidden={hideNavigation}
     >
       {isOnline ? (
         <Query<SearchUsersQuery>
@@ -968,4 +950,4 @@ function UserListComponent(props: IProps) {
 
 export const UserList = connect((state: IStoreState) => ({
   userDetails: getUserDetails(state)
-}))(withTheme(injectIntl(withOnlineStatus(UserListComponent))))
+}))(withTheme(UserListComponent))
