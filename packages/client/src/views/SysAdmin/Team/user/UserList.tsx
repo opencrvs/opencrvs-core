@@ -18,7 +18,6 @@ import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import { formatUrl } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
@@ -55,7 +54,7 @@ import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import {
   withOnlineStatus,
   LoadingIndicator
@@ -219,10 +218,6 @@ function UserListComponent(props: IProps) {
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const locations = getLocations.useSuspenseQuery()
 
-  const offlineOffices = [...locations.values()].filter(
-    ({ locationType }) => locationType === LocationType.enum.CRVS_OFFICE
-  )
-
   const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)
   const [showUsernameReminderSuccess, setShowUsernameReminderSuccess] =
     useState(false)
@@ -235,7 +230,7 @@ function UserListComponent(props: IProps) {
   const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
     usePermissions()
 
-  const { intl, userDetails, isOnline, offlineCountryConfig } = props
+  const { intl, userDetails, isOnline } = props
 
   const { locationId } = parse(location.search, {
     ignoreQueryPrefix: true
@@ -266,8 +261,10 @@ function UserListComponent(props: IProps) {
 
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
-  const isMultipleOfficeUnderJurisdiction =
-    offlineOffices.filter(canAccessOffice).length > 1
+  const canAccessMultipleLocations = useMemo(
+    () => Array.from(locations.values()).filter(canAccessOffice).length > 1,
+    [locations, canAccessOffice]
+  )
 
   const toggleUserActivationModal = useCallback(
     function toggleUserActivationModal(user?: User) {
@@ -605,7 +602,7 @@ function UserListComponent(props: IProps) {
 
   const LocationButton = (locationId: string) => {
     const buttons: React.ReactElement[] = []
-    if (isMultipleOfficeUnderJurisdiction) {
+    if (canAccessMultipleLocations) {
       buttons.push(
         <LocationPicker
           key={`location-picker-${locationId}`}
@@ -620,10 +617,7 @@ function UserListComponent(props: IProps) {
 
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
-          locationFilter={(location) =>
-            (location as Location).locationType ===
-              LocationType.enum.CRVS_OFFICE && canAccessOffice(location)
-          }
+          locationFilter={(location) => canAccessOffice(location)}
         />
       )
     }
@@ -819,7 +813,7 @@ function UserListComponent(props: IProps) {
   return (
     <SysAdminContentWrapper
       changeTeamLocation={
-        isMultipleOfficeUnderJurisdiction ? onChangeLocation : undefined
+        canAccessMultipleLocations ? onChangeLocation : undefined
       }
       isCertificatesConfigPage={true}
       hideBackground={true}
@@ -864,7 +858,6 @@ function UserListComponent(props: IProps) {
                   <>
                     <Header id="header">{searchedLocation?.name || ''}</Header>
                     <LocationInfo>
-                      {/* @TODO: check that this makes sense. We do the same thing inline as the fn does? */}
                       {searchedLocation && (
                         <LocationInfoValue>
                           {getAddressNameV2(
@@ -974,6 +967,5 @@ function UserListComponent(props: IProps) {
 }
 
 export const UserList = connect((state: IStoreState) => ({
-  userDetails: getUserDetails(state),
-  offlineCountryConfig: getOfflineData(state)
+  userDetails: getUserDetails(state)
 }))(withTheme(injectIntl(withOnlineStatus(UserListComponent))))

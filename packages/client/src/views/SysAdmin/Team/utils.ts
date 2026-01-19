@@ -88,12 +88,10 @@ export const getAddressNameV2 = (
     ? administrativeAreas.get(administrativeArea.parentId)
     : null
 
-  // @TODO: this was recursive previously.
-  return joinValues([
-    administrativeArea?.name,
-    parentAdministrativeArea?.name,
+  return joinValues(
+    [administrativeArea?.name, parentAdministrativeArea?.name],
     ', '
-  ])
+  )
 }
 
 export function getUserAuditDescription(
