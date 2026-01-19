@@ -68,6 +68,9 @@ export const AlphaPrintButton = {
     const intl = useIntl()
     const location = useLocation()
     const parts = location.pathname.split('/')
+    /*
+    Asserting the eventId type below, as it can be a temporary UUID in offline mode
+    */
     const eventId = parts[3] as UUID
     const { getEvent } = useEvents()
     const { certificateTemplates, language } = useAppConfig()
