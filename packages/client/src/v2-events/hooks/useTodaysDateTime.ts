@@ -9,24 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { TimeValue } from '@opencrvs/commons/client'
-import { padZero } from '../utils'
+import { TimeValue, DateValue } from '@opencrvs/commons/client'
 
-export function useTodaysDateTime(): {
-  $$date: string
-  $$time: z.infer<typeof TimeValue>
-} {
-  const today = new Date()
-
-  const year = today.getFullYear()
-  const month = padZero(today.getMonth() + 1)
-  const day = padZero(today.getDate())
-  const hours = padZero(today.getHours())
-  const minutes = padZero(today.getMinutes())
-
+export function useTodaysDateTime(): { $$date: DateValue; $$time: TimeValue } {
   return {
-    $$date: `${year}-${month}-${day}`,
-    $$time: `${hours}:${minutes}`
+    $$date: new Date().toISOString().slice(0, 10),
+    $$time: new Date().toISOString().slice(11, 16)
   }
 }
