@@ -50,6 +50,7 @@ export {
   FileSearch,
   FileText,
   FileX,
+  FileEdit,
   Fingerprint,
   FloppyDisk,
   Gear,
