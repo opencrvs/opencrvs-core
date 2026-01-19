@@ -19,7 +19,6 @@ import { Button } from '@opencrvs/components/lib/Button'
 import {
   ActionType,
   CustomActionConfig,
-  EventConfig,
   EventIndex,
   FieldConfig,
   FieldUpdateValue,
@@ -45,7 +44,7 @@ const quickActions = {
 
 interface ModalConfig {
   label?: MessageDescriptor
-  description?: MessageDescriptor
+  supportingCopy?: MessageDescriptor
   confirmButtonType?: 'primary' | 'danger'
   confirmButtonLabel?: MessageDescriptor
   fields?: FieldConfig[]
@@ -150,7 +149,9 @@ function QuickActionModal({
     >
       <Stack alignItems="left" direction="column" gap={16}>
         <Text color="grey500" element="p" variant="reg16">
-          {config.description ? intl.formatMessage(config.description) : null}
+          {config.supportingCopy
+            ? intl.formatMessage(config.supportingCopy)
+            : null}
         </Text>
         <FormFieldGenerator
           fields={config.fields ?? []}
@@ -177,6 +178,7 @@ export function useQuickActionModal(event: EventIndex) {
     const config = quickActions[actionType]
     const label = actionLabels[actionType]
     const actionConfig = getActionConfig({ actionType, eventConfiguration })
+    const supportingCopy = actionConfig?.supportingCopy
     const { result } = await openModal<ModalResult>((close) => (
       <QuickActionModal
         close={close}
@@ -184,6 +186,7 @@ export function useQuickActionModal(event: EventIndex) {
           label,
           actionType,
           icon: actionConfig?.icon,
+          supportingCopy,
           ...config.modal
         }}
       />
@@ -235,7 +238,7 @@ export function useCustomActionModal(event: EventIndex) {
         config={{
           ...customActionConfigBase,
           label: actionConfig.label,
-          description: actionConfig.supportingCopy,
+          supportingCopy: actionConfig.supportingCopy,
           fields: actionConfig.form,
           icon: actionConfig.icon
         }}

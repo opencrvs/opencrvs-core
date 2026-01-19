@@ -37,7 +37,7 @@ export const ActionConfigBase = z.object({
     .default([])
     .describe('Flag actions which are executed when the action is performed.'),
   supportingCopy: TranslationConfig.optional().describe(
-    'Text displayed on the confirmation'
+    'Text displayed on the confirmation dialog'
   ),
   icon: AvailableIcons.describe('Icon representing the action').optional(),
   conditionals: z
@@ -68,13 +68,43 @@ const DeclareConfig = DeclarationActionBase.extend(
     type: z.literal(ActionType.DECLARE),
     review: DeclarationReviewConfig.describe(
       'Configuration of the review page fields.'
-    )
+    ),
+    dialogCopy: z
+      .object({
+        notify: TranslationConfig.describe(
+          'Confirmation text for the notify action'
+        ),
+        declare: TranslationConfig.describe(
+          'Confirmation text for the declare action'
+        ),
+        register: TranslationConfig.describe(
+          'Confirmation text for the register action'
+        )
+      })
+      .optional()
+  }).shape
+)
+
+const ArchiveConfig = ActionConfigBase.extend(
+  z.object({
+    type: z.literal(ActionType.ARCHIVE)
   }).shape
 )
 
 const EditActionConfig = ActionConfigBase.extend(
   z.object({
-    type: z.literal(ActionType.EDIT)
+    type: z.literal(ActionType.EDIT),
+    dialogCopy: z.object({
+      notify: TranslationConfig.describe(
+        'Confirmation text for the notify with edits action'
+      ),
+      declare: TranslationConfig.describe(
+        'Confirmation text for the declare with edits action'
+      ),
+      register: TranslationConfig.describe(
+        'Confirmation text for the register with edits action'
+      )
+    })
   }).shape
 )
 
@@ -139,6 +169,7 @@ export const ActionConfig = z
     }),
     RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
     EditActionConfig.meta({ id: 'EditActionConfig' }),
+    ArchiveConfig.meta({ id: 'ArchiveActionConfig' }),
     CustomActionConfig.meta({ id: 'CustomActionConfig' })
   ])
   .describe(

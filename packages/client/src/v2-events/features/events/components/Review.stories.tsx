@@ -102,29 +102,6 @@ export const ReviewWithoutChanges: Story = {
   }
 }
 
-const reviewActionMessages = {
-  title: {
-    id: 'changeModal.title',
-    defaultMessage: 'This is a title',
-    description: 'The title for review action'
-  },
-  description: {
-    id: 'changeModal.description',
-    defaultMessage: 'This is a description',
-    description: 'The title for review action'
-  },
-  onConfirm: {
-    id: 'ourOnConfirm',
-    defaultMessage: 'Confirm test',
-    description: 'The title for review action'
-  },
-  onReject: {
-    id: 'ourOnReject',
-    defaultMessage: 'Reject test',
-    description: 'The title for review action'
-  }
-}
-
 export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
@@ -155,11 +132,9 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
             action="Declare"
             close={close}
             copy={{
-              description: generateTranslationConfig('description'),
+              supportingCopy: generateTranslationConfig('description'),
               title: generateTranslationConfig('title'),
-              onCancel: generateTranslationConfig('onCancel'),
-              onConfirm: generateTranslationConfig('onConfirm'),
-              eventLabel: tennisClubMembershipEvent.label
+              onConfirm: generateTranslationConfig('onConfirm')
             }}
           />
         )
@@ -188,15 +163,7 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
           formConfig={TENNIS_CLUB_DECLARATION_FORM}
           title="My test action"
           onEdit={handleEdit}
-        >
-          <Review.Actions
-            icon="Check"
-            incomplete={false}
-            messages={reviewActionMessages}
-            onConfirm={handleDeclaration}
-            onReject={handleRejection}
-          />
-        </Review.Body>
+        ></Review.Body>
         {modal}
       </>
     )
@@ -248,13 +215,6 @@ export const ReviewWithValidationErrors: Story = {
         title="My test action"
         onEdit={noop}
       >
-        <Review.Actions
-          icon="Check"
-          incomplete={false}
-          messages={reviewActionMessages}
-          onConfirm={noop}
-          onReject={handleRejection}
-        />
         {modal}
       </Review.Body>
     )
@@ -283,11 +243,6 @@ export const ReviewWithConditionallyHiddenFields: Story = {
   render: function Component(args) {
     const [modal, openModal] = useModal()
 
-    async function handleRejection() {
-      await openModal<RejectionState | null>((close) => (
-        <Review.ActionModal.Reject close={close} />
-      ))
-    }
     return (
       <Review.Body
         {...args}
@@ -390,124 +345,8 @@ export const ReviewWithConditionallyHiddenFields: Story = {
         title="My review page for testing conditionally hidden fields"
         onEdit={noop}
       >
-        <Review.Actions
-          icon="Check"
-          incomplete={false}
-          messages={reviewActionMessages}
-          onConfirm={noop}
-          onReject={handleRejection}
-        />
         {modal}
       </Review.Body>
-    )
-  }
-}
-
-export const RejectModalInteraction: StoryObj<typeof Review.Body> = {
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await step('Open reject modal', async () => {
-      const [changeButton] = await canvas.findAllByRole('button', {
-        name: 'Reject test'
-      })
-
-      await fireEvent.click(changeButton)
-
-      const modal = await canvas.findByTestId('reject-modal')
-
-      await within(modal).findByRole('heading', {
-        name: 'Reason for rejection?'
-      })
-      const textarea = await within(modal).findByTestId('reject-reason')
-      const checkbox = await within(modal).findByRole('checkbox')
-      const cancel = await within(modal).findByRole('button', {
-        name: 'Cancel'
-      })
-      const archive = await within(modal).findByRole('button', {
-        name: 'Archive'
-      })
-      const sendForUpdate = await within(modal).findByRole('button', {
-        name: 'Send For Update'
-      })
-
-      await expect(cancel).toBeEnabled()
-      await expect(archive).toBeDisabled()
-      await expect(sendForUpdate).toBeDisabled()
-
-      await userEvent.type(textarea, 'Duplicate', { delay: 100 })
-
-      await expect(archive).toBeEnabled()
-      await expect(sendForUpdate).toBeEnabled()
-
-      await userEvent.click(checkbox)
-
-      await expect(archive).toBeEnabled()
-      await expect(sendForUpdate).toBeDisabled()
-
-      await userEvent.click(cancel)
-
-      await waitFor(async () => {
-        await expect(
-          canvas.queryByTestId('reject-modal')
-        ).not.toBeInTheDocument()
-      })
-    })
-  },
-  render: function Component(args) {
-    const [modal, openModal] = useModal()
-
-    async function handleDeclaration() {
-      await openModal<boolean | null>((close) => {
-        return (
-          <Review.ActionModal.Accept
-            action="Declare"
-            close={close}
-            copy={{
-              description: generateTranslationConfig('description'),
-              title: generateTranslationConfig('title'),
-              onCancel: generateTranslationConfig('onCancel'),
-              onConfirm: generateTranslationConfig('onConfirm'),
-              eventLabel: tennisClubMembershipEvent.label
-            }}
-          />
-        )
-      })
-    }
-
-    async function handleRejection() {
-      await openModal<RejectionState | null>((close) => (
-        <Review.ActionModal.Reject close={close} />
-      ))
-    }
-
-    async function handleEdit() {
-      await openModal<boolean | null>((close) => (
-        <Review.EditModal close={close}></Review.EditModal>
-      ))
-
-      return
-    }
-
-    return (
-      <>
-        <Review.Body
-          {...args}
-          form={mockDeclaration}
-          formConfig={TENNIS_CLUB_DECLARATION_FORM}
-          title="My test action"
-          onEdit={handleEdit}
-        >
-          <Review.Actions
-            icon="Check"
-            incomplete={false}
-            messages={reviewActionMessages}
-            onConfirm={handleDeclaration}
-            onReject={handleRejection}
-          />
-        </Review.Body>
-        {modal}
-      </>
     )
   }
 }

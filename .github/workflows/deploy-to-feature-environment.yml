@@ -30,12 +30,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Validate branch name and check for skip-e2e label
   check_skip_e2e_label:
     runs-on: ubuntu-24.04
     outputs:
       skip_e2e: ${{ steps.set_skip_flag.outputs.SKIP_E2E }}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Validate branch name
+        id: validate
+        uses: ./.github/actions/validate-branch
+        with:
+          pattern: '^[a-z][a-z0-9\/\-]{1,29}$'
 
       - name: Check for skip-e2e label
         id: set_skip_flag
@@ -281,8 +288,7 @@ jobs:
                 stack: '${{  steps.generate_stack.outputs.stack  }}',
                 'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
                 'branch': '${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}',
-                'chart-branch': '${{ needs.generate_stack_name_and_branch.outputs.chart_branch }}',
-                'runtime': '${{ needs.generate_stack_name_and_branch.outputs.runtime }}'
+                'chart-branch': '${{ needs.generate_stack_name_and_branch.outputs.chart_branch }}'
               }
             });
 

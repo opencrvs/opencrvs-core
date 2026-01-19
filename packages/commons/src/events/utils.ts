@@ -80,6 +80,7 @@ export function isActionConfigType(
   return actionConfigTypes.has(type as any)
 }
 
+// @TODO: refactor this function to return typed ActionConfig depending on given actionType. Perhaps this function should also throw an error if the action config is not found.
 export function getActionConfig({
   eventConfiguration,
   actionType,

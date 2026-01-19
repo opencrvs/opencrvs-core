@@ -15,12 +15,11 @@ import { v4 as uuid } from 'uuid'
 import {
   ActionType,
   getDeclaration,
-  EventStatus,
   EventDocument,
   getCurrentEventState,
-  InherentFlags,
   getActionReview,
-  getAvailableActionsForEvent
+  getAvailableActionsForEvent,
+  getActionConfig
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components/lib/Button'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -38,20 +37,11 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { reviewMessages } from '@client/v2-events/features/events/actions/messages'
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
 import { useRejectionModal } from '../reject/useRejectionModal'
 import { useEventConfiguration } from '../../useEventConfiguration'
-
-// @TODO: These should be made configurable in action config, so that different event types can have different copy
-// This will be implemented as part of https://github.com/opencrvs/opencrvs-core/issues/10900
-const actionModalMessages = {
-  [ActionType.NOTIFY]: reviewMessages.incomplete.declare,
-  [ActionType.DECLARE]: reviewMessages.complete.declare,
-  [ActionType.REGISTER]: reviewMessages.complete.register
-}
 
 /**
  * Declaration actions contain actions available on the review page of the declare flow. This can include:
@@ -78,7 +68,10 @@ function useDeclarationActions(event: EventDocument) {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const [modal, openModal] = useModal()
-  const { rejectionModal, handleRejection } = useRejectionModal(event.id)
+  const { rejectionModal, handleRejection } = useRejectionModal(
+    event.id,
+    eventType
+  )
   const canDirectlyRegister = useCanDirectlyRegister(event)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.DECLARE.REVIEW
@@ -86,10 +79,44 @@ function useDeclarationActions(event: EventDocument) {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const events = useEvents()
 
-  const mutateFns = {
-    [ActionType.NOTIFY]: events.actions.notify.mutate,
-    [ActionType.DECLARE]: events.actions.declare.mutate,
-    [ActionType.REGISTER]: events.customActions.registerOnDeclare.mutate
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    actionType: ActionType.DECLARE
+  })
+
+  const dialogCopy =
+    actionConfig && 'dialogCopy' in actionConfig
+      ? actionConfig.dialogCopy
+      : null
+
+  const actions = {
+    [ActionType.NOTIFY]: {
+      mutate: events.actions.notify.mutate,
+      supportingCopy: dialogCopy?.notify,
+      title: {
+        id: 'review.declare.incomplete.confirmModal.title',
+        defaultMessage: 'Notify the {event}?',
+        description: 'The title for review action modal when declaring'
+      }
+    },
+    [ActionType.DECLARE]: {
+      mutate: events.actions.declare.mutate,
+      supportingCopy: dialogCopy?.declare,
+      title: {
+        id: 'review.declare.confirmModal.title',
+        defaultMessage: 'Declare the {event}?',
+        description: 'The title for review action modal when declaring'
+      }
+    },
+    [ActionType.REGISTER]: {
+      mutate: events.customActions.registerOnDeclare.mutate,
+      supportingCopy: dialogCopy?.register,
+      title: {
+        id: 'review.register.confirmModal.title',
+        defaultMessage: 'Register the {event}?',
+        description: 'The title for review action modal when registering'
+      }
+    }
   }
 
   const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
@@ -119,27 +146,25 @@ function useDeclarationActions(event: EventDocument) {
     await deleteDeclaration(eventId)
   }, [eventId, deleteDeclaration])
 
-  async function handleDeclaration(actionType: keyof typeof mutateFns) {
-    const mutateFn = mutateFns[actionType]
-    const msgs = actionModalMessages[actionType]
+  async function handleDeclaration(actionType: keyof typeof actions) {
+    const action = actions[actionType]
+
     const confirmedDeclaration = await openModal<boolean | null>((close) => {
       return (
         <Review.ActionModal.Accept
           action="Declare"
           close={close}
           copy={{
-            // @TODO: make the messages configurable in action config?
-            // Will be implemented as part of https://github.com/opencrvs/opencrvs-core/issues/10900
-            ...msgs.modal,
-            onConfirm: actionLabels[actionType],
-            eventLabel: eventConfiguration.label
+            supportingCopy: action.supportingCopy,
+            title: action.title,
+            onConfirm: actionLabels[actionType]
           }}
         />
       )
     })
 
     if (confirmedDeclaration) {
-      mutateFn({
+      action.mutate({
         eventId,
         declaration,
         annotation,
