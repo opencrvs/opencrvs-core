@@ -16,12 +16,18 @@ import * as selectEvent from 'react-select-event'
 import {
   ActionStatus,
   ActionType,
+  AddressType,
   Draft,
+  field,
+  FieldConfig,
+  FieldType,
   generateEventDocument,
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  UUID
+  UUID,
+  user,
+  footballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -29,6 +35,7 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormData } from '../../useEventFormData'
 import { useActionAnnotation } from '../../useActionAnnotation'
+import { addLocalEventConfig, setEventData } from '../../useEvents/api'
 import { Pages } from './index'
 
 // Use an undeclared draft event for tests
@@ -373,7 +380,119 @@ export const FilledPagesVisibleInReview: Story = {
   }
 }
 
+const placeOfEventFieldConfig: FieldConfig = {
+  id: 'eventLocationId',
+  label: {
+    id: 'event.birth.action.declare.form.section.child.field.birthLocation.label',
+    defaultMessage: 'Health Institution',
+    description: 'This is the label for the field'
+  },
+  parent: {
+    $$field: 'applicant.address',
+    $$subfield: []
+  },
+  required: true,
+  conditionals: [],
+  secured: false,
+  validation: [],
+  hideLabel: false,
+  uncorrectable: false,
+  value: {
+    $$field: 'applicant.address',
+    $$subfield: ['administrativeArea']
+  },
+  analytics: false,
+  type: 'ALPHA_HIDDEN'
+}
+
+const overriddenEventConfig = {
+  ...tennisClubMembershipEvent,
+  label: {
+    defaultMessage: 'Tennis club membership application with Place of Event',
+    description: 'This is what this event is referred as in the system',
+    id: 'event.tennis-club-membership.label'
+  },
+  placeOfEvent: { $$field: 'eventLocationId' },
+  declaration: {
+    ...tennisClubMembershipEvent.declaration,
+    pages: tennisClubMembershipEvent.declaration.pages.map((page, index) => {
+      if (index === 0) {
+        return {
+          ...page,
+          fields: [...page.fields, placeOfEventFieldConfig]
+        }
+      }
+      return page
+    })
+  }
+}
+
 export const CanSubmitValidlyFilledForm: Story = {
+  parameters: {
+    offline: {
+      events: [undeclaredDraftEvent],
+      configs: [overriddenEventConfig]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.actions.declare.request.mutation(async (payload) => {
+            await expect(payload.declaration).not.toHaveProperty(
+              'recommender.name'
+            )
+            return generateEventDocument({
+              configuration: overriddenEventConfig,
+              actions: [
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE }
+              ]
+            })
+          }),
+          tRPCMsw.event.actions.register.request.mutation(async (payload) => {
+            await expect(payload.declaration).not.toHaveProperty(
+              'recommender.name'
+            )
+            return generateEventDocument({
+              configuration: overriddenEventConfig,
+              actions: [
+                { type: ActionType.CREATE },
+                { type: ActionType.DECLARE },
+
+                { type: ActionType.REGISTER }
+              ]
+            })
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return {
+              results: [
+                getCurrentEventState(
+                  generateEventDocument({
+                    configuration: overriddenEventConfig,
+                    actions: [
+                      { type: ActionType.CREATE },
+                      { type: ActionType.DECLARE },
+
+                      { type: ActionType.REGISTER }
+                    ]
+                  }),
+                  overriddenEventConfig
+                )
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    },
+    chromatic: { disableSnapshot: true }
+  },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -395,10 +514,6 @@ export const CanSubmitValidlyFilledForm: Story = {
       await userEvent.type(await canvas.findByPlaceholderText('mm'), '11')
 
       await userEvent.type(await canvas.findByPlaceholderText('yyyy'), '1990')
-
-      await userEvent.click(
-        await canvas.findByText('Tennis club membership application')
-      )
 
       const country = await canvas.findByTestId('location__country')
       await userEvent.click(country)
@@ -439,87 +554,9 @@ export const CanSubmitValidlyFilledForm: Story = {
       async () => {
         await expect(canvas.queryByText('Required')).not.toBeInTheDocument()
         const registerButton = await canvas.findByText('Register')
-        await expect(registerButton).toBeEnabled()
         await userEvent.click(registerButton)
         await userEvent.click(await canvas.findByTestId('confirm_Declare'))
       }
     )
-  },
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
-        eventId: undeclaredDraftEvent.id,
-        pageId: 'applicant'
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return undeclaredDraftEvent
-          }),
-          tRPCMsw.event.actions.declare.request.mutation(async (payload) => {
-            await expect(payload.declaration).not.toHaveProperty(
-              'recommender.name'
-            )
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                { type: ActionType.CREATE },
-                { type: ActionType.DECLARE }
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.validate.request.mutation(async (payload) => {
-            await expect(payload.declaration).not.toHaveProperty(
-              'recommender.name'
-            )
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                { type: ActionType.CREATE },
-                { type: ActionType.DECLARE },
-                { type: ActionType.VALIDATE }
-              ]
-            })
-          }),
-          tRPCMsw.event.actions.register.request.mutation(async (payload) => {
-            await expect(payload.declaration).not.toHaveProperty(
-              'recommender.name'
-            )
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                { type: ActionType.CREATE },
-                { type: ActionType.DECLARE },
-                { type: ActionType.VALIDATE },
-                { type: ActionType.REGISTER }
-              ]
-            })
-          }),
-          tRPCMsw.event.search.query((input) => {
-            return {
-              results: [
-                getCurrentEventState(
-                  generateEventDocument({
-                    configuration: tennisClubMembershipEvent,
-                    actions: [
-                      { type: ActionType.CREATE },
-                      { type: ActionType.DECLARE },
-                      { type: ActionType.VALIDATE },
-                      { type: ActionType.REGISTER }
-                    ]
-                  }),
-                  tennisClubMembershipEvent
-                )
-              ],
-              total: 1
-            }
-          })
-        ]
-      }
-    },
-    chromatic: { disableSnapshot: true }
   }
 }

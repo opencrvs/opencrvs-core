@@ -240,6 +240,7 @@ function AddressInput(props: Props) {
   } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
+
   const locations = getLocations.useSuspenseQuery()
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
@@ -285,14 +286,6 @@ function AddressInput(props: Props) {
 
   const resolvedAdministrativeArea =
     resolveAdministrativeArea(administrativeArea)
-
-  if (
-    value &&
-    value.addressType === AddressType.DOMESTIC &&
-    resolvedAdministrativeArea
-  ) {
-    value.administrativeArea = resolvedAdministrativeArea
-  }
 
   const resolvedValue = {
     ...value,

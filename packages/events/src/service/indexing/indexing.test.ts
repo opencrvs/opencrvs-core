@@ -112,13 +112,6 @@ test('records are indexed with full location hierarchy', async () => {
     })
   })
 
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(createdEvent.id, {
-      declaration: event.declaration,
-      keepAssignment: true
-    })
-  )
-
   // --- Verify indexed ES document contains full hierarchy -------------------
   const searchResponse = await esClient.search({
     index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
@@ -225,13 +218,13 @@ const rangeRegisteredAtPayload: QueryType = {
   ]
 }
 
-const exactRegisteredAtLocationPayload: QueryType = {
+const withinRegisteredAtLocationPayload: QueryType = {
   type: 'and',
   clauses: [
     {
       'legalStatuses.REGISTERED.createdAtLocation': {
-        type: 'exact',
-        term: RANDOM_UUID
+        type: 'within',
+        location: RANDOM_UUID
       },
       eventType: TENNIS_CLUB_MEMBERSHIP
     }
@@ -256,7 +249,7 @@ const fullAndPayload: QueryType = {
       trackingId: { type: 'exact', term: 'ABC123' },
       createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
       updatedAt: { type: 'exact', term: '2024-06-01' },
-      createdAtLocation: { type: 'exact', term: RANDOM_UUID },
+      createdAtLocation: { type: 'within', location: RANDOM_UUID },
       updatedAtLocation: {
         type: 'within',
         location: RANDOM_UUID
@@ -367,9 +360,9 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
-  test('builds query with exact legalStatuses.REGISTERED.createdAtLocation', async () => {
+  test('builds query with legalStatuses.REGISTERED.createdAtLocation', async () => {
     const result = await buildElasticQueryFromSearchPayload(
-      exactRegisteredAtLocationPayload,
+      withinRegisteredAtLocationPayload,
       [tennisClubMembershipEvent]
     )
     expect(result).toEqual({
@@ -438,18 +431,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
                 },
                 { term: { updatedAt: '2024-06-01' } },
                 { term: { createdAtLocation: RANDOM_UUID } },
-                {
-                  bool: {
-                    minimum_should_match: 1,
-                    should: [
-                      {
-                        term: {
-                          updatedAtLocation: RANDOM_UUID
-                        }
-                      }
-                    ]
-                  }
-                },
+                { term: { updatedAtLocation: RANDOM_UUID } },
                 {
                   match: {
                     'declaration.applicant____name.__fullname': 'John Doe'
@@ -1047,13 +1029,6 @@ describe('placeOfEvent location hierarchy handling', () => {
       })
     )
 
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(createdEvent.id, {
-        declaration: declarationWithHomeAddress,
-        keepAssignment: true
-      })
-    )
-
     // Verify: Elasticsearch document contains full location hierarchies
     const esSearchResponse = await esClient.search({
       index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
@@ -1163,13 +1138,6 @@ describe('placeOfEvent location hierarchy handling', () => {
 
       await client.event.actions.declare.request(
         generator.event.actions.declare(event.id, {
-          declaration: declarationWithHomeAddress,
-          keepAssignment: true
-        })
-      )
-
-      await client.event.actions.validate.request(
-        generator.event.actions.validate(event.id, {
           declaration: declarationWithHomeAddress,
           keepAssignment: true
         })
@@ -1302,13 +1270,6 @@ describe('placeOfEvent location hierarchy handling', () => {
       })
     )
 
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
-        declaration: declarationWithInternationalAddress,
-        keepAssignment: true
-      })
-    )
-
     // Step 2: Verify events are indexed correctly BEFORE reindexing
     const initialSearchResponse = await esClient.search({
       index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
@@ -1372,13 +1333,6 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     await client.event.actions.declare.request(
       generator.event.actions.declare(event.id, {
-        declaration: declarationWithHomeAddress,
-        keepAssignment: true
-      })
-    )
-
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
         declaration: declarationWithHomeAddress,
         keepAssignment: true
       })

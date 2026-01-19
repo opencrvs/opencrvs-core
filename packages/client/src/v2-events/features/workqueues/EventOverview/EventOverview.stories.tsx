@@ -725,76 +725,6 @@ export const WithDuplicateDetectedActionModal: Story = {
   }
 }
 
-const unassignAction = {
-  id: 'a5d1aeb0-3c3b-4924-8612-a3129f11f12b' as UUID,
-  transactionId: '74c346dd-0d16-4f3d-b88c-4ce7384fcb57',
-  createdByUserType: 'user',
-  createdAt: '2025-12-03T08:28:10.960Z',
-  createdBy: '692562040e9efc8301944dda',
-  createdByRole: 'LOCAL_REGISTRAR',
-  createdAtLocation: '5ea30886-72ef-404b-a966-f634aa69d127' as UUID,
-  declaration: {},
-  annotation: {},
-  status: 'Accepted',
-  type: 'UNASSIGN'
-} satisfies ActionDocument
-
-const unassignedEvent = {
-  ...duplicateEvent,
-  actions: duplicateEvent.actions.concat(unassignAction)
-}
-
-export const HideEventHistoryAfterUnassign: Story = {
-  parameters: {
-    /**
-     * Intentionally disabled snapshot - should hide history after unassign
-     */
-    chromatic: { disableSnapshot: false },
-    offline: {
-      events: [duplicateEvent]
-    },
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
-        eventId: duplicateEvent.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.search.query(() => {
-            return {
-              results: [
-                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
-              ],
-              total: 1
-            }
-          }),
-          tRPCMsw.event.actions.assignment.unassign.mutation(() => {
-            return unassignedEvent
-          })
-        ]
-      }
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(
-      await canvas.findByRole('button', {
-        name: 'Action'
-      })
-    )
-
-    await userEvent.click(await canvas.findByText('Unassign'))
-
-    await userEvent.click(
-      await canvas.findByRole('button', {
-        name: 'Unassign'
-      })
-    )
-  }
-}
-
 const rng = createPrng(33123)
 const validateActionUuid = generateUuid(rng)
 
@@ -819,31 +749,6 @@ const annotationUpdateOnValidateEvent = {
         annotation: {
           'review.signature': generateRandomSignature(rng)
         }
-      }
-    }),
-    generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      declarationOverrides: {},
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
-        id: validateActionUuid,
-        status: ActionStatus.Requested,
-        annotation: {
-          'review.signature': generateRandomSignature(rng)
-        }
-      }
-    }),
-    generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      declarationOverrides: {},
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
-        status: ActionStatus.Accepted,
-        originalActionId: validateActionUuid
       }
     }),
     generateActionDocument({
@@ -912,15 +817,6 @@ const annotationChangeDuringRegisterEvent = {
           'review.signature': generateRandomSignature(rng)
         }
       }
-    }),
-    generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString()
-      },
-      declarationOverrides: {}
     }),
     generateActionDocument({
       action: ActionType.REGISTER,

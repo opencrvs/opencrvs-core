@@ -47,7 +47,6 @@ test('REQUEST_CORRECTION allows access if required scope is present', async () =
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -126,7 +125,6 @@ test('a correction request can be added to a registered event', async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -154,7 +152,6 @@ test(`REQUEST_CORRECTION validation error message contains all the offending fie
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -209,7 +206,6 @@ test(`REQUEST_CORRECTION Skips required field validation when they are condition
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -290,7 +286,6 @@ test('REQUEST_CORRECTION prevents correcting a field which is configured as unco
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -315,7 +310,6 @@ describe('when a correction request exists', () => {
 
     const event = await createEvent(client, generator, [
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER
     ])
 
@@ -387,7 +381,6 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
   const client = createTestClient(user)
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -426,7 +419,6 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -470,7 +462,6 @@ test('a correction request is not allowed if the event is already waiting for co
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 

@@ -43,6 +43,7 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  EventIndexWithLocationHierarchy,
   getEventIndexWithLocationHierarchy,
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
@@ -198,6 +199,15 @@ function mapFieldTypeToElasticsearch(
        * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
        * The field still lands in `_source`.
        */
+      return {
+        type: 'object',
+        enabled: false
+      }
+    case FieldType._EXPERIMENTAL_CUSTOM:
+      /**
+       * Custom fields are not indexed as their structure is unknown.
+       */
+
       return {
         type: 'object',
         enabled: false
@@ -376,7 +386,7 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
   const eventIndex = eventToEventIndex(event, config)
   const eventIndexWithLocationHierarchy =
     await getEventIndexWithLocationHierarchy(config, eventIndex)
-  return esClient.index<EventIndex>({
+  return esClient.index<EventIndexWithLocationHierarchy>({
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
@@ -499,7 +509,7 @@ export async function findRecordsByQuery({
   const events = response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((eventIndex) => {
+    .map((eventIndex: EncodedEventIndex) => {
       const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
       const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
       const eventIndexWithoutLocationHierarchy =

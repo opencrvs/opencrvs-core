@@ -8,12 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ServerRoute } from '@hapi/hapi'
-import { resolveLocationParents } from './locationTreeSolver'
-import { UUID } from '@opencrvs/commons'
 
-export const locationHierarchyHandler: ServerRoute['handler'] = async (req) => {
-  const { locationId } = req.params as { locationId: UUID }
+/*
+ * These are exported modules for modules that are dynamically important into the app
+ */
 
-  return await resolveLocationParents(locationId)
-}
+import React from 'react'
+export default React

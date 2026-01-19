@@ -75,14 +75,6 @@ const declarationActionWithAge = generateActionDocument({
   }
 })
 
-const validateAction = generateActionDocument({
-  configuration: tennisClubMembershipEvent,
-  action: ActionType.VALIDATE,
-  defaults: {
-    declaration: {}
-  }
-})
-
 const declarationActionWithDob = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.DECLARE,
@@ -107,12 +99,7 @@ const eventCorrectionAgeToDob = {
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  actions: [
-    createAction,
-    declarationActionWithAge,
-    validateAction,
-    registerAction
-  ]
+  actions: [createAction, declarationActionWithAge, registerAction]
 }
 
 const correctionDraftAgeToDob = {
@@ -160,12 +147,7 @@ const eventCorrectionDobToAge = {
   id: generateUuid(prng),
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  actions: [
-    createAction,
-    declarationActionWithDob,
-    validateAction,
-    registerAction
-  ]
+  actions: [createAction, declarationActionWithDob, registerAction]
 }
 
 const correctionDraftDobToAge = {
@@ -221,10 +203,6 @@ const eventCorrectionAddress = {
     generateActionDocument({
       configuration: ChildOnboardingEvent,
       action: ActionType.DECLARE
-    }),
-    generateActionDocument({
-      configuration: ChildOnboardingEvent,
-      action: ActionType.VALIDATE
     }),
     generateActionDocument({
       configuration: ChildOnboardingEvent,

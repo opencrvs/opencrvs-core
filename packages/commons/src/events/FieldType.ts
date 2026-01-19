@@ -51,7 +51,18 @@ export const FieldType = {
   QR_READER: 'QR_READER',
   ID_READER: 'ID_READER',
   LOADER: 'LOADER',
-  ALPHA_HIDDEN: 'ALPHA_HIDDEN'
+  ALPHA_HIDDEN: 'ALPHA_HIDDEN',
+  /**
+   * @internal
+   * @experimental
+   *
+   * Internal API used by the OpenCRVS core team for experimentation.
+   *
+   * This component is not part of the public, stable API.
+   * Its shape, behavior, or existence may change at any time or be removed
+   * entirely without notice.
+   */
+  _EXPERIMENTAL_CUSTOM: 'CUSTOM'
 } as const
 
 /**

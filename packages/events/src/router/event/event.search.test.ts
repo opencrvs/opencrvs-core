@@ -389,10 +389,7 @@ test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column',
     ...generator.event.actions.declare(event.id),
     keepAssignment: true
   })
-  await client.event.actions.validate.request({
-    ...generator.event.actions.validate(event.id),
-    keepAssignment: true
-  })
+
   await client.event.actions.register.request(
     generator.event.actions.register(event.id)
   )
@@ -1318,16 +1315,10 @@ test('Returns relevant events in right order', async () => {
   // Since it is expensive and time consuming, we will run multiple checks against the same set of events.
   const actionCombinations = [
     [ActionType.DECLARE],
-    [ActionType.DECLARE, ActionType.VALIDATE],
-    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REJECT],
-    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.ARCHIVE],
-    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REGISTER],
-    [
-      ActionType.DECLARE,
-      ActionType.VALIDATE,
-      ActionType.REGISTER,
-      ActionType.PRINT_CERTIFICATE
-    ]
+    [ActionType.DECLARE, ActionType.REJECT],
+    [ActionType.DECLARE, ActionType.ARCHIVE],
+    [ActionType.DECLARE, ActionType.REGISTER],
+    [ActionType.DECLARE, ActionType.REGISTER, ActionType.PRINT_CERTIFICATE]
   ]
 
   // 1. Create events with all combinations of actions
@@ -1348,7 +1339,7 @@ test('Returns relevant events in right order', async () => {
     }
   })
 
-  expect(declaredEvents).toHaveLength(3)
+  expect(declaredEvents).toHaveLength(2)
   expect(
     sanitizeForSnapshot(declaredEvents, UNSTABLE_EVENT_FIELDS)
   ).toMatchSnapshot()

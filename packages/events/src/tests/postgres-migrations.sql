@@ -194,7 +194,8 @@ CREATE TABLE app.locations (
     deleted_at timestamp with time zone,
     location_type app.location_type,
     valid_until timestamp with time zone,
-    administrative_area_id uuid
+    administrative_area_id uuid,
+    external_id text
 );
 
 
@@ -362,6 +363,14 @@ ALTER TABLE ONLY app.events
 
 ALTER TABLE ONLY app.events
     ADD CONSTRAINT events_transaction_id_event_type_key UNIQUE (transaction_id, event_type);
+
+
+--
+-- Name: locations locations_external_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.locations
+    ADD CONSTRAINT locations_external_id_key UNIQUE (external_id);
 
 
 --

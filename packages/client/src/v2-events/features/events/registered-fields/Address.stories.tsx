@@ -20,7 +20,8 @@ import {
   AddressFieldValue,
   AddressType,
   getDeclaration,
-  UUID
+  UUID,
+  user
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Review } from '@client/v2-events/features/events/components/Review'
@@ -103,7 +104,10 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             defaultValue: {
               country: 'FAR',
               addressType: AddressType.DOMESTIC,
-              administrativeArea: leafAdminStructureLocationId
+              administrativeArea: {
+                $userField: 'primaryOfficeId',
+                $location: 'district'
+              }
             },
             configuration: {
               streetAddressForm: [

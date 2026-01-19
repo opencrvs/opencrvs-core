@@ -8,18 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { SavedLocation } from '@opencrvs/commons/types'
-import { fetchFromHearth } from '@config/services/hearth'
 import * as Hapi from '@hapi/hapi'
 
-export async function fetchLocationHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const locationId = request.params.locationId
-  const response = await fetchFromHearth<SavedLocation>(
-    `Location/${locationId}`
-  )
-
-  return response
-}
+/**
+ * Retrieves a parameter from either the request payload or query string.
+ * Prioritizes payload over query for POST requests with form data.
+ */
+export const getParam = (req: Hapi.Request, key: string) =>
+  (req.payload as any)?.[key] || req.query[key]

@@ -46,10 +46,7 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
     `search[event=${type},access=all]`
   ])
 
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE
-  ])
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   mswServer.use(
     http.post(
@@ -99,10 +96,7 @@ test('Does not add any flags when accepted form countryconfig', async () => {
     `search[event=${type},access=all]`
   ])
 
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE
-  ])
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   mswServer.use(
     http.post(
@@ -152,10 +146,7 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
     `search[event=${type},access=all]`
   ])
 
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE
-  ])
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   mswServer.use(
     http.post(
@@ -207,7 +198,6 @@ test(`Adds ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.REGIST
 
   await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -236,7 +226,6 @@ test(`Removes ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.PRI
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -269,7 +258,6 @@ test(`Removes ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.REQ
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER,
     ActionType.PRINT_CERTIFICATE
   ])
@@ -304,7 +292,6 @@ test(`Adds back ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.A
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER,
     ActionType.PRINT_CERTIFICATE
   ])
@@ -356,7 +343,6 @@ test(`Adds ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.REQUEST
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -391,7 +377,6 @@ test(`Removes ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.APPR
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
