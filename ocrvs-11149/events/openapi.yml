@@ -3574,6 +3574,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -3636,6 +3637,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -11167,6 +11169,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -11229,6 +11232,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -11526,6 +11530,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -11588,6 +11593,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -11716,6 +11722,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -11778,6 +11785,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -11920,6 +11928,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -11982,6 +11991,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -12232,6 +12242,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -12294,6 +12305,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -12508,6 +12520,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -12570,6 +12583,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -12716,6 +12730,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -12778,6 +12793,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -12906,6 +12922,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -12968,6 +12985,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
