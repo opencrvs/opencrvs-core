@@ -172,9 +172,16 @@ function createIDBPersister(storageIdentifier: string) {
   } satisfies Persister
 }
 
+console.log('getting trpc client')
+
 export const trpcClient = getTrpcClient()
 
+console.log('got trpc client')
+
 export const queryClient = getQueryClient()
+
+console.log('got query client')
+
 export const trpcOptionsProxy = createTRPCOptionsProxy({
   queryClient,
   client: trpcClient
@@ -195,6 +202,8 @@ export function TRPCProvider({
   storeIdentifier?: string
   waitForClientRestored?: boolean
 }) {
+  console.log('in trpc provider')
+
   const [queriesRestored, setQueriesRestored] = React.useState(false)
 
   return (

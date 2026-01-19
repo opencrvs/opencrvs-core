@@ -209,6 +209,9 @@ export const SearchResultComponent = ({
   emptyMessage?: TranslationConfig
 }>) => {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
+
+  console.log(`in ${slug} workqueue`)
+
   const intl = useIntl()
   const navigate = useNavigate()
   const { width: windowWidth } = useWindowSize()
