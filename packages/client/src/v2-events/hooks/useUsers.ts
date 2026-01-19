@@ -115,7 +115,9 @@ export function useUsers() {
           enabled?: boolean
         }
       ) => {
-        const { queryFn, ...queryOptions } = trpc.user.get.queryOptions(id)
+        const { queryFn, ...rest } = trpc.user.get.queryOptions(id)
+        const queryOptions = { ...rest, staleTime: Infinity }
+
         return useQuery({
           ...queryOptions,
           ...options,

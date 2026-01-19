@@ -22,7 +22,8 @@ export function useCountryConfigWorkqueueConfigurations() {
 
   const config = useSuspenseQuery({
     ...trpc.workqueue.config.list.queryOptions(),
-    networkMode: 'offlineFirst'
+    networkMode: 'offlineFirst',
+    staleTime: Infinity
   }).data
 
   const scopes = useSelector(getScope)
