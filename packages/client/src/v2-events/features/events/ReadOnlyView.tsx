@@ -72,14 +72,21 @@ function ReadonlyView() {
 
   useEffect(() => {
     return () => {
-      if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
+      if (
+        assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF ||
+        !fullEvent
+      ) {
         return
       }
+
       void (async () => {
         await removeCachedFiles(fullEvent)
       })()
     }
   }, [fullEvent, assignmentStatus])
+
+  console.log('fullEvent', fullEvent)
+  console.log('eventIndex', eventIndex)
 
   if (!shouldShowFullOverview) {
     // @TODO: Ask Jon about the desired UI here.
