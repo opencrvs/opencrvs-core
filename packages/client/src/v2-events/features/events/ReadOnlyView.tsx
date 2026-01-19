@@ -17,10 +17,9 @@ import {
   applyDraftToEventIndex,
   getDeclaration,
   getOrThrow,
-  getCurrentEventState
+  deepDropNulls
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -30,39 +29,37 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { removeCachedFiles } from '../files/cache'
+import { useEventOverviewInfo } from '../workqueues/EventOverview/components/useEventOverviewInfo'
 
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
-  const events = useEvents()
-  const event = events.getEvent.viewEvent(eventId)
-  const validatorContext = useValidatorContext(event)
+  const { getRemoteDraftByEventId } = useDrafts()
+  const { eventIndex, fullEvent, shouldShowFullOverview } =
+    useEventOverviewInfo(eventId)
+  const draft = getRemoteDraftByEventId(eventIndex.id)
+  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
 
+  const eventWithDrafts = draft
+    ? deepDropNulls(
+        applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
+      )
+    : eventIndex
+
+  const validatorContext = useValidatorContext(fullEvent)
   const maybeAuth = useAuthentication()
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
+
   const authentication = getOrThrow(
     maybeAuth,
     'Authentication is not available but is required'
   )
 
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(event.id)
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
-
-  const eventStateWithDraft = useMemo(() => {
-    const eventState = getCurrentEventState(event, configuration)
-
-    return draft
-      ? applyDraftToEventIndex(eventState, draft, configuration)
-      : eventState
-  }, [draft, event, configuration])
-
   const assignmentStatus = getAssignmentStatus(
-    eventStateWithDraft,
+    eventWithDrafts,
     authentication.sub
   )
 
-  const actionConfiguration = configuration.actions.find(
+  const actionConfiguration = eventConfiguration.actions.find(
     (a) => a.type === ActionType.READ
   )
   if (!actionConfiguration) {
@@ -70,9 +67,8 @@ function ReadonlyView() {
   }
 
   const { title, fields } = actionConfiguration.review
-  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
-  const formConfig = getDeclaration(configuration)
+  const formConfig = getDeclaration(eventConfiguration)
 
   useEffect(() => {
     return () => {
@@ -80,18 +76,20 @@ function ReadonlyView() {
         return
       }
       void (async () => {
-        await removeCachedFiles(event)
+        await removeCachedFiles(fullEvent)
       })()
     }
-  }, [event, assignmentStatus])
+  }, [fullEvent, assignmentStatus])
+
+  console.log('CIHAN TEST')
 
   return (
     <ReviewComponent.Body
       readonlyMode
-      form={eventStateWithDraft.declaration}
+      form={eventWithDrafts.declaration}
       formConfig={formConfig}
       reviewFields={fields}
-      title={formatMessage(title, eventStateWithDraft.declaration)}
+      title={formatMessage(title, eventWithDrafts.declaration)}
       validatorContext={validatorContext}
       onEdit={noop}
     />
