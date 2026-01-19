@@ -5,6 +5,7 @@
 ### New features
 
 - NUMBER_WITH_UNIT Input, which is a number input with a configurable selectable unit of measurement.
+- `now()` magic function, which can be used as a dynamic `defaultValue` for DATE and TIME inputs and resolves to the current date/time at runtime.
 
 ## 1.9.5
 
