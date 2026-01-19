@@ -63,7 +63,7 @@ export const messages = defineMessages({
   },
   advancedSearch: {
     id: 'home.header.advancedSearch',
-    defaultMessage: 'Advanced Search',
+    defaultMessage: 'Advanced search',
     description: 'Search menu advanced search type'
   },
   placeholderName: {

@@ -66,12 +66,14 @@ const StyledInputContainer = styled.div<{
 const StyledPrefix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
   color: ${({ theme }) => theme.colors.grey400};
+  white-space: nowrap;
   user-select: none;
 `
 
 const StyledPostfix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
   color: ${({ theme }) => theme.colors.grey400};
+  white-space: nowrap;
   user-select: none;
 `
 

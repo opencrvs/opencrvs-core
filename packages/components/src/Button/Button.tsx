@@ -24,6 +24,7 @@ type ButtonType =
   | 'secondaryNegative'
   | 'icon'
   | 'iconPrimary'
+  | 'action'
 
 type ButtonModifier = 'disabled' | 'loading'
 
@@ -77,6 +78,7 @@ const StyledButton = styled.button.withConfig({
   ${(props) => props.variant === 'negative' && styles.negative}
   ${(props) => props.variant === 'icon' && styles.icon}
   ${(props) => props.variant === 'iconPrimary' && styles.iconPrimary}
+  ${(props) => props.variant === 'action' && styles.action}
 
   ${(props) => props.loading && styles.loading}
   ${(props) => props.disabled && styles.disabled}

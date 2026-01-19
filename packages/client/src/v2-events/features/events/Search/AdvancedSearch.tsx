@@ -33,7 +33,7 @@ import {
 const advancedSearchMessages = {
   advancedSearch: {
     id: 'config.advanced.search',
-    defaultMessage: 'Advanced Search',
+    defaultMessage: 'Advanced search',
     description: 'This is used for the advanced search'
   },
   advancedSearchInstruction: {

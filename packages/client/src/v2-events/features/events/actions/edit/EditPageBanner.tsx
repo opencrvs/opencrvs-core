@@ -25,13 +25,10 @@ const Wrapper = styled.div`
   display: flex;
   flex: 1;
   color: ${({ theme }) => theme.colors.white};
-  background-color: ${({ theme }) => theme.colors.orangeDarker};
+  background-color: ${({ theme }) => theme.colors.purpleDarker};
   padding: 8px 20px;
+  gap: 8px;
   align-items: center;
-`
-
-const StyledText = styled(Text)`
-  margin-left: 8px;
 `
 
 const declaredMessage = defineMessage({
@@ -97,9 +94,9 @@ export function EditPageBanner() {
   return (
     <Wrapper>
       <Icon name="PencilSimpleLine" size="small" />
-      <StyledText color="white" element="span" variant="bold14">
+      <Text color="white" element="span" variant="bold14">
         {formattedMessage}
-      </StyledText>
+      </Text>
     </Wrapper>
   )
 }

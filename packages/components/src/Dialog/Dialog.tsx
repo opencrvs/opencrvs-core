@@ -22,10 +22,6 @@ export interface IDialogProps {
   children?: React.ReactNode
   actions: JSX.Element[]
   onClose?: () => void
-  /**
-   * Width of the dialog in pixels (for large variant).
-   */
-  width?: number
   variant?: 'small' | 'large'
 }
 
@@ -44,54 +40,68 @@ const DialogWrapper = styled.div`
 
 const DialogContainer = styled.div<{
   variant?: 'small' | 'large'
-  width?: number
 }>`
   position: relative;
-  ${({ variant, width }) =>
-    variant === 'small'
-      ? `
-        width: 480px;
-        max-width: 90%;
-      `
-      : `
-        min-height: 118px;
-        height: auto;
-        width: ${width ? `${width}px` : '80%'};
-            @media (max-width: 768px) and (orientation: portrait) {
-             width: 100%;
-             height: 100%;
-             max-width: 100%;
-             max-height: 100%;
-             border-radius: 0;
-             }
-      `}
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 4px;
   box-shadow: ${({ theme }) => theme.shadows.heavy};
   display: flex;
   flex-direction: column;
   max-height: 80vh;
+
+  ${({ variant, theme }) => {
+    if (variant === 'small') {
+      return `
+        width: 480px;
+        max-width: 90%;
+      `
+    }
+
+    return `
+      min-height: 240px;
+      height: auto;
+      width: 60%;
+
+      @media (max-width: ${theme.grid.breakpoints.lg}px) {
+        width: 80%;
+      }
+
+      @media (max-width: ${theme.grid.breakpoints.md}px) {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 0;
+      }
+    `
+  }}
 `
 const DialogHeader = styled.div`
   display: flex;
-  padding: 10px 32px;
+  padding: 10px 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   justify-content: space-between;
 `
 const DialogTitle = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 `
 
-const DialogContent = styled.div`
-  padding: 24px 32px;
+const DialogContent = styled.div<{
+  variant?: 'small' | 'large'
+}>`
+  padding: ${({ variant }) => {
+    if (variant === 'small') return '16px 32px'
+    return '24px 40px'
+  }};
+
   flex-grow: 1;
   overflow-y: auto;
 `
 
 const DialogFooter = styled.div`
-  padding: 24px 32px;
+  padding: 12px 24px;
   align-items: center;
   display: flex;
   gap: 8px;
@@ -107,7 +117,6 @@ export function Dialog({
   children,
   actions,
   variant = 'small',
-  width,
   titleIcon
 }: IDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -134,12 +143,7 @@ export function Dialog({
     <>
       {isOpen && (
         <DialogWrapper onClick={handleClickOutside}>
-          <DialogContainer
-            id={id}
-            width={width}
-            variant={variant}
-            ref={dialogRef}
-          >
+          <DialogContainer id={id} variant={variant} ref={dialogRef}>
             <DialogHeader>
               <DialogTitle>
                 {titleIcon}

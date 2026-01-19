@@ -46,6 +46,24 @@ export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   }
 `
 
+export const action = css`
+  padding: 0 8px 0 16px;
+  gap: 12px;
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.primary};
+
+  svg {
+    color: ${({ theme }) => theme.colors.white};
+  }
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primaryDark};
+  }
+  &:active {
+    background-color: ${({ theme }) => theme.colors.primaryDarker};
+  }
+`
+
 export const primary = ({ loading }: { loading?: boolean }) => css`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};

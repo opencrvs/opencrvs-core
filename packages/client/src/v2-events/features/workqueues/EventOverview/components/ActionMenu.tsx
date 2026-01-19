@@ -13,8 +13,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { getOrThrow } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -76,14 +75,11 @@ export function ActionMenu({
   return (
     <>
       <DropdownMenu id="action">
-        <DropdownMenu.Trigger asChild>
-          <PrimaryButton
-            data-testid="action-dropdownMenu"
-            icon={() => <CaretDown />}
-            size="medium"
-          >
+        <DropdownMenu.Trigger>
+          <Button data-testid="action-dropdownMenu" size="small" type="action">
             {intl.formatMessage(messages.action)}
-          </PrimaryButton>
+            <Icon name="CaretDown" size="small" />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {assignedToOther && (

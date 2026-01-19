@@ -113,15 +113,23 @@ export function FormHeader({
           </Button>
           {menuItems.length > 0 && (
             <ToggleMenu
-              id="event-menu"
-              menuItems={menuItems}
+              id={'event-menu'}
+              menuItems={[
+                {
+                  label: 'Delete declaration',
+                  icon: <Icon name="Trash" />,
+                  handler: onDelete
+                }
+              ]}
               toggleButton={
-                <Icon
-                  color="primary"
+                <Button
+                  aria-label="More options"
                   data-testid="event-menu-toggle-button-image"
-                  name="DotsThreeVertical"
-                  size="large"
-                />
+                  size="medium"
+                  type="icon"
+                >
+                  <Icon name="DotsThreeVertical" size="large" />
+                </Button>
               }
             />
           )}
@@ -149,7 +157,6 @@ export function FormHeader({
   return (
     <>
       <AppBar
-        desktopLeft={appbarIcon}
         desktopRight={getActionComponent()}
         desktopTitle={label}
         mobileLeft={appbarIcon}
@@ -178,12 +185,14 @@ export function FormHeader({
                     }
                   ]}
                   toggleButton={
-                    <Icon
-                      color="primary"
+                    <Button
+                      aria-label="More options"
                       data-testid="event-menu-toggle-button-image"
-                      name="DotsThreeVertical"
-                      size="large"
-                    />
+                      size="medium"
+                      type="icon"
+                    >
+                      <Icon name="DotsThreeVertical" size="large" />
+                    </Button>
                   }
                 />
               </>

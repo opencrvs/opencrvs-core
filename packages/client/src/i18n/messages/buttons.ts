@@ -93,7 +93,7 @@ export const buttonMessages = defineMessages({
     id: 'buttons.editRegistration'
   },
   exitButton: {
-    defaultMessage: 'EXIT',
+    defaultMessage: 'Close',
     description: 'Label for Exit button on EventTopBar',
     id: 'buttons.exit'
   },

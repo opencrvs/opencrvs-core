@@ -15,30 +15,48 @@ import { Stack } from '../Stack'
 import { Text } from '../Text'
 import { useWindowSize } from '../hooks'
 
-export const APP_BAR_HEIGHT = '56px'
-
 const AppBarWrapper = styled.div`
-  padding: 0 16px;
-  height: ${APP_BAR_HEIGHT};
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  width: 100%;
   background: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+`
+
+const AppBarRowOne = styled.div`
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
   gap: 16px;
+  justify-content: space-between;
+  height: 56px;
+`
+
+const AppBarRowTwo = styled.div`
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  border-top: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 const Left = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  flex: 1;
   gap: 16px;
-  grid-column: 1;
   overflow: hidden;
 `
 
 const Center = styled.div``
+
+const Right = styled.div``
+
+const MobileWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`
 
 const MobileLeft = styled.div`
   display: flex;
@@ -80,6 +98,7 @@ type IProps = {
   mobileTitle?: React.ReactNode
   mobileCenter?: React.ReactNode
   mobileRight?: React.ReactNode
+  appBarRowTwo?: React.ReactNode
   desktopLeft?: React.ReactNode
   desktopTitle?: React.ReactNode
   desktopCenter?: React.ReactNode
@@ -100,36 +119,51 @@ export const AppBar = (props: IAppBarProps) => {
   if (width > grid.breakpoints.lg) {
     return (
       <AppBarWrapper id={props.id} className={props.className}>
-        <Left>
-          {props.desktopLeft && <Stack>{props.desktopLeft}</Stack>}
-          {props.desktopTitle && (
-            <Title variant="h4" element="h1">
-              {props.desktopTitle}
-            </Title>
-          )}
-        </Left>
-        {!props.desktopTitle && <Center>{props.desktopCenter}</Center>}
-        <Actions $flex={props.desktopCenter ? '1' : 'none'}>
-          {props.desktopRight}
-        </Actions>
+        <AppBarRowOne>
+          <Left>
+            {props.desktopLeft && <Stack>{props.desktopLeft}</Stack>}
+            {props.desktopTitle && (
+              <Title variant="bold18" element="h1">
+                {props.desktopTitle}
+              </Title>
+            )}
+          </Left>
+          <Center>{props.desktopCenter}</Center>
+          <Right>
+            <Actions $flex={props.desktopCenter ? '1' : 'none'}>
+              {props.desktopRight}
+            </Actions>
+          </Right>
+        </AppBarRowOne>
       </AppBarWrapper>
     )
   }
 
   return (
     <AppBarWrapper id={props.id} className={props.className}>
-      <MobileLeft>
-        {props.mobileLeft && <Stack>{props.mobileLeft}</Stack>}
-        {props.mobileTitle && (
-          <Title variant="h4" element="h1">
-            {props.mobileTitle}
-          </Title>
+      <MobileWrapper>
+        <AppBarRowOne>
+          <MobileLeft>
+            {props.mobileLeft && <Stack>{props.mobileLeft}</Stack>}
+            {props.mobileTitle && (
+              <Title variant="bold18" element="h1">
+                {props.mobileTitle}
+              </Title>
+            )}
+          </MobileLeft>
+
+          {!props.mobileTitle && (
+            <MobileCenter>{props.mobileCenter}</MobileCenter>
+          )}
+
+          {props.mobileRight && (
+            <Actions $flex="none">{props.mobileRight}</Actions>
+          )}
+        </AppBarRowOne>
+        {props.appBarRowTwo && (
+          <AppBarRowTwo>{props.appBarRowTwo}</AppBarRowTwo>
         )}
-      </MobileLeft>
-
-      {!props.mobileTitle && <MobileCenter>{props.mobileCenter}</MobileCenter>}
-
-      {props.mobileRight && <Actions $flex="none">{props.mobileRight}</Actions>}
+      </MobileWrapper>
     </AppBarWrapper>
   )
 }

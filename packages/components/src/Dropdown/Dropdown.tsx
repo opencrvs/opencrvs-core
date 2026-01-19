@@ -56,7 +56,7 @@ const StyledContent = styled.ul.withConfig({
   position-anchor: ${({ dropdownName }) => `--Dropdown-Anchor-${dropdownName}`};
   inset-area: ${({ position }) => position};
   position-area: ${({ position }) => position};
-  position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  position-try-fallbacks: flip-block flip-inline;
   margin: 0;
   margin: ${({ offsetX, offsetY }) => `${offsetY}px ${offsetX}px`};
   list-style: none;
@@ -171,7 +171,7 @@ const Content: React.FC<{
 }> = ({
   position = 'bottom span-left',
   offsetX = 0,
-  offsetY = 10,
+  offsetY = 6,
   children
 }) => {
   const { dropdownName, setFocusedIndex } = useDropdown()

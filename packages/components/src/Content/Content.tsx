@@ -33,6 +33,10 @@ const Container = styled.div<{ size: ContentSize }>`
   }};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    max-width: 100%;
+    margin: 24px;
+  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0;
     height: 100%;
@@ -159,9 +163,9 @@ const Icon = styled.div`
 `
 
 const Contents = styled.div<{ noPadding?: boolean }>`
-  padding: ${(props) => (props.noPadding ? 0 : '24px')};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: ${(props) => (props.noPadding ? 0 : '16px')};
+  padding: ${(props) => (props.noPadding ? 0 : '32px')};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding: ${(props) => (props.noPadding ? 0 : '24px')};
   }
 `
 

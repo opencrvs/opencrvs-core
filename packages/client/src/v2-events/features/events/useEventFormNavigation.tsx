@@ -11,7 +11,7 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
+import { Button, Dialog, Stack, Text } from '@opencrvs/components'
 import { EventIndex, isUndeclaredDraft } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -102,8 +102,7 @@ export function useEventFormNavigation() {
 
   async function exit(event: EventIndex) {
     const exitConfirm = await openModal<boolean | null>((close) => (
-      <ResponsiveModal
-        autoHeight
+      <Dialog
         actions={[
           <Button
             key="cancel_save_without_exit"
@@ -126,17 +125,17 @@ export function useEventFormNavigation() {
             {intl.formatMessage(modalMessages.confirm)}
           </Button>
         ]}
-        handleClose={() => close(null)}
-        responsive={false}
-        show={true}
+        isOpen={true}
         title={intl.formatMessage(modalMessages.exitWithoutSavingTitle)}
+        variant="small"
+        onClose={() => close(null)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">
             {intl.formatMessage(modalMessages.exitWithoutSavingDescription)}
           </Text>
         </Stack>
-      </ResponsiveModal>
+      </Dialog>
     ))
 
     if (!exitConfirm) {
@@ -155,8 +154,7 @@ export function useEventFormNavigation() {
     workqueueToGoBackTo?: string
   ) {
     const deleteConfirm = await openModal<boolean | null>((close) => (
-      <ResponsiveModal
-        autoHeight
+      <Dialog
         actions={[
           <Button
             key="cancel_delete"
@@ -179,17 +177,17 @@ export function useEventFormNavigation() {
             {intl.formatMessage(modalMessages.confirm)}
           </Button>
         ]}
-        handleClose={() => close(null)}
-        responsive={false}
-        show={true}
+        isOpen={true}
         title={intl.formatMessage(modalMessages.deleteDeclarationTitle)}
+        variant="small"
+        onClose={() => close(null)}
       >
         <Stack>
           <Text color="grey500" element="p" variant="reg16">
             {intl.formatMessage(modalMessages.deleteDeclarationDescription)}
           </Text>
         </Stack>
-      </ResponsiveModal>
+      </Dialog>
     ))
 
     if (deleteConfirm) {

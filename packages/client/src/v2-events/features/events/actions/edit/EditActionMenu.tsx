@@ -21,16 +21,15 @@ import {
   getCurrentEventState,
   EventStatus
 } from '@opencrvs/commons/client'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import {
   Icon,
-  ResponsiveModal,
   Button,
   Stack,
   Text,
-  TextArea
+  TextArea,
+  Dialog
 } from '@opencrvs/components'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { messages as actionMessages } from '@client/i18n/messages/views/action'
@@ -120,10 +119,7 @@ function EditActionModal({
   const [comment, setComment] = useState('')
 
   return (
-    <ResponsiveModal
-      autoHeight
-      show
-      showHeaderBorder
+    <Dialog
       actions={[
         <Button
           key={'cancel_edit'}
@@ -142,9 +138,10 @@ function EditActionModal({
           {intl.formatMessage(messages.confirm)}
         </Button>
       ]}
-      handleClose={() => close({ confirmed: false })}
+      isOpen={true}
       title={intl.formatMessage(title)}
-      width={800}
+      variant="large"
+      onClose={() => close({ confirmed: false })}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
@@ -159,7 +156,7 @@ function EditActionModal({
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
@@ -329,14 +326,11 @@ export function EditActionMenu({ event }: { event: EventDocument }) {
   return (
     <>
       <DropdownMenu id="action">
-        <DropdownMenu.Trigger asChild>
-          <PrimaryButton
-            data-testid="action-dropdownMenu"
-            icon={() => <CaretDown />}
-            size="medium"
-          >
+        <DropdownMenu.Trigger>
+          <Button data-testid="action-dropdownMenu" size="small" type="action">
             {intl.formatMessage(actionMessages.action)}
-          </PrimaryButton>
+            <Icon name="CaretDown" size="small" />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           {actions.map(({ onClick, icon, label, disabled }, index) => (

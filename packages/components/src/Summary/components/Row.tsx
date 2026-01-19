@@ -17,10 +17,10 @@ import { colors } from '../../colors'
 const RowContainer = styled.tr``
 
 const RowLabelContainer = styled.th`
-  width: 190px;
+  width: 240px;
   text-align: left;
   vertical-align: middle;
-
+  padding-right: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: block;
   }
