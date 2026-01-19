@@ -77,7 +77,7 @@ export async function fileUploadHandler(
 
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId,
-    'content-type': 'application/pdf'
+    ...(filename.endsWith('.pdf') && { 'content-type': 'application/pdf' })
   })
 
   return `/${MINIO_BUCKET}/${filePath}` as FullDocumentPath
