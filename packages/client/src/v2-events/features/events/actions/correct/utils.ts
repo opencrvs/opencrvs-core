@@ -92,7 +92,7 @@ export function isLastActionCorrectionRequest(event: EventDocument) {
   return lastWriteAction.type === ActionType.REQUEST_CORRECTION
 }
 
-function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
+export function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
   return actions.reduce((ann, sortedAction) => {
     return deepMerge(ann, sortedAction.annotation ?? {})
   }, {} as EventState)

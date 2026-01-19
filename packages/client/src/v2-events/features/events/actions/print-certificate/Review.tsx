@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
+import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -91,13 +91,13 @@ const messages = defineMessages({
   },
   printAndIssueModalTitle: {
     id: 'print.certificate.review.printAndIssueModalTitle',
-    defaultMessage: 'Print and issue certificate?',
+    defaultMessage: 'Print certified copy?',
     description: 'Print and issue certificate modal title text'
   },
   printAndIssueModalBody: {
     id: 'print.certificate.review.modal.body.printAndIssue',
     defaultMessage:
-      'A Pdf of the certificate will open in a new tab for printing and issuing.',
+      'This will generate a certified copy of the record for printing.',
     description: 'Print certificate modal body text'
   },
   makeCorrection: {
