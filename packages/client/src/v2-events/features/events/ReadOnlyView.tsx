@@ -81,7 +81,10 @@ function ReadonlyView() {
     }
   }, [fullEvent, assignmentStatus])
 
-  console.log('CIHAN TEST')
+  if (!shouldShowFullOverview) {
+    // @TODO: Ask Jon about the desired UI here.
+    return <div>{'No full overview!!'}</div>
+  }
 
   return (
     <ReviewComponent.Body
