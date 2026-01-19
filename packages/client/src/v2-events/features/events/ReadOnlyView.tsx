@@ -85,9 +85,6 @@ function ReadonlyView() {
     }
   }, [fullEvent, assignmentStatus])
 
-  console.log('fullEvent', fullEvent)
-  console.log('eventIndex', eventIndex)
-
   if (!shouldShowFullOverview) {
     // @TODO: Ask Jon about the desired UI here.
     return <div>{'No full overview!!'}</div>
