@@ -104,7 +104,6 @@ export const AvailableIcons = z.enum([
   'FileArrowUp',
   'FileDotted',
   'Files',
-  'FileEdit',
   'PencilLine',
   'PencilCircle',
   'UserCircle',
