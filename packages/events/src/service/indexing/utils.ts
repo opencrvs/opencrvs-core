@@ -13,10 +13,15 @@ import { estypes } from '@elastic/elasticsearch'
 import {
   AddressFieldValue,
   AddressType,
+  ageToDate,
+  AgeValue,
+  DateValue,
   EventConfig,
   EventIndex,
+  EventState,
   FieldValue,
   getDeclarationFieldById,
+  isAgeFieldType,
   isNameFieldType,
   NameFieldValue,
   QueryInputType
@@ -25,6 +30,7 @@ import {
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
 export const NAME_QUERY_KEY = '__fullname'
+export const AGE_DOB_QUERY_KEY = '__derived_dob'
 
 export function encodeFieldId(fieldId: string) {
   return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
@@ -34,14 +40,19 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
-type IndexedNameFieldValue = NameFieldValue & {
+export type IndexedNameFieldValue = NameFieldValue & {
   [NAME_QUERY_KEY]?: string
+}
+
+export type IndexedAgeFieldValue = AgeValue & {
+  [AGE_DOB_QUERY_KEY]?: string
 }
 
 function addIndexFieldsToValue(
   eventConfig: EventConfig,
   fieldId: string,
-  value: FieldValue
+  value: FieldValue,
+  declaration: EventState
 ) {
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
 
@@ -50,6 +61,20 @@ function addIndexFieldsToValue(
       ...field.value,
       [NAME_QUERY_KEY]: Object.values(field.value).join(' ')
     } satisfies IndexedNameFieldValue
+  }
+  if (isAgeFieldType(field) && field.value) {
+    const maybeAsOfDate = DateValue.safeParse(
+      declaration[field.value.asOfDateRef]
+    )
+    return {
+      ...field.value,
+      [AGE_DOB_QUERY_KEY]: ageToDate(
+        field.value.age,
+        maybeAsOfDate.success
+          ? maybeAsOfDate.data
+          : formatISO(new Date(), { representation: 'date' })
+      )
+    } satisfies IndexedAgeFieldValue
   }
 
   return value
@@ -64,7 +89,12 @@ export function encodeEventIndex(
     declaration: Object.entries(event.declaration).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [encodeFieldId(key)]: addIndexFieldsToValue(eventConfig, key, value)
+        [encodeFieldId(key)]: addIndexFieldsToValue(
+          eventConfig,
+          key,
+          value,
+          event.declaration
+        )
       }),
       {}
     )
@@ -82,6 +112,17 @@ function isIndexedNameFieldValue(
   )
 }
 
+function isIndexedAgeFieldValue(
+  value: FieldValue
+): value is IndexedAgeFieldValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    AGE_DOB_QUERY_KEY in value &&
+    typeof value[AGE_DOB_QUERY_KEY] === 'string'
+  )
+}
+
 function stripIndexFieldsFromValue(
   eventConfig: EventConfig,
   fieldId: string,
@@ -91,6 +132,9 @@ function stripIndexFieldsFromValue(
 
   if (isIndexedNameFieldValue(field.value)) {
     return _.omit(field.value, [NAME_QUERY_KEY])
+  }
+  if (isIndexedAgeFieldValue(field.value)) {
+    return _.omit(field.value, [AGE_DOB_QUERY_KEY])
   }
 
   return value
@@ -184,4 +228,7 @@ export function generateQueryForAddressField(
       should: undefined
     }
   } satisfies estypes.QueryDslQueryContainer
+}
+function formatISO(arg0: Date, arg1: { representation: string }): string {
+  throw new Error('Function not implemented.')
 }
