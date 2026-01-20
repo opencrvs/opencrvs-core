@@ -15,7 +15,8 @@ import {
   EventIndex,
   WorkqueueActionsWithDefault,
   isMetaAction,
-  getOrThrow
+  getOrThrow,
+  ActionType
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { useAuthentication } from '@client/utils/userUtils'
@@ -54,7 +55,7 @@ function ActionCtaComponent({
       : // If action type is not allowed, we don't provide it.
         allowedActionConfigs.find((item) => item.type === actionType)
 
-  if (!config || config.reviewOnCta) {
+  if (!config || actionType === ActionType.READ || config.reviewOnCta) {
     return (
       <Button
         type="primary"

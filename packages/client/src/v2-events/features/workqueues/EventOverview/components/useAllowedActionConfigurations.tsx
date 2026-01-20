@@ -392,6 +392,7 @@ function useViewableActionConfigurations(
             )
           )
         },
+        reviewOnCta: true,
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
         hidden: isRejected
       },
@@ -572,7 +573,8 @@ function useCustomActionConfigs(
         disabled: !isDownloadedAndAssignedToUser,
         hidden: false,
         type: ActionType.CUSTOM,
-        customActionType: action.customActionType
+        customActionType: action.customActionType,
+        reviewOnCta: true
       }))
   }, [
     eventConfiguration.actions,
@@ -627,8 +629,7 @@ function applyActionConditionalEffects({
   return {
     ...action,
     hidden: action.hidden || hidden,
-    disabled: action.disabled || disabled,
-    reviewOnCta: true
+    disabled: action.disabled || disabled
   }
 }
 
