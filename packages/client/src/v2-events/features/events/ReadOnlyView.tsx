@@ -33,8 +33,15 @@ import { removeCachedFiles } from '../files/cache'
 
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
-  const events = useEvents()
-  const event = events.getEvent.viewEvent(eventId)
+  const { getEvent } = useEvents()
+
+  // If event is found from cache, we can use that. This is to handle cases where user is offline but has downloaded the record.
+  let event = getEvent.useFindEventFromCache(eventId).data
+  // Otherwise let's download the event from the server.
+  if (!event) {
+    event = getEvent.viewEvent(eventId)
+  }
+
   const validatorContext = useValidatorContext(event)
 
   const maybeAuth = useAuthentication()
