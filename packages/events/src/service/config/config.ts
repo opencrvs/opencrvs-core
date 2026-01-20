@@ -189,6 +189,7 @@ export async function getLocations() {
       async (res) => res.json() as Promise<Bundle<SavedLocation>>
     )
   )
+
   const locations = results
     .flatMap((result) => result.entry.map(({ resource }) => resource))
     .map((entry) => {

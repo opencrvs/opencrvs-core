@@ -26,11 +26,12 @@ export async function getAdministrativeAreas({
 
   let query = db
     .selectFrom('administrativeAreas')
-    .select(['id', 'name', 'parentId', 'validUntil'])
+    .select(['id', 'name', 'parentId', 'validUntil', 'externalId'])
     .where('deletedAt', 'is', null)
     .$narrowType<{
       deletedAt: null
       validUntil: AdministrativeArea['validUntil']
+      externalId: string | null
     }>()
 
   if (ids && ids.length > 0) {
@@ -62,12 +63,13 @@ export async function setAdministrativeAreasInTrx(
     await trx
       .insertInto('administrativeAreas')
       .values(
-        batch.map((loc) => ({
-          id: loc.id,
-          name: loc.name,
-          parentId: loc.parentId,
-          validUntil: loc.validUntil,
-          deletedAt: null
+        batch.map((aa) => ({
+          id: aa.id,
+          name: aa.name,
+          parentId: aa.parentId,
+          validUntil: aa.validUntil,
+          deletedAt: null,
+          externalId: aa.externalId
         }))
       )
       .onConflict((oc) =>

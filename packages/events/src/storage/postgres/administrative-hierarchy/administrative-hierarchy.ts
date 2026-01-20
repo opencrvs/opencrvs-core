@@ -14,6 +14,10 @@ import { getClient } from '@events/storage/postgres/events'
 import * as administrativeAreaRepo from '@events/storage/postgres/administrative-hierarchy/administrative-areas'
 import * as locationRepo from '@events/storage/postgres/administrative-hierarchy/locations'
 
+/**
+ * Given administrative areas and locations, set them in the database within a transaction.
+ *
+ */
 export async function setAdministrativeHierarchy({
   administrativeAreas,
   locations
