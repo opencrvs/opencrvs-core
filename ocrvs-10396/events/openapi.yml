@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 5c1e4184-693b-4908-a722-d1a99aee0eec
+                transactionId: 57943d23-a9f6-4d00-b6bf-24c4f311b6c1
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 07261ac7-aa31-4b8b-8d6e-a6b4945ca4f6
+                transactionId: e2cd9f5f-c03a-4429-aa44-cc51ef06630f
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9878,6 +9878,23 @@ components:
                 boost:
                   type: number
                   default: 1
+                alsoMatchAgainst:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                    description: Reference to a field by its ID
               required:
                 - days
                 - boost
