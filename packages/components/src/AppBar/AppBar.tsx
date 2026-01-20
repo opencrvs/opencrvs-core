@@ -15,30 +15,55 @@ import { Stack } from '../Stack'
 import { Text } from '../Text'
 import { useWindowSize } from '../hooks'
 
-export const APP_BAR_HEIGHT = '56px'
-
 const AppBarWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: ${({ theme }) => theme.colors.white};
+`
+
+const AppBarRowOne = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  height: 56px;
   padding: 0 16px;
-  height: ${APP_BAR_HEIGHT};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+`
+
+const AppBarRowTwo = styled.div`
+  padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: ${({ theme }) => theme.colors.white};
+  height: 56px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  gap: 16px;
 `
 
 const Left = styled.div`
   display: flex;
-  flex-direction: row;
   align-items: center;
-  flex: 1;
   gap: 16px;
-  grid-column: 1;
   overflow: hidden;
 `
 
-const Center = styled.div``
+const Center = styled.div`
+  display: flex;
+  justify-self: center;
+  align-items: center;
+`
+
+const Right = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: end;
+`
+
+const MobileWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`
 
 const MobileLeft = styled.div`
   display: flex;
@@ -59,12 +84,12 @@ const MobileCenter = styled.div`
   grid-column: 1;
 `
 
-const Actions = styled.div<{ $flex?: '1' | 'none' }>`
+const MobileRight = styled.div<{ $flex?: '1' | 'none' }>`
   display: flex;
   gap: 8px;
   flex-direction: row;
   align-items: center;
-  justify-content: right;
+  justify-self: right;
   flex: ${({ $flex }) => $flex ?? '1'};
 `
 const Title = styled(Text)`
@@ -80,6 +105,7 @@ type IProps = {
   mobileTitle?: React.ReactNode
   mobileCenter?: React.ReactNode
   mobileRight?: React.ReactNode
+  appBarRowTwo?: React.ReactNode
   desktopLeft?: React.ReactNode
   desktopTitle?: React.ReactNode
   desktopCenter?: React.ReactNode
@@ -100,36 +126,47 @@ export const AppBar = (props: IAppBarProps) => {
   if (width > grid.breakpoints.lg) {
     return (
       <AppBarWrapper id={props.id} className={props.className}>
-        <Left>
-          {props.desktopLeft && <Stack>{props.desktopLeft}</Stack>}
-          {props.desktopTitle && (
-            <Title variant="h4" element="h1">
-              {props.desktopTitle}
-            </Title>
-          )}
-        </Left>
-        {!props.desktopTitle && <Center>{props.desktopCenter}</Center>}
-        <Actions $flex={props.desktopCenter ? '1' : 'none'}>
-          {props.desktopRight}
-        </Actions>
+        <AppBarRowOne>
+          <Left>
+            {props.desktopLeft && <Stack>{props.desktopLeft}</Stack>}
+            {props.desktopTitle && (
+              <Title variant="bold18" element="h1">
+                {props.desktopTitle}
+              </Title>
+            )}
+          </Left>
+          <Center>{props.desktopCenter}</Center>
+          <Right>{props.desktopRight}</Right>
+        </AppBarRowOne>
       </AppBarWrapper>
     )
   }
 
   return (
     <AppBarWrapper id={props.id} className={props.className}>
-      <MobileLeft>
-        {props.mobileLeft && <Stack>{props.mobileLeft}</Stack>}
-        {props.mobileTitle && (
-          <Title variant="h4" element="h1">
-            {props.mobileTitle}
-          </Title>
+      <MobileWrapper>
+        <AppBarRowOne>
+          <MobileLeft>
+            {props.mobileLeft && <Stack>{props.mobileLeft}</Stack>}
+            {props.mobileTitle && (
+              <Title variant="bold18" element="h1">
+                {props.mobileTitle}
+              </Title>
+            )}
+          </MobileLeft>
+
+          {!props.mobileTitle && (
+            <MobileCenter>{props.mobileCenter}</MobileCenter>
+          )}
+
+          {props.mobileRight && (
+            <MobileRight $flex="none">{props.mobileRight}</MobileRight>
+          )}
+        </AppBarRowOne>
+        {props.appBarRowTwo && (
+          <AppBarRowTwo>{props.appBarRowTwo}</AppBarRowTwo>
         )}
-      </MobileLeft>
-
-      {!props.mobileTitle && <MobileCenter>{props.mobileCenter}</MobileCenter>}
-
-      {props.mobileRight && <Actions $flex="none">{props.mobileRight}</Actions>}
+      </MobileWrapper>
     </AppBarWrapper>
   )
 }
