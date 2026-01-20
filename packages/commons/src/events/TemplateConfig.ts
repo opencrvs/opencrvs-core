@@ -21,8 +21,6 @@ import { FieldValue } from './FieldValue'
  * Available system variables for configuration.
  */
 export type SystemVariables = {
-  $$date: string
-  $$time: string
   user: {
     id: string
     province?: string

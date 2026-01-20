@@ -96,8 +96,7 @@ export function handleDefaultValue({
   if (isFieldConfigDefaultValue(defaultValue)) {
     return replacePlaceholders({
       field,
-      defaultValue,
-      systemVariables
+      defaultValue
     })
   }
 

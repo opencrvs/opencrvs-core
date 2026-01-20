@@ -11,18 +11,15 @@
 
 import { SystemVariables } from '@opencrvs/commons/client'
 import { useUserDetails } from './useUserDetails'
-import { useTodaysDateTime } from './useTodaysDateTime'
 
 /**
  * Exposes template variables such as `$user` for components to replace field values or other templates
  */
 export function useSystemVariables() {
   const user = useUserDetails()
-  const todaysDateTime = useTodaysDateTime()
 
   const variables = {
     user,
-    ...todaysDateTime,
     $window: {
       location: {
         href: window.location.href,

@@ -12,11 +12,11 @@
 import format from 'date-fns/format'
 import * as React from 'react'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
-import { z } from 'zod'
 import {
   TimeField as TimeFieldComponent,
   ITimeFieldProps as TimeFieldProps
 } from '@opencrvs/components/lib/TimeField'
+import { TimeValue } from '@opencrvs/commons/client'
 
 const messages = defineMessages({
   timeFormat: {
@@ -28,8 +28,17 @@ const messages = defineMessages({
 
 const EMPTY_TIME = '--'
 
-// Time validation schema (HH:mm in 24 hour format)
-const TimeValue = z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+function resolveNowForTimeInput(value: string): string {
+  if (value === '$$now') {
+    const now = new Date()
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+
+    return `${hours}:${minutes}`
+  }
+
+  return value
+}
 
 function TimeInput({
   onChange,
@@ -39,6 +48,7 @@ function TimeInput({
   onChange: (newValue: string) => void
   value: string
 }) {
+  const resolvedValue = resolveNowForTimeInput(value)
   const cleanEmpty = React.useCallback(
     (val: string) => (val === EMPTY_TIME ? '' : val),
     []
@@ -47,18 +57,18 @@ function TimeInput({
   const handleChange = React.useCallback(
     (val: string) => {
       const cleaned = cleanEmpty(val)
-      if (cleaned !== value) {
+      if (cleaned !== resolvedValue) {
         onChange(cleaned)
       }
     },
-    [value, onChange, cleanEmpty]
+    [resolvedValue, onChange, cleanEmpty]
   )
 
   return (
     <TimeFieldComponent
       {...props}
       data-testid={`${props.id}`}
-      value={value}
+      value={resolvedValue}
       onChange={handleChange}
     />
   )

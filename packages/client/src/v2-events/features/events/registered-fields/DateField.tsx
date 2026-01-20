@@ -33,6 +33,19 @@ const messages = defineMessages({
 
 const EMPTY_DATE = '--'
 
+function resolveNowForDateInput(value: string): string {
+  if (value === '$$now') {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+
+    return `${year}-${month}-${day}`
+  }
+
+  return value
+}
+
 function DateInput({
   onChange,
   value = '',
@@ -47,16 +60,17 @@ function DateInput({
    */
   const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
   const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
+  const resolvedValue = resolveNowForDateInput(value)
 
   return (
     <DateFieldComponent
       {...props}
       data-testid={`${props.id}`}
-      value={value}
+      value={resolvedValue}
       onBlur={(e) => {
         const segmentType = String(e.target.id.split('-').pop())
         const val = e.target.value
-        const dateSegmentVals = value.split('-')
+        const dateSegmentVals = resolvedValue.split('-')
 
         // Add possibly missing leading 0 for days and months
         if (segmentType === 'dd' && val.length === 1) {

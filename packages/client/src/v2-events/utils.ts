@@ -100,25 +100,6 @@ function isTextField(field: FieldConfig): field is TextField {
   return field.type === FieldType.TEXT
 }
 
-function resolveAndValidateFieldValue({
-  field,
-  resolvedValue,
-  context
-}: {
-  field: InteractiveFieldType
-  resolvedValue: unknown
-  context: string
-}): FieldValue {
-  const validator = mapFieldTypeToZod(field)
-  const parsed = validator.safeParse(resolvedValue)
-
-  if (parsed.success) {
-    return parsed.data as FieldValue
-  }
-
-  throw new Error(`Could not resolve ${context}: ${parsed.error}`)
-}
-
 /**
  *
  * @param fieldType: The type of the field.
@@ -131,13 +112,11 @@ function resolveAndValidateFieldValue({
 export function replacePlaceholders({
   field,
   currentValue,
-  defaultValue,
-  systemVariables
+  defaultValue
 }: {
   field: InteractiveFieldType
   currentValue?: FieldValue
   defaultValue?: FieldConfigDefaultValue
-  systemVariables: SystemVariables
 }): FieldValue | undefined {
   if (currentValue) {
     return currentValue
@@ -151,15 +130,6 @@ export function replacePlaceholders({
     return defaultValue
   }
 
-  if (isTemplateVariable(defaultValue)) {
-    const resolvedValue = get(systemVariables, defaultValue)
-    return resolveAndValidateFieldValue({
-      field,
-      resolvedValue,
-      context: defaultValue
-    })
-  }
-
   if (
     compositeFieldTypes.some((ft) => ft === field.type) &&
     typeof defaultValue === 'object'
@@ -169,25 +139,7 @@ export function replacePlaceholders({
      * Some STRING values within the defaultValue object may contain template variables (prefixed with $).
      */
     const result = { ...defaultValue }
-
-    // @TODO: This resolves template variables in the first level of the object. In the future, we might need to extend it to arbitrary depth.
-    for (const [key, val] of Object.entries(result)) {
-      if (val && isTemplateVariable(val) && isTextField(field)) {
-        const resolvedValue = get(systemVariables, val)
-        // For now, we only support resolving template variables for text fields.
-        result[key] = resolveAndValidateFieldValue({
-          field,
-          resolvedValue,
-          context: key
-        })
-      }
-    }
-
-    return resolveAndValidateFieldValue({
-      field,
-      resolvedValue: result,
-      context: JSON.stringify(defaultValue)
-    })
+    return result
   }
   throw new Error(
     `Could not resolve ${field.type}: ${JSON.stringify(defaultValue)}`

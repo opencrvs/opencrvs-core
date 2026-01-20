@@ -13,6 +13,7 @@ import {
   field,
   FieldType,
   InteractiveFieldType,
+  now,
   SystemVariables,
   user
 } from '@opencrvs/commons/client'
@@ -29,6 +30,32 @@ const TextField = {
     defaultMessage: "Recommender's membership ID",
     description: 'This is the label for the field',
     id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
+  }
+} satisfies InteractiveFieldType
+
+const TimeField = {
+  id: 'recommender.id',
+  type: FieldType.TIME,
+  defaultValue: now(),
+  required: true,
+  conditionals: [],
+  label: {
+    defaultMessage: "Recommender's time of recommendation",
+    description: 'This is the label for the time field',
+    id: 'event.tennis-club-membership.time'
+  }
+} satisfies InteractiveFieldType
+
+const DateField = {
+  id: 'recommender.id',
+  type: FieldType.DATE,
+  defaultValue: now(),
+  required: true,
+  conditionals: [],
+  label: {
+    defaultMessage: "Recommender's date of recommendation",
+    description: 'This is the label for the date field',
+    id: 'event.tennis-club-membership.date'
   }
 } satisfies InteractiveFieldType
 
@@ -231,9 +258,7 @@ const testCases = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      },
-      $$date: '2024-10-10',
-      $$time: '14:08'
+      }
     } satisfies SystemVariables,
     expected: undefined,
     field: AddressField satisfies InteractiveFieldType
@@ -256,9 +281,7 @@ const testCases = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      },
-      $$date: '2024-10-10',
-      $$time: '14:08'
+      }
     } satisfies SystemVariables,
     expected: 'Hello',
     field: TextField
@@ -281,9 +304,7 @@ const testCases = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      },
-      $$date: '2024-10-10',
-      $$time: '14:08'
+      }
     } satisfies SystemVariables,
     expected: 'Hello world',
     field: TextField
@@ -309,9 +330,7 @@ const testCases = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      },
-      $$date: '2024-10-10',
-      $$time: '14:08'
+      }
     } satisfies SystemVariables,
     expected: {
       country: 'FAR',
@@ -351,9 +370,7 @@ const testCasesForDefaultValue = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      },
-      $$date: '2024-10-10',
-      $$time: '14:08'
+      }
     } satisfies SystemVariables,
     expected: 'Jon Doe',
     field: TextField
@@ -376,9 +393,7 @@ const testCasesForDefaultValue = [
           originPathname: '/path',
           hostname: 'example.com'
         }
-      },
-      $$date: '2024-10-10',
-      $$time: '14:08'
+      }
     } satisfies SystemVariables,
     expected: {
       firstname: 'Jon',
@@ -386,12 +401,58 @@ const testCasesForDefaultValue = [
       surname: 'Doe'
     },
     field: NameField
+  },
+  {
+    systemVariables: {
+      user: {
+        name: 'Jon Doe',
+        firstname: 'Jon',
+        surname: 'Doe',
+        role: '',
+        id: '',
+        province: '',
+        district: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
+      }
+    } satisfies SystemVariables,
+    expected: '$$now',
+    field: TimeField
+  },
+  {
+    systemVariables: {
+      user: {
+        name: 'Jon Doe',
+        firstname: 'Jon',
+        surname: 'Doe',
+        role: '',
+        id: '',
+        province: '',
+        district: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
+      }
+    } satisfies SystemVariables,
+    expected: '$$now',
+    field: DateField
   }
 ]
 
 describe('handleDefaultValue', () => {
   testCasesForDefaultValue.forEach(({ expected, ...props }) => {
-    it(`When field type is ${JSON.stringify(
+    it.only(`When field type is ${JSON.stringify(
       props.field.type
     )} returns ${JSON.stringify(expected)}`, () => {
       const result = handleDefaultValue(props)
