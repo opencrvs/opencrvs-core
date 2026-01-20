@@ -55,7 +55,7 @@ function ActionCtaComponent({
       : // If action type is not allowed, we don't provide it.
         allowedActionConfigs.find((item) => item.type === actionType)
 
-  if (!config || actionType === ActionType.READ || config.reviewOnCta) {
+  if (!config || actionType === ActionType.READ) {
     return (
       <Button
         type="primary"

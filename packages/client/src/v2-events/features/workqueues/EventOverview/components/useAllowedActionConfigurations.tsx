@@ -185,8 +185,6 @@ interface ActionConfig {
   icon: IconProps['name']
   /** onClick is used when clicking an action menu item. */
   onClick: (workqueue?: string) => Promise<void> | void
-  /** If true, the CTA will be 'Review' instead of the action itself. */
-  reviewOnCta?: boolean
   disabled?: boolean
   hidden?: boolean
   customActionType?: string
@@ -377,12 +375,9 @@ function useViewableActionConfigurations(
         onClick: onDelete,
         disabled: !isDownloadedAndAssignedToUser
       },
-      // Configurable event actions
       [ActionType.DECLARE]: {
         icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
-        label: isReviewingDeclaration
-          ? reviewLabel
-          : actionLabels[ActionType.DECLARE],
+        label: reviewLabel,
         onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
@@ -392,7 +387,6 @@ function useViewableActionConfigurations(
             )
           )
         },
-        reviewOnCta: true,
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
         hidden: isRejected
       },
@@ -405,7 +399,6 @@ function useViewableActionConfigurations(
             ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId }, { workqueue })
           )
         },
-        reviewOnCta: true,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REJECT]: {
@@ -429,7 +422,6 @@ function useViewableActionConfigurations(
         icon: getAction(ActionType.REGISTER)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) =>
           onQuickAction(ActionType.REGISTER, workqueue),
-        reviewOnCta: true,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.PRINT_CERTIFICATE]: {
@@ -503,7 +495,6 @@ function useViewableActionConfigurations(
             )
           )
         },
-        reviewOnCta: true,
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
