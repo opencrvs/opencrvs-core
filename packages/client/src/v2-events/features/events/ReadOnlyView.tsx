@@ -17,7 +17,7 @@ import {
   applyDraftToEventIndex,
   getDeclaration,
   getOrThrow,
-  deepDropNulls
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
@@ -29,74 +29,71 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { removeCachedFiles } from '../files/cache'
-import { useEventOverviewInfo } from '../workqueues/EventOverview/components/useEventOverviewInfo'
+import { useEvents } from './useEvents/useEvents'
 
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
   const { getRemoteDraftByEventId } = useDrafts()
-  const { eventIndex, fullEvent, shouldShowFullOverview } =
-    useEventOverviewInfo(eventId)
-  const draft = getRemoteDraftByEventId(eventIndex.id)
-  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
-
-  const eventWithDrafts = draft
-    ? deepDropNulls(
-        applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
-      )
-    : eventIndex
-
-  const validatorContext = useValidatorContext(fullEvent)
-  const maybeAuth = useAuthentication()
+  const { getEvent } = useEvents()
+  const draft = getRemoteDraftByEventId(eventId)
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-
+  const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
     maybeAuth,
     'Authentication is not available but is required'
   )
 
+  let event = getEvent.useFindEventFromCache(eventId).data
+
+  if (!event) {
+    event = getEvent.viewEvent(eventId)
+  }
+
+  const validatorContext = useValidatorContext(event)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+
+  const eventStateWithDraft = useMemo(() => {
+    const eventState = getCurrentEventState(event, eventConfiguration)
+
+    return draft
+      ? applyDraftToEventIndex(eventState, draft, eventConfiguration)
+      : eventState
+  }, [draft, event, eventConfiguration])
+
   const assignmentStatus = getAssignmentStatus(
-    eventWithDrafts,
+    eventStateWithDraft,
     authentication.sub
   )
 
   const actionConfiguration = eventConfiguration.actions.find(
     (a) => a.type === ActionType.READ
   )
+
   if (!actionConfiguration) {
     throw new Error('Action configuration not found')
   }
 
   const { title, fields } = actionConfiguration.review
-
   const formConfig = getDeclaration(eventConfiguration)
 
   useEffect(() => {
     return () => {
-      if (
-        assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF ||
-        !fullEvent
-      ) {
+      if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
         return
       }
-
       void (async () => {
-        await removeCachedFiles(fullEvent)
+        await removeCachedFiles(event)
       })()
     }
-  }, [fullEvent, assignmentStatus])
-
-  if (!shouldShowFullOverview) {
-    // @TODO: Ask Jon about the desired UI here.
-    return <div>{'No full overview!!'}</div>
-  }
+  }, [event, assignmentStatus])
 
   return (
     <ReviewComponent.Body
       readonlyMode
-      form={eventWithDrafts.declaration}
+      form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}
-      title={formatMessage(title, eventWithDrafts.declaration)}
+      title={formatMessage(title, eventStateWithDraft.declaration)}
       validatorContext={validatorContext}
       onEdit={noop}
     />
