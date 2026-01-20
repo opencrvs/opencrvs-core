@@ -174,7 +174,7 @@ export const actionLabels = {
   }
 } as const
 
-const reviewLabel = {
+export const reviewLabel = {
   id: 'buttons.review',
   defaultMessage: 'Review',
   description: 'Label for review CTA button'
@@ -185,10 +185,8 @@ interface ActionConfig {
   icon: IconProps['name']
   /** onClick is used when clicking an action menu item. */
   onClick: (workqueue?: string) => Promise<void> | void
-  /** onCtaClick is used when clicking a workqueue CTA button. If its not defined, the onClick will be used. */
-  onCtaClick?: (workqueue?: string) => Promise<void> | void
-  /** ctaLabel is used on workqueue CTA buttons to override the label */
-  ctaLabel?: TranslationConfig
+  /** If true, the CTA will be 'Review' instead of the action itself. */
+  reviewOnCta?: boolean
   disabled?: boolean
   hidden?: boolean
   customActionType?: string
@@ -406,6 +404,7 @@ function useViewableActionConfigurations(
             ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({ eventId }, { workqueue })
           )
         },
+        reviewOnCta: true,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REJECT]: {
@@ -429,11 +428,7 @@ function useViewableActionConfigurations(
         icon: getAction(ActionType.REGISTER)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) =>
           onQuickAction(ActionType.REGISTER, workqueue),
-        ctaLabel: reviewLabel,
-        onCtaClick: (workqueue) =>
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
-          ),
+        reviewOnCta: true,
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.PRINT_CERTIFICATE]: {
@@ -507,7 +502,7 @@ function useViewableActionConfigurations(
             )
           )
         },
-        ctaLabel: reviewLabel,
+        reviewOnCta: true,
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
@@ -632,7 +627,8 @@ function applyActionConditionalEffects({
   return {
     ...action,
     hidden: action.hidden || hidden,
-    disabled: action.disabled || disabled
+    disabled: action.disabled || disabled,
+    reviewOnCta: true
   }
 }
 

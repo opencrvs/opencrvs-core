@@ -10,6 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
 import {
   EventIndex,
   WorkqueueActionsWithDefault,
@@ -19,14 +20,12 @@ import {
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { useAuthentication } from '@client/utils/userUtils'
-import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { ROUTES } from '@client/v2-events/routes'
+import {
+  useAllowedActionConfigurations,
+  reviewLabel
+} from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { withSuspense } from '../../../components/withSuspense'
-
-// Actions which should never be shown as a CTA
-const EXCLUDED_ACTIONS: string[] = [
-  ActionTypes.enum.ARCHIVE,
-  ActionTypes.enum.CUSTOM
-]
 
 /**
  * @returns next available action cta based on the given event.
@@ -46,6 +45,7 @@ function ActionCtaComponent({
     maybeAuth,
     'Authentication is not available but is required'
   )
+  const navigate = useNavigate()
 
   const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
 
@@ -55,21 +55,31 @@ function ActionCtaComponent({
       : // If action type is not allowed, we don't provide it.
         allowedActionConfigs.find((item) => item.type === actionType)
 
-  if (!config || EXCLUDED_ACTIONS.includes(config.type)) {
-    return null
+  if (!config || config.reviewOnCta) {
+    return (
+      <Button
+        type="primary"
+        onClick={() => {
+          navigate(
+            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue: redirectParam }
+            )
+          )
+        }}
+      >
+        {intl.formatMessage(reviewLabel)}
+      </Button>
+    )
   }
 
   return (
     <Button
       disabled={'disabled' in config && Boolean(config.disabled)}
       type="primary"
-      onClick={async () =>
-        config.onCtaClick
-          ? config.onCtaClick(redirectParam)
-          : config.onClick(redirectParam)
-      }
+      onClick={async () => config.onClick(redirectParam)}
     >
-      {intl.formatMessage(config.ctaLabel || config.label)}
+      {intl.formatMessage(config.label)}
     </Button>
   )
 }
