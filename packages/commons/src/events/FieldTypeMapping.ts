@@ -288,7 +288,7 @@ export const isParagraphFieldType = (field: {
 export const isDateFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: DateField } => {
+}): field is { value: DateValue; config: DateField } => {
   return field.config.type === FieldType.DATE
 }
 
@@ -302,7 +302,7 @@ export const isAgeFieldType = (field: {
 export const isTimeFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: TimeField } => {
+}): field is { value: TimeValue; config: TimeField } => {
   return field.config.type === FieldType.TIME
 }
 

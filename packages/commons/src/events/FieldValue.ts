@@ -25,6 +25,7 @@ import {
   QrReaderFieldValue,
   IdReaderFieldValue
 } from './CompositeFieldValue'
+import { SerializedNowDateTime } from './serializers/date/serializer'
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
@@ -46,7 +47,7 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
-export type DateValue = z.infer<typeof DateValue>
+export type DateValue = z.infer<typeof DateValue> | SerializedNowDateTime
 
 export const AgeValue = z.object({
   age: z.number(),
@@ -56,7 +57,7 @@ export type AgeValue = z.infer<typeof AgeValue>
 export const AgeUpdateValue = AgeValue.optional().nullable()
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
-export type TimeValue = z.infer<typeof TimeValue>
+export type TimeValue = z.infer<typeof TimeValue> | SerializedNowDateTime
 
 export const DatetimeValue = z.string().datetime()
 
@@ -135,10 +136,14 @@ export const DataFieldValue = z
   .nullish()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
-export type FieldValue = FieldValuesWithoutDataField | DataFieldValue
+export type FieldValue =
+  | FieldValuesWithoutDataField
+  | DataFieldValue
+  | SerializedNowDateTime
 export const FieldValue: z.ZodType<FieldValue> = z.union([
   FieldValuesWithoutDataField,
-  DataFieldValue
+  DataFieldValue,
+  SerializedNowDateTime
 ])
 
 // Priority order for schema matching.
@@ -227,6 +232,7 @@ export type FieldUpdateValue =
   | z.infer<typeof NameFieldUpdateValue>
   | z.infer<typeof HttpFieldUpdateValue>
   | z.infer<typeof QueryParamReaderFieldUpdateValue>
+  | SerializedNowDateTime
 
 // All schemas are tagged using .describe() so we can identify them later
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
@@ -246,7 +252,8 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   DataFieldValue.describe('DataFieldValue'),
   NameFieldUpdateValue.describe('NameFieldUpdateValue'),
   HttpFieldUpdateValue.describe('HttpFieldUpdateValue'),
-  QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue')
+  QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue'),
+  SerializedNowDateTime.describe('SerializedNowDateTime')
 ])
 
 /**

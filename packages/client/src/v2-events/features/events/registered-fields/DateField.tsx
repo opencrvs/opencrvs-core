@@ -34,8 +34,8 @@ const messages = defineMessages({
 
 const EMPTY_DATE = '--'
 
-function resolveNowForDateInput(value: string): string {
-  if (SerializedNowDateTime.parse(value)) {
+function resolveNowForDateInput(value: DateValue): string {
+  if (SerializedNowDateTime.safeParse(value).success) {
     const now = new Date()
     const year = now.getFullYear()
     const month = String(now.getMonth() + 1).padStart(2, '0')
@@ -44,7 +44,7 @@ function resolveNowForDateInput(value: string): string {
     return `${year}-${month}-${day}`
   }
 
-  return value
+  return value.toString()
 }
 
 function DateInput({
@@ -53,7 +53,7 @@ function DateInput({
   ...props
 }: DateFieldProps & {
   onChange: (newValue: string) => void
-  value: string
+  value: DateValue
 }) {
   /**
    * Component library returns '--' for empty dates when input has been touched.
@@ -89,7 +89,7 @@ function DateInput({
   )
 }
 
-function DateOutput({ value }: { value?: string }) {
+function DateOutput({ value }: { value?: DateValue }) {
   const intl = useIntl()
   const parsed = DateValue.safeParse(value)
 
