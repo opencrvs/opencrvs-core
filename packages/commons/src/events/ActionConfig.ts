@@ -47,7 +47,13 @@ export const ActionConfigBase = z.object({
 })
 
 const DeclarationActionBase = ActionConfigBase.extend({
-  deduplication: DeduplicationConfig.optional()
+  deduplication: DeduplicationConfig.optional(),
+  form: z
+    .array(FieldConfig)
+    .optional()
+    .describe(
+      'Form configuration. The form configured here will be used on the action confirmation dialog.'
+    )
 })
 
 const ReadActionConfig = ActionConfigBase.extend(
@@ -140,11 +146,11 @@ const CustomActionConfig = ActionConfigBase.merge(
     customActionType: z
       .string()
       .describe('Type identifier of the custom action.'),
-    /** Custom action form configuration supports a simple array of field configs, which should be rendered on the action modal. In the future, we might add support for pages etc. */
+    /** Custom action form configuration supports a simple array of field configs, which should be rendered on the action dialog. In the future, we might add support for pages etc. */
     form: z
       .array(FieldConfig)
       .describe(
-        'Form configuration for the custom action. The form configured here will be used on the custom action confirmation modal.'
+        'Form configuration for the custom action. The form configured here will be used on the custom action confirmation dialog.'
       ),
     auditHistoryLabel: TranslationConfig.describe(
       'The label to show in audit history for this action. For example "Approved".'
