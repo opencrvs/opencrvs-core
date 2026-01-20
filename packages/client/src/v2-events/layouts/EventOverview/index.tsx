@@ -70,7 +70,11 @@ const TabContainer = styled(Stack)`
   height: ${APP_BAR_HEIGHT};
 `
 
-const messages = defineMessages({
+export const messages = defineMessages({
+  summary: {
+    id: 'events.overview.tabs.summary',
+    defaultMessage: 'Summary'
+  },
   record: {
     id: 'events.overview.tabs.record',
     defaultMessage: 'Record'
@@ -106,7 +110,9 @@ function EventOverviewTabs({
         onClick={() => {
           navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { workqueue }))
         }}
-      >{`${intl.formatMessage(configuration.label)} • ${event.trackingId}`}</Tab>
+      >
+        {intl.formatMessage(messages.summary)}
+      </Tab>
       <Tab
         className={isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''}
         onClick={() => {
