@@ -422,7 +422,9 @@ const testCasesForDefaultValue = [
         }
       }
     } satisfies SystemVariables,
-    expected: '$$now',
+    expected: {
+      $$now: true
+    },
     field: TimeField
   },
   {
@@ -445,7 +447,9 @@ const testCasesForDefaultValue = [
         }
       }
     } satisfies SystemVariables,
-    expected: '$$now',
+    expected: {
+      $$now: true
+    },
     field: DateField
   }
 ]
