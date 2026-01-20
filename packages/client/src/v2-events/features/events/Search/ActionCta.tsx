@@ -15,8 +15,7 @@ import {
   EventIndex,
   WorkqueueActionsWithDefault,
   isMetaAction,
-  getOrThrow,
-  ActionTypes
+  getOrThrow
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { useAuthentication } from '@client/utils/userUtils'
