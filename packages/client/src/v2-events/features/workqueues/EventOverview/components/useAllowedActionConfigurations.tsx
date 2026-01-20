@@ -377,7 +377,9 @@ function useViewableActionConfigurations(
       },
       [ActionType.DECLARE]: {
         icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
-        label: reviewLabel,
+        label: isReviewingDeclaration
+          ? reviewLabel
+          : actionLabels[ActionType.DECLARE],
         onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
