@@ -16,7 +16,7 @@ import {
   TimeField as TimeFieldComponent,
   ITimeFieldProps as TimeFieldProps
 } from '@opencrvs/components/lib/TimeField'
-import { TimeValue } from '@opencrvs/commons/client'
+import { SerializedNowDateTime, TimeValue } from '@opencrvs/commons/client'
 
 const messages = defineMessages({
   timeFormat: {
@@ -29,7 +29,7 @@ const messages = defineMessages({
 const EMPTY_TIME = '--'
 
 function resolveNowForTimeInput(value: string): string {
-  if (value === '$$now') {
+  if (SerializedNowDateTime.parse(value)) {
     const now = new Date()
     const hours = String(now.getHours()).padStart(2, '0')
     const minutes = String(now.getMinutes()).padStart(2, '0')

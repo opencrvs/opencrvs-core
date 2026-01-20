@@ -15,9 +15,12 @@ import { z } from 'zod'
  * Represents a date-time value indicating the current date and time.
  * Note: Values of $$date and $$time are not used for any computation; their presence indicates 'now'
  */
-export const SerializedNowDateTime = z.literal('$$now')
+export const SerializedNowDateTime = z.object({
+  $$now: z.literal(true)
+})
+
 export type SerializedNowDateTime = z.infer<typeof SerializedNowDateTime>
 
 export function todayDateTimeValueSerializer(): SerializedNowDateTime {
-  return '$$now'
+  return { $$now: true }
 }

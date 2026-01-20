@@ -15,7 +15,8 @@ import { defineMessages, useIntl } from 'react-intl'
 import {
   DateField as DateFieldType,
   DatetimeValue,
-  DateValue
+  DateValue,
+  SerializedNowDateTime
 } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
@@ -34,7 +35,7 @@ const messages = defineMessages({
 const EMPTY_DATE = '--'
 
 function resolveNowForDateInput(value: string): string {
-  if (value === '$$now') {
+  if (SerializedNowDateTime.parse(value)) {
     const now = new Date()
     const year = now.getFullYear()
     const month = String(now.getMonth() + 1).padStart(2, '0')
