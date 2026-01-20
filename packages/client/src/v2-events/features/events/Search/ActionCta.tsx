@@ -61,7 +61,7 @@ function ActionCtaComponent({
         type="primary"
         onClick={() => {
           navigate(
-            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
               { eventId: event.id },
               { workqueue: redirectParam }
             )
