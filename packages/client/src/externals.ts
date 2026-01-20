@@ -10,7 +10,7 @@
  */
 
 /*
- * These are exported modules for modules that are dynamically important into the app
+ * These are exported modules for modules that are dynamically imported into the app
  */
 
 import React from 'react'

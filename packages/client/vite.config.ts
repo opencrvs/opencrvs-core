@@ -81,7 +81,13 @@ export default defineConfig(({ mode }) => {
     // This changes the output dir from dist to build
     build: {
       outDir: 'build',
+      lib: {
+        entry: 'src/externals.ts',
+        formats: ['es'],
+        fileName: 'externals'
+      },
       rollupOptions: {
+        external: ['react', 'react-dom'],
         plugins: [noTreeshakingForEvalPlugin()]
       },
       commonjsOptions: {
