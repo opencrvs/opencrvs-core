@@ -2773,7 +2773,7 @@ components:
               type: string
               const: DATE
             defaultValue:
-              type: object
+              type: string
               description: Default date value(yyyy-MM-dd)
             configuration:
               type: object
