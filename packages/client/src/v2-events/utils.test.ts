@@ -452,7 +452,7 @@ const testCasesForDefaultValue = [
 
 describe('handleDefaultValue', () => {
   testCasesForDefaultValue.forEach(({ expected, ...props }) => {
-    it.only(`When field type is ${JSON.stringify(
+    it(`When field type is ${JSON.stringify(
       props.field.type
     )} returns ${JSON.stringify(expected)}`, () => {
       const result = handleDefaultValue(props)
