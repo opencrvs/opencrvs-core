@@ -15,6 +15,7 @@ import * as z from 'zod/v4'
 export const AvailableIcons = z.enum([
   'Archived',
   'Assigned',
+  'Briefcase',
   'Certified',
   'Close',
   'Collapse',
@@ -77,6 +78,7 @@ export const AvailableIcons = z.enum([
   'Paperclip',
   'PaperPlaneTilt',
   'Pen',
+  'PenNib',
   'Pencil',
   'PencilSimpleLine',
   'Phone',
