@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 91f40efd-e697-4b19-afbd-03b2bfacad25
+                transactionId: cd1048ba-65a2-48d9-bfd5-a13a8c042468
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 8a4d9d24-6e54-4f3f-bd76-97ba040cc9da
+                transactionId: 681d4124-3b3a-4f55-a4c9-82efe8c8dc22
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -12283,6 +12283,14 @@ components:
                               type: string
                 required:
                   - data
+              - type: object
+                properties:
+                  $$now:
+                    type: boolean
+                    enum:
+                      - true
+                required:
+                  - $$now
           description: Aggregate representation of event data after all actions have been
             applied, with all updates consolidated and null values removed.
       required:
