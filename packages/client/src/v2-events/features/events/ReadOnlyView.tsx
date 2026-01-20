@@ -20,6 +20,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -29,52 +30,56 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { removeCachedFiles } from '../files/cache'
-import { useEvents } from './useEvents/useEvents'
 
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
-  const { getRemoteDraftByEventId } = useDrafts()
   const { getEvent } = useEvents()
-  const draft = getRemoteDraftByEventId(eventId)
-  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
+
+  // If event is found from cache, we can use that. This is to handle cases where user is offline but has downloaded the record.
+  let event = getEvent.useFindEventFromCache(eventId).data
+  // Otherwise let's download the event from the server.
+  if (!event) {
+    event = getEvent.viewEvent(eventId)
+  }
+
+  const validatorContext = useValidatorContext(event)
+
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
     maybeAuth,
     'Authentication is not available but is required'
   )
 
-  let event = getEvent.useFindEventFromCache(eventId).data
-
-  if (!event) {
-    event = getEvent.viewEvent(eventId)
-  }
-
-  const validatorContext = useValidatorContext(event)
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { getRemoteDraftByEventId } = useDrafts()
+  const draft = getRemoteDraftByEventId(event.id)
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
 
   const eventStateWithDraft = useMemo(() => {
-    const eventState = getCurrentEventState(event, eventConfiguration)
+    const eventState = getCurrentEventState(event, configuration)
 
     return draft
-      ? applyDraftToEventIndex(eventState, draft, eventConfiguration)
+      ? applyDraftToEventIndex(eventState, draft, configuration)
       : eventState
-  }, [draft, event, eventConfiguration])
+  }, [draft, event, configuration])
 
   const assignmentStatus = getAssignmentStatus(
     eventStateWithDraft,
     authentication.sub
   )
 
-  const actionConfiguration = eventConfiguration.actions.find(
+  const actionConfiguration = configuration.actions.find(
     (a) => a.type === ActionType.READ
   )
-
   if (!actionConfiguration) {
     throw new Error('Action configuration not found')
   }
 
   const { title, fields } = actionConfiguration.review
-  const formConfig = getDeclaration(eventConfiguration)
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
+
+  const formConfig = getDeclaration(configuration)
 
   useEffect(() => {
     return () => {
