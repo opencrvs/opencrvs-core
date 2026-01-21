@@ -566,8 +566,7 @@ function useCustomActionConfigs(
         disabled: !isDownloadedAndAssignedToUser,
         hidden: false,
         type: ActionType.CUSTOM,
-        customActionType: action.customActionType,
-        reviewOnCta: true
+        customActionType: action.customActionType
       }))
   }, [
     eventConfiguration.actions,
