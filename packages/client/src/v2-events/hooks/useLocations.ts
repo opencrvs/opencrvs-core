@@ -26,7 +26,7 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
 
     return queryOptions.queryFn(...params)
   },
-  staleTime: 1000 * 60 * 60 * 24 // keep it in cache 1 day
+  staleTime: Infinity
 })
 
 export function useLocations() {

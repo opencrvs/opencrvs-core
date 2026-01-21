@@ -61,7 +61,8 @@ setQueryDefaults<
         : undefined,
       avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
     }
-  }
+  },
+  staleTime: Infinity
 })
 
 setQueryDefaults(trpcOptionsProxy.user.list, {
@@ -115,8 +116,7 @@ export function useUsers() {
           enabled?: boolean
         }
       ) => {
-        const { queryFn, ...rest } = trpc.user.get.queryOptions(id)
-        const queryOptions = { ...rest, staleTime: Infinity }
+        const { queryFn, ...queryOptions } = trpc.user.get.queryOptions(id)
 
         return useQuery({
           ...queryOptions,
