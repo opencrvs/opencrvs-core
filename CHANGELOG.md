@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.8.3](https://github.com/opencrvs/opencrvs-core/compare/v1.8.2...v1.8.3)
+
+### Bug fixes
+
+- Adjust content security policy, so that library used for image compression works as expected [#11627](https://github.com/opencrvs/opencrvs-core/issues/11627)
+
 ## [1.8.1](https://github.com/opencrvs/opencrvs-core/compare/v1.8.1...v1.8.2)
 
 - **Switch back to default redis image** [#10173](https://github.com/opencrvs/opencrvs-core/issues/10173)
@@ -16,14 +22,14 @@
 - Ensure that place of birth/death only shows active facilities/offices on the form [#9311](https://github.com/opencrvs/opencrvs-core/issues/9311)
 - Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
 
-
 ## [1.8.0](https://github.com/opencrvs/opencrvs-core/compare/v1.7.4...v1.8.0)
 
 ### New features
 
 - **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
 - Build OpenCRVS release images for arm devices [#9455](https://github.com/opencrvs/opencrvs-core/issues/9455)
-- **New form components** 
+- **New form components**
+
   - `ID_READER` - Parse the contents of a QR code and pre-populate some fields in the form
   - `HTTP` - Allows making HTTP requests to external APIs. Used in conjunction with `BUTTON` component to trigger the request & the response can be used to pre-populate fields in the form
   - `BUTTON` - Used to trigger actions in the form, such as a `HTTP` component
@@ -33,6 +39,7 @@
   More on how these components can be used can be found here: [In-form authentication/verification](https://documentation.opencrvs.org/technology/interoperability/national-id-client/in-form-authentication-verification)
 
 ### Bug fixes
+
 - When the building the graphql payload from form data, we now check if a field was changed. If so then include it in the payload even if it might have been changed to an empty value.[#9369](https://github.com/opencrvs/opencrvs-core/issues/9369)
 
 ### Improvements
