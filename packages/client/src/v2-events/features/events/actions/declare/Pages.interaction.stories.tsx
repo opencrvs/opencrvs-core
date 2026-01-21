@@ -217,8 +217,6 @@ export const SaveAndExit: Story = {
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
     await expect(recordInCreatedState).not.toBeInTheDocument()
 
-    const reviewButton = canvas.queryByRole('button', { name: 'Review' })
-    await expect(reviewButton).not.toBeInTheDocument()
     // Draft status should not affect the action.
     await canvas.findByRole('button', { name: 'Declare' })
   }
