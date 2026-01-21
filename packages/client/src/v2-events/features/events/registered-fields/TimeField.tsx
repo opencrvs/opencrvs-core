@@ -28,8 +28,8 @@ const messages = defineMessages({
 
 const EMPTY_TIME = '--'
 
-function resolveNowForTimeInput(value: string): string {
-  if (SerializedNowDateTime.parse(value)) {
+function resolveNowForTimeInput(value: string | SerializedNowDateTime): string {
+  if (SerializedNowDateTime.safeParse(value).success) {
     const now = new Date()
     const hours = String(now.getHours()).padStart(2, '0')
     const minutes = String(now.getMinutes()).padStart(2, '0')
@@ -37,7 +37,7 @@ function resolveNowForTimeInput(value: string): string {
     return `${hours}:${minutes}`
   }
 
-  return value
+  return value.toString()
 }
 
 function TimeInput({
@@ -46,7 +46,7 @@ function TimeInput({
   ...props
 }: TimeFieldProps & {
   onChange: (newValue: string) => void
-  value: string
+  value: string | SerializedNowDateTime
 }) {
   const resolvedValue = resolveNowForTimeInput(value)
   const cleanEmpty = React.useCallback(

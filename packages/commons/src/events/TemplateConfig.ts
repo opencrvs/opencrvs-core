@@ -80,18 +80,10 @@ export type FieldConfigDefaultValue =
   | FlattenenedSystemVariables
   | Record<string, FlattenenedSystemVariables | FieldValue>
 
-const KNOWN_SYSTEM_KEYS = ['$$date', '$$time'] as const
-
 export function isTemplateVariable(
   value: FieldConfigDefaultValue
 ): value is FlattenenedSystemVariables {
-  // explicit known system variable keys
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (typeof value === 'string' && KNOWN_SYSTEM_KEYS.includes(value as any)) {
-    return true
-  }
-
-  return false
+  return typeof value === 'string' && (value as string).startsWith('$')
 }
 
 export function isFieldValue(
