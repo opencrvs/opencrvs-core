@@ -147,7 +147,11 @@ export async function createTokenForActionConfirmation(
 ) {
   return sign(
     {
-      scope: ['record.confirm-registration', 'record.reject-registration'],
+      scope: [
+        'record.confirm-registration',
+        'record.reject-registration',
+        'record.declared.reject'
+      ],
       eventId: 'eventId' in input ? input.eventId : undefined,
       actionId: 'actionId' in input ? input.actionId : undefined,
       recordId: 'recordId' in input ? input.recordId : undefined,
