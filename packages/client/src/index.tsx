@@ -22,6 +22,8 @@ import { createBrowserRouter } from 'react-router-dom'
 import WebFont from 'webfontloader'
 import { App, routesConfig } from './App'
 import { APPLICATION_VERSION } from './utils/constants'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(globalThis as any).React = React
 
 WebFont.load({
   google: {
