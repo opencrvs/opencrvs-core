@@ -56,9 +56,6 @@ import { DateValue, SelectDateRangeValue } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 
 export function ageToDate(age: number, asOfDate: DateValue) {
-  if (typeof asOfDate !== 'string') {
-    throw new Error('asOfDate is required to convert age to date')
-  }
   const date = new Date(asOfDate)
   return DateValue.parse(format(subYears(date, age), 'yyyy-MM-dd'))
 }
