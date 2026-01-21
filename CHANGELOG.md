@@ -5,6 +5,7 @@
 ### New features
 
 - NUMBER_WITH_UNIT Input, which is a number input with a configurable selectable unit of measurement.
+- The document upload and preview feature now supports PDF files in addition to image formats (JPEG, PNG, JPG), allowing PDFs to be viewed alongside existing DECLARED and REGISTERED documents.
 
 ## 1.9.5
 

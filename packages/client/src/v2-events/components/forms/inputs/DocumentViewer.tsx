@@ -15,6 +15,7 @@ import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanC
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { Option } from '@client/v2-events/utils'
 import { Select } from './Select'
+import { SimplePdfPreview } from './FileInput/SimplePdfPreview'
 
 /* Based on components/DocumentViewer.tsx */
 
@@ -95,6 +96,16 @@ export function DocumentViewer({
     setRotation((prev) => (prev - 90) % 360)
   }
 
+  const renderDocument = () => {
+    const url = selectedOption?.value.url || ''
+
+    if (url.toLowerCase().endsWith('.pdf')) {
+      return <SimplePdfPreview pdfUrl={url} />
+    }
+
+    return <PanViewer image={url} rotation={rotation} zoom={zoom} />
+  }
+
   return (
     <ViewerWrapper id={id}>
       <ViewerContainer>
@@ -113,12 +124,8 @@ export function DocumentViewer({
           />
         </ViewerHeader>
         {!!selectedOption && (
-          <ViewerImage>
-            <PanViewer
-              image={selectedOption.value.url}
-              rotation={rotation}
-              zoom={zoom}
-            />
+          <ViewerImage key={selectedOption.value.id}>
+            {renderDocument()}
           </ViewerImage>
         )}
         {children}
