@@ -116,8 +116,10 @@ export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
           {
             id: 'storybook.time',
             type: FieldType.TIME,
-            // value of now() will be resolve to '$$time' after zod parsing
-            defaultValue: '$$time',
+            // value of now() will be resolve to { $$now: true }
+            defaultValue: {
+              $$now: true
+            },
             label: {
               id: 'storybook.time.label',
               defaultMessage: 'Time input (24-hour)',

@@ -98,8 +98,10 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
           {
             id: 'storybook.date',
             type: FieldType.DATE,
-            // value of now() will be resolve to '$$date' after zod parsing
-            defaultValue: '$$date',
+            // value of now() will be resolve to { $$now: true }
+            defaultValue: {
+              $$now: true
+            },
             label: {
               id: 'storybook.date.label',
               defaultMessage: 'Date input',
