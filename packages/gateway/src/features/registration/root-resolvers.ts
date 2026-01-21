@@ -17,7 +17,6 @@ import {
   hasScope,
   inScope
 } from '@gateway/features/user/utils'
-import fetch from '@gateway/fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
   Bundle,
@@ -71,9 +70,16 @@ import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
 import { Context } from '@gateway/graphql/context'
 import { GraphQLResolveInfo } from 'graphql'
 
+interface VerifyNIDResponse {
+  operationResult: {
+    success: boolean
+    error?: { errorMessage: string }
+  }
+  data: any
+}
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
-  const { token } = await res.json()
+  const { token } = (await res.json()) as { token: string }
   return token
 }
 
@@ -247,10 +253,10 @@ export const resolvers: GQLResolver = {
               ...authHeader
             }
           }
-        ).then((data) => data.json())
+        ).then((data) => data.json() as Promise<VerifyNIDResponse>)
 
         if (!response.operationResult.success) {
-          throw new Error(response.operationResult.error.errorMessage)
+          throw new Error(response.operationResult.error?.errorMessage)
         } else {
           return response.data
         }
@@ -291,7 +297,9 @@ export const resolvers: GQLResolver = {
               ...authHeader
             }
           }
-        ).then((data) => data.json())
+        ).then(
+          (data) => data.json() as Promise<GQLStatusWiseRegistrationCount[]>
+        )
 
         let total = 0
         if (results && results.length > 0) {

@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import nodeFetch from 'node-fetch'
 import { IAuthHeader, UUID } from '@opencrvs/commons'
 import {
   addExtensionsToTask,
@@ -31,10 +30,6 @@ type DeathDuplicateSearchBody = {
   deathDate?: string
 }
 
-function fetch(...params: Parameters<typeof nodeFetch>) {
-  return nodeFetch(...params)
-}
-
 const searchDeathDuplicates = async (
   authHeader: IAuthHeader,
   criteria: DeathDuplicateSearchBody
@@ -48,7 +43,7 @@ const searchDeathDuplicates = async (
       },
       body: JSON.stringify(criteria)
     })
-    return await response.json()
+    return (await response.json()) as { id: UUID; trackingId: string }[]
   } catch (error) {
     return await Promise.reject(
       new Error(`Search request failed: ${error.message}`)
@@ -105,7 +100,7 @@ async function findBirthDuplicateIds(
     motherDoB: birthRegDetails.mother?.birthDate
   })
 
-  return res
+  return res as { id: UUID; trackingId: string }[]
 }
 
 async function findDeathDuplicateIds(

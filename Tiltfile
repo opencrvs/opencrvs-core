@@ -21,8 +21,8 @@ load('../infrastructure/tilt/opencrvs.tilt', 'setup_opencrvs')
 
 # Build baseimage
 docker_build("ghcr.io/opencrvs/ocrvs-base", ".",
-              dockerfile="packages/Dockerfile.base",
-              only=["packages/commons","package.json","yarn.lock"],
+              dockerfile="packages/Dockerfile.base", 
+              only=["packages/commons","package.json","pnpm-lock.yaml"], 
               network="host")
 
 # Build services

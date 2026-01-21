@@ -58,7 +58,7 @@ import { Link } from '@opencrvs/components/lib/Link'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import formatDate from '@client/utils/date-formatting'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'querystring'
+import { stringify } from '@client/utils'
 
 const ToolTipContainer = styled.span`
   text-align: center;

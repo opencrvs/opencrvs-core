@@ -8,8 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import nodeFetch from 'node-fetch'
+// eslint-disable-next-line import/no-unassigned-import
+import '@hapi/hapi'
 
-export default function fetch(...params: Parameters<typeof nodeFetch>) {
-  return nodeFetch(...params)
+declare module '@hapi/hapi' {
+  interface ServerInjectOptions {
+    method: string
+    url: string
+    headers?: Record<string, string>
+    payload?: any
+  }
+  interface ServerInjectResponse {
+    statusCode: number
+    payload: any
+  }
 }

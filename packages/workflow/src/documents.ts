@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { DOCUMENTS_URL } from './constants'
 import { IAuthHeader, isBase64FileString } from '@opencrvs/commons'
 import {
@@ -32,7 +31,9 @@ export async function uploadFileToMinio(
     body: JSON.stringify({ fileData: fileData })
   }
   const result = await fetch(`${DOCUMENTS_URL}${suffix}`, request)
-  const res = await result.json()
+  const res = (await result.json()) as {
+    refUrl: string
+  }
   return res.refUrl
 }
 

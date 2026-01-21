@@ -10,7 +10,7 @@
  */
 import { useHomePage } from '@client/hooks/useHomePage'
 import React from 'react'
-import { Navigate } from 'react-router'
+import { Navigate } from 'react-router-dom'
 
 export function Home() {
   const { path } = useHomePage()

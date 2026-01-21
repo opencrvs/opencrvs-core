@@ -181,7 +181,7 @@ export async function loopNotificationQueue(server: Hapi.Server) {
       const error: any = await res.json()
 
       await markQueueRecordFailedWithErrorDetails(record, error)
-      server.log(['error', error.error, internal(error.message)])
+      server.log(['error', error.error], internal(error.message))
     } else {
       await markQueueRecordSuccess(record)
     }

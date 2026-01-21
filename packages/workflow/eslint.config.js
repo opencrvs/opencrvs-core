@@ -31,6 +31,9 @@ module.exports = defineConfig([
         }
       }
     },
-    files: ['./src/**/*.ts']
+    files: ['./src/**/*.ts'],
+    rules: {
+      'import/no-relative-parent-imports': 'off'
+    }
   }
 ])

@@ -30,7 +30,6 @@ import {
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@search/constants'
 import { logger } from '@opencrvs/commons'
-import fetch from 'node-fetch'
 
 export function findTaskExtension<
   T extends keyof KnownExtensionType,
@@ -180,7 +179,7 @@ async function getFromFhir<T>(suffix: string): Promise<T> {
       }] body: ${await response.text()}`
     )
   }
-  return await response.json()
+  return (await response.json()) as T
 }
 
 export async function fetchParentLocationByLocationID(locationID: string) {

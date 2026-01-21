@@ -336,7 +336,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       if (
         error instanceof ApolloError &&
         error.graphQLErrors.length > 0 &&
-        error.graphQLErrors[0].extensions.code === 'UNASSIGNED'
+        error.graphQLErrors[0].extensions?.code === 'UNASSIGNED'
       ) {
         dispatch(
           showUnassigned({

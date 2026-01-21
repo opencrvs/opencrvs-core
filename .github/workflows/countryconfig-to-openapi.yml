@@ -21,6 +21,12 @@ jobs:
         with:
           fetch-depth: 1
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          run_install: false
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -31,9 +37,9 @@ jobs:
         with:
           timeout_minutes: 10
           max_attempts: 3
-          command: yarn install --frozen-lockfile
+          command: pnpm install
       - name: Generate OpenAPI
-        run: bash build.sh
+        run: pnpm build
         working-directory: packages/api-docs
 
       - name: Deploy to GitHub Pages

@@ -12,6 +12,6 @@ import { Scope } from './scopes'
 
 export type Roles = Array<{
   id: string
-  labels: Array<{ language: string; label: string }>
+  label: { id: string; defaultMessage: string; description: string }
   scopes: Scope[]
 }>

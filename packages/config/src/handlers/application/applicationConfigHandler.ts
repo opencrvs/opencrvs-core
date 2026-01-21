@@ -15,7 +15,6 @@ import * as Joi from 'joi'
 import { pick } from 'lodash'
 import getSystems from '@config/handlers/system/systemHandler'
 import { env } from '@config/environment'
-import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
 import { pipe } from 'fp-ts/lib/function'
 import { verifyToken } from '@config/utils/verifyToken'
@@ -85,6 +84,7 @@ async function getConfigFromCountry(authToken?: string) {
   const url = new URL('application-config', env.COUNTRY_CONFIG_URL).toString()
 
   const res = await fetch(url)
+
   if (!res.ok) {
     throw new Error(`Expected to get the application config from ${url}`)
   }

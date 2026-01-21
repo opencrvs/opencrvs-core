@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { env } from '@auth/environment'
 import { resolve } from 'url'
 import { redis } from '@auth/database'
@@ -35,7 +34,7 @@ export async function verifyUser(mobile?: string, email?: string) {
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
+  const body: any = await res.json()
   return {
     userId: body.id,
     username: body.username,

@@ -12,7 +12,7 @@
 import { server as mswServer } from '@test/setupServer'
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import * as jwt from 'jsonwebtoken'
 import {
   getTaskFromSavedBundle,
@@ -50,7 +50,7 @@ describe('not-duplicate record endpoint', () => {
 
     // Hearth response
     mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+      http.post('http://localhost:3447/fhir', () => {
         // we only test response of composition and task
         // in an actual response there should be response entries for all payload entriest
         const responseBundle: TransactionResponse = {
@@ -73,33 +73,30 @@ describe('not-duplicate record endpoint', () => {
             }
           ]
         }
-        return res(ctx.json(responseBundle))
+        return HttpResponse.json(responseBundle)
       })
     )
 
     // Fetches a record from search
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/c8b8e843-c5e0-49b5-96d9-a702ddb46454',
-        (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+        () => {
+          return HttpResponse.json(READY_FOR_REVIEW_BIRTH_RECORD)
         }
       )
     )
 
     // Sends bundle to metrics and gets a response
     mswServer.use(
-      rest.post(
-        'http://localhost:1050/events/birth/not-duplicate',
-        (_, res, ctx) => {
-          return res(ctx.json({}))
-        }
-      )
+      http.post('http://localhost:1050/events/birth/not-duplicate', () => {
+        return HttpResponse.json({})
+      })
     )
     // Sends bundle to deduplicate handler in search
     mswServer.use(
-      rest.post('http://localhost:9090/events/not-duplicate', (_, res, ctx) => {
-        return res(ctx.json({}))
+      http.post('http://localhost:9090/events/not-duplicate', () => {
+        return HttpResponse.json({})
       })
     )
 

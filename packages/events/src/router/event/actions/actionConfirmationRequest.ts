@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { EventDocument, logger, ActionType } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
@@ -83,7 +82,9 @@ export async function requestActionConfirmation(
 
     return {
       responseStatus,
-      responseBody: await res.json().catch(() => undefined)
+      responseBody: (await res.json().catch(() => undefined)) as
+        | Record<string, unknown>
+        | undefined
     }
   } catch (error) {
     logger.error(error)

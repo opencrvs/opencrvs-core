@@ -11,7 +11,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
-import { IStoreState } from '@opencrvs/client/src/store'
+import { IStoreState } from '@client/store'
 import { setInitialDeclarations } from '@client/declarations'
 import {
   getOfflineData,

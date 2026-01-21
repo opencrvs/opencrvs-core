@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AUTH_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
 
 export async function getRecordSpecificToken(
   token: string,
@@ -29,7 +28,9 @@ export async function getRecordSpecificToken(
   const res = await fetch(authUrl, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      // TODO : uncomment when we implement a OAuth2.0 standard token exchange
+      // with request body https://datatracker.ietf.org/doc/html/rfc8693#name-request
+      // 'Content-Type': 'application/json',
       ...headers
     }
   })

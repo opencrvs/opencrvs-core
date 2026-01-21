@@ -5,11 +5,11 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node --files -r tsconfig-paths/register src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
-    "test": "yarn test:compilation && jest --coverage --silent --noStackTrace",
+    "test": "pnpm test:compilation && jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
-    "open:cov": "yarn test && opener coverage/index.html",
+    "open:cov": "pnpm test && opener coverage/index.html",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "generate-test-token": "NODE_PATH=. ts-node resources/generate-test-token",
     "request-token": "NODE_PATH=. ts-node resources/request-token",
@@ -30,7 +30,6 @@
     "io-ts": "^2.2.18",
     "joi": "^17.3.0",
     "jsonwebtoken": "^9.0.0",
-    "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
     "redis": "^4.7.0",
     "tsconfig-paths": "^3.13.0"
@@ -40,10 +39,10 @@
     "@types/command-line-usage": "^5.0.1",
     "@types/dotenv": "^6.1.0",
     "@types/fhir": "^0.0.30",
-    "@types/hapi__hapi": "^20.0.0",
+    "@types/hapi__hapi": "^20.0.13",
     "@types/jest": "^26.0.14",
     "@types/jsonwebtoken": "^9.0.0",
-    "@types/node-fetch": "^2.5.12",
+    "@types/node": "22.15.29",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "command-line-args": "^6.0.0",
@@ -58,13 +57,13 @@
     "nodemon": "^3.0.0",
     "prettier": "3.5.3",
     "ts-jest": "29.2.5",
-    "ts-node": "^6.1.1",
+    "ts-node": "^10.9.2",
     "typescript": "5.6.3"
   },
   "lint-staged": {
     "src/**/*.ts": [
       "prettier --write",
-      "eslint -c .eslintrc.js --fix"
+      "eslint -c eslint.config.js --fix"
     ]
   },
   "jest": {

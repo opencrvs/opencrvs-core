@@ -39,7 +39,6 @@ import {
 } from '@workflow/features/registration/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import { logger } from '@opencrvs/commons'
-import fetch, { RequestInit } from 'node-fetch'
 
 export async function getSharedContactMsisdn(fhirBundle: Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -182,7 +181,8 @@ export const getFromFhir = (suffix: string) => {
       if (!response.ok) {
         throw new Error(`Failed to resolve "${suffix}" from hearth`)
       }
-      return response.json()
+      // @todo: come up with a stricter type for the response
+      return response.json() as Promise<any>
     })
     .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))

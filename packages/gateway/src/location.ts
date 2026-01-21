@@ -12,7 +12,6 @@
 import { UUID } from '@opencrvs/commons'
 import { Location, SavedBundle, SavedLocation } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL } from './constants'
-import fetch from 'node-fetch'
 
 export const fetchLocation = async (id: UUID) => {
   const response = await fetch(
@@ -41,7 +40,7 @@ export const fetchAllLocations = async () => {
       `Couldn't fetch the locations from config: ${await response.text()}`
     )
   }
-  const locationsBundle: SavedBundle<SavedLocation> = await response.json()
+  const locationsBundle = (await response.json()) as SavedBundle<SavedLocation>
 
   return locationsBundle.entry.map(({ resource }) => resource)
 }

@@ -36,8 +36,8 @@ import {
   IPreviewGroup
 } from '@client/forms'
 import { Button } from '@opencrvs/components/src/Button'
-import { ReviewSectionCorrection } from '@opencrvs/client/src/views/RegisterForm/review/ReviewSectionCorrection'
-import { ReviewHeader } from '@opencrvs/client/src/views/RegisterForm/review/ReviewHeader'
+import { ReviewSectionCorrection } from '@client/views/RegisterForm/review/ReviewSectionCorrection'
+import { ReviewHeader } from '@client/views/RegisterForm/review/ReviewHeader'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { buttonMessages } from '@client/i18n/messages'
 import { Table } from '@opencrvs/components/lib/Table'
@@ -56,10 +56,10 @@ import {
   isViewOnly,
   isVisibleField,
   renderValue
-} from '@opencrvs/client/src/views/CorrectionForm/utils'
+} from '@client/views/CorrectionForm/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { getLanguage } from '@client/i18n/selectors'
-import { getName } from '@opencrvs/client/src/views/RecordAudit/utils'
+import { getName } from '@client/views/RecordAudit/utils'
 import format from '@client/utils/date-formatting'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserDetails } from '@client/profile/profileSelectors'

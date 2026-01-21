@@ -3,8 +3,13 @@ FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
 USER node
 
-WORKDIR /app/packages/metrics
+WORKDIR /app
 COPY --chown=node:node packages/metrics /app/packages/metrics
-RUN yarn install --frozen-lockfile && yarn build
 
-CMD ["yarn", "start:prod"]
+RUN pnpm fetch --filter ./packages/metrics...
+RUN pnpm install -r --offline --filter ./packages/metrics...
+
+WORKDIR /app/packages/metrics
+RUN pnpm build
+
+CMD ["pnpm", "start:prod"]

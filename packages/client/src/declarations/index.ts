@@ -1932,7 +1932,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         (declaration) =>
           declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_UNASSIGN
       )
-      if (error.graphQLErrors[0]?.extensions.code === 'UNASSIGNED') {
+      if (error.graphQLErrors[0]?.extensions?.code === 'UNASSIGNED') {
         return loop(
           state,
           Cmd.list<

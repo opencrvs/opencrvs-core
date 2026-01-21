@@ -11,7 +11,7 @@
 import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import {
   getStatusFromTask,
@@ -49,24 +49,24 @@ describe('Register record endpoint', () => {
 
     // Gets record by id via getRecordById endpoint
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
-        (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+        () => {
+          return HttpResponse.json(READY_FOR_REVIEW_BIRTH_RECORD)
         }
       )
     )
 
     // Mock response from country-config
     mswServer.use(
-      rest.post('http://localhost:3040/event-registration', (_, res, ctx) => {
-        return res(ctx.status(400))
+      http.post('http://localhost:3040/event-registration', () => {
+        return HttpResponse.json(null, { status: 400 })
       })
     )
 
     // Mock response from hearth
     mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+      http.post('http://localhost:3447/fhir', () => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
           type: 'batch-response',
@@ -80,7 +80,7 @@ describe('Register record endpoint', () => {
             }
           ]
         }
-        return res(ctx.json(responseBundle))
+        return HttpResponse.json(responseBundle)
       })
     )
 
@@ -119,24 +119,24 @@ describe('Register record endpoint', () => {
 
     // Gets record by id via getRecordById endpoint
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
-        (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+        () => {
+          return HttpResponse.json(READY_FOR_REVIEW_BIRTH_RECORD)
         }
       )
     )
 
     // Notification endpoint mockcall
     mswServer.use(
-      rest.get('http://localhost:3040/record-notification', (_, res, ctx) => {
-        return res(ctx.json({}))
+      http.get('http://localhost:3040/record-notification', () => {
+        return HttpResponse.json({})
       })
     )
 
     // Mock response from hearth
     mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+      http.post('http://localhost:3447/fhir', () => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
           type: 'batch-response',
@@ -157,11 +157,10 @@ describe('Register record endpoint', () => {
             }
           ]
         }
-        return res(ctx.json(responseBundle))
+        return HttpResponse.json(responseBundle)
       }),
-      rest.post(
-        'http://localhost:2525/events/birth/mark-registered',
-        (_, res, ctx) => res(ctx.status(200))
+      http.post('http://localhost:2525/events/birth/mark-registered', () =>
+        HttpResponse.json(null, { status: 200 })
       )
     )
 

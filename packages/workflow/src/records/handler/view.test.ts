@@ -12,7 +12,7 @@
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
@@ -48,25 +48,25 @@ describe('View record endpoint', () => {
 
     // Fetches a record from search
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
-        (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+        () => {
+          return HttpResponse.json(READY_FOR_REVIEW_BIRTH_RECORD)
         }
       )
     )
 
     // Sends bundle to save in elastic search
     mswServer.use(
-      rest.post('http://localhost:9090/events/unassigned', (_, res, ctx) => {
-        return res(ctx.json({}))
+      http.post('http://localhost:9090/events/unassigned', () => {
+        return HttpResponse.json({})
       })
     )
 
     // Sends bundle to metrics
     mswServer.use(
-      rest.post('http://localhost:1050/events/birth/viewed', (_, res, ctx) => {
-        return res(ctx.json({}))
+      http.post('http://localhost:1050/events/birth/viewed', () => {
+        return HttpResponse.json({})
       })
     )
 

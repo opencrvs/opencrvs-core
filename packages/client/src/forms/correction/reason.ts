@@ -19,7 +19,7 @@ import {
 import { formMessages } from '@client/i18n/messages/form'
 import { messages } from '@client/i18n/messages/views/correction'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
-import { required as requiredValidation } from '@opencrvs/client/src/utils/validate'
+import { required as requiredValidation } from '@client/utils/validate'
 import { validationMessages } from '@client/i18n/messages'
 
 export enum CorrectionReason {

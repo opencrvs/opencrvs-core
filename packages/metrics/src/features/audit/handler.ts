@@ -16,7 +16,6 @@ import { IUserAuditBody, IUserModelData } from '@metrics/features/registration'
 import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
 import { countUserAuditEvents, getUserAuditEvents } from './service'
 import { getClientIdFromToken } from '@metrics/utils/authUtils'
-import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@metrics/constants'
 
 export async function newAuditHandler(
@@ -78,7 +77,7 @@ export async function getUser(
     )
   }
 
-  return await res.json()
+  return (await res.json()) as IUserModelData
 }
 
 export async function getUserAuditsHandler(request: Hapi.Request) {

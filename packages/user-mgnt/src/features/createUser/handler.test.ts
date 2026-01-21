@@ -127,7 +127,7 @@ describe('createUser handler', () => {
       ]
     }
 
-    expect(fetch.mock.calls.length).toBe(3)
+    expect(fetch.mock.calls.length).toBe(4)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(
       expectedPractitioner
     )

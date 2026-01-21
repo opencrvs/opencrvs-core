@@ -34,11 +34,11 @@ import {
   GQLHumanNameInput,
   GQLResolver,
   GQLSearchFieldAgentResponse,
+  GQLStatus,
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 
-import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
@@ -211,7 +211,10 @@ export const resolvers: GQLResolver = {
             ...authHeader
           }
         })
-        const userResponse = await res.json()
+        const userResponse = (await res.json()) as {
+          totalItems: number
+          results: IUserModelData[]
+        }
         if (
           !userResponse ||
           !userResponse.results ||
@@ -224,7 +227,7 @@ export const resolvers: GQLResolver = {
           }
         }
         // Loading metrics data by practitioner ids
-        const metricsForPractitioners = await postMetrics(
+        const metricsForPractitioners = (await postMetrics(
           '/declarationStartedMetricsByPractitioners',
           {
             timeStart,
@@ -236,7 +239,13 @@ export const resolvers: GQLResolver = {
             )
           },
           authHeader
-        )
+        )) as Array<{
+          practitionerId: string
+          totalNumberOfDeclarationStarted: number
+          totalNumberOfInProgressAppStarted: number
+          totalNumberOfRejectedDeclarations: number
+          averageTimeForDeclaredDeclarations: number
+        }>
 
         const roles = await dataSources.countryConfigAPI.getRoles()
 
@@ -263,7 +272,7 @@ export const resolvers: GQLResolver = {
                 practitionerId: user.practitionerId,
                 fullName: getFullName(user, language),
                 role: role,
-                status: user.status,
+                status: user.status as GQLStatus,
                 avatar: user.avatar,
                 primaryOfficeId: user.primaryOfficeId,
                 creationDate: user?.creationDate,
@@ -380,7 +389,10 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status === 403) {
-        const errorResponse = await res.json()
+        const errorResponse = (await res.json()) as {
+          message: string
+          errorThrowingProperty: string
+        }
         const duplicateDataErrorMap = {
           emailForNotification: {
             field: 'email',
@@ -430,8 +442,9 @@ export const resolvers: GQLResolver = {
         }
       })
 
-      const response = await res.json()
-
+      const response = (await res.json()) as {
+        userId: string
+      }
       if (res.status !== 201) {
         throw new Error(
           "Something went wrong on user-mgnt service. Couldn't activate given user"

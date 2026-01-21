@@ -10,7 +10,6 @@
  */
 import { StateIdenfitiers } from '@opencrvs/commons/types'
 import { SEARCH_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
 
 export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   recordId: string,
@@ -34,7 +33,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
     }
   })
 
-  return res.json()
+  return res.json() as Promise<StateIdenfitiers[T[number]]>
 }
 
 export async function getValidRecordById(

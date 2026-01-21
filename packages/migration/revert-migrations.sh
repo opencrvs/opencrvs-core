@@ -20,34 +20,34 @@ SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # Revert hearth migrations
 HEARTH_FILES=$(ls ./build/dist/src/migrations/hearth | wc -l)
 for ((n=0;n<$HEARTH_FILES;n++)); do
-  yarn --cwd $SCRIPT_PATH migrate-mongo down --file $HEARTH_CONFIG
+  pnpm --dir $SCRIPT_PATH exec migrate-mongo down --file $HEARTH_CONFIG
 done
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $HEARTH_CONFIG
 
 # Revert events migrations
 EVENTS_FILES=$(ls ./build/dist/src/migrations/events | wc -l)
 for ((n=0;n<$EVENTS_FILES;n++)); do
-  yarn --cwd $SCRIPT_PATH migrate-mongo down --file $EVENTS_CONFIG
+  pnpm --dir $SCRIPT_PATH exec migrate-mongo down --file $EVENTS_CONFIG
 done
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $EVENTS_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $EVENTS_CONFIG
 
 ## Revert openhim migrations
 OPENHIM_FILES=$(ls ./build/dist/src/migrations/openhim | wc -l)
 for ((n=0;n<$OPENHIM_FILES;n++)); do
-  yarn --cwd $SCRIPT_PATH migrate-mongo down --file $OPENHIM_CONFIG
+  pnpm --dir $SCRIPT_PATH exec migrate-mongo down --file $OPENHIM_CONFIG
 done
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $OPENHIM_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $OPENHIM_CONFIG
 
 ## Revert application Config migration
 APP_CONFIG_FILES=$(ls ./build/dist/src/migrations/application-config | wc -l)
 for ((n=0;n<$APP_CONFIG_FILES;n++)); do
-  yarn --cwd $SCRIPT_PATH migrate-mongo down --file $APP_CONFIG
+  pnpm --dir $SCRIPT_PATH exec migrate-mongo down --file $APP_CONFIG
 done
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $APP_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $APP_CONFIG
 
 ## Revert user-mgnt migration
 USER_MGNT_FILES=$(ls ./build/dist/src/migrations/user-mgnt | wc -l)
 for ((n=0;n<$USER_MGNT_FILES;n++)); do
-  yarn --cwd $SCRIPT_PATH migrate-mongo down --file $USER_MGNT_CONFIG
+  pnpm --dir $SCRIPT_PATH exec migrate-mongo down --file $USER_MGNT_CONFIG
 done
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $USER_MGNT_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $USER_MGNT_CONFIG

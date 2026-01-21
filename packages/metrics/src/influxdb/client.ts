@@ -16,7 +16,6 @@ import {
 } from '@metrics/influxdb/constants'
 import { logger } from '@opencrvs/commons'
 import { IPoints } from '@metrics/features/registration'
-import fetch from 'node-fetch'
 
 export const influx = new Influx.InfluxDB({
   host: INFLUX_HOST,

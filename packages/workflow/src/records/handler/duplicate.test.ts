@@ -12,7 +12,7 @@
 import { server as mswServer } from '@test/setupServer'
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import * as jwt from 'jsonwebtoken'
 import {
   Extension,
@@ -71,26 +71,26 @@ describe('duplicate record endpoint', () => {
 
     // Fetches a record from search
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/c8b8e843-c5e0-49b5-96d9-a702ddb46454',
-        (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+        () => {
+          return HttpResponse.json(READY_FOR_REVIEW_BIRTH_RECORD)
         }
       )
     )
 
     // Sends bundle to metrics and gets a response
     mswServer.use(
-      rest.post(
+      http.post(
         'http://localhost:1050/events/birth/marked-as-duplicate',
-        (_, res, ctx) => {
-          return res(ctx.json({}))
+        () => {
+          return HttpResponse.json({})
         }
       )
     )
 
     mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+      http.post('http://localhost:3447/fhir', () => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
           type: 'transaction-response',
@@ -105,7 +105,7 @@ describe('duplicate record endpoint', () => {
           ]
         }
 
-        return res(ctx.json(responseBundle))
+        return HttpResponse.json(responseBundle)
       })
     )
 

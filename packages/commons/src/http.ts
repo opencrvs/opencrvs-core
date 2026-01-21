@@ -10,7 +10,6 @@
  */
 import type * as Hapi from '@hapi/hapi'
 import { uniqueId } from 'lodash'
-import nodeFetch from 'node-fetch'
 
 export interface IAuthHeader {
   Authorization: string
@@ -36,9 +35,9 @@ export class NotFound extends Error {
 }
 
 export async function fetchJSON<ResponseType = any>(
-  ...params: Parameters<typeof nodeFetch>
+  ...params: Parameters<typeof fetch>
 ) {
-  const res = await nodeFetch(...params)
+  const res = await fetch(...params)
 
   if (!res.ok) {
     if (res.status === 404) {

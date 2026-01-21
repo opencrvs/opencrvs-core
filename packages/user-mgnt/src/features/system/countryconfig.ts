@@ -10,7 +10,6 @@
  */
 import { env } from '@user-mgnt/environment'
 import { EventConfig, joinUrl, logger } from '@opencrvs/commons'
-import fetch from 'node-fetch'
 
 /**
  * During 1.9.0 we support only docker swarm configuration.

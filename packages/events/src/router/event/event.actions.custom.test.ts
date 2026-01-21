@@ -240,7 +240,6 @@ describe('event.actions.custom', () => {
         http.post<never, { actionId: string }>(
           `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/CUSTOM`,
           () => {
-            // @ts-expect-error - For some reason the msw types here complain about the status, even though this is correct
             return HttpResponse.json({}, { status })
           }
         )

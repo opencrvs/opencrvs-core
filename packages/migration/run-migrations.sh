@@ -38,7 +38,7 @@ for arg in "$@"; do
 done
 
 # hearth migrations
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $HEARTH_CONFIG
 
 run_pg_migrations() {
   MIGRATIONS_PATH="$1"
@@ -84,7 +84,7 @@ run_pg_migrations() {
   # --- Run migrations ---
   echo "Running migrations for schema '$schema' in $MIGRATIONS_PATH"
   DATABASE_URL="$database_url" \
-    yarn --cwd "$SCRIPT_PATH" node-pg-migrate up \
+    pnpm --dir "$SCRIPT_PATH" exec node-pg-migrate up \
     --schema="$schema" \
     --migrations-dir="$MIGRATIONS_PATH" \
     --migrations-table="$migrations_table"
@@ -126,13 +126,13 @@ run_pg_migrations \
   "app"
 
 #openhim migrations
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $OPENHIM_CONFIG
 
 # Application Config migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $APP_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $APP_CONFIG
 
 # User mgnt migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $USER_MGNT_CONFIG
 
 # performance migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $PERFORMANCE_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $PERFORMANCE_CONFIG

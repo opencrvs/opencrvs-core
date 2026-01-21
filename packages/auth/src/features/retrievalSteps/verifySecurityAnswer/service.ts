@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { env } from '@auth/environment'
 import { resolve } from 'url'
 
@@ -33,7 +32,7 @@ export async function verifySecurityAnswer(
   if (res.status !== 200) {
     throw Error(res.statusText)
   }
-  const body = await res.json()
+  const body: any = await res.json()
   return {
     matched: body.matched,
     questionKey: body.questionKey
