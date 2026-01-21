@@ -70,7 +70,7 @@ function createRejectedEventByStatus(status: EventStatus) {
 const rejectedNotifiedEvent = createRejectedEventByStatus(
   EventStatus.enum.NOTIFIED
 )
-export const DirectsRejectedNotifiedToDeclare: Story = {
+export const DirectsRejectedNotifiedToEdit: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
@@ -103,11 +103,11 @@ export const DirectsRejectedNotifiedToDeclare: Story = {
             }
           },
           {
-            path: ROUTES.V2.EVENTS.EVENT.RECORD.path,
+            path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
             Component: () => {
               return (
                 <div>
-                  {ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+                  {ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
                     eventId: rejectedNotifiedEvent.event.id
                   })}
                 </div>
@@ -122,7 +122,7 @@ export const DirectsRejectedNotifiedToDeclare: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
+      name: 'Edit'
     })
 
     await userEvent.click(actionButton)
@@ -130,8 +130,81 @@ export const DirectsRejectedNotifiedToDeclare: Story = {
     await waitFor(async () => {
       await expect(
         canvas.getByText(
-          ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({
+          ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
             eventId: rejectedNotifiedEvent.event.id
+          })
+        )
+      ).toBeInTheDocument()
+    })
+  }
+}
+
+const rejectedDeclaredEvent = createRejectedEventByStatus(
+  EventStatus.enum.DECLARED
+)
+
+export const DirectsRejectedDeclaredToEdit: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(rejectedDeclaredEvent.event.id, rejectedDeclaredEvent.event)
+  },
+  args: {
+    event: rejectedDeclaredEvent.eventQueryData
+  },
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: {
+        path: '/',
+        children: [
+          {
+            path: 'start',
+            Component: () => {
+              return (
+                <div>
+                  <ActionCta
+                    actionType={'DEFAULT'}
+                    event={rejectedDeclaredEvent.eventQueryData}
+                  />
+                </div>
+              )
+            }
+          },
+          {
+            path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
+            Component: () => {
+              return (
+                <div>
+                  {ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
+                    eventId: rejectedDeclaredEvent.event.id
+                  })}
+                </div>
+              )
+            }
+          }
+        ]
+      },
+      initialPath: '/start'
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const actionButton = await canvas.findByRole('button', {
+      name: 'Edit'
+    })
+
+    await userEvent.click(actionButton)
+
+    // Ensure the user is redirected to the declaration review page
+    await waitFor(async () => {
+      await expect(
+        canvas.getByText(
+          ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
+            eventId: rejectedDeclaredEvent.event.id
           })
         )
       ).toBeInTheDocument()
