@@ -21,7 +21,9 @@ import {
   DateValue,
   FieldType,
   extractPotentialDuplicatesFromActions,
-  EventDocument
+  EventDocument,
+  getDeclarationFields,
+  FieldConfig
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -29,6 +31,7 @@ import {
   getEventIndexName
 } from '@events/storage/elasticsearch'
 import {
+  ageQueryKey,
   declarationReference,
   decodeEventIndex,
   EncodedEventIndex,
@@ -44,6 +47,7 @@ import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
  * The `and` query resolves to null if any of the sub-queries is null,
  * while the `or` query resolves to null if all of the sub-queries are null
  */
+
 export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
   queryInput: ClauseOutput,
@@ -165,38 +169,76 @@ export function generateElasticsearchQuery(
       if (!dateValue.success) {
         logger.warn(
           queryValue,
-          `Invalid query value for found for dateRange matching ${rawFieldId}. Expected date in YYYY-MM-DD format`
+          `Invalid query value for dateRange matching ${rawFieldId}`
         )
         return null
       }
+
       const pivot =
         queryInput.options.pivot ??
         Math.floor((queryInput.options.days * 2) / 3)
+
+      // Build list of all fields to match against
+      const fieldsToMatch = [queryKey] // Primary field first
+
+      if (Array.isArray(queryInput.options.alsoMatchAgainst)) {
+        const fields = getDeclarationFields(eventConfig)
+        const additionalFields = queryInput.options.alsoMatchAgainst
+          .map((x) => fields.find((f) => f.id === x.$$field))
+          .filter((field): field is FieldConfig => {
+            if (!field) {
+              return false
+            }
+            return field.type === FieldType.DATE || field.type === FieldType.AGE
+          })
+          .map((field) => {
+            // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+            switch (field.type) {
+              case FieldType.AGE:
+                return declarationReference(
+                  ageQueryKey(encodeFieldId(field.id))
+                )
+              default:
+                return declarationReference(encodeFieldId(field.id))
+            }
+          })
+
+        fieldsToMatch.push(...additionalFields)
+      }
+
+      // Helper to build query for a single field
+      const buildFieldQuery = (fieldKey: string) => ({
+        range: {
+          [fieldKey]: {
+            gte: DateTime.fromISO(dateValue.data)
+              .minus({ days: queryInput.options.days })
+              .toISO(),
+            lte: DateTime.fromISO(dateValue.data)
+              .plus({ days: queryInput.options.days })
+              .toISO()
+          }
+        }
+      })
+
+      const buildDistanceFeature = (fieldKey: string) => ({
+        distance_feature: {
+          field: fieldKey,
+          pivot: `${pivot}d`,
+          origin: dateValue.data
+        }
+      })
+
       return {
         bool: {
           must: [
             {
-              range: {
-                [queryKey]: {
-                  gte: DateTime.fromISO(dateValue.data)
-                    .minus({ days: queryInput.options.days })
-                    .toISO(),
-                  lte: DateTime.fromISO(dateValue.data)
-                    .plus({ days: queryInput.options.days })
-                    .toISO()
-                }
+              bool: {
+                should: fieldsToMatch.map(buildFieldQuery),
+                minimum_should_match: 1
               }
             }
           ],
-          should: [
-            {
-              distance_feature: {
-                field: queryKey,
-                pivot: `${pivot}d`,
-                origin: dateValue.data
-              }
-            }
-          ]
+          should: fieldsToMatch.map(buildDistanceFeature)
         }
       }
     }
