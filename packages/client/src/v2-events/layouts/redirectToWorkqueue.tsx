@@ -17,8 +17,6 @@ import { useHomePage } from '@client/hooks/useHomePage'
 import { useCountryConfigWorkqueueConfigurations } from '../features/events/useCountryConfigWorkqueueConfigurations'
 
 export const RedirectToWorkqueue = () => {
-  console.log('Redirecting to workqueue')
-
   const workqueues = useCountryConfigWorkqueueConfigurations()
   const navigate = useNavigate()
   const { path } = useHomePage()

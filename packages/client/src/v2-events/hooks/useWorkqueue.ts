@@ -117,7 +117,6 @@ export function useWorkqueues() {
           return
         }
 
-        console.log(`Prefetching ${workqueueConfig.slug} workqueue`)
         return queryClient.prefetchQuery({
           ...trpc.event.search.queryOptions({
             query: deserializedQuery,
