@@ -66,7 +66,7 @@ export const useWorkqueue = (workqueueSlug: string) => {
               sort: [{ field: 'updatedAt', direction: 'desc' }]
             },
             {
-              networkMode: 'offlineFirst',
+              // networkMode: 'offlineFirst',
               refetchInterval: 20000
             }
           ),

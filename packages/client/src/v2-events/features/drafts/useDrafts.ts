@@ -192,7 +192,7 @@ export function useDrafts() {
       ...options,
       ...additionalOptions,
       // First use data from browser cache, then fetch from the server if online
-      networkMode: 'offlineFirst',
+      // networkMode: 'offlineFirst',
       queryKey: trpc.event.draft.list.queryKey(),
       select: (currentDraftState) => {
         const locallyStoredDrafts =
