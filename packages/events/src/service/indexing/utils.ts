@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import _ from 'lodash'
+import formatISO from 'date-fns/formatISO'
 import { estypes } from '@elastic/elasticsearch'
 import {
   AddressFieldValue,
@@ -183,6 +184,10 @@ export function nameQueryKey(fieldName: string) {
   return `${fieldName}.${NAME_QUERY_KEY}`
 }
 
+export function ageQueryKey(fieldName: string) {
+  return `${fieldName}.${AGE_DOB_QUERY_KEY}`
+}
+
 export function generateQueryForAddressField(
   fieldId: string,
   search: QueryInputType
@@ -228,7 +233,4 @@ export function generateQueryForAddressField(
       should: undefined
     }
   } satisfies estypes.QueryDslQueryContainer
-}
-function formatISO(arg0: Date, arg1: { representation: string }): string {
-  throw new Error('Function not implemented.')
 }
