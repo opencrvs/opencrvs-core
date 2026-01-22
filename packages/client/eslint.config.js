@@ -42,7 +42,6 @@ module.exports = [
   },
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
     'plugin:import/recommended',
     'plugin:jsx-a11y/recommended'
   ),
