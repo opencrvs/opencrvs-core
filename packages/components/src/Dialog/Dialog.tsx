@@ -143,7 +143,12 @@ export function Dialog({
     <>
       {isOpen && (
         <DialogWrapper onClick={handleClickOutside}>
-          <DialogContainer id={id} variant={variant} ref={dialogRef}>
+          <DialogContainer
+            id={id}
+            variant={variant}
+            ref={dialogRef}
+            role="dialog"
+          >
             <DialogHeader>
               <DialogTitle>
                 {titleIcon}
