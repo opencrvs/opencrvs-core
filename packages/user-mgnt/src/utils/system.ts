@@ -17,7 +17,8 @@ export const types = {
   HEALTH: 'HEALTH',
   RECORD_SEARCH: 'RECORD_SEARCH',
   WEBHOOK: 'WEBHOOK',
-  IMPORT_EXPORT: 'IMPORT_EXPORT'
+  IMPORT_EXPORT: 'IMPORT_EXPORT',
+  AUTOMATION_CLIENT: 'AUTOMATION_CLIENT'
 }
 
 export const integratingSystemTypes = {

@@ -225,6 +225,11 @@ const messagesToDefine = {
     defaultMessage: 'Import/Export',
     description: 'Label for import/export type system'
   },
+  automationClient: {
+    id: 'integrations.type.automationClient',
+    defaultMessage: 'Automation Client',
+    description: 'Label for automation client type system'
+  },
   healthSystem: {
     id: 'integrations.type.healthSystem',
     defaultMessage: 'Health integration',
