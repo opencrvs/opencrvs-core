@@ -64,11 +64,11 @@ export const useWorkqueue = (workqueueSlug: string) => {
               offset,
               limit,
               sort: [{ field: 'updatedAt', direction: 'desc' }]
-            },
-            {
-              // networkMode: 'offlineFirst',
-              refetchInterval: 20000
             }
+            // {
+            //   // networkMode: 'offlineFirst',
+            //   refetchInterval: 20000
+            // }
           ),
         useQuery: () =>
           searchEvent.useQuery(
@@ -77,8 +77,8 @@ export const useWorkqueue = (workqueueSlug: string) => {
               offset,
               limit,
               sort: [{ field: 'updatedAt', direction: 'desc' }]
-            },
-            { refetchInterval: 10000 }
+            }
+            // { refetchInterval: 10000 }
           )
       }
     },
