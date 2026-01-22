@@ -8,17 +8,17 @@ exports[`createSearchOptions > creates search options for locations and administ
     "searchableText": "Central Provincial Office",
   },
   {
-    "displayLabel": "Ibombo District Office, Ibombo",
+    "displayLabel": "Ibombo District Office, Ibombo, Central",
     "id": "028d2c85-ca31-426d-b5d1-2cef545a4902",
     "searchableText": "Ibombo District Office",
   },
   {
-    "displayLabel": "Isamba District Office, Isamba",
+    "displayLabel": "Isamba District Office, Isamba, Central",
     "id": "62a0ccb4-4f30-4f30-8882-f256007dff9f",
     "searchableText": "Isamba District Office",
   },
   {
-    "displayLabel": "Isango District Office, Isango",
+    "displayLabel": "Isango District Office, Isango, Central",
     "id": "954c93e1-13f7-4435-bb82-35e0e215e07d",
     "searchableText": "Isango District Office",
   },
@@ -28,62 +28,62 @@ exports[`createSearchOptions > creates search options for locations and administ
     "searchableText": "Sulaka Provincial Office",
   },
   {
-    "displayLabel": "Ilanga District Office, Ilanga",
+    "displayLabel": "Ilanga District Office, Ilanga, Sulaka",
     "id": "030358c6-54af-44be-821b-8e4af963a49c",
     "searchableText": "Ilanga District Office",
   },
   {
-    "displayLabel": "Chamakubi Health Post, Ibombo",
+    "displayLabel": "Chamakubi Health Post, Ibombo, Central",
     "id": "423d000f-101b-47c0-8b86-21a908067cee",
     "searchableText": "Chamakubi Health Post",
   },
   {
-    "displayLabel": "Ibombo Rural Health Centre, Ibombo",
+    "displayLabel": "Ibombo Rural Health Centre, Ibombo, Central",
     "id": "4d3279be-d026-420c-88f7-f0a4ae986973",
     "searchableText": "Ibombo Rural Health Centre",
   },
   {
-    "displayLabel": "Chikobo Rural Health Centre, Ibombo",
+    "displayLabel": "Chikobo Rural Health Centre, Ibombo, Central",
     "id": "190902f4-1d77-476a-8947-41145af1db7d",
     "searchableText": "Chikobo Rural Health Centre",
   },
   {
-    "displayLabel": "Chilochabalenje Health Post, Ibombo",
+    "displayLabel": "Chilochabalenje Health Post, Ibombo, Central",
     "id": "f5ecbd9b-a01e-4a65-910e-70e86ab41b71",
     "searchableText": "Chilochabalenje Health Post",
   },
   {
-    "displayLabel": "Chipeso Rural Health Centre, Ibombo",
+    "displayLabel": "Chipeso Rural Health Centre, Ibombo, Central",
     "id": "dbfc178f-7295-4b90-b28d-111c95b03127",
     "searchableText": "Chipeso Rural Health Centre",
   },
   {
-    "displayLabel": "Chisamba Rural Health Centre, Ibombo",
+    "displayLabel": "Chisamba Rural Health Centre, Ibombo, Central",
     "id": "09862bfe-c7ac-46cd-987b-668681533c80",
     "searchableText": "Chisamba Rural Health Centre",
   },
   {
-    "displayLabel": "Chitanda Rural Health Centre, Ibombo",
+    "displayLabel": "Chitanda Rural Health Centre, Ibombo, Central",
     "id": "834ce389-e95b-4fb0-96a0-33e9ab323059",
     "searchableText": "Chitanda Rural Health Centre",
   },
   {
-    "displayLabel": "Golden Valley Rural Health Centre, Ibombo",
+    "displayLabel": "Golden Valley Rural Health Centre, Ibombo, Central",
     "id": "0431c433-6062-4a4c-aee9-25271aec61ee",
     "searchableText": "Golden Valley Rural Health Centre",
   },
   {
-    "displayLabel": "Ipongo Rural Health Centre, Ibombo",
+    "displayLabel": "Ipongo Rural Health Centre, Ibombo, Central",
     "id": "bc84d0b6-7ba7-480d-a339-5d9920d90eb2",
     "searchableText": "Ipongo Rural Health Centre",
   },
   {
-    "displayLabel": "Itumbwe Health Post, Ibombo",
+    "displayLabel": "Itumbwe Health Post, Ibombo, Central",
     "id": "4cf1f53b-b730-41d2-8649-dff7eeed970d",
     "searchableText": "Itumbwe Health Post",
   },
   {
-    "displayLabel": "Kabangalala Rural Health Centre, Ibombo",
+    "displayLabel": "Kabangalala Rural Health Centre, Ibombo, Central",
     "id": "4b3676cb-9355-4942-9eb9-2ce46acaf0e0",
     "searchableText": "Kabangalala Rural Health Centre",
   },
@@ -143,12 +143,12 @@ exports[`createSearchOptions > creates search options for locations and administ
 exports[`createSearchOptions > filters search options for both locations and administrative areas 1`] = `
 [
   {
-    "displayLabel": "Ibombo District Office, Ibombo",
+    "displayLabel": "Ibombo District Office, Ibombo, Central",
     "id": "028d2c85-ca31-426d-b5d1-2cef545a4902",
     "searchableText": "Ibombo District Office",
   },
   {
-    "displayLabel": "Ibombo Rural Health Centre, Ibombo",
+    "displayLabel": "Ibombo Rural Health Centre, Ibombo, Central",
     "id": "4d3279be-d026-420c-88f7-f0a4ae986973",
     "searchableText": "Ibombo Rural Health Centre",
   },
