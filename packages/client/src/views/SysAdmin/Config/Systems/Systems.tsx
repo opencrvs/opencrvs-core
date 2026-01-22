@@ -260,7 +260,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook),
     IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport),
-    AUTOMATION_CLIENT: intl.formatMessage(integrationMessages.automationClient)
+    CITIZEN_PORTAL: intl.formatMessage(integrationMessages.citizenPortal)
   }
 
   const systemToLabel = (system: System) => {
@@ -561,9 +561,9 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                     },
                     {
                       label: intl.formatMessage(
-                        integrationMessages.automationClient
+                        integrationMessages.citizenPortal
                       ),
-                      value: SystemRole.enum.AUTOMATION_CLIENT
+                      value: SystemRole.enum.CITIZEN_PORTAL
                     },
                     {
                       label: intl.formatMessage(

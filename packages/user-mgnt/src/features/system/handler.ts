@@ -139,7 +139,7 @@ export async function registerSystem(
         types.WEBHOOK,
         types.RECORD_SEARCH,
         types.IMPORT_EXPORT,
-        types.AUTOMATION_CLIENT
+        types.CITIZEN_PORTAL
       ].includes(type)
     ) {
       const systemDetails = {

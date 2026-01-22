@@ -18,7 +18,7 @@ export const types = {
   RECORD_SEARCH: 'RECORD_SEARCH',
   WEBHOOK: 'WEBHOOK',
   IMPORT_EXPORT: 'IMPORT_EXPORT',
-  AUTOMATION_CLIENT: 'AUTOMATION_CLIENT'
+  CITIZEN_PORTAL: 'CITIZEN_PORTAL'
 }
 
 export const integratingSystemTypes = {

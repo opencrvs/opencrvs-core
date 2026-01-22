@@ -84,7 +84,7 @@ const systemSchema = new Schema({
       types.RECORD_SEARCH,
       types.WEBHOOK,
       types.IMPORT_EXPORT,
-      types.AUTOMATION_CLIENT
+      types.CITIZEN_PORTAL
     ]
   },
   integratingSystemType: {
