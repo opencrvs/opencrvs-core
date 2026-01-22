@@ -45,6 +45,11 @@ npx esbuild src/notification/index.ts --bundle --format=cjs --outdir=./dist/noti
 mkdir -p ./dist/commons/notification
 cp -r ../commons/build/dist/common/notification/*.d.ts ./dist/commons/notification
 
+# Build common config
+npx esbuild src/config/index.ts --bundle --format=cjs --outdir=./dist/config --allow-overwrite --packages=external
+mkdir -p ./dist/commons/config
+cp -r ../commons/build/dist/common/config/*.d.ts ./dist/commons/config
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
   find dist -type f -exec sed -i '' 's|@opencrvs/commons|../commons|g' {} +

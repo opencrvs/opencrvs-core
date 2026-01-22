@@ -8,19 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
-export * from './url'
-export * from './logger'
-export * from './roles'
-export * from './search'
-export * from './events'
-export * from './users/User'
-export * from './authentication'
-export * from './utils'
-export * from './countryconfig'
-export * from './icons'
-export * from './notification'
-export * from './config'
+
+import {
+  WindowConfig,
+  WindowConfigInput,
+  WindowConfigSchema
+} from './WindowConfig'
+
+export const defineWindowConfig = (
+  windowConfig: WindowConfigInput
+): WindowConfig => WindowConfigSchema.parse(windowConfig)

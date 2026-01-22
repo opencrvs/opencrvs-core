@@ -10,7 +10,8 @@
     "./scopes": "./dist/scopes/index.js",
     "./events/deduplication": "./dist/events/deduplication.js",
     "./conditionals": "./dist/conditionals/index.js",
-    "./notification": "./dist/notification/index.js"
+    "./notification": "./dist/notification/index.js",
+    "./config": "./dist/config/index.js"
   },
   "scripts": {
     "build": "./build.sh",
