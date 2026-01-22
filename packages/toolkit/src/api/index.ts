@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
+import {
+  CreateTRPCClient,
+  createTRPCClient,
+  httpBatchLink,
+  TRPCClientError
+} from '@trpc/client'
 import superjson from 'superjson'
 import { AppRouter } from '@opencrvs/events/build/types/router'
 
@@ -37,3 +42,5 @@ export function createClient(
     ]
   })
 }
+
+export { TRPCClientError }
