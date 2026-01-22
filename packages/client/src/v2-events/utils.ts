@@ -336,52 +336,6 @@ export function mergeWithoutNullsOrUndefined<T>(
 }
 
 type OutputMode = 'withIds' | 'withNames'
-/*
-  Function to traverse the administrative level hierarchy from an arbitrary / leaf point
-*/
-export function getAdminLevelHierarchy(
-  administrativeAreaId: string | undefined | null,
-  administrativeAreas: Map<UUID, AdministrativeArea>,
-  adminStructure: string[],
-  outputMode: OutputMode = 'withIds'
-) {
-  // Collect location objects from leaf to root
-  const collectedLocations: AdministrativeArea[] = []
-
-  const parsedAdministrativeAreaId =
-    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
-
-  let current = parsedAdministrativeAreaId
-    ? administrativeAreas.get(parsedAdministrativeAreaId)
-    : null
-
-  while (current) {
-    collectedLocations.push(current)
-    if (!current.parentId) {
-      break
-    }
-    const parentId = current.parentId
-    current = administrativeAreas.get(parentId)
-  }
-
-  // Reverse so root is first, leaf is last
-  collectedLocations.reverse()
-
-  // Map collected locations to the provided admin structure
-  const hierarchy: Partial<Record<string, string>> = {}
-  for (
-    let i = 0;
-    i < adminStructure.length && i < collectedLocations.length;
-    i++
-  ) {
-    hierarchy[adminStructure[i]] =
-      outputMode === 'withNames'
-        ? collectedLocations[i].name
-        : collectedLocations[i].id
-  }
-
-  return hierarchy
-}
 
 // Given an administrative area id, return the full hierarchy from root to leaf.
 export function getAdministrativeAreaHierarchy(
@@ -408,6 +362,37 @@ export function getAdministrativeAreaHierarchy(
   }
 
   return collectedLocations
+}
+
+/*
+  Function to traverse the administrative level hierarchy from an arbitrary / leaf point
+*/
+export function getAdminLevelHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>,
+  adminStructure: string[],
+  outputMode: OutputMode = 'withIds'
+) {
+  // Reverse so root is first, leaf is last
+  const collectedLocations = getAdministrativeAreaHierarchy(
+    administrativeAreaId,
+    administrativeAreas
+  ).reverse()
+
+  // Map collected locations to the provided admin structure
+  const hierarchy: Partial<Record<string, string>> = {}
+  for (
+    let i = 0;
+    i < adminStructure.length && i < collectedLocations.length;
+    i++
+  ) {
+    hierarchy[adminStructure[i]] =
+      outputMode === 'withNames'
+        ? collectedLocations[i].name
+        : collectedLocations[i].id
+  }
+
+  return hierarchy
 }
 
 export function hasStringFilename(
