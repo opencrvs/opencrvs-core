@@ -82,8 +82,6 @@ function getQueryClient() {
     defaultOptions: {
       queries: {
         gcTime: Infinity,
-        staleTime: Infinity,
-        refetchOnReconnect: 'always',
         retry: 1
       },
       mutations: {
