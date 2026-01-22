@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 
-export const DashboardSchema = z.object({
+const DashboardSchema = z.object({
   id: z.string(),
   title: z.object({
     id: z.string(),
@@ -21,7 +21,7 @@ export const DashboardSchema = z.object({
   url: z.string(),
   context: z
     .object({
-      params: z.enum(['locationId', 'token']).optional(),
+      params: z.array(z.enum(['locationId', 'token'])).optional(),
       forwardSearchParams: z.boolean().optional()
     })
     .optional()
