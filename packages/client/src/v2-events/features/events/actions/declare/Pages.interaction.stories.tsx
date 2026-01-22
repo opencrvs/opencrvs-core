@@ -198,10 +198,10 @@ export const SaveAndExit: Story = {
       await userEvent.click(modal.getByRole('button', { name: /Confirm/ }))
     })
 
-    await step('Navigate to My drafts workqueue', async () => {
+    await step('Navigate to Drafts workqueue', async () => {
       await waitFor(
         async () =>
-          userEvent.click(canvas.getByRole('button', { name: /My drafts/ })),
+          userEvent.click(canvas.getByRole('button', { name: /Drafts/ })),
         { timeout: 5000 }
       )
     })
@@ -310,9 +310,7 @@ export const DraftShownInForm: Story = {
 
     await waitFor(
       async () =>
-        userEvent.click(
-          await canvas.findByRole('button', { name: /My drafts/ })
-        ),
+        userEvent.click(await canvas.findByRole('button', { name: /Drafts/ })),
       { timeout: 5000 }
     )
     await userEvent.click(await canvas.findByText('Clearly Draft'))

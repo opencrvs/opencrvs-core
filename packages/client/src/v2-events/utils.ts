@@ -309,7 +309,7 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
 export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
   name: {
     id: 'workqueues.draft.title',
-    defaultMessage: 'My drafts',
+    defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
   actions: [],
