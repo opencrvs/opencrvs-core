@@ -407,8 +407,7 @@ export function getAdministrativeAreaHierarchy(
     current = administrativeAreas.get(parentId)
   }
 
-  // Reverse so root is first, leaf is last
-  return collectedLocations.reverse()
+  return collectedLocations
 }
 
 export function hasStringFilename(

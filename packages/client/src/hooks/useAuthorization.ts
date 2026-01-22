@@ -23,7 +23,7 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-import { isOfficeUnderJurisdictionV2 } from '@client/utils/locationUtils'
+import { isOfficeUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
@@ -116,7 +116,7 @@ export function usePermissions() {
       return user.primaryOffice.id === userPrimaryOffice?.id
     }
     if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdictionV2({
+      return isOfficeUnderJurisdiction({
         officeId: userPrimaryOffice.id,
         otherOfficeId: user.primaryOffice.id,
         locations,
@@ -149,7 +149,7 @@ export function usePermissions() {
       if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
         return false
       }
-      return isOfficeUnderJurisdictionV2({
+      return isOfficeUnderJurisdiction({
         officeId: userPrimaryOffice.id,
         otherOfficeId: user.primaryOffice.id,
         locations,
@@ -178,7 +178,7 @@ export function usePermissions() {
     }
 
     if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdictionV2({
+      return isOfficeUnderJurisdiction({
         officeId: userPrimaryOffice.id,
         otherOfficeId: office.id,
         locations,
@@ -196,7 +196,7 @@ export function usePermissions() {
       return true
     }
     if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdictionV2({
+      return isOfficeUnderJurisdiction({
         officeId: userPrimaryOffice.id,
         otherOfficeId: office.id,
         locations,
