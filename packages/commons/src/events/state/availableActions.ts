@@ -27,7 +27,7 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   ],
   [EventStatus.enum.NOTIFIED]: [
     ActionType.READ,
-    ActionType.DECLARE,
+    ActionType.EDIT,
     ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
     ActionType.REJECT,

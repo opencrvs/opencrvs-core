@@ -282,6 +282,7 @@ function useViewableActionConfigurations(
   // Incomplete declarations are always shown as "Review" for the reviewer.
   const isReviewingIncompleteDeclaration = !isRejected && isNotifiedState
 
+  // @TODO CIHAN: can we remove this?
   // Rejected declarations are always shown as "Review" for the reviewer.
   const isReviewingRejectedDeclaration =
     isRejected && (isNotifiedState || isDeclaredState)
@@ -419,8 +420,7 @@ function useViewableActionConfigurations(
                 )
               : navigate(ROUTES.V2.buildPath({}))
           ),
-        disabled: !isDownloadedAndAssignedToUser,
-        hidden: isReviewingDeclaration
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
         label: isReviewingIncompleteDeclaration

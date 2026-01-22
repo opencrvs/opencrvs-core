@@ -203,6 +203,7 @@ function useDeclarationActions(event: EventDocument) {
           !availableActions.includes(ActionType.NOTIFY) ||
           !isActionAllowed(ActionType.NOTIFY)
       },
+      // @TODO CIHAN: Do we still need reject here?
       {
         icon: 'FileX' as const,
         label: actionLabels[ActionType.REJECT],
