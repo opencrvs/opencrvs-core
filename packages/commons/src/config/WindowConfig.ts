@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 
-const DashboardSchema = z.object({
+export const DashboardSchema = z.object({
   id: z.string(),
   title: z.object({
     id: z.string(),
@@ -26,6 +26,8 @@ const DashboardSchema = z.object({
     })
     .optional()
 })
+
+export type Dashboard = z.infer<typeof DashboardSchema>
 
 const BIRTH_CONFIG_SCHEMA = z.object({
   REGISTRATION_TARGET: z.number().optional(),

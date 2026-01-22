@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import IframeResizer from 'iframe-resizer-react'
 import { useIntl } from 'react-intl'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -17,12 +18,16 @@ import styled from 'styled-components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
 import { AppBar, Frame } from '@opencrvs/components'
+import { Dashboard } from '@opencrvs/commons/client'
 import { constantsMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
 import {
   NavigationStack,
   useNavigationHistory
 } from '@client/v2-events/components/NavigationStack'
+import { getToken } from '@client/utils/authUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { buildDashboardUrl } from './buildDashboardUrl'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -31,11 +36,11 @@ const StyledIFrame = styled(IframeResizer)`
 `
 interface IdashboardView {
   title: string
-  url?: string
   icon?: JSX.Element
+  dashboard: Dashboard
 }
 
-function DashboardEmbedView({ title, url, icon }: IdashboardView) {
+function DashboardEmbedView({ title, dashboard, icon }: IdashboardView) {
   const intl = useIntl()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -43,6 +48,9 @@ function DashboardEmbedView({ title, url, icon }: IdashboardView) {
     searchParams.entries()
   )
   const history = useNavigationHistory()
+  const token = getToken()
+  const userDetails = useSelector(getUserDetails)
+  const locationId = userDetails?.primaryOffice.id
 
   const handleCrossBar = () => {
     if (history.length > 1) {
@@ -53,6 +61,15 @@ function DashboardEmbedView({ title, url, icon }: IdashboardView) {
       navigate(ROUTES.V2.path)
     }
   }
+  const iframeUrl = useMemo(
+    () =>
+      buildDashboardUrl({
+        dashboard,
+        token,
+        locationId
+      }),
+    [dashboard, token, locationId]
+  )
 
   return (
     <>
@@ -87,7 +104,7 @@ function DashboardEmbedView({ title, url, icon }: IdashboardView) {
           constantsMessages.skipToMainContent
         )}
       >
-        <StyledIFrame allowFullScreen id={title} src={url} />
+        <StyledIFrame allowFullScreen id={title} src={iframeUrl} />
       </Frame>
     </>
   )
@@ -95,19 +112,18 @@ function DashboardEmbedView({ title, url, icon }: IdashboardView) {
 
 export const PerformanceDashboard = () => {
   const intl = useIntl()
-  const params = useParams()
-  const id = params.id
-  const config = window.config.DASHBOARDS.find((d) => d.id === id)
-  if (!config) {
-    // If no dashboard config found for the given id, render nothing
+  const { id } = useParams()
+
+  const dashboard = window.config.DASHBOARDS.find((d) => d.id === id)
+  if (!dashboard) {
     return null
   }
   return (
     <NavigationStack>
       <DashboardEmbedView
+        dashboard={dashboard}
         icon={<Icon name="Activity" size="medium" />}
-        title={intl.formatMessage(config.title)}
-        url={config.url}
+        title={intl.formatMessage(dashboard.title)}
       />
     </NavigationStack>
   )

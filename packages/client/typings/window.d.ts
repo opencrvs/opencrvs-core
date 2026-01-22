@@ -67,6 +67,10 @@ interface Window {
         description: string
       }
       url: string
+      context: {
+        params: ('token' | 'locationId')[]
+        forwardSearchParams: boolean
+      }
     }>
     SIGNATURE_REQUIRED_FOR_ROLES: string[]
     SYSTEM_IANA_TIMEZONE: string
