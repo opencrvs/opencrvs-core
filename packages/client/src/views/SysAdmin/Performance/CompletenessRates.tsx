@@ -48,6 +48,7 @@ import { SegmentedControl } from '@client/components/SegmentedControl'
 import { useQuery } from '@apollo/client'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { LocationType } from '@opencrvs/commons/client'
+import { isAdministrativeArea } from '../../../utils/locationUtils'
 const { useState } = React
 
 export enum COMPLETENESS_RATE_REPORT_BASE {
@@ -163,10 +164,7 @@ function Filter({
       <LocationPicker
         additionalLocations={getAdditionalLocations(intl)}
         selectedLocationId={locationId}
-        // @TODO:
-        // locationFilter={({ locationType }) =>
-        //   locationType === LocationType.enum.ADMIN_STRUCTURE
-        // }
+        locationFilter={isAdministrativeArea}
         onChangeLocation={(newLocationId) => {
           navigate(
             generateCompletenessRatesUrl({
