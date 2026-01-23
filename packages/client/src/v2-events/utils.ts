@@ -29,14 +29,13 @@ import {
   joinValues,
   UUID,
   SystemRole,
-  Location,
   UserOrSystem,
   InteractiveFieldType,
   FieldConfig,
   TextField,
-  AddressType,
   DefaultAddressFieldValue,
-  AdministrativeArea
+  AdministrativeArea,
+  ActionType
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -312,7 +311,7 @@ export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  actions: [],
+  actions: [{ type: ActionType.READ }],
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }
