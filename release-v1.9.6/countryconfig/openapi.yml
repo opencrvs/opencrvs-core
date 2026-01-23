@@ -2774,8 +2774,7 @@ components:
               const: DATE
             defaultValue:
               type: string
-              format: date
-              description: Date in the format YYYY-MM-DD
+              description: Default date value(yyyy-MM-dd)
             configuration:
               type: object
               properties:
@@ -2924,8 +2923,8 @@ components:
               type: string
               const: TIME
             defaultValue:
-              type: string
-              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              type: object
+              description: Default time value (HH-mm)
             configuration:
               type: object
               properties:

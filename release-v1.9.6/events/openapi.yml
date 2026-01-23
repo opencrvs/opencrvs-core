@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 30033903-70cc-40e4-9ed8-718b6191bafb
+                transactionId: 81c5a0b4-0771-4e5e-bfbf-eb059899c3fc
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 1d3e7076-d874-46f0-bd05-0673cc4c007d
+                transactionId: b9e25fa6-434e-485c-9f76-c835598ecda2
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -3414,8 +3414,7 @@ components:
                 - DATE
             defaultValue:
               type: string
-              format: date
-              description: Date in the format YYYY-MM-DD
+              description: Default date value(yyyy-MM-dd)
             configuration:
               type: object
               properties:
@@ -3568,8 +3567,8 @@ components:
               enum:
                 - TIME
             defaultValue:
-              type: string
-              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              type: object
+              description: Default time value (HH-mm)
             configuration:
               type: object
               properties:
