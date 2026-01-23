@@ -17,8 +17,6 @@ import {
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import { formatUrl } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
@@ -43,11 +41,7 @@ import {
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { parse } from 'qs'
-import {
-  injectIntl,
-  useIntl,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
+import { useIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
@@ -55,22 +49,20 @@ import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
-import React, { useCallback, useState } from 'react'
-import {
-  withOnlineStatus,
-  LoadingIndicator
-} from '@client/views/OfficeHome/LoadingIndicator'
+import React, { useCallback, useMemo, useState } from 'react'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { SearchUsersQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
-import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { Location, LocationType, UUID } from '@opencrvs/commons/client'
+import { Location, UUID } from '@opencrvs/commons/client'
+import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
+import { useOnlineStatus } from '../../../../utils'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -158,26 +150,14 @@ const LinkButtonModified = styled(LinkButton)`
   height: 24px;
 `
 
-interface ISearchParams {
+interface SearchParams {
   locationId?: string
 }
 
-type IOnlineStatusProps = {
-  isOnline: boolean
-}
-
-type BaseProps = {
+type UserListProps = {
+  hideNavigation?: boolean
   theme: ITheme
   userDetails: UserDetails | null
-  offlineCountryConfig: IOfflineData
-}
-
-type IProps = BaseProps &
-  IntlShapeProps &
-  IOnlineStatusProps & { hideNavigation?: boolean }
-
-interface IStatusProps {
-  status: string
 }
 
 interface ToggleModal {
@@ -185,7 +165,7 @@ interface ToggleModal {
   selectedUser: User | null
 }
 
-export const Status = (statusProps: IStatusProps) => {
+export const Status = (statusProps: { status: string }) => {
   const status = statusProps.status
   const intl = useIntl()
   switch (status) {
@@ -210,16 +190,17 @@ export const Status = (statusProps: IStatusProps) => {
   }
 }
 
-function UserListComponent(props: IProps) {
+function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const { getLocations } = useLocations()
-  const locations = getLocations.useSuspenseQuery()
+  const intl = useIntl()
+  const isOnline = useOnlineStatus()
 
-  const offlineOffices = [...locations.values()].filter(
-    ({ locationType }) => locationType === LocationType.enum.CRVS_OFFICE
-  )
+  const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
   const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)
   const [showUsernameReminderSuccess, setShowUsernameReminderSuccess] =
@@ -233,11 +214,9 @@ function UserListComponent(props: IProps) {
   const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
     usePermissions()
 
-  const { intl, userDetails, isOnline, offlineCountryConfig } = props
-
   const { locationId } = parse(location.search, {
     ignoreQueryPrefix: true
-  }) as unknown as ISearchParams
+  }) as unknown as SearchParams
   const [toggleUsernameReminder, setToggleUsernameReminder] =
     useState<ToggleModal>({
       modalVisible: false,
@@ -264,8 +243,10 @@ function UserListComponent(props: IProps) {
 
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
-  const isMultipleOfficeUnderJurisdiction =
-    offlineOffices.filter(canAccessOffice).length > 1
+  const canAccessMultipleLocations = useMemo(
+    () => Array.from(locations.values()).filter(canAccessOffice).length > 1,
+    [locations, canAccessOffice]
+  )
 
   const toggleUserActivationModal = useCallback(
     function toggleUserActivationModal(user?: User) {
@@ -603,7 +584,7 @@ function UserListComponent(props: IProps) {
 
   const LocationButton = (locationId: string) => {
     const buttons: React.ReactElement[] = []
-    if (isMultipleOfficeUnderJurisdiction) {
+    if (canAccessMultipleLocations) {
       buttons.push(
         <LocationPicker
           key={`location-picker-${locationId}`}
@@ -618,10 +599,7 @@ function UserListComponent(props: IProps) {
 
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
-          locationFilter={(location) =>
-            location.locationType === LocationType.enum.CRVS_OFFICE &&
-            canAccessOffice(location)
-          }
+          locationFilter={(location) => canAccessOffice(location)}
         />
       )
     }
@@ -817,11 +795,11 @@ function UserListComponent(props: IProps) {
   return (
     <SysAdminContentWrapper
       changeTeamLocation={
-        isMultipleOfficeUnderJurisdiction ? onChangeLocation : undefined
+        canAccessMultipleLocations ? onChangeLocation : undefined
       }
       isCertificatesConfigPage={true}
       hideBackground={true}
-      isHidden={props.hideNavigation}
+      isHidden={hideNavigation}
     >
       {isOnline ? (
         <Query<SearchUsersQuery>
@@ -865,9 +843,11 @@ function UserListComponent(props: IProps) {
                       {searchedLocation && (
                         <LocationInfoValue>
                           {getAddressNameV2(
-                            locations,
-                            searchedLocation.parentId
-                              ? locations.get(searchedLocation.parentId)
+                            administrativeAreas,
+                            searchedLocation.administrativeAreaId
+                              ? administrativeAreas.get(
+                                  searchedLocation.administrativeAreaId
+                                )
                               : undefined
                           )}
                         </LocationInfoValue>
@@ -969,6 +949,5 @@ function UserListComponent(props: IProps) {
 }
 
 export const UserList = connect((state: IStoreState) => ({
-  userDetails: getUserDetails(state),
-  offlineCountryConfig: getOfflineData(state)
-}))(withTheme(injectIntl(withOnlineStatus(UserListComponent))))
+  userDetails: getUserDetails(state)
+}))(withTheme(UserListComponent))

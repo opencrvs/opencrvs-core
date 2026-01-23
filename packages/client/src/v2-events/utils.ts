@@ -29,12 +29,12 @@ import {
   joinValues,
   UUID,
   SystemRole,
-  Location,
   UserOrSystem,
   InteractiveFieldType,
   FieldConfig,
   TextField,
   DefaultAddressFieldValue,
+  AdministrativeArea,
   ActionType
 } from '@opencrvs/commons/client'
 
@@ -335,21 +335,21 @@ export function mergeWithoutNullsOrUndefined<T>(
 }
 
 type OutputMode = 'withIds' | 'withNames'
-/*
-Function to traverse the administrative level hierarchy from an arbitrary / leaf point
-*/
-export function getAdminLevelHierarchy(
-  maybeLocationId: string | undefined,
-  locations: Map<UUID, Location>,
-  adminStructure: string[],
-  outputMode: OutputMode = 'withIds'
+
+// Given an administrative area id, return the full hierarchy from root to leaf.
+export function getAdministrativeAreaHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>
 ) {
   // Collect location objects from leaf to root
-  const collectedLocations: Location[] = []
+  const collectedLocations: AdministrativeArea[] = []
 
-  const locationId = maybeLocationId && UUID.safeParse(maybeLocationId).data
+  const parsedAdministrativeAreaId =
+    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
 
-  let current = locationId ? locations.get(locationId) : null
+  let current = parsedAdministrativeAreaId
+    ? administrativeAreas.get(parsedAdministrativeAreaId)
+    : null
 
   while (current) {
     collectedLocations.push(current)
@@ -357,11 +357,26 @@ export function getAdminLevelHierarchy(
       break
     }
     const parentId = current.parentId
-    current = locations.get(parentId)
+    current = administrativeAreas.get(parentId)
   }
 
+  return collectedLocations
+}
+
+/*
+  Function to traverse the administrative level hierarchy from an arbitrary / leaf point
+*/
+export function getAdminLevelHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>,
+  adminStructure: string[],
+  outputMode: OutputMode = 'withIds'
+) {
   // Reverse so root is first, leaf is last
-  collectedLocations.reverse()
+  const collectedLocations = getAdministrativeAreaHierarchy(
+    administrativeAreaId,
+    administrativeAreas
+  ).reverse()
 
   // Map collected locations to the provided admin structure
   const hierarchy: Partial<Record<string, string>> = {}
