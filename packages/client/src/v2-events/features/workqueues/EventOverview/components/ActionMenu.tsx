@@ -132,12 +132,8 @@ export function ActionMenu({
   const assignedToOther =
     eventState.assignedTo && eventState.assignedTo !== auth.sub
 
-  const sortedActions = useMemo(
-    () => sortActions(actionMenuItems, eventConfiguration),
-    [actionMenuItems, eventConfiguration]
-  )
-
   function ActionMenuItems() {
+    const sortedActions = sortActions(actionMenuItems, eventConfiguration)
     if (sortedActions.length === 0) {
       return (
         <DropdownMenu.Label>

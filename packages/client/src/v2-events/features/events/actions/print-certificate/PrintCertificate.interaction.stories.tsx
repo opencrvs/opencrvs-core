@@ -353,9 +353,9 @@ export const RedirectAfterPrint: Story = {
         await canvas.findByRole('button', { name: 'Yes, print certificate' })
       )
 
-      await canvas.findByText('Print and issue certificate?')
+      await canvas.findByText('Print certified copy?')
       await canvas.findByText(
-        'A Pdf of the certificate will open in a new tab for printing and issuing.'
+        'This will generate a certified copy of the record for printing.'
       )
 
       await canvas.findByRole('button', { name: 'Cancel' })

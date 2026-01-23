@@ -44,9 +44,9 @@ import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext, UserContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
-import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
-import { getEventIndexWithLocationHierarchy } from '../../../service/indexing/utils'
+import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
+import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
 import { canAccessEventWithScopes, getAcceptedScopesFromToken } from './utils'
 
 /**
@@ -402,7 +402,7 @@ export const userCanReadEventV2: MiddlewareFunction<
 
   const eventIndex = getCurrentEventState(event, eventConfig)
   const eventIndexWithLocationHierarchy =
-    await getEventIndexWithLocationHierarchy(eventConfig, eventIndex)
+    await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
 
   const hasAccess = canAccessEventWithScopes(
     eventIndexWithLocationHierarchy,
@@ -478,10 +478,14 @@ export const userCanReadOtherUser: MiddlewareFunction<
     return next()
   }
 
-  const isUnderJurisdiction = await isLocationUnderJurisdiction({
-    jurisdictionLocationId: userReading.primaryOfficeId,
-    locationToSearchId: otherUser.primaryOfficeId
-  })
+  // If administrative area is undefined, we consider the user has access to all locations.
+  // This will change once we implement 2.0. user scopes.
+  const isUnderJurisdiction = userReading.administrativeAreaId
+    ? await isLocationUnderAdministrativeArea({
+        administrativeAreaId: userReading.administrativeAreaId,
+        locationId: otherUser.primaryOfficeId
+      })
+    : true
 
   if (
     hasScope(token, SCOPES.USER_READ_MY_JURISDICTION) &&

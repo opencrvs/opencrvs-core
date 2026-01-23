@@ -51,8 +51,14 @@ const reviewCorrectionMessages = defineMessages({
   actionModalDescription: {
     id: 'actionModal.description',
     defaultMessage:
-      'The informant will be notified of this decision and a record of this decision will be recorded',
+      'The informant will be notified of this decision and a record of this decision will be recorded.',
     description: 'The description for action modal'
+  },
+  rejectModalDescription: {
+    id: 'correction.correctionReject.description',
+    defaultMessage:
+      'Rejecting this correction request will leave the original record unchanged. A reason for rejection should be provided.',
+    description: 'The description for reject correction modal'
   },
   approveCorrection: {
     id: 'modal.approveCorrection',
@@ -188,7 +194,7 @@ function RejectModal({
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
+          {intl.formatMessage(reviewCorrectionMessages.rejectModalDescription)}
         </Text>
       </Stack>
       <StyledStack>
