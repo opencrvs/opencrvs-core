@@ -41,7 +41,7 @@ const messages24Hour = {
 }
 
 const meta: Meta<typeof FormFieldGenerator> = {
-  title: 'Inputs/TimeInput',
+  title: 'Inputs/TimeField',
   args: { onChange: fn() },
   decorators: [withValidatorContext]
 }
