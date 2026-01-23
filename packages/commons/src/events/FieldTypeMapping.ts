@@ -169,7 +169,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
       schema = NumberFieldValue
       break
     case FieldType.NUMBER_WITH_UNIT:
-      schema = NumberWithUnitFieldUpdateValue
+      schema = field.required
+        ? NumberWithUnitFieldValue
+        : NumberWithUnitFieldUpdateValue
       break
     case FieldType.CHECKBOX:
       schema = CheckboxFieldValue
