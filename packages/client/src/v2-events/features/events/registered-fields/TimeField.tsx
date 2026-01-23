@@ -17,6 +17,7 @@ import {
   ITimeFieldProps as TimeFieldProps
 } from '@opencrvs/components/lib/TimeField'
 import { SerializedNowDateTime, TimeValue } from '@opencrvs/commons/client'
+import { useResolveOnce } from '../useResolveOnce'
 
 const messages = defineMessages({
   timeFormat: {
@@ -53,6 +54,8 @@ function TimeInput({
     (val: string) => (val === EMPTY_TIME ? '' : val),
     []
   )
+  // Ensure that 'now' is resolved to the current date and set in the form data.
+  useResolveOnce({ value, resolvedValue, onChange })
 
   const handleChange = React.useCallback(
     (val: string) => {

@@ -22,6 +22,7 @@ import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
+import { useResolveOnce } from '../useResolveOnce'
 import { StringifierContext } from './RegisteredField'
 
 const messages = defineMessages({
@@ -62,6 +63,9 @@ function DateInput({
   const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
   const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
   const resolvedValue = resolveNowForDateInput(value)
+
+  // Ensure that 'now' is resolved to the current date and set in the form data.
+  useResolveOnce({ value, resolvedValue, onChange })
 
   return (
     <DateFieldComponent
