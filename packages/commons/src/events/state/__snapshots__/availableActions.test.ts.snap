@@ -58,7 +58,7 @@ exports[`getAvailableActions should return the correct actions for "DECLARED" st
 exports[`getAvailableActions should return the correct actions for "NOTIFIED" status with no flags 1`] = `
 [
   "READ",
-  "DECLARE",
+  "EDIT",
   "ARCHIVE",
   "REJECT",
   "CUSTOM",
