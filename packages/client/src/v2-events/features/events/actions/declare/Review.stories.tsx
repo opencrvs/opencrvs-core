@@ -425,44 +425,6 @@ export const ReviewShowsFilesFromDraft: Story = {
   }
 }
 
-export const Notified: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: notifiedEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return notifiedEventDocument
-          })
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar().v1
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
-  }
-}
-
 export const RejectedNotified: Story = {
   parameters: {
     reactRouter: {
