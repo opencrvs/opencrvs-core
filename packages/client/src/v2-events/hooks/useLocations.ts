@@ -10,7 +10,7 @@
  */
 
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Location, LocationType, UUID } from '@opencrvs/commons/client'
+import { Location, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 
@@ -39,7 +39,7 @@ export function useLocations() {
       }: {
         isActive?: boolean
         locationIds?: UUID[]
-        locationType?: LocationType
+        locationType?: string
       } = {}) => {
         // We intentionally remove `queryFn` here because we already set a global default
         // via `setQueryDefaults`. Passing it again would override caching/persistence.
@@ -64,85 +64,4 @@ export function useLocations() {
       }
     }
   }
-}
-
-/**
- *
- * @returns given the type of location, check if it matches the provided types. When no types are provided, always returns true.
- */
-function matchesType(
-  type: LocationType | null,
-  locationTypes?: LocationType[]
-) {
-  return (
-    !locationTypes ||
-    locationTypes.length === 0 ||
-    (type !== null && locationTypes.includes(type))
-  )
-}
-
-/**
- * Get the leaf location IDs from a list of locations.
- *
- * A leaf location is defined as a location that does not have any children in the provided list.
- * e.g. if a location is a parent of another location in the list, it is not considered a leaf. ADMIN_STRUCTURE might have CRVS_OFFICE children, but can be a leaf if we only consider ADMIN_STRUCTURE locations.
- *
- * @param locations - The list of locations to search.
- * @param locationTypes - The types of locations to include.
- * @returns The list of leaf location IDs.
- */
-export function getLeafLocationIds(
-  locations: Map<UUID, Location>,
-  locationTypes?: LocationType[]
-): Array<{ id: UUID }> {
-  const nonLeafLocationIds = new Set<string>()
-
-  for (const [id, location] of locations) {
-    if (
-      location.parentId &&
-      matchesType(location.locationType, locationTypes)
-    ) {
-      nonLeafLocationIds.add(location.parentId)
-    }
-  }
-
-  const result: { id: UUID }[] = []
-  for (const [id, location] of locations) {
-    if (
-      !nonLeafLocationIds.has(id) &&
-      matchesType(location.locationType, locationTypes)
-    ) {
-      result.push({ id })
-    }
-  }
-
-  return result
-}
-
-// Ref works since arrays are compared by reference.
-let cachedLocationsRef: unknown = null
-/** In-memory cache of leaf location IDs */
-let cachedLeafIds: { id: UUID }[] | null = null
-
-/**
- * Uses in-memory caching to avoid recomputation on re-renders. Becomes costly with large datasets.
- *
- * @returns array of leaf location IDs within the specified types. When no types are provided, returns leaf locations based on all types.
- */
-export function useSuspenseAdminLeafLevelLocations() {
-  const { getLocations } = useLocations()
-  const locations = getLocations.useSuspenseQuery()
-
-  if (cachedLeafIds && cachedLocationsRef === locations) {
-    return cachedLeafIds
-  }
-
-  const leafIds = getLeafLocationIds(locations, [
-    LocationType.enum.ADMIN_STRUCTURE
-  ])
-
-  cachedLocationsRef = locations
-  cachedLeafIds = leafIds
-
-  return leafIds
 }

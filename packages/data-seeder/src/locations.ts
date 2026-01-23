@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
+import * as _ from 'lodash'
 import { env } from './environment'
 import { TypeOf, z } from 'zod'
 import { raise } from './utils'
@@ -124,6 +125,7 @@ async function getLocations() {
   if (!res.ok) {
     raise(`Expected to get the locations from ${url}`)
   }
+
   const parsedLocations = LocationSchema.safeParse(await res.json())
   if (!parsedLocations.success) {
     raise(
@@ -132,39 +134,53 @@ async function getLocations() {
       })
     )
   }
-  const adminStructureMap = validateAdminStructure(
-    parsedLocations.data.filter(
-      ({ locationType }) => locationType === 'ADMIN_STRUCTURE'
-    )
+
+  const [administrativeAreas, locations] = _.partition(
+    parsedLocations.data,
+    ({ locationType }) => locationType === 'ADMIN_STRUCTURE'
   )
-  parsedLocations.data
-    .filter(({ locationType }) => locationType !== 'ADMIN_STRUCTURE')
-    .forEach((facilityOrOffice) => {
-      if (!adminStructureMap.get(facilityOrOffice.partOf.split('/')[1])) {
-        raise(
-          `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
-        )
-      }
-    })
-  const locations = parsedLocations.data
 
-  const locationIdMap = new Map(locations.map(({ id }) => [id, getUUID()]))
+  const administrativeAreaMap = validateAdminStructure(administrativeAreas)
 
-  return locations.map((loc) => ({
-    id: locationIdMap.get(loc.id)!,
-    name: loc.name,
-    parentId: locationIdMap.get(loc.partOf.split('/')[1]) || null,
-    locationType: loc.locationType,
-    externalId: loc.id,
-    validUntil: null
-  }))
+  locations.forEach((facilityOrOffice) => {
+    if (!administrativeAreaMap.get(facilityOrOffice.partOf.split('/')[1])) {
+      raise(
+        `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
+      )
+    }
+  })
+
+  const administrativeHierarchyIdMap = new Map(
+    parsedLocations.data.map(({ id }) => [id, getUUID()])
+  )
+
+  return {
+    administrativeAreas: administrativeAreas.map((a) => ({
+      id: administrativeHierarchyIdMap.get(a.id)!,
+      name: a.name,
+      parentId:
+        administrativeHierarchyIdMap.get(a.partOf.split('/')[1]) || null,
+      externalId: a.id,
+      validUntil: null
+    })),
+    locations: locations.map((loc) => ({
+      id: administrativeHierarchyIdMap.get(loc.id)!,
+      name: loc.name,
+      administrativeAreaId:
+        administrativeHierarchyIdMap.get(loc.partOf.split('/')[1]) || null,
+      locationType: loc.locationType,
+      externalId: loc.id,
+      validUntil: null
+    }))
+  }
 }
 
 export async function seedLocations(token: string) {
-  const locations = await getLocations()
+  const { administrativeAreas, locations } = await getLocations()
 
   const url = new URL('events', env.GATEWAY_HOST).toString()
   const client = createClient(url, `Bearer ${token}`)
 
-  return await client.locations.set.mutate(locations)
+  await client.administrativeAreas.set.mutate(administrativeAreas)
+  await client.locations.set.mutate(locations)
 }
