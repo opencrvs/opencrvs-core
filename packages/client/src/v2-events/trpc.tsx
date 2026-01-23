@@ -199,7 +199,7 @@ export function TRPCProvider({
   waitForClientRestored?: boolean
 }) {
   queryClient.getQueryCache().subscribe((event) => {
-    console.log(event)
+    console.log({ [event.type]: event.query })
   })
 
   const [queriesRestored, setQueriesRestored] = React.useState(false)
@@ -223,7 +223,8 @@ export function TRPCProvider({
             }
 
             return mutation.state.status !== 'success'
-          }
+          },
+          shouldDehydrateQuery: () => true
         }
       }}
       onSuccess={async () => {
