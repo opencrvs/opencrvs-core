@@ -11,7 +11,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { AppRouter } from '@events/router'
 import { userEvent, within, expect } from '@storybook/test'
 import {
   ActionType,
@@ -22,6 +21,7 @@ import {
   generateTrackingId,
   ActionDocument
 } from '@opencrvs/commons/client'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { ReviewDuplicateIndex } from './ReviewDuplicate'
 
