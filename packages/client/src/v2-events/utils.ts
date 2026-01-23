@@ -34,8 +34,8 @@ import {
   InteractiveFieldType,
   FieldConfig,
   TextField,
-  AddressType,
-  DefaultAddressFieldValue
+  DefaultAddressFieldValue,
+  ActionType
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -311,7 +311,7 @@ export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  actions: [],
+  actions: [{ type: ActionType.READ }],
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }
