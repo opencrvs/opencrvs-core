@@ -82,6 +82,7 @@ function getQueryClient() {
     defaultOptions: {
       queries: {
         gcTime: Infinity,
+        networkMode: 'offlineFirst',
         retry: 1
       },
       mutations: {
@@ -197,6 +198,10 @@ export function TRPCProvider({
   storeIdentifier?: string
   waitForClientRestored?: boolean
 }) {
+  queryClient.getQueryCache().subscribe((event) => {
+    console.log(event)
+  })
+
   const [queriesRestored, setQueriesRestored] = React.useState(false)
 
   return (
