@@ -17,6 +17,7 @@ import { IntlProvider } from 'react-intl'
 import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { padZero } from '@client/v2-events/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const messages24Hour = {
@@ -341,6 +342,74 @@ export const TimeFieldEdgeCases: StoryObj<typeof FormFieldGenerator> = {
           {'Valid format: HH:mm (24-hour format, e.g., 00:00 to 23:59)'}
         </OutputDisplay>
       </Container>
+    )
+  }
+}
+
+// Original TimeInput story with 24-hour format
+export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
+  decorators: [IntlDecorator(messages24Hour)],
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    layout: 'centered'
+  },
+  play: async ({ canvasElement, step }) => {
+    await step('Accept input time', async () => {
+      const canvas = within(canvasElement)
+      const today = new Date()
+      const hour = padZero(today.getHours())
+      const minute = padZero(today.getMinutes())
+
+      const hourInput = (await canvas.findByTestId(
+        'storybook____time-hh-twentyfour'
+      )) as HTMLInputElement
+
+      const minuteInput = (await canvas.findByTestId(
+        'storybook____time-mm-twentyfour'
+      )) as HTMLInputElement
+
+      void expect(hourInput.value).toBe(hour)
+      void expect(minuteInput.value).toBe(minute)
+
+      await userEvent.clear(hourInput)
+      await userEvent.clear(minuteInput)
+
+      await userEvent.type(await canvas.findByPlaceholderText('hh'), '9')
+
+      await userEvent.click(await canvas.findByText('Time input (24-hour)'))
+
+      await userEvent.type(await canvas.findByPlaceholderText('mm'), '30')
+    })
+  },
+  render: function Component(args) {
+    const [formData, setFormData] = React.useState({})
+
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.time',
+            type: FieldType.TIME,
+            // value of now() will be resolve to { $$now: true }
+            defaultValue: {
+              $$now: true
+            },
+            label: {
+              id: 'storybook.time.label',
+              defaultMessage: 'Time input (24-hour)',
+              description: 'The title for the time input'
+            },
+            required: true
+          }
+        ]}
+        id="my-form"
+        initialValues={formData}
+        onChange={(data) => {
+          args.onChange(data)
+          setFormData(data)
+        }}
+      />
     )
   }
 }
