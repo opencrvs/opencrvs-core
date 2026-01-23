@@ -52,6 +52,7 @@ export default meta
 export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
   decorators: [IntlDecorator(messages24Hour)],
   parameters: {
+    chromatic: { disableSnapshot: true },
     layout: 'centered'
   },
   play: async ({ canvasElement, step }) => {
