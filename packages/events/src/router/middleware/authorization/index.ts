@@ -40,7 +40,7 @@ import {
   ResolvedRecordScopeV2
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
-import { TrpcContext, UserContext } from '@events/context'
+import { SystemContext, TrpcContext, UserContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
 import { isLocationUnderJurisdiction } from '../../../storage/postgres/events/locations'
@@ -341,16 +341,23 @@ export const userCanReadEventV2: MiddlewareFunction<
   TrpcContext & { eventId: UUID; eventType: string },
   UUID
 > = async ({ next, ctx, input }) => {
-  const humanUser = UserContext.safeParse(ctx.user)
-
-  if (!humanUser.success) {
-    throw new EventNotFoundError(input)
-  }
-
   const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
   const acceptedScopes = getAcceptedScopesFromToken(ctx.token, ['record.read'])
   const event = await getEventById(input)
+  const system = SystemContext.safeParse(ctx.user)
+  const humanUser = UserContext.safeParse(ctx.user)
+  const isSystemUser = system.success
+
+  if (isSystemUser) {
+    return next({
+      ctx: {
+        ...ctx,
+        eventId: input,
+        eventType: event.type
+      }
+    })
+  }
 
   // 1. If no accepted scopes are found, fall back to V1 style check based on CREATE action.
   // This will be removed once we have migrated countryconfigs to use V2 scopes only.
@@ -402,14 +409,16 @@ export const userCanReadEventV2: MiddlewareFunction<
   const eventIndexWithLocationHierarchy =
     await getEventIndexWithLocationHierarchy(eventConfig, eventIndex)
 
-  const hasAccess = canAccessEventWithScopes(
-    eventIndexWithLocationHierarchy,
-    acceptedScopes as ResolvedRecordScopeV2[],
-    humanUser.data
-  )
+  if (humanUser.success) {
+    const hasAccess = canAccessEventWithScopes(
+      eventIndexWithLocationHierarchy,
+      acceptedScopes as ResolvedRecordScopeV2[],
+      humanUser.data
+    )
 
-  if (!hasAccess) {
-    throw new EventNotFoundError(input)
+    if (!hasAccess) {
+      throw new EventNotFoundError(input)
+    }
   }
 
   return next({

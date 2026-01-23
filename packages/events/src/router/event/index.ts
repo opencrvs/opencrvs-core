@@ -120,7 +120,7 @@ export const eventRouter = router({
         config
       })
     }),
-  get: userOnlyProcedure
+  get: userAndSystemProcedure
     .input(UUID)
     // @ts-expect-error: middleware.userCanReadEvent does not have proper type definitions but works as intended
     .use(middleware.userCanReadEventV2)

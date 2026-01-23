@@ -30,6 +30,7 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
   WEBHOOK: [SCOPES.WEBHOOK],
   REINDEX: [SCOPES.RECORD_REINDEX],
   CITIZEN_PORTAL: [
+    'record.read',
     'record.create',
     'record.notify',
     'record.declare',
