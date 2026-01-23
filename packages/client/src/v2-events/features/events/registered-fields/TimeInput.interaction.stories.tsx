@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { StoryObj } from '@storybook/react'
-import { expect, userEvent, within } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react'
+import { expect, userEvent, fn, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { IntlProvider } from 'react-intl'
@@ -18,6 +18,7 @@ import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { padZero } from '@client/v2-events/utils'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 function IntlDecorator(messages: Record<string, string>) {
   return (Story: React.ComponentType) => (
@@ -38,6 +39,14 @@ const messages24Hour = {
   'storybook.time.label': 'Time input (24-hour)',
   'storybook.time.label.description': 'The title for the time input'
 }
+
+const meta: Meta<typeof FormFieldGenerator> = {
+  title: 'Inputs/TimeInput',
+  args: { onChange: fn() },
+  decorators: [withValidatorContext]
+}
+
+export default meta
 
 // Original TimeInput story with 24-hour format
 export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
