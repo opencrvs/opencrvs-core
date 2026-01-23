@@ -40,6 +40,7 @@ import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
 import { JSONSchema } from '../client'
+import { SerializedNowDateTime } from './serializers/date/serializer'
 extendZodWithOpenApi(z)
 
 const FieldId = z
@@ -261,7 +262,10 @@ export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: DateValue.optional(),
+  defaultValue: SerializedNowDateTime.or(DateValue)
+    .optional()
+    .openapi({ effectType: 'input', type: 'string' })
+    .describe('Default date value(yyyy-MM-dd)'),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
@@ -287,7 +291,10 @@ export type AgeField = z.infer<typeof AgeField>
 
 const TimeField = BaseField.extend({
   type: z.literal(FieldType.TIME),
-  defaultValue: TimeValue.optional(),
+  defaultValue: SerializedNowDateTime.or(TimeValue)
+    .optional()
+    .openapi({ effectType: 'input', type: 'object' })
+    .describe('Default time value (HH-mm)'),
   configuration: z
     .object({
       use12HourFormat: z
