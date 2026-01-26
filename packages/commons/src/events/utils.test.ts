@@ -28,6 +28,8 @@ import {
   tennisClubMembershipEvent
 } from '../client'
 
+/* eslint-disable max-lines */
+
 const commonAction = {
   status: 'Requested' as const,
   id: 'action-id-1' as UUID,
