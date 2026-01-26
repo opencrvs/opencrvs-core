@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as elasticsearch from '@elastic/elasticsearch'
+import formatISO from 'date-fns/formatISO'
 import { get } from 'lodash'
 import { DateTime } from 'luxon'
 import {
@@ -23,7 +24,9 @@ import {
   extractPotentialDuplicatesFromActions,
   EventDocument,
   getDeclarationFields,
-  FieldConfig
+  FieldConfig,
+  AgeValue,
+  ageToDate
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -34,6 +37,7 @@ import {
   ageQueryKey,
   declarationReference,
   decodeEventIndex,
+  decodeFieldId,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
@@ -165,8 +169,32 @@ export function generateElasticsearchQuery(
       }
     }
     case 'dateRange': {
-      const dateValue = DateValue.safeParse(queryValue)
-      if (!dateValue.success) {
+      let dateValue: string = ''
+      const _dateValue = DateValue.safeParse(queryValue)
+      const ageValue = AgeValue.safeParse(queryValue)
+      if (_dateValue.success) {
+        dateValue = _dateValue.data
+      } else if (ageValue.success) {
+        const ageFieldConfig = getDeclarationFields(eventConfig).find(
+          (x) => x.id === decodeFieldId(queryKey.split('.')[1])
+        )
+
+        if (ageFieldConfig && ageFieldConfig.type === FieldType.AGE) {
+          const asOfDateValue = DateValue.safeParse(
+            eventIndex.declaration[
+              encodeFieldId(ageFieldConfig.configuration.asOfDate.$$field)
+            ]
+          )
+          dateValue = ageToDate(
+            ageValue.data.age,
+            asOfDateValue.success
+              ? asOfDateValue.data
+              : formatISO(new Date(), { representation: 'date' })
+          )
+        }
+      }
+
+      if (!_dateValue.success && !ageValue.success && !dateValue) {
         logger.warn(
           queryValue,
           `Invalid query value for dateRange matching ${rawFieldId}`
@@ -207,13 +235,13 @@ export function generateElasticsearchQuery(
       }
 
       // Helper to build query for a single field
-      const buildFieldQuery = (fieldKey: string) => ({
+      const buildFieldQuery = (fieldKey: string, date: string) => ({
         range: {
           [fieldKey]: {
-            gte: DateTime.fromISO(dateValue.data)
+            gte: DateTime.fromISO(date)
               .minus({ days: queryInput.options.days })
               .toISO(),
-            lte: DateTime.fromISO(dateValue.data)
+            lte: DateTime.fromISO(date)
               .plus({ days: queryInput.options.days })
               .toISO()
           }
@@ -224,7 +252,7 @@ export function generateElasticsearchQuery(
         distance_feature: {
           field: fieldKey,
           pivot: `${pivot}d`,
-          origin: dateValue.data
+          origin: dateValue
         }
       })
 
@@ -233,7 +261,7 @@ export function generateElasticsearchQuery(
           must: [
             {
               bool: {
-                should: fieldsToMatch.map(buildFieldQuery),
+                should: fieldsToMatch.map((f) => buildFieldQuery(f, dateValue)),
                 minimum_should_match: 1
               }
             }

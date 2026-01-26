@@ -5,11 +5,18 @@ exports[`deduplication query input conversion > should convert childDobWithin5Da
   "bool": {
     "must": [
       {
-        "range": {
-          "declaration.child____dob": {
-            "gte": "2011-11-06T00:00:00.000Z",
-            "lte": "2011-11-16T00:00:00.000Z",
-          },
+        "bool": {
+          "minimum_should_match": 1,
+          "should": [
+            {
+              "range": {
+                "declaration.child____dob": {
+                  "gte": "2011-11-06T00:00:00.000Z",
+                  "lte": "2011-11-16T00:00:00.000Z",
+                },
+              },
+            },
+          ],
         },
       },
     ],
@@ -75,16 +82,31 @@ exports[`deduplication query input conversion > should convert similar child nam
 }
 `;
 
-exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query 1`] = `
+exports[`deduplication query input conversion > should convert similarDobMother to dateRange query 1`] = `
 {
   "bool": {
     "must": [
       {
-        "range": {
-          "declaration.mother____dob": {
-            "gte": "1998-11-11T00:00:00.000Z",
-            "lte": "2000-11-10T00:00:00.000Z",
-          },
+        "bool": {
+          "minimum_should_match": 1,
+          "should": [
+            {
+              "range": {
+                "declaration.mother____dob": {
+                  "gte": "1998-11-11T00:00:00.000Z",
+                  "lte": "2000-11-10T00:00:00.000Z",
+                },
+              },
+            },
+            {
+              "range": {
+                "declaration.mother____age.__derived_dob": {
+                  "gte": "1998-11-11T00:00:00.000Z",
+                  "lte": "2000-11-10T00:00:00.000Z",
+                },
+              },
+            },
+          ],
         },
       },
     ],
@@ -92,6 +114,13 @@ exports[`deduplication query input conversion > should convert similarAgedMother
       {
         "distance_feature": {
           "field": "declaration.mother____dob",
+          "origin": "1999-11-11",
+          "pivot": "243d",
+        },
+      },
+      {
+        "distance_feature": {
+          "field": "declaration.mother____age.__derived_dob",
           "origin": "1999-11-11",
           "pivot": "243d",
         },

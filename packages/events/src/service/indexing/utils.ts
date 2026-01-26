@@ -37,7 +37,7 @@ export function encodeFieldId(fieldId: string) {
   return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
 }
 
-function decodeFieldId(fieldId: string) {
+export function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
