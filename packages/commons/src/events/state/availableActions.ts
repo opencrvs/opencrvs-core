@@ -121,6 +121,7 @@ function getAvailableActionsWithoutFlagFilters(
     return [ActionType.NOTIFY, ActionType.DECLARE, ActionType.REGISTER]
   }
 
+  // At some point we will refactor 'Rejected' to be a countryconfig flag, at which point we can remove this silly logic.
   if (flags.includes(InherentFlags.REJECTED)) {
     return [
       ActionType.READ,
