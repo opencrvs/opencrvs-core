@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 67103095-a913-4928-afa2-dd3ebf0d60ba
+                transactionId: 9d9369c8-52ec-4446-8671-3bdc0fddacc1
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: f1fd882d-373e-4a19-a1cc-5cd30a358f7b
+                transactionId: 958a76af-ad87-477e-a36a-f31ad7ff0077
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9877,7 +9877,7 @@ components:
                 boost:
                   type: number
                   default: 1
-                alsoMatchAgainst:
+                matchAgainst:
                   type: array
                   items:
                     type: object

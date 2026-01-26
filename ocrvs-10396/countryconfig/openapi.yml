@@ -9114,7 +9114,7 @@ components:
                 boost:
                   type: number
                   default: 1
-                alsoMatchAgainst:
+                matchAgainst:
                   type: array
                   items:
                     type: object
