@@ -33,22 +33,6 @@ function isEditInProgress(actions: Action[]) {
   return actions.at(-1)?.type === ActionType.EDIT
 }
 
-function isPendingCertification(actions: Action[]) {
-  if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
-    return false
-  }
-
-  return actions.reduce<boolean>((prev, { type }) => {
-    if (type === ActionType.PRINT_CERTIFICATE) {
-      return false
-    }
-    if (type === ActionType.APPROVE_CORRECTION) {
-      return true
-    }
-    return prev
-  }, true)
-}
-
 function isCorrectionRequested(actions: Action[]) {
   return actions.reduce<boolean>((prev, { type }) => {
     if (type === ActionType.REQUEST_CORRECTION) {
@@ -212,9 +196,6 @@ export function getEventFlags(
       return flag satisfies Flag
     })
 
-  if (isPendingCertification(sortedActions)) {
-    flags.push(InherentFlags.PENDING_CERTIFICATION)
-  }
   if (isCorrectionRequested(sortedActions)) {
     flags.push(InherentFlags.CORRECTION_REQUESTED)
   }
