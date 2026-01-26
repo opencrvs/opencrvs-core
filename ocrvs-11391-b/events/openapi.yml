@@ -618,10 +618,10 @@ paths:
         "401": *a1
         "403": *a2
         "500": *a3
-  /sync-locations:
+  /sync-administrative-hierarchy:
     post:
-      operationId: locations-sync
-      summary: Sync locations between V1 and V2
+      operationId: administrativeHierarchy-sync
+      summary: Sync administrative hierarchy between V1 and V2
       tags:
         - events
       security:
@@ -692,21 +692,17 @@ components:
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+            - type: "null"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         updatedAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/Within"
-            - $ref: "#/components/schemas/Exact"
+          $ref: "#/components/schemas/Within"
         assignedTo:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
@@ -869,7 +865,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -886,7 +881,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -2897,6 +2891,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ActionConfig"
+        actionOrder:
+          description: Order of actions in the action menu. Use either the action type for
+            core actions or the customActionType for custom actions.
+          type: array
+          items:
+            type: string
         declaration:
           description: Configuration of the form used to gather event data.
           type: object
@@ -3506,6 +3506,7 @@ components:
         - $ref: "#/components/schemas/PrintCertificateActionConfig"
         - $ref: "#/components/schemas/RequestCorrectionActionConfig"
         - $ref: "#/components/schemas/EditActionConfig"
+        - $ref: "#/components/schemas/ArchiveActionConfig"
         - $ref: "#/components/schemas/CustomActionConfig"
       type: object
       discriminator:
@@ -3518,6 +3519,7 @@ components:
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateActionConfig"
           REQUEST_CORRECTION: "#/components/schemas/RequestCorrectionActionConfig"
           EDIT: "#/components/schemas/EditActionConfig"
+          ARCHIVE: "#/components/schemas/ArchiveActionConfig"
           CUSTOM: "#/components/schemas/CustomActionConfig"
     ReadActionConfig:
       type: object
@@ -3539,7 +3541,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -3562,7 +3563,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -3570,6 +3571,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -3632,6 +3634,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -3940,6 +3943,7 @@ components:
                             - signature
                             - avatar
                             - primaryOfficeId
+                            - administrativeAreaId
                         $location:
                           type: string
                       required:
@@ -11131,7 +11135,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11154,7 +11157,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -11162,6 +11165,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -11224,6 +11228,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -11325,6 +11330,23 @@ components:
           required:
             - title
             - fields
+          additionalProperties: false
+        dialogCopy:
+          type: object
+          properties:
+            notify:
+              description: Confirmation text for the notify action
+              $ref: "#/components/schemas/TranslationConfig"
+            declare:
+              description: Confirmation text for the declare action
+              $ref: "#/components/schemas/TranslationConfig"
+            register:
+              description: Confirmation text for the register action
+              $ref: "#/components/schemas/TranslationConfig"
+          required:
+            - notify
+            - declare
+            - register
           additionalProperties: false
       required:
         - label
@@ -11473,7 +11495,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11496,7 +11517,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -11504,6 +11525,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -11566,6 +11588,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -11663,7 +11686,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11686,7 +11708,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -11694,6 +11716,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -11756,6 +11779,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -11867,7 +11891,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11890,7 +11913,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -11898,6 +11921,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -11960,6 +11984,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -12179,7 +12204,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12202,7 +12226,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -12210,6 +12234,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -12272,6 +12297,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -12455,7 +12481,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12478,7 +12503,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -12486,6 +12511,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -12548,6 +12574,7 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -12620,12 +12647,30 @@ components:
         type:
           type: string
           const: EDIT
+        dialogCopy:
+          type: object
+          properties:
+            notify:
+              description: Confirmation text for the notify with edits action
+              $ref: "#/components/schemas/TranslationConfig"
+            declare:
+              description: Confirmation text for the declare with edits action
+              $ref: "#/components/schemas/TranslationConfig"
+            register:
+              description: Confirmation text for the register with edits action
+              $ref: "#/components/schemas/TranslationConfig"
+          required:
+            - notify
+            - declare
+            - register
+          additionalProperties: false
       required:
         - label
         - flags
         - type
+        - dialogCopy
       additionalProperties: false
-    CustomActionConfig:
+    ArchiveActionConfig:
       type: object
       properties:
         label:
@@ -12645,7 +12690,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12668,7 +12712,7 @@ components:
               - operation
             additionalProperties: false
         supportingCopy:
-          description: Text displayed on the confirmation
+          description: Text displayed on the confirmation dialog
           $ref: "#/components/schemas/TranslationConfig"
         icon:
           description: Icon representing the action
@@ -12676,6 +12720,7 @@ components:
           enum:
             - Archived
             - Assigned
+            - Briefcase
             - Certified
             - Close
             - Collapse
@@ -12738,6 +12783,198 @@ components:
             - Paperclip
             - PaperPlaneTilt
             - Pen
+            - PenNib
+            - Pencil
+            - PencilSimpleLine
+            - Phone
+            - Plus
+            - Printer
+            - SignOut
+            - Stamp
+            - Star
+            - Target
+            - TextT
+            - Trash
+            - UploadSimple
+            - User
+            - UserPlus
+            - Users
+            - WarningCircle
+            - X
+            - ChatText
+            - CircleWavyCheck
+            - CircleWavyQuestion
+            - ArchiveBox
+            - ArrowCircleDown
+            - FileArrowUp
+            - FileDotted
+            - Files
+            - PencilLine
+            - PencilCircle
+            - UserCircle
+            - Clock
+            - QrCode
+            - Webcam
+            - Sun
+            - DeviceTabletCamera
+            - Globe
+            - Fingerprint
+            - PushPin
+            - Timer
+        conditionals:
+          description: Conditionals which can disable or hide actions.
+          type: array
+          items:
+            oneOf:
+              - description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+              - description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+                type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                additionalProperties: false
+            type: object
+        type:
+          type: string
+          const: ARCHIVE
+      required:
+        - label
+        - flags
+        - type
+      additionalProperties: false
+    CustomActionConfig:
+      type: object
+      properties:
+        label:
+          description: Human readable description of the action
+          $ref: "#/components/schemas/TranslationConfig"
+        flags:
+          description: Flag actions which are executed when the action is performed.
+          default: []
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                anyOf:
+                  - anyOf:
+                      - type: string
+                        pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
+                      - type: string
+                        enum:
+                          - incomplete
+                          - rejected
+                          - correction-requested
+                          - potential-duplicate
+                          - edit-in-progress
+                  - description: Custom flag identifier defined by the country config.
+                    type: string
+              operation:
+                description: Operation to perform on the flag.
+                type: string
+                enum:
+                  - add
+                  - remove
+              conditional:
+                description: When conditional is met, the operation is performed on the flag. If
+                  not provided, the operation is performed unconditionally.
+                $ref: "#/components/schemas/Conditional"
+            required:
+              - id
+              - operation
+            additionalProperties: false
+        supportingCopy:
+          description: Text displayed on the confirmation dialog
+          $ref: "#/components/schemas/TranslationConfig"
+        icon:
+          description: Icon representing the action
+          type: string
+          enum:
+            - Archived
+            - Assigned
+            - Briefcase
+            - Certified
+            - Close
+            - Collapse
+            - Draft
+            - DuplicateYellow
+            - Expand
+            - ExternalValidate
+            - FilledCheck
+            - InReview
+            - Offline
+            - Registered
+            - RequiresUpdates
+            - Sent
+            - Validated
+            - WaitingApproval
+            - ChartActivity
+            - Activity
+            - Archive
+            - ArchiveTray
+            - ArrowLeft
+            - ArrowRight
+            - Buildings
+            - Circle
+            - CaretDown
+            - CaretLeft
+            - CaretRight
+            - ChartBar
+            - ChartLine
+            - ChatCircle
+            - CheckSquare
+            - Compass
+            - Check
+            - Copy
+            - Database
+            - DotsThreeVertical
+            - ArrowCounterClockwise
+            - MagnifyingGlassMinus
+            - MagnifyingGlassPlus
+            - Export
+            - Eye
+            - EyeSlash
+            - Envelope
+            - File
+            - FileSearch
+            - FileMinus
+            - FilePlus
+            - FileText
+            - FileX
+            - Handshake
+            - Gear
+            - GitBranch
+            - IdentificationCard
+            - List
+            - ListBullets
+            - Lock
+            - MagnifyingGlass
+            - MapPin
+            - Medal
+            - NotePencil
+            - Paperclip
+            - PaperPlaneTilt
+            - Pen
+            - PenNib
             - Pencil
             - PencilSimpleLine
             - Phone
@@ -13295,7 +13532,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -13820,21 +14056,17 @@ components:
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+            - type: "null"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+            - type: "null"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/ExactOutput"
         createdAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+          $ref: "#/components/schemas/WithinOutput"
         updatedAtLocation:
-          anyOf:
-            - $ref: "#/components/schemas/WithinOutput"
-            - $ref: "#/components/schemas/ExactOutput"
+          $ref: "#/components/schemas/WithinOutput"
         assignedTo:
           $ref: "#/components/schemas/ExactOutput"
         createdByUserType:
@@ -14006,7 +14238,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -14023,7 +14254,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
