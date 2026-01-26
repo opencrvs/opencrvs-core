@@ -12,12 +12,12 @@
 import format from 'date-fns/format'
 import * as React from 'react'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
+import { useField } from 'formik'
 import {
   TimeField as TimeFieldComponent,
   ITimeFieldProps as TimeFieldProps
 } from '@opencrvs/components/lib/TimeField'
 import { SerializedNowDateTime, TimeValue } from '@opencrvs/commons/client'
-import { useResolveOnce } from '../useResolveOnce'
 
 const messages = defineMessages({
   timeFormat: {
@@ -55,7 +55,23 @@ function TimeInput({
     []
   )
   // Ensure that 'now' is resolved to the current date and set in the form data.
-  useResolveOnce({ value, resolvedValue, onChange })
+  // Form values are updated in a single batched operation.
+  // When multiple fields try to resolve `$$now` at the same time,
+  // each calls `setValue`, but only the *last* update in the batch
+  // is applied.
+  //
+  // Example:
+  // applicant.dob = { $$now: true }, applicant.tob = "15:34"
+  // applicant.dob = "1990-01-01", applicant.tob = { $$now: true }
+  // → only one resolved field survives per render cycle.
+  //
+  // `useField` is used to get access to `helpers.setValue`, ensuring
+  // the resolved value is written directly to Formik’s state rather
+  // than relying on local `onChange`, which may be overwritten.
+  const [, , helpers] = useField(props.name ?? '')
+  if (value !== resolvedValue) {
+    void helpers.setValue(resolvedValue)
+  }
 
   const handleChange = React.useCallback(
     (val: string) => {
