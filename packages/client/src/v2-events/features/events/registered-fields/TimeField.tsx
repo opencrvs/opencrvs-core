@@ -18,6 +18,7 @@ import {
   ITimeFieldProps as TimeFieldProps
 } from '@opencrvs/components/lib/TimeField'
 import { SerializedNowDateTime, TimeValue } from '@opencrvs/commons/client'
+import { useResolveDefaultValue } from '../useResolveDefaultValue'
 
 const messages = defineMessages({
   timeFormat: {
@@ -49,15 +50,15 @@ function TimeInput({
   onChange: (newValue: string) => void
   value: string | SerializedNowDateTime
 }) {
-  const resolvedValue = resolveNowForTimeInput(value)
   const cleanEmpty = React.useCallback(
     (val: string) => (val === EMPTY_TIME ? '' : val),
     []
   )
+
   // Ensure that 'now' is resolved to the current date and set in the form data.
   // Form values are updated in a single batched operation.
   // When multiple fields try to resolve `$$now` at the same time,
-  // each calls `setValue`, but only the *last* update in the batch
+  // each calls `setValues`, but only the *last* update in the batch
   // is applied.
   //
   // Example:
@@ -68,10 +69,11 @@ function TimeInput({
   // `useField` is used to get access to `helpers.setValue`, ensuring
   // the resolved value is written directly to Formik’s state rather
   // than relying on local `onChange`, which may be overwritten.
-  const [, , helpers] = useField(props.name ?? '')
-  if (value !== resolvedValue) {
-    void helpers.setValue(resolvedValue)
-  }
+  const resolvedValue = useResolveDefaultValue({
+    defaultValue: value,
+    resolver: resolveNowForTimeInput,
+    fieldName: props.name
+  })
 
   const handleChange = React.useCallback(
     (val: string) => {

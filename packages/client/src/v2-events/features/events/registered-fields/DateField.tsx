@@ -23,6 +23,7 @@ import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
+import { useResolveDefaultValue } from '../useResolveDefaultValue'
 import { StringifierContext } from './RegisteredField'
 
 const messages = defineMessages({
@@ -62,7 +63,6 @@ function DateInput({
    */
   const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
   const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
-  const resolvedValue = resolveNowForDateInput(value)
 
   // Ensure that 'now' is resolved to the current date and set in the form data.
   // Form values are updated in a single batched operation.
@@ -78,10 +78,12 @@ function DateInput({
   // `useField` is used to get access to `helpers.setValue`, ensuring
   // the resolved value is written directly to Formik’s state rather
   // than relying on local `onChange`, which may be overwritten.
-  const [, , helpers] = useField(props.name ?? '')
-  if (value !== resolvedValue) {
-    void helpers.setValue(resolvedValue)
-  }
+  const resolvedValue = useResolveDefaultValue({
+    defaultValue: value,
+    resolver: resolveNowForDateInput,
+    fieldName: props.name
+  })
+
   return (
     <DateFieldComponent
       {...props}
