@@ -174,7 +174,7 @@ export const actionLabels = {
   }
 } as const
 
-const reviewLabel = {
+export const reviewLabel = {
   id: 'buttons.review',
   defaultMessage: 'Review',
   description: 'Label for review CTA button'
@@ -185,10 +185,6 @@ interface ActionConfig {
   icon: IconProps['name']
   /** onClick is used when clicking an action menu item. */
   onClick: (workqueue?: string) => Promise<void> | void
-  /** onCtaClick is used when clicking a workqueue CTA button. If its not defined, the onClick will be used. */
-  onCtaClick?: (workqueue?: string) => Promise<void> | void
-  /** ctaLabel is used on workqueue CTA buttons to override the label */
-  ctaLabel?: TranslationConfig
   disabled?: boolean
   hidden?: boolean
   customActionType?: string
@@ -196,7 +192,7 @@ interface ActionConfig {
 
 type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
 
-interface ActionMenuItem extends ActionConfig {
+export interface ActionMenuItem extends ActionConfig {
   type: ActionMenuActionType | (typeof ActionTypes.enum)['CUSTOM']
 }
 
@@ -243,7 +239,11 @@ function useViewableActionConfigurations(
     },
     [event, deleteDeclaration]
   )
-  const { rejectionModal, handleRejection } = useRejectionModal(event.id, false)
+  const { rejectionModal, handleRejection } = useRejectionModal(
+    event.id,
+    event.type,
+    false
+  )
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
@@ -375,7 +375,6 @@ function useViewableActionConfigurations(
         onClick: onDelete,
         disabled: !isDownloadedAndAssignedToUser
       },
-      // Configurable event actions
       [ActionType.DECLARE]: {
         icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
         label: isReviewingDeclaration
@@ -425,11 +424,6 @@ function useViewableActionConfigurations(
         icon: getAction(ActionType.REGISTER)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) =>
           onQuickAction(ActionType.REGISTER, workqueue),
-        ctaLabel: reviewLabel,
-        onCtaClick: (workqueue) =>
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
-          ),
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.PRINT_CERTIFICATE]: {
@@ -503,7 +497,6 @@ function useViewableActionConfigurations(
             )
           )
         },
-        ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }

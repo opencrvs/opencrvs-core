@@ -26,7 +26,8 @@ import {
   getCurrentEventState,
   ActionDocument,
   getAcceptedActions,
-  FieldUpdateValue
+  FieldUpdateValue,
+  deepDropNulls
 } from '@opencrvs/commons/client'
 import { EventHistoryActionDocument } from './useActionForHistory'
 
@@ -57,7 +58,9 @@ export function hasFieldChanged(
   // Ensure that if previous value is 'undefined' and current value is 'null'
   // it doesn't get detected as a value change
   const bothNil = _.isNil(prevValue) && _.isNil(currValue)
-  const valueHasChanged = !isEqualFieldValue(prevValue, currValue) && !bothNil
+  const valueHasChanged =
+    !isEqualFieldValue(deepDropNulls(prevValue), deepDropNulls(currValue)) &&
+    !bothNil
 
   return isVisible && valueHasChanged
 }
@@ -89,7 +92,7 @@ export function isLastActionCorrectionRequest(event: EventDocument) {
   return lastWriteAction.type === ActionType.REQUEST_CORRECTION
 }
 
-function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
+export function aggregateAnnotations(actions: EventHistoryActionDocument[]) {
   return actions.reduce((ann, sortedAction) => {
     return deepMerge(ann, sortedAction.annotation ?? {})
   }, {} as EventState)

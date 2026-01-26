@@ -9,12 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { IntlShape, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
   FieldPropsWithoutReferenceValue,
   Country,
-  FieldProps,
-  FieldTypeToFieldConfig,
   SelectOption
 } from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'

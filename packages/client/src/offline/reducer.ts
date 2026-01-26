@@ -274,7 +274,9 @@ function getDataLoadingCommands() {
     CONDITIONALS_CMD,
     VALIDATORS_CMD,
     HANDLEBARS_CMD,
-    FORMS_CMD,
+    ...(import.meta.env.MODE === 'test' || import.meta.env.STORYBOOK
+      ? [FORMS_CMD]
+      : []),
     CONTENT_CMD
   ])
 }

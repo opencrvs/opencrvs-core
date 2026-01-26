@@ -29,11 +29,13 @@ import {
   joinValues,
   UUID,
   SystemRole,
-  Location,
   UserOrSystem,
   InteractiveFieldType,
   FieldConfig,
-  TextField
+  TextField,
+  DefaultAddressFieldValue,
+  AdministrativeArea,
+  ActionType
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -100,6 +102,50 @@ export function createTemporaryId() {
 
 function isTextField(field: FieldConfig): field is TextField {
   return field.type === FieldType.TEXT
+}
+
+/**
+ *
+ * @param defaultValue: Configured default value from the country configuration for address field.
+ * @param systemVariables: systemVariables fields such as '$user', '$event', and others.
+ *
+ * @returns Resolves administrativeArea reference in the default value
+ */
+export function handleDefaultValueForAddressField({
+  defaultValue,
+  systemVariables
+}: {
+  defaultValue?: DefaultAddressFieldValue
+  systemVariables: SystemVariables
+}) {
+  if (!defaultValue) {
+    return defaultValue
+  }
+
+  const { administrativeArea } = defaultValue
+
+  // Check if administrativeArea is a dynamic reference to user's primary office
+  const isDynamicReference =
+    administrativeArea &&
+    typeof administrativeArea === 'object' &&
+    administrativeArea.$userField === 'primaryOfficeId' &&
+    typeof administrativeArea.$location === 'string'
+
+  if (isDynamicReference) {
+    const locationKey =
+      administrativeArea.$location as keyof typeof systemVariables.$user
+    // Resolve administrativeArea from systemVariables.$user where
+    // locationKey field (ex: 'district') is pre-populated from
+    // user's primary office (see useCurrentUser hook)
+    if (locationKey in systemVariables.$user) {
+      return {
+        ...defaultValue,
+        administrativeArea: systemVariables.$user[locationKey]
+      }
+    }
+  }
+
+  return defaultValue
 }
 
 /**
@@ -262,10 +308,10 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
 export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
   name: {
     id: 'workqueues.draft.title',
-    defaultMessage: 'My drafts',
+    defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  actions: [],
+  actions: [{ type: ActionType.READ }],
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }
@@ -289,21 +335,21 @@ export function mergeWithoutNullsOrUndefined<T>(
 }
 
 type OutputMode = 'withIds' | 'withNames'
-/*
-Function to traverse the administrative level hierarchy from an arbitrary / leaf point
-*/
-export function getAdminLevelHierarchy(
-  maybeLocationId: string | undefined,
-  locations: Map<UUID, Location>,
-  adminStructure: string[],
-  outputMode: OutputMode = 'withIds'
+
+// Given an administrative area id, return the full hierarchy from root to leaf.
+export function getAdministrativeAreaHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>
 ) {
   // Collect location objects from leaf to root
-  const collectedLocations: Location[] = []
+  const collectedLocations: AdministrativeArea[] = []
 
-  const locationId = maybeLocationId && UUID.safeParse(maybeLocationId).data
+  const parsedAdministrativeAreaId =
+    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
 
-  let current = locationId ? locations.get(locationId) : null
+  let current = parsedAdministrativeAreaId
+    ? administrativeAreas.get(parsedAdministrativeAreaId)
+    : null
 
   while (current) {
     collectedLocations.push(current)
@@ -311,11 +357,26 @@ export function getAdminLevelHierarchy(
       break
     }
     const parentId = current.parentId
-    current = locations.get(parentId)
+    current = administrativeAreas.get(parentId)
   }
 
+  return collectedLocations
+}
+
+/*
+  Function to traverse the administrative level hierarchy from an arbitrary / leaf point
+*/
+export function getAdminLevelHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>,
+  adminStructure: string[],
+  outputMode: OutputMode = 'withIds'
+) {
   // Reverse so root is first, leaf is last
-  collectedLocations.reverse()
+  const collectedLocations = getAdministrativeAreaHierarchy(
+    administrativeAreaId,
+    administrativeAreas
+  ).reverse()
 
   // Map collected locations to the provided admin structure
   const hierarchy: Partial<Record<string, string>> = {}

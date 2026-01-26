@@ -15,6 +15,7 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   ActionType,
   AddressType,
+  AdministrativeArea,
   createPrng,
   EventConfig,
   EventDocument,
@@ -29,7 +30,8 @@ import {
   LocationType,
   QueryType,
   TENNIS_CLUB_MEMBERSHIP,
-  TestUserRole
+  TestUserRole,
+  UUID
 } from '@opencrvs/commons/events'
 import { SCOPES } from '@opencrvs/commons'
 import {
@@ -77,24 +79,34 @@ test('records are indexed with full location hierarchy', async () => {
   ])
   const esClient = getOrCreateClient()
 
-  // --- Setup locations -------------------------------------------------------
   const locationRng = createPrng(842)
 
-  const parentLocation = {
-    ...generator.locations.set(1, locationRng)[0],
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    name: 'Parent location'
+  const parentAdministrativeArea = {
+    ...generator.administrativeAreas.set(1, locationRng)[0],
+    name: 'Administrative Area'
+  }
+
+  const childAdministrativeArea = {
+    validUntil: null,
+    externalId: null,
+    name: 'Child Administrative Area',
+    id: user.administrativeAreaId as UUID,
+    parentId: parentAdministrativeArea.id
   }
 
   const childLocation = {
     ...generator.locations.set(1, locationRng)[0],
     id: user.primaryOfficeId,
-    parentId: parentLocation.id,
+    administrativeAreaId: childAdministrativeArea.id,
     name: 'Child location',
     locationType: LocationType.enum.CRVS_OFFICE
-  }
+  } satisfies Location
 
-  await seed.locations([parentLocation, childLocation])
+  await seed.administrativeAreas([
+    parentAdministrativeArea,
+    childAdministrativeArea
+  ])
+  await seed.locations([childLocation])
 
   // --- Create & move event through lifecycle --------------------------------
   const createdEvent = await client.event.create(
@@ -124,17 +136,37 @@ test('records are indexed with full location hierarchy', async () => {
     id: createdEvent.id,
     type: TENNIS_CLUB_MEMBERSHIP,
     status: 'DECLARED',
-    createdAtLocation: [parentLocation.id, childLocation.id],
-    updatedAtLocation: [parentLocation.id, childLocation.id],
-    placeOfEvent: [parentLocation.id, childLocation.id],
+    createdAtLocation: [
+      parentAdministrativeArea.id,
+      childAdministrativeArea.id,
+      childLocation.id
+    ],
+    updatedAtLocation: [
+      parentAdministrativeArea.id,
+      childAdministrativeArea.id,
+      childLocation.id
+    ],
+    placeOfEvent: [
+      parentAdministrativeArea.id,
+      childAdministrativeArea.id,
+      childLocation.id
+    ],
     legalStatuses: {
       DECLARED: {
-        createdAtLocation: [parentLocation.id, childLocation.id]
+        createdAtLocation: [
+          parentAdministrativeArea.id,
+          childAdministrativeArea.id,
+          childLocation.id
+        ]
       }
     },
     declaration: {
       applicant____address: {
-        administrativeArea: [parentLocation.id, childLocation.id]
+        administrativeArea: [
+          parentAdministrativeArea.id,
+          childAdministrativeArea.id
+          // administrative area should not include location id
+        ]
       }
     }
   })
@@ -218,13 +250,13 @@ const rangeRegisteredAtPayload: QueryType = {
   ]
 }
 
-const exactRegisteredAtLocationPayload: QueryType = {
+const withinRegisteredAtLocationPayload: QueryType = {
   type: 'and',
   clauses: [
     {
       'legalStatuses.REGISTERED.createdAtLocation': {
-        type: 'exact',
-        term: RANDOM_UUID
+        type: 'within',
+        location: RANDOM_UUID
       },
       eventType: TENNIS_CLUB_MEMBERSHIP
     }
@@ -249,7 +281,7 @@ const fullAndPayload: QueryType = {
       trackingId: { type: 'exact', term: 'ABC123' },
       createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
       updatedAt: { type: 'exact', term: '2024-06-01' },
-      createdAtLocation: { type: 'exact', term: RANDOM_UUID },
+      createdAtLocation: { type: 'within', location: RANDOM_UUID },
       updatedAtLocation: {
         type: 'within',
         location: RANDOM_UUID
@@ -360,9 +392,9 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
-  test('builds query with exact legalStatuses.REGISTERED.createdAtLocation', async () => {
+  test('builds query with legalStatuses.REGISTERED.createdAtLocation', async () => {
     const result = await buildElasticQueryFromSearchPayload(
-      exactRegisteredAtLocationPayload,
+      withinRegisteredAtLocationPayload,
       [tennisClubMembershipEvent]
     )
     expect(result).toEqual({
@@ -431,18 +463,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
                 },
                 { term: { updatedAt: '2024-06-01' } },
                 { term: { createdAtLocation: RANDOM_UUID } },
-                {
-                  bool: {
-                    minimum_should_match: 1,
-                    should: [
-                      {
-                        term: {
-                          updatedAtLocation: RANDOM_UUID
-                        }
-                      }
-                    ]
-                  }
-                },
+                { term: { updatedAtLocation: RANDOM_UUID } },
                 {
                   match: {
                     'declaration.applicant____name.__fullname': 'John Doe'
@@ -854,15 +875,15 @@ describe('placeOfEvent location hierarchy handling', () => {
   let declarationWithHomeAddress: EventState
   let generator: Awaited<ReturnType<typeof setupTestCase>>['generator']
   let seed: Awaited<ReturnType<typeof setupTestCase>>['seed']
-  let grandParentLocation: Location
-  let parentLocation: Location
+  let grandParentAdministrativeArea: AdministrativeArea
+  let parentAdministrativeArea: AdministrativeArea
   let childOffice: Location
   let modifiedEventConfig: EventConfig
   beforeEach(async () => {
     // Setup: Generate location IDs upfront
     const prng = createPrng(942)
     const childOfficeId = generateUuid(prng)
-    const parentLocationId = generateUuid(prng)
+    const parentAdministrativeAreaId = generateUuid(prng)
 
     // Setup: Configure event with conditional address fields
     const createAddressField = (
@@ -988,27 +1009,29 @@ describe('placeOfEvent location hierarchy handling', () => {
     esClient = getOrCreateClient()
 
     // Setup: Create location hierarchy (grandparent -> parent -> child office)
-    grandParentLocation = {
-      ...generator.locations.set(1, prng)[0],
-      locationType: LocationType.enum.ADMIN_STRUCTURE,
-      name: 'Grand Parent locations'
+    grandParentAdministrativeArea = {
+      ...generator.administrativeAreas.set(1, prng)[0],
+      name: 'Grand Parent administrative area'
     }
-    parentLocation = {
-      ...generator.locations.set(1, prng)[0],
-      id: parentLocationId,
-      parentId: grandParentLocation.id,
-      locationType: LocationType.enum.ADMIN_STRUCTURE,
-      name: 'Parent location'
+    parentAdministrativeArea = {
+      ...generator.administrativeAreas.set(1, prng)[0],
+      id: parentAdministrativeAreaId,
+      parentId: grandParentAdministrativeArea.id,
+      name: 'Parent administrative area'
     }
     childOffice = {
       ...generator.locations.set(1, prng)[0],
       id: user.primaryOfficeId,
-      parentId: parentLocationId,
+      administrativeAreaId: parentAdministrativeAreaId,
       name: 'Child location',
       locationType: LocationType.enum.CRVS_OFFICE
     }
 
-    await seed.locations([grandParentLocation, parentLocation, childOffice])
+    await seed.administrativeAreas([
+      grandParentAdministrativeArea,
+      parentAdministrativeArea
+    ])
+    await seed.locations([childOffice])
 
     declarationWithHomeAddress = {
       ...generateActionDeclarationInput(
@@ -1021,9 +1044,9 @@ describe('placeOfEvent location hierarchy handling', () => {
         country: 'FAR',
         streetLevelDetails: { town: 'Gazipur' },
         addressType: AddressType.DOMESTIC,
-        administrativeArea: parentLocationId
+        administrativeArea: parentAdministrativeAreaId
       },
-      locationId: parentLocationId
+      locationId: parentAdministrativeAreaId
     }
   })
 
@@ -1052,21 +1075,24 @@ describe('placeOfEvent location hierarchy handling', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       status: 'DECLARED',
       createdAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
       updatedAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
-      placeOfEvent: [grandParentLocation.id, parentLocation.id],
+      placeOfEvent: [
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id
+      ],
       legalStatuses: {
         DECLARED: {
           createdAtLocation: [
-            grandParentLocation.id,
-            parentLocation.id,
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id,
             childOffice.id
           ]
         }
@@ -1078,7 +1104,10 @@ describe('placeOfEvent location hierarchy handling', () => {
           streetLevelDetails: {
             town: 'Gazipur'
           },
-          administrativeArea: [grandParentLocation.id, parentLocation.id]
+          administrativeArea: [
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id
+          ]
         }
       }
     })
@@ -1091,7 +1120,7 @@ describe('placeOfEvent location hierarchy handling', () => {
     expect(results).toHaveLength(1)
     expect(results[0].createdAtLocation).toEqual(childOffice.id)
     expect(results[0].updatedAtLocation).toEqual(childOffice.id)
-    expect(results[0].placeOfEvent).toEqual(parentLocation.id)
+    expect(results[0].placeOfEvent).toEqual(parentAdministrativeArea.id)
     expect(results[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
       childOffice.id
     )
@@ -1115,9 +1144,9 @@ describe('placeOfEvent location hierarchy handling', () => {
             country: 'FAR',
             streetLevelDetails: { town: 'Dhaka' },
             addressType: AddressType.DOMESTIC,
-            administrativeArea: grandParentLocation.id
+            administrativeArea: grandParentAdministrativeArea.id
           },
-          locationId: grandParentLocation.id
+          locationId: grandParentAdministrativeArea.id
         }
       })
     )
@@ -1130,7 +1159,9 @@ describe('placeOfEvent location hierarchy handling', () => {
     expect(updatedResults).toHaveLength(1)
     expect(updatedResults[0].createdAtLocation).toEqual(childOffice.id)
     expect(updatedResults[0].updatedAtLocation).toEqual(childOffice.id)
-    expect(updatedResults[0].placeOfEvent).toEqual(grandParentLocation.id)
+    expect(updatedResults[0].placeOfEvent).toEqual(
+      grandParentAdministrativeArea.id
+    )
     expect(updatedResults[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
       childOffice.id
     )
@@ -1169,21 +1200,24 @@ describe('placeOfEvent location hierarchy handling', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       status: 'DECLARED',
       createdAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
       updatedAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
-      placeOfEvent: [grandParentLocation.id, parentLocation.id],
+      placeOfEvent: [
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id
+      ],
       legalStatuses: {
         DECLARED: {
           createdAtLocation: [
-            grandParentLocation.id,
-            parentLocation.id,
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id,
             childOffice.id
           ]
         }
@@ -1195,7 +1229,10 @@ describe('placeOfEvent location hierarchy handling', () => {
           streetLevelDetails: {
             town: 'Gazipur'
           },
-          administrativeArea: [grandParentLocation.id, parentLocation.id]
+          administrativeArea: [
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id
+          ]
         }
       }
     }
@@ -1293,21 +1330,25 @@ describe('placeOfEvent location hierarchy handling', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       status: 'DECLARED',
       createdAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
       updatedAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
-      placeOfEvent: [grandParentLocation.id, parentLocation.id, childOffice.id],
+      placeOfEvent: [
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
+        childOffice.id
+      ],
       legalStatuses: {
         DECLARED: {
           createdAtLocation: [
-            grandParentLocation.id,
-            parentLocation.id,
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id,
             childOffice.id
           ]
         }
@@ -1361,21 +1402,25 @@ describe('placeOfEvent location hierarchy handling', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       status: 'DECLARED',
       createdAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
       updatedAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
-      placeOfEvent: [grandParentLocation.id, parentLocation.id, childOffice.id],
+      placeOfEvent: [
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
+        childOffice.id
+      ],
       legalStatuses: {
         DECLARED: {
           createdAtLocation: [
-            grandParentLocation.id,
-            parentLocation.id,
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id,
             childOffice.id
           ]
         }
@@ -1387,7 +1432,10 @@ describe('placeOfEvent location hierarchy handling', () => {
           streetLevelDetails: {
             town: 'Gazipur'
           },
-          administrativeArea: [grandParentLocation.id, parentLocation.id]
+          administrativeArea: [
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id
+          ]
         }
       }
     }

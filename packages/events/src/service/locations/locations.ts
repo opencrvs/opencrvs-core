@@ -9,31 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Location, LocationType, UUID } from '@opencrvs/commons'
-import * as locationsRepo from '@events/storage/postgres/events/locations'
-import * as config from '@events/service/config/config'
+import { Location, UUID } from '@opencrvs/commons'
+import * as locationsRepo from '@events/storage/postgres/administrative-hierarchy/locations'
 
 /**
  * Sets incoming locations in the database for events. Should be only run as part of the initial seeding.
  * @param incomingLocations - Locations to be set
  */
-
 export async function setLocations(locations: Location[]) {
-  /** Inserting data on both administrative areas and other locations will be intermediary step to allow development against develop, without causing interruptions to other environments */
-  /** we will clear locations from administrative areas.  */
-  const administrativeAreas = locations.filter(
-    (loc) => loc.locationType === LocationType.enum.ADMIN_STRUCTURE
-  )
-
-  await locationsRepo.addAdministrativeAreas(administrativeAreas)
-
   await locationsRepo.setLocations(
     locations.map(
-      ({ id, name, parentId, validUntil, locationType, externalId }) => ({
+      ({
         id,
         name,
-        parentId,
-        administrativeAreaId: parentId,
+        administrativeAreaId,
+        validUntil,
+        locationType,
+        externalId
+      }) => ({
+        id,
+        name,
+        administrativeAreaId,
         validUntil: validUntil ? new Date(validUntil).toISOString() : null,
         locationType,
         externalId
@@ -43,21 +39,12 @@ export async function setLocations(locations: Location[]) {
 }
 
 /**
- * Syncs locations from V1 to V2 database.
- * @param incomingLocations - Locations to be set
- */
-export async function syncLocations() {
-  const locations = await config.getLocations()
-  return setLocations(locations)
-}
-
-/**
  * NOTE: Be cautious when calling this function as it fetches all locations from the database.
  * Do you really need all of them? Consider using more specific functions if possible. Act as if there could be hundreds of thousands of locations.
  *
  */
 export async function getLocations(params?: {
-  locationType?: LocationType
+  locationType?: string
   locationIds?: UUID[]
   isActive?: boolean
   externalId?: string
@@ -77,18 +64,6 @@ export async function getLocationById(locationId: UUID) {
   return location
 }
 
-export const getChildLocations = async (parentIdToSearch: UUID) => {
-  const locations = await locationsRepo.getChildLocations(parentIdToSearch)
-
-  return locations.map(({ id, name, parentId, validUntil, locationType }) => ({
-    id,
-    name,
-    validUntil,
-    parentId,
-    locationType
-  }))
-}
-
 export const getLocationHierarchy = async (locationId: UUID) => {
-  return locationsRepo.getLocationHierarchyRaw(locationId)
+  return locationsRepo.getAdministrativeHierarchyById(locationId)
 }
