@@ -86,7 +86,7 @@ const DateRangeMatcher = Matcher.extend({
     pivot: z.number().optional(),
     days: z.number(),
     boost: z.number().optional().default(1),
-    alsoMatchAgainst: z.array(FieldRef).optional()
+    matchAgainst: z.array(FieldRef).optional()
   })
 })
 
