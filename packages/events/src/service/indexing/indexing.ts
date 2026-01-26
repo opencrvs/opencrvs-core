@@ -26,7 +26,6 @@ import {
   getDeclarationFields,
   WorkqueueCountInput,
   getEventConfigById,
-  SearchScopeAccessLevels,
   SearchQuery,
   DateRangeField,
   SelectDateRangeField
@@ -459,28 +458,24 @@ export async function getIndexedEvents(
 export async function findRecordsByQuery({
   search,
   eventConfigs,
-  options,
   user,
   acceptedScopes
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
-  options?: Record<string, SearchScopeAccessLevels>
   user: TrpcUserContext
-  acceptedScopes?: RecordScopeV2[]
+  acceptedScopes: RecordScopeV2[]
 }) {
   const esClient = getOrCreateClient()
 
   const { query, limit, offset } = search
 
-  const resolvedScopes = acceptedScopes?.map((scope) =>
+  const resolvedScopes = acceptedScopes.map((scope) =>
     resolveRecordActionScopeToIds(scope, user)
   )
 
   const esQuery = withJurisdictionFilters({
     query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
-    options,
-    userOfficeId: user.primaryOfficeId,
     scopesV2: resolvedScopes
   })
 
@@ -537,20 +532,31 @@ const MsearchResponseSchema = z.object({
   })
 })
 
-export async function getEventCount(
-  queries: WorkqueueCountInput,
-  eventConfigs: EventConfig[],
-  options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined
-) {
+export async function getEventCount({
+  queries,
+  eventConfigs,
+  user,
+  acceptedScopes
+}: {
+  queries: WorkqueueCountInput
+  eventConfigs: EventConfig[]
+  user: TrpcUserContext
+  acceptedScopes: RecordScopeV2[]
+}) {
   const esClient = getOrCreateClient()
 
   const esQueries = queries.map(async (query) =>
     buildElasticQueryFromSearchPayload(query.query, eventConfigs)
   )
+  const resolvedScopes = acceptedScopes.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
+  )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters({ query, options, userOfficeId })
+    withJurisdictionFilters({
+      query,
+      scopesV2: resolvedScopes
+    })
   )
   const { responses } = await esClient.msearch({
     searches: filteredQueries.flatMap((query) => [
