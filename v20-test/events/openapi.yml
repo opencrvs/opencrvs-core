@@ -618,10 +618,10 @@ paths:
         "401": *a1
         "403": *a2
         "500": *a3
-  /sync-locations:
+  /sync-administrative-hierarchy:
     post:
-      operationId: locations-sync
-      summary: Sync locations between V1 and V2
+      operationId: administrativeHierarchy-sync
+      summary: Sync administrative hierarchy between V1 and V2
       tags:
         - events
       security:
