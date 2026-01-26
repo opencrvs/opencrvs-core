@@ -70,7 +70,7 @@ function createRejectedEventByStatus(status: EventStatus) {
 const rejectedNotifiedEvent = createRejectedEventByStatus(
   EventStatus.enum.NOTIFIED
 )
-export const DirectsRejectedNotifiedToDeclare: Story = {
+export const DirectsRejectedNotifiedToEdit: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
@@ -127,7 +127,6 @@ export const DirectsRejectedNotifiedToDeclare: Story = {
 
     await userEvent.click(actionButton)
 
-    // Ensure the user is redirected to the declaration review page
     await waitFor(async () => {
       await expect(
         canvas.getByText(
@@ -144,7 +143,7 @@ const rejectedDeclaredEvent = createRejectedEventByStatus(
   EventStatus.enum.DECLARED
 )
 
-export const DirectsRejectedDeclaredToDeclared: Story = {
+export const DirectsRejectedDeclaredToEdit: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
@@ -152,7 +151,6 @@ export const DirectsRejectedDeclaredToDeclared: Story = {
     addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(rejectedDeclaredEvent.event.id, rejectedDeclaredEvent.event)
   },
-
   args: {
     event: rejectedDeclaredEvent.eventQueryData
   },

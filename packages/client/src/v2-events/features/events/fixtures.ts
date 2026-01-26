@@ -51,6 +51,14 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   }
 }
 
+/**
+ * @deprecated
+ *
+ * Prefer test data generators instead of static fixtures.
+ * @see packages/client/src/tests/test-data-generators.ts
+ * @see packages/commons/src/events/test.utils.ts
+ *
+ */
 export const tennisClubMembershipEventDocument: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
   id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52' as UUID,
@@ -66,7 +74,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdByUserType: 'user',
       createdBy: localRegistrarId,
       createdByRole: 'LOCAL_REGISTRAR',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
       declaration: {},
       transactionId: 'a0f1b2c3-d4e5-6f7g-8h9i-j0k1l2m3n4o5'
     },
@@ -96,7 +104,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdByUserType: 'user',
       createdByRole: 'LOCAL_REGISTRAR',
       createdAt: '2025-01-23T05:30:08.847Z',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
       transactionId: 'aasdk342-asdkj3423-kn234k23'
     },
     {
@@ -118,7 +126,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdByRole: 'LOCAL_REGISTRAR',
       createdAt: '2025-01-23T05:35:27.689Z',
       createdByUserType: 'user',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
       registrationNumber: 'TEST12121212',
       transactionId: 'aasdk342-asdkj3423-kn234k25'
     },
@@ -131,7 +139,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdByRole: 'LOCAL_REGISTRAR',
       createdByUserType: 'user',
       createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
       assignedTo: testDataGenerator().user.id.localRegistrar,
       transactionId: 'aasdk342-asdkj3423-kn234k26'
     }
@@ -157,7 +165,7 @@ const correctionRequestAction: Action = {
   createdByRole: 'some-user-role',
   createdByUserType: 'user' as const,
   createdAt: '2025-01-23T05:35:27.689Z',
-  createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+  createdAtLocation: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
   transactionId: 'aasdk342-asdkj3423-kn234k26'
 }
 

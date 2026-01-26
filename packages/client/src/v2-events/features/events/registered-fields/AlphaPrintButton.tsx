@@ -28,6 +28,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useEventFormData } from '../useEventFormData'
+import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 interface PrintButtonProps {
   id: string
@@ -67,11 +68,14 @@ export const AlphaPrintButton = {
     const { certificateTemplates, language } = useAppConfig()
     const { getUser } = useUsers()
     const { getLocations } = useLocations()
+    const { getAdministrativeAreas } = useAdministrativeAreas()
     const event = getEvent.getFromCache(eventId)
     const actions = getAcceptedActions(event)
     const users = getUser.getAllCached()
 
     const locations = getLocations.useSuspenseQuery()
+    const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+
     const { eventConfiguration } = useEventConfiguration(event.type)
     const formDeclaration = useEventFormData((state) => state.getFormValues())
 
@@ -112,6 +116,7 @@ export const AlphaPrintButton = {
       } as EventDocument,
       config: eventConfiguration,
       locations,
+      administrativeAreas,
       users,
       certificateConfig,
       language

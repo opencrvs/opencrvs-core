@@ -22,8 +22,7 @@ const compat = new FlatCompat({
 module.exports = defineConfig([
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
-    'plugin:import/recommended',
-    'plugin:prettier/recommended'
+    'plugin:import/recommended'
   ),
   {
     ignores: ['eslint*.js'],
@@ -47,17 +46,6 @@ module.exports = defineConfig([
     rules: {
       'import/namespace': 'off',
       'no-debugger': 'error',
-      'prettier/prettier': [
-        'error',
-        {
-          printWidth: 80,
-          singleQuote: true,
-          useTabs: false,
-          tabWidth: 2,
-          trailingComma: 'none',
-          semi: false
-        }
-      ],
       'no-console': 'warn',
       'arrow-parens': 'off',
       'no-return-assign': 'off',

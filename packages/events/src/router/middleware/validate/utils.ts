@@ -14,12 +14,11 @@ import _ from 'lodash'
 import {
   ActionUpdate,
   errorMessages,
-  LocationType,
   ValidatorContext
 } from '@opencrvs/commons/events'
 import { getOrThrow } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
-import { getLeafLocationIds } from '@events/storage/postgres/events/locations'
+import { getLeafLevelAdministrativeAreaIds } from '../../../storage/postgres/administrative-hierarchy/administrative-areas'
 
 type ValidationError = {
   message: string
@@ -102,9 +101,8 @@ export function getInvalidUpdateKeys<T>({
 export async function getValidatorContext(
   token: string
 ): Promise<Omit<ValidatorContext, 'event'>> {
-  const leafAdminStructureLocationIds = await getLeafLocationIds({
-    locationTypes: [LocationType.enum.ADMIN_STRUCTURE]
-  })
+  const leafAdminStructureLocationIds =
+    await getLeafLevelAdministrativeAreaIds()
 
   const user = getOrThrow(getTokenPayload(token), 'Token is missing.')
 

@@ -11,6 +11,7 @@
 
 import { IntlShape } from 'react-intl'
 import {
+  AdministrativeArea,
   FieldConfigInput,
   Location,
   User,
@@ -36,6 +37,7 @@ export interface RegisteredFieldModule<T extends FieldConfigInput> {
 export interface StringifierContext<F extends FieldConfigInput> {
   intl: IntlShape
   locations: Map<UUID, Location>
+  administrativeAreas: Map<UUID, AdministrativeArea>
   users?: User[]
   config?: F
   adminLevels?: AdminStructureItem[]

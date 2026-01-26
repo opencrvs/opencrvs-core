@@ -120,6 +120,7 @@ vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
 }))
 
 vi.mock('@client/v2-events/hooks/useLocations')
+vi.mock('@client/v2-events/hooks/useAdministrativeAreas')
 
 vi.mock('@client/forms/handlebarHelpers', async () => {
   return {

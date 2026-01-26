@@ -309,15 +309,23 @@ export const FormFieldParentChildReset: Story = {
       await userEvent.click(
         canvas.getByTestId('change-button-recommender.relation')
       )
+
+      await canvas.findByText('Who is recommending the applicant?')
+
       await expect(canvas.getByTestId('text__firstname')).toHaveValue(
         'Mohammed'
       )
       await expect(canvas.getByTestId('text__surname')).toHaveValue('Rahim')
-      await expect(canvas.getByTestId('recommender____dob-dd')).toHaveValue(12)
-      await expect(canvas.getByTestId('recommender____dob-mm')).toHaveValue(5)
-      await expect(canvas.getByTestId('recommender____dob-yyyy')).toHaveValue(
-        1978
-      )
+      await waitFor(async () => {
+        await expect(canvas.getByTestId('recommender____dob-dd')).toHaveValue(
+          12
+        )
+
+        await expect(canvas.getByTestId('recommender____dob-mm')).toHaveValue(5)
+        await expect(canvas.getByTestId('recommender____dob-yyyy')).toHaveValue(
+          1978
+        )
+      })
 
       await userEvent.click(
         canvas.getByTestId('select__recommender____relation')
