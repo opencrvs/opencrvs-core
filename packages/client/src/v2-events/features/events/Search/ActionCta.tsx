@@ -11,6 +11,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
 import {
   EventIndex,
   WorkqueueActionsWithDefault,
@@ -26,6 +27,14 @@ import {
   reviewLabel
 } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { withSuspense } from '../../../components/withSuspense'
+
+const StyledButton = styled(Button)`
+  max-width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: block;
+  text-overflow: ellipsis;
+`
 
 /**
  * @returns next available action cta based on the given event.
@@ -57,7 +66,7 @@ function ActionCtaComponent({
 
   if (!config || actionType === ActionType.READ) {
     return (
-      <Button
+      <StyledButton
         type="primary"
         onClick={() => {
           navigate(
@@ -69,18 +78,18 @@ function ActionCtaComponent({
         }}
       >
         {intl.formatMessage(reviewLabel)}
-      </Button>
+      </StyledButton>
     )
   }
 
   return (
-    <Button
+    <StyledButton
       disabled={'disabled' in config && Boolean(config.disabled)}
       type="primary"
       onClick={async () => config.onClick(redirectParam)}
     >
       {intl.formatMessage(config.label)}
-    </Button>
+    </StyledButton>
   )
 }
 
