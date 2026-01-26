@@ -32,11 +32,11 @@ const childDobWithin5Days = field('child.dob').dateRangeMatches({ days: 5 })
 const similarNamedMother = field('mother.name').fuzzyMatches()
 const similarDobMother = field('mother.dob').dateRangeMatches({
   days: 365,
-  alsoMatchAgainst: [$field('mother.age')]
+  matchAgainst: [$field('mother.dob'), $field('mother.age')]
 })
 const similarAgedMother = field('mother.age').dateRangeMatches({
   days: 365,
-  alsoMatchAgainst: [$field('mother.dob')]
+  matchAgainst: [$field('mother.age'), $field('mother.dob')]
 })
 const differentMotherIdTypes = not(field('mother.idType').strictMatches())
 const motherIdNotProvided = field('mother.idType').strictMatches({

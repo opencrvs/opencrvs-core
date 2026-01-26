@@ -206,12 +206,11 @@ export function generateElasticsearchQuery(
         queryInput.options.pivot ??
         Math.floor((queryInput.options.days * 2) / 3)
 
-      // Build list of all fields to match against
-      const fieldsToMatch = [queryKey] // Primary field first
+      const fieldsToMatch = []
 
-      if (Array.isArray(queryInput.options.alsoMatchAgainst)) {
+      if (Array.isArray(queryInput.options.matchAgainst)) {
         const fields = getDeclarationFields(eventConfig)
-        const additionalFields = queryInput.options.alsoMatchAgainst
+        const additionalFields = queryInput.options.matchAgainst
           .map((x) => fields.find((f) => f.id === x.$$field))
           .filter((field): field is FieldConfig => {
             if (!field) {
@@ -232,6 +231,9 @@ export function generateElasticsearchQuery(
           })
 
         fieldsToMatch.push(...additionalFields)
+      } else {
+        // default query key if matchAgainst option not provided
+        fieldsToMatch.push(queryKey)
       }
 
       // Helper to build query for a single field

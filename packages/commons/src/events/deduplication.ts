@@ -51,6 +51,47 @@ export function field(fieldId: string) {
         type: 'strict',
         options
       }) satisfies ClauseInput,
+    /**
+     * Creates a date range matcher that finds records where date fields fall within a specified range.
+     *
+     * By default, matches against the field specified in `field()` (e.g., 'mother.dob').
+     * When `matchAgainst` is provided, it overwrites the default field and searches across multiple fields with OR logic .
+     *
+     * @param options - Configuration for the date range matching
+     * @param options.days - Number of days before and after the target date to search (creates a ±days range)
+     * @param options.pivot - Optional. Distance in days where relevance scoring drops by 50%. Defaults to ⌊(days * 2) / 3⌋
+     * @param options.boost - Optional. Scoring boost multiplier for matching results. Defaults to 1
+     * @param options.matchAgainst - Optional. Additional fields to match against. When provided,
+     * the query matches if any of these fields fall within the date range. The default field is always excluded in the search in that case.
+     * If you want to add the default field, you have to explicitly add that field in `matchAgainst` option
+     *
+     * @returns A clause that matches records where at least one of the specified date fields is within the range
+     *
+     * @example
+     * // Matches only against mother.dob (±365 days)
+     * field('mother.dob').dateRangeMatches({ days: 365 })
+     *
+     * @example
+     * // Matches against mother.age OR spouse.dob, not mother.dob
+     * field('mother.dob').dateRangeMatches({
+     *   days: 365,
+     *   matchAgainst: [$field('mother.age'), $field('spouse.dob')]
+     * })
+     *
+     * If you want to add mother.dob, then
+     * field('mother.dob').dateRangeMatches({
+     *   days: 365,
+     *   matchAgainst: [$field('mother.age'), $field('spouse.dob'), $field('mother.dob')]
+     * })
+     *
+     * @example
+     * // With custom pivot and boost
+     * field('mother.dob').dateRangeMatches({
+     *   days: 730,
+     *   pivot: 365,
+     *   boost: 2
+     * })
+     */
     dateRangeMatches: (options: DateRangeMatcherOptions) =>
       ({
         fieldId,
