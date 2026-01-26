@@ -135,16 +135,6 @@ function getAvailableActionsWithoutFlagFilters(
   return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
 }
 
-export function getAvailableActions(
-  status: EventStatus,
-  flags: Flag[]
-): DisplayableAction[] {
-  return filterActionsByFlags(
-    getAvailableActionsWithoutFlagFilters(status, flags),
-    flags
-  )
-}
-
 export function getAvailableActionsForEvent(
   event: EventIndex
 ): DisplayableAction[] {

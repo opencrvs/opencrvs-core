@@ -534,7 +534,7 @@ test(`Adds ${InherentFlags.REJECTED} flag after ${ActionType.REJECT} is called`,
   expect(index[0].flags).toContain(InherentFlags.REJECTED)
 })
 
-test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.DECLARE} is called again`, async () => {
+test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.EDIT} + ${ActionType.DECLARE} is called`, async () => {
   const { user, generator } = await setupTestCase()
 
   const { type } = generator.event.create()
@@ -547,6 +547,16 @@ test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.DECLARE} is call
 
   await client.event.actions.reject.request(
     generator.event.actions.reject(event.id)
+  )
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: event.actions[0].createdBy
+    })
+  )
+
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(event.id)
   )
 
   await client.event.actions.assignment.assign(
