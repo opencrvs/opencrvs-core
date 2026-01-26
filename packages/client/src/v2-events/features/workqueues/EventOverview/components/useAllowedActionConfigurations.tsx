@@ -270,9 +270,6 @@ function useViewableActionConfigurations(
     event.id
   )
 
-  // @TODO CIHAN: handle this in allowedActions?
-  const isRejected = event.flags.includes(InherentFlags.REJECTED)
-
   const userMayCorrect = isActionInScope(
     authentication.scope,
     ActionType.REQUEST_CORRECTION,
@@ -376,7 +373,6 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: isRejected
       },
       [ActionType.EDIT]: {
         icon: 'PencilLine' as const,
