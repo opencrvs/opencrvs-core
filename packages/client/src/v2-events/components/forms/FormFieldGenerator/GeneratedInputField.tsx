@@ -662,8 +662,8 @@ export const GeneratedInputField = React.memo(
             error={inputFieldProps.error}
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
+            required={inputFieldProps.required}
             setFieldTouched={() => setFieldTouched(inputFieldProps.id, true)}
-            touched={inputFieldProps.touched}
             onChange={handleFileWithOptionChange}
             options={field.config.options}
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

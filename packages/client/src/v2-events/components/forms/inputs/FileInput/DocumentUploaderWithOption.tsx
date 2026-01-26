@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import {
   FileFieldValueWithOption,
@@ -17,7 +17,8 @@ import {
   FullDocumentPath,
   FileUploadWithOptions,
   MimeType,
-  SelectOption
+  SelectOption,
+  errorMessages
 } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
@@ -80,6 +81,7 @@ function DocumentUploaderWithOption({
   maxFileSize,
   touched,
   setFieldTouched,
+  required,
   maxImageSize
 }: {
   name: string
@@ -95,6 +97,7 @@ function DocumentUploaderWithOption({
   maxFileSize: number
   touched: boolean
   setFieldTouched: () => void
+  required: boolean
   maxImageSize?: FileUploadWithOptions['configuration']['maxImageSize']
 }) {
   const intl = useIntlWithFormData()
@@ -103,6 +106,7 @@ function DocumentUploaderWithOption({
   )
 
   const [files, setFiles] = useState(value)
+  const [requiredError, setRequiredError] = useState('')
   const [filesBeingProcessed, setFilesBeingProcessed] = useState<
     Array<{ label: string }>
   >([])
@@ -118,6 +122,18 @@ function DocumentUploaderWithOption({
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
   const { processImageFile } = useImageProcessing()
+
+  const requiredMessage = intl.formatMessage(errorMessages.requiredField)
+
+  useEffect(() => {
+    if (required) {
+      if (files.length === 0 && touched) {
+        setRequiredError(requiredMessage)
+      } else {
+        setRequiredError('')
+      }
+    }
+  }, [files, required, touched, requiredMessage])
 
   const { uploadFile } = useFileUpload(name, {
     onSuccess: ({ type, originalFilename, path, id }) => {
@@ -226,7 +242,9 @@ function DocumentUploaderWithOption({
   }
 
   const errorMessage =
-    touched && error ? error : unselectedOptionError || fileChangeError || ''
+    touched && error
+      ? error
+      : unselectedOptionError || fileChangeError || requiredError || ''
 
   return (
     <UploadWrapper>
