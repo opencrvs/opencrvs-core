@@ -27,21 +27,11 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useFlagLabelsString } from '@client/v2-events/messages/flags'
 
 const messages = {
-  assignedTo: {
+  event: {
     label: {
-      id: 'event.summary.assignedTo.label',
-      defaultMessage: 'Assigned to',
-      description: 'Assigned to label'
-    },
-    value: {
-      id: 'event.summary.assignedTo.value',
-      defaultMessage: '{event.assignedTo}',
-      description: 'Assigned to value'
-    },
-    emptyValueMessage: {
-      id: 'event.summary.assignedTo.empty',
-      defaultMessage: 'Not assigned',
-      description: 'Not assigned message'
+      id: 'event.summary.event.label',
+      defaultMessage: 'Event',
+      description: 'Event label'
     }
   },
   status: {
@@ -67,13 +57,6 @@ const messages = {
       id: 'event.summary.flags.placeholder',
       defaultMessage: 'No flags',
       description: 'Message when no flags are present'
-    }
-  },
-  event: {
-    label: {
-      id: 'event.summary.event.label',
-      defaultMessage: 'Event',
-      description: 'Event label'
     }
   },
   trackingId: {
@@ -108,6 +91,23 @@ const messages = {
       id: 'event.summary.registrationNumber.value',
       defaultMessage: '{event.registrationNumber}',
       description: 'Registration number value'
+    }
+  },
+  assignedTo: {
+    label: {
+      id: 'event.summary.assignedTo.label',
+      defaultMessage: 'Assigned to',
+      description: 'Assigned to label'
+    },
+    value: {
+      id: 'event.summary.assignedTo.value',
+      defaultMessage: '{event.assignedTo}',
+      description: 'Assigned to value'
+    },
+    emptyValueMessage: {
+      id: 'event.summary.assignedTo.empty',
+      defaultMessage: 'Not assigned',
+      description: 'Not assigned message'
     }
   }
 }
@@ -190,13 +190,10 @@ export function EventSummary({
     <>
       <Summary id="summary">
         <Summary.Row
-          key="assignedTo"
-          data-testid="assignedTo"
-          label={intl.formatMessage(messages.assignedTo.label)}
-          placeholder={intl.formatMessage(
-            messages.assignedTo.emptyValueMessage
-          )}
-          value={intl.formatMessage(messages.assignedTo.value, event)}
+          key="event"
+          data-testid="event"
+          label={intl.formatMessage(messages.event.label)}
+          value={intl.formatMessage(eventLabelMessage)}
         />
         <Summary.Row
           key="status"
@@ -210,12 +207,6 @@ export function EventSummary({
           label={intl.formatMessage(messages.flags.label)}
           placeholder={intl.formatMessage(messages.flags.placeholder)}
           value={flagLabels}
-        />
-        <Summary.Row
-          key="event"
-          data-testid="event"
-          label={intl.formatMessage(messages.event.label)}
-          value={intl.formatMessage(eventLabelMessage)}
         />
         <Summary.Row
           key="tracking-id"
@@ -250,6 +241,15 @@ export function EventSummary({
               value={field.value}
             />
           ))}
+        <Summary.Row
+          key="assignedTo"
+          data-testid="assignedTo"
+          label={intl.formatMessage(messages.assignedTo.label)}
+          placeholder={intl.formatMessage(
+            messages.assignedTo.emptyValueMessage
+          )}
+          value={intl.formatMessage(messages.assignedTo.value, event)}
+        />
       </Summary>
     </>
   )
