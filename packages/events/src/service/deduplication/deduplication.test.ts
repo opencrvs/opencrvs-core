@@ -18,6 +18,7 @@ import {
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { field, and, or, not } from '@opencrvs/commons/events/deduplication'
+import { field as $field } from '@opencrvs/commons/events'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
@@ -29,7 +30,14 @@ import {
 const similarNamedChild = field('child.name').fuzzyMatches()
 const childDobWithin5Days = field('child.dob').dateRangeMatches({ days: 5 })
 const similarNamedMother = field('mother.name').fuzzyMatches()
-const similarAgedMother = field('mother.dob').dateRangeMatches({ days: 365 })
+const similarDobMother = field('mother.dob').dateRangeMatches({
+  days: 365,
+  alsoMatchAgainst: [$field('mother.age')]
+})
+const similarAgedMother = field('mother.age').dateRangeMatches({
+  days: 365,
+  alsoMatchAgainst: [$field('mother.dob')]
+})
 const differentMotherIdTypes = not(field('mother.idType').strictMatches())
 const motherIdNotProvided = field('mother.idType').strictMatches({
   value: 'NONE'
@@ -62,12 +70,12 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
       similarNamedChild,
       childDobWithin5Days,
       similarNamedMother,
-      similarAgedMother,
+      or(similarAgedMother, similarDobMother),
       motherIdMatchesIfGiven
     ),
     and(
       similarNamedMother,
-      similarAgedMother,
+      or(similarAgedMother, similarDobMother),
       motherIdMatchesIfGiven,
       childDobWithin9Months
     ),
@@ -75,7 +83,7 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
       exactNamedChild,
       childDobWithin3Years,
       similarNamedMother,
-      similarAgedMother,
+      or(similarAgedMother, similarDobMother),
       motherIdMatchesIfGiven
     )
   )
@@ -175,7 +183,7 @@ describe('deduplication query input conversion', () => {
     ).toMatchSnapshot()
   })
 
-  it('should convert similarAgedMother to dateRange query', () => {
+  it('should convert similarDobMother to dateRange query', () => {
     const encodedEventIndex = encodeEventIndex(
       eventQueryDataGenerator({
         declaration: {
@@ -187,7 +195,7 @@ describe('deduplication query input conversion', () => {
     expect(
       generateElasticsearchQuery(
         encodedEventIndex,
-        Clause.parse(similarAgedMother),
+        Clause.parse(similarDobMother),
         v2BirthEvent
       )
     ).toMatchSnapshot()
@@ -469,6 +477,44 @@ describe('deduplication tests', () => {
           { firstname: 'Mother', surname: 'Smith' }
         ],
         'mother.dob': ['2000-11-12', '2000-11-12'],
+        'mother.nid': ['23412387', '23412387']
+      })
+    ).resolves.toHaveLength(1)
+  })
+
+  it('finds a duplicate for dob against age', async () => {
+    await expect(
+      findDuplicates({
+        'child.dob': ['2011-11-11', '2011-11-01'],
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'John', surname: 'Smith' }
+        ],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Mother', surname: 'Smith' }
+        ],
+        'mother.dob': [undefined, '2000-11-12'],
+        'mother.age': [{ age: 11, asOfDateRef: 'child.dob' }, undefined],
+        'mother.nid': ['23412387', '23412387']
+      })
+    ).resolves.toHaveLength(1)
+  })
+
+  it('finds a duplicate for age against dob', async () => {
+    await expect(
+      findDuplicates({
+        'child.dob': ['2011-11-11', '2011-11-01'],
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'John', surname: 'Smith' }
+        ],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Mother', surname: 'Smith' }
+        ],
+        'mother.dob': ['2000-11-12', undefined],
+        'mother.age': [undefined, { age: 11, asOfDateRef: 'child.dob' }],
         'mother.nid': ['23412387', '23412387']
       })
     ).resolves.toHaveLength(1)
