@@ -121,42 +121,17 @@ function getAvailableActionsWithoutFlagFilters(
     return [ActionType.NOTIFY, ActionType.DECLARE, ActionType.REGISTER]
   }
 
-  switch (status) {
-    case EventStatus.enum.CREATED: {
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.enum.NOTIFIED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActionsWithoutFlagFilters(
-          EventStatus.enum.CREATED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-          .filter((action) => action !== ActionType.DELETE)
-          .concat(ActionType.EDIT)
-          .concat(ActionType.ARCHIVE)
-      }
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.enum.DECLARED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActionsWithoutFlagFilters(
-          EventStatus.enum.CREATED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-          .filter((action) => action !== ActionType.DELETE)
-          .concat(ActionType.EDIT)
-          .concat(ActionType.ARCHIVE)
-      }
-
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.enum.REGISTERED: {
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.enum.ARCHIVED: {
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
+  if (flags.includes(InherentFlags.REJECTED)) {
+    return [
+      ActionType.READ,
+      ActionType.NOTIFY,
+      ActionType.CUSTOM,
+      ActionType.EDIT,
+      ActionType.ARCHIVE
+    ]
   }
+
+  return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
 }
 
 export function getAvailableActions(
