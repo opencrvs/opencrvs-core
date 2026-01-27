@@ -35,6 +35,7 @@ import { NetworkStatus } from '@apollo/client'
 import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { createMemoryRouter } from 'react-router-dom'
 import * as useLocationsModule from '@client/v2-events/hooks/useLocations'
+import * as useAdministrativeAreasModule from '@client/v2-events/hooks/useAdministrativeAreas'
 
 const searchUserResultsMock = (
   officeId: string,
@@ -117,7 +118,7 @@ describe('for user with create my jurisdiction scope', () => {
   })
 
   it('should show add user button if office is under jurisdiction', async () => {
-    const userOfficeId = '62a0ccb4-880d-4f30-8882-f256007dfff9'
+    const userOfficeId = '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12'
     const selectedOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' // This office is under the user's office in hierarchy
 
     const { component } = await createTestComponent(<UserList />, {
@@ -241,7 +242,7 @@ describe('for user with update my jurisdiction scope', () => {
   })
 
   it('should show edit user button if office is under jurisdiction', async () => {
-    const userOfficeId = '62a0ccb4-880d-4f30-8882-f256007dfff9'
+    const userOfficeId = '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12'
     const selectedOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' // This office is under the user's office in hierarchy
     const { component } = await createTestComponent(<UserList />, {
       store,

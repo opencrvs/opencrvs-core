@@ -10,23 +10,31 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
 import {
   EventIndex,
   WorkqueueActionsWithDefault,
   isMetaAction,
   getOrThrow,
-  ActionTypes
+  ActionType
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { useAuthentication } from '@client/utils/userUtils'
-import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { ROUTES } from '@client/v2-events/routes'
+import {
+  useAllowedActionConfigurations,
+  reviewLabel
+} from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { withSuspense } from '../../../components/withSuspense'
 
-// Actions which should never be shown as a CTA
-const EXCLUDED_ACTIONS: string[] = [
-  ActionTypes.enum.ARCHIVE,
-  ActionTypes.enum.CUSTOM
-]
+const StyledButton = styled(Button)`
+  max-width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: block;
+  text-overflow: ellipsis;
+`
 
 /**
  * @returns next available action cta based on the given event.
@@ -46,6 +54,7 @@ function ActionCtaComponent({
     maybeAuth,
     'Authentication is not available but is required'
   )
+  const navigate = useNavigate()
 
   const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
 
@@ -55,22 +64,32 @@ function ActionCtaComponent({
       : // If action type is not allowed, we don't provide it.
         allowedActionConfigs.find((item) => item.type === actionType)
 
-  if (!config || EXCLUDED_ACTIONS.includes(config.type)) {
-    return null
+  if (!config || actionType === ActionType.READ) {
+    return (
+      <StyledButton
+        type="primary"
+        onClick={() => {
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
+              { eventId: event.id },
+              { workqueue: redirectParam }
+            )
+          )
+        }}
+      >
+        {intl.formatMessage(reviewLabel)}
+      </StyledButton>
+    )
   }
 
   return (
-    <Button
+    <StyledButton
       disabled={'disabled' in config && Boolean(config.disabled)}
       type="primary"
-      onClick={async () =>
-        config.onCtaClick
-          ? config.onCtaClick(redirectParam)
-          : config.onClick(redirectParam)
-      }
+      onClick={async () => config.onClick(redirectParam)}
     >
-      {intl.formatMessage(config.ctaLabel || config.label)}
-    </Button>
+      {intl.formatMessage(config.label)}
+    </StyledButton>
   )
 }
 

@@ -1,0 +1,16 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Prevents sending empty payload 1`] = `
+[TRPCError: [
+  {
+    "origin": "array",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [],
+    "message": "Too small: expected array to have >=1 items"
+  }
+]]
+`;
+
+exports[`prevents access when required scope is missing 1`] = `[TRPCError: FORBIDDEN]`;

@@ -13,7 +13,7 @@
 import * as z from 'zod/v4'
 import {
   AddressField,
-  AdministrativeArea,
+  AdministrativeAreaField,
   BulletList,
   Checkbox,
   Country,
@@ -466,7 +466,7 @@ export const isDividerFieldType = (field: {
 export const isAdministrativeAreaFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
-}): field is { value: string; config: AdministrativeArea } => {
+}): field is { value: string; config: AdministrativeAreaField } => {
   return field.config.type === FieldType.ADMINISTRATIVE_AREA
 }
 

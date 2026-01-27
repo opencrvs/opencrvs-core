@@ -1,0 +1,161 @@
+// Vitest Snapshot v1
+
+exports[`createSearchOptions > creates search options for locations and administrative areas 1`] = `
+[
+  {
+    "displayLabel": "Central Provincial Office, Central",
+    "id": "6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12",
+    "searchableText": "Central Provincial Office",
+  },
+  {
+    "displayLabel": "Ibombo District Office, Ibombo, Central",
+    "id": "028d2c85-ca31-426d-b5d1-2cef545a4902",
+    "searchableText": "Ibombo District Office",
+  },
+  {
+    "displayLabel": "Isamba District Office, Isamba, Central",
+    "id": "62a0ccb4-4f30-4f30-8882-f256007dff9f",
+    "searchableText": "Isamba District Office",
+  },
+  {
+    "displayLabel": "Isango District Office, Isango, Central",
+    "id": "954c93e1-13f7-4435-bb82-35e0e215e07d",
+    "searchableText": "Isango District Office",
+  },
+  {
+    "displayLabel": "Sulaka Provincial Office, Sulaka",
+    "id": "2884f5b9-17b4-49ce-bf4d-f538228935df",
+    "searchableText": "Sulaka Provincial Office",
+  },
+  {
+    "displayLabel": "Ilanga District Office, Ilanga, Sulaka",
+    "id": "030358c6-54af-44be-821b-8e4af963a49c",
+    "searchableText": "Ilanga District Office",
+  },
+  {
+    "displayLabel": "Chamakubi Health Post, Ibombo, Central",
+    "id": "423d000f-101b-47c0-8b86-21a908067cee",
+    "searchableText": "Chamakubi Health Post",
+  },
+  {
+    "displayLabel": "Ibombo Rural Health Centre, Ibombo, Central",
+    "id": "4d3279be-d026-420c-88f7-f0a4ae986973",
+    "searchableText": "Ibombo Rural Health Centre",
+  },
+  {
+    "displayLabel": "Chikobo Rural Health Centre, Ibombo, Central",
+    "id": "190902f4-1d77-476a-8947-41145af1db7d",
+    "searchableText": "Chikobo Rural Health Centre",
+  },
+  {
+    "displayLabel": "Chilochabalenje Health Post, Ibombo, Central",
+    "id": "f5ecbd9b-a01e-4a65-910e-70e86ab41b71",
+    "searchableText": "Chilochabalenje Health Post",
+  },
+  {
+    "displayLabel": "Chipeso Rural Health Centre, Ibombo, Central",
+    "id": "dbfc178f-7295-4b90-b28d-111c95b03127",
+    "searchableText": "Chipeso Rural Health Centre",
+  },
+  {
+    "displayLabel": "Chisamba Rural Health Centre, Ibombo, Central",
+    "id": "09862bfe-c7ac-46cd-987b-668681533c80",
+    "searchableText": "Chisamba Rural Health Centre",
+  },
+  {
+    "displayLabel": "Chitanda Rural Health Centre, Ibombo, Central",
+    "id": "834ce389-e95b-4fb0-96a0-33e9ab323059",
+    "searchableText": "Chitanda Rural Health Centre",
+  },
+  {
+    "displayLabel": "Golden Valley Rural Health Centre, Ibombo, Central",
+    "id": "0431c433-6062-4a4c-aee9-25271aec61ee",
+    "searchableText": "Golden Valley Rural Health Centre",
+  },
+  {
+    "displayLabel": "Ipongo Rural Health Centre, Ibombo, Central",
+    "id": "bc84d0b6-7ba7-480d-a339-5d9920d90eb2",
+    "searchableText": "Ipongo Rural Health Centre",
+  },
+  {
+    "displayLabel": "Itumbwe Health Post, Ibombo, Central",
+    "id": "4cf1f53b-b730-41d2-8649-dff7eeed970d",
+    "searchableText": "Itumbwe Health Post",
+  },
+  {
+    "displayLabel": "Kabangalala Rural Health Centre, Ibombo, Central",
+    "id": "4b3676cb-9355-4942-9eb9-2ce46acaf0e0",
+    "searchableText": "Kabangalala Rural Health Centre",
+  },
+  {
+    "displayLabel": "Central",
+    "id": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
+    "searchableText": "Central",
+  },
+  {
+    "displayLabel": "Sulaka",
+    "id": "c599b691-fd2d-45e1-abf4-d185de727fb5",
+    "searchableText": "Sulaka",
+  },
+  {
+    "displayLabel": "Pualula",
+    "id": "7ef2b9c7-5e6d-49f6-ae05-656207d0fc64",
+    "searchableText": "Pualula",
+  },
+  {
+    "displayLabel": "Chuminga",
+    "id": "6d1a59df-988c-4021-a846-ccbc021931a7",
+    "searchableText": "Chuminga",
+  },
+  {
+    "displayLabel": "Ibombo, Central",
+    "id": "62a0ccb4-880d-4f30-8882-f256007dfff9",
+    "searchableText": "Ibombo",
+  },
+  {
+    "displayLabel": "Isango, Central",
+    "id": "27160bbd-32d1-4625-812f-860226bfb92a",
+    "searchableText": "Isango",
+  },
+  {
+    "displayLabel": "Isamba, Central",
+    "id": "967032fd-3f81-478a-826c-30cb8fe121bd",
+    "searchableText": "Isamba",
+  },
+  {
+    "displayLabel": "Itambo, Central",
+    "id": "89a33893-b17d-481d-a26d-6461e7ac1651",
+    "searchableText": "Itambo",
+  },
+  {
+    "displayLabel": "Ezhi, Central",
+    "id": "d42ab2fe-e7ed-470e-8b31-4fb27f9b8250",
+    "searchableText": "Ezhi",
+  },
+  {
+    "displayLabel": "Ilanga, Sulaka",
+    "id": "8fbd09d2-212b-47f4-beb3-5e1694931d9f",
+    "searchableText": "Ilanga",
+  },
+]
+`;
+
+exports[`createSearchOptions > filters search options for both locations and administrative areas 1`] = `
+[
+  {
+    "displayLabel": "Ibombo District Office, Ibombo, Central",
+    "id": "028d2c85-ca31-426d-b5d1-2cef545a4902",
+    "searchableText": "Ibombo District Office",
+  },
+  {
+    "displayLabel": "Ibombo Rural Health Centre, Ibombo, Central",
+    "id": "4d3279be-d026-420c-88f7-f0a4ae986973",
+    "searchableText": "Ibombo Rural Health Centre",
+  },
+  {
+    "displayLabel": "Ibombo, Central",
+    "id": "62a0ccb4-880d-4f30-8882-f256007dfff9",
+    "searchableText": "Ibombo",
+  },
+]
+`;

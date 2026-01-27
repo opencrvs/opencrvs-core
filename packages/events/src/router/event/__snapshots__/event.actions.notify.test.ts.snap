@@ -27,7 +27,7 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
 
 exports[`event.actions.notify > System client receives error for malformed input 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"this should cause an error"}]]`;
 
-exports[`event.actions.notify > system user > should require createdAtLocation for system user 1`] = `[TRPCError: createdAtLocation is required and must be a valid office id]`;
+exports[`event.actions.notify > system user > should require createdAtLocation for system user 1`] = `[TRPCError: createdAtLocation is required and must be a valid location id]`;
 
 exports[`event.actions.notify > system user > should require createdAtLocation for system user 2`] = `
 [TRPCError: [
@@ -44,8 +44,8 @@ exports[`event.actions.notify > system user > should require createdAtLocation f
 ]]
 `;
 
-exports[`event.actions.notify > system user > should require createdAtLocation for system user 3`] = `[TRPCError: insert or update on table "event_actions" violates foreign key constraint "event_actions_created_at_location_fkey"]`;
+exports[`event.actions.notify > system user > should require createdAtLocation for system user 3`] = `[TRPCError: createdAtLocation must be a valid location id]`;
 
-exports[`event.actions.notify > system user > should require createdAtLocation for system user 4`] = `[TRPCError: createdAtLocation must be an office location]`;
+exports[`event.actions.notify > system user > should require createdAtLocation for system user 4`] = `[TRPCError: createdAtLocation must be a valid location id]`;
 
 exports[`event.actions.notify > system user > system user should not be able to perform action on assigned event 1`] = `[TRPCError: System user can not perform action on assigned event]`;

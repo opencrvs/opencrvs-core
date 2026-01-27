@@ -4,6 +4,8 @@
 
 ### Breaking changes
 
+#### Location APIs
+
 - **Removed following endpoints from gateway:**
   | Path | Method |
   |--------------------|--------|
@@ -12,6 +14,11 @@
   | `/locations` | `GET` |
   | `/locations` | `POST` |
   | `/locations/{id}` | `*` |
+
+V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
+
+- **events-service location APIs changes**
+  Administrative areas (v1 `locationType: 'ADMIN_STRUCTURE'`) are exposed from a separate endpoint. See the [definition of the administrative hierarchy](/ADMINISTRATIVE-HIERARCHY.md) 2.0.0 onwards.
 
 ### New features
 
