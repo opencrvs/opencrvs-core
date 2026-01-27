@@ -74,13 +74,13 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 function viewEvent(id: string) {
   const trpc = useTRPC()
   const eventConfig = useEventConfigurations()
-  const options = trpc.event.get.queryOptions(id)
+  const options = trpc.event.get.queryOptions({ id })
   return useSuspenseQuery({
     // In this case we can use the queryFn as this is a ad-hoc query
     ...options,
     queryKey: [['view-event', id]],
     queryFn: async () => {
-      const eventDocument = await trpcClient.event.get.query(id)
+      const eventDocument = await trpcClient.event.get.query({ id })
       await Promise.all([
         cacheFiles(eventDocument),
         cacheUsersFromEventDocument(eventDocument)
@@ -113,11 +113,11 @@ export function useGetEvent() {
   const useFindEventFromCache = (id: string) => {
     const eventConfig = useEventConfigurations()
     // Skip the queryFn defined by tRPC and use our own default defined above
-    const { queryFn, ...options } = trpc.event.get.queryOptions(id)
+    const { queryFn, ...options } = trpc.event.get.queryOptions({ id })
 
     return useQuery({
       ...options,
-      queryKey: trpc.event.get.queryKey(id),
+      queryKey: trpc.event.get.queryKey({ id }),
       meta: {
         eventConfig
       },
@@ -143,9 +143,11 @@ export function useGetEvent() {
       const intl = useIntl()
       const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
-      const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
+      const { queryFn, ...queryOptions } = trpc.event.get.queryOptions({ id })
 
-      const downloaded = queryClient.getQueryData(trpc.event.get.queryKey(id))
+      const downloaded = queryClient.getQueryData(
+        trpc.event.get.queryKey({ id })
+      )
       const downloadedForViewing = queryClient.getQueryData([
         ['view-event', id]
       ])
@@ -168,7 +170,7 @@ export function useGetEvent() {
         ...queryOptions,
         queryKey: downloadedForViewing
           ? [['view-event', id]]
-          : trpc.event.get.queryKey(id),
+          : trpc.event.get.queryKey({ id }),
         meta: {
           eventConfig
         },

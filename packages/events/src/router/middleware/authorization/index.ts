@@ -339,12 +339,12 @@ export const userCanReadEventV2: MiddlewareFunction<
   OpenApiMeta,
   TrpcContext,
   TrpcContext & { eventId: UUID; eventType: string },
-  UUID
+  EventIdParam
 > = async ({ next, ctx, input }) => {
   const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
   const acceptedScopes = getAcceptedScopesFromToken(ctx.token, ['record.read'])
-  const event = await getEventById(input)
+  const event = await getEventById(input.eventId)
   const system = SystemContext.safeParse(ctx.user)
   const humanUser = UserContext.safeParse(ctx.user)
   const isSystemUser = system.success
@@ -353,7 +353,7 @@ export const userCanReadEventV2: MiddlewareFunction<
     return next({
       ctx: {
         ...ctx,
-        eventId: input,
+        eventId: input.eventId,
         eventType: event.type
       }
     })
@@ -388,13 +388,13 @@ export const userCanReadEventV2: MiddlewareFunction<
       return next({
         ctx: {
           ...ctx,
-          eventId: input,
+          eventId: input.eventId,
           eventType: event.type
         }
       })
     }
 
-    throw new EventNotFoundError(input)
+    throw new EventNotFoundError(input.eventId)
   }
 
   const eventConfig = eventConfigs.find((c) => c.id === event.type)
@@ -417,14 +417,14 @@ export const userCanReadEventV2: MiddlewareFunction<
     )
 
     if (!hasAccess) {
-      throw new EventNotFoundError(input)
+      throw new EventNotFoundError(input.eventId)
     }
   }
 
   return next({
     ctx: {
       ...ctx,
-      eventId: input,
+      eventId: input.eventId,
       eventType: event.type
     }
   })

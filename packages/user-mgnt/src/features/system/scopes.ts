@@ -29,13 +29,7 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
   ], // TODO Should we call this MIGRATION or keep it generic?
   WEBHOOK: [SCOPES.WEBHOOK],
   REINDEX: [SCOPES.RECORD_REINDEX],
-  CITIZEN_PORTAL: [
-    'record.read',
-    'record.create',
-    'record.notify',
-    'record.declare',
-    SCOPES.RECORDSEARCH
-  ]
+  CITIZEN_PORTAL: ['record.read', 'record.create', 'record.notify']
 } satisfies Record<SystemRole, Scope[]>
 
 const DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES = {

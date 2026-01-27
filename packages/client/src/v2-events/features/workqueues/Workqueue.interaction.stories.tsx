@@ -369,10 +369,10 @@ export const DraftPagination: Story = {
         event: [
           tRPCMsw.event.draft.list.query(() => drafts),
           tRPCMsw.event.get.query((input) => {
-            const event = events.find((e) => e.event.id === input)?.event
+            const event = events.find((e) => e.event.id === input.id)?.event
 
             if (!event) {
-              throw new Error(`Event not found with id: ${input}`)
+              throw new Error(`Event not found with id: ${input.id}`)
             }
 
             return event
