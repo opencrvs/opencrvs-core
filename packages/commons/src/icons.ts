@@ -9,12 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 // How not to hardcode? these are defined in Component service
 export const AvailableIcons = z.enum([
   'Archived',
   'Assigned',
+  'Briefcase',
   'Certified',
   'Close',
   'Collapse',
@@ -77,12 +78,14 @@ export const AvailableIcons = z.enum([
   'Paperclip',
   'PaperPlaneTilt',
   'Pen',
+  'PenNib',
   'Pencil',
   'PencilSimpleLine',
   'Phone',
   'Plus',
   'Printer',
   'SignOut',
+  'Stamp',
   'Star',
   'Target',
   'TextT',
@@ -93,6 +96,7 @@ export const AvailableIcons = z.enum([
   'Users',
   'WarningCircle',
   'X',
+  'ChatText',
   'CircleWavyCheck',
   'CircleWavyQuestion',
   'ArchiveBox',

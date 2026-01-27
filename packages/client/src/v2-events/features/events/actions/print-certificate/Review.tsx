@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
+import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -59,6 +59,7 @@ import { useOnlineStatus } from '@client/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useAdministrativeAreas } from '../../../../hooks/useAdministrativeAreas'
 
 const CertificateContainer = styled.div`
   svg {
@@ -90,13 +91,13 @@ const messages = defineMessages({
   },
   printAndIssueModalTitle: {
     id: 'print.certificate.review.printAndIssueModalTitle',
-    defaultMessage: 'Print and issue certificate?',
+    defaultMessage: 'Print certified copy?',
     description: 'Print and issue certificate modal title text'
   },
   printAndIssueModalBody: {
     id: 'print.certificate.review.modal.body.printAndIssue',
     defaultMessage:
-      'A Pdf of the certificate will open in a new tab for printing and issuing.',
+      'This will generate a certified copy of the record for printing.',
     description: 'Print certificate modal body text'
   },
   makeCorrection: {
@@ -171,7 +172,9 @@ export function Review() {
   const [users] = getUsers.useSuspenseQuery(userIds)
 
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
@@ -216,6 +219,7 @@ export function Review() {
     event: { ...fullEvent, actions: actionsWithAnOptimisticPrintAction },
     config: eventConfiguration,
     locations,
+    administrativeAreas,
     users,
     certificateConfig,
     language
@@ -298,7 +302,6 @@ export function Review() {
         const printCertificate = await preparePdfCertificate(fullEvent)
 
         await onlineActions.printCertificate.mutateAsync({
-          fullEvent,
           eventId: fullEvent.id,
           declaration: {},
           annotation,
@@ -324,7 +327,7 @@ export function Review() {
 
         slug
           ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
-          : navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+          : navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }))
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console

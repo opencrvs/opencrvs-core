@@ -16,10 +16,14 @@ import {
   InteractiveFieldType,
   SerializedUserField,
   isNonInteractiveFieldType,
+  DefaultAddressFieldValue,
   FieldType,
   NameField
 } from '@opencrvs/commons/client'
-import { replacePlaceholders } from '@client/v2-events/utils'
+import {
+  replacePlaceholders,
+  handleDefaultValueForAddressField
+} from '@client/v2-events/utils'
 import { useSystemVariables } from './useSystemVariables'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,6 +98,15 @@ export function handleDefaultValue({
   }
 
   if (isFieldConfigDefaultValue(defaultValue)) {
+    if (field.type === FieldType.ADDRESS) {
+      const { success, data } = DefaultAddressFieldValue.safeParse(defaultValue)
+      if (success) {
+        return handleDefaultValueForAddressField({
+          defaultValue: data,
+          systemVariables
+        })
+      }
+    }
     return replacePlaceholders({
       field,
       defaultValue,

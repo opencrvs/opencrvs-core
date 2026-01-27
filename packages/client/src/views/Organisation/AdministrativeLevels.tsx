@@ -22,23 +22,23 @@ import {
   ListViewItemSimplified,
   ListViewSimplified,
   BreadCrumb,
-  Divider,
-  Icon
+  Divider
 } from '@opencrvs/components/lib'
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { ILocation } from '@client/offline/reducer'
 import { useParams, useNavigate } from 'react-router-dom'
-import { formatUrl, generatePerformanceHomeUrl } from '@client/navigation'
-import { Button } from '@opencrvs/components/lib/Button'
-import startOfMonth from 'date-fns/startOfMonth'
-import subMonths from 'date-fns/subMonths'
+import { formatUrl } from '@client/navigation'
 import styled from 'styled-components'
-import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import {
+  AdministrativeArea,
+  Location,
+  LocationType,
+  UUID
+} from '@opencrvs/commons/client'
+import { useAdministrativeAreas } from '../../v2-events/hooks/useAdministrativeAreas'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -47,7 +47,7 @@ type IRouteProps = {
 }
 
 type IGetNewLevel = {
-  childLocations: ILocation[]
+  childLocations: (Location | AdministrativeArea)[]
   breadCrumb: IBreadCrumbData[]
 }
 
@@ -101,67 +101,63 @@ export function AdministrativeLevels({
   const { locationId } = useParams<IRouteProps>()
   const { canAccessOffice } = usePermissions()
   const navigate = useNavigate()
+  const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
 
-  const getNewLevel =
-    (currentlySelectedLocation?: string) =>
-    (store: IStoreState): IGetNewLevel => {
-      const location = currentlySelectedLocation ?? '0'
-      const locations = store.offline.offlineData.locations as {
-        [key: string]: ILocation
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
+
+  const getNewLevel = (
+    currentlySelectedLocationId: UUID | null
+  ): IGetNewLevel => {
+    const childLocations = [...locations.values()].filter(
+      ({ administrativeAreaId, validUntil }) =>
+        (validUntil === null || new Date(validUntil) > new Date()) &&
+        administrativeAreaId === currentlySelectedLocationId
+    )
+
+    const childAdministrativeAreas = [...administrativeAreas.values()].filter(
+      ({ parentId, validUntil }) =>
+        (validUntil === null || new Date(validUntil) > new Date()) &&
+        parentId === currentlySelectedLocationId
+    )
+
+    let dataOfBreadCrumb: IBreadCrumbData[] = [
+      {
+        label: intl.formatMessage(constantsMessages.countryName),
+        paramId: ''
       }
-      const offices = store.offline.offlineData.offices as {
-        [key: string]: ILocation
-      }
+    ]
 
-      const childLocations = Object.values(locations)
-        .filter(
-          (s) => s.status === 'active' && s.partOf === `Location/${location}`
-        )
-        .concat(
-          Object.values(offices).filter(
-            (s) => s.status === 'active' && s.partOf === `Location/${location}`
-          )
-        )
+    if (currentlySelectedLocationId) {
+      let currentLocationId: UUID | null = currentlySelectedLocationId
+      const locationBreadCrumb: IBreadCrumbData[] | null = []
+      do {
+        const currentOffice = locations.get(currentLocationId)
 
-      let dataOfBreadCrumb: IBreadCrumbData[] = [
-        {
-          label: intl.formatMessage(constantsMessages.countryName),
-          paramId: ''
+        if (currentOffice) {
+          locationBreadCrumb.push({
+            label: currentOffice.name,
+            paramId: currentOffice.id
+          })
+
+          currentLocationId = currentOffice.administrativeAreaId
+        } else {
+          currentLocationId = null
         }
-      ]
+      } while (currentLocationId !== null)
 
-      if (currentlySelectedLocation) {
-        let currentLocationId = currentlySelectedLocation
-        const LocationBreadCrumb: IBreadCrumbData[] | null = []
-        do {
-          const currentOffice = locations[currentLocationId]
-
-          if (currentOffice) {
-            LocationBreadCrumb.push({
-              label: getLocalizedLocationName(intl, currentOffice),
-              paramId: currentOffice.id
-            })
-            currentLocationId = currentOffice.partOf.split('/')[1]
-          } else {
-            currentLocationId = ''
-          }
-        } while (currentLocationId !== '')
-
-        dataOfBreadCrumb = [
-          ...dataOfBreadCrumb,
-          ...LocationBreadCrumb.reverse()
-        ]
-      }
-
-      return {
-        breadCrumb: dataOfBreadCrumb,
-        childLocations
-      }
+      dataOfBreadCrumb = [...dataOfBreadCrumb, ...locationBreadCrumb.reverse()]
     }
 
-  const dataLocations = useSelector<IStoreState, IGetNewLevel>(
-    getNewLevel(locationId)
-  )
+    return {
+      breadCrumb: dataOfBreadCrumb,
+      childLocations: [...childAdministrativeAreas, ...childLocations]
+    }
+  }
+
+  const dataLocations = getNewLevel(UUID.safeParse(locationId).data ?? null)
+
   const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
 
@@ -199,20 +195,20 @@ export function AdministrativeLevels({
                   (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
                   currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
                 )
-                .map((level: ILocation, index: number) => (
+                .map((level: Location | AdministrativeArea, index: number) => (
                   <ListViewItemSimplified
                     key={index}
                     label={
-                      level.type === 'ADMIN_STRUCTURE' ? (
+                      AdministrativeArea.safeParse(level).success ? (
                         <Link
                           onClick={(e) => {
                             setCurrentPageNumber(1)
                             changeLevelAction(e, level.id)
                           }}
                         >
-                          {getLocalizedLocationName(intl, level)}
+                          {level.name}
                         </Link>
-                      ) : level.type === 'CRVS_OFFICE' ? (
+                      ) : (
                         <Link
                           disabled={!canAccessOffice(level)}
                           onClick={() =>
@@ -224,32 +220,9 @@ export function AdministrativeLevels({
                             })
                           }
                         >
-                          {getLocalizedLocationName(intl, level)}
+                          {level.name}
                         </Link>
-                      ) : null
-                    }
-                    actions={
-                      <Button
-                        type="icon"
-                        size="small"
-                        onClick={() => {
-                          navigate(
-                            generatePerformanceHomeUrl({
-                              timeStart: startOfMonth(
-                                subMonths(new Date(Date.now()), 11)
-                              ),
-                              timeEnd: new Date(Date.now()),
-                              locationId: level.id
-                            })
-                          )
-                        }}
-                      >
-                        <Icon
-                          name="Activity"
-                          color="currentColor"
-                          size="medium"
-                        />
-                      </Button>
+                      )
                     }
                   />
                 ))

@@ -10,22 +10,37 @@
  */
 
 import { UUID } from '../uuid'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
-export const LocationType = z.enum([
+/** @deprecated */
+export const LocationTypeV1 = z.enum([
   'ADMIN_STRUCTURE',
   'CRVS_OFFICE',
   'HEALTH_FACILITY'
 ])
+export type LocationTypeV1 = z.infer<typeof LocationTypeV1>
+
+export const LocationType = z.enum(['CRVS_OFFICE', 'HEALTH_FACILITY'])
 
 export type LocationType = z.infer<typeof LocationType>
+
+export const AdministrativeArea = z.object({
+  id: UUID,
+  name: z.string(),
+  externalId: z.string().nullish(),
+  parentId: UUID.nullable(),
+  validUntil: z.iso.datetime().nullable()
+})
+
+export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
 export const Location = z.object({
   id: UUID,
   name: z.string(),
-  parentId: UUID.nullable(),
-  validUntil: z.string().datetime().nullable(),
-  locationType: LocationType.nullable()
+  externalId: z.string().nullish(),
+  administrativeAreaId: UUID.nullable(),
+  validUntil: z.iso.datetime().nullable(),
+  locationType: z.string().nullable()
 })
 
 export type Location = z.infer<typeof Location>

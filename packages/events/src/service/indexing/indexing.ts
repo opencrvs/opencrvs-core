@@ -10,7 +10,7 @@
  */
 
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -31,19 +31,25 @@ import {
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
-import { logger } from '@opencrvs/commons'
+import { logger, RecordScopeV2 } from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { TrpcUserContext } from '../../context'
 import {
   decodeEventIndex,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
+  EventIndexWithAdministrativeHierarchy,
+  getEventIndexWithAdministrativeHierarchy,
+  getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
-  removeSecuredFields
+  removeSecuredFields,
+  resolveRecordActionScopeToIds,
+  valueFromTotal
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
@@ -95,6 +101,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.TIME:
+    case FieldType.ALPHA_HIDDEN:
       return { type: 'text' }
     case FieldType.NUMBER_WITH_UNIT:
       return {
@@ -144,6 +151,7 @@ function mapFieldTypeToElasticsearch(
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }
+
       return {
         type: 'object',
         properties: addressProperties
@@ -198,6 +206,15 @@ function mapFieldTypeToElasticsearch(
        * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
        * The field still lands in `_source`.
        */
+      return {
+        type: 'object',
+        enabled: false
+      }
+    case FieldType._EXPERIMENTAL_CUSTOM:
+      /**
+       * Custom fields are not indexed as their structure is unknown.
+       */
+
       return {
         type: 'object',
         enabled: false
@@ -347,10 +364,25 @@ export async function indexEventsInBulk(
 ) {
   const esClient = getOrCreateClient()
 
-  const body = batch.flatMap((doc) => [
-    { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
-    eventToEventIndex(doc, getEventConfigById(configs, doc.type))
-  ])
+  const locationHierarchyCache = new Map<string, string[]>()
+  const indexedDocs = await Promise.all(
+    batch.map(async (doc) => {
+      const config = getEventConfigById(configs, doc.type)
+      const eventIndex = eventToEventIndex(doc, config)
+      const eventIndexWithLocationHierarchy =
+        await getEventIndexWithAdministrativeHierarchy(
+          config,
+          eventIndex,
+          locationHierarchyCache
+        )
+      return [
+        { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+        eventIndexWithLocationHierarchy
+      ]
+    })
+  )
+
+  const body = indexedDocs.flat()
 
   return esClient.bulk({ refresh: false, body })
 }
@@ -358,12 +390,14 @@ export async function indexEventsInBulk(
 export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
-
-  return esClient.index<EventIndex>({
+  const eventIndex = eventToEventIndex(event, config)
+  const eventIndexWithAdministrativeHierarchy =
+    await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
+  return esClient.index<EventIndexWithAdministrativeHierarchy>({
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventToEventIndex(event, config),
+    document: eventIndexWithAdministrativeHierarchy,
     refresh: 'wait_for'
   })
 }
@@ -402,10 +436,12 @@ export async function getIndexedEvents(
               { term: { status: EventStatus.enum.CREATED } },
               { term: { createdBy: userId } }
             ],
+
             should: undefined
           }
         }
       ],
+
       minimum_should_match: 1
     }
   } satisfies estypes.QueryDslQueryContainer
@@ -427,32 +463,33 @@ export async function getIndexedEvents(
     })
 }
 
-function valueFromTotal(total?: number | estypes.SearchTotalHits) {
-  if (!total) {
-    return 0
-  }
-  if (typeof total === 'number') {
-    return total
-  } else {
-    return total.value
-  }
-}
-
-export async function findRecordsByQuery(
-  search: SearchQuery,
-  eventConfigs: EventConfig[],
-  options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined
-) {
+export async function findRecordsByQuery({
+  search,
+  eventConfigs,
+  options,
+  user,
+  acceptedScopes
+}: {
+  search: SearchQuery
+  eventConfigs: EventConfig[]
+  options?: Record<string, SearchScopeAccessLevels>
+  user: TrpcUserContext
+  acceptedScopes?: RecordScopeV2[]
+}) {
   const esClient = getOrCreateClient()
 
   const { query, limit, offset } = search
 
-  const esQuery = withJurisdictionFilters(
-    await buildElasticQueryFromSearchPayload(query, eventConfigs),
-    options,
-    userOfficeId
+  const resolvedScopes = acceptedScopes?.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
   )
+
+  const esQuery = withJurisdictionFilters({
+    query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
+    options,
+    userOfficeId: user.primaryOfficeId,
+    scopesV2: resolvedScopes
+  })
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -479,10 +516,16 @@ export async function findRecordsByQuery(
   const events = response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((eventIndex) => {
+    .map((eventIndex: EncodedEventIndex) => {
       const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
       const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
-      return removeSecuredFields(eventConfig, decodedEventIndex)
+      const eventIndexWithoutLocationHierarchy =
+        getEventIndexWithoutLocationHierarchy(eventConfig, decodedEventIndex)
+
+      return removeSecuredFields(
+        eventConfig,
+        eventIndexWithoutLocationHierarchy
+      )
     })
 
   return { results: events, total: valueFromTotal(response.hits.total) }
@@ -514,7 +557,7 @@ export async function getEventCount(
   )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters(query, options, userOfficeId)
+    withJurisdictionFilters({ query, options, userOfficeId })
   )
   const { responses } = await esClient.msearch({
     searches: filteredQueries.flatMap((query) => [

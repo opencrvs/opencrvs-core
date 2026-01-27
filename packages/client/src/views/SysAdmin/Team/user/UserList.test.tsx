@@ -21,7 +21,7 @@ import {
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import * as React from 'react'
 import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
@@ -34,6 +34,8 @@ import { SearchUsersQuery, Status } from '@client/utils/gateway'
 import { NetworkStatus } from '@apollo/client'
 import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { createMemoryRouter } from 'react-router-dom'
+import * as useLocationsModule from '@client/v2-events/hooks/useLocations'
+import * as useAdministrativeAreasModule from '@client/v2-events/hooks/useAdministrativeAreas'
 
 const searchUserResultsMock = (
   officeId: string,
@@ -45,7 +47,8 @@ const searchUserResultsMock = (
       variables: {
         primaryOfficeId: officeId,
         count: 10,
-        skip: 0
+        skip: 0,
+        status: 'active'
       }
     },
     result: {
@@ -115,8 +118,8 @@ describe('for user with create my jurisdiction scope', () => {
   })
 
   it('should show add user button if office is under jurisdiction', async () => {
-    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
-    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const userOfficeId = '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12'
+    const selectedOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' // This office is under the user's office in hierarchy
 
     const { component } = await createTestComponent(<UserList />, {
       store,
@@ -178,7 +181,7 @@ describe('for user with create scope', () => {
 
   it('should show add user button if office is under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
-    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const selectedOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' // This office is under the user's office in hierarchy
     const { component } = await createTestComponent(<UserList />, {
       store,
       path: TEAM_USER_LIST,
@@ -239,8 +242,8 @@ describe('for user with update my jurisdiction scope', () => {
   })
 
   it('should show edit user button if office is under jurisdiction', async () => {
-    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
-    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const userOfficeId = '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12'
+    const selectedOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' // This office is under the user's office in hierarchy
     const { component } = await createTestComponent(<UserList />, {
       store,
       path: TEAM_USER_LIST,
@@ -271,8 +274,8 @@ describe('for user with update my jurisdiction scope', () => {
   })
 
   it('should not show edit user button if the other user has update all scope even if under jurisdiction', async () => {
-    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
-    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const userOfficeId = '62a0ccb4-880d-4f30-8882-f256007dfff9'
+    const selectedOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' // This office is under the user's office in hierarchy
     const { component } = await createTestComponent(<UserList />, {
       store,
       path: TEAM_USER_LIST,
@@ -341,7 +344,7 @@ describe('for user with update scope', () => {
 
   it('should show edit user button if office is under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
-    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const selectedOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' // This office is under the user's office in hierarchy
     const { component } = await createTestComponent(<UserList />, {
       store,
       path: TEAM_USER_LIST,
@@ -373,7 +376,7 @@ describe('for user with update scope', () => {
 
   it('should show edit user button even if the other user has update all scope', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
-    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const selectedOfficeId = '028d2c85-ca31-426d-b5d1-2cef545a4902' // This office is under the user's office in hierarchy
     const { component } = await createTestComponent(<UserList />, {
       store,
       path: TEAM_USER_LIST,
@@ -506,9 +509,10 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
+              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
               count: 10,
-              skip: 0
+              skip: 0,
+              status: 'active'
             }
           },
           result: {
@@ -528,11 +532,21 @@ describe('User list tests', () => {
           TEAM_USER_LIST +
             '?' +
             stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+              locationId: '028d2c85-ca31-426d-b5d1-2cef545a4902'
             })
         ],
         graphqlMocks: userListMock
       })
+
+      store.dispatch(
+        actions.setUserDetails({
+          loading: false,
+          data: fetchUserMock('028d2c85-ca31-426d-b5d1-2cef545a4902'),
+          networkStatus: NetworkStatus.ready
+        })
+      )
+      component.update()
+
       component.update()
       const addUser = await waitForElement(component, '#add-user')
       addUser.hostNodes().simulate('click')
@@ -547,9 +561,10 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
+              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
               count: 10,
-              skip: 0
+              skip: 0,
+              status: 'active'
             }
           },
           result: {
@@ -569,7 +584,7 @@ describe('User list tests', () => {
           TEAM_USER_LIST +
             '?' +
             stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+              locationId: '028d2c85-ca31-426d-b5d1-2cef545a4902'
             })
         ],
         graphqlMocks: userListMock
@@ -592,9 +607,10 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
+              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
               count: 10,
-              skip: 0
+              skip: 0,
+              status: 'active'
             }
           },
           result: {
@@ -614,7 +630,7 @@ describe('User list tests', () => {
           TEAM_USER_LIST +
             '?' +
             stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+              locationId: '028d2c85-ca31-426d-b5d1-2cef545a4902'
             })
         ],
         graphqlMocks: userListMock
@@ -641,9 +657,10 @@ describe('User list tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
+              primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
               count: 10,
-              skip: 0
+              skip: 0,
+              status: 'active'
             }
           },
           result: {
@@ -661,7 +678,7 @@ describe('User list tests', () => {
                       }
                     ],
                     primaryOffice: {
-                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                      id: '028d2c85-ca31-426d-b5d1-2cef545a4902'
                     },
                     role: {
                       id: 'REGISTRATION_AGENT',
@@ -684,7 +701,7 @@ describe('User list tests', () => {
                       }
                     ],
                     primaryOffice: {
-                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                      id: '028d2c85-ca31-426d-b5d1-2cef545a4902'
                     },
                     role: {
                       id: 'LOCAL_REGISTRAR',
@@ -707,7 +724,7 @@ describe('User list tests', () => {
                       }
                     ],
                     primaryOffice: {
-                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                      id: '028d2c85-ca31-426d-b5d1-2cef545a4902'
                     },
                     role: {
                       id: 'DISTRICT_REGISTRAR',
@@ -730,7 +747,7 @@ describe('User list tests', () => {
                       }
                     ],
                     primaryOffice: {
-                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                      id: '028d2c85-ca31-426d-b5d1-2cef545a4902'
                     },
                     role: {
                       id: 'STATE_REGISTRAR',
@@ -753,7 +770,7 @@ describe('User list tests', () => {
                       }
                     ],
                     primaryOffice: {
-                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                      id: '028d2c85-ca31-426d-b5d1-2cef545a4902'
                     },
                     role: {
                       id: 'FIELD_AGENT',
@@ -786,7 +803,7 @@ describe('User list tests', () => {
             TEAM_USER_LIST +
               '?' +
               stringify({
-                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+                locationId: '028d2c85-ca31-426d-b5d1-2cef545a4902'
               })
           ],
           graphqlMocks: userListMock

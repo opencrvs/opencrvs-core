@@ -23,7 +23,7 @@ import {
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
-import { parse } from 'query-string'
+import { parse } from 'qs'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
 import { vi } from 'vitest'
@@ -94,7 +94,9 @@ describe('Team search test', () => {
       app.update()
       flushPromises()
 
-      expect(parse(router.state.location.search)).toEqual({
+      expect(
+        parse(router.state.location.search, { ignoreQueryPrefix: true })
+      ).toEqual({
         locationId: '0d8474da-0361-4d32-979e-af91f012340a'
       })
       expect(router.state.location.pathname).toContain('/team/users')

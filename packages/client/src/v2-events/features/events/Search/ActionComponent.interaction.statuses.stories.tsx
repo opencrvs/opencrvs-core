@@ -137,7 +137,7 @@ export const DirectsCreatedToDeclare: Story = {
 }
 
 const notifiedEvent = createEventByStatus(EventStatus.enum.NOTIFIED)
-export const DirectsNotifiedToDeclare: Story = {
+export const DirectsNotifiedToEdit: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
@@ -170,11 +170,11 @@ export const DirectsNotifiedToDeclare: Story = {
             }
           },
           {
-            path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
+            path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
             Component: () => {
               return (
                 <div>
-                  {ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+                  {ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
                     eventId: notifiedEvent.event.id
                   })}
                 </div>
@@ -189,7 +189,7 @@ export const DirectsNotifiedToDeclare: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
+      name: 'Edit'
     })
 
     await userEvent.click(actionButton)
@@ -198,7 +198,7 @@ export const DirectsNotifiedToDeclare: Story = {
     await waitFor(async () => {
       await expect(
         canvas.getByText(
-          ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+          ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
             eventId: notifiedEvent.event.id
           })
         )
@@ -208,148 +208,6 @@ export const DirectsNotifiedToDeclare: Story = {
 }
 
 const declaredEvent = createEventByStatus(EventStatus.enum.DECLARED)
-
-export const DirectsDeclaredToValidate: Story = {
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(declaredEvent.event.id, declaredEvent.event)
-  },
-
-  args: {
-    event: declaredEvent.eventQueryData
-  },
-  parameters: {
-    layout: 'centered',
-    chromatic: { disableSnapshot: true },
-    reactRouter: {
-      router: {
-        path: '/',
-        children: [
-          {
-            path: 'start',
-            Component: () => {
-              return (
-                <div>
-                  <ActionCta
-                    actionType={'DEFAULT'}
-                    event={declaredEvent.eventQueryData}
-                  />
-                </div>
-              )
-            }
-          },
-          {
-            path: ROUTES.V2.EVENTS.VALIDATE.REVIEW.path,
-            Component: () => {
-              return (
-                <div>
-                  {ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-                    eventId: declaredEvent.event.id
-                  })}
-                </div>
-              )
-            }
-          }
-        ]
-      },
-      initialPath: '/start'
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
-    })
-
-    await userEvent.click(actionButton)
-
-    // Ensure the user is redirected to the declaration review page
-    await waitFor(async () => {
-      await expect(
-        canvas.getByText(
-          ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-            eventId: declaredEvent.event.id
-          })
-        )
-      ).toBeInTheDocument()
-    })
-  }
-}
-
-const validatedEvent = createEventByStatus(EventStatus.enum.VALIDATED)
-
-export const directsValidatedToRegister: Story = {
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(validatedEvent.event.id, validatedEvent.event)
-  },
-
-  args: {
-    event: validatedEvent.eventQueryData
-  },
-  parameters: {
-    layout: 'centered',
-    chromatic: { disableSnapshot: true },
-    reactRouter: {
-      router: {
-        path: '/',
-        children: [
-          {
-            path: 'start',
-            Component: () => {
-              return (
-                <div>
-                  <ActionCta
-                    actionType={'DEFAULT'}
-                    event={validatedEvent.eventQueryData}
-                  />
-                </div>
-              )
-            }
-          },
-          {
-            path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
-            Component: () => {
-              return (
-                <div>
-                  {ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
-                    eventId: validatedEvent.event.id
-                  })}
-                </div>
-              )
-            }
-          }
-        ]
-      },
-      initialPath: '/start'
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
-    })
-
-    await userEvent.click(actionButton)
-
-    // Ensure the user is redirected to the declaration review page
-    await waitFor(async () => {
-      await expect(
-        canvas.getByText(
-          ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({
-            eventId: validatedEvent.event.id
-          })
-        )
-      ).toBeInTheDocument()
-    })
-  }
-}
 
 const registeredEvent = createEventByStatus(EventStatus.enum.REGISTERED)
 

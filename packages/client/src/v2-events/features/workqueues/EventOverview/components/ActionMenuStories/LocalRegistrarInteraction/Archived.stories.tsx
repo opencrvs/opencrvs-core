@@ -16,9 +16,9 @@ import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
-  AssertType,
   Scenario,
-  UserRoles
+  UserRoles,
+  AssertType
 } from '../ActionMenu.common'
 
 export default {
@@ -39,7 +39,10 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      // @TODO - decide whether to keep/remove them after conditionals are implemented
+      ['Assign']: AssertType.ENABLED,
+      ['Unassign']: AssertType.ENABLED,
+      ['Confirm']: AssertType.DISABLED
     }
   },
   {
@@ -55,7 +58,10 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      // @TODO - decide whether to keep/remove them after conditionals are implemented
+      ['Assign']: AssertType.ENABLED,
+      ['Unassign']: AssertType.ENABLED,
+      ['Confirm']: AssertType.DISABLED
     }
   }
 ]

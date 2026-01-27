@@ -10,7 +10,7 @@
  */
 
 import { FullDocumentPath } from '../documents'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
 
@@ -39,6 +39,7 @@ export const User = z.object({
     'Storage key for the user signature. e.g. /ocrvs/signature.png'
   ),
   primaryOfficeId: UUID,
+  administrativeAreaId: UUID.nullish(),
   device: z.string().optional(),
   fullHonorificName: z.string().optional(),
   type: TokenUserType.extract(['user'])
@@ -60,6 +61,7 @@ export const System = z.object({
   type: TokenUserType.extract(['system']),
   role: SystemRole,
   primaryOfficeId: z.undefined().optional(),
+  administrativeAreaId: z.undefined().optional(),
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
   fullHonorificName: z.string().optional()

@@ -48,7 +48,9 @@ import {
   isSignatureFieldType,
   isDataFieldType,
   EventConfig,
-  isAgeFieldType
+  isAgeFieldType,
+  FieldUpdateValue,
+  isCustomFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -77,6 +79,7 @@ import { DateRangeField } from '@client/v2-events/features/events/registered-fie
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { isEqualFieldValue } from '../actions/correct/utils'
 import { Data } from '../registered-fields/Data'
+import { Custom } from '../registered-fields/Custom'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -99,7 +102,7 @@ export function ValueOutput({
   eventConfig
 }: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
   searchMode?: {} | boolean
   eventConfig?: EventConfig
 }) {
@@ -229,6 +232,10 @@ export function ValueOutput({
       />
     )
   }
+
+  if (isCustomFieldType(field)) {
+    return <Custom.Output {...field.config} value={field.value} />
+  }
 }
 
 function findPreviousValueWithSameLabel(
@@ -289,7 +296,7 @@ export function Output({
   displayEmptyAsDash = false
 }: {
   field: FieldConfig
-  value?: FieldValue
+  value?: FieldValue | FieldUpdateValue
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged?: boolean
   previousForm?: EventState

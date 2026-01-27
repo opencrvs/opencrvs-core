@@ -38,7 +38,7 @@ import type {
   GQLQuery
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { orderBy } from 'lodash'
-import { parse } from 'query-string'
+import { parse } from 'qs'
 import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
@@ -191,9 +191,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const location = useLocation()
 
   const { intl } = props
-  const { locationId, status, event } = parse(
-    location.search
-  ) as unknown as ISearchParams
+  const { locationId, status, event } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as ISearchParams
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(
@@ -709,17 +709,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   })
                 )
               }}
-              locationFilter={
-                window.config.DECLARATION_AUDIT_LOCATIONS
-                  ? ({ jurisdictionType }) =>
-                      Boolean(
-                        jurisdictionType &&
-                          window.config.DECLARATION_AUDIT_LOCATIONS.split(
-                            ','
-                          ).includes(jurisdictionType)
-                      )
-                  : undefined
-              }
             />
             <PerformanceSelect
               onChange={({ value }) => {

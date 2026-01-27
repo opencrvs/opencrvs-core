@@ -34,7 +34,6 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       ActionType.REQUEST_CORRECTION,
@@ -42,11 +41,10 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
-      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN,
-      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: AssertType.DISABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Print']: AssertType.HIDDEN,
+      ['Correct record']: AssertType.HIDDEN,
+      ['Review correction request']: AssertType.DISABLED
     }
   },
   {
@@ -56,18 +54,16 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.REQUEST_CORRECTION,
       ClientSpecificAction.REVIEW_CORRECTION_REQUEST
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
-      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN,
-      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Print']: AssertType.HIDDEN,
+      ['Correct record']: AssertType.HIDDEN,
+      ['Review correction request']: AssertType.ENABLED
     }
   },
   {
@@ -77,7 +73,6 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS,
@@ -86,11 +81,10 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
-      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN,
-      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: AssertType.DISABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Print']: AssertType.HIDDEN,
+      ['Correct record']: AssertType.HIDDEN,
+      ['Review correction request']: AssertType.DISABLED
     }
   }
 ]

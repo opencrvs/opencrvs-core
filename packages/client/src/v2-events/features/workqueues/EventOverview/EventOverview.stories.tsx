@@ -84,7 +84,7 @@ export const Overview: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: defaultEvent.id
       })
     },
@@ -125,29 +125,12 @@ export const WithAcceptedRegisterEvent: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
     msw: {
-      handlers: {
-        drafts: [
-          tRPCMsw.event.draft.list.query(() => {
-            return [
-              generateEventDraftDocument({
-                eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
-                declaration: {
-                  'applicant.name': {
-                    firstname: 'Riku',
-                    surname: 'This value is from a draft'
-                  }
-                }
-              })
-            ]
-          })
-        ]
-      }
+      handlers: {}
     }
   }
 }
@@ -177,7 +160,7 @@ export const WithRejectedAction: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -303,7 +286,7 @@ export const WithSystemUserActions: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -598,7 +581,7 @@ export const WithVariousUserRoles: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -632,7 +615,7 @@ const actionDefaults = {
     new Date('2024-04-01')
   ),
   createdBy: refData.user.id.localRegistrar,
-  createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+  createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
   createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId,
   transactionId: getUUID()
 } satisfies Partial<ActionDocument>
@@ -685,7 +668,7 @@ export const WithDuplicateDetectedAction: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: duplicateEvent.id
       })
     },
@@ -713,7 +696,7 @@ export const WithDuplicateDetectedActionModal: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
         eventId: duplicateEvent.id
       })
     },
@@ -769,31 +752,6 @@ const annotationUpdateOnValidateEvent = {
       }
     }),
     generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      declarationOverrides: {},
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
-        id: validateActionUuid,
-        status: ActionStatus.Requested,
-        annotation: {
-          'review.signature': generateRandomSignature(rng)
-        }
-      }
-    }),
-    generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      declarationOverrides: {},
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
-        status: ActionStatus.Accepted,
-        originalActionId: validateActionUuid
-      }
-    }),
-    generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.ASSIGN,
       defaults: {
@@ -815,7 +773,7 @@ export const WithAnnotationChangeOnValidate: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: annotationUpdateOnValidateEvent.id
       })
     },
@@ -859,15 +817,6 @@ const annotationChangeDuringRegisterEvent = {
           'review.signature': generateRandomSignature(rng)
         }
       }
-    }),
-    generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString()
-      },
-      declarationOverrides: {}
     }),
     generateActionDocument({
       action: ActionType.REGISTER,
@@ -915,7 +864,7 @@ export const WithAnnotationChangeOnRegister: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: annotationChangeDuringRegisterEvent.id
       })
     },

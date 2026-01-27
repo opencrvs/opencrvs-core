@@ -19,10 +19,9 @@ import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import { router as correctionReviewRouter } from '@client/v2-events/features/events/actions/correct/review/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
+import * as Edit from '@client/v2-events/features/events/actions/edit'
 import { DeleteEventIndex } from '@client/v2-events/features/events/actions/delete'
 import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
-import * as Register from '@client/v2-events/features/events/actions/register'
-import * as Validate from '@client/v2-events/features/events/actions/validate'
 import {
   AdvancedSearch,
   SearchResult
@@ -54,6 +53,7 @@ import { ProtectedRoute } from '../../components/ProtectedRoute'
 import { UserAudit } from '../../views/UserAudit/UserAudit'
 import { SystemList } from '../../views/SysAdmin/Config/Systems/Systems'
 import AllUserEmail from '../../views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import { EventHistoryIndex } from '../features/workqueues/EventOverview/components/EventHistory'
 import { PerformanceDashboard } from '../features/performance/Dashboard'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
@@ -63,12 +63,25 @@ function PrefetchQueries() {
 
   useEffect(() => {
     {
-      const { queryKey, queryFn } =
-        trpcOptionsProxy.locations.list.queryOptions()
+      const locationsQuery = trpcOptionsProxy.locations.list.queryOptions()
+
+      const administrativeAreasQuery =
+        trpcOptionsProxy.administrativeAreas.list.queryOptions()
 
       // only fetch if we don't already have it cached
-      if (!queryClient.getQueryData(queryKey)) {
-        void queryClient.prefetchQuery({ queryKey, queryFn })
+      if (!queryClient.getQueryData(locationsQuery.queryKey)) {
+        void queryClient.prefetchQuery({
+          queryKey: locationsQuery.queryKey,
+          queryFn: locationsQuery.queryFn
+        })
+      }
+
+      // only fetch if we don't already have it cached
+      if (!queryClient.getQueryData(administrativeAreasQuery.queryKey)) {
+        void queryClient.prefetchQuery({
+          queryKey: administrativeAreasQuery.queryKey,
+          queryFn: administrativeAreasQuery.queryFn
+        })
       }
     }
     void prefetch()
@@ -114,16 +127,26 @@ export const routesConfig = {
     },
     workqueueRouter,
     {
-      path: ROUTES.V2.EVENTS.VIEW.path,
-      element: <ReadonlyViewIndex />
-    },
-    {
-      path: ROUTES.V2.EVENTS.OVERVIEW.path,
+      path: ROUTES.V2.EVENTS.EVENT.path,
       element: (
         <EventOverviewLayout>
-          <EventOverviewIndex />
+          <Outlet />
         </EventOverviewLayout>
-      )
+      ),
+      children: [
+        {
+          index: true,
+          element: <EventOverviewIndex />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EVENT.RECORD.path,
+          element: <ReadonlyViewIndex />
+        },
+        {
+          path: ROUTES.V2.EVENTS.EVENT.AUDIT.path,
+          element: <EventHistoryIndex />
+        }
+      ]
     },
     {
       path: ROUTES.V2.EVENTS.CREATE.path,
@@ -156,51 +179,29 @@ export const routesConfig = {
       ]
     },
     {
-      path: ROUTES.V2.EVENTS.VALIDATE.path,
+      path: ROUTES.V2.EVENTS.EDIT.path,
       element: (
-        <DeclarationAction actionType={ActionType.VALIDATE}>
+        <DeclarationAction actionType={ActionType.EDIT}>
           <Outlet />
         </DeclarationAction>
       ),
       children: [
         {
           index: true,
-          element: <Validate.Pages />
+          element: <Edit.Pages />
         },
         {
-          path: ROUTES.V2.EVENTS.VALIDATE.PAGES.path,
-          element: <Validate.Pages />
+          path: ROUTES.V2.EVENTS.EDIT.PAGES.path,
+          element: <Edit.Pages />
         },
         {
-          path: ROUTES.V2.EVENTS.VALIDATE.REVIEW.path,
-          element: <Validate.Review />
+          path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
+          element: <Edit.Review />
         }
       ]
     },
     correctionRequestRouter,
     correctionReviewRouter,
-    {
-      path: ROUTES.V2.EVENTS.REGISTER.path,
-      element: (
-        <DeclarationAction actionType={ActionType.REGISTER}>
-          <Outlet />
-        </DeclarationAction>
-      ),
-      children: [
-        {
-          index: true,
-          element: <Register.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.REGISTER.PAGES.path,
-          element: <Register.Pages />
-        },
-        {
-          path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
-          element: <Register.Review />
-        }
-      ]
-    },
     {
       path: ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.path,
       element: <ReviewDuplicateIndex />

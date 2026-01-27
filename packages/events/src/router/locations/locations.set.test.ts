@@ -55,10 +55,11 @@ test('Creates single location', async () => {
   const locationPayload: Location[] = [
     {
       id: generateUuid(),
-      parentId: null,
+      administrativeAreaId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: LocationType.enum.ADMIN_STRUCTURE
+      locationType: LocationType.enum.CRVS_OFFICE,
+      externalId: 'abc123xyz456'
     }
   ]
 
@@ -70,20 +71,25 @@ test('Creates single location', async () => {
   expect(locations).toMatchObject(initialLocations.concat(locationPayload))
 })
 
-test('Creates multiple locations', async () => {
+test('Creates multiple locations under administrative area', async () => {
   const { user, generator, rng } = await setupTestCase()
 
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const initialLocations = await dataSeedingClient.locations.list()
 
-  const parentId = generateUuid(rng)
+  const administrativeAreaId = generateUuid(rng)
 
+  const administrativeAreaPayload = generator.administrativeAreas.set(
+    [{ id: administrativeAreaId }],
+    rng
+  )
   const locationPayload = generator.locations.set(
-    [{ id: parentId }, { parentId: parentId }, { parentId: parentId }, {}],
+    [{ administrativeAreaId }, { administrativeAreaId }, {}],
     rng
   )
 
+  await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
   await dataSeedingClient.locations.set(locationPayload)
 
   const locations = await dataSeedingClient.locations.list()

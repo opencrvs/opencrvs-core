@@ -26,7 +26,7 @@ import {
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
-import { getLocations } from '@events/storage/postgres/events/locations'
+import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
 
 describe('event.actions.notify', () => {
   describe('authorization', () => {
@@ -133,7 +133,6 @@ describe('event.actions.notify', () => {
     }
 
     await expect(
-      // @ts-expect-error - expect name error
       client.event.actions.notify.request(payload)
     ).rejects.toMatchSnapshot()
   })
@@ -213,15 +212,21 @@ describe('event.actions.notify', () => {
         SCOPES.USER_DATA_SEEDING
       ])
 
-      const parentId = generateUuid(rng)
+      const administrativeAreaId = generateUuid(rng)
 
       const locationRng = createPrng(843)
 
-      const locationPayload = generator.locations.set(
-        [{ id: parentId }, { parentId: parentId }, { parentId: parentId }],
+      const administrativeAreaPayload = generator.administrativeAreas.set(
+        [{ id: administrativeAreaId }],
         locationRng
       )
 
+      const locationPayload = generator.locations.set(
+        [{ administrativeAreaId }, { administrativeAreaId }],
+        locationRng
+      )
+
+      await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
       await dataSeedingClient.locations.set(locationPayload)
 
       const locations = await dataSeedingClient.locations.list()
@@ -259,11 +264,13 @@ describe('event.actions.notify', () => {
       await expect(
         client.event.actions.notify.request({
           ...payload,
-          createdAtLocation: parentId
+          createdAtLocation: administrativeAreaId
         })
       ).rejects.toMatchSnapshot()
 
-      const childLocation = locations.find((l) => l.parentId === parentId)
+      const childLocation = locations.find(
+        (l) => l.administrativeAreaId === administrativeAreaId
+      )
 
       if (!childLocation) {
         throw new Error('Child location not found')
@@ -375,7 +382,6 @@ describe('event.actions.notify', () => {
         transactionId: generateUuid(),
         type: 'NOTIFY',
         declaration: {
-          // @ts-expect-error - testing partial address
           'applicant.address': {
             country: 'FAR'
           }
@@ -427,7 +433,6 @@ describe('event.actions.notify', () => {
         'applicant.address': {
           country: 'FAR',
           addressType: AddressType.INTERNATIONAL,
-          // @ts-expect-error - testing wrong field (administrativeArea for DOMESTIC) in address
           administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' // it goes away when AddressFieldValue parses it
         }
       },

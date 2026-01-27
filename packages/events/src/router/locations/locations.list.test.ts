@@ -26,10 +26,11 @@ test('Returns single location in right format', async () => {
   const setLocationPayload: Location[] = [
     {
       id: generateUuid(),
-      parentId: null,
+      administrativeAreaId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: LocationType.enum.ADMIN_STRUCTURE
+      locationType: LocationType.enum.CRVS_OFFICE,
+      externalId: 'abc123xyz456'
     }
   ]
 

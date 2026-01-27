@@ -95,7 +95,8 @@ test('Find user by id outside of jurisdiction with global scope', async () => {
   })
 })
 
-test('Finds user in nested location with my jurisdiction scope', async () => {
+test('Finds user in nested location using administrative area id with my jurisdiction scope', async () => {
+  // @TODO: Probably wont work
   const { user: userOnParentLocation, seed } = await setupTestCase()
   const parentLocationClient = createTestClient(userOnParentLocation, [
     SCOPES.USER_READ_MY_JURISDICTION
@@ -103,30 +104,34 @@ test('Finds user in nested location with my jurisdiction scope', async () => {
 
   const rng = createPrng(44444)
 
-  const childLocationId = generateUuid(rng)
+  const childAdministrativeAreaId = generateUuid(rng)
   const grandchildLocationId = generateUuid(rng)
+
+  await seed.administrativeAreas([
+    {
+      name: 'Child office',
+      parentId: userOnParentLocation.administrativeAreaId,
+      id: childAdministrativeAreaId,
+      validUntil: null,
+      externalId: 'abc123xyz457'
+    }
+  ])
 
   await seed.locations([
     {
-      name: 'Child office',
-      parentId: userOnParentLocation.primaryOfficeId,
-      locationType: LocationType.Enum.ADMIN_STRUCTURE,
-      id: childLocationId,
-      validUntil: null
-    },
-    {
       name: 'Grandchild office',
-      parentId: childLocationId,
-      locationType: LocationType.Enum.CRVS_OFFICE,
+      administrativeAreaId: childAdministrativeAreaId,
+      locationType: LocationType.enum.CRVS_OFFICE,
       id: grandchildLocationId,
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz458'
     }
   ])
 
   const userToSearch = seed.user({
     name: [{ family: 'Smith', given: ['John'], use: 'en' }],
     primaryOfficeId: grandchildLocationId,
-    role: TestUserRole.Enum.FIELD_AGENT
+    role: TestUserRole.enum.FIELD_AGENT
   })
 
   mswServer.use(
@@ -167,17 +172,18 @@ test('Find user with appropriate scopes', async () => {
   await seed.locations([
     {
       name: 'Child office',
-      parentId: userOnParentLocation.primaryOfficeId,
-      locationType: LocationType.Enum.CRVS_OFFICE,
+      administrativeAreaId: userOnParentLocation.administrativeAreaId,
+      locationType: LocationType.enum.CRVS_OFFICE,
       id: userToSearchLocationId,
-      validUntil: null
+      validUntil: null,
+      externalId: 'abc123xyz459'
     }
   ])
 
   const userInTheSameOffice = seed.user({
     name: [{ family: 'Jones', given: ['James'], use: 'en' }],
     primaryOfficeId: userToSearchLocationId,
-    role: TestUserRole.Enum.FIELD_AGENT
+    role: TestUserRole.enum.FIELD_AGENT
   })
 
   const clientWithOfficeScope = createTestClient(userInTheSameOffice, [
@@ -187,7 +193,7 @@ test('Find user with appropriate scopes', async () => {
   const userToSearch = seed.user({
     name: [{ family: 'Smith', given: ['John'], use: 'en' }],
     primaryOfficeId: userToSearchLocationId,
-    role: TestUserRole.Enum.FIELD_AGENT
+    role: TestUserRole.enum.FIELD_AGENT
   })
 
   const userToSearchClient = createTestClient(userToSearch, [
@@ -263,12 +269,11 @@ test('Returns user actions', async () => {
   // CREATE + ASSIGN
   await createEvent(clientThatDoesThings, generator, [
     ActionType.DECLARE, // x2
-    ActionType.VALIDATE, // x2
     ActionType.REGISTER, // x2
     ActionType.PRINT_CERTIFICATE // x2
   ])
 
-  const expectedTotalActions = 12
+  const expectedTotalActions = 10
 
   const userActions = await clientThatSearchesUser.user.actions({
     userId: userThatDoesThings.id
@@ -289,12 +294,7 @@ test('Returns user actions', async () => {
   const userDeclarationActions = await clientThatSearchesUser.user.actions({
     userId: userThatDoesThings.id,
     count: 20,
-    actionTypes: [
-      ActionType.CREATE,
-      ActionType.DECLARE,
-      ActionType.VALIDATE,
-      ActionType.REGISTER
-    ]
+    actionTypes: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
   })
 
   const userOtherActions = await clientThatSearchesUser.user.actions({

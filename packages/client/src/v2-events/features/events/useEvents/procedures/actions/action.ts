@@ -123,6 +123,17 @@ function getCleanedDeclarationDiff({
   )
 }
 
+setMutationDefaults(trpcOptionsProxy.event.actions.custom.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.custom.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.CUSTOM }
+})
+
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.declare.request
@@ -137,6 +148,17 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
     true
   ),
   meta: { actionType: ActionType.DECLARE }
+})
+
+setMutationDefaults(trpcOptionsProxy.event.actions.edit.request, {
+  mutationFn: createEventActionMutationFn(
+    trpcOptionsProxy.event.actions.edit.request
+  ),
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.EDIT }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
@@ -159,17 +181,6 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.NOTIFY }
-})
-
-setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
-  mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.validate.request
-  ),
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEvent,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.VALIDATE }
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
@@ -288,29 +299,22 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
 type CustomMutationKeys = keyof typeof customApi
 
 export const customMutationKeys = {
-  validateOnDeclare: [['validateOnDeclare']],
   registerOnDeclare: [['registerOnDeclare']],
-  registerOnValidate: [['registerOnValidate']],
+  editAndRegister: [['editAndRegister']],
+  editAndDeclare: [['editAndDeclare']],
+  editAndNotify: [['editAndNotify']],
   archiveOnDuplicate: [['archiveOnDuplicate']],
   makeCorrectionOnRequest: [['makeCorrectionOnRequest']]
 } satisfies Record<CustomMutationKeys, MutationKey>
 
 interface CustomMutationTypes {
-  validateOnDeclare: customApi.CustomMutationParams
   registerOnDeclare: customApi.CustomMutationParams
-  registerOnValidate: customApi.CustomMutationParams
+  editAndRegister: customApi.EditRequestParams
+  editAndDeclare: customApi.EditRequestParams
+  editAndNotify: customApi.EditRequestParams
   archiveOnDuplicate: customApi.ArchiveOnDuplicateParams
   makeCorrectionOnRequest: customApi.CorrectionRequestParams
 }
-
-queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
-  mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
-  retry: retryUnlessConflict,
-  retryDelay,
-  onSuccess: deleteLocalEvent,
-  onError: errorToastOnConflict,
-  meta: { actionType: ActionType.DECLARE }
-})
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
@@ -321,13 +325,31 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   meta: { actionType: ActionType.DECLARE }
 })
 
-queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
-  mutationFn: customApi.registerOnValidate,
+queryClient.setMutationDefaults(customMutationKeys.editAndRegister, {
+  mutationFn: customApi.editAndRegister,
   retry: retryUnlessConflict,
   retryDelay,
   onSuccess: deleteLocalEvent,
   onError: errorToastOnConflict,
   meta: { actionType: ActionType.REGISTER }
+})
+
+queryClient.setMutationDefaults(customMutationKeys.editAndDeclare, {
+  mutationFn: customApi.editAndDeclare,
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.DECLARE }
+})
+
+queryClient.setMutationDefaults(customMutationKeys.editAndNotify, {
+  mutationFn: customApi.editAndNotify,
+  retry: retryUnlessConflict,
+  retryDelay,
+  onSuccess: deleteLocalEvent,
+  onError: errorToastOnConflict,
+  meta: { actionType: ActionType.DECLARE }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.archiveOnDuplicate, {
@@ -409,7 +431,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   type ActionMutationInput = inferInput<P> & { fullEvent?: EventDocument }
 
   function getMutationPayload(params: ActionMutationInput) {
-    const { eventId } = params
+    const { eventId, fullEvent, event, context, ...restParams } = params
     const localEvent =
       /*
        * In most cases an event should be stored in browser as a full event. This applies when:
@@ -420,7 +442,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       findLocalEventDocument(eventId) || findLocalEventIndex(eventId)
 
     const eventConfiguration = eventConfigurations.find(
-      (event) => event.id === localEvent?.type
+      (e) => e.id === localEvent?.type
     )
 
     if (!eventConfiguration) {
@@ -436,21 +458,22 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
         : action.type === actionType
     )
 
-    const originalDeclaration = params.fullEvent
-      ? getCurrentEventState(params.fullEvent, eventConfiguration).declaration
+    const originalDeclaration = fullEvent
+      ? getCurrentEventState(fullEvent, eventConfiguration).declaration
       : {}
 
     const annotation = actionConfiguration
       ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          params.annotation,
+          restParams.annotation,
           {}
         )
       : {}
 
     return {
-      ...params,
+      ...restParams,
+      eventId,
       declaration: getCleanedDeclarationDiff({
         eventConfiguration,
         originalDeclaration,

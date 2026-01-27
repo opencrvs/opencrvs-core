@@ -11,6 +11,8 @@
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
+import { AdministrativeArea, joinValues, UUID } from '@opencrvs/commons/client'
+import { getAdministrativeAreaHierarchy } from '../../../v2-events/utils'
 
 export enum UserStatus {
   ACTIVE,
@@ -68,6 +70,27 @@ export const getAddressName = (
   if (parentLocationId === '0') return name
   const parentLocation = offlineCountryConfig?.locations[parentLocationId]
   return `${name}, ${getAddressName(offlineCountryConfig, parentLocation)}`
+}
+
+export const getAddressNameV2 = (
+  administrativeAreas: Map<UUID, AdministrativeArea>,
+  administrativeArea?: AdministrativeArea
+): string => {
+  if (!administrativeArea) {
+    return ''
+  }
+  const { name, parentId } = administrativeArea
+
+  if (!parentId) {
+    return name
+  }
+
+  const hierarchy = getAdministrativeAreaHierarchy(
+    administrativeArea.id,
+    administrativeAreas
+  )
+
+  return hierarchy.map((area) => area.name).join(', ')
 }
 
 export function getUserAuditDescription(

@@ -1,5 +1,44 @@
 # Changelog
 
+## 2.0.0 Release Candidate
+
+### Breaking changes
+
+#### Location APIs
+
+- **Removed following endpoints from gateway:**
+  | Path | Method |
+  |--------------------|--------|
+  | `/location` | `*` |
+  | `/location/{id}` | `*` |
+  | `/locations` | `GET` |
+  | `/locations` | `POST` |
+  | `/locations/{id}` | `*` |
+
+V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
+
+- **events-service location APIs changes**
+  Administrative areas (v1 `locationType: 'ADMIN_STRUCTURE'`) are exposed from a separate endpoint. See the [definition of the administrative hierarchy](/ADMINISTRATIVE-HIERARCHY.md) 2.0.0 onwards.
+
+### New features
+
+#### HTTP Input
+
+HTTP input now accepts `field('..')` references in the HTTP body definition.
+
+#### Jurisdiction
+
+- Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
+- Added configurable placeOfEvent in EventConfig, allowing multiple location fields to be defined, with only one becoming the active place of event per document (based on conditionals), enabling jurisdiction-specific search by event location (e.g., birth location, child’s home address, death location).
+
+### Improvements
+
+- Refactor the tRPC context to allow defining public procedures that don't require authentication.
+- Remove legacy mongo migration status outputs and skip typecheck which reduced the migration service startup time by 66%.
+- The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
+- Added experimental ALPHA_HIDDEN form field type, allowing configurable default/derived values and conditional inclusion in form submissions.
+- Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
+
 ## 1.9.6
 
 ### New features
@@ -149,7 +188,7 @@ field('child.dob').isBefore().days(45).fromNow()
 
 - Toolkit now exports `window().location.get` to country config that can be used as a template variable e.g. in HttpField request body.
 
-## 1.9.1
+## [1.9.1](https://github.com/opencrvs/opencrvs-core/compare/v1.9.0...v1.9.1)
 
 ### Breaking changes
 
@@ -470,6 +509,8 @@ To see Events V2 in action, check out the example configurations in the **countr
 - Add Import/Export system client and `record.export` scope to enable data migrations [#10415](https://github.com/opencrvs/opencrvs-core/issues/10415)
 - Add an Alpha version of configurable "Print" button that will be refactored in a later release - this button can be used to print certificates during declaration/correction flow. [#10039](https://github.com/opencrvs/opencrvs-core/issues/10039)
 - Add bulk import endpoint [#10590](https://github.com/opencrvs/opencrvs-core/pull/10590)
+- Add multi-field search with a single component [#10617](https://github.com/opencrvs/opencrvs-core/issues/10617)
+- Add registration number field to advanced search configuration so that documents can be searched by their `Registration Number`. [#10760](https://github.com/opencrvs/opencrvs-core/issues/10760)
 
 ### Improvements
 

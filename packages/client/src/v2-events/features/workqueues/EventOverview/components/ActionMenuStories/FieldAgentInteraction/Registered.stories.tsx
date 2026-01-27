@@ -34,13 +34,11 @@ const registeredScenariosForFieldAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN
     ],
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   },
   {
@@ -50,14 +48,12 @@ const registeredScenariosForFieldAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   }
 ]

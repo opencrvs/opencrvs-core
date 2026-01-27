@@ -34,16 +34,14 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Print']: AssertType.DISABLED,
+      ['Correct record']: AssertType.DISABLED
     }
   },
   {
@@ -53,15 +51,13 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.ENABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Print']: AssertType.ENABLED,
+      ['Correct record']: AssertType.ENABLED
     }
   },
   {
@@ -71,17 +67,15 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Print']: AssertType.DISABLED,
+      ['Correct record']: AssertType.DISABLED
     }
   }
 ]

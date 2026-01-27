@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import {
   MiddlewareFunction,
   TRPCError
@@ -43,13 +42,14 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  ValidatorContext
+  ValidatorContext,
+  getCustomActionFields
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
-import { isLeafLocation } from '@events/storage/postgres/events/locations'
+import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcContext } from '@events/context'
 import {
   getValidatorContext,
@@ -228,6 +228,24 @@ function validateActionAnnotation({
   return errors
 }
 
+function validateCustomAction({
+  eventConfig,
+  annotation = {},
+  context,
+  customActionType
+}: {
+  eventConfig: EventConfig
+  annotation?: ActionUpdate
+  context: ValidatorContext
+  customActionType: string
+}) {
+  const customActionFields = getCustomActionFields(
+    eventConfig,
+    customActionType
+  )
+  return getFieldErrors(customActionFields, annotation, context, {})
+}
+
 function validateNotifyAction({
   eventConfig,
   annotation = {},
@@ -366,7 +384,7 @@ export const validateAction: MiddlewareFunction<
 
   const declaration = getCurrentEventState(event, eventConfig).declaration
 
-  if (actionType === ActionType.NOTIFY) {
+  if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
     const errors = validateNotifyAction({
       eventConfig,
       annotation: input.annotation,
@@ -392,6 +410,18 @@ export const validateAction: MiddlewareFunction<
     actionType === ActionType.REJECT_CORRECTION
   ) {
     throwIfRequestActionNotFound(event, input)
+  }
+
+  if (actionType === ActionType.CUSTOM) {
+    const errors = validateCustomAction({
+      eventConfig,
+      annotation: input.annotation,
+      context,
+      customActionType: input.customActionType
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
   }
 
   const declarationUpdateAction = DeclarationUpdateActions.safeParse(actionType)
@@ -453,16 +483,15 @@ export const requireLocationForSystemUserAction: MiddlewareFunction<
   if (!input.createdAtLocation) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'createdAtLocation is required and must be a valid office id'
+      message: 'createdAtLocation is required and must be a valid location id'
     })
   }
 
-  // Ensure given location is a leaf location, i.e. an office location
-  const isLeaf = await isLeafLocation(input.createdAtLocation)
-  if (!isLeaf) {
+  const isLocationId = await locationExists(input.createdAtLocation)
+  if (!isLocationId) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'createdAtLocation must be an office location'
+      message: 'createdAtLocation must be a valid location id'
     })
   }
 

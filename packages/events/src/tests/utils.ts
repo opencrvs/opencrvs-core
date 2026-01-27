@@ -12,11 +12,19 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import {
+  ActionStatus,
   ActionType,
+  ActionTypes,
   createPrng,
+  DeclarationActionType,
+  encodeScope,
   EventConfig,
   EventDocument,
+  generateActionDeclarationInput,
   generateRandomSignature,
+  generateRegistrationNumber,
+  generateUuid,
+  getUUID,
   Scope,
   SCOPES,
   SystemRole,
@@ -25,9 +33,10 @@ import {
 } from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
-import { SystemContext } from '@events/context'
+import { SystemContext, UserContext } from '@events/context'
 import { getClient } from '@events/storage/postgres/events'
 import { getLocations } from '../service/locations/locations'
+import { NewEventActions } from '../storage/postgres/events/schema/app/EventActions'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 /**
@@ -49,6 +58,7 @@ export const UNSTABLE_EVENT_FIELDS = [
   'updatedBy',
   'acceptedAt',
   'dateOfEvent',
+  'placeOfEvent',
   'registrationNumber',
   'originalActionId'
 ]
@@ -95,19 +105,24 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
   SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
-  `record.create[event=birth|death|tennis-club-membership]`,
-  'record.read[event=birth|death|tennis-club-membership]',
-  'record.notify[event=birth|death|tennis-club-membership]',
-  'record.create[event=birth|death|tennis-club-membership]',
-  'record.declare[event=birth|death|tennis-club-membership]',
-  'record.declared.validate[event=birth|death|tennis-club-membership]',
-  'record.declared.reject[event=birth|death|tennis-club-membership]',
-  'record.declared.archive[event=birth|death|tennis-club-membership]',
-  'record.register[event=birth|death|tennis-club-membership]',
-  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
-  'record.registered.request-correction[event=birth|death|tennis-club-membership]',
-  'record.registered.correct[event=birth|death|tennis-club-membership]',
-  'record.unassign-others[event=birth|death|tennis-club-membership]'
+  'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.read',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.register[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.registered.request-correction[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.registered.correct[event=birth|death|tennis-club-membership|child-onboarding]',
+  'record.unassign-others[event=birth|death|tennis-club-membership|child-onboarding]'
 ]
 
 export function createTestToken({
@@ -242,18 +257,33 @@ export const setupTestCase = async (
 
   const seed = seeder()
   const locationRng = createPrng(10123)
-  await seed.locations(generator.locations.set(5, locationRng))
+
+  const administrativeAreaPayload = generator.administrativeAreas.set(
+    5,
+    locationRng
+  )
+  await seed.administrativeAreas(administrativeAreaPayload)
+  await seed.locations(
+    generator.locations.set(
+      administrativeAreaPayload.map((area) => ({
+        administrativeAreaId: area.id
+      })),
+      locationRng
+    )
+  )
 
   const locations = await getLocations()
 
   const defaultUser = seed.user(
     generator.user.create({
-      primaryOfficeId: locations[0].id
+      primaryOfficeId: locations[0].id,
+      administrativeAreaId: locations[0].administrativeAreaId
     })
   )
   const secondaryUser = seed.user(
     generator.user.create({
-      primaryOfficeId: locations[1].id
+      primaryOfficeId: locations[1].id,
+      administrativeAreaId: locations[1].administrativeAreaId
     })
   )
 
@@ -305,11 +335,6 @@ function actionToClientAction(
         client.event.actions.declare.request(
           generator.event.actions.declare(eventId, { keepAssignment: true })
         )
-    case ActionType.VALIDATE:
-      return async (eventId: string) =>
-        client.event.actions.validate.request(
-          generator.event.actions.validate(eventId, { keepAssignment: true })
-        )
     case ActionType.REJECT:
       return async (eventId: string) =>
         client.event.actions.reject.request(
@@ -351,7 +376,9 @@ function actionToClientAction(
     case ActionType.MARK_AS_DUPLICATE:
     case ActionType.REJECT_CORRECTION:
     case ActionType.DELETE:
+    case ActionType.CUSTOM:
     case ActionType.READ:
+    case ActionType.EDIT:
     default:
       throw new Error(
         `Unsupported action type: ${action}. Create a case for it if you need it.`
@@ -388,4 +415,101 @@ export async function createEvent(
   }
 
   return createdEvent
+}
+
+/**
+ * Seeds an event with the specified actions directly into the database.
+ * Given set of action types, will create requested and accepted actions for each action type with CREATE and ASSIGN actions to resemble realistic event history.
+ *
+ * Useful for setting up test data quickly without going through the full API flow. NOTE: When testing search endpoints, remember to reindex after seeding.
+ */
+export async function seedEvent(
+  dbClient: ReturnType<typeof getClient>,
+  {
+    eventConfig,
+    actions,
+    user,
+    rng
+  }: {
+    eventConfig: EventConfig
+    actions: DeclarationActionType[]
+    user: Omit<UserContext, 'type'>
+    rng: () => number
+  }
+) {
+  await dbClient.transaction().execute(async (trx) => {
+    const event = await trx
+      .insertInto('events')
+      .values({
+        eventType: eventConfig.id,
+        transactionId: `tx-${Date.now()}`,
+        trackingId: getUUID()
+      })
+      .returning(['id'])
+      .executeTakeFirstOrThrow()
+
+    const baseAction: Omit<
+      NewEventActions,
+      'transactionId' | 'status' | 'actionType'
+    > = {
+      eventId: event.id,
+      createdByUserType: TokenUserType.enum.user,
+      createdAtLocation: user.primaryOfficeId,
+      createdBy: user.id,
+      createdByRole: user.role,
+      annotation: null
+    }
+
+    const generatedActions: NewEventActions[] = actions.flatMap(
+      (actionType): NewEventActions[] => {
+        return [
+          {
+            ...baseAction,
+            actionType,
+            transactionId: generateUuid(rng),
+            status: ActionStatus.Requested,
+            declaration: generateActionDeclarationInput(
+              eventConfig,
+              actionType,
+              rng
+            )
+          },
+          {
+            ...baseAction,
+            registrationNumber:
+              actionType === ActionTypes.enum.REGISTER
+                ? generateRegistrationNumber(rng)
+                : null,
+            actionType,
+            transactionId: generateUuid(rng),
+            status: ActionStatus.Accepted,
+            declaration: {}
+          }
+        ]
+      }
+    )
+
+    await trx
+      .insertInto('eventActions')
+      .values([
+        {
+          ...baseAction,
+          actionType: ActionTypes.enum.CREATE,
+          transactionId: generateUuid(rng),
+          status: ActionStatus.Accepted
+        },
+        {
+          ...baseAction,
+          actionType: ActionTypes.enum.ASSIGN,
+          assignedTo: user.id,
+          transactionId: generateUuid(rng),
+          status: ActionStatus.Accepted
+        },
+        ...generatedActions
+      ])
+      .onConflict((oc) =>
+        oc.columns(['transactionId', 'actionType', 'status']).doNothing()
+      )
+      .execute()
+  })
 }
