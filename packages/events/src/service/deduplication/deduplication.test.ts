@@ -18,7 +18,6 @@ import {
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { field, and, or, not } from '@opencrvs/commons/events/deduplication'
-import { field as $field } from '@opencrvs/commons/events'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
@@ -30,14 +29,22 @@ import {
 const similarNamedChild = field('child.name').fuzzyMatches()
 const childDobWithin5Days = field('child.dob').dateRangeMatches({ days: 5 })
 const similarNamedMother = field('mother.name').fuzzyMatches()
-const similarDobMother = field('mother.dob').dateRangeMatches({
-  days: 365,
-  matchAgainst: [$field('mother.dob'), $field('mother.age')]
-})
-const similarAgedMother = field('mother.age').dateRangeMatches({
-  days: 365,
-  matchAgainst: [$field('mother.age'), $field('mother.dob')]
-})
+const similarAgedMother = or(
+  field('mother.dob').dateRangeMatches({
+    days: 365
+  }),
+  field('mother.age').dateRangeMatches({
+    days: 365
+  }),
+  field('mother.dob').dateRangeMatches({
+    days: 365,
+    matchAgainst: 'mother.age'
+  }),
+  field('mother.age').dateRangeMatches({
+    days: 365,
+    matchAgainst: 'mother.dob'
+  })
+)
 const differentMotherIdTypes = not(field('mother.idType').strictMatches())
 const motherIdNotProvided = field('mother.idType').strictMatches({
   value: 'NONE'
@@ -70,12 +77,12 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
       similarNamedChild,
       childDobWithin5Days,
       similarNamedMother,
-      or(similarAgedMother, similarDobMother),
+      similarAgedMother,
       motherIdMatchesIfGiven
     ),
     and(
       similarNamedMother,
-      or(similarAgedMother, similarDobMother),
+      similarAgedMother,
       motherIdMatchesIfGiven,
       childDobWithin9Months
     ),
@@ -83,7 +90,7 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
       exactNamedChild,
       childDobWithin3Years,
       similarNamedMother,
-      or(similarAgedMother, similarDobMother),
+      similarAgedMother,
       motherIdMatchesIfGiven
     )
   )
@@ -183,7 +190,7 @@ describe('deduplication query input conversion', () => {
     ).toMatchSnapshot()
   })
 
-  it('should convert similarDobMother to dateRange query', () => {
+  it('should convert similarAgedMother to dateRange query when dob present', () => {
     const encodedEventIndex = encodeEventIndex(
       eventQueryDataGenerator({
         declaration: {
@@ -195,10 +202,49 @@ describe('deduplication query input conversion', () => {
     expect(
       generateElasticsearchQuery(
         encodedEventIndex,
-        Clause.parse(similarDobMother),
+        Clause.parse(similarAgedMother),
         v2BirthEvent
       )
     ).toMatchSnapshot()
+  })
+
+  describe('should convert similarAgedMother to dateRange query when age present', () => {
+    it('with reference date present', () => {
+      const encodedEventIndex = encodeEventIndex(
+        eventQueryDataGenerator({
+          declaration: {
+            'child.dob': '2020-11-11',
+            'mother.age': { age: 19, asOfDateRef: 'child.dob' }
+          }
+        }),
+        v2BirthEvent
+      )
+      expect(
+        generateElasticsearchQuery(
+          encodedEventIndex,
+          Clause.parse(similarAgedMother),
+          v2BirthEvent
+        )
+      ).toMatchSnapshot()
+    })
+
+    it('with reference date absent', () => {
+      const encodedEventIndex = encodeEventIndex(
+        eventQueryDataGenerator({
+          declaration: {
+            'mother.age': { age: 11, asOfDateRef: 'child.dob' }
+          }
+        }),
+        v2BirthEvent
+      )
+      expect(
+        generateElasticsearchQuery(
+          encodedEventIndex,
+          Clause.parse(similarAgedMother),
+          v2BirthEvent
+        )
+      ).toMatchSnapshot()
+    })
   })
 
   it('should convert motherIdMatchesIfGiven to strict query', () => {

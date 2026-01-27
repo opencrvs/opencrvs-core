@@ -5,18 +5,11 @@ exports[`deduplication query input conversion > should convert childDobWithin5Da
   "bool": {
     "must": [
       {
-        "bool": {
-          "minimum_should_match": 1,
-          "should": [
-            {
-              "range": {
-                "declaration.child____dob": {
-                  "gte": "2011-11-06T00:00:00.000Z",
-                  "lte": "2011-11-16T00:00:00.000Z",
-                },
-              },
-            },
-          ],
+        "range": {
+          "declaration.child____dob": {
+            "gte": "2011-11-06T00:00:00.000Z",
+            "lte": "2011-11-16T00:00:00.000Z",
+          },
         },
       },
     ],
@@ -82,14 +75,70 @@ exports[`deduplication query input conversion > should convert similar child nam
 }
 `;
 
-exports[`deduplication query input conversion > should convert similarDobMother to dateRange query 1`] = `
+exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query when age present > with reference date absent 1`] = `null`;
+
+exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query when age present > with reference date present 1`] = `
 {
   "bool": {
-    "must": [
+    "should": [
       {
         "bool": {
-          "minimum_should_match": 1,
+          "must": [
+            {
+              "range": {
+                "declaration.mother____age.__derived_dob": {
+                  "gte": "2000-11-11T00:00:00.000Z",
+                  "lte": "2002-11-11T00:00:00.000Z",
+                },
+              },
+            },
+          ],
           "should": [
+            {
+              "distance_feature": {
+                "field": "declaration.mother____age.__derived_dob",
+                "origin": "2001-11-11",
+                "pivot": "243d",
+              },
+            },
+          ],
+        },
+      },
+      {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "declaration.mother____dob": {
+                  "gte": "2000-11-11T00:00:00.000Z",
+                  "lte": "2002-11-11T00:00:00.000Z",
+                },
+              },
+            },
+          ],
+          "should": [
+            {
+              "distance_feature": {
+                "field": "declaration.mother____dob",
+                "origin": "2001-11-11",
+                "pivot": "243d",
+              },
+            },
+          ],
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query when dob present 1`] = `
+{
+  "bool": {
+    "should": [
+      {
+        "bool": {
+          "must": [
             {
               "range": {
                 "declaration.mother____dob": {
@@ -98,6 +147,21 @@ exports[`deduplication query input conversion > should convert similarDobMother 
                 },
               },
             },
+          ],
+          "should": [
+            {
+              "distance_feature": {
+                "field": "declaration.mother____dob",
+                "origin": "1999-11-11",
+                "pivot": "243d",
+              },
+            },
+          ],
+        },
+      },
+      {
+        "bool": {
+          "must": [
             {
               "range": {
                 "declaration.mother____age.__derived_dob": {
@@ -107,22 +171,15 @@ exports[`deduplication query input conversion > should convert similarDobMother 
               },
             },
           ],
-        },
-      },
-    ],
-    "should": [
-      {
-        "distance_feature": {
-          "field": "declaration.mother____dob",
-          "origin": "1999-11-11",
-          "pivot": "243d",
-        },
-      },
-      {
-        "distance_feature": {
-          "field": "declaration.mother____age.__derived_dob",
-          "origin": "1999-11-11",
-          "pivot": "243d",
+          "should": [
+            {
+              "distance_feature": {
+                "field": "declaration.mother____age.__derived_dob",
+                "origin": "1999-11-11",
+                "pivot": "243d",
+              },
+            },
+          ],
         },
       },
     ],
