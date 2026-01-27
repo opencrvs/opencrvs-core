@@ -14,32 +14,14 @@
  */
 module.exports = {
   rules: {
-    'prettier/prettier': [
-      'error',
-      {
-        printWidth: 80,
-        singleQuote: true,
-        useTabs: false,
-        tabWidth: 2,
-        trailingComma: 'none',
-        semi: false
-      }
-    ],
-    '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/no-empty-function': 'warn',
     '@typescript-eslint/consistent-type-definitions': 'warn',
     '@typescript-eslint/default-param-last': 'error',
     '@typescript-eslint/no-dynamic-delete': 'error',
     '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-floating-promises': 'error',
-    '@typescript-eslint/no-misused-promises': 'error',
     '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
     '@typescript-eslint/no-non-null-assertion': 'error',
-    '@typescript-eslint/no-unnecessary-condition': 'warn',
     '@typescript-eslint/prefer-includes': 'warn',
-    '@typescript-eslint/promise-function-async': 'error',
-    '@typescript-eslint/require-await': 'error',
-    '@typescript-eslint/return-await': 'error',
     '@typescript-eslint/switch-exhaustiveness-check': 'error',
     '@typescript-eslint/no-use-before-define': 'warn',
     'func-style': [

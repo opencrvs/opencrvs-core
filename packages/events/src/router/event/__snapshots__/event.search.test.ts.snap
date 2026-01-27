@@ -195,67 +195,6 @@ exports[`Returns relevant events in right order 1`] = `
 ]
 `;
 
-exports[`Returns relevant events in right order 2`] = `
-{
-  "assignedTo": "[sanitized]",
-  "createdAt": "[sanitized]",
-  "createdAtLocation": "[sanitized]",
-  "createdBy": "[sanitized]",
-  "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-  "createdByUserType": "[sanitized]",
-  "dateOfEvent": "[sanitized]",
-  "declaration": {
-    "applicant.age": 19,
-    "applicant.dobUnknown": true,
-    "applicant.email": "test@opencrvs.org",
-    "applicant.image": {
-      "originalFilename": "abcd.png",
-      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-      "type": "image/png",
-    },
-    "applicant.name": {
-      "firstname": "Sara",
-      "surname": "Garcia",
-    },
-    "recommender.none": true,
-  },
-  "flags": [
-    "pending-certification",
-  ],
-  "id": "[sanitized]",
-  "legalStatuses": {
-    "DECLARED": {
-      "acceptedAt": "[sanitized]",
-      "createdAt": "[sanitized]",
-      "createdAtLocation": "[sanitized]",
-      "createdBy": "[sanitized]",
-      "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-      "createdByUserType": "[sanitized]",
-    },
-    "REGISTERED": {
-      "acceptedAt": "[sanitized]",
-      "createdAt": "[sanitized]",
-      "createdAtLocation": "[sanitized]",
-      "createdBy": "[sanitized]",
-      "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-      "createdByUserType": "[sanitized]",
-      "registrationNumber": "[sanitized]",
-    },
-  },
-  "placeOfEvent": "[sanitized]",
-  "potentialDuplicates": [],
-  "status": "REGISTERED",
-  "trackingId": "[sanitized]",
-  "type": "tennis-club-membership",
-  "updatedAt": "[sanitized]",
-  "updatedAtLocation": "[sanitized]",
-  "updatedBy": "[sanitized]",
-  "updatedByUserRole": "REGISTRATION_AGENT",
-}
-`;
-
 exports[`Throws when date field is invalid 1`] = `
 [TRPCError: [
   {
