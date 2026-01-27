@@ -140,7 +140,7 @@ export const SearchToolbar = () => {
       return
     }
 
-    const serializedParams = serializeSearchParams({ keys: searchTerm })
+    const serializedParams = serializeSearchParams({ term: searchTerm })
 
     navigate(`${searchUrl}?${serializedParams}`)
   }
