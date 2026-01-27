@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 9d9369c8-52ec-4446-8671-3bdc0fddacc1
+                transactionId: 85e2f82d-8124-4107-adf9-7587750ee1d3
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 958a76af-ad87-477e-a36a-f31ad7ff0077
+                transactionId: 9553e415-913b-4a83-b6a5-1378da2f75dc
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9825,6 +9825,8 @@ components:
                 boost:
                   type: number
                   default: 1
+                matchAgainst:
+                  type: string
               required:
                 - fuzziness
                 - boost
@@ -9850,6 +9852,8 @@ components:
                   type: number
                   default: 1
                 value:
+                  type: string
+                matchAgainst:
                   type: string
               required:
                 - boost
@@ -9878,22 +9882,7 @@ components:
                   type: number
                   default: 1
                 matchAgainst:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      $$field:
-                        type: string
-                        description: Unique identifier for the field
-                      $$subfield:
-                        type: array
-                        items:
-                          type: string
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    required:
-                      - $$field
-                    description: Reference to a field by its ID
+                  type: string
               required:
                 - days
                 - boost
