@@ -56,6 +56,7 @@ export type AgeValue = z.infer<typeof AgeValue>
 export const AgeUpdateValue = AgeValue.optional().nullable()
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
+export type TimeValue = z.infer<typeof TimeValue>
 
 export const DatetimeValue = z.string().datetime()
 

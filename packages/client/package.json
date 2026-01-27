@@ -89,6 +89,7 @@
     "lodash": "^4.17.10",
     "msw-storybook-addon": "^2.0.4",
     "patch-package": "^6.1.2",
+    "pdfjs-dist": "^5.4.530",
     "pdfmake": "^0.2.5",
     "postinstall-postinstall": "^2.0.0",
     "query-string": "^6.1.0",

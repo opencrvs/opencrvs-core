@@ -12,11 +12,13 @@
 import format from 'date-fns/format'
 import * as React from 'react'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
-import { z } from 'zod'
+import { useField } from 'formik'
 import {
   TimeField as TimeFieldComponent,
   ITimeFieldProps as TimeFieldProps
 } from '@opencrvs/components/lib/TimeField'
+import { SerializedNowDateTime, TimeValue } from '@opencrvs/commons/client'
+import { useResolveDefaultValue } from '../useResolveDefaultValue'
 
 const messages = defineMessages({
   timeFormat: {
@@ -28,8 +30,17 @@ const messages = defineMessages({
 
 const EMPTY_TIME = '--'
 
-// Time validation schema (HH:mm in 24 hour format)
-const TimeValue = z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+function resolveNowForTimeInput(value: string | SerializedNowDateTime): string {
+  if (SerializedNowDateTime.safeParse(value).success) {
+    const now = new Date()
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+
+    return `${hours}:${minutes}`
+  }
+
+  return value.toString()
+}
 
 function TimeInput({
   onChange,
@@ -37,28 +48,48 @@ function TimeInput({
   ...props
 }: TimeFieldProps & {
   onChange: (newValue: string) => void
-  value: string
+  value: string | SerializedNowDateTime
 }) {
   const cleanEmpty = React.useCallback(
     (val: string) => (val === EMPTY_TIME ? '' : val),
     []
   )
 
+  // Ensure that 'now' is resolved to the current date and set in the form data.
+  // Form values are updated in a single batched operation.
+  // When multiple fields try to resolve `$$now` at the same time,
+  // each calls `setValues`, but only the *last* update in the batch
+  // is applied.
+  //
+  // Example:
+  // applicant.dob = { $$now: true }, applicant.tob = "15:34"
+  // applicant.dob = "1990-01-01", applicant.tob = { $$now: true }
+  // → only one resolved field survives per render cycle.
+  //
+  // `useField` is used to get access to `helpers.setValue`, ensuring
+  // the resolved value is written directly to Formik’s state rather
+  // than relying on local `onChange`, which may be overwritten.
+  const resolvedValue = useResolveDefaultValue({
+    defaultValue: value,
+    resolver: resolveNowForTimeInput,
+    fieldName: props.name
+  })
+
   const handleChange = React.useCallback(
     (val: string) => {
       const cleaned = cleanEmpty(val)
-      if (cleaned !== value) {
+      if (cleaned !== resolvedValue) {
         onChange(cleaned)
       }
     },
-    [value, onChange, cleanEmpty]
+    [resolvedValue, onChange, cleanEmpty]
   )
 
   return (
     <TimeFieldComponent
       {...props}
       data-testid={`${props.id}`}
-      value={value}
+      value={resolvedValue}
       onChange={handleChange}
     />
   )
