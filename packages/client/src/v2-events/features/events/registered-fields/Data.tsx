@@ -113,8 +113,8 @@ const Container = styled.div`
   }
 
   dd {
-    margin: 0 0 1.5rem;
     ${({ theme }) => theme.fonts.reg16};
+    margin: 0 0 1.5rem;
   }
 `
 
