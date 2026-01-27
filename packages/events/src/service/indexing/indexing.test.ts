@@ -33,7 +33,7 @@ import {
   TestUserRole,
   UUID
 } from '@opencrvs/commons/events'
-import { SCOPES } from '@opencrvs/commons'
+import { encodeScope, SCOPES } from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
@@ -75,7 +75,12 @@ test('records are indexed with full location hierarchy', async () => {
 
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${TENNIS_CLUB_MEMBERSHIP},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
   const esClient = getOrCreateClient()
 
@@ -633,13 +638,17 @@ describe('withJurisdictionFilters', () => {
     term: { someField: 'someValue' }
   }
 
-  test('returns original query if no my-jurisdiction and no userOfficeId', () => {
-    const options = { birth: 'all' as const }
-
+  test('returns original query if no scope filters are applied', () => {
     const result = withJurisdictionFilters({
       query: baseQuery,
-      options,
-      userOfficeId: undefined
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth']
+          }
+        }
+      ]
     })
 
     expect(result).toEqual({
@@ -669,13 +678,17 @@ describe('withJurisdictionFilters', () => {
     })
   })
 
-  test('returns original query if no my-jurisdiction scopes are available for multiple events', () => {
-    const options = { birth: 'all' as const, death: 'all' as const }
-
+  test('returns original query if no "location"scopes are available for multiple events', () => {
     const result = withJurisdictionFilters({
       query: baseQuery,
-      options,
-      userOfficeId: undefined
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth', 'death']
+          }
+        }
+      ]
     })
 
     expect(result).toEqual({
@@ -703,15 +716,23 @@ describe('withJurisdictionFilters', () => {
   })
 
   test('adds filters for my-jurisdiction eventTypes only', () => {
-    const options = {
-      birth: 'my-jurisdiction' as const,
-      death: 'all' as const
-    }
-
     const result = withJurisdictionFilters({
       query: baseQuery,
-      options,
-      userOfficeId: 'office-123'
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['death']
+          }
+        },
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth'],
+            eventLocation: 'office-123' as UUID
+          }
+        }
+      ]
     })
 
     expect(result).toEqual({
@@ -742,15 +763,17 @@ describe('withJurisdictionFilters', () => {
   })
 
   test('returns filtered query if multiple events are marked as my-jurisdiction', () => {
-    const options = {
-      birth: 'my-jurisdiction' as const,
-      death: 'my-jurisdiction' as const
-    }
-
     const result = withJurisdictionFilters({
       query: baseQuery,
-      options,
-      userOfficeId: 'office-123'
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth', 'death'],
+            eventLocation: 'office-123' as UUID
+          }
+        }
+      ]
     })
 
     expect(result).toEqual({
@@ -784,15 +807,23 @@ describe('withJurisdictionFilters', () => {
   })
 
   test('returns filtered query if multiple events are marked with different jurisdiction access', () => {
-    const options = {
-      birth: 'my-jurisdiction' as const,
-      death: 'all' as const
-    }
-
     const result = withJurisdictionFilters({
       query: baseQuery,
-      options,
-      userOfficeId: 'office-123'
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth'],
+            eventLocation: 'office-123' as UUID
+          }
+        },
+        {
+          type: 'record.search',
+          options: {
+            event: ['death']
+          }
+        }
+      ]
     })
 
     expect(result).toEqual({
@@ -1003,7 +1034,12 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     client = createTestClient(user, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${TENNIS_CLUB_MEMBERSHIP},access=all]`,
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
       SCOPES.RECORD_REINDEX
     ])
     esClient = getOrCreateClient()

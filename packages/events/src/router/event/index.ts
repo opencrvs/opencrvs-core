@@ -104,6 +104,7 @@ export const eventRouter = router({
     })
     .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.CREATE]))
     .input(EventInput)
+    .use(middleware.requireLocationForSystemUserEventCreate)
     .use(middleware.eventTypeAuthorization)
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
@@ -116,6 +117,7 @@ export const eventRouter = router({
         transactionId: input.transactionId,
         eventInput: input,
         user: ctx.user,
+        createdAtLocation: input.createdAtLocation,
         config
       })
     }),

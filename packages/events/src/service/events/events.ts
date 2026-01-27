@@ -205,11 +205,13 @@ function generateTrackingId(): string {
 export async function createEvent({
   eventInput,
   user,
-  transactionId
+  transactionId,
+  createdAtLocation
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
   transactionId: string
+  createdAtLocation?: UUID | null | undefined
   config: EventConfig
 }): Promise<EventDocument> {
   const isSystem = user.type === TokenUserType.enum.system
@@ -218,6 +220,7 @@ export async function createEvent({
     ? eventsRepo.getOrCreateEvent // System users create events without assignment
     : eventsRepo.getOrCreateEventAndAssign
 
+  const eventLocation = isSystem ? createdAtLocation : user.primaryOfficeId
   const event = await getOrCreateEvent({
     eventType: eventInput.type,
     transactionId: transactionId,
@@ -226,7 +229,7 @@ export async function createEvent({
     createdByUserType: user.type,
     createdByRole: user.role,
     createdBySignature: user.signature,
-    createdAtLocation: user.primaryOfficeId
+    createdAtLocation: eventLocation
   })
 
   return event

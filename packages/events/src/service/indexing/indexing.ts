@@ -361,6 +361,7 @@ export async function indexEventsInBulk(
     batch.map(async (doc) => {
       const config = getEventConfigById(configs, doc.type)
       const eventIndex = eventToEventIndex(doc, config)
+
       const eventIndexWithLocationHierarchy =
         await getEventIndexWithAdministrativeHierarchy(
           config,
@@ -383,6 +384,7 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
   const eventIndex = eventToEventIndex(event, config)
+
   const eventIndexWithAdministrativeHierarchy =
     await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
   return esClient.index<EventIndexWithAdministrativeHierarchy>({

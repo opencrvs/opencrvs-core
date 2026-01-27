@@ -13,7 +13,6 @@ import * as z from 'zod/v4'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { UUID } from '../uuid'
-import { CreatedAtLocation } from './CreatedAtLocation'
 import { TokenUserType } from '../authentication'
 
 /**
@@ -64,7 +63,7 @@ export const ActionBase = z.object({
     .string()
     .nullish()
     .describe('Reference to the signature of the user who created the action.'),
-  createdAtLocation: CreatedAtLocation.describe(
+  createdAtLocation: UUID.describe(
     'Reference to the location of the user who created the action.'
   ),
   declaration: ActionUpdate.describe(

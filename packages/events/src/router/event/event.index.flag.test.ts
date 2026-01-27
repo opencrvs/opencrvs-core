@@ -18,7 +18,8 @@ import {
   Flag,
   getCurrentEventState,
   createPrng,
-  generateActionDuplicateDeclarationInput
+  generateActionDuplicateDeclarationInput,
+  encodeScope
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -43,7 +44,12 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -93,7 +99,12 @@ test('Does not add any flags when accepted form countryconfig', async () => {
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -143,7 +154,12 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -193,7 +209,12 @@ test(`Adds ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.REGIST
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   await createEvent(client, generator, [
@@ -221,7 +242,12 @@ test(`Removes ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.PRI
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [
@@ -253,7 +279,12 @@ test(`Removes ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.REQ
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [
@@ -287,7 +318,12 @@ test(`Adds back ${InherentFlags.PENDING_CERTIFICATION} flag after ${ActionType.A
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [
@@ -338,7 +374,12 @@ test(`Adds ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.REQUEST
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [
@@ -372,7 +413,12 @@ test(`Removes ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.APPR
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [
@@ -434,7 +480,12 @@ test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [])
@@ -463,7 +514,12 @@ test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.DECLARE} is ca
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [])
@@ -501,7 +557,12 @@ test(`Adds ${InherentFlags.REJECTED} flag after ${ActionType.REJECT} is called`,
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -529,7 +590,12 @@ test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.DECLARE} is call
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
