@@ -2793,7 +2793,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -10606,7 +10605,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -10623,7 +10621,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -10715,7 +10712,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11076,7 +11072,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11268,7 +11263,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11474,7 +11468,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11788,7 +11781,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12066,7 +12058,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12276,7 +12267,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12468,7 +12458,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
