@@ -34,8 +34,7 @@ import {
   canUserReadEvent,
   hasScope,
   SCOPES,
-  hasAnyOfScopes,
-  logger
+  hasAnyOfScopes
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -80,15 +79,9 @@ function getAuthorizedEntities(
   configurableScopes: ConfigurableScopeType[]
 ) {
   const userScopes = getScopes(token)
-  logger.info(`User scopes: ${JSON.stringify(userScopes)}`)
-  logger.info(
-    'Configurable scopes to check: ' + JSON.stringify(configurableScopes)
-  )
   const foundScopes = configurableScopes
     .map((scope) => findScope(userScopes, scope))
     .filter((scope) => scope !== undefined)
-
-  logger.info('Found scopes: ' + JSON.stringify(foundScopes))
 
   if (!foundScopes.length) {
     throw new TRPCError({ code: 'FORBIDDEN' })

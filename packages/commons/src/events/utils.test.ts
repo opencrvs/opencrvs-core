@@ -27,6 +27,7 @@ import {
   fieldConfigsToActionPayload,
   tennisClubMembershipEvent
 } from '../client'
+import { generateActionDocument } from './test.utils'
 
 /* eslint-disable max-lines */
 
@@ -528,72 +529,45 @@ describe('getPendingAction', () => {
   })
 
   it('handles the history having rejected action', () => {
-    const creates = {
-      ...commonAction,
-      type: ActionType.CREATE,
-      createdByUserType: TokenUserType.Enum.user,
-      createdAt: '2023-01-01T00:00:00Z',
-      status: 'Accepted' as const
-    }
-
-    const requests = {
-      ...commonAction,
-      id: 'action-id-2' as UUID,
-      type: ActionType.DECLARE,
-      createdByUserType: TokenUserType.Enum.user,
-      createdAt: '2023-02-01T00:00:00Z',
-      status: 'Requested' as const
-    }
-
-    const accepts = {
-      ...commonAction,
-      id: 'action-id-3' as UUID,
-      type: ActionType.DECLARE,
-      createdByUserType: TokenUserType.Enum.user,
-      createdAt: '2023-02-01T00:00:00Z',
-      status: 'Accepted' as const,
-      originalActionId: 'action-id-2' as UUID
-    }
-
-    const requestsAgain = {
-      ...commonAction,
-      id: 'action-id-5' as UUID,
-      type: ActionType.REGISTER,
-      createdByUserType: TokenUserType.Enum.user,
-      createdAt: '2023-01-01T00:00:00Z',
-      status: 'Requested' as const
-    }
-
-    const rejects = {
-      ...commonAction,
-      id: 'action-id-6' as UUID,
-      type: ActionType.REGISTER,
-      createdByUserType: TokenUserType.Enum.user,
-      createdAt: '2023-01-01T00:00:00Z',
-      status: 'Rejected' as const,
-      originalActionId: 'action-id-5' as UUID
-    }
-
-    const requestsFinally = {
-      ...commonAction,
-      id: 'action-id-7' as UUID,
-      type: ActionType.REJECT,
-      createdByUserType: TokenUserType.Enum.user,
-      createdAt: '2023-01-01T00:00:00Z',
-      status: 'Requested' as const,
-      content: { reason: 'Please reconsider' }
-    }
-
-    expect(
-      getPendingAction([
-        creates,
-        requests,
-        accepts,
-        requestsAgain,
-        rejects,
-        requestsFinally
-      ])
-    ).toMatchObject(requestsFinally)
+    const actionSequence = [
+      {
+        type: ActionType.CREATE,
+        status: 'Accepted' as const
+      },
+      {
+        id: 'action-id-2' as UUID,
+        type: ActionType.DECLARE,
+        status: 'Requested' as const
+      },
+      {
+        type: ActionType.DECLARE,
+        status: 'Accepted' as const,
+        originalActionId: 'action-id-2' as UUID
+      },
+      {
+        id: 'action-id-5' as UUID,
+        type: ActionType.REGISTER,
+        status: 'Requested' as const
+      },
+      {
+        type: ActionType.REGISTER,
+        status: 'Rejected' as const,
+        originalActionId: 'action-id-5' as UUID
+      },
+      {
+        type: ActionType.REJECT,
+        status: 'Requested' as const,
+        content: { reason: 'Please reconsider' }
+      }
+    ].map(({ type, ...defaults }) =>
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: type,
+        defaults
+      })
+    )
+    const lastAction = actionSequence[actionSequence.length - 1]
+    expect(getPendingAction(actionSequence)).toMatchObject(lastAction)
   })
 })
 
