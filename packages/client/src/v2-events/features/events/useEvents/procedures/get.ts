@@ -102,6 +102,64 @@ function viewEvent(id: string) {
   }).data
 }
 
+function useGetOrDownloadEvent(id: UUID) {
+  const trpc = useTRPC()
+  const eventConfig = useEventConfigurations()
+
+  const cachedAssignedEvent = queryClient.getQueryData(
+    trpc.event.get.queryKey(id)
+  )
+
+  const cachedViewEvent = queryClient.getQueryData([
+    ['view-event', id]
+  ])
+
+  // If already downloaded for viewing, reuse viewEvent logic
+  if (cachedViewEvent) {
+    return viewEvent(id)
+  }
+
+  // If assigned & cached, read from cache without network
+  if (cachedAssignedEvent) {
+    const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
+
+    return useSuspenseQuery({
+      ...queryOptions,
+      queryKey: trpc.event.get.queryKey(id),
+      meta: {
+        eventConfig
+      },
+      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false
+    }).data
+  }
+
+  // Otherwise: download explicitly (same behavior as viewEvent)
+  return useSuspenseQuery({
+    queryKey: [['view-event', id]],
+    meta: {
+      eventConfig
+    },
+    queryFn: async () => {
+      const eventDocument = await trpcClient.event.get.query(id)
+
+      await Promise.all([
+        cacheFiles(eventDocument),
+        cacheUsersFromEventDocument(eventDocument)
+      ])
+
+      return eventDocument
+    },
+    gcTime: 0,
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false
+  }).data
+}
+
 export function useGetEvent() {
   const trpc = useTRPC()
 
@@ -139,6 +197,7 @@ export function useGetEvent() {
      * This downloads the event document from the server without caching it
      */
     viewEvent,
+    useGetOrDownloadEvent,
     getFromCache: (id: UUID) => {
       const intl = useIntl()
       const eventConfig = useEventConfigurations()
