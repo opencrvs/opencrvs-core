@@ -2812,7 +2812,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -3212,6 +3211,11 @@ components:
                             - id
                             - name
                             - role
+                            - fullHonorificName
+                            - device
+                            - firstname
+                            - middlename
+                            - surname
                             - signature
                             - avatar
                             - primaryOfficeId
@@ -3374,8 +3378,31 @@ components:
               type: string
               const: TEXT
             defaultValue:
-              type: string
-              minLength: 1
+              anyOf:
+                - type: string
+                  minLength: 1
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum:
+                        - id
+                        - name
+                        - role
+                        - fullHonorificName
+                        - device
+                        - firstname
+                        - middlename
+                        - surname
+                        - signature
+                        - avatar
+                        - primaryOfficeId
+                        - administrativeAreaId
+                    $location:
+                      type: string
+                  required:
+                    - $userField
+                  additionalProperties: false
             configuration:
               default:
                 type: text
@@ -5612,14 +5639,83 @@ components:
               type: object
               properties:
                 firstname:
-                  type: string
-                  minLength: 1
+                  anyOf:
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum:
+                            - id
+                            - name
+                            - role
+                            - fullHonorificName
+                            - device
+                            - firstname
+                            - middlename
+                            - surname
+                            - signature
+                            - avatar
+                            - primaryOfficeId
+                            - administrativeAreaId
+                        $location:
+                          type: string
+                      required:
+                        - $userField
+                      additionalProperties: false
+                    - type: string
+                      minLength: 1
                 middlename:
-                  type: string
-                  minLength: 1
+                  anyOf:
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum:
+                            - id
+                            - name
+                            - role
+                            - fullHonorificName
+                            - device
+                            - firstname
+                            - middlename
+                            - surname
+                            - signature
+                            - avatar
+                            - primaryOfficeId
+                            - administrativeAreaId
+                        $location:
+                          type: string
+                      required:
+                        - $userField
+                      additionalProperties: false
+                    - type: string
+                      minLength: 1
                 surname:
-                  type: string
-                  minLength: 1
+                  anyOf:
+                    - type: object
+                      properties:
+                        $userField:
+                          type: string
+                          enum:
+                            - id
+                            - name
+                            - role
+                            - fullHonorificName
+                            - device
+                            - firstname
+                            - middlename
+                            - surname
+                            - signature
+                            - avatar
+                            - primaryOfficeId
+                            - administrativeAreaId
+                        $location:
+                          type: string
+                      required:
+                        - $userField
+                      additionalProperties: false
+                    - type: string
+                      minLength: 1
               additionalProperties: false
             configuration:
               default:
@@ -6351,6 +6447,23 @@ components:
                       - application/msword
                       - application/vnd.openxmlformats-officedocument.wordprocessingml.document
                       - application/vnd.oasis.opendocument.text
+                maxImageSize:
+                  type: object
+                  properties:
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
+                      additionalProperties: false
+                  required:
+                    - targetSize
+                  additionalProperties: false
                 style:
                   type: object
                   properties:
@@ -7844,6 +7957,23 @@ components:
                   default: 5242880
                   description: Maximum file size in bytes
                   type: number
+                maxImageSize:
+                  type: object
+                  properties:
+                    targetSize:
+                      type: object
+                      properties:
+                        width:
+                          type: number
+                        height:
+                          type: number
+                      required:
+                        - width
+                        - height
+                      additionalProperties: false
+                  required:
+                    - targetSize
+                  additionalProperties: false
                 acceptedFileTypes:
                   description: List of allowed file formats for the signature
                   type: array
@@ -10625,7 +10755,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -10642,7 +10771,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -10734,7 +10862,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11095,7 +11222,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11287,7 +11413,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11493,7 +11618,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11807,7 +11931,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12085,7 +12208,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12295,7 +12417,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12487,7 +12608,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
