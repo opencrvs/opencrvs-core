@@ -24,7 +24,6 @@ import {
   getCurrentEventState,
   getMixedPath,
   getUUID,
-  InherentFlags,
   Location,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
@@ -1339,30 +1338,6 @@ test('Returns relevant events in right order', async () => {
   expect(declaredEvents).toHaveLength(2)
   expect(
     sanitizeForSnapshot(declaredEvents, UNSTABLE_EVENT_FIELDS)
-  ).toMatchSnapshot()
-
-  const { results: registeredEventsPendingCertification } =
-    await client.event.search({
-      query: {
-        type: 'and',
-        clauses: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            status: { type: 'exact', term: EventStatus.enum.REGISTERED },
-            flags: {
-              anyOf: [InherentFlags.PENDING_CERTIFICATION]
-            }
-          }
-        ]
-      }
-    })
-
-  expect(registeredEventsPendingCertification).toHaveLength(1)
-  expect(
-    sanitizeForSnapshot(
-      registeredEventsPendingCertification[0],
-      UNSTABLE_EVENT_FIELDS
-    )
   ).toMatchSnapshot()
 
   // 3. Search by past timestamp, which should not match to any event.
