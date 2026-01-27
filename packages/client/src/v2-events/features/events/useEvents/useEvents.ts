@@ -93,6 +93,7 @@ export function useEvents() {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
+          networkMode: 'online',
           // refetchOnMount: () => navigator.onLine,
           // refetchOnMount: 'always',
           // staleTime: 0,
@@ -106,6 +107,7 @@ export function useEvents() {
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
+          networkMode: 'online',
           // refetchOnMount: 'always',
           // staleTime: 0,
           ...options
