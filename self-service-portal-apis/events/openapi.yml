@@ -80,6 +80,39 @@ paths:
         "401": *a1
         "403": *a2
         "500": *a3
+  /events/{eventId}:
+    get:
+      operationId: event-get
+      summary: Fetch full event document
+      tags:
+        - events
+      security:
+        - Authorization: []
+      parameters:
+        - in: path
+          name: eventId
+          schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          required: true
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventDocument"
+        "400": *a4
+        "401": *a1
+        "403": *a2
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.NOT_FOUND"
+        "500": *a3
   /events/notifications:
     post:
       operationId: event-actions-notify-request
@@ -618,10 +651,10 @@ paths:
         "401": *a1
         "403": *a2
         "500": *a3
-  /sync-locations:
+  /sync-administrative-hierarchy:
     post:
-      operationId: locations-sync
-      summary: Sync locations between V1 and V2
+      operationId: administrativeHierarchy-sync
+      summary: Sync administrative hierarchy between V1 and V2
       tags:
         - events
       security:
@@ -865,7 +898,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -882,7 +914,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -3543,7 +3574,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11138,7 +11168,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11499,7 +11528,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11691,7 +11719,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -11897,7 +11924,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12211,7 +12237,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12489,7 +12514,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12699,7 +12723,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -12891,7 +12914,6 @@ components:
                         pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                       - type: string
                         enum:
-                          - pending-certification
                           - incomplete
                           - rejected
                           - correction-requested
@@ -13324,6 +13346,39 @@ components:
         - message
         - code
       additionalProperties: false
+    error.NOT_FOUND:
+      title: Not found error (404)
+      description: The error information
+      example:
+        code: NOT_FOUND
+        message: Not found
+        issues: []
+      type: object
+      properties:
+        message:
+          description: The error message
+          example: Not found
+          type: string
+        code:
+          description: The error code
+          example: NOT_FOUND
+          type: string
+        issues:
+          description: An array of issues that were responsible for the error
+          example: []
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+            additionalProperties: false
+      required:
+        - message
+        - code
+      additionalProperties: false
     EventIndex:
       type: object
       properties:
@@ -13543,7 +13598,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -14250,7 +14304,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
@@ -14267,7 +14320,6 @@ components:
                     pattern: ^(delete|create|notify|declare|register|edit|duplicate_detected|reject|mark_as_duplicate|mark_as_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign|custom):(requested|accepted|rejected)$
                   - type: string
                     enum:
-                      - pending-certification
                       - incomplete
                       - rejected
                       - correction-requested
