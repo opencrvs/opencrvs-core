@@ -206,7 +206,7 @@ export function Review() {
     createdByRole: userFromUsersList.role,
     status: 'Accepted',
     declaration: {},
-    annotation: null,
+    annotation,
     originalActionId: null,
     createdBySignature: userFromUsersList.signature,
     createdAtLocation: userDetails.primaryOffice.id as UUID,

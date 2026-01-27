@@ -46,6 +46,7 @@ export function useCurrentUser() {
       adminLevelIds
     )
     return {
+      id: user.id,
       name,
       role: user.role,
       ...adminLevels
@@ -53,6 +54,7 @@ export function useCurrentUser() {
   }
 
   return {
+    id: user.id,
     name,
     role: user.role
   }
