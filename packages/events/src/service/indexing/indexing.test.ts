@@ -656,24 +656,10 @@ describe('withJurisdictionFilters', () => {
         must: [baseQuery],
         filter: {
           bool: {
-            minimum_should_match: 1,
-            should: [
-              {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        type: 'birth'
-                      }
-                    }
-                  ],
-                  should: undefined
-                }
-              }
-            ]
+            should: [{ bool: { must: [{ terms: { type: ['birth'] } }] } }],
+            minimum_should_match: 1
           }
-        },
-        should: undefined
+        }
       }
     })
   })
@@ -696,19 +682,20 @@ describe('withJurisdictionFilters', () => {
         must: [baseQuery],
         filter: {
           bool: {
-            minimum_should_match: 1,
             should: [
               {
                 bool: {
-                  must: [{ term: { type: 'birth' } }]
-                }
-              },
-              {
-                bool: {
-                  must: [{ term: { type: 'death' } }]
+                  must: [
+                    {
+                      terms: {
+                        type: ['birth', 'death']
+                      }
+                    }
+                  ]
                 }
               }
-            ]
+            ],
+            minimum_should_match: 1
           }
         }
       }
@@ -740,22 +727,36 @@ describe('withJurisdictionFilters', () => {
         must: [baseQuery],
         filter: {
           bool: {
-            minimum_should_match: 1,
             should: [
               {
                 bool: {
                   must: [
-                    { term: { type: 'birth' } },
-                    { term: { updatedAtLocation: 'office-123' } }
+                    {
+                      terms: {
+                        type: ['death']
+                      }
+                    }
                   ]
                 }
               },
               {
                 bool: {
-                  must: [{ term: { type: 'death' } }]
+                  must: [
+                    {
+                      terms: {
+                        type: ['birth']
+                      }
+                    },
+                    {
+                      term: {
+                        createdAtLocation: 'office-123'
+                      }
+                    }
+                  ]
                 }
               }
-            ]
+            ],
+            minimum_should_match: 1
           }
         }
       }
@@ -781,25 +782,25 @@ describe('withJurisdictionFilters', () => {
         must: [baseQuery],
         filter: {
           bool: {
-            minimum_should_match: 1,
             should: [
               {
                 bool: {
                   must: [
-                    { term: { type: 'birth' } },
-                    { term: { updatedAtLocation: 'office-123' } }
-                  ]
-                }
-              },
-              {
-                bool: {
-                  must: [
-                    { term: { type: 'death' } },
-                    { term: { updatedAtLocation: 'office-123' } }
+                    {
+                      terms: {
+                        type: ['birth', 'death']
+                      }
+                    },
+                    {
+                      term: {
+                        createdAtLocation: 'office-123'
+                      }
+                    }
                   ]
                 }
               }
-            ]
+            ],
+            minimum_should_match: 1
           }
         }
       }
@@ -826,29 +827,44 @@ describe('withJurisdictionFilters', () => {
       ]
     })
 
+    console.log('result', JSON.stringify(result, null, 2))
     expect(result).toEqual({
       bool: {
+        must: [baseQuery],
         filter: {
           bool: {
-            minimum_should_match: 1,
             should: [
               {
                 bool: {
                   must: [
-                    { term: { type: 'birth' } },
-                    { term: { updatedAtLocation: 'office-123' } }
+                    {
+                      terms: {
+                        type: ['birth']
+                      }
+                    },
+                    {
+                      term: {
+                        createdAtLocation: 'office-123'
+                      }
+                    }
                   ]
                 }
               },
               {
                 bool: {
-                  must: [{ term: { type: 'death' } }]
+                  must: [
+                    {
+                      terms: {
+                        type: ['death']
+                      }
+                    }
+                  ]
                 }
               }
-            ]
+            ],
+            minimum_should_match: 1
           }
-        },
-        must: [baseQuery]
+        }
       }
     })
   })
