@@ -63,7 +63,8 @@ export const ActionBase = z.object({
     .string()
     .nullish()
     .describe('Reference to the signature of the user who created the action.'),
-  createdAtLocation: UUID.describe(
+  // @TODO: createdAtLocation should be non-nullable in the future once all actions have this field populated.
+  createdAtLocation: UUID.nullish().describe(
     'Reference to the location of the user who created the action.'
   ),
   declaration: ActionUpdate.describe(

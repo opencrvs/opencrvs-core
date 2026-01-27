@@ -37,7 +37,8 @@ export const ActionCreationMetadata = z.object({
   createdBy: z
     .string()
     .describe('ID of the user who created the action request.'),
-  createdAtLocation: UUID.describe(
+  // @TODO: createdAtLocation should be non-nullable in the future once all action requests have this field populated.
+  createdAtLocation: UUID.nullish().describe(
     'Location of the user who created the action request.'
   ),
   createdByUserType: z
@@ -103,7 +104,8 @@ export const EventMetadata = z.object({
   updatedByUserRole: z
     .string()
     .describe('Role of the user who last changed the status.'),
-  createdAtLocation: UUID.describe(
+  // @TODO: createdAtLocation should be non-nullable in the future once all action requests have this field populated.
+  createdAtLocation: UUID.nullish().describe(
     'Location of the user who created the event.'
   ),
   createdBySignature: z
