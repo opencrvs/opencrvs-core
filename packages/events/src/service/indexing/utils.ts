@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import _ from 'lodash'
-import formatISO from 'date-fns/formatISO'
 import { estypes } from '@elastic/elasticsearch'
 import {
   AddressFieldValue,
@@ -67,15 +66,12 @@ function addIndexFieldsToValue(
     const maybeAsOfDate = DateValue.safeParse(
       declaration[field.value.asOfDateRef]
     )
-    return {
-      ...field.value,
-      [AGE_DOB_QUERY_KEY]: ageToDate(
-        field.value.age,
-        maybeAsOfDate.success
-          ? maybeAsOfDate.data
-          : formatISO(new Date(), { representation: 'date' })
-      )
-    } satisfies IndexedAgeFieldValue
+    if (maybeAsOfDate.success) {
+      return {
+        ...field.value,
+        [AGE_DOB_QUERY_KEY]: ageToDate(field.value.age, maybeAsOfDate.data)
+      } satisfies IndexedAgeFieldValue
+    }
   }
 
   return value
