@@ -61,6 +61,13 @@ paths:
                   type: string
                 type:
                   type: string
+                createdAtLocation:
+                  description: Location where the event occurred. Required for system users.
+                  anyOf:
+                    - type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    - type: "null"
               required:
                 - transactionId
                 - type
@@ -129,6 +136,10 @@ paths:
                   pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                 keepAssignment:
                   type: boolean
+                type:
+                  default: NOTIFY
+                  type: string
+                  const: NOTIFY
                 createdAtLocation:
                   description: A valid office location ID. This is required for system users
                     performing actions. The provided location must be a
@@ -138,10 +149,6 @@ paths:
                       format: uuid
                       pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                     - type: "null"
-                type:
-                  default: NOTIFY
-                  type: string
-                  const: NOTIFY
               required:
                 - eventId
                 - transactionId
@@ -206,15 +213,6 @@ paths:
                   pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                 keepAssignment:
                   type: boolean
-                createdAtLocation:
-                  description: A valid office location ID. This is required for system users
-                    performing actions. The provided location must be a
-                    leaf-location, i.e. it must not have any children locations.
-                  anyOf:
-                    - type: string
-                      format: uuid
-                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                    - type: "null"
                 type:
                   default: REQUEST_CORRECTION
                   type: string
@@ -283,15 +281,6 @@ paths:
                   pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                 keepAssignment:
                   type: boolean
-                createdAtLocation:
-                  description: A valid office location ID. This is required for system users
-                    performing actions. The provided location must be a
-                    leaf-location, i.e. it must not have any children locations.
-                  anyOf:
-                    - type: string
-                      format: uuid
-                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                    - type: "null"
                 requestId:
                   type: string
                 type:
@@ -363,15 +352,6 @@ paths:
                   pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                 keepAssignment:
                   type: boolean
-                createdAtLocation:
-                  description: A valid office location ID. This is required for system users
-                    performing actions. The provided location must be a
-                    leaf-location, i.e. it must not have any children locations.
-                  anyOf:
-                    - type: string
-                      format: uuid
-                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                    - type: "null"
                 requestId:
                   type: string
                 type:
@@ -542,11 +522,9 @@ paths:
                               - type: "null"
                           createdAtLocation:
                             description: Reference to the location of the user who created the action.
-                            anyOf:
-                              - type: string
-                                format: uuid
-                                pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                              - type: "null"
+                            type: string
+                            format: uuid
+                            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                           status:
                             type: string
                             const: Rejected
@@ -579,6 +557,7 @@ paths:
                           - createdAt
                           - createdBy
                           - createdByRole
+                          - createdAtLocation
                           - status
                           - type
                 trackingId:
@@ -1028,11 +1007,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1082,6 +1059,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -1121,11 +1099,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1184,6 +1160,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -1224,11 +1201,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1297,6 +1272,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -1337,11 +1313,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1391,6 +1365,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -1430,11 +1405,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1493,6 +1466,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -1532,11 +1506,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1595,6 +1567,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -1635,11 +1608,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1689,6 +1660,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -1728,11 +1700,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1786,6 +1756,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -1825,11 +1796,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1879,6 +1848,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -1918,11 +1888,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -1975,6 +1943,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -2015,11 +1984,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -2069,6 +2036,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -2108,11 +2076,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -2164,6 +2130,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -2204,11 +2171,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -2269,6 +2234,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -2310,11 +2276,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -2364,6 +2328,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -2403,11 +2368,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -2464,6 +2427,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -2503,11 +2467,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -2557,6 +2519,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -2596,11 +2559,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -2656,6 +2617,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -2696,11 +2658,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -2752,6 +2712,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -13240,11 +13201,9 @@ components:
                       - type: "null"
                   createdAtLocation:
                     description: Reference to the location of the user who created the action.
-                    anyOf:
-                      - type: string
-                        format: uuid
-                        pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                      - type: "null"
+                    type: string
+                    format: uuid
+                    pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                   status:
                     type: string
                     const: Rejected
@@ -13277,6 +13236,7 @@ components:
                   - createdAt
                   - createdBy
                   - createdByRole
+                  - createdAtLocation
                   - status
                   - type
                 additionalProperties: false
@@ -13361,11 +13321,9 @@ components:
                       type: string
                     createdAtLocation:
                       description: Location of the user who created the action request.
-                      anyOf:
-                        - type: string
-                          format: uuid
-                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                        - type: "null"
+                      type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                     createdByUserType:
                       description: Whether the user is a normal user or a system.
                       anyOf:
@@ -13390,6 +13348,7 @@ components:
                   required:
                     - createdAt
                     - createdBy
+                    - createdAtLocation
                     - acceptedAt
                     - createdByRole
                   additionalProperties: false
@@ -13408,11 +13367,9 @@ components:
                       type: string
                     createdAtLocation:
                       description: Location of the user who created the action request.
-                      anyOf:
-                        - type: string
-                          format: uuid
-                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                        - type: "null"
+                      type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
                     createdByUserType:
                       description: Whether the user is a normal user or a system.
                       anyOf:
@@ -13441,6 +13398,7 @@ components:
                   required:
                     - createdAt
                     - createdBy
+                    - createdAtLocation
                     - acceptedAt
                     - createdByRole
                     - registrationNumber
@@ -13480,11 +13438,9 @@ components:
           type: string
         createdAtLocation:
           description: Location of the user who created the event.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         createdBySignature:
           description: Signature of the user who created the event.
           anyOf:
@@ -14006,6 +13962,7 @@ components:
         - createdAt
         - createdBy
         - updatedByUserRole
+        - createdAtLocation
         - updatedAt
         - trackingId
         - potentialDuplicates
@@ -14417,11 +14374,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -14471,6 +14426,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -14511,11 +14467,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -14575,6 +14529,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -14616,11 +14571,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -14691,6 +14644,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -14732,11 +14686,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -14786,6 +14738,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -14826,11 +14779,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -14890,6 +14841,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -14930,11 +14882,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -14994,6 +14944,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15035,11 +14986,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15089,6 +15038,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15129,11 +15079,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15187,6 +15135,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15227,11 +15176,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15281,6 +15228,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15321,11 +15269,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15378,6 +15324,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15419,11 +15366,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15473,6 +15418,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15513,11 +15459,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15569,6 +15513,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15610,11 +15555,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15676,6 +15619,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15718,11 +15662,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15772,6 +15714,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15812,11 +15755,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15874,6 +15815,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -15914,11 +15856,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -15968,6 +15908,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -16008,11 +15949,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -16069,6 +16008,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
@@ -16110,11 +16050,9 @@ components:
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
-          anyOf:
-            - type: string
-              format: uuid
-              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-            - type: "null"
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
         declaration:
           description: Declaration data defined by the ActionConfig. Supports partial
             updates.
@@ -16166,6 +16104,7 @@ components:
         - createdAt
         - createdBy
         - createdByRole
+        - createdAtLocation
         - declaration
         - status
         - type
