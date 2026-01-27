@@ -94,10 +94,6 @@ function getViewEventQuery(
       return eventDocument
     },
     gcTime: 0,
-    /*
-     * We never want to refetch this query automatically
-     * because it is the user's explicit (audit logged) action to fetch a record
-     */
     staleTime: Infinity,
     refetchOnMount: false,
     refetchOnReconnect: false,
