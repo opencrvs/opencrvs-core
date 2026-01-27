@@ -254,7 +254,6 @@ function useViewableActionConfigurations(
   )
 
   const { eventConfiguration } = useEventConfiguration(event.type)
-
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const isDownloadedAndAssignedToUser =
@@ -270,20 +269,6 @@ function useViewableActionConfigurations(
   const isAssignmentInProgress = events.actions.assignment.assign.isAssigning(
     event.id
   )
-
-  const isRejected = event.flags.includes(InherentFlags.REJECTED)
-  const isDeclaredState = event.status === EventStatus.enum.DECLARED
-  const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
-
-  // Incomplete declarations are always shown as "Review" for the reviewer.
-  const isReviewingIncompleteDeclaration = !isRejected && isNotifiedState
-
-  // Rejected declarations are always shown as "Review" for the reviewer.
-  const isReviewingRejectedDeclaration =
-    isRejected && (isNotifiedState || isDeclaredState)
-
-  const isReviewingDeclaration =
-    isReviewingIncompleteDeclaration || isReviewingRejectedDeclaration
 
   const userMayCorrect = isActionInScope(
     authentication.scope,
@@ -377,9 +362,7 @@ function useViewableActionConfigurations(
       },
       [ActionType.DECLARE]: {
         icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
-        label: isReviewingDeclaration
-          ? reviewLabel
-          : actionLabels[ActionType.DECLARE],
+        label: actionLabels[ActionType.DECLARE],
         onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
@@ -390,7 +373,6 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: isRejected
       },
       [ActionType.EDIT]: {
         icon: 'PencilLine' as const,
@@ -414,13 +396,10 @@ function useViewableActionConfigurations(
                 )
               : navigate(ROUTES.V2.buildPath({}))
           ),
-        disabled: !isDownloadedAndAssignedToUser,
-        hidden: isReviewingDeclaration
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
-        label: isReviewingIncompleteDeclaration
-          ? reviewLabel
-          : actionLabels[ActionType.REGISTER],
+        label: actionLabels[ActionType.REGISTER],
         icon: getAction(ActionType.REGISTER)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) =>
           onQuickAction(ActionType.REGISTER, workqueue),
