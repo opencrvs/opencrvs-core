@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 
 import { HttpResponse, http } from 'msw'
 import {
@@ -508,7 +508,7 @@ test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called
   expect(index[0].flags).toContain(InherentFlags.INCOMPLETE)
 })
 
-test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.DECLARE} is called`, async () => {
+test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.EDIT} + ${ActionType.DECLARE} is called`, async () => {
   const { user, generator } = await setupTestCase()
 
   const { type } = generator.event.create()
@@ -534,9 +534,20 @@ test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.DECLARE} is ca
     })
   )
 
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(event.id)
+  )
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: event.actions[0].createdBy
+    })
+  )
+
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
+
   const { results: index } = await client.event.search({
     query: {
       type: 'and',
@@ -584,7 +595,7 @@ test(`Adds ${InherentFlags.REJECTED} flag after ${ActionType.REJECT} is called`,
   expect(index[0].flags).toContain(InherentFlags.REJECTED)
 })
 
-test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.DECLARE} is called again`, async () => {
+test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.EDIT} + ${ActionType.DECLARE} is called`, async () => {
   const { user, generator } = await setupTestCase()
 
   const { type } = generator.event.create()
@@ -602,6 +613,16 @@ test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.DECLARE} is call
 
   await client.event.actions.reject.request(
     generator.event.actions.reject(event.id)
+  )
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: event.actions[0].createdBy
+    })
+  )
+
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(event.id)
   )
 
   await client.event.actions.assignment.assign(

@@ -298,7 +298,7 @@ describe('getCurrentEventState()', () => {
       ) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
       placeOfEvent: createAction.createdAtLocation,
-      flags: [InherentFlags.PENDING_CERTIFICATION],
+      flags: [],
       potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
@@ -400,7 +400,7 @@ describe('getCurrentEventState()', () => {
       declaration: deepDropNulls(declareAcceptAction.declaration) as EventState,
       dateOfEvent: event.createdAt.split('T')[0],
       placeOfEvent: createAction.createdAtLocation,
-      flags: [InherentFlags.PENDING_CERTIFICATION],
+      flags: [],
       potentialDuplicates: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
@@ -444,10 +444,7 @@ describe('getCurrentEventState()', () => {
 
     expect(
       getCurrentEventState(event1, tennisClubMembershipEvent).flags
-    ).toEqual([
-      InherentFlags.PENDING_CERTIFICATION,
-      InherentFlags.CORRECTION_REQUESTED
-    ])
+    ).toEqual([InherentFlags.CORRECTION_REQUESTED])
 
     const event2 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
@@ -462,7 +459,7 @@ describe('getCurrentEventState()', () => {
 
     expect(
       getCurrentEventState(event2, tennisClubMembershipEvent).flags
-    ).toEqual([InherentFlags.PENDING_CERTIFICATION])
+    ).toEqual([])
 
     const event3 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
