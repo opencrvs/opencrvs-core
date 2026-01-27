@@ -326,7 +326,14 @@ export function isFieldVisible(
 
 function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
   const fieldValue = form[field.id]
-  return !field.required && (fieldValue === undefined || fieldValue === '')
+  return (
+    !field.required &&
+    (fieldValue === undefined ||
+      fieldValue === '' ||
+      (fieldValue &&
+        typeof fieldValue === 'object' &&
+        Object.values(fieldValue).every((v) => v === undefined || v === '')))
+  )
 }
 
 export function isFieldEnabled(
