@@ -63,13 +63,13 @@ test('stored events can be deleted', async () => {
   const event = await client.event.create(generator.event.create())
 
   // at this point event should exist
-  await expect(client.event.get(event.id)).resolves.toBeDefined()
+  await expect(client.event.get({eventId: event.id})).resolves.toBeDefined()
 
   const removedEvent = await client.event.delete({ eventId: event.id })
   expect(removedEvent.id).toBe(event.id)
 
   // now event should be removed
-  await expect(client.event.get(event.id)).rejects.toThrow(
+  await expect(client.event.get({eventId: event.id})).rejects.toThrow(
     `Event not found with ID: ${event.id}`
   )
 })
@@ -146,7 +146,7 @@ describe('check unreferenced draft attachments are deleted while final action su
     // declaring final action submission
     await client.event.actions.declare.request(getDeclaration(6))
 
-    const updatedEvent = await client.event.get(event.id)
+    const updatedEvent = await client.event.get({eventId: event.id})
 
     // since declare action has been submitted 5 times
     expect(updatedEvent.actions).toEqual([
