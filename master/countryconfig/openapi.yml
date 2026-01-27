@@ -220,6 +220,7 @@ paths:
                                         - ADDRESS
                                         - TEXT
                                         - NUMBER
+                                        - NUMBER_WITH_UNIT
                                         - TEXTAREA
                                         - EMAIL
                                         - DATE
@@ -505,6 +506,7 @@ paths:
                                         - ADDRESS
                                         - TEXT
                                         - NUMBER
+                                        - NUMBER_WITH_UNIT
                                         - TEXTAREA
                                         - EMAIL
                                         - DATE
@@ -1010,6 +1012,7 @@ components:
                             - ADDRESS
                             - TEXT
                             - NUMBER
+                            - NUMBER_WITH_UNIT
                             - TEXTAREA
                             - EMAIL
                             - DATE
@@ -1254,6 +1257,7 @@ components:
                             - ADDRESS
                             - TEXT
                             - NUMBER
+                            - NUMBER_WITH_UNIT
                             - TEXTAREA
                             - EMAIL
                             - DATE
@@ -2256,6 +2260,187 @@ components:
                 its value becomes available in the analytics dashboard.
             type:
               type: string
+              const: NUMBER_WITH_UNIT
+            defaultValue:
+              type: object
+              properties:
+                numericValue:
+                  type: number
+                unit:
+                  type: string
+              required:
+                - numericValue
+                - unit
+            options:
+              type: array
+              items:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    description: The value of the option
+                  label:
+                    anyOf:
+                      - type: string
+                      - $ref: "#/components/schemas/TranslationConfig"
+                    description: The label of the option
+                required:
+                  - value
+                  - label
+              description: A list of options for the unit select
+            configuration:
+              type: object
+              properties:
+                min:
+                  type: number
+                  description: Minimum value of the number field
+                max:
+                  type: number
+                  description: Maximum value of the number field
+                numberFieldPlaceholder:
+                  $ref: "#/components/schemas/TranslationConfig"
+                  description: Placeholder for the number field
+          required:
+            - id
+            - label
+            - type
+            - options
+          description: Number with unit input
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier of the field.
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+              description: Human-readable label of the field.
+            parent:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                    description: Reference to a field by its ID
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      $ref: "#/components/schemas/TranslationConfig"
+                      description: Custom required validation message
+                  required:
+                    - message
+              default: false
+              description: Indicates whether the field is mandatory.
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a7
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+            secured:
+              type: boolean
+              default: false
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a8
+              description: Additional validation rules applied to the field.
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates whether the field can be modified during record
+                correction.
+            value:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                    description: Reference to a field by its ID
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+            analytics:
+              type: boolean
+              default: false
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+            type:
+              type: string
               const: TEXTAREA
             defaultValue:
               type: string
@@ -2589,8 +2774,7 @@ components:
               const: DATE
             defaultValue:
               type: string
-              format: date
-              description: Date in the format YYYY-MM-DD
+              description: Default date value(yyyy-MM-dd)
             configuration:
               type: object
               properties:
@@ -2739,8 +2923,8 @@ components:
               type: string
               const: TIME
             defaultValue:
-              type: string
-              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              type: object
+              description: Default time value (HH-mm)
             configuration:
               type: object
               properties:
