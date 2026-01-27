@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as elasticsearch from '@elastic/elasticsearch'
-import formatISO from 'date-fns/formatISO'
 import { get } from 'lodash'
 import { DateTime } from 'luxon'
 import {
@@ -22,11 +21,7 @@ import {
   DateValue,
   FieldType,
   extractPotentialDuplicatesFromActions,
-  EventDocument,
-  getDeclarationFields,
-  FieldConfig,
-  AgeValue,
-  ageToDate
+  EventDocument
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -37,7 +32,6 @@ import {
   ageQueryKey,
   declarationReference,
   decodeEventIndex,
-  decodeFieldId,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
@@ -107,19 +101,28 @@ export function generateElasticsearchQuery(
       }
     }
   }
-  const rawFieldId = queryInput.fieldId
-  const fieldConfig = getDeclarationFieldById(eventConfig, rawFieldId)
-  const encodedFieldId = encodeFieldId(rawFieldId)
-  const valuePath =
-    fieldConfig.type === FieldType.NAME
-      ? nameQueryKey(encodedFieldId)
-      : encodedFieldId
 
-  const queryKey = declarationReference(valuePath)
-  const queryValue = get(eventIndex.declaration, valuePath)
+  function resolveFieldPath(fieldId: string): string {
+    const fieldConfig = getDeclarationFieldById(eventConfig, fieldId)
+    const encodedFieldId = encodeFieldId(fieldId)
+    if (fieldConfig.type == FieldType.NAME) {
+      return nameQueryKey(encodedFieldId)
+    }
+    if (fieldConfig.type == FieldType.AGE) {
+      return ageQueryKey(encodedFieldId)
+    }
+    return encodedFieldId
+  }
+
+  const matchAgainst = queryInput.options.matchAgainst ?? queryInput.fieldId
+  const queryKey = declarationReference(resolveFieldPath(matchAgainst))
+  const queryValue = get(
+    eventIndex.declaration,
+    resolveFieldPath(queryInput.fieldId)
+  )
   if (!queryValue) {
     logger.warn(
-      `No value found for field ${rawFieldId} in the current event. Skipping query clause.`
+      `No value found for field ${queryInput.fieldId} in the current event. Skipping query clause.`
     )
     return null
   }
@@ -138,7 +141,7 @@ export function generateElasticsearchQuery(
       if (!isPrimitiveQueryValue(queryValue)) {
         logger.warn(
           queryValue,
-          `Invalid query value found for fuzzy matching ${rawFieldId}. Expected string, number or boolean`
+          `Invalid query value found for fuzzy matching ${queryInput.fieldId}. Expected string, number or boolean`
         )
         return null
       }
@@ -157,7 +160,7 @@ export function generateElasticsearchQuery(
       if (!isPrimitiveQueryValue(queryValue)) {
         logger.warn(
           queryValue,
-          `Invalid query value for found for strict matching ${rawFieldId}. Expected string, number or boolean`
+          `Invalid query value for found for strict matching ${queryInput.fieldId}. Expected string, number or boolean`
         )
         return null
       }
@@ -169,106 +172,42 @@ export function generateElasticsearchQuery(
       }
     }
     case 'dateRange': {
-      let dateValue: string = ''
-      const _dateValue = DateValue.safeParse(queryValue)
-      const ageValue = AgeValue.safeParse(queryValue)
-      if (_dateValue.success) {
-        dateValue = _dateValue.data
-      } else if (ageValue.success) {
-        const ageFieldConfig = getDeclarationFields(eventConfig).find(
-          (x) => x.id === decodeFieldId(queryKey.split('.')[1])
-        )
-
-        if (ageFieldConfig && ageFieldConfig.type === FieldType.AGE) {
-          const asOfDateValue = DateValue.safeParse(
-            eventIndex.declaration[
-              encodeFieldId(ageFieldConfig.configuration.asOfDate.$$field)
-            ]
-          )
-          dateValue = ageToDate(
-            ageValue.data.age,
-            asOfDateValue.success
-              ? asOfDateValue.data
-              : formatISO(new Date(), { representation: 'date' })
-          )
-        }
-      }
-
-      if (!_dateValue.success && !ageValue.success && !dateValue) {
+      const dateValue = DateValue.safeParse(queryValue)
+      if (!dateValue.success) {
         logger.warn(
           queryValue,
-          `Invalid query value for dateRange matching ${rawFieldId}`
+          `Invalid query value for found for dateRange matching ${queryInput.fieldId}. Expected date in YYYY-MM-DD format`
         )
         return null
       }
-
       const pivot =
         queryInput.options.pivot ??
         Math.floor((queryInput.options.days * 2) / 3)
-
-      const fieldsToMatch = []
-
-      if (Array.isArray(queryInput.options.matchAgainst)) {
-        const fields = getDeclarationFields(eventConfig)
-        const additionalFields = queryInput.options.matchAgainst
-          .map((x) => fields.find((f) => f.id === x.$$field))
-          .filter((field): field is FieldConfig => {
-            if (!field) {
-              return false
-            }
-            return field.type === FieldType.DATE || field.type === FieldType.AGE
-          })
-          .map((field) => {
-            // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
-            switch (field.type) {
-              case FieldType.AGE:
-                return declarationReference(
-                  ageQueryKey(encodeFieldId(field.id))
-                )
-              default:
-                return declarationReference(encodeFieldId(field.id))
-            }
-          })
-
-        fieldsToMatch.push(...additionalFields)
-      } else {
-        // default query key if matchAgainst option not provided
-        fieldsToMatch.push(queryKey)
-      }
-
-      // Helper to build query for a single field
-      const buildFieldQuery = (fieldKey: string, date: string) => ({
-        range: {
-          [fieldKey]: {
-            gte: DateTime.fromISO(date)
-              .minus({ days: queryInput.options.days })
-              .toISO(),
-            lte: DateTime.fromISO(date)
-              .plus({ days: queryInput.options.days })
-              .toISO()
-          }
-        }
-      })
-
-      const buildDistanceFeature = (fieldKey: string) => ({
-        distance_feature: {
-          field: fieldKey,
-          pivot: `${pivot}d`,
-          origin: dateValue
-        }
-      })
-
       return {
         bool: {
           must: [
             {
-              bool: {
-                should: fieldsToMatch.map((f) => buildFieldQuery(f, dateValue)),
-                minimum_should_match: 1
+              range: {
+                [queryKey]: {
+                  gte: DateTime.fromISO(dateValue.data)
+                    .minus({ days: queryInput.options.days })
+                    .toISO(),
+                  lte: DateTime.fromISO(dateValue.data)
+                    .plus({ days: queryInput.options.days })
+                    .toISO()
+                }
               }
             }
           ],
-          should: fieldsToMatch.map(buildDistanceFeature)
+          should: [
+            {
+              distance_feature: {
+                field: queryKey,
+                pivot: `${pivot}d`,
+                origin: dateValue.data
+              }
+            }
+          ]
         }
       }
     }
