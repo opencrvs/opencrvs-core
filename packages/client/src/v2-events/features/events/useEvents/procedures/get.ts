@@ -27,6 +27,8 @@ import { buttonMessages } from '@client/i18n/messages'
 import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
 
+// misc change
+
 /*
  * This logic overrides the default behaviour of "api.event.get"
  * by making it so all "FILE" or "FILE_WITH_OPTIONS" type data points
