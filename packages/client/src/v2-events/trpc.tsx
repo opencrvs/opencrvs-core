@@ -82,7 +82,7 @@ function getQueryClient() {
     defaultOptions: {
       queries: {
         gcTime: Infinity,
-        networkMode: 'offlineFirst',
+        networkMode: 'online',
         retry: 1
       },
       mutations: {
