@@ -27,15 +27,18 @@ import {
   FieldConfig,
   FieldUpdateValue,
   getActionConfig,
-  runFieldValidations
+  runFieldValidations,
+  UUID,
+  getCurrentEventState,
+  EventConfig
 } from '@opencrvs/commons/client'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useUserAllowedActions } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useModal } from '../../../../hooks/useModal'
-import { useEvents } from '../../useEvents/useEvents'
 import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { register } from './register'
@@ -87,13 +90,14 @@ function QuickActionModal({
   close,
   config,
   event,
+  eventConfiguration,
 }: {
   close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
   event: EventIndex
+  eventConfiguration: EventConfig
 }) {
   const intl = useIntl()
-  const { eventConfiguration } = useEventConfiguration(event.type)
   const validatorContext = useValidatorContext()
   const [modalValues, setModalValues] = React.useState<
     Record<string, FieldUpdateValue>
@@ -177,12 +181,14 @@ function QuickActionModal({
   )
 }
 
-export function useQuickActionModal(event: EventIndex) {
+export function useQuickActionModal(eventId: UUID) {
   const [quickActionModal, openModal] = useModal()
   const navigate = useNavigate()
-  const { actions, customActions } = useEvents()
-  const { isActionAllowed } = useUserAllowedActions(event.type)
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { actions, customActions, getEvent } = useEvents()
+  const eventDocument = getEvent.useGetOrDownloadEvent(eventId)
+  const { eventConfiguration } = useEventConfiguration(eventDocument.type)
+  const { isActionAllowed } = useUserAllowedActions(eventDocument.type)
+  const event = getCurrentEventState(eventDocument, eventConfiguration)
 
   const onQuickAction = async (
     actionType: keyof typeof quickActions,
@@ -203,6 +209,7 @@ export function useQuickActionModal(event: EventIndex) {
           ...config.modal
         }}
         event={event}
+        eventConfiguration={eventConfiguration}
       />
     ))
 
@@ -237,10 +244,13 @@ const customActionConfigBase: Partial<ModalConfig> = {
   }
 }
 
-export function useCustomActionModal(event: EventIndex) {
+export function useCustomActionModal(eventId: UUID) {
   const [customActionModal, openModal] = useModal()
   const navigate = useNavigate()
-  const { actions } = useEvents()
+  const { actions, getEvent } = useEvents()
+  const eventDocument = getEvent.useGetOrDownloadEvent(eventId)
+  const { eventConfiguration } = useEventConfiguration(eventDocument.type)
+  const event = getCurrentEventState(eventDocument, eventConfiguration)
 
   const onCustomAction = async (
     actionConfig: CustomActionConfig,
@@ -257,12 +267,13 @@ export function useCustomActionModal(event: EventIndex) {
           icon: actionConfig.icon
         }}
         event={event}
+        eventConfiguration={eventConfiguration}
       />
     ))
 
     if (modalResult.result) {
       void actions.custom.mutate({
-        eventId: event.id,
+        eventId,
         customActionType: actionConfig.customActionType,
         declaration: event.declaration,
         transactionId: uuid(),

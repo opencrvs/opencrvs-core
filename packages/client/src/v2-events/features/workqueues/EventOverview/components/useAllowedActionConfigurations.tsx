@@ -276,7 +276,7 @@ function useViewableActionConfigurations(
     event.type
   )
 
-  const { quickActionModal, onQuickAction } = useQuickActionModal(event)
+  const { quickActionModal, onQuickAction } = useQuickActionModal(event.id)
 
   const getAction = (type: ActionType) => {
     return eventConfiguration.actions.find((action) => action.type === type)
@@ -515,7 +515,7 @@ function useCustomActionConfigs(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { customActionModal, onCustomAction } = useCustomActionModal(event)
+  const { customActionModal, onCustomAction } = useCustomActionModal(event.id)
   const { useFindEventFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
