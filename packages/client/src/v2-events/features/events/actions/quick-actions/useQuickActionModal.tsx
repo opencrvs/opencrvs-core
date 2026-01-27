@@ -85,12 +85,15 @@ const DefaultIcons = {
 
 function QuickActionModal({
   close,
-  config
+  config,
+  event,
 }: {
   close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
+  event: EventIndex
 }) {
   const intl = useIntl()
+  const { eventConfiguration } = useEventConfiguration(event.type)
   const validatorContext = useValidatorContext()
   const [modalValues, setModalValues] = React.useState<
     Record<string, FieldUpdateValue>
@@ -161,8 +164,11 @@ function QuickActionModal({
             : null}
         </Text>
         <FormFieldGenerator
+          eventConfig={eventConfiguration}
           fields={config.fields ?? []}
           id={'quick-action-modal-form'}
+          // Pass in the complete declaration form values so that read-only declaration data is available for Data components or calculations.
+          initialValues={event.declaration}
           validatorContext={validatorContext}
           onChange={handleChange}
         />
@@ -196,6 +202,7 @@ export function useQuickActionModal(event: EventIndex) {
           supportingCopy,
           ...config.modal
         }}
+        event={event}
       />
     ))
 
@@ -249,6 +256,7 @@ export function useCustomActionModal(event: EventIndex) {
           fields: actionConfig.form,
           icon: actionConfig.icon
         }}
+        event={event}
       />
     ))
 
