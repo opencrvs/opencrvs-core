@@ -376,9 +376,7 @@ const testCasesForDefaultValue = [
         firstname: 'Jon',
         surname: 'Doe',
         role: '',
-        id: '',
-        province: '',
-        district: ''
+        id: ''
       },
       $window: {
         location: {
@@ -401,9 +399,7 @@ const testCasesForDefaultValue = [
         firstname: 'Jon',
         surname: 'Doe',
         role: '',
-        id: '',
-        province: '',
-        district: ''
+        id: ''
       },
       $window: {
         location: {
