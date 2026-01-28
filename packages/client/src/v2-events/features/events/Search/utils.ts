@@ -770,8 +770,11 @@ export function checkScopeForEventSearch(eventId: string) {
     scopes: scopes ?? []
   })
 
-  const isEventSearchAllowed = searchScopes.some((scope) =>
-    scope.options?.event?.includes(eventId)
+  const isEventSearchAllowed = searchScopes.some(
+    (scope) =>
+      scope.options?.event?.includes(eventId) ||
+      // Unless specified, event search is allowed for all events
+      scope.options?.event === undefined
   )
 
   return isEventSearchAllowed
