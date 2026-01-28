@@ -174,6 +174,7 @@ export const GeneratedInputField = React.memo(
       helperText: fieldDefinition.helperText
         ? intl.formatMessage(fieldDefinition.helperText)
         : undefined,
+      hideErrorLabel: fieldDefinition.hideErrorLabel,
       error,
       touched
     }
@@ -220,13 +221,12 @@ export const GeneratedInputField = React.memo(
       )
 
       return (
-        // We are showing errors to underlying text input, so we need to ignore them here
-        <InputField {...omit(field.inputFieldProps, 'error')}>
+        <InputField {...field.inputFieldProps}>
           <Name.Input
             configuration={field.config.configuration}
             disabled={disabled}
             id={fieldDefinition.id}
-            validation={validation}
+            validation={fieldDefinition.hideErrorLabel ? validation : []}
             validatorContext={validatorContext}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -500,8 +500,7 @@ export const GeneratedInputField = React.memo(
     }
     if (isAddressFieldType(field)) {
       return (
-        // We are showing errors to underlying inputs, so we need to ignore them here
-        <InputField {...omit(field.inputFieldProps, 'error')}>
+        <InputField {...field.inputFieldProps}>
           <Address.Input
             {...field.config}
             configuration={field.config.configuration}

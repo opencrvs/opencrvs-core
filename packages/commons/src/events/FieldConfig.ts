@@ -126,6 +126,16 @@ const BaseField = z
       .describe('Additional validation rules applied to the field.'),
     helperText: TranslationConfig.optional(),
     hideLabel: z.boolean().default(false).optional(),
+    hideErrorLabel: z
+      .boolean()
+      .default(false)
+      .optional()
+      .describe(
+        `If true, hides the field's validation error message. Useful for composite components like ADDRESS or NAME where errors are shown at the sub-field level instead of the parent 
+        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
+        validation error messages.`
+      ),
+
     uncorrectable: z
       .boolean()
       .default(false)
