@@ -79,7 +79,7 @@ export function getPreviousDeclarationActionType(
       break
     }
     case ActionType.EDIT: {
-      actionTypes = [ActionType.DECLARE]
+      actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
       break
     }
     case ActionType.REGISTER: {

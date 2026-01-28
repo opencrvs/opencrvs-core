@@ -8,14 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 import { InherentFlags } from '../Flag'
-import { getAvailableActions } from './availableActions'
+import { getAvailableActionsForEvent } from './availableActions'
 
-describe('getAvailableActions', () => {
+describe('getAvailableActionsForEvent()', () => {
   for (const status of EventStatus.options) {
     it(`should return the correct actions for "${status}" status with no flags`, () => {
-      expect(getAvailableActions(status as EventStatus, [])).toMatchSnapshot()
+      expect(getAvailableActionsForEvent({ status: status as EventStatus, flags: [] } as unknown as EventIndex)).toMatchSnapshot()
     })
   }
 
@@ -27,41 +28,41 @@ describe('getAvailableActions', () => {
   for (const status of REJECTABLE_STATUSES) {
     it(`should return the correct actions for "${status}" status with ${InherentFlags.REJECTED} flag`, () => {
       expect(
-        getAvailableActions(status as EventStatus, [InherentFlags.REJECTED])
+        getAvailableActionsForEvent({ status: status as EventStatus, flags: [InherentFlags.REJECTED] } as EventIndex)
       ).toMatchSnapshot()
     })
   }
 
   it(`should return the correct actions for "${EventStatus.enum.REGISTERED}" status with ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
     expect(
-      getAvailableActions(EventStatus.enum.REGISTERED, [
+      getAvailableActionsForEvent({ status: EventStatus.enum.REGISTERED, flags: [
         InherentFlags.CORRECTION_REQUESTED
-      ])
+      ] } as EventIndex)
     ).toMatchSnapshot()
   })
 
   it(`returns the correct actions for "${EventStatus.enum.REGISTERED}" status with a "registered:requested" flag`, () => {
     expect(
-      getAvailableActions(EventStatus.enum.REGISTERED, [
+      getAvailableActionsForEvent({ status: EventStatus.enum.REGISTERED, flags: [
         (EventStatus.enum.REGISTERED + ':requested').toLowerCase()
-      ])
+      ] } as EventIndex)
     ).toMatchSnapshot()
   })
 
   it(`returns the correct actions for "${EventStatus.enum.DECLARED}" status with a "declared:requested" flag`, () => {
     expect(
-      getAvailableActions(EventStatus.enum.DECLARED, [
+      getAvailableActionsForEvent({ status: EventStatus.enum.DECLARED, flags: [
         (EventStatus.enum.DECLARED + ':requested').toLowerCase()
-      ])
+      ] } as EventIndex)
     ).toMatchSnapshot()
   })
 
   it(`should return the correct actions for "${EventStatus.enum.REGISTERED}" status with "registered:requested" ${InherentFlags.CORRECTION_REQUESTED} flag`, () => {
     expect(
-      getAvailableActions(EventStatus.enum.REGISTERED, [
+      getAvailableActionsForEvent({ status: EventStatus.enum.REGISTERED, flags: [
         InherentFlags.CORRECTION_REQUESTED,
         (EventStatus.enum.REGISTERED + ':requested').toLowerCase()
-      ])
+      ] } as EventIndex)
     ).toMatchSnapshot()
   })
 })
