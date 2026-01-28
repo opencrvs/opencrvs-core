@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: e6f43f2f-ffe7-4a78-b29b-cc6830d03290
+                transactionId: dff2a43d-5a47-49ef-b2ea-7d18cf09b263
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 4cbb69a7-1221-4ac3-9a3d-d7762bb505f7
+                transactionId: a0a4819c-d771-4826-ada1-e9dd6a756e15
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -7104,6 +7104,7 @@ components:
                   - originalFilename
                   - type
                   - option
+              minItems: 1
             configuration:
               type: object
               properties:
@@ -12016,6 +12017,7 @@ components:
                         - originalFilename
                         - type
                         - option
+                    minItems: 1
                   - type: object
                     properties:
                       firstname:
@@ -12205,6 +12207,7 @@ components:
                               - originalFilename
                               - type
                               - option
+                          minItems: 1
                         - type: object
                           properties:
                             firstname:
