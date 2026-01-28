@@ -12,6 +12,7 @@
 import format from 'date-fns/format'
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
+import { useField } from 'formik'
 import {
   DateField as DateFieldType,
   DatetimeValue,
@@ -22,7 +23,7 @@ import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
-import { useResolveOnce } from '../useResolveOnce'
+import { useResolveDefaultValue } from '../useResolveDefaultValue'
 import { StringifierContext } from './RegisteredField'
 
 const messages = defineMessages({
@@ -62,10 +63,26 @@ function DateInput({
    */
   const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
   const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
-  const resolvedValue = resolveNowForDateInput(value)
 
   // Ensure that 'now' is resolved to the current date and set in the form data.
-  useResolveOnce({ value, resolvedValue, onChange })
+  // Form values are updated in a single batched operation.
+  // When multiple fields try to resolve `$$now` at the same time,
+  // each calls `setValue`, but only the *last* update in the batch
+  // is applied.
+  //
+  // Example:
+  // applicant.dob = { $$now: true }, applicant.tob = "15:34"
+  // applicant.dob = "1990-01-01", applicant.tob = { $$now: true }
+  // → only one resolved field survives per render cycle.
+  //
+  // `useField` is used to get access to `helpers.setValue`, ensuring
+  // the resolved value is written directly to Formik’s state rather
+  // than relying on local `onChange`, which may be overwritten.
+  const resolvedValue = useResolveDefaultValue({
+    defaultValue: value,
+    resolver: resolveNowForDateInput,
+    fieldName: props.name
+  })
 
   return (
     <DateFieldComponent
