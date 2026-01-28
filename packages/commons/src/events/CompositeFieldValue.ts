@@ -119,7 +119,7 @@ export const FileFieldValueWithOption = z.object({
 
 export type FileFieldValueWithOption = z.infer<typeof FileFieldValueWithOption>
 
-export const FileFieldWithOptionValue = z.array(FileFieldValueWithOption)
+export const FileFieldWithOptionValue = z.array(FileFieldValueWithOption).min(1)
 export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
 
 export const HttpFieldValue = z.object({

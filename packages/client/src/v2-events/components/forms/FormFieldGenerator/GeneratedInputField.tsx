@@ -662,7 +662,6 @@ export const GeneratedInputField = React.memo(
             error={inputFieldProps.error}
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
-            required={inputFieldProps.required}
             setFieldTouched={() => setFieldTouched(inputFieldProps.id, true)}
             onChange={handleFileWithOptionChange}
             options={field.config.options}
