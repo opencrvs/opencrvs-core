@@ -16,6 +16,8 @@ import {
   FileFieldWithOptionValue,
   NameFieldValue,
   NameFieldUpdateValue,
+  NumberWithUnitFieldValue,
+  NumberWithUnitFieldUpdateValue,
   HttpFieldUpdateValue,
   HttpFieldValue,
   QueryParamReaderFieldValue,
@@ -53,6 +55,7 @@ export type AgeValue = z.infer<typeof AgeValue>
 export const AgeUpdateValue = AgeValue.optional().nullable()
 
 export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
+export type TimeValue = z.infer<typeof TimeValue>
 
 export const DatetimeValue = z.iso.datetime()
 
@@ -118,6 +121,8 @@ const FieldValuesWithoutDataField = z.union([
   QueryParamReaderFieldValue,
   QrReaderFieldValue,
   IdReaderFieldValue,
+  NumberWithUnitFieldValue,
+  NumberWithUnitFieldUpdateValue,
   CustomFieldValue
 ])
 type FieldValuesWithoutDataField = z.infer<typeof FieldValuesWithoutDataField>
@@ -153,6 +158,7 @@ const PRIORITY_ORDER = [
   'SelectDateRangeValue',
   'CheckboxFieldValue',
   'NumberFieldValue',
+  'NumberWithUnitFieldUpdateValue',
   'FileFieldValue',
   'FileFieldWithOptionValue',
   'DataFieldValue'
@@ -226,6 +232,7 @@ export type FieldUpdateValue =
   | z.infer<typeof SelectDateRangeValue>
   | z.infer<typeof CheckboxFieldValue>
   | z.infer<typeof NumberFieldValue>
+  | z.infer<typeof NumberWithUnitFieldUpdateValue>
   | z.infer<typeof FileFieldValue>
   | z.infer<typeof FileFieldWithOptionValue>
   | z.infer<typeof DataFieldValue>
@@ -247,6 +254,7 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   SelectDateRangeValue.describe('SelectDateRangeValue'),
   CheckboxFieldValue.describe('CheckboxFieldValue'),
   NumberFieldValue.describe('NumberFieldValue'),
+  NumberWithUnitFieldUpdateValue.describe('NumberWithUnitFieldUpdateValue'),
   FileFieldValue.describe('FileFieldValue'),
   FileFieldWithOptionValue.describe('FileFieldWithOptionValue'),
   DataFieldValue.describe('DataFieldValue'),
@@ -266,6 +274,7 @@ export type FieldValueSchema =
   | typeof CheckboxFieldValue
   | typeof AddressFieldValue
   | typeof NumberFieldValue
+  | typeof NumberWithUnitFieldValue
   | typeof DataFieldValue
   | typeof NameFieldValue
   | z.ZodString
@@ -284,6 +293,8 @@ export type FieldUpdateValueSchema =
   | typeof CheckboxFieldValue
   | typeof AddressFieldUpdateValue
   | typeof NumberFieldValue
+  | typeof NumberWithUnitFieldValue
+  | typeof NumberWithUnitFieldUpdateValue
   | typeof DataFieldValue
   | typeof NameFieldValue
   | typeof NameFieldUpdateValue
