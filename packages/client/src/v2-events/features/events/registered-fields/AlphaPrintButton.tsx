@@ -45,10 +45,16 @@ interface PrintButtonProps {
 const addedButtonLabel = { id: 'buttons.print', defaultMessage: 'Print' }
 
 /**
- * Indicates that declaration action changed declaration content. Satisfies V1 spec.
+ * Specialized print declaration action used only on the client side.
+ *
+ * DECLARE has been used here so that in offline mode
+ * getCurrentEventState can be tricked to include both
+ * metadata and declaration data not really persisted
+ * on the record’s history
+ *
  */
-export const DECLARATION_ACTION_UPDATE = 'UPDATE' as const
-type DECLARATION_ACTION_UPDATE = typeof DECLARATION_ACTION_UPDATE
+const PRINT_DECLARATION_ACTION = 'DECLARE' as const
+type PRINT_DECLARATION_ACTION = typeof PRINT_DECLARATION_ACTION
 
 export const AlphaPrintButton = {
   Input: ({
@@ -62,7 +68,10 @@ export const AlphaPrintButton = {
     const intl = useIntl()
     const location = useLocation()
     const parts = location.pathname.split('/')
-    const eventId = UUID.parse(parts[3])
+    /*
+    Asserting the eventId type below, as it can be a temporary UUID in offline mode
+    */
+    const eventId = parts[3] as UUID
     const { getEvent } = useEvents()
     const { certificateTemplates, language } = useAppConfig()
     const { getUser } = useUsers()
@@ -89,7 +98,7 @@ export const AlphaPrintButton = {
     const actionsWithAnOptimisticPrintAction = [
       ...actions,
       {
-        type: DECLARATION_ACTION_UPDATE,
+        type: PRINT_DECLARATION_ACTION,
         id: getUUID(),
         transactionId: getUUID(),
         createdByUserType: 'user',
