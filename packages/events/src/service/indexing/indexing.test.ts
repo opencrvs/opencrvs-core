@@ -827,7 +827,6 @@ describe('withJurisdictionFilters', () => {
       ]
     })
 
-    console.log('result', JSON.stringify(result, null, 2))
     expect(result).toEqual({
       bool: {
         must: [baseQuery],
