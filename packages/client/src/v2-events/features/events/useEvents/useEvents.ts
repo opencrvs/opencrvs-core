@@ -93,8 +93,10 @@ export function useEvents() {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
-          refetchOnMount: 'always',
-          staleTime: 0,
+          networkMode: 'online',
+          // refetchOnMount: () => navigator.onLine,
+          // refetchOnMount: 'always',
+          // staleTime: 0,
           ...options
         })
       },
@@ -105,8 +107,9 @@ export function useEvents() {
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
-          refetchOnMount: 'always',
-          staleTime: 0,
+          networkMode: 'online',
+          // refetchOnMount: 'always',
+          // staleTime: 0,
           ...options
         }).data
       }

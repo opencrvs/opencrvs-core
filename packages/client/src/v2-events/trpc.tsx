@@ -82,6 +82,7 @@ function getQueryClient() {
     defaultOptions: {
       queries: {
         gcTime: Infinity,
+        networkMode: 'online',
         retry: 1
       },
       mutations: {
@@ -197,6 +198,10 @@ export function TRPCProvider({
   storeIdentifier?: string
   waitForClientRestored?: boolean
 }) {
+  queryClient.getQueryCache().subscribe((event) => {
+    console.log({ [event.type]: event.query })
+  })
+
   const [queriesRestored, setQueriesRestored] = React.useState(false)
 
   return (
@@ -218,7 +223,8 @@ export function TRPCProvider({
             }
 
             return mutation.state.status !== 'success'
-          }
+          },
+          shouldDehydrateQuery: () => true
         }
       }}
       onSuccess={async () => {

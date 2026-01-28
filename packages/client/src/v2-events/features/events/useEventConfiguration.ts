@@ -20,8 +20,8 @@ export function useEventConfigurations() {
   const trpc = useTRPC()
   const config = useSuspenseQuery({
     ...trpc.event.config.get.queryOptions(),
-    queryKey: trpc.event.config.get.queryKey(),
-    networkMode: 'offlineFirst'
+    queryKey: trpc.event.config.get.queryKey()
+    // networkMode: 'offlineFirst'
   }).data
 
   return config
