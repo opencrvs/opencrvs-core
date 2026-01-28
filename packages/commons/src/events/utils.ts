@@ -150,6 +150,10 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
     return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
   }
 
+  if (actionConfig.type === ActionType.CUSTOM) {
+    return actionConfig.form
+  }
+
   if ('review' in actionConfig) {
     return actionConfig.review.fields
   }
