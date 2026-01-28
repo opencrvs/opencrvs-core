@@ -88,7 +88,9 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
                  * If we are touching  `firstname` from `child____name`,
                  * we mark `child____name____firstname` as dirty
                  */
-                [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true
+                [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true,
+                // If the subfield of a parent is dirty, then parent is also dirty
+                [parentId]: true
               }),
               {}
             )
