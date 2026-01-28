@@ -181,6 +181,7 @@ function TimeInput12(props: ITimeFieldProps) {
       <TextInput
         {...otherProps}
         id={`${id}-hh`}
+        data-testid={`${otherProps['data-testid']}-hh-twelve`}
         ref={hh}
         error={Boolean(meta && meta.error)}
         isDisabled={props.disabled}
@@ -200,6 +201,7 @@ function TimeInput12(props: ITimeFieldProps) {
       <TextInput
         {...otherProps}
         id={`${id}-mm`}
+        data-testid={`${otherProps['data-testid']}-mm-twelve`}
         ref={mm}
         error={Boolean(meta && meta.error)}
         isDisabled={props.disabled}
@@ -324,6 +326,7 @@ function TimeInput24(props: ITimeFieldProps) {
       <TextInput
         {...otherProps}
         id={`${id}-hh`}
+        data-testid={`${otherProps['data-testid']}-hh-twentyfour`}
         ref={hh}
         error={Boolean(meta && meta.error)}
         isDisabled={props.disabled}
@@ -343,6 +346,7 @@ function TimeInput24(props: ITimeFieldProps) {
       <TextInput
         {...otherProps}
         id={`${id}-mm`}
+        data-testid={`${otherProps['data-testid']}-mm-twentyfour`}
         ref={mm}
         error={Boolean(meta && meta.error)}
         isDisabled={props.disabled}

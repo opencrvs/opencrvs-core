@@ -34,7 +34,7 @@ module.exports = [
       'eslint*',
       '**/*.js',
       '**/__mocks__/**/*',
-
+      'public/pdfjs/**',
       'dev-dist/**/*',
       'node_modules/**/*',
       'storybook-static/**/*'
