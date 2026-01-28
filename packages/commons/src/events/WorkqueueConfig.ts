@@ -44,10 +44,7 @@ export const mandatoryColumns = defineWorkqueuesColumns([
 ])
 
 /** Workqueue Call-to-action -button action type */
-export const CtaActionType = z.enum([
-  ...workqueueActions.options,
-  ActionType.READ
-] as const)
+export const CtaActionType = z.enum([...workqueueActions.options, ActionType.READ] as const)
 
 export type CtaActionType = z.infer<typeof CtaActionType>
 
