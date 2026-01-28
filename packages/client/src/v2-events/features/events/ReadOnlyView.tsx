@@ -34,7 +34,7 @@ import { removeCachedFiles } from '../files/cache'
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
   const events = useEvents()
-  const event = events.getEvent.viewEvent(eventId)
+  const event = events.getEvent.useGetOrDownloadEvent(eventId)
   const validatorContext = useValidatorContext(event)
 
   const maybeAuth = useAuthentication()

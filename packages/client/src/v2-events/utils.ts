@@ -133,14 +133,14 @@ export function handleDefaultValueForAddressField({
 
   if (isDynamicReference) {
     const locationKey =
-      administrativeArea.$location as keyof typeof systemVariables.$user
+      administrativeArea.$location as keyof typeof systemVariables.user
     // Resolve administrativeArea from systemVariables.$user where
     // locationKey field (ex: 'district') is pre-populated from
     // user's primary office (see useCurrentUser hook)
-    if (locationKey in systemVariables.$user) {
+    if (locationKey in systemVariables.user) {
       return {
         ...defaultValue,
-        administrativeArea: systemVariables.$user[locationKey]
+        administrativeArea: systemVariables.user[locationKey]
       }
     }
   }
@@ -205,7 +205,7 @@ export function replacePlaceholders({
 
     // @TODO: This resolves template variables in the first level of the object. In the future, we might need to extend it to arbitrary depth.
     for (const [key, val] of Object.entries(result)) {
-      if (isTemplateVariable(val) && isTextField(field)) {
+      if (val && isTemplateVariable(val) && isTextField(field)) {
         const resolvedValue = get(systemVariables, val)
         // For now, we only support resolving template variables for text fields.
         const validator = mapFieldTypeToZod(field)
@@ -403,4 +403,8 @@ export function hasStringFilename(
     'filename' in field &&
     typeof field.filename === 'string'
   )
+}
+
+export function padZero(num: number) {
+  return num.toString().padStart(2, '0')
 }
