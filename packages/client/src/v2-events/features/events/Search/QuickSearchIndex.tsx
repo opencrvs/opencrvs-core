@@ -12,7 +12,7 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
-import { mandatoryColumns } from '@opencrvs/commons/client'
+import { mandatoryColumns, ActionType } from '@opencrvs/commons/client'
 import { SearchResultComponent } from '@client/v2-events/features/events/Search/SearchResult'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -34,7 +34,7 @@ function QuickSearchComponent({ term }: { term: string }) {
 
   return (
     <SearchResultComponent
-      actions={['DEFAULT']}
+      actions={[ActionType.READ]}
       columns={mandatoryColumns}
       eventConfigs={eventConfigurations}
       queryData={queryData.results}
