@@ -20,7 +20,8 @@ SERVICES=(
   "search:9090"
   "user-mgnt:3030"
   "webhooks:2525"
-  "countryconfig:3040"
+  "countryconfig:3040",
+  "document:9050"
 )
 
 # ANSI color codes
