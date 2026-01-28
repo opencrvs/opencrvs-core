@@ -91,7 +91,7 @@ export const DirectsCreatedToDeclare: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.READ}
                     event={createdEvent.eventQueryData}
                   />
                 </div>
@@ -162,7 +162,7 @@ export const DirectsNotifiedToEdit: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.READ}
                     event={notifiedEvent.eventQueryData}
                   />
                 </div>
@@ -236,7 +236,7 @@ export const directsRegisteredToPrint: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.READ}
                     event={registeredEvent.eventQueryData}
                   />
                 </div>

@@ -95,7 +95,7 @@ export const DirectsRejectedNotifiedToEdit: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.READ}
                     event={rejectedNotifiedEvent.eventQueryData}
                   />
                 </div>
@@ -167,7 +167,7 @@ export const DirectsRejectedDeclaredToEdit: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.READ}
                     event={rejectedDeclaredEvent.eventQueryData}
                   />
                 </div>
