@@ -162,7 +162,7 @@ export const DirectsNotifiedToEdit: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={ActionType.READ}
+                    actionType={ActionType.EDIT}
                     event={notifiedEvent.eventQueryData}
                   />
                 </div>
