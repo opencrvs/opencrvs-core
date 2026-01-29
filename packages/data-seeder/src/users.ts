@@ -14,7 +14,7 @@ import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
-import { EventConfig, joinUrl } from '@opencrvs/commons'
+import { decodeScope, EventConfig, joinUrl } from '@opencrvs/commons'
 import {
   parseLiteralScope,
   parseConfigurableScope
@@ -38,8 +38,13 @@ const RoleSchema = (eventIds: string[]) =>
         z.string().superRefine((scope, ctx) => {
           const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedLiteralScope = parseLiteralScope(scope)
+          const parsedV2Scopes = decodeScope(scope)
 
-          if (!parsedConfigurableScope && !parsedLiteralScope) {
+          if (
+            !parsedConfigurableScope &&
+            !parsedLiteralScope &&
+            !parsedV2Scopes
+          ) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
@@ -47,8 +52,8 @@ const RoleSchema = (eventIds: string[]) =>
             return
           }
 
-          if (parsedConfigurableScope?.type === 'search') {
-            const options = parsedConfigurableScope.options
+          if (parsedV2Scopes?.type === 'record.search') {
+            const options = parsedV2Scopes.options
             const invalidEventIds = options.event.filter(
               (id) => !eventIds.includes(id)
             )
