@@ -91,7 +91,7 @@ export const DirectsCreatedToDeclare: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={ActionType.READ}
+                    actionType={ActionType.DECLARE}
                     event={createdEvent.eventQueryData}
                   />
                 </div>
@@ -236,7 +236,7 @@ export const directsRegisteredToPrint: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={ActionType.READ}
+                    actionType={ActionType.PRINT_CERTIFICATE}
                     event={registeredEvent.eventQueryData}
                   />
                 </div>
