@@ -118,38 +118,27 @@ export const FieldConfigSchema = BaseField.extend({
 })
 
 /**
- * The event fields that are available for advanced search. These are the values
- * that can be passed to the `event` function to create a field config.
- */
-export const EventFieldIdInput = z.enum([
-  'trackingId',
-  'status',
-  'legalStatuses.REGISTERED.acceptedAt',
-  'legalStatuses.REGISTERED.createdAtLocation',
-  'legalStatuses.REGISTERED.registrationNumber',
-  'updatedAt'
-])
-
-/**
  * Represent the prefix used to differentiate event metadata fields from
  * the declaration ones in advanced search form.
  */
 export const METADATA_FIELD_PREFIX = 'event.'
 
 /**
- * The field IDs that are actually used in the advanced search. The `event`
- * function prefixes the `EventFieldIdInput` values with METADATA_FIELD_PREFIX.
+ * The event fields that are available for advanced search. These are the values
+ * that can be passed to the `event` function to create a field config.
  */
-export const EventFieldId = z.enum([
-  `${METADATA_FIELD_PREFIX}trackingId`,
-  `${METADATA_FIELD_PREFIX}status`,
-  `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.acceptedAt`,
-  `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.createdAtLocation`,
-  `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.registrationNumber`,
-  `${METADATA_FIELD_PREFIX}updatedAt`
-])
+export const EventFieldId = z
+  .enum([
+    'trackingId',
+    'status',
+    'legalStatuses.REGISTERED.acceptedAt',
+    'legalStatuses.REGISTERED.createdAtLocation',
+    'legalStatuses.REGISTERED.registrationNumber',
+    'updatedAt'
+  ])
+  .transform((val) => `${METADATA_FIELD_PREFIX}${val}` as const)
 
-export type EventFieldIdInput = z.infer<typeof EventFieldIdInput>
+export type EventFieldIdInput = z.input<typeof EventFieldId>
 export type EventFieldId = z.infer<typeof EventFieldId>
 
 export const EventFieldConfigSchema = BaseField.extend({
