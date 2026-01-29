@@ -10,7 +10,7 @@
 ```ts
 field('mother.dob').dateRangeMatches({
   days: 365,
-  matchAgainst: 'mother.age'
+  matchAgainst: { $$field: 'mother.age' }
 })
 ```
 
