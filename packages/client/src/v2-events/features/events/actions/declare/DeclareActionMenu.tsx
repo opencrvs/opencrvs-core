@@ -53,6 +53,7 @@ import { useEventConfiguration } from '../../useEventConfiguration'
  *   - Delete declaration
  */
 function useDeclarationActions(event: EventDocument) {
+  const intl = useIntl()
   const eventType = event.type
   const drafts = useDrafts()
   const {
@@ -154,6 +155,7 @@ function useDeclarationActions(event: EventDocument) {
             title: action.title,
             onConfirm: actionLabels[actionType]
           }}
+          eventType={intl.formatMessage(eventConfiguration.label)}
         />
       )
     })
