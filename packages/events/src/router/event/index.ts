@@ -14,7 +14,6 @@ import {
   getScopes,
   getUUID,
   SCOPES,
-  UUID,
   findScope,
   RecordScopeV2
 } from '@opencrvs/commons'
@@ -120,9 +119,18 @@ export const eventRouter = router({
         config
       })
     }),
-  get: userOnlyProcedure
-    .input(UUID)
-    // @ts-expect-error: middleware.userCanReadEvent does not have proper type definitions but works as intended
+  get: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Fetch full event document',
+        method: 'GET',
+        path: '/events/{eventId}',
+        tags: ['events'],
+        protect: true
+      }
+    })
+    .input(EventIdParam)
+    .output(EventDocument)
     .use(middleware.userCanReadEventV2)
     .query(async ({ ctx }) => {
       const { eventId, eventType } = ctx

@@ -310,7 +310,7 @@ describe('event.actions.notify', () => {
       const { user } = await setupTestCase()
       client = createTestClient(user)
 
-      const fetchedEvent = await client.event.get(event.id)
+      const fetchedEvent = await client.event.get({eventId: event.id})
       expect(fetchedEvent.actions.length).toEqual(4)
       expect(fetchedEvent.actions).toEqual([
         expect.objectContaining({ type: ActionType.CREATE }),
