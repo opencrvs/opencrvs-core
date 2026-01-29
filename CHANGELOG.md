@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.9.7
+
+### New features
+
+- In deduplication, the dateRange matcher now supports both `AGE` and `DATE` field.
+- The dateRange matcher supports a new `matchAgainst` option, which can reference either a date field or an age field. When provided, the matcher compares the source field against the specified `matchAgainst` field instead of only matching against itself.
+
+```ts
+field('mother.dob').dateRangeMatches({
+  days: 365,
+  matchAgainst: { $$field: 'mother.age' }
+})
+```
+
 ## 1.9.6
 
 ### New features
