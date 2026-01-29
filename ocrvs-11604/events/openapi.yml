@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: ccb9d290-c11c-4aa0-bea0-33b9a3e41e7c
+                transactionId: b51f0c72-38e2-43b7-8e62-e58e4face23f
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: f37851e1-477e-4b67-b82d-ad0a865727e2
+                transactionId: c74d7069-6df2-4460-a1c6-8817e341ba94
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2260,15 +2260,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -2518,15 +2509,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -2701,15 +2683,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -2869,15 +2842,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -3063,15 +3027,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -3237,15 +3192,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -3417,15 +3363,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -3580,15 +3517,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -3746,15 +3674,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -3926,15 +3845,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -4104,15 +4014,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -4283,15 +4184,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -4467,15 +4359,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -4639,15 +4522,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -4795,15 +4669,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -4992,15 +4857,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -5169,6 +5025,15 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                hideSubFieldError:
+                  type: boolean
+                  default: false
+                  description: >-
+                    If true, hides the field's validation error message. Useful
+                    for composite components like ADDRESS or NAME where errors
+                    are shown at the sub-field level instead of the parent 
+                            field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
+                            validation error messages.
               default:
                 name:
                   firstname:
@@ -5270,15 +5135,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -5426,15 +5282,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -5582,15 +5429,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -5739,15 +5577,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -5960,15 +5789,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -6116,15 +5936,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -6293,15 +6104,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -6446,15 +6248,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -6616,15 +6409,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -6772,15 +6556,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -6928,15 +6703,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -7106,15 +6872,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -7270,15 +7027,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -7494,15 +7242,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -7699,15 +7438,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -7870,15 +7600,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -8036,15 +7757,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -8274,15 +7986,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -8444,15 +8147,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -8619,15 +8313,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -8782,15 +8467,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -8940,16 +8616,6 @@ components:
                       hideLabel:
                         type: boolean
                         default: false
-                      hideErrorLabel:
-                        type: boolean
-                        default: false
-                        description: >-
-                          If true, hides the field's validation error message.
-                          Useful for composite components like ADDRESS or NAME
-                          where errors are shown at the sub-field level instead
-                          of the parent 
-                                  field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                                  validation error messages.
                       uncorrectable:
                         type: boolean
                         default: false
@@ -9110,16 +8776,6 @@ components:
                       hideLabel:
                         type: boolean
                         default: false
-                      hideErrorLabel:
-                        type: boolean
-                        default: false
-                        description: >-
-                          If true, hides the field's validation error message.
-                          Useful for composite components like ADDRESS or NAME
-                          where errors are shown at the sub-field level instead
-                          of the parent 
-                                  field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                                  validation error messages.
                       uncorrectable:
                         type: boolean
                         default: false
@@ -9292,15 +8948,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -9457,15 +9104,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
@@ -9621,15 +9259,6 @@ components:
             hideLabel:
               type: boolean
               default: false
-            hideErrorLabel:
-              type: boolean
-              default: false
-              description: >-
-                If true, hides the field's validation error message. Useful for
-                composite components like ADDRESS or NAME where errors are shown
-                at the sub-field level instead of the parent 
-                        field level. When enabled, errors are hidden at the composite component level on the form page but remain visible on the review page. It doesn't interfere with the sub-field's 
-                        validation error messages.
             uncorrectable:
               type: boolean
               default: false
