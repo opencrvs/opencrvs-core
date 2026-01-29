@@ -485,13 +485,18 @@ function isRequestedAction(a: Action): a is ActionDocument {
 function isAcceptedAction(a: Action): a is ActionDocument {
   return a.status === ActionStatus.Accepted
 }
+function isRejectedAction(a: Action): a is ActionDocument {
+  return a.status === ActionStatus.Rejected
+}
 
 export function getPendingAction(actions: Action[]): ActionDocument {
   const requestedActions = actions.filter(isRequestedAction)
   const pendingActions = requestedActions.filter(
     ({ id }) =>
       !actions.some(
-        (action) => isAcceptedAction(action) && action.originalActionId === id
+        (action) =>
+          (isAcceptedAction(action) || isRejectedAction(action)) &&
+          action.originalActionId === id
       )
   )
 
