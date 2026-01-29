@@ -33,7 +33,9 @@ import {
   InteractiveFieldType,
   FieldConfig,
   TextField,
+  findV2Scope,
   DefaultAddressFieldValue,
+  ACTION_SCOPE_MAP_V2,
   AdministrativeArea,
   ActionType
 } from '@opencrvs/commons/client'
@@ -287,11 +289,26 @@ export function hasOutboxWorkqueue(scopes: Scope[]) {
   const hasConfigurableActionScopes = parsedScopes.some(
     (scope) => ConfigurableActionScopes.safeParse(scope).success
   )
-  return hasLiteralActionScopes || hasConfigurableActionScopes
+
+  const hasV2ActionScopes = Object.values(ACTION_SCOPE_MAP_V2).some(
+    (actionScopes) =>
+      actionScopes === null ||
+      actionScopes.some((actionScope) =>
+        Boolean(findV2Scope(scopes, actionScope))
+      )
+  )
+
+  return (
+    hasLiteralActionScopes || hasConfigurableActionScopes || hasV2ActionScopes
+  )
 }
 
 export function hasDraftWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => scope.startsWith('record.declare'))
+  const hasDeclareScope = scopes.some((scope) =>
+    scope.startsWith('record.declare')
+  )
+  const hasV2DeclareScope = Boolean(findV2Scope(scopes, 'record.declare'))
+  return hasDeclareScope || hasV2DeclareScope
 }
 
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {

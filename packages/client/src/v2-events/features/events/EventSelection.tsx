@@ -22,7 +22,11 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { ActionType, isActionInScope } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  isActionInScope,
+  findV2Scope
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 
 import { createTemporaryId } from '@client/v2-events/utils'
@@ -82,8 +86,13 @@ function EventSelector() {
   const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
 
-  const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
-    isActionInScope(scopes, ActionType.CREATE, id)
+  const v2AllowedEvents =
+    findV2Scope(scopes, 'record.create')?.options?.event ?? []
+
+  const allowedEventConfigurations = eventConfigurations.filter(
+    ({ id }) =>
+      isActionInScope(scopes, ActionType.CREATE, id) ||
+      v2AllowedEvents.includes(id)
   )
 
   function handleContinue() {

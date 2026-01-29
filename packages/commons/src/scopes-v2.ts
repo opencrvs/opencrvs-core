@@ -10,12 +10,13 @@
  */
 
 import * as z from 'zod/v4'
-import * as qs from 'qs'
 import {
   ConfigurableScopeType,
+  decodeScope,
+  encodeScope,
   parseConfigurableScope,
   parseLiteralScope
-} from './authentication'
+} from './scopes'
 import { UUID } from './uuid'
 
 /*
@@ -40,6 +41,7 @@ export const RecordAction = z.enum([
   'record.create',
   'record.read',
   'record.declare',
+  'record.edit',
   'record.notify',
   'record.validate',
   'record.reject',
@@ -51,6 +53,7 @@ export const RecordAction = z.enum([
   'record.correct',
   'record.unassign-others'
 ])
+export type RecordAction = z.infer<typeof RecordAction>
 
 export const ResolvedRecordScopeV2 = z
   .object({
@@ -92,51 +95,7 @@ export const RecordScopeV2 = z
   )
 
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
-
-/**
- * Generic scope structure that can represent any scope.
- * Used for encoding/decoding scopes to/from strings.
- * We can then later refine to more specific scope types as needed.
- */
-export const AnyScope = z.object({
-  type: z.string(),
-  options: z
-    .record(z.string(), z.string().or(z.array(z.string()).or(z.undefined())))
-    .optional()
-})
-export type AnyScope = z.infer<typeof AnyScope>
-
-const flattenScope = (scope: AnyScope) => ({
-  type: scope.type,
-  ...scope.options
-})
-
-const unflattenScope = (input: Record<string, unknown>) => {
-  const { type, ...options } = input
-  return { type, options }
-}
-
-export const encodeScope = (scope: AnyScope): string => {
-  const flattened = flattenScope(scope)
-
-  return qs.stringify(flattened, {
-    arrayFormat: 'comma',
-    allowDots: true,
-    addQueryPrefix: false,
-    encode: false
-  })
-}
-
-export const decodeScope = (query: string) => {
-  const scope = qs.parse(query, {
-    ignoreQueryPrefix: true,
-    comma: true,
-    allowDots: true
-  })
-
-  const unflattenedScope = unflattenScope(scope)
-  return AnyScope.safeParse(unflattenedScope)?.data
-}
+export type RecordScopeV2Options = z.infer<typeof RecordScopeV2>['options']
 
 type LegacyScopeType = ConfigurableScopeType
 
@@ -211,4 +170,14 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
     })
   }
   throw new Error(`Unsupported V1 scope type: ${v1Scope}`)
+}
+
+export const findV2Scope = (scopes: string[], type: string) => {
+  return scopes
+    .map((scope) => decodeScope(scope))
+    .find((scope) => scope?.type === type)
+}
+
+export const getV2Workqueues = (scopes: string[]) => {
+  return findV2Scope(scopes, 'workqueue')?.options?.id ?? []
 }

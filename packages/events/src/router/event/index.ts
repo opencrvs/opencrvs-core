@@ -103,7 +103,11 @@ export const eventRouter = router({
         protect: true
       }
     })
-    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.CREATE]))
+    .use(
+      requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.CREATE], [
+        'record.create'
+      ])
+    )
     .input(EventInput)
     .use(middleware.eventTypeAuthorization)
     .output(EventDocument)
