@@ -25,6 +25,7 @@ import {
   PrintCertificateActionInput,
   DeclareActionInput,
   ACTION_SCOPE_MAP,
+  ACTION_SCOPE_MAP_V2,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
@@ -337,7 +338,8 @@ export function getDefaultActionProcedures(
 
   const requireScopesForRequestMiddleware = requiresAnyOfScopes(
     [],
-    ACTION_SCOPE_MAP[actionType]
+    ACTION_SCOPE_MAP[actionType],
+    ACTION_SCOPE_MAP_V2[actionType]
   )
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}

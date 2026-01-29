@@ -44,7 +44,7 @@ export default async function getForm(
       `Core failed to fetch form definition from ${url.href}. Check country config logs for more details`
     )
 
-    return h.response().code(500)
+    return h.response([]).code(200)
   }
 
   const forms: IFormsPayload = await response.json()

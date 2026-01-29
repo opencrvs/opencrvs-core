@@ -30,7 +30,8 @@ import { searchForDuplicates } from '@events/service/deduplication/deduplication
 export function declareActionProcedures() {
   const requireScopesMiddleware = requiresAnyOfScopes(
     [],
-    ACTION_SCOPE_MAP[ActionType.DECLARE]
+    ACTION_SCOPE_MAP[ActionType.DECLARE],
+    ['record.declare']
   )
 
   return {

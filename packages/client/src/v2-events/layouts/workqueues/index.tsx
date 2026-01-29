@@ -16,7 +16,11 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
-import { ActionType, isActionInScope } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  isActionInScope,
+  findV2Scope
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
@@ -33,9 +37,14 @@ export function DesktopCenter() {
   const { createNewDeclaration } = useEventFormNavigation()
   const scopes = useSelector(getScope) ?? []
 
+  const v2AllowedEvents =
+    findV2Scope(scopes, 'record.create')?.options?.event ?? []
+
   const eventConfigurations = useEventConfigurations()
-  const mayCreateEvents = eventConfigurations.some(({ id }) =>
-    isActionInScope(scopes, ActionType.CREATE, id)
+  const mayCreateEvents = eventConfigurations.some(
+    ({ id }) =>
+      isActionInScope(scopes, ActionType.CREATE, id) ||
+      v2AllowedEvents.includes(id)
   )
 
   return (
@@ -74,7 +83,9 @@ export function WorkqueueLayout({
 
   const scopes = useSelector(getScope) ?? []
 
-  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
+  const hasSearchScope =
+    scopes.some((scope) => scope.startsWith('search')) ||
+    Boolean(findV2Scope(scopes, 'record.search'))
 
   return (
     <Frame

@@ -13,9 +13,11 @@ import {
   findScope,
   parseConfigurableScope,
   parseLiteralScope,
-  SCOPES
+  SCOPES,
+  decodeScope,
+  encodeScope
 } from './scopes'
-import { decodeScope, encodeScope, v1ScopeToV2Scope } from './scopes-v2'
+import { v1ScopeToV2Scope } from './scopes-v2'
 
 describe('findScope()', () => {
   const userScopes = [

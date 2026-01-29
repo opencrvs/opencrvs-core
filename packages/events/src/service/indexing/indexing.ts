@@ -544,20 +544,35 @@ const MsearchResponseSchema = z.object({
   })
 })
 
-export async function getEventCount(
-  queries: WorkqueueCountInput,
-  eventConfigs: EventConfig[],
-  options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined
-) {
+export async function getEventCount({
+  queries,
+  eventConfigs,
+  options,
+  acceptedScopes,
+  user
+}: {
+  queries: WorkqueueCountInput
+  eventConfigs: EventConfig[]
+  options?: Record<string, SearchScopeAccessLevels>
+  acceptedScopes?: RecordScopeV2[]
+  user: TrpcUserContext
+}) {
   const esClient = getOrCreateClient()
 
   const esQueries = queries.map(async (query) =>
     buildElasticQueryFromSearchPayload(query.query, eventConfigs)
   )
+  const resolvedScopes = acceptedScopes?.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
+  )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters({ query, options, userOfficeId })
+    withJurisdictionFilters({
+      query,
+      options,
+      userOfficeId: user.primaryOfficeId,
+      scopesV2: resolvedScopes
+    })
   )
   const { responses } = await esClient.msearch({
     searches: filteredQueries.flatMap((query) => [
