@@ -25,7 +25,8 @@ const Matcher = z.object({
   fieldId: FieldReference,
   options: z
     .object({
-      boost: z.number().optional()
+      boost: z.number().optional(),
+      matchAgainst: FieldReference.optional()
     })
     .optional()
     .default({
@@ -46,7 +47,8 @@ const FuzzyMatcher = Matcher.extend({
         .union([z.string(), z.number()])
         .optional()
         .default('AUTO:4,7'),
-      boost: z.number().optional().default(1)
+      boost: z.number().optional().default(1),
+      matchAgainst: FieldReference.optional()
     })
     .optional()
     .default({
@@ -65,7 +67,8 @@ const StrictMatcher = Matcher.extend({
       /**
        * The constant value to be present in the field for both records
        */
-      value: z.string().optional()
+      value: z.string().optional(),
+      matchAgainst: FieldReference.optional()
     })
     .optional()
     .default({
@@ -84,7 +87,8 @@ const DateRangeMatcher = Matcher.extend({
      */
     pivot: z.number().optional(),
     days: z.number(),
-    boost: z.number().optional().default(1)
+    boost: z.number().optional().default(1),
+    matchAgainst: FieldReference.optional()
   })
 })
 
