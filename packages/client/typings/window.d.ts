@@ -61,6 +61,7 @@ interface Window {
     SENTRY: string
     DASHBOARDS: Array<{
       id: string
+      origin: string
       title: {
         id: string
         defaultMessage: string
