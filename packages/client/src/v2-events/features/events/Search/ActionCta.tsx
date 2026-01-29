@@ -14,8 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import {
   EventIndex,
-  WorkqueueActionsWithDefault,
-  isMetaAction,
+  CtaActionType,
   getOrThrow,
   ActionType
 } from '@opencrvs/commons/client'
@@ -45,7 +44,7 @@ function ActionCtaComponent({
   redirectParam
 }: {
   event: EventIndex
-  actionType: WorkqueueActionsWithDefault
+  actionType: CtaActionType
   redirectParam?: string
 }) {
   const intl = useIntl()
@@ -57,12 +56,7 @@ function ActionCtaComponent({
   const navigate = useNavigate()
 
   const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
-
-  const config =
-    actionType === 'DEFAULT'
-      ? allowedActionConfigs.find(({ type }) => !isMetaAction(type))
-      : // If action type is not allowed, we don't provide it.
-        allowedActionConfigs.find((item) => item.type === actionType)
+  const config = allowedActionConfigs.find((item) => item.type === actionType)
 
   if (!config || actionType === ActionType.READ) {
     return (

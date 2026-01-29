@@ -20,6 +20,11 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 - **events-service location APIs changes**
   Administrative areas (v1 `locationType: 'ADMIN_STRUCTURE'`) are exposed from a separate endpoint. See the [definition of the administrative hierarchy](/ADMINISTRATIVE-HIERARCHY.md) 2.0.0 onwards.
 
+#### Workqueue configurations
+
+- The `'DEFAULT'` value is no longer supported in workqueue configuration under `actions: [{ type: CtaActionType }]`. Please ensure you specify a valid `CtaActionType` (see [WorkqueueConfig.ts](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/commons/src/events/WorkqueueConfig.ts)).
+- The `conditionals` option has been removed from workqueue configuration under `actions`. This option was previously present but had no effect.
+
 ### New features
 
 #### HTTP Input
