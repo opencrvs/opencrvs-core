@@ -12,7 +12,6 @@ import { defineConfig } from '../events/defineConfig'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
-import { field } from '../events/field'
 import { event } from '../events/event'
 import {
   PRINT_CERTIFICATE_FORM,
@@ -370,10 +369,10 @@ export const footballClubMembershipEvent = defineConfig({
         id: 'advancedSearch.form.registrationDetails'
       },
       fields: [
-        event('legalStatuses.REGISTERED.createdAtLocation').exact(),
-        event('legalStatuses.REGISTERED.acceptedAt').range(),
-        event('status').exact(),
-        event('updatedAt').range()
+        event.metadata('legalStatuses.REGISTERED.createdAtLocation').exact(),
+        event.metadata('legalStatuses.REGISTERED.acceptedAt').range(),
+        event.metadata('status').exact(),
+        event.metadata('updatedAt').range()
       ]
     },
     {
@@ -383,9 +382,9 @@ export const footballClubMembershipEvent = defineConfig({
         id: 'event.football-club-membership.search.applicants'
       },
       fields: [
-        field('applicant.name').fuzzy(),
-        field('applicant.dob').range(),
-        field('applicant.email').exact()
+        event.declarationField('applicant.name').fuzzy(),
+        event.declarationField('applicant.dob').range(),
+        event.declarationField('applicant.email').exact()
       ]
     },
     {
@@ -394,7 +393,7 @@ export const footballClubMembershipEvent = defineConfig({
         description: 'Recommender details search field section title',
         id: 'event.football-club-membership.search.recommender'
       },
-      fields: [field('recommender.name').fuzzy()]
+      fields: [event.declarationField('recommender.name').fuzzy()]
     }
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM

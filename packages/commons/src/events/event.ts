@@ -13,6 +13,7 @@ import { defineConditional } from '../conditionals/conditionals'
 import { createEventFieldConfig } from '../event-config/event-configuration'
 import { ActionType } from './ActionType'
 import { EventFieldIdInput } from './AdvancedSearchConfig'
+import { field } from './field'
 import {
   WorkqueueColumnKeys,
   WorkqueueColumnValue
@@ -21,9 +22,9 @@ import {
 /**
  * Creates a function that acts like a callable + static method container.
  *
- * @example
- * event('status') // → returns search config
- * event.hasAction('CLICKED') // → returns conditional
+ * @deprecated
+ * This function is deprecated and will be removed in future releases.
+ * Please use `event.metadata` instead.
  */
 function eventFn(fieldId: EventFieldIdInput) {
   return createEventFieldConfig(fieldId)
@@ -158,6 +159,24 @@ const event = Object.assign(eventFn, {
     return {
       $event: field
     }
+  },
+  /**
+   * Entry point for defining conditional logic or configuration for a form field.
+   * @param fieldId - The ID of the field to define rules or config for.
+   * @returns An object combining conditional methods and configuration builders.
+   */
+  declarationField: (
+    fieldId: string,
+    options?: Parameters<typeof field>[1]
+  ) => {
+    return field(fieldId, options)
+  },
+  /**
+   * @example
+   * event.metadata('status') // → returns search config
+   */
+  metadata(fieldId: EventFieldIdInput) {
+    return createEventFieldConfig(fieldId)
   }
 })
 
