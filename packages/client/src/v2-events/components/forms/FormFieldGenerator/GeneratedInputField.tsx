@@ -129,6 +129,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   onBlur: (e: React.FocusEvent) => void
   value: FieldValue
   touched: boolean
+  setFieldTouched: (fieldId: string, touched: boolean) => void
   /**
    * Errors are rendered only when both error and touched are truthy
    */
@@ -149,6 +150,7 @@ export const GeneratedInputField = React.memo(
     onBatchFieldValueChange,
     error,
     touched,
+    setFieldTouched,
     allKnownFields,
     value,
     form,
@@ -660,10 +662,11 @@ export const GeneratedInputField = React.memo(
             error={inputFieldProps.error}
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
+            setFieldTouched={() => setFieldTouched(inputFieldProps.id, true)}
+            onChange={handleFileWithOptionChange}
             options={field.config.options}
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
-            onChange={handleFileWithOptionChange}
           />
         </InputField>
       )

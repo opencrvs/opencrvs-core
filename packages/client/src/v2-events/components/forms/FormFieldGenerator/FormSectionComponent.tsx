@@ -465,6 +465,12 @@ export function FormSectionComponent({
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}
+                  setFieldTouched={(fieldId: string, isTouched: boolean) => {
+                    const updatedTouched = cloneDeep(touched)
+                    set(updatedTouched, fieldId, isTouched)
+                    void setTouched(updatedTouched)
+                    void setAllTouchedFields(updatedTouched)
+                  }}
                   touched={
                     /**
                      * We check the full path so that,

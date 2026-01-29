@@ -78,6 +78,7 @@ function DocumentUploaderWithOption({
   hideOnEmptyOption,
   autoSelectOnlyOption,
   maxFileSize,
+  setFieldTouched,
   maxImageSize
 }: {
   name: string
@@ -91,6 +92,7 @@ function DocumentUploaderWithOption({
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number
+  setFieldTouched: () => void
   maxImageSize?: FileUploadWithOptions['configuration']['maxImageSize']
 }) {
   const intl = useIntlWithFormData()
@@ -221,7 +223,7 @@ function DocumentUploaderWithOption({
     setSelectedOption(remainingOptions[0].value)
   }
 
-  const errorMessage = error || unselectedOptionError || fileChangeError || ''
+  const errorMessage = unselectedOptionError || fileChangeError || ''
 
   return (
     <UploadWrapper>
@@ -250,6 +252,7 @@ function DocumentUploaderWithOption({
             type={'SELECT'}
             value={selectedOption}
             onChange={(val) => {
+              setFieldTouched()
               setSelectedOption(val)
               setUnselectedOptionError('')
             }}
