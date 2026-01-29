@@ -231,43 +231,6 @@ describe('event.actions.notify', () => {
 
       const locations = await dataSeedingClient.locations.list()
 
-      const client = createSystemTestClient('test-system', [
-        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
-      ])
-
-      const event = await client.event.create(generator.event.create())
-
-      const payload = generator.event.actions.notify(event.id)
-
-      // Should throw error since createdAtLocation is not given
-      await expect(
-        client.event.actions.notify.request(payload)
-      ).rejects.toMatchSnapshot()
-
-      // Should throw error since given createdAtLocation is not an uuid
-      await expect(
-        client.event.actions.notify.request({
-          ...payload,
-          createdAtLocation: 'foobar'
-        })
-      ).rejects.toMatchSnapshot()
-
-      // Should throw error since given createdAtLocation is not a valid location
-      await expect(
-        client.event.actions.notify.request({
-          ...payload,
-          createdAtLocation: getUUID()
-        })
-      ).rejects.toMatchSnapshot()
-
-      await expect(
-        client.event.actions.notify.request({
-          ...payload,
-          createdAtLocation: administrativeAreaId
-        })
-      ).rejects.toMatchSnapshot()
-
       const childLocation = locations.find(
         (l) => l.administrativeAreaId === administrativeAreaId
       )
@@ -276,9 +239,49 @@ describe('event.actions.notify', () => {
         throw new Error('Child location not found')
       }
 
+      const systemClient = createSystemTestClient('test-system', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      ])
+
+      const event = await systemClient.event.create({
+        ...generator.event.create(),
+        createdAtLocation: childLocation.id
+      })
+
+      const payload = generator.event.actions.notify(event.id)
+
+      // Should throw error since createdAtLocation is not given
+      await expect(
+        systemClient.event.actions.notify.request(payload)
+      ).rejects.toMatchSnapshot()
+
+      // Should throw error since given createdAtLocation is not an uuid
+      await expect(
+        systemClient.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: 'foobar'
+        })
+      ).rejects.toMatchSnapshot()
+
+      // Should throw error since given createdAtLocation is not a valid location
+      await expect(
+        systemClient.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: getUUID()
+        })
+      ).rejects.toMatchSnapshot()
+
+      await expect(
+        systemClient.event.actions.notify.request({
+          ...payload,
+          createdAtLocation: administrativeAreaId
+        })
+      ).rejects.toMatchSnapshot()
+
       // should succeed, since it is a valid location id
       await expect(
-        client.event.actions.notify.request({
+        systemClient.event.actions.notify.request({
           ...payload,
           createdAtLocation: childLocation.id
         })
@@ -293,14 +296,16 @@ describe('event.actions.notify', () => {
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
-      const event = await client.event.create(generator.event.create())
+      const locations = await getLocations()
+      const event = await client.event.create({
+        ...generator.event.create(),
+        createdAtLocation: locations[3].id
+      })
 
       client = createSystemTestClient('test-system-2', [
         `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
         `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
-
-      const locations = await getLocations()
 
       await client.event.actions.notify.request({
         ...generator.event.actions.notify(event.id),
@@ -346,7 +351,7 @@ describe('event.actions.notify', () => {
   })
 
   test('System client receives error for malformed input', async () => {
-    const { user, generator } = await setupTestCase()
+    const { user, generator, locations } = await setupTestCase()
 
     let client = createTestClient(user)
 
@@ -355,7 +360,10 @@ describe('event.actions.notify', () => {
       `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
     ])
 
-    const event = await client.event.create(generator.event.create())
+    const event = await client.event.create({
+      ...generator.event.create(),
+      createdAtLocation: locations[0].id
+    })
     await expect(
       client.event.actions.notify.request({
         eventId: event.id,

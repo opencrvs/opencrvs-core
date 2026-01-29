@@ -12,9 +12,7 @@
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import {
-  findScope,
-  getScopes,
-  SearchScopeAccessLevels,
+  RecordScopeV2,
   WorkqueueConfig,
   WorkqueueCountInput,
   WorkqueueCountOutput
@@ -25,7 +23,10 @@ import {
   getInMemoryWorkqueueConfigurations
 } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
-import { requireScopeForWorkqueues } from '@events/router/middleware'
+import {
+  requiresAnyOfScopes,
+  requireScopeForWorkqueues
+} from '@events/router/middleware'
 
 export const workqueueRouter = router({
   config: router({
@@ -39,24 +40,18 @@ export const workqueueRouter = router({
   count: userOnlyProcedure
     .input(WorkqueueCountInput)
     .use(requireScopeForWorkqueues)
+    .use(requiresAnyOfScopes([], undefined, ['record.search']))
     .output(WorkqueueCountOutput)
     .query(async ({ ctx, input }) => {
-      const scopes = getScopes(ctx.token)
-      const searchScope = findScope(scopes, 'search')
-      // Only to satisfy type checking, as findScope will return undefined if no scope is found
-      if (!searchScope) {
+      if (!ctx.acceptedScopes) {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
-      const searchScopeOptions = searchScope.options as Record<
-        string,
-        SearchScopeAccessLevels
-      >
 
-      return getEventCount(
-        input,
-        await getInMemoryEventConfigurations(ctx.token),
-        searchScopeOptions,
-        ctx.user.primaryOfficeId
-      )
+      return getEventCount({
+        queries: input,
+        user: ctx.user,
+        eventConfigs: await getInMemoryEventConfigurations(ctx.token),
+        acceptedScopes: ctx.acceptedScopes as RecordScopeV2[]
+      })
     })
 })

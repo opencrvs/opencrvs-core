@@ -450,6 +450,12 @@ function getLocationIdsFromScopeOptions(
   throw new Error(`Unknown jurisdiction filter: ${filter}`)
 }
 
+/**
+ *
+ * @param scope V2 scope
+ * @param user User context
+ * @returns Resolves location-based scope options to actual IDs based on user context.
+ */
 export function resolveRecordActionScopeToIds(
   scope: RecordScopeV2,
   user: TrpcUserContext

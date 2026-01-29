@@ -16,7 +16,11 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
-import { ActionType, isActionInScope } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  getAcceptedScopesByType,
+  isActionInScope
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
@@ -74,7 +78,11 @@ export function WorkqueueLayout({
 
   const scopes = useSelector(getScope) ?? []
 
-  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
+  const hasSearchScope =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.search'],
+      scopes
+    }).length > 0
 
   return (
     <Frame
