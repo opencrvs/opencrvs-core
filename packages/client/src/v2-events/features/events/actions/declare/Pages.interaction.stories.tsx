@@ -314,7 +314,7 @@ export const DraftShownInForm: Story = {
 
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
 
-    await userEvent.click(await canvas.findByText(/Declare/))
+    await userEvent.click(await canvas.findByText(/Update/))
   }
 }
 
