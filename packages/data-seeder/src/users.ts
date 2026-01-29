@@ -54,15 +54,18 @@ const RoleSchema = (eventIds: string[]) =>
 
           if (parsedV2Scopes?.type === 'record.search') {
             const options = parsedV2Scopes.options
-            const invalidEventIds = options.event.filter(
-              (id) => !eventIds.includes(id)
-            )
 
-            if (invalidEventIds.length > 0) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-              })
+            if (options?.event && Array.isArray(options.event)) {
+              const invalidEventIds = options.event.filter(
+                (id) => !eventIds.includes(id)
+              )
+
+              if (invalidEventIds.length > 0) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
+                })
+              }
             }
           }
         })
