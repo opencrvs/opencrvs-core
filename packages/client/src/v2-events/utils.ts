@@ -311,7 +311,7 @@ export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  actions: [{ type: ActionType.READ }],
+  actions: [{ type: ActionType.DECLARE }],
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }

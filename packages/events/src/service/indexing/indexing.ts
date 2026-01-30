@@ -26,7 +26,6 @@ import {
   getDeclarationFields,
   WorkqueueCountInput,
   getEventConfigById,
-  SearchScopeAccessLevels,
   SearchQuery,
   DateRangeField,
   SelectDateRangeField
@@ -369,6 +368,7 @@ export async function indexEventsInBulk(
     batch.map(async (doc) => {
       const config = getEventConfigById(configs, doc.type)
       const eventIndex = eventToEventIndex(doc, config)
+
       const eventIndexWithLocationHierarchy =
         await getEventIndexWithAdministrativeHierarchy(
           config,
@@ -391,6 +391,7 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
   const eventIndex = eventToEventIndex(event, config)
+
   const eventIndexWithAdministrativeHierarchy =
     await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
   return esClient.index<EventIndexWithAdministrativeHierarchy>({
@@ -466,28 +467,24 @@ export async function getIndexedEvents(
 export async function findRecordsByQuery({
   search,
   eventConfigs,
-  options,
   user,
   acceptedScopes
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
-  options?: Record<string, SearchScopeAccessLevels>
   user: TrpcUserContext
-  acceptedScopes?: RecordScopeV2[]
+  acceptedScopes: RecordScopeV2[]
 }) {
   const esClient = getOrCreateClient()
 
   const { query, limit, offset } = search
 
-  const resolvedScopes = acceptedScopes?.map((scope) =>
+  const resolvedScopes = acceptedScopes.map((scope) =>
     resolveRecordActionScopeToIds(scope, user)
   )
 
   const esQuery = withJurisdictionFilters({
     query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
-    options,
-    userOfficeId: user.primaryOfficeId,
     scopesV2: resolvedScopes
   })
 
@@ -547,15 +544,13 @@ const MsearchResponseSchema = z.object({
 export async function getEventCount({
   queries,
   eventConfigs,
-  options,
   user,
   acceptedScopes
 }: {
   queries: WorkqueueCountInput
   eventConfigs: EventConfig[]
-  options?: Record<string, SearchScopeAccessLevels>
   user: TrpcUserContext
-  acceptedScopes?: RecordScopeV2[]
+  acceptedScopes: RecordScopeV2[]
 }) {
   const esClient = getOrCreateClient()
 
@@ -566,12 +561,13 @@ export async function getEventCount({
   const esQueries = queries.map(async (query) =>
     buildElasticQueryFromSearchPayload(query.query, eventConfigs)
   )
+  const resolvedScopes = acceptedScopes.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
+  )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
     withJurisdictionFilters({
       query,
-      options,
-      userOfficeId: user.primaryOfficeId,
       scopesV2: resolvedScopes
     })
   )

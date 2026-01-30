@@ -821,7 +821,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 ]
 `;
 
-exports[`User with my-jurisdiction scope can see events from other offices based on their scopes 1`] = `
+exports[`User with "location" scope can see events from other offices based on their scopes 1`] = `
 {
   "assignedTo": "[sanitized]",
   "createdAt": "[sanitized]",
@@ -870,7 +870,7 @@ exports[`User with my-jurisdiction scope can see events from other offices based
 }
 `;
 
-exports[`User with my-jurisdiction scope only sees events created by system user to their primary office 1`] = `
+exports[`User with "location" scope only sees events created by system user to their primary office 1`] = `
 {
   "createdAt": "[sanitized]",
   "createdAtLocation": "[sanitized]",
@@ -908,7 +908,7 @@ exports[`User with my-jurisdiction scope only sees events created by system user
 }
 `;
 
-exports[`User with my-jurisdiction scope only sees events from their primary office 1`] = `
+exports[`User with "location" scope only sees events from their primary office 1`] = `
 {
   "assignedTo": "[sanitized]",
   "createdAt": "[sanitized]",

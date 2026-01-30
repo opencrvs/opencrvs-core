@@ -38,10 +38,13 @@ const RoleSchema = (eventIds: string[]) =>
         z.string().superRefine((scope, ctx) => {
           const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedLiteralScope = parseLiteralScope(scope)
+          const parsedV2Scopes = decodeScope(scope)
 
-          const v2Scope = decodeScope(scope)
-
-          if (!parsedConfigurableScope && !parsedLiteralScope && !v2Scope) {
+          if (
+            !parsedConfigurableScope &&
+            !parsedLiteralScope &&
+            !parsedV2Scopes
+          ) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
@@ -49,17 +52,20 @@ const RoleSchema = (eventIds: string[]) =>
             return
           }
 
-          if (parsedConfigurableScope?.type === 'search') {
-            const options = parsedConfigurableScope.options
-            const invalidEventIds = options.event.filter(
-              (id) => !eventIds.includes(id)
-            )
+          if (parsedV2Scopes?.type === 'record.search') {
+            const options = parsedV2Scopes.options
 
-            if (invalidEventIds.length > 0) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-              })
+            if (options?.event && Array.isArray(options.event)) {
+              const invalidEventIds = options.event.filter(
+                (id) => !eventIds.includes(id)
+              )
+
+              if (invalidEventIds.length > 0) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
+                })
+              }
             }
           }
         })

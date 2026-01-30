@@ -1108,7 +1108,7 @@ export const generateWorkqueues = (
         type: 'and',
         clauses: [{ eventType: tennisClubMembershipEvent.id }]
       },
-      actions: [{ type: 'DEFAULT' }],
+      actions: [{ type: ActionType.READ }],
       icon: 'Draft'
     }
   ])
