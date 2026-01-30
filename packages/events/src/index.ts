@@ -18,6 +18,8 @@ import { getInMemoryEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { ensureConnection } from './storage/postgres/events'
 
+// misc change
+
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
 // eslint-disable-next-line @typescript-eslint/no-require-imports
