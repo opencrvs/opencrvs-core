@@ -23,9 +23,7 @@ import {
   StaticDataEntry,
   EventConfig,
   getDeclarationFields,
-  FieldValue,
   DataEntry,
-  TranslationConfig,
   FieldReference
 } from '@opencrvs/commons/client'
 import { Summary } from '@opencrvs/components/lib/Summary'
@@ -100,6 +98,7 @@ const Container = styled.div`
   background-color: ${({ theme }) => theme.colors.background};
   padding: 17px 20px 10px;
   border-radius: 5px;
+  ${({ theme }) => theme.fonts.reg16}
 
   label {
     ${({ theme }) => theme.fonts.h3};
