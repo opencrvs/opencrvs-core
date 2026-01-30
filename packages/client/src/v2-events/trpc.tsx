@@ -197,6 +197,10 @@ export function TRPCProvider({
   storeIdentifier?: string
   waitForClientRestored?: boolean
 }) {
+  queryClient.getQueryCache().subscribe((event) => {
+    console.log({ [event.type]: event.query })
+  })
+
   const [queriesRestored, setQueriesRestored] = React.useState(false)
 
   return (
