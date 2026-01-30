@@ -9065,6 +9065,8 @@ components:
                 boost:
                   type: number
                   default: 1
+                matchAgainst:
+                  type: string
               required:
                 - fuzziness
                 - boost
@@ -9089,6 +9091,8 @@ components:
                   type: number
                   default: 1
                 value:
+                  type: string
+                matchAgainst:
                   type: string
               required:
                 - boost
@@ -9115,6 +9119,8 @@ components:
                 boost:
                   type: number
                   default: 1
+                matchAgainst:
+                  type: string
               required:
                 - days
                 - boost
