@@ -77,6 +77,7 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
   )
   // this is the root location
   locationNodeMap.set('0', { id: '0', children: [] })
+
   locations.forEach((loc) => {
     const parent = locationNodeMap.get(loc.partOf.split('/')[1])
     if (!parent) {
@@ -142,8 +143,13 @@ async function getLocations() {
 
   const administrativeAreaMap = validateAdminStructure(administrativeAreas)
 
+  const NULL_ADMINISTRATIVE_AREA_ID = '0'
   locations.forEach((facilityOrOffice) => {
-    if (!administrativeAreaMap.get(facilityOrOffice.partOf.split('/')[1])) {
+    const administrativeAreaId = facilityOrOffice.partOf.split('/')[1]
+    if (
+      !administrativeAreaMap.get(administrativeAreaId) &&
+      administrativeAreaId !== NULL_ADMINISTRATIVE_AREA_ID
+    ) {
       raise(
         `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
       )
