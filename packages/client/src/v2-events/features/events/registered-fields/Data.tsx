@@ -110,7 +110,7 @@ const Container = styled.div`
 const Subtitle = styled.div`
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.grey500};
-  margin: 0 0 2rem;
+  margin: 0 0 1rem;
 `
 
 /**
