@@ -230,7 +230,6 @@ export function extractPotentialDuplicatesFromActions(
 
 /**
  * NOTE: This function should not run field validations. It should return the state based on the actions, without considering context (users, roles, permissions, etc).
-createdAtLocation: CreatedAtLocation
  *
  * If you update this function, please ensure @EventIndex type is updated accordingly.
  * In most cases, you won't need to add new parameters to this function. Discuss with the team before doing so.

@@ -61,6 +61,7 @@ import {
 } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { buttonMessages } from '@client/i18n/messages'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -174,11 +175,6 @@ export const actionLabels = {
   }
 } as const
 
-export const reviewLabel = {
-  id: 'buttons.review',
-  defaultMessage: 'Review',
-  description: 'Label for review CTA button'
-}
 
 interface ActionConfig {
   label: TranslationConfig
@@ -254,7 +250,6 @@ function useViewableActionConfigurations(
   )
 
   const { eventConfiguration } = useEventConfiguration(event.type)
-
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const isDownloadedAndAssignedToUser =
@@ -271,27 +266,13 @@ function useViewableActionConfigurations(
     event.id
   )
 
-  const isRejected = event.flags.includes(InherentFlags.REJECTED)
-  const isDeclaredState = event.status === EventStatus.enum.DECLARED
-  const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
-
-  // Incomplete declarations are always shown as "Review" for the reviewer.
-  const isReviewingIncompleteDeclaration = !isRejected && isNotifiedState
-
-  // Rejected declarations are always shown as "Review" for the reviewer.
-  const isReviewingRejectedDeclaration =
-    isRejected && (isNotifiedState || isDeclaredState)
-
-  const isReviewingDeclaration =
-    isReviewingIncompleteDeclaration || isReviewingRejectedDeclaration
-
   const userMayCorrect = isActionInScope(
     authentication.scope,
     ActionType.REQUEST_CORRECTION,
     event.type
   )
 
-  const { quickActionModal, onQuickAction } = useQuickActionModal(event)
+  const { quickActionModal, onQuickAction } = useQuickActionModal(event.id, eventConfiguration, event.type)
 
   const getAction = (type: ActionType) => {
     return eventConfiguration.actions.find((action) => action.type === type)
@@ -377,9 +358,7 @@ function useViewableActionConfigurations(
       },
       [ActionType.DECLARE]: {
         icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
-        label: isReviewingDeclaration
-          ? reviewLabel
-          : actionLabels[ActionType.DECLARE],
+        label: hasDeclarationDraftOpen ? buttonMessages.update : actionLabels[ActionType.DECLARE],
         onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
@@ -390,7 +369,6 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: isRejected
       },
       [ActionType.EDIT]: {
         icon: 'PencilLine' as const,
@@ -410,17 +388,14 @@ function useViewableActionConfigurations(
           handleRejection(() =>
             workqueue
               ? navigate(
-                  ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
-                )
+                ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
+              )
               : navigate(ROUTES.V2.buildPath({}))
           ),
-        disabled: !isDownloadedAndAssignedToUser,
-        hidden: isReviewingDeclaration
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
-        label: isReviewingIncompleteDeclaration
-          ? reviewLabel
-          : actionLabels[ActionType.REGISTER],
+        label: actionLabels[ActionType.REGISTER],
         icon: getAction(ActionType.REGISTER)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) =>
           onQuickAction(ActionType.REGISTER, workqueue),
@@ -536,7 +511,7 @@ function useCustomActionConfigs(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { customActionModal, onCustomAction } = useCustomActionModal(event)
+  const { customActionModal, onCustomAction } = useCustomActionModal(event.id, eventConfiguration)
   const { useFindEventFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)

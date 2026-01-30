@@ -41,7 +41,6 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useCanDirectlyRegister } from '../useCanDirectlyRegister'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
-import { useRejectionModal } from '../reject/useRejectionModal'
 import { useEventConfiguration } from '../../useEventConfiguration'
 
 /**
@@ -50,11 +49,11 @@ import { useEventConfiguration } from '../../useEventConfiguration'
  *   - Declare (non-incomplete records)
  *   - Validate (aka. 'direct validation', which means declare+validate actions)
  *   - Register (aka. 'direct registration', which means declare+validate+register actions)
- *   - Reject (only available for previously notified events)
  *   - Save and exit
  *   - Delete declaration
  */
 function useDeclarationActions(event: EventDocument) {
+  const intl = useIntl()
   const eventType = event.type
   const drafts = useDrafts()
   const {
@@ -69,10 +68,6 @@ function useDeclarationActions(event: EventDocument) {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const [modal, openModal] = useModal()
-  const { rejectionModal, handleRejection } = useRejectionModal(
-    event.id,
-    eventType
-  )
   const canDirectlyRegister = useCanDirectlyRegister(event)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.DECLARE.REVIEW
@@ -160,6 +155,7 @@ function useDeclarationActions(event: EventDocument) {
             title: action.title,
             onConfirm: actionLabels[actionType]
           }}
+          eventType={intl.formatMessage(eventConfiguration.label)}
         />
       )
     })
@@ -179,7 +175,7 @@ function useDeclarationActions(event: EventDocument) {
   const availableActions = getAvailableActionsForEvent(eventIndex)
 
   return {
-    modals: [modal, rejectionModal, saveAndExitModal, deleteDeclarationModal],
+    modals: [modal, saveAndExitModal, deleteDeclarationModal],
     actions: [
       {
         icon: 'Check' as const,
@@ -202,12 +198,6 @@ function useDeclarationActions(event: EventDocument) {
         hidden:
           !availableActions.includes(ActionType.NOTIFY) ||
           !isActionAllowed(ActionType.NOTIFY)
-      },
-      {
-        icon: 'FileX' as const,
-        label: actionLabels[ActionType.REJECT],
-        onClick: async () => handleRejection(() => closeActionView(slug)),
-        hidden: !availableActions.includes(ActionType.REJECT)
       },
       {
         icon: 'FloppyDisk' as const,

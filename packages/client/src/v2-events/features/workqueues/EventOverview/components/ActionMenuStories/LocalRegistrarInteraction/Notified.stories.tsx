@@ -39,7 +39,8 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Assign']: AssertType.ENABLED,
-      ['Review']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED,
+      ['Reject']: AssertType.DISABLED,
       ['Archive']: AssertType.DISABLED
     }
   },
@@ -56,7 +57,8 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Unassign']: AssertType.ENABLED,
-      ['Review']: AssertType.ENABLED,
+      ['Edit']: AssertType.ENABLED,
+      ['Reject']: AssertType.ENABLED,
       ['Archive']: AssertType.ENABLED
     }
   },
@@ -73,7 +75,8 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Unassign']: AssertType.ENABLED,
-      ['Review']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED,
+      ['Reject']: AssertType.DISABLED,
       ['Archive']: AssertType.DISABLED
     }
   }

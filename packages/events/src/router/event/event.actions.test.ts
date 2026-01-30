@@ -26,7 +26,8 @@ import {
   ActionUpdate,
   TestUserRole,
   AddressType,
-  deepMerge
+  deepMerge,
+  encodeScope
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -406,7 +407,12 @@ describe('Action updates', () => {
 
     const client = createTestClient(user, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${multiFileConfig.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [multiFileConfig.id]
+        }
+      })
     ])
 
     const originalEvent = await client.event.create({
@@ -477,7 +483,12 @@ describe('Action updates', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${multiFileConfig.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [multiFileConfig.id]
+        }
+      })
     ])
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
@@ -628,6 +639,15 @@ test('Can not add action with same [transactionId, type, status]', async () => {
 
   await client.event.actions.reject.request(
     generator.event.actions.reject(originalEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(originalEvent.id)
   )
 
   const eventBeforeDuplicateAttempt =
@@ -798,7 +818,12 @@ describe('Conditionals based on user role', () => {
 
     const registrationAgentClient = createTestClient(registrationAgent, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${tennisClubMembershipEvent.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [tennisClubMembershipEvent.id]
+        }
+      })
     ])
 
     await registrationAgentClient.event.actions.assignment.assign({
