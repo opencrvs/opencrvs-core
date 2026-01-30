@@ -530,7 +530,14 @@ const NameField = BaseField.extend({
       order: z.array(z.enum(['firstname', 'middlename', 'surname'])).optional(),
       maxLength: z.number().optional().describe('Maximum length of the text'),
       prefix: TranslationConfig.optional(),
-      postfix: TranslationConfig.optional()
+      postfix: TranslationConfig.optional(),
+      showParentFieldError: z
+        .boolean()
+        .default(false)
+        .optional()
+        .describe(
+          `If true, shows the parent field error and hides the subfield error`
+        )
     })
     .default({
       name: {

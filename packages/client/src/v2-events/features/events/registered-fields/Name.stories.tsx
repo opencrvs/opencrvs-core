@@ -12,18 +12,39 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import { FieldType, NameField, NameFieldValue } from '@opencrvs/commons/client'
+import {
+  and,
+  field,
+  FieldType,
+  NameField,
+  NameFieldValue,
+  or,
+  not,
+  EventState,
+  tennisClubMembershipEvent,
+  ActionType
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { ValueOutput } from '../components/Output'
-import { withValidatorContext } from '../../../../../.storybook/decorators'
+import {
+  getTestValidatorContext,
+  withValidatorContext
+} from '../../../../../.storybook/decorators'
+import { tennisClubMembershipEventDocument } from '../fixtures'
 
 const meta: Meta<FormFieldGeneratorProps> = {
   title: 'Inputs/Name',
   component: FormFieldGenerator,
   argTypes: {
     validatorContext: { control: false }
+  },
+  args: {
+    onChange: (values: EventState) => {
+      console.log(values)
+    }
   },
   decorators: [
     (Story, context) => (
@@ -167,6 +188,144 @@ export const NameWithAllOptions: StoryObj<typeof FormFieldGenerator> = {
           id="storybook.name"
           onChange={(data) => {
             setFormState(data['storybook.name'] as NameFieldValue)
+            args.onChange(data)
+          }}
+        />
+      </div>
+    )
+  }
+}
+
+const undeclaredDraftEvent = {
+  ...tennisClubMembershipEventDocument,
+  actions: tennisClubMembershipEventDocument.actions.filter(
+    ({ type }) => type === ActionType.CREATE || type === ActionType.ASSIGN
+  )
+}
+
+const nameField: NameField = {
+  id: 'applicant.name',
+  type: FieldType.NAME,
+  label: {
+    id: 'applicant.name.label',
+    defaultMessage: 'Name',
+    description: 'The title for the name input'
+  },
+  validation: [
+    {
+      message: {
+        defaultMessage:
+          "Input contains invalid characters. Please use only letters (a-z, A-Z), numbers (0-9), hyphens (-) and apostrophes(')",
+        description: 'This is the error message for invalid name',
+        id: 'error.invalidName'
+      },
+      validator: and(
+        field('applicant.name').get('firstname').isValidEnglishName(),
+        field('applicant.name').get('middlename').isValidEnglishName(),
+        field('applicant.name').get('surname').isValidEnglishName()
+      )
+    },
+    {
+      message: {
+        defaultMessage:
+          'At least one of the name fields (first name, middle name, or surname) is required.',
+        description: 'This is the error message for name required',
+        id: 'error.nameRequired'
+      },
+      validator: or(
+        not(field('applicant.name').get('firstname').isFalsy()),
+        not(field('applicant.name').get('middlename').isFalsy()),
+        not(field('applicant.name').get('surname').isFalsy())
+      )
+    }
+  ],
+  configuration: {
+    order: ['surname', 'firstname', 'middlename'],
+    showParentFieldError: true,
+    name: {
+      firstname: {
+        required: false,
+        label: {
+          id: 'applicant.name.custom.firstname.label',
+          defaultMessage: 'My firstname label',
+          description: 'The title for the name input'
+        }
+      },
+      middlename: {
+        required: false,
+        label: {
+          id: 'applicant.name.custom.middlename.label',
+          defaultMessage: 'My middlename label',
+          description: 'The title for the name input'
+        }
+      },
+      surname: {
+        required: false,
+        label: {
+          id: 'applicant.name.custom.surname.label',
+          defaultMessage: 'My surname label',
+          description: 'The title for the name input'
+        }
+      }
+    }
+  }
+}
+
+const modifiedEventConfig = {
+  ...tennisClubMembershipEvent,
+  declaration: {
+    ...tennisClubMembershipEvent.declaration,
+    pages: tennisClubMembershipEvent.declaration.pages.map((x) => {
+      x.fields = x.fields.map((y) => {
+        if (y.id === nameField.id) {
+          y = nameField
+        }
+        return y
+      })
+      return x
+    })
+  }
+}
+export const NameWithHideSubFieldError: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Name Subfield errors are hidden, Name Field level error are shown',
+  parameters: {
+    layout: 'centered',
+    offline: {
+      events: [undeclaredDraftEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({
+        eventId: undeclaredDraftEvent.id,
+        pageId: 'applicant'
+      })
+    }
+  },
+  render: function Component(args) {
+    const [formState, setFormState] = React.useState<EventState>({})
+    // Key Change 1: Manually create the validator context, passing in the event document.
+    const validatorContext = getTestValidatorContext(
+      undefined,
+      undeclaredDraftEvent
+    )
+
+    return (
+      <div>
+        <strong>{'Current Value:'}</strong>
+        <ValueOutput config={nameField} value={formState['applicant.name']} />
+        <br />
+        <br />
+        <strong>{'Form:'}</strong>
+
+        <StyledFormFieldGenerator
+          eventConfig={modifiedEventConfig}
+          fields={modifiedEventConfig.declaration.pages[0].fields}
+          id="storybook.name"
+          initialValues={formState}
+          validateAllFields={true}
+          validatorContext={validatorContext}
+          onChange={(data) => {
+            setFormState(data)
             args.onChange(data)
           }}
         />
