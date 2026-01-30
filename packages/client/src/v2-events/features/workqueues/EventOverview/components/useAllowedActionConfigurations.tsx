@@ -61,6 +61,7 @@ import {
 } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { buttonMessages } from '@client/i18n/messages'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -174,11 +175,6 @@ export const actionLabels = {
   }
 } as const
 
-export const reviewLabel = {
-  id: 'buttons.review',
-  defaultMessage: 'Review',
-  description: 'Label for review CTA button'
-}
 
 interface ActionConfig {
   label: TranslationConfig
@@ -362,7 +358,7 @@ function useViewableActionConfigurations(
       },
       [ActionType.DECLARE]: {
         icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
-        label: actionLabels[ActionType.DECLARE],
+        label: hasDeclarationDraftOpen ? buttonMessages.update : actionLabels[ActionType.DECLARE],
         onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
@@ -392,8 +388,8 @@ function useViewableActionConfigurations(
           handleRejection(() =>
             workqueue
               ? navigate(
-                  ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
-                )
+                ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
+              )
               : navigate(ROUTES.V2.buildPath({}))
           ),
         disabled: !isDownloadedAndAssignedToUser
