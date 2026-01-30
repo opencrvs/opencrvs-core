@@ -10,7 +10,11 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
+import {
+  ActionType,
+  generateUuid,
+  TENNIS_CLUB_MEMBERSHIP
+} from '@opencrvs/commons/events'
 import {
   createSystemTestClient,
   createTestClient,
@@ -128,12 +132,73 @@ describe('event.create', () => {
       ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 
+    test('should not allow system user to create event if createdAtLocation is not defined', async () => {
+      const { generator } = await setupTestCase()
+      const client = createSystemTestClient('test-system', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      ])
+
+      await expect(
+        client.event.create(generator.event.create())
+      ).rejects.toMatchObject(
+        new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'createdAtLocation is required and must be a valid location id'
+        })
+      )
+    })
+
+    test('should prevent system user to create event when createdAtLocation is invalid', async () => {
+      const { generator } = await setupTestCase()
+      const client = createSystemTestClient('test-system', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      ])
+
+      await expect(
+        client.event.create({
+          ...generator.event.create(),
+          createdAtLocation: generateUuid()
+        })
+      ).rejects.toMatchObject(
+        new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'createdAtLocation must be a valid location id'
+        })
+      )
+    })
+
+    test('should allow system user to create when createdAtLocation is defined', async () => {
+      const { generator, locations } = await setupTestCase()
+      const client = createSystemTestClient('test-system', [
+        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
+      ])
+
+      const response = await client.event.create({
+        ...generator.event.create(),
+        createdAtLocation: locations[0].id
+      })
+
+      expect(response.actions).toBeDefined()
+
+      expect(response.actions.length).toEqual(1)
+      expect(response.actions).toEqual([
+        expect.objectContaining({
+          type: ActionType.CREATE,
+          createdAtLocation: locations[0].id
+        })
+      ])
+    })
+
     test('event created by system user should not have assignment action', async () => {
-      const { generator, user } = await setupTestCase()
+      const { generator, user, locations } = await setupTestCase()
       const systemClient = createSystemTestClient('test-system', [
         `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
-      const event = await systemClient.event.create(generator.event.create())
+      const event = await systemClient.event.create({
+        ...generator.event.create(),
+        createdAtLocation: locations[0].id
+      })
 
       const userClient = createTestClient(user, [
         `record.read[event=${TENNIS_CLUB_MEMBERSHIP}]`
@@ -145,7 +210,10 @@ describe('event.create', () => {
       expect(fetchedEventWithoutReadAction).toEqual(event.actions)
       expect(fetchedEvent.actions.length).toEqual(2)
       expect(fetchedEvent.actions).toEqual([
-        expect.objectContaining({ type: ActionType.CREATE }),
+        expect.objectContaining({
+          type: ActionType.CREATE,
+          createdAtLocation: locations[0].id
+        }),
         expect.objectContaining({ type: ActionType.READ })
       ])
     })

@@ -15,6 +15,7 @@ import {
   getUUID,
   SCOPES,
   findScope,
+  UUID,
   RecordScopeV2
 } from '@opencrvs/commons'
 import {
@@ -104,6 +105,7 @@ export const eventRouter = router({
     })
     .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.CREATE]))
     .input(EventInput)
+    .use(middleware.requireLocationForSystemUserEventCreate)
     .use(middleware.eventTypeAuthorization)
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
@@ -116,6 +118,7 @@ export const eventRouter = router({
         transactionId: input.transactionId,
         eventInput: input,
         user: ctx.user,
+        createdAtLocation: input.createdAtLocation,
         config
       })
     }),
@@ -314,7 +317,7 @@ export const eventRouter = router({
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
     .use(
-      requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search'], ['record.search'])
+      requiresAnyOfScopes([SCOPES.RECORDSEARCH], undefined, ['record.search'])
     )
     .input(SearchQuery)
     .output(
@@ -330,15 +333,16 @@ export const eventRouter = router({
       const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
 
       if (isRecordSearchSystemClient) {
-        const allAccessForEveryEventType = Object.fromEntries(
-          eventConfigs.map(({ id }) => [id, 'all' as const])
-        )
-
         return findRecordsByQuery({
           search: input,
           eventConfigs,
-          options: allAccessForEveryEventType,
-          user: ctx.user
+          user: ctx.user,
+          acceptedScopes: [
+            {
+              type: 'record.search',
+              options: {}
+            }
+          ]
         })
       }
 
@@ -351,19 +355,7 @@ export const eventRouter = router({
         })
       }
 
-      const searchScopeV1 = findScope(scopes, 'search')
-
-      // Only to satisfy type checking, as findScope will return undefined if no scope is found
-      if (!searchScopeV1) {
-        throw new Error('No search scope provided')
-      }
-
-      return findRecordsByQuery({
-        search: input,
-        eventConfigs,
-        options: searchScopeV1.options,
-        user: ctx.user
-      })
+      throw new Error('No search scope provided')
     }),
   bulkImport: userAndSystemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
