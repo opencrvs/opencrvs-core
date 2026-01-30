@@ -6392,7 +6392,6 @@ components:
                   - originalFilename
                   - type
                   - option
-              minItems: 1
             configuration:
               type: object
               properties:
