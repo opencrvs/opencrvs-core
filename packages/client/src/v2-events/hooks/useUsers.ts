@@ -119,7 +119,6 @@ export function useUsers() {
         return useQuery({
           ...queryOptions,
           ...options,
-          networkMode: 'online',
           queryKey: trpc.user.get.queryKey(id)
         })
       },
@@ -128,7 +127,6 @@ export function useUsers() {
         return [
           useSuspenseQuery({
             ...options,
-            networkMode: 'online',
             queryKey: trpc.user.get.queryKey(id)
           }).data
         ]

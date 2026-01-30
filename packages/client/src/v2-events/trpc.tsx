@@ -82,7 +82,6 @@ function getQueryClient() {
     defaultOptions: {
       queries: {
         gcTime: Infinity,
-        networkMode: 'online',
         retry: 1
       },
       mutations: {
@@ -223,8 +222,7 @@ export function TRPCProvider({
             }
 
             return mutation.state.status !== 'success'
-          },
-          shouldDehydrateQuery: () => true
+          }
         }
       }}
       onSuccess={async () => {
