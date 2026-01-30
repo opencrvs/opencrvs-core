@@ -8,6 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID } from '../uuid'
+import { useField } from 'formik'
 
-export const CreatedAtLocation = UUID.nullish()
+export function useResolveDefaultValue<T>({
+  fieldName,
+  defaultValue,
+  resolver
+}: {
+  fieldName?: string
+  defaultValue: T
+  resolver: (value: T) => string
+}) {
+  const [, , helpers] = useField(fieldName ?? '')
+  const resolvedValue = resolver(defaultValue)
+  if (defaultValue !== resolvedValue) {
+    void helpers.setValue(resolvedValue)
+  }
+  return resolvedValue
+}

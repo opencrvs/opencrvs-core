@@ -13,6 +13,7 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   createPrng,
+  encodeScope,
   generateEventDocument,
   SCOPES
 } from '@opencrvs/commons'
@@ -55,7 +56,12 @@ describe('bulkImport', () => {
     const client = createSystemTestClient('test-system', [
       SCOPES.RECORD_IMPORT,
       SCOPES.RECORD_READ,
-      `search[event=${tennisClubMembershipEvent.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [tennisClubMembershipEvent.id]
+        }
+      })
     ])
     const event1 = generateEventDocument({
       configuration: tennisClubMembershipEvent,

@@ -13,6 +13,7 @@ import {
   field,
   FieldType,
   InteractiveFieldType,
+  now,
   SystemVariables,
   user
 } from '@opencrvs/commons/client'
@@ -29,6 +30,32 @@ const TextField = {
     defaultMessage: "Recommender's membership ID",
     description: 'This is the label for the field',
     id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
+  }
+} satisfies InteractiveFieldType
+
+const TimeField = {
+  id: 'recommender.id',
+  type: FieldType.TIME,
+  defaultValue: now(),
+  required: true,
+  conditionals: [],
+  label: {
+    defaultMessage: "Recommender's time of recommendation",
+    description: 'This is the label for the time field',
+    id: 'event.tennis-club-membership.time'
+  }
+} satisfies InteractiveFieldType
+
+const DateField = {
+  id: 'recommender.id',
+  type: FieldType.DATE,
+  defaultValue: now(),
+  required: true,
+  conditionals: [],
+  label: {
+    defaultMessage: "Recommender's date of recommendation",
+    description: 'This is the label for the date field',
+    id: 'event.tennis-club-membership.date'
   }
 } satisfies InteractiveFieldType
 
@@ -341,6 +368,52 @@ const testCasesForDefaultValue = [
       surname: 'Doe'
     },
     field: NameField
+  },
+  {
+    systemVariables: {
+      user: {
+        name: 'Jon Doe',
+        firstname: 'Jon',
+        surname: 'Doe',
+        role: '',
+        id: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
+      }
+    } satisfies SystemVariables,
+    expected: {
+      $$now: true
+    },
+    field: TimeField
+  },
+  {
+    systemVariables: {
+      user: {
+        name: 'Jon Doe',
+        firstname: 'Jon',
+        surname: 'Doe',
+        role: '',
+        id: ''
+      },
+      $window: {
+        location: {
+          href: 'http://example.com',
+          pathname: '/path',
+          originPathname: '/path',
+          hostname: 'example.com'
+        }
+      }
+    } satisfies SystemVariables,
+    expected: {
+      $$now: true
+    },
+    field: DateField
   }
 ]
 

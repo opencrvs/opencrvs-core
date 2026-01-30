@@ -311,7 +311,7 @@ export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  actions: [{ type: ActionType.READ }],
+  actions: [{ type: ActionType.DECLARE }],
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }
@@ -403,4 +403,8 @@ export function hasStringFilename(
     'filename' in field &&
     typeof field.filename === 'string'
   )
+}
+
+export function padZero(num: number) {
+  return num.toString().padStart(2, '0')
 }

@@ -18,6 +18,7 @@ export const FieldType = {
   ADDRESS: 'ADDRESS',
   TEXT: 'TEXT',
   NUMBER: 'NUMBER',
+  NUMBER_WITH_UNIT: 'NUMBER_WITH_UNIT',
   TEXTAREA: 'TEXTAREA',
   EMAIL: 'EMAIL',
   DATE: 'DATE',

@@ -555,7 +555,8 @@ function EditModal({
 function AcceptActionModal({
   copy,
   close,
-  action
+  action,
+  eventType
 }: {
   copy: {
     onConfirm: MessageDescriptor
@@ -564,6 +565,7 @@ function AcceptActionModal({
   }
   close: (result: boolean | null) => void
   action: string
+  eventType: string
 }) {
   const intl = useIntl()
 
@@ -571,7 +573,6 @@ function AcceptActionModal({
     <ResponsiveModal
       autoHeight
       show
-      showHeaderBorder
       actions={[
         <Button
           key={'cancel_' + action}
@@ -595,7 +596,8 @@ function AcceptActionModal({
         </Button>
       ]}
       handleClose={() => close(null)}
-      title={intl.formatMessage(copy.title)}
+      showHeaderBorder={!!copy.supportingCopy}
+      title={intl.formatMessage(copy.title, { event: eventType })}
       width={600}
     >
       <Stack>
