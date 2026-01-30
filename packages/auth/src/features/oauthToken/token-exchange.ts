@@ -54,12 +54,14 @@ export async function tokenExchangeHandler(
   if (decodedOrError._tag === 'Left') {
     return oauthResponse.invalidSubjectToken(h)
   }
-  const { sub } = decodedOrError.right
+
+  const { sub, userType } = decodedOrError.right
 
   // @TODO: If in the future we have a fine grained access control for records, check here that the subject actually has access to the record requested
   const recordToken = await createTokenForActionConfirmation(
     { eventId, actionId },
-    sub as UUID
+    sub as UUID,
+    userType as 'user' | 'system'
   )
 
   return oauthResponse.success(h, recordToken)

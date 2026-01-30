@@ -135,7 +135,12 @@ export async function registerSystem(
     }
 
     if (
-      [types.WEBHOOK, types.RECORD_SEARCH, types.IMPORT_EXPORT].includes(type)
+      [
+        types.WEBHOOK,
+        types.RECORD_SEARCH,
+        types.IMPORT_EXPORT,
+        types.CITIZEN_PORTAL
+      ].includes(type)
     ) {
       const systemDetails = {
         client_id,
