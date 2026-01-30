@@ -8,18 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { v4 as uuid } from 'uuid'
-import { QuickActionConfig } from './useQuickActionModal'
+import { useField } from 'formik'
 
-export const register: QuickActionConfig = {
-  modal: {},
-  onConfirm: ({ eventId, actions }) => {
-    return actions.register.mutate({
-      eventId,
-      declaration: {},
-      /** As part of https://github.com/opencrvs/opencrvs-core/issues/11305, we will implement annotation fields to the register modal */
-      annotation: {},
-      transactionId: uuid()
-    })
+export function useResolveDefaultValue<T>({
+  fieldName,
+  defaultValue,
+  resolver
+}: {
+  fieldName?: string
+  defaultValue: T
+  resolver: (value: T) => string
+}) {
+  const [, , helpers] = useField(fieldName ?? '')
+  const resolvedValue = resolver(defaultValue)
+  if (defaultValue !== resolvedValue) {
+    void helpers.setValue(resolvedValue)
   }
+  return resolvedValue
 }
