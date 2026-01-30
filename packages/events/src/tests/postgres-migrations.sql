@@ -40,19 +40,6 @@ CREATE TYPE app.action_status AS ENUM (
 ALTER TYPE app.action_status OWNER TO events_migrator;
 
 --
--- Name: location_type; Type: TYPE; Schema: app; Owner: events_migrator
---
-
-CREATE TYPE app.location_type AS ENUM (
-    'HEALTH_FACILITY',
-    'CRVS_OFFICE',
-    'ADMIN_STRUCTURE'
-);
-
-
-ALTER TYPE app.location_type OWNER TO events_migrator;
-
---
 -- Name: user_type; Type: TYPE; Schema: app; Owner: events_migrator
 --
 
@@ -79,7 +66,8 @@ CREATE TABLE app.administrative_areas (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
-    valid_until timestamp with time zone
+    valid_until timestamp with time zone,
+    external_id text
 );
 
 
@@ -188,11 +176,10 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 CREATE TABLE app.locations (
     id uuid NOT NULL,
     name text NOT NULL,
-    parent_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
-    location_type app.location_type,
+    location_type text,
     valid_until timestamp with time zone,
     administrative_area_id uuid,
     external_id text
@@ -291,6 +278,14 @@ COMMENT ON COLUMN app.users.legacy_id IS 'References the user id from the legacy
 --
 
 ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmigrations_id_seq'::regclass);
+
+
+--
+-- Name: administrative_areas administrative_areas_external_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.administrative_areas
+    ADD CONSTRAINT administrative_areas_external_id_key UNIQUE (external_id);
 
 
 --
@@ -452,20 +447,6 @@ CREATE INDEX idx_event_tracking_id ON app.events USING btree (tracking_id);
 
 
 --
--- Name: idx_locations_active; Type: INDEX; Schema: app; Owner: events_migrator
---
-
-CREATE INDEX idx_locations_active ON app.locations USING btree (id, name, parent_id, valid_until, location_type) WHERE (deleted_at IS NULL);
-
-
---
--- Name: idx_locations_parent_type; Type: INDEX; Schema: app; Owner: events_migrator
---
-
-CREATE INDEX idx_locations_parent_type ON app.locations USING btree (parent_id, location_type);
-
-
---
 -- Name: idx_locations_valid_until; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
@@ -526,14 +507,6 @@ ALTER TABLE ONLY app.event_actions
 
 ALTER TABLE ONLY app.locations
     ADD CONSTRAINT locations_administrative_area_id_fkey FOREIGN KEY (administrative_area_id) REFERENCES app.administrative_areas(id);
-
-
---
--- Name: locations locations_parent_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.locations
-    ADD CONSTRAINT locations_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES app.locations(id);
 
 
 --
@@ -611,4 +584,5 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 --
 -- PostgreSQL database dump complete
 --
+
 

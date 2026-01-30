@@ -43,8 +43,8 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
-  EventIndexWithLocationHierarchy,
-  getEventIndexWithLocationHierarchy,
+  EventIndexWithAdministrativeHierarchy,
+  getEventIndexWithAdministrativeHierarchy,
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
   removeSecuredFields,
@@ -100,10 +100,17 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
-    case FieldType.EMAIL:
     case FieldType.TIME:
     case FieldType.ALPHA_HIDDEN:
       return { type: 'text' }
+    case FieldType.NUMBER_WITH_UNIT:
+      return {
+        type: 'object',
+        properties: {
+          numericValue: { type: 'double' },
+          unit: { type: 'text' }
+        }
+      }
     case FieldType.EMAIL:
       return {
         type: 'keyword',
@@ -363,7 +370,7 @@ export async function indexEventsInBulk(
       const config = getEventConfigById(configs, doc.type)
       const eventIndex = eventToEventIndex(doc, config)
       const eventIndexWithLocationHierarchy =
-        await getEventIndexWithLocationHierarchy(
+        await getEventIndexWithAdministrativeHierarchy(
           config,
           eventIndex,
           locationHierarchyCache
@@ -384,13 +391,13 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
   const eventIndex = eventToEventIndex(event, config)
-  const eventIndexWithLocationHierarchy =
-    await getEventIndexWithLocationHierarchy(config, eventIndex)
-  return esClient.index<EventIndexWithLocationHierarchy>({
+  const eventIndexWithAdministrativeHierarchy =
+    await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
+  return esClient.index<EventIndexWithAdministrativeHierarchy>({
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventIndexWithLocationHierarchy,
+    document: eventIndexWithAdministrativeHierarchy,
     refresh: 'wait_for'
   })
 }

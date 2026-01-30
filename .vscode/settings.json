@@ -8,7 +8,13 @@
     "typescriptreact"
   ],
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "eslint.workingDirectories": [
+    {
+      "pattern": "./packages/*/",
+      "changeProcessCWD": true
+    }
+  ],
+  "eslint.codeActionsOnSave.mode": "problems",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },

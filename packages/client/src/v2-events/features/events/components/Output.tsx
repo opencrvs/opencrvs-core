@@ -29,6 +29,7 @@ import {
   isFileFieldType,
   isFileFieldWithOptionType,
   isNumberFieldType,
+  isNumberWithUnitFieldType,
   isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
@@ -65,6 +66,7 @@ import {
   SelectCountry,
   Paragraph,
   Number,
+  NumberWithUnit,
   Text,
   TimeField,
   getRegisteredFieldByFieldConfig,
@@ -142,6 +144,10 @@ export function ValueOutput({
 
   if (isNumberFieldType(field)) {
     return <Number.Output {...field} />
+  }
+
+  if (isNumberWithUnitFieldType(field)) {
+    return <NumberWithUnit.Output {...field} />
   }
 
   if (isFileFieldType(field) || isSignatureFieldType(field)) {

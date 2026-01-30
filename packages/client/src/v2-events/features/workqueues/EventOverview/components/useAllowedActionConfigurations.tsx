@@ -174,7 +174,7 @@ export const actionLabels = {
   }
 } as const
 
-const reviewLabel = {
+export const reviewLabel = {
   id: 'buttons.review',
   defaultMessage: 'Review',
   description: 'Label for review CTA button'
@@ -185,10 +185,6 @@ interface ActionConfig {
   icon: IconProps['name']
   /** onClick is used when clicking an action menu item. */
   onClick: (workqueue?: string) => Promise<void> | void
-  /** onCtaClick is used when clicking a workqueue CTA button. If its not defined, the onClick will be used. */
-  onCtaClick?: (workqueue?: string) => Promise<void> | void
-  /** ctaLabel is used on workqueue CTA buttons to override the label */
-  ctaLabel?: TranslationConfig
   disabled?: boolean
   hidden?: boolean
   customActionType?: string
@@ -258,7 +254,6 @@ function useViewableActionConfigurations(
   )
 
   const { eventConfiguration } = useEventConfiguration(event.type)
-
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const isDownloadedAndAssignedToUser =
@@ -275,27 +270,13 @@ function useViewableActionConfigurations(
     event.id
   )
 
-  const isRejected = event.flags.includes(InherentFlags.REJECTED)
-  const isDeclaredState = event.status === EventStatus.enum.DECLARED
-  const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
-
-  // Incomplete declarations are always shown as "Review" for the reviewer.
-  const isReviewingIncompleteDeclaration = !isRejected && isNotifiedState
-
-  // Rejected declarations are always shown as "Review" for the reviewer.
-  const isReviewingRejectedDeclaration =
-    isRejected && (isNotifiedState || isDeclaredState)
-
-  const isReviewingDeclaration =
-    isReviewingIncompleteDeclaration || isReviewingRejectedDeclaration
-
   const userMayCorrect = isActionInScope(
     authentication.scope,
     ActionType.REQUEST_CORRECTION,
     event.type
   )
 
-  const { quickActionModal, onQuickAction } = useQuickActionModal(event)
+  const { quickActionModal, onQuickAction } = useQuickActionModal(event.id, eventConfiguration, event.type)
 
   const getAction = (type: ActionType) => {
     return eventConfiguration.actions.find((action) => action.type === type)
@@ -379,12 +360,9 @@ function useViewableActionConfigurations(
         onClick: onDelete,
         disabled: !isDownloadedAndAssignedToUser
       },
-      // Configurable event actions
       [ActionType.DECLARE]: {
         icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
-        label: isReviewingDeclaration
-          ? reviewLabel
-          : actionLabels[ActionType.DECLARE],
+        label: actionLabels[ActionType.DECLARE],
         onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
@@ -395,7 +373,6 @@ function useViewableActionConfigurations(
           )
         },
         disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
-        hidden: isRejected
       },
       [ActionType.EDIT]: {
         icon: 'PencilLine' as const,
@@ -419,21 +396,13 @@ function useViewableActionConfigurations(
                 )
               : navigate(ROUTES.V2.buildPath({}))
           ),
-        disabled: !isDownloadedAndAssignedToUser,
-        hidden: isReviewingDeclaration
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
-        label: isReviewingIncompleteDeclaration
-          ? reviewLabel
-          : actionLabels[ActionType.REGISTER],
+        label: actionLabels[ActionType.REGISTER],
         icon: getAction(ActionType.REGISTER)?.icon ?? ('PencilLine' as const),
         onClick: async (workqueue) =>
           onQuickAction(ActionType.REGISTER, workqueue),
-        ctaLabel: reviewLabel,
-        onCtaClick: (workqueue) =>
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
-          ),
         disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.PRINT_CERTIFICATE]: {
@@ -507,7 +476,6 @@ function useViewableActionConfigurations(
             )
           )
         },
-        ctaLabel: reviewLabel,
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
@@ -547,7 +515,7 @@ function useCustomActionConfigs(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { customActionModal, onCustomAction } = useCustomActionModal(event)
+  const { customActionModal, onCustomAction } = useCustomActionModal(event.id, eventConfiguration)
   const { useFindEventFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)

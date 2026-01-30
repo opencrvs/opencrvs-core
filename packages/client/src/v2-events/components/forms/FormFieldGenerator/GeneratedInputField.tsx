@@ -63,6 +63,7 @@ import {
   isQrReaderFieldType,
   isLoaderFieldType,
   isAgeFieldType,
+  isNumberWithUnitFieldType,
   isCustomFieldType,
   isHiddenFieldType
 } from '@opencrvs/commons/client'
@@ -102,6 +103,7 @@ import { IdReader } from '@client/v2-events/features/events/registered-fields/Id
 import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
+import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
 import {
@@ -432,6 +434,19 @@ export const GeneratedInputField = React.memo(
         </InputField>
       )
     }
+    if (isNumberWithUnitFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <NumberWithUnit.Input
+            {...inputProps}
+            configuration={field.config.configuration}
+            options={field.config.options}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
 
     if (isTextAreaFieldType(field)) {
       return (
@@ -472,6 +487,7 @@ export const GeneratedInputField = React.memo(
             error={inputFieldProps.error}
             label={uploadedFileNameLabel}
             maxFileSize={field.config.configuration.maxFileSize}
+            maxImageSize={field.config.configuration.maxImageSize}
             value={field.value}
             width={field.config.configuration.style?.width}
             onChange={handleFileChange}
@@ -647,6 +663,7 @@ export const GeneratedInputField = React.memo(
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
             error={inputFieldProps.error}
             maxFileSize={field.config.configuration.maxFileSize}
+            maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}

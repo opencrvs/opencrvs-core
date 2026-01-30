@@ -14,13 +14,12 @@ import {
   EventDocument,
   getOrThrow,
   getTokenPayload,
-  LocationType,
   TestUserRole,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { getLeafLocationIds } from '@client/v2-events/hooks/useLocations'
-import { V2_DEFAULT_MOCK_LOCATIONS_MAP } from '@client/tests/v2-events/locations-mock'
+import { getLeafAdministrativeAreaIds } from '@client/v2-events/hooks/useAdministrativeAreas'
+import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP } from '@client/tests/v2-events/administrative-hierarchy-mock'
 
 const generator = testDataGenerator()
 
@@ -79,9 +78,8 @@ export function getTestValidatorContext(
     'Token payload missing. User is not logged in'
   )
 
-  const leafAdminStructureLocationIds = getLeafLocationIds(
-    V2_DEFAULT_MOCK_LOCATIONS_MAP,
-    [LocationType.enum.ADMIN_STRUCTURE]
+  const leafAdminStructureLocationIds = getLeafAdministrativeAreaIds(
+    V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
   )
 
   return {

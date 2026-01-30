@@ -13,7 +13,7 @@
 import * as z from 'zod/v4'
 import {
   AddressField,
-  AdministrativeArea,
+  AdministrativeAreaField,
   BulletList,
   Checkbox,
   Country,
@@ -34,6 +34,7 @@ import {
   TextAreaField,
   TextField,
   NumberField,
+  NumberWithUnitField,
   DataField,
   NameField,
   PhoneField,
@@ -82,6 +83,8 @@ import {
   AddressType,
   NameFieldValue,
   HttpFieldUpdateValue,
+  NumberWithUnitFieldValue,
+  NumberWithUnitFieldUpdateValue,
   QueryParamReaderFieldUpdateValue,
   QrReaderFieldValue,
   IdReaderFieldValue,
@@ -169,6 +172,11 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.NUMBER:
       schema = NumberFieldValue
       break
+    case FieldType.NUMBER_WITH_UNIT:
+      schema = field.required
+        ? NumberWithUnitFieldValue
+        : NumberWithUnitFieldUpdateValue
+      break
     case FieldType.CHECKBOX:
       schema = CheckboxFieldValue
       break
@@ -237,6 +245,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.NUMBER:
+    case FieldType.NUMBER_WITH_UNIT:
     case FieldType.EMAIL:
     case FieldType.DATE:
     case FieldType.AGE:
@@ -346,6 +355,16 @@ export const isNumberFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: number; config: NumberField } => {
   return field.config.type === FieldType.NUMBER
+}
+
+export const isNumberWithUnitFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is {
+  value: NumberWithUnitFieldValue
+  config: NumberWithUnitField
+} => {
+  return field.config.type === FieldType.NUMBER_WITH_UNIT
 }
 
 export const isNameFieldType = (field: {
@@ -466,7 +485,7 @@ export const isDividerFieldType = (field: {
 export const isAdministrativeAreaFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
-}): field is { value: string; config: AdministrativeArea } => {
+}): field is { value: string; config: AdministrativeAreaField } => {
   return field.config.type === FieldType.ADMINISTRATIVE_AREA
 }
 
