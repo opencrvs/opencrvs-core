@@ -181,7 +181,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
       schema = FileFieldValue
       break
     case FieldType.FILE_WITH_OPTIONS:
-      schema = FileFieldWithOptionValue
+      schema = field.required
+        ? FileFieldWithOptionValue.min(1)
+        : FileFieldWithOptionValue
       break
     case FieldType.ADDRESS:
       schema = getDynamicAddressFieldValue(field)
