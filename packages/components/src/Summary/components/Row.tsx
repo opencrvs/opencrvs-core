@@ -27,6 +27,9 @@ const RowLabelContainer = styled.th`
 `
 
 const RowValueContainer = styled.td`
+  /* Set a default font style as some 'value's may be components rendering to plain text */
+  ${({ theme }) => theme.fonts.reg16}
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: block;
   }
