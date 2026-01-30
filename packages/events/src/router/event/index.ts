@@ -14,8 +14,6 @@ import {
   getScopes,
   getUUID,
   SCOPES,
-  findScope,
-  UUID,
   RecordScopeV2
 } from '@opencrvs/commons'
 import {
