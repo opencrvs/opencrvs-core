@@ -25,7 +25,12 @@ import { EventIndex } from './EventIndex'
 
 type AlwaysAllowed = null
 
-// This defines the mapping between event actions and the scopes required to perform them.
+/**
+ * Defines the mapping between record actions and the scopes required to perform them.
+ * - Any of the listed scopes is enough to perform the action.
+ * - Empty array means that the action is never allowed.
+ * - Null is always allowed.
+ */
 export const ACTION_SCOPE_MAP = {
   [ActionType.READ]: ['record.read'],
   [ActionType.CREATE]: ['record.create'],
