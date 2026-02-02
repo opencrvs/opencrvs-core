@@ -76,6 +76,11 @@ function V2ActionTypeToV1ActionType(
   actionType: ActionType
 ): V1ActionType | null {
   switch (actionType) {
+    case ActionType.CUSTOM:
+    case ActionType.DELETE:
+    case ActionType.CREATE:
+    case ActionType.DUPLICATE_DETECTED:
+      return null
     case ActionType.DECLARE:
       return 'DECLARED'
     case ActionType.REGISTER:
@@ -96,14 +101,8 @@ function V2ActionTypeToV1ActionType(
       return 'REJECTED_CORRECTION'
     case ActionType.READ:
       return 'VIEWED'
-    case ActionType.DELETE:
-      return null
-    case ActionType.CREATE:
-      return null
     case ActionType.NOTIFY:
       return 'IN_PROGRESS'
-    case ActionType.DUPLICATE_DETECTED:
-      return null
     case ActionType.ARCHIVE:
       return 'ARCHIVED'
     case ActionType.ASSIGN:
