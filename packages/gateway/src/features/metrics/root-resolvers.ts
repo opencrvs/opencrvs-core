@@ -80,6 +80,7 @@ function V2ActionTypeToV1ActionType(
     case ActionType.DELETE:
     case ActionType.CREATE:
     case ActionType.DUPLICATE_DETECTED:
+    case ActionType.EDIT:
       return null
     case ActionType.DECLARE:
       return 'DECLARED'
@@ -299,7 +300,8 @@ export const resolvers: GQLResolver = {
             ActionTypes.enum.CREATE,
             ActionTypes.enum.DUPLICATE_DETECTED,
             ActionTypes.enum.NOTIFY,
-            ActionTypes.enum.CUSTOM
+            ActionTypes.enum.CUSTOM,
+            ActionTypes.enum.EDIT
           ]).options
         },
         { ...authHeader }
