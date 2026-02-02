@@ -8,24 +8,31 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
+import { http, HttpResponse } from 'msw'
 import fc from 'fast-check'
 import {
+  ActionType,
   AddressType,
+  FieldType,
   JurisdictionFilter,
   RecordScopeV2,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
   createPrng,
   encodeScope,
+  generateEventConfig,
+  generateTranslationConfig,
   getOrThrow,
   pickRandom
 } from '@opencrvs/commons'
 import { createTestClient, TEST_USER_DEFAULT_SCOPES } from '@events/tests/utils'
+import { mswServer } from '@events/tests/msw'
 import {
   payloadGenerator,
   setupHierarchyWithUsers
 } from '@events/tests/generators'
+import { env } from '../../environment'
 
 test('single scope, multi-filter combinations', async () => {
   const rng = createPrng(123453)
@@ -87,20 +94,22 @@ test('single scope, multi-filter combinations', async () => {
   const scopeCombinations = fc.record({
     user: testUsers,
     declaredIn: jurisdictionOptions,
-    declaredBy: userOptions
+    declaredBy: userOptions,
+    placeOfEvent: jurisdictionOptions
   })
 
   // 4. Property based test to verify each combination works as expected.
   await fc.assert(
     fc.asyncProperty(
       scopeCombinations,
-      async ({ user, declaredIn, declaredBy }) => {
+      async ({ user, declaredIn, declaredBy, placeOfEvent }) => {
         const searchScope = encodeScope({
           type: 'record.search',
           options: {
             event: [TENNIS_CLUB_MEMBERSHIP],
             declaredIn,
-            declaredBy
+            declaredBy,
+            placeOfEvent
           }
         })
 
@@ -175,9 +184,34 @@ test('single scope, multi-filter combinations', async () => {
         // 4. User should see all declarations when declaredIn=all and no declaredBy filter is not set
         if (
           declaredIn === JurisdictionFilter.enum.all &&
-          declaredBy === undefined
+          declaredBy === undefined &&
+          placeOfEvent === undefined
         ) {
           expect(results.length).toBe(users.length)
+        }
+
+        // 5. User should only see declarations from their exact location when placeOfEvent=location is set.
+        if (placeOfEvent === JurisdictionFilter.enum.location) {
+          for (const r of results) {
+            expect(r.placeOfEvent).toBe(user.primaryOfficeId)
+          }
+        }
+
+        // 6. User should only see declarations from their administrative area when placeOfEvent=administrativeArea is set.
+        if (placeOfEvent === JurisdictionFilter.enum.administrativeArea) {
+          for (const r of results) {
+            const eventLocation = getOrThrow(
+              r.placeOfEvent,
+              'placeOfEvent is undefined'
+            )
+
+            expect(
+              isUnderAdministrativeArea(
+                eventLocation,
+                user.administrativeAreaId
+              )
+            ).toBe(true)
+          }
         }
       }
     ),
@@ -245,6 +279,8 @@ test('multi-scope combinations', async () => {
 
   const scopeCombinations = fc.record({
     user: testUsers,
+    placeOfEvent1: jurisdictionOptions,
+    placeOfEvent2: jurisdictionOptions,
     declaredIn1: jurisdictionOptions,
     declaredBy1: userOptions,
     declaredIn2: jurisdictionOptions,
@@ -255,13 +291,22 @@ test('multi-scope combinations', async () => {
   await fc.assert(
     fc.asyncProperty(
       scopeCombinations,
-      async ({ user, declaredIn1, declaredBy1, declaredIn2, declaredBy2 }) => {
+      async ({
+        user,
+        declaredIn1,
+        declaredBy1,
+        declaredIn2,
+        declaredBy2,
+        placeOfEvent1,
+        placeOfEvent2
+      }) => {
         const scope1 = {
           type: 'record.search',
           options: {
             event: [TENNIS_CLUB_MEMBERSHIP],
             declaredIn: declaredIn1,
-            declaredBy: declaredBy1
+            declaredBy: declaredBy1,
+            placeOfEvent: placeOfEvent1
           }
         }
 
@@ -270,7 +315,8 @@ test('multi-scope combinations', async () => {
           options: {
             event: [TENNIS_CLUB_MEMBERSHIP],
             declaredBy: declaredBy2,
-            declaredIn: declaredIn2
+            declaredIn: declaredIn2,
+            placeOfEvent: placeOfEvent2
           }
         }
 
@@ -302,6 +348,16 @@ test('multi-scope combinations', async () => {
         ) {
           for (const r of searchResult.results) {
             expect(r.legalStatuses.DECLARED?.createdBy).toBe(user.id)
+          }
+        }
+
+        // 2. Strictest filter is applied only when the other all scopes have it. User should only see declarations from their exact location placeOfEvent is set on both (and uses default).
+        if (
+          scope1.options.placeOfEvent === JurisdictionFilter.enum.location &&
+          scope2.options.placeOfEvent === JurisdictionFilter.enum.location
+        ) {
+          for (const r of searchResult.results) {
+            expect(r.placeOfEvent).toBe(user.primaryOfficeId)
           }
         }
       }
@@ -518,4 +574,146 @@ test('combined registeredBy and declaredBy filters in scope', async () => {
   // None of the users should see the event as it was declared by or registered by a different user than themselves.
   expect(districtAUserResults.length).toBe(0)
   expect(provinceAUserResults.length).toBe(0)
+})
+
+test('placeOfEvent scope filters out results', async () => {
+  const addressFieldId = 'whereEventHappened'
+  const eventType = 'event-with-optional-address'
+
+  const eventWithOptionalAddress = generateEventConfig({
+    id: eventType,
+    fields: [
+      {
+        type: FieldType.ADDRESS,
+        id: addressFieldId,
+        label: generateTranslationConfig('Place of Event'),
+        required: false
+      },
+      {
+        type: FieldType.TEXT,
+        id: 'textField',
+        label: generateTranslationConfig('Some Text Field'),
+        required: true
+      }
+    ],
+    placeOfEventId: addressFieldId
+  })
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([eventWithOptionalAddress])
+    })
+  )
+
+  const { users } = await setupHierarchyWithUsers()
+
+  const user = users[0]
+
+  const clientWithActionScopes = createTestClient(user, [
+    `record.create[event=${eventType}]`,
+    `record.read[event=${eventType}]`,
+    `record.notify[event=${eventType}]`,
+    `record.declare[event=${eventType}]`
+  ])
+
+  // 1. Create event without placeOfEvent filled (defaults to user's location)
+  const eventWithoutPlaceOfEventFilled =
+    await clientWithActionScopes.event.create({
+      transactionId: 'tx-001',
+      type: eventType
+    })
+
+  await expect(
+    clientWithActionScopes.event.actions.declare.request({
+      eventId: eventWithoutPlaceOfEventFilled.id,
+      type: ActionType.DECLARE,
+      transactionId: '12312312312',
+      declaration: {
+        textField: 'Some text'
+      }
+    })
+  ).resolves.toBeDefined()
+
+  // 2. Create event with placeOfEvent filled (input user's administrative area)
+  const eventWithPlaceOfEventFilled = await clientWithActionScopes.event.create(
+    {
+      transactionId: 'tx-002',
+      type: eventType
+    }
+  )
+
+  await expect(
+    clientWithActionScopes.event.actions.declare.request({
+      eventId: eventWithPlaceOfEventFilled.id,
+      type: ActionType.DECLARE,
+      transactionId: '12312312312-2',
+      declaration: {
+        textField: 'Some text',
+        whereEventHappened: {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: user.administrativeAreaId
+        }
+      }
+    })
+  ).resolves.toBeDefined()
+
+  // 3. Search with different placeOfEvent scopes
+  const searchClientLocation = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  const searchClientAdministrativeArea = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        placeOfEvent: 'administrativeArea'
+      }
+    })
+  ])
+
+  const { results: resultsLocation } = await searchClientLocation.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType
+        }
+      ]
+    }
+  })
+
+  const { results: resultsAdministrativeArea } =
+    await searchClientAdministrativeArea.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            eventType
+          }
+        ]
+      }
+    })
+
+  // 4. User should see both events when searching with administrativeArea filter
+  expect(resultsAdministrativeArea.length).toBe(2)
+  expect(user.administrativeAreaId).toBeDefined()
+  expect(
+    resultsAdministrativeArea.some(
+      (r) => r.placeOfEvent === user.administrativeAreaId
+    )
+  ).toBe(true)
+  expect(
+    resultsAdministrativeArea.some(
+      (r) => r.placeOfEvent === user.primaryOfficeId
+    )
+  ).toBe(true)
+  // 5. User should see only the event which defaulted to their location
+  expect(resultsLocation.length).toBe(1)
+  expect(resultsLocation[0].placeOfEvent).toBe(user.primaryOfficeId)
 })

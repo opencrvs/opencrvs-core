@@ -292,8 +292,23 @@ function generateTestUsersForLocations(
 }
 /**
  * Sets up a realistic hierarchy of administrative areas, offices, and users for testing scopes.
- * Each location has two users assigned to it. Hiearchies include cases where some levels are skipped or do not exist.
  *
+ * Administrative hierarchy:
+ *
+ * Province A
+ * └── District A
+ *     └── Village A
+ *
+ * Province B
+ * └── Village B (skips district level)
+ *
+ * District C (no parent, no children)
+ *
+ * Each administrative area has 2 locations:
+ * - CRVS Office
+ * - Health Facility
+ *
+ * Each location has 2 users (Mirella-X and Jonathan-X)
  */
 export async function setupHierarchyWithUsers() {
   const rng = createPrng(1234)
