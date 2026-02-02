@@ -72,49 +72,6 @@ type V1ActionType =
   | 'MARKED_AS_DUPLICATE'
   | 'MARKED_AS_NOT_DUPLICATE'
 
-function V2ActionTypeToV1ActionType(
-  actionType: ActionType
-): V1ActionType | null {
-  switch (actionType) {
-    case ActionType.CUSTOM:
-    case ActionType.DELETE:
-    case ActionType.CREATE:
-    case ActionType.DUPLICATE_DETECTED:
-    case ActionType.EDIT:
-      return null
-    case ActionType.DECLARE:
-      return 'DECLARED'
-    case ActionType.REGISTER:
-      return 'REGISTERED'
-    case ActionType.REJECT:
-      return 'REJECTED'
-    case ActionType.PRINT_CERTIFICATE:
-      return 'CERTIFIED'
-    case ActionType.MARK_AS_DUPLICATE:
-      return 'MARKED_AS_DUPLICATE'
-    case ActionType.MARK_AS_NOT_DUPLICATE:
-      return 'MARKED_AS_NOT_DUPLICATE'
-    case ActionType.REQUEST_CORRECTION:
-      return 'REQUESTED_CORRECTION'
-    case ActionType.APPROVE_CORRECTION:
-      return 'APPROVED_CORRECTION'
-    case ActionType.REJECT_CORRECTION:
-      return 'REJECTED_CORRECTION'
-    case ActionType.READ:
-      return 'VIEWED'
-    case ActionType.NOTIFY:
-      return 'IN_PROGRESS'
-    case ActionType.ARCHIVE:
-      return 'ARCHIVED'
-    case ActionType.ASSIGN:
-      return 'ASSIGNED'
-    case ActionType.UNASSIGN:
-      return 'UNASSIGNED'
-    default:
-      return null
-  }
-}
-
 export const resolvers: GQLResolver = {
   Query: {
     async getTotalMetrics(_, variables, { headers: authHeader }) {
@@ -279,9 +236,7 @@ export const resolvers: GQLResolver = {
       )
 
       const user = await getUser(
-        {
-          practitionerId: params.practitionerId
-        },
+        { practitionerId: params.practitionerId },
         authHeader
       )
 
@@ -292,32 +247,19 @@ export const resolvers: GQLResolver = {
           skip: 0,
           count: params.count + (params.skip || 0),
           timeStart: params.timeStart,
-          timeEnd: params.timeEnd,
-          // 2. In order to get the correct action total, we need to exclude actions that are not mapped to V1 actions.
-          // Removing them after the fact will break the pagination and result to "no results found" pages.
-          actionTypes: ActionTypes.exclude([
-            ActionTypes.enum.DELETE,
-            ActionTypes.enum.CREATE,
-            ActionTypes.enum.DUPLICATE_DETECTED,
-            ActionTypes.enum.NOTIFY,
-            ActionTypes.enum.CUSTOM,
-            ActionTypes.enum.EDIT
-          ]).options
+          timeEnd: params.timeEnd
         },
         { ...authHeader }
       )
 
       const cleanedEventActions = eventActionsData.results.map((action) => ({
         isV2: true,
-        action: V2ActionTypeToV1ActionType(action.actionType as ActionType),
+        action: action.actionType,
         ipAddress: '', // Not available in event actions
         practitionerId: action.createdBy,
         time: action.createdAt,
         userAgent: '', // Not available in event actions
-        data: {
-          compositionId: action.eventId,
-          trackingId: action.trackingId
-        }
+        data: { compositionId: action.eventId, trackingId: action.trackingId }
       }))
 
       // 3. Combine and sort the results by time.
