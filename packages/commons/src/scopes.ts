@@ -104,9 +104,6 @@ export const SCOPES = {
   USER_UPDATE: 'user.update:all',
   USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
 
-  // dashboard
-  DASHBOARD_VIEW: 'dashboard.view',
-
   // config
   CONFIG_UPDATE_ALL: 'config.update:all',
 
@@ -172,7 +169,7 @@ const CorrectionScopes = z.union([
 ])
 
 // Search
-export const SearchScopes = z.union([
+const SearchScopes = z.union([
   z.literal(SCOPES.SEARCH_BIRTH_MY_JURISDICTION),
   z.literal(SCOPES.SEARCH_BIRTH),
   z.literal(SCOPES.SEARCH_DEATH_MY_JURISDICTION),
@@ -229,7 +226,6 @@ const LiteralScopes = z.union([
   SearchScopes,
   AuditScopes,
   z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
-  z.literal(SCOPES.DASHBOARD_VIEW),
   PerformanceScopes,
   OrganisationScopes,
   UserScopes,
@@ -276,6 +272,13 @@ const SearchScope = z.object({
   })
 })
 
+export const DashboardScope = z.object({
+  type: z.literal('dashboard.view'),
+  options: z.object({
+    id: z.array(z.string())
+  })
+})
+
 export type SearchScope = z.infer<typeof SearchScope>
 
 export const RecordScopeType = z.enum([
@@ -291,8 +294,7 @@ export const RecordScopeType = z.enum([
   'record.registered.print-certified-copies',
   'record.registered.request-correction',
   'record.registered.correct',
-  'record.unassign-others',
-  'dashboard.view'
+  'record.unassign-others'
 ])
 
 export type RecordScopeType = z.infer<typeof RecordScopeType>
@@ -328,6 +330,7 @@ const ConfigurableRawScopes = z.discriminatedUnion('type', [
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
+  DashboardScope,
   RecordScope,
   CustomActionScope
 ])

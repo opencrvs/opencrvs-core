@@ -259,7 +259,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.DASHBOARD.path,
       element: (
-        <ProtectedRoute scopes={[SCOPES.DASHBOARD_VIEW]}>
+        <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
           <PerformanceDashboard />
         </ProtectedRoute>
       )
