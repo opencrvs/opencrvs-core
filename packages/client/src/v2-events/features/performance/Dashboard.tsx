@@ -58,7 +58,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
   )
   const history = useNavigationHistory()
   const token = getToken()
-  const [error, setError] = useState<'FORBIDDEN' | undefined>(undefined)
+  const [error, setError] = useState<boolean | undefined>(undefined)
 
   const handleCrossBar = () => {
     if (history.length > 1) {
@@ -87,22 +87,19 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
         return
       }
 
-      if (
-        event.data?.type === 'READY' ||
-        event.data?.type === 'AUTH_REQUIRED'
-      ) {
+      if (event.data?.type === 'REQUEST_AUTH_TOKEN') {
         sourceWindow.postMessage({ type: 'AUTH_TOKEN', token }, event.origin)
       }
 
       if (event.data?.type === 'FORBIDDEN') {
-        setError('FORBIDDEN')
+        setError(true)
       }
     }
 
     window.addEventListener('message', handleMessage)
 
     return () => window.removeEventListener('message', handleMessage)
-  }, [dashboard.context?.auth, dashboard.origin, navigate, token])
+  }, [dashboard.context?.auth, dashboard.origin, token])
 
   return (
     <>
