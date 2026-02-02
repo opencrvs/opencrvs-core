@@ -41,7 +41,7 @@ on:
       branch_tag_name:
         default: develop
         required: true
-        description: Branch or Tag to build from
+        description: Branch (or tag) to build from
       publish_release:
         type: boolean
         default: false
@@ -50,6 +50,7 @@ on:
         type: boolean
         required: false
         default: false
+        description: Skip security scanning of images
       build_arm:
         description: Build ARM images
         type: boolean
