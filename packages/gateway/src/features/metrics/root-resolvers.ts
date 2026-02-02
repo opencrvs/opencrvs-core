@@ -253,6 +253,7 @@ export const resolvers: GQLResolver = {
       )
 
       const cleanedEventActions = eventActionsData.results.map((action) => ({
+        // TODO CIHAN: remove isV2?
         isV2: true,
         action: action.actionType,
         ipAddress: '', // Not available in event actions
