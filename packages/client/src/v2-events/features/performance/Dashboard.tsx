@@ -32,7 +32,6 @@ const StyledIFrame = styled(IframeResizer)`
 `
 interface IdashboardView {
   dashboard: {
-    origin: string
     context?: {
       auth: 'postMessage'
     }
@@ -44,6 +43,15 @@ interface IdashboardView {
     url: string
   }
   icon?: JSX.Element
+}
+
+function isValidAbsoluteURL(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.origin !== 'null'
+  } catch {
+    return false
+  }
 }
 
 function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
@@ -75,8 +83,13 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
       return
     }
 
+    if (!isValidAbsoluteURL(dashboard.url)) {
+      throw new Error(`Invalid dashboard URL: ${dashboard.url}`)
+    }
+
+    const dashboardOrigin = new URL(dashboard.url).origin
     const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== dashboard.origin) {
+      if (event.origin !== dashboardOrigin) {
         return
       }
 
@@ -94,7 +107,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
     window.addEventListener('message', handleMessage)
 
     return () => window.removeEventListener('message', handleMessage)
-  }, [dashboard.context?.auth, dashboard.origin, token])
+  }, [dashboard.context?.auth, dashboard.url, token])
 
   return (
     <>
