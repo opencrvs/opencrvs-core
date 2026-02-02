@@ -33,7 +33,7 @@ const StyledIFrame = styled(IframeResizer)`
 interface IdashboardView {
   dashboard: {
     context?: {
-      auth: 'postMessage'
+      auth: 'REQUEST_AUTH_TOKEN'
     }
     title: {
       id: string
@@ -79,7 +79,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
 
   // ---- Send token to wrapper iframe when ready ----
   useEffect(() => {
-    if (!token || dashboard.context?.auth !== 'postMessage') {
+    if (!token || dashboard.context?.auth !== 'REQUEST_AUTH_TOKEN') {
       return
     }
 
