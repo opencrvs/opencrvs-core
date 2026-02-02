@@ -299,7 +299,8 @@ export const resolvers: GQLResolver = {
             ActionTypes.enum.DELETE,
             ActionTypes.enum.CREATE,
             ActionTypes.enum.DUPLICATE_DETECTED,
-            ActionTypes.enum.NOTIFY
+            ActionTypes.enum.NOTIFY,
+            ActionTypes.enum.CUSTOM
           ]).options
         },
         { ...authHeader }
