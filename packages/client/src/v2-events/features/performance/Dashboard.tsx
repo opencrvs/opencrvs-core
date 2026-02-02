@@ -58,7 +58,6 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
   )
   const history = useNavigationHistory()
   const token = getToken()
-  const [error, setError] = useState<boolean | undefined>(undefined)
 
   const handleCrossBar = () => {
     if (history.length > 1) {
@@ -89,10 +88,6 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
 
       if (event.data?.type === 'REQUEST_AUTH_TOKEN') {
         sourceWindow.postMessage({ type: 'AUTH_TOKEN', token }, event.origin)
-      }
-
-      if (event.data?.type === 'FORBIDDEN') {
-        setError(true)
       }
     }
 
@@ -134,16 +129,14 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
           constantsMessages.skipToMainContent
         )}
       >
-        {!error ? (
+        {
           <StyledIFrame
             ref={iframeRef}
             allowFullScreen
             id={title}
             src={dashboard.url}
           />
-        ) : (
-          <></>
-        )}
+        }
       </Frame>
     </>
   )
