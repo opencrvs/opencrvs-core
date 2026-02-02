@@ -104,6 +104,9 @@ export const SCOPES = {
   USER_UPDATE: 'user.update:all',
   USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
 
+  // dashboard
+  DASHBOARD_VIEW: 'dashboard.view',
+
   // config
   CONFIG_UPDATE_ALL: 'config.update:all',
 
@@ -226,6 +229,7 @@ const LiteralScopes = z.union([
   SearchScopes,
   AuditScopes,
   z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
+  z.literal(SCOPES.DASHBOARD_VIEW),
   PerformanceScopes,
   OrganisationScopes,
   UserScopes,
@@ -287,7 +291,8 @@ export const RecordScopeType = z.enum([
   'record.registered.print-certified-copies',
   'record.registered.request-correction',
   'record.registered.correct',
-  'record.unassign-others'
+  'record.unassign-others',
+  'dashboard.view'
 ])
 
 export type RecordScopeType = z.infer<typeof RecordScopeType>
