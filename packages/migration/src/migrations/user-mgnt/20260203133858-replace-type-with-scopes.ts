@@ -59,11 +59,11 @@ export const down = async (db: Db, client: MongoClient) => {
                             then: 'WEBHOOK',
                             else: {
                               $cond: {
-                                if: { $in: ['record-import', '$scope'] },
+                                if: { $in: ['record.import', '$scope'] },
                                 then: 'IMPORT_EXPORT',
                                 else: {
                                   $cond: {
-                                    if: { $in: ['record-reindex', '$scope'] },
+                                    if: { $in: ['record.reindex', '$scope'] },
                                     then: 'REINDEX',
                                     else: {
                                       $cond: {

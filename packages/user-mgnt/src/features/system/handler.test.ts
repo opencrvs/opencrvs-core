@@ -89,8 +89,7 @@ const mockSystem = {
   practitionerId: '123',
   sha_secret: '123',
   scope: ['nationalId'],
-  status: statuses.ACTIVE,
-  type: 'NATIONAL_ID'
+  status: statuses.ACTIVE
 } as unknown as ISystem & { secretHash: string }
 
 describe('registerSystem handler', () => {
@@ -118,7 +117,7 @@ describe('registerSystem handler', () => {
       method: 'POST',
       url: '/registerSystem',
       payload: {
-        type: 'RECORD_SEARCH',
+        scopes: [SCOPES.RECORDSEARCH],
         name: 'Fortune Green',
         settings: {
           dailyQuota: 50
@@ -138,7 +137,8 @@ describe('registerSystem handler', () => {
       method: 'POST',
       url: '/registerSystem',
       payload: {
-        type: 'NATIONAL_ID'
+        scopes: [SCOPES.NATIONALID],
+        name: 'Test System'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -153,7 +153,8 @@ describe('registerSystem handler', () => {
       method: 'POST',
       url: '/registerSystem',
       payload: {
-        type: 'NATIONAL_ID'
+        scopes: [SCOPES.NATIONALID],
+        name: 'Test System'
       },
       headers: {
         Authorization: `Bearer ${badToken}`
@@ -163,12 +164,12 @@ describe('registerSystem handler', () => {
     expect(res.statusCode).toBe(403)
   })
 
-  it('return an error if system scope is not supported', async () => {
+  it('return an error if scopes are not provided', async () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/registerSystem',
       payload: {
-        type: '123'
+        name: 'Test System'
       },
       headers: {
         Authorization: `Bearer ${token}`

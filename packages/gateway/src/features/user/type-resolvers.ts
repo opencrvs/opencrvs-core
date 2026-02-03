@@ -81,7 +81,6 @@ export interface ISystemModelData {
   username: string
   status: string
   sha_secret: string
-  type: 'HEALTH'
   practitionerId: string
   settings: {
     dailyQuota: number
