@@ -32,69 +32,17 @@ export const up = async (db: Db, client: MongoClient) => {
 }
 
 export const down = async (db: Db, client: MongoClient) => {
-  const session = client.startSession()
-  try {
-    await session.withTransaction(async () => {
-      // Restore the type field based on the scopes array
-      // This uses the same logic as the original migration that created types from scopes
-      
-      await db.collection('systems').updateMany({}, [
-        {
-          $set: {
-            type: {
-              $cond: {
-                if: { $in: ['notification-api', '$scope'] },
-                then: 'HEALTH',
-                else: {
-                  $cond: {
-                    if: { $in: ['nationalId', '$scope'] },
-                    then: 'NATIONAL_ID',
-                    else: {
-                      $cond: {
-                        if: { $in: ['recordsearch', '$scope'] },
-                        then: 'RECORD_SEARCH',
-                        else: {
-                          $cond: {
-                            if: { $in: ['webhook', '$scope'] },
-                            then: 'WEBHOOK',
-                            else: {
-                              $cond: {
-                                if: { $in: ['record.import', '$scope'] },
-                                then: 'IMPORT_EXPORT',
-                                else: {
-                                  $cond: {
-                                    if: { $in: ['record.reindex', '$scope'] },
-                                    then: 'REINDEX',
-                                    else: {
-                                      $cond: {
-                                        if: {
-                                          $regexMatch: {
-                                            input: { $arrayElemAt: ['$scope', 0] },
-                                            regex: /^record\.(read|create|notify)/
-                                          }
-                                        },
-                                        then: 'CITIZEN_PORTAL',
-                                        else: null
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ])
-    })
-  } finally {
-    await session.endSession()
-  }
+  // This migration cannot be reliably reversed because:
+  // 1. Multiple types can have the same scopes (e.g., HEALTH and CITIZEN_PORTAL both use record.create, record.notify)
+  // 2. Custom scope combinations don't map to any type
+  // 3. The type field is deprecated and only existed transiently - it was never part of the long-term data model
+  // 
+  // If you need to roll back this migration, you'll need to:
+  // - Restore the systems collection from a backup taken before the migration
+  // - Or manually recreate the type field based on your knowledge of each system's purpose
+  throw new Error(
+    'Cannot reverse this migration: type cannot be reliably derived from scopes. ' +
+    'Restore from backup if rollback is required.'
+  )
 }
 

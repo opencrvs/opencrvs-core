@@ -241,8 +241,9 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }
 
   const systemToLabel = (system: System) => {
-    // Simply return the generic type label - no need to derive type from scopes
-    return intl.formatMessage(integrationMessages.type)
+    // Show the scopes directly - don't try to derive type as it's not reliable
+    // Type only exists at creation time to select which scopes to assign
+    return system.scopes?.join(', ') || EMPTY_STRING
   }
 
   return (
