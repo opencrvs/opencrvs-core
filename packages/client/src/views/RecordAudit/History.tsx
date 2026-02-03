@@ -46,7 +46,6 @@ import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'qs'
 import { SystemRole } from '@opencrvs/commons/client'
-import { SCOPES } from '@opencrvs/commons/authentication'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -126,21 +125,8 @@ const GetNameWithAvatar = ({
 }
 
 function getSystemType(system: { type?: string; scopes?: string[] } | undefined) {
-  // If scopes are available, derive type from them
-  if (system?.scopes) {
-    // Use exact match with SCOPES constant for reliability
-    const hasRecordSearch = system.scopes.includes(SCOPES.RECORDSEARCH)
-    if (hasRecordSearch) {
-      return integrationMessages.recordSearch
-    }
-  }
-  
-  // Fall back to legacy type field if available
-  if (system?.type === SystemRole.enum.RECORD_SEARCH) {
-    return integrationMessages.recordSearch
-  }
-  
-  return integrationMessages.healthSystem
+  // Return generic integration type message
+  return integrationMessages.type
 }
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const getIndexByAction = (histories: any, index: number): number => {

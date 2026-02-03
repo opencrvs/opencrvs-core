@@ -10,19 +10,18 @@
  */
 
 import { SystemType } from '@client/utils/gateway'
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { SCOPES } from '@opencrvs/commons/client'
 
 /**
  * Maps a SystemType to its corresponding scopes array
  * This function translates the client-side type concept to backend scopes
- * Event IDs are included for configurable scopes like record.create and record.notify
  */
 export function getSystemScopesFromType(
   systemType: SystemType,
   eventIds: string[]
 ): string[] {
   const baseScopes: Record<SystemType, string[]> = {
-    [SystemType.Health]: [SCOPES.NOTIFICATION_API],
+    [SystemType.Health]: ['record.create', 'record.notify'],
     [SystemType.NationalId]: [SCOPES.NATIONALID],
     [SystemType.RecordSearch]: [SCOPES.RECORDSEARCH],
     [SystemType.Webhook]: [SCOPES.WEBHOOK],
@@ -37,19 +36,7 @@ export function getSystemScopesFromType(
     [SystemType.Reindex]: [SCOPES.RECORD_REINDEX]
   }
 
-  const literalScopes = baseScopes[systemType]
-
-  // For HEALTH type, add configurable event-specific scopes
-  if (systemType === SystemType.Health && eventIds.length > 0) {
-    const eventScopesStr = eventIds.join('|')
-    return [
-      ...literalScopes,
-      `record.create[event=${eventScopesStr}]`,
-      `record.notify[event=${eventScopesStr}]`
-    ]
-  }
-
-  return literalScopes
+  return baseScopes[systemType]
 }
 
 /**

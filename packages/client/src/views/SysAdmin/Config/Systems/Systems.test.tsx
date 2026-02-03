@@ -56,7 +56,7 @@ describe('render create system integrations', () => {
         variables: {
           system: {
             name: 'Sweet Health Org',
-            scopes: ['notification-api']
+            scopes: ['record.create', 'record.notify']
           }
         }
       },
@@ -67,7 +67,7 @@ describe('render create system integrations', () => {
             system: {
               client: '4090df15-f4e5-4f16-ae7e-bb518129d493',
               name: 'Sweet Health Org',
-              scopes: ['notification-api']
+              scopes: ['record.create', 'record.notify']
             }
           }
         }

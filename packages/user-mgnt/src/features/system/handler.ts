@@ -61,27 +61,10 @@ export async function registerSystem(
       return h.response('Scopes are required!').code(400)
     }
 
-    // Check if this is a webhook system based on scopes
-    const isWebhook = scopes.includes(SCOPES.WEBHOOK)
-    if (isWebhook && !settings) {
-      logger.error('Webhook payloads are required !')
-      return h.response('Webhook payloads are required !').code(400)
-    }
-
-    // Check if this is a record search system based on scopes
-    const isRecordSearch = scopes.includes(SCOPES.RECORDSEARCH) && !isWebhook
-    if (isRecordSearch && !settings) {
+    // Set default settings if not provided
+    if (!settings) {
       settings = {
-        dailyQuota: RECORD_SEARCH_QUOTA,
-        webhook: []
-      }
-    }
-
-    // Check if this is an import/export system based on scopes
-    const isImportExport = scopes.includes(SCOPES.RECORD_IMPORT)
-    if (isImportExport && !settings) {
-      settings = {
-        dailyQuota: 1000000, //Arbitrary high number, should we make this configurable?
+        dailyQuota: 0,
         webhook: []
       }
     }
@@ -141,40 +124,7 @@ export async function registerSystem(
       )
     }
 
-    // For systems that need settings (webhook, record search, import/export, citizen portal with specific scopes)
-    const isCitizenPortal =
-      scopes.includes('record.read') ||
-      scopes.includes('record.create') ||
-      scopes.includes('record.notify') ||
-      scopes.some((s) => s.startsWith('record.read[')) ||
-      scopes.some((s) => s.startsWith('record.create[')) ||
-      scopes.some((s) => s.startsWith('record.notify['))
-
-    if (isWebhook || isRecordSearch || isImportExport || isCitizenPortal) {
-      const systemDetails = {
-        client_id,
-        name: name || systemAdminUser.username,
-        createdBy: userId,
-        username: systemAdminUser.username,
-        status: statuses.ACTIVE,
-        scope: scopes,
-        practitionerId,
-        secretHash: hash,
-        salt,
-        sha_secret,
-        settings
-      }
-      const newSystem = await System.create(systemDetails)
-
-      return h
-        .response({
-          // NOTE! Client secret is visible for only this response and then forever gone
-          clientSecret,
-          system: pickSystem(newSystem)
-        })
-        .code(201)
-    }
-
+    // Create system with provided settings
     const systemDetails = {
       client_id,
       name: name || systemAdminUser.username,
@@ -186,6 +136,7 @@ export async function registerSystem(
       secretHash: hash,
       salt,
       sha_secret,
+      settings,
       integratingSystemType
     }
     const newSystem = await System.create(systemDetails)

@@ -51,7 +51,6 @@ import styled from 'styled-components'
 import { useSystems } from './useSystems'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 import { SystemRole } from '@opencrvs/commons/client'
-import { getSystemTypeFromScopes } from './systemScopes'
 import { SCOPES } from '@opencrvs/commons/authentication'
 
 interface ToggleModal {
@@ -215,11 +214,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   )
 
   const getMenuItems = (system: System) => {
-    // Derive type from scopes for conditional UI logic
-    const systemType = system.scopes
-      ? getSystemTypeFromScopes(system.scopes)
-      : null
-
     const menuItems: { handler: () => void; label: string }[] = [
       {
         handler: () => {
@@ -229,7 +223,8 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
       }
     ]
 
-    if (systemType === SystemRole.enum.WEBHOOK) {
+    // Show edit permissions for systems with webhook settings
+    if (system.settings?.webhook && system.settings.webhook.length > 0) {
       menuItems.push({
         handler: () => {
           setSystemToShowPermission(system)
@@ -261,30 +256,9 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     return menuItems
   }
 
-  const systemTypeLabels = {
-    HEALTH: intl.formatMessage(integrationMessages.eventNotification),
-    RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
-    NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
-    WEBHOOK: intl.formatMessage(integrationMessages.webhook),
-    IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport),
-    CITIZEN_PORTAL: intl.formatMessage(integrationMessages.citizenPortal)
-  }
-
   const systemToLabel = (system: System) => {
-    // Derive type from scopes for display
-    if (!system.scopes) {
-      // Fallback to empty string if scopes not available
-      return ''
-    }
-
-    const systemType = getSystemTypeFromScopes(system.scopes)
-    
-    // REINDEX systems are internal and shouldn't normally appear in UI
-    if (systemType === 'REINDEX') {
-      return intl.formatMessage(integrationMessages.recordSearch)
-    }
-    
-    return systemTypeLabels[systemType] || ''
+    // Simply return the generic type label - no need to derive type from scopes
+    return intl.formatMessage(integrationMessages.type)
   }
 
   return (
