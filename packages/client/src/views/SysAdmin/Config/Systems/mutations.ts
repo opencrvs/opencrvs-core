@@ -21,6 +21,7 @@ export const registerSystem = gql`
         name
         shaSecret
         status
+        scopes
         integratingSystemType
         settings {
           webhook {
@@ -41,6 +42,7 @@ export const deactivateSystem = gql`
       name
       shaSecret
       status
+      scopes
       settings {
         webhook {
           event
@@ -58,6 +60,7 @@ export const activateSystem = gql`
       name
       shaSecret
       status
+      scopes
       settings {
         webhook {
           event
@@ -77,6 +80,7 @@ export const refreshClientSecret = gql`
         name
         shaSecret
         status
+        scopes
       }
     }
   }
@@ -89,6 +93,7 @@ export const updateSystemPermissions = gql`
       name
       shaSecret
       status
+      scopes
       settings {
         webhook {
           event
@@ -107,6 +112,7 @@ export const deleteSystem = gql`
       name
       shaSecret
       status
+      scopes
     }
   }
 `
