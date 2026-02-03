@@ -11,23 +11,21 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { getSystemIntegrationRoleScopes } from './scopes'
 import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger, SystemRole } from '@opencrvs/commons'
+import { logger, SCOPES } from '@opencrvs/commons'
 import System, { WebhookPermissions } from '@user-mgnt/model/system'
 import User from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
-import { pickSystem, types } from '@user-mgnt/utils/system'
+import { pickSystem } from '@user-mgnt/utils/system'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
 import uuid from 'uuid/v4'
-import { getInMemoryEventConfigurations } from './countryconfig'
 
 export enum EventType {
   Birth = 'birth',
@@ -45,7 +43,7 @@ interface IRegisterSystemPayload {
     dailyQuota: number
     webhook: WebHookPayload[]
   }
-  type: SystemRole
+  scopes: string[]
   integratingSystemType: string
 }
 
@@ -54,23 +52,34 @@ export async function registerSystem(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRegisterSystemPayload
-  const { name, type, integratingSystemType } = payload
-  let { settings } = payload
+  const { name, integratingSystemType } = payload
+  let { settings, scopes } = payload
 
   try {
-    if (type === types.WEBHOOK && !settings) {
+    if (!scopes || scopes.length === 0) {
+      logger.error('Scopes are required!')
+      return h.response('Scopes are required!').code(400)
+    }
+
+    // Check if this is a webhook system based on scopes
+    const isWebhook = scopes.includes(SCOPES.WEBHOOK)
+    if (isWebhook && !settings) {
       logger.error('Webhook payloads are required !')
       return h.response('Webhook payloads are required !').code(400)
     }
 
-    if (type === types.RECORD_SEARCH && !settings) {
+    // Check if this is a record search system based on scopes
+    const isRecordSearch = scopes.includes(SCOPES.RECORDSEARCH) && !isWebhook
+    if (isRecordSearch && !settings) {
       settings = {
         dailyQuota: RECORD_SEARCH_QUOTA,
         webhook: []
       }
     }
 
-    if (type === types.IMPORT_EXPORT && !settings) {
+    // Check if this is an import/export system based on scopes
+    const isImportExport = scopes.includes(SCOPES.RECORD_IMPORT)
+    if (isImportExport && !settings) {
       settings = {
         dailyQuota: 1000000, //Arbitrary high number, should we make this configurable?
         webhook: []
@@ -81,32 +90,28 @@ export async function registerSystem(
     const token = getTokenPayload(authorization.split(' ')[1])
     const userId = token.sub
     const systemAdminUser = await User.findById(userId)
-    const existingSystem = await System.findOne({ type: type })
+    
+    // Check if this is a national ID system based on scopes
+    const isNationalId = scopes.includes(SCOPES.NATIONALID)
+    if (isNationalId) {
+      const existingSystem = await System.findOne({
+        scope: { $in: [SCOPES.NATIONALID] }
+      })
+      if (existingSystem) {
+        throw new Error('System with NATIONAL_ID scope already exists!')
+      }
+    }
 
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
       logger.error('active system admin user details cannot be found')
       throw unauthorized()
     }
 
-    if (existingSystem && existingSystem.type === types.NATIONAL_ID) {
-      throw new Error('System with NATIONAL_ID already exists !')
-    }
-
-    const eventConfigurations =
-      await getInMemoryEventConfigurations(authorization)
-    const eventIds = eventConfigurations.map((eventConfig) => eventConfig.id)
-    const systemScopes = getSystemIntegrationRoleScopes(type, eventIds)
-
-    if (!systemScopes) {
-      logger.error('scope doesnt exist')
-      return h.response().code(400)
-    }
-
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
-      !systemScopes.includes('demo')
+      !scopes.includes('demo')
     ) {
-      systemScopes.push('demo')
+      scopes.push('demo')
     }
 
     const client_id = uuid()
@@ -134,13 +139,12 @@ export async function registerSystem(
       )
     }
 
+    // For systems that need settings (webhook, record search, import/export, citizen portal)
     if (
-      [
-        types.WEBHOOK,
-        types.RECORD_SEARCH,
-        types.IMPORT_EXPORT,
-        types.CITIZEN_PORTAL
-      ].includes(type)
+      isWebhook ||
+      isRecordSearch ||
+      isImportExport ||
+      scopes.some((s) => s.startsWith('record.'))
     ) {
       const systemDetails = {
         client_id,
@@ -148,13 +152,12 @@ export async function registerSystem(
         createdBy: userId,
         username: systemAdminUser.username,
         status: statuses.ACTIVE,
-        scope: systemScopes,
+        scope: scopes,
         practitionerId,
         secretHash: hash,
         salt,
         sha_secret,
-        settings,
-        type
+        settings
       }
       const newSystem = await System.create(systemDetails)
 
@@ -173,12 +176,11 @@ export async function registerSystem(
       createdBy: userId,
       username: systemAdminUser.username,
       status: statuses.ACTIVE,
-      scope: systemScopes,
+      scope: scopes,
       practitionerId,
       secretHash: hash,
       salt,
       sha_secret,
-      type,
       integratingSystemType
     }
     const newSystem = await System.create(systemDetails)
@@ -360,7 +362,6 @@ export async function getSystemHandler(
     scope: system.scope,
     sha_secret: system.sha_secret,
     practitionerId: system.practitionerId,
-    type: system.type,
     settings: system.settings
   }
 }
@@ -394,7 +395,6 @@ export const getSystemResponseSchema = Joi.object({
   scope: Joi.array().items(Joi.string()),
   sha_secret: Joi.string(),
   practitionerId: Joi.string(),
-  type: Joi.string(),
   settings: settingsSchema
 })
 
@@ -406,7 +406,6 @@ export const SystemSchema = Joi.object({
   _id: Joi.string(),
   name: Joi.string(),
   status: Joi.string(),
-  type: Joi.string(),
   integratingSystemType: Joi.string(),
   shaSecret: Joi.string(),
   clientId: Joi.string(),
@@ -458,7 +457,7 @@ export const reqUpdateSystemSchema = Joi.object({
 })
 
 export const reqRegisterSystemSchema = Joi.object({
-  type: Joi.string().required(),
+  scopes: Joi.array().items(Joi.string()).required(),
   name: Joi.string().required(),
   integratingSystemType: Joi.string(),
   settings: Joi.object({

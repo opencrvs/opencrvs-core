@@ -28,7 +28,6 @@ export interface ISystem {
     webhook: WebHook[]
   }
   creationDate?: number
-  type: keyof typeof types
 }
 
 export enum EventType {
@@ -76,17 +75,6 @@ const systemSchema = new Schema({
     dailyQuota: { type: Number, default: 0 }
   },
   creationDate: { type: Number, default: Date.now },
-  type: {
-    type: String,
-    enum: [
-      types.HEALTH,
-      types.NATIONAL_ID,
-      types.RECORD_SEARCH,
-      types.WEBHOOK,
-      types.IMPORT_EXPORT,
-      types.CITIZEN_PORTAL
-    ]
-  },
   integratingSystemType: {
     type: String,
     enum: [integratingSystemTypes.MOSIP, integratingSystemTypes.OTHER]

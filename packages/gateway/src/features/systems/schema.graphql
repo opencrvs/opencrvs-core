@@ -20,16 +20,6 @@ enum SystemStatus {
   deactivated
 }
 
-enum SystemType {
-  NATIONAL_ID
-  HEALTH
-  RECORD_SEARCH
-  WEBHOOK
-  IMPORT_EXPORT
-  CITIZEN_PORTAL
-  REINDEX
-}
-
 enum IntegratingSystemType {
   OTHER
 }
@@ -48,9 +38,9 @@ type System {
   shaSecret: ID!
   status: SystemStatus!
   name: String!
-  type: SystemType!
   integratingSystemType: IntegratingSystemType
   settings: SystemSettings
+  scopes: [String!]!
 }
 
 type SystemSecret {
@@ -74,7 +64,7 @@ input SystemSettingsInput {
 }
 input SystemInput {
   name: String!
-  type: SystemType!
+  scopes: [String!]!
   settings: SystemSettingsInput
   integratingSystemType: IntegratingSystemType
 }

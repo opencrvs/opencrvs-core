@@ -34,6 +34,8 @@ import { SystemRole } from '@opencrvs/commons/client'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as mutations from './mutations'
+import { getSystemScopesFromType } from './systemScopes'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 /** Handles the user input when creating a new system in a modal */
 function useNewSystemDraft() {
@@ -121,6 +123,9 @@ export function useSystems() {
     existingSystems,
     dispatchSystemRemove
   } = useSystemsGlobalState()
+
+  const eventConfigurations = useEventConfigurations()
+  const eventIds = eventConfigurations.map((config) => config.id)
 
   const [birthPermissions, setBirthPermissions] = useState<WebhookPermission>(
     initWebHook(EventType.Birth)
@@ -284,10 +289,13 @@ export function useSystems() {
   }
 
   const registerSystem = () => {
+    // Convert SystemType to scopes array before sending to backend
+    const scopes = getSystemScopesFromType(newSystemType, eventIds)
+
     registerSystemMutate({
       variables: {
         system: {
-          type: newSystemType,
+          scopes,
           name: newClientName,
           integratingSystemType: undefined,
           ...(newSystemType === SystemRole.enum.WEBHOOK && {

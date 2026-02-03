@@ -45,7 +45,6 @@ export const pickSystem = (system: MongooseQueriedSystem) => {
   const directlyPassedParameters = pick(system, [
     'name',
     'status',
-    'type',
     'integratingSystemType'
   ])
 
