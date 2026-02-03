@@ -350,6 +350,9 @@ export const userCanReadEventV2: MiddlewareFunction<
   const isSystemUser = system.success
 
   if (isSystemUser) {
+    if (!inScope(ctx.token, [SCOPES.RECORD_READ])) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
     return next({
       ctx: {
         ...ctx,
