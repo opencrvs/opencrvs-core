@@ -412,18 +412,18 @@ export const userCanReadEventV2: MiddlewareFunction<
   const eventIndexWithLocationHierarchy =
     await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
 
-  if (humanUser.success) {
-    const hasAccess = canAccessEventWithScopes(
-      eventIndexWithLocationHierarchy,
-      acceptedScopes as ResolvedRecordScopeV2[],
-      humanUser.data
-    )
-
-    if (!hasAccess) {
-      throw new EventNotFoundError(input.eventId)
-    }
+  if (!humanUser.success) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
+  const hasAccess = canAccessEventWithScopes(
+    eventIndexWithLocationHierarchy,
+    acceptedScopes as ResolvedRecordScopeV2[],
+    humanUser.data
+  )
 
+  if (!hasAccess) {
+    throw new EventNotFoundError(input.eventId)
+  }
   return next({
     ctx: {
       ...ctx,

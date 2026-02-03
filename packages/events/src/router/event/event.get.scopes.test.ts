@@ -41,7 +41,7 @@ function eventMatchesScope({
   isUnderAdministrativeArea
 }: {
   eventIndex: EventIndex
-  user: { id: UUID; primaryOfficeId: UUID; administrativeAreaId?: UUID | null }
+  user: { id: UUID; primaryOfficeId: UUID; administrativeAreaId: UUID | null }
   declaredBy?: UserFilter
   registeredBy?: UserFilter
   declaredIn?: JurisdictionFilter
@@ -49,7 +49,7 @@ function eventMatchesScope({
   event?: string[]
   isUnderAdministrativeArea: (
     locationId: UUID,
-    adminAreaId?: UUID | null | undefined
+    adminAreaId: UUID | null
   ) => boolean
 }): boolean {
   if (declaredBy === UserFilter.enum.user) {
