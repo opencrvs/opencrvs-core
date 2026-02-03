@@ -20,6 +20,7 @@ import {
   FieldConfig,
   FieldValue,
   joinValues,
+  mapErrors,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -116,17 +117,15 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         initialTouched={touchedFields}
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
-          Object.fromEntries(
-            Object.entries(
+          makeFormFieldIdsFormikCompatible(
+            mapErrors(
               getValidationErrorsForForm(
                 fields,
                 makeFormikFieldIdsOpenCRVSCompatible(values),
                 validatorContext
-              )
-            ).map(([fieldId, errors]) => [
-              fieldId,
-              errors?.[0]?.message && intl.formatMessage(errors[0].message)
-            ])
+              ),
+              ({ message }) => intl.formatMessage(message)
+            )
           )
         }
         validateOnMount={true}

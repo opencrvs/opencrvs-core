@@ -225,7 +225,7 @@ export const GeneratedInputField = React.memo(
           <Name.Input
             configuration={field.config.configuration}
             disabled={disabled}
-            id={fieldDefinition.id}
+            name={fieldDefinition.id}
             validation={validation}
             validatorContext={validatorContext}
             value={field.value}

@@ -29,8 +29,10 @@ import {
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
-import { ageToDate } from '../events/utils'
-import { ActionType, EventDocument } from '../client'
+import { ageToDate, IndexMap } from '../events/utils'
+import { ActionType } from '../events/ActionType'
+import { EventDocument } from '../events/EventDocument'
+import { FieldType } from '../events/FieldType'
 
 const ajv = new Ajv({
   $data: true,
@@ -556,6 +558,42 @@ export function runStructuralValidations({
   return fieldValidationResult
 }
 
+type FieldError<T> =
+  | T[]
+  | {
+      [id: string]: FieldError<T> | undefined
+    }
+export type FormErrors<T> = IndexMap<FieldError<T>>
+
+export function flattenErrors<T>(errors: FieldError<T>): T[] {
+  if (Array.isArray(errors)) {
+    return errors
+  }
+  return Object.values(errors)
+    .filter((e): e is FieldError<T> => e !== undefined)
+    .flatMap(flattenErrors)
+}
+
+export function mapErrors<T, R>(
+  errors: FormErrors<T>,
+  fn: (err: T) => R
+): FormErrors<R> {
+  return Object.entries(errors).reduce(
+    (mappedErrors: FormErrors<R>, [key, value]) => {
+      if (!value) {
+        return mappedErrors
+      }
+      if (Array.isArray(value)) {
+        mappedErrors[key] = value.map(fn)
+        return mappedErrors
+      }
+      mappedErrors[key] = mapErrors(value, fn)
+      return mappedErrors
+    },
+    {}
+  )
+}
+
 export function runFieldValidations({
   field,
   values,
@@ -564,7 +602,23 @@ export function runFieldValidations({
   field: FieldConfig
   values: ActionUpdate
   context: ValidatorContext
-}) {
+}): FieldError<{ message: TranslationConfig }> {
+  if (field.type === FieldType.NAME) {
+    const subFieldErrors: Record<
+      string,
+      FieldError<{ message: TranslationConfig }>
+    > = (field.fields ?? []).reduce((acc, subField) => {
+      return {
+        ...acc,
+        [subField.id]: runFieldValidations({
+          field: subField,
+          values,
+          context
+        })
+      }
+    }, {})
+    return subFieldErrors
+  }
   if (
     !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)

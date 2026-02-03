@@ -43,7 +43,8 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  ValidatorContext
+  ValidatorContext,
+  flattenErrors
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -95,11 +96,13 @@ export function getFieldErrors(
 
   // For visible fields, run the field validations as configured
   const visibleFieldErrors = visibleFields.flatMap((field) => {
-    const fieldErrors = runFieldValidations({
-      field,
-      values: data,
-      context
-    })
+    const fieldErrors = flattenErrors(
+      runFieldValidations({
+        field,
+        values: data,
+        context
+      })
+    )
 
     return fieldErrors.map((error) => ({
       message: error.message.defaultMessage,

@@ -124,7 +124,6 @@ function FocusNameInputsOnHash({
 
 function NameInput(props: NameInputProps) {
   const {
-    id,
     name,
     onBlur,
     onChange,
@@ -253,7 +252,7 @@ function NameInput(props: NameInputProps) {
     <>
       <InputFieldWithBottomMargin
         error={firstnameMeta.error}
-        id={`${id}.firstname`}
+        id={`${name}.firstname`}
         label={firstnameLabel}
         required={!!nameConfig.firstname?.required}
         touched={firstnameMeta.touched}
@@ -268,7 +267,7 @@ function NameInput(props: NameInputProps) {
       </InputFieldWithBottomMargin>
       <InputFieldWithBottomMargin
         error={middlenameMeta.error}
-        id={`${id}.middlename`}
+        id={`${name}.middlename`}
         label={middlenameLabel}
         required={!!nameConfig.middlename?.required}
         touched={middlenameMeta.touched}
@@ -283,7 +282,7 @@ function NameInput(props: NameInputProps) {
       </InputFieldWithBottomMargin>
       <InputFieldWithBottomMargin
         error={surnameMeta.error}
-        id={`${id}.surname`}
+        id={`${name}.surname`}
         label={surnameLabel}
         required={!!nameConfig.surname?.required}
         touched={surnameMeta.touched}

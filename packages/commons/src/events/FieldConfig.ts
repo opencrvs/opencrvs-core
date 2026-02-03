@@ -80,7 +80,8 @@ export const ValidationConfig = z.object({
 })
 
 export type ValidationConfig = z.infer<typeof ValidationConfig>
-const requiredSchema = z
+
+const RequiredSchema = z
   .union([
     z.boolean(),
     z.object({
@@ -90,7 +91,7 @@ const requiredSchema = z
   .default(false)
   .optional()
 
-export type RequireConfig = z.infer<typeof requiredSchema>
+export type RequireConfig = z.infer<typeof RequiredSchema>
 
 const BaseField = z
   .object({
@@ -101,7 +102,7 @@ const BaseField = z
       .describe(
         'Reference to the parent field or fields. When a parent field changes, this field is reset.'
       ),
-    required: requiredSchema.describe(
+    required: RequiredSchema.describe(
       'Indicates whether the field is mandatory.'
     ),
     conditionals: z
@@ -156,18 +157,17 @@ const Divider = BaseField.extend({
 
 export type Divider = z.infer<typeof Divider>
 
+const TextFieldConfiguration = z.object({
+  maxLength: z.number().optional().describe('Maximum length of the text'),
+  type: z.enum(['text', 'password']).optional(),
+  prefix: TranslationConfig.optional(),
+  postfix: TranslationConfig.optional()
+})
+
 export const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   defaultValue: z.union([NonEmptyTextValue, SerializedUserField]).optional(),
-  configuration: z
-    .object({
-      maxLength: z.number().optional().describe('Maximum length of the text'),
-      type: z.enum(['text', 'password']).optional(),
-      prefix: TranslationConfig.optional(),
-      postfix: TranslationConfig.optional()
-    })
-    .default({ type: 'text' })
-    .optional()
+  configuration: TextFieldConfiguration.default({ type: 'text' }).optional()
 }).describe('Text input')
 
 export type TextField = z.infer<typeof TextField>
@@ -498,15 +498,29 @@ export const SelectDateRangeField = BaseField.extend({
 
 export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
+const NameSchema = TextField.pick({
+  label: true,
+  required: true,
+  conditionals: true
+}).extend({
+  id: z.union([
+    z.literal('firstname'),
+    z.literal('middlename'),
+    z.literal('surname')
+  ]),
+  type: z.literal(FieldType.TEXT).default(FieldType.TEXT),
+  configuration: TextFieldConfiguration.omit({ type: true }).default({})
+})
+
 export const NameConfig = z.object({
   firstname: z
-    .object({ required: requiredSchema, label: TranslationConfig.optional() })
+    .object({ required: RequiredSchema, label: TranslationConfig.optional() })
     .optional(),
   middlename: z
-    .object({ required: requiredSchema, label: TranslationConfig.optional() })
+    .object({ required: RequiredSchema, label: TranslationConfig.optional() })
     .optional(),
   surname: z
-    .object({ required: requiredSchema, label: TranslationConfig.optional() })
+    .object({ required: RequiredSchema, label: TranslationConfig.optional() })
     .optional()
 })
 
@@ -521,6 +535,7 @@ const NameField = BaseField.extend({
       surname: SerializedUserField.or(NonEmptyTextValue).optional()
     })
     .optional(),
+  fields: z.array(NameSchema).optional(),
   configuration: z
     .object({
       name: NameConfig.default({
@@ -658,7 +673,7 @@ const Address = BaseField.extend({
         .array(
           z.object({
             id: z.string(),
-            required: requiredSchema,
+            required: RequiredSchema,
             label: TranslationConfig,
             type: z.literal(FieldType.TEXT),
             conditionals: z.array(FieldConditional).default([]).optional(),
