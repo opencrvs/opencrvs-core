@@ -95,8 +95,9 @@ export async function registerSystem(
     const isNationalId = scopes.includes(SCOPES.NATIONALID)
     if (isNationalId) {
       // Query for systems that have NATIONALID scope in their scope array
+      // Using simple equality check since NATIONALID systems typically only have this scope
       const existingSystem = await System.findOne({
-        scope: { $in: [SCOPES.NATIONALID] }
+        scope: SCOPES.NATIONALID
       })
       if (existingSystem) {
         throw new Error('System with NATIONAL_ID scope already exists!')

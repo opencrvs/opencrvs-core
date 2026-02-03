@@ -52,6 +52,7 @@ import { useSystems } from './useSystems'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 import { SystemRole } from '@opencrvs/commons/client'
 import { getSystemTypeFromScopes } from './systemScopes'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 interface ToggleModal {
   modalVisible: boolean
@@ -272,13 +273,18 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   const systemToLabel = (system: System) => {
     // Derive type from scopes for display
     if (!system.scopes) {
-      return 'UNKNOWN_SYSTEM_TYPE'
+      // Fallback to empty string if scopes not available
+      return ''
     }
 
     const systemType = getSystemTypeFromScopes(system.scopes)
-    return systemType !== 'REINDEX'
-      ? systemTypeLabels[systemType]
-      : 'INVALID_SYSTEM_TYPE__REINDEX'
+    
+    // REINDEX systems are internal and shouldn't normally appear in UI
+    if (systemType === 'REINDEX') {
+      return intl.formatMessage(integrationMessages.recordSearch)
+    }
+    
+    return systemTypeLabels[systemType] || ''
   }
 
   return (

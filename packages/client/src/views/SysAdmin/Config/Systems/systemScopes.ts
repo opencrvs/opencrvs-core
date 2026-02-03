@@ -55,6 +55,7 @@ export function getSystemScopesFromType(
 /**
  * Derives SystemType from scopes array
  * This is the reverse operation - determining type from backend scopes for UI display
+ * Note: Order matters - check more specific types before more generic ones
  */
 export function getSystemTypeFromScopes(scopes: string[]): SystemType {
   // Check for unique identifying scopes first
@@ -67,11 +68,12 @@ export function getSystemTypeFromScopes(scopes: string[]): SystemType {
   if (scopes.includes(SCOPES.NOTIFICATION_API)) {
     return SystemType.Health
   }
-  if (scopes.includes(SCOPES.RECORDSEARCH) && !scopes.includes(SCOPES.RECORD_IMPORT)) {
-    return SystemType.RecordSearch
-  }
+  // Check IMPORT_EXPORT before RECORD_SEARCH since IMPORT_EXPORT includes RECORDSEARCH
   if (scopes.includes(SCOPES.RECORD_IMPORT)) {
     return SystemType.ImportExport
+  }
+  if (scopes.includes(SCOPES.RECORDSEARCH)) {
+    return SystemType.RecordSearch
   }
   // Check for exact citizen portal scopes or parameterized versions
   if (
