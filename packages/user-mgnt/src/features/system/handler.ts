@@ -95,7 +95,7 @@ export async function registerSystem(
     const isNationalId = scopes.includes(SCOPES.NATIONALID)
     if (isNationalId) {
       const existingSystem = await System.findOne({
-        scope: { $in: [SCOPES.NATIONALID] }
+        scope: SCOPES.NATIONALID
       })
       if (existingSystem) {
         throw new Error('System with NATIONAL_ID scope already exists!')
@@ -139,13 +139,16 @@ export async function registerSystem(
       )
     }
 
-    // For systems that need settings (webhook, record search, import/export, citizen portal)
-    if (
-      isWebhook ||
-      isRecordSearch ||
-      isImportExport ||
-      scopes.some((s) => s.startsWith('record.'))
-    ) {
+    // For systems that need settings (webhook, record search, import/export, citizen portal with specific scopes)
+    const isCitizenPortal =
+      scopes.includes('record.read') ||
+      scopes.includes('record.create') ||
+      scopes.includes('record.notify') ||
+      scopes.some((s) => s.startsWith('record.read[')) ||
+      scopes.some((s) => s.startsWith('record.create[')) ||
+      scopes.some((s) => s.startsWith('record.notify['))
+
+    if (isWebhook || isRecordSearch || isImportExport || isCitizenPortal) {
       const systemDetails = {
         client_id,
         name: name || systemAdminUser.username,

@@ -127,7 +127,8 @@ const GetNameWithAvatar = ({
 function getSystemType(system: { type?: string; scopes?: string[] } | undefined) {
   // If scopes are available, derive type from them
   if (system?.scopes) {
-    const hasRecordSearch = system.scopes.some(s => s.includes('recordsearch'))
+    // Use exact match with SCOPES constant for reliability
+    const hasRecordSearch = system.scopes.includes('recordsearch')
     if (hasRecordSearch) {
       return integrationMessages.recordSearch
     }

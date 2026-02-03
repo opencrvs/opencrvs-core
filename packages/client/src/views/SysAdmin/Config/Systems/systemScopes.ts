@@ -73,7 +73,15 @@ export function getSystemTypeFromScopes(scopes: string[]): SystemType {
   if (scopes.includes(SCOPES.RECORD_IMPORT)) {
     return SystemType.ImportExport
   }
-  if (scopes.some(s => s.startsWith('record.read') || s.startsWith('record.create') || s.startsWith('record.notify'))) {
+  // Check for exact citizen portal scopes or parameterized versions
+  if (
+    scopes.includes('record.read') ||
+    scopes.includes('record.create') ||
+    scopes.includes('record.notify') ||
+    scopes.some(s => s.startsWith('record.read[')) ||
+    scopes.some(s => s.startsWith('record.create[')) ||
+    scopes.some(s => s.startsWith('record.notify['))
+  ) {
     return SystemType.CitizenPortal
   }
   if (scopes.includes(SCOPES.RECORD_REINDEX) && scopes.length === 1) {
