@@ -78,9 +78,9 @@ export function getSystemTypeFromScopes(scopes: string[]): SystemType {
     scopes.includes('record.read') ||
     scopes.includes('record.create') ||
     scopes.includes('record.notify') ||
-    scopes.some(s => s.startsWith('record.read[')) ||
-    scopes.some(s => s.startsWith('record.create[')) ||
-    scopes.some(s => s.startsWith('record.notify['))
+    scopes.some((s) => s.startsWith('record.read[')) ||
+    scopes.some((s) => s.startsWith('record.create[')) ||
+    scopes.some((s) => s.startsWith('record.notify['))
   ) {
     return SystemType.CitizenPortal
   }
