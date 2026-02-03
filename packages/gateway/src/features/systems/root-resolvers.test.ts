@@ -179,7 +179,6 @@ describe('generate refresh token', () => {
         _id: '234241',
         name: 'Dummy System',
         status: 'active',
-        type: 'HEALTH',
         shaSecret: '823823',
         clientId: '1239014'
       }
@@ -248,7 +247,6 @@ describe('delete system integration', () => {
         _id: '234241',
         name: 'Dummy System',
         status: 'active',
-        type: 'HEALTH',
         shaSecret: '823823',
         clientId: '1239014'
       }

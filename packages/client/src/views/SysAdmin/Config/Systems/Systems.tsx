@@ -51,6 +51,7 @@ import styled from 'styled-components'
 import { useSystems } from './useSystems'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 import { SystemRole } from '@opencrvs/commons/client'
+import { getSystemTypeFromScopes } from './systemScopes'
 
 interface ToggleModal {
   modalVisible: boolean
@@ -213,6 +214,11 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   )
 
   const getMenuItems = (system: System) => {
+    // Derive type from scopes for conditional UI logic
+    const systemType = system.scopes
+      ? getSystemTypeFromScopes(system.scopes)
+      : null
+
     const menuItems: { handler: () => void; label: string }[] = [
       {
         handler: () => {
@@ -222,7 +228,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
       }
     ]
 
-    if (system.type === SystemRole.enum.WEBHOOK) {
+    if (systemType === SystemRole.enum.WEBHOOK) {
       menuItems.push({
         handler: () => {
           setSystemToShowPermission(system)
@@ -264,8 +270,14 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }
 
   const systemToLabel = (system: System) => {
-    return system.type !== 'REINDEX'
-      ? systemTypeLabels[system.type]
+    // Derive type from scopes for display
+    if (!system.scopes) {
+      return 'UNKNOWN_SYSTEM_TYPE'
+    }
+
+    const systemType = getSystemTypeFromScopes(system.scopes)
+    return systemType !== 'REINDEX'
+      ? systemTypeLabels[systemType]
       : 'INVALID_SYSTEM_TYPE__REINDEX'
   }
 

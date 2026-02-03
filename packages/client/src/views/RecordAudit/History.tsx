@@ -124,10 +124,20 @@ const GetNameWithAvatar = ({
   )
 }
 
-function getSystemType(type: string | undefined) {
-  if (type === SystemRole.enum.RECORD_SEARCH) {
+function getSystemType(system: { type?: string; scopes?: string[] } | undefined) {
+  // If scopes are available, derive type from them
+  if (system?.scopes) {
+    const hasRecordSearch = system.scopes.some(s => s.includes('recordsearch'))
+    if (hasRecordSearch) {
+      return integrationMessages.recordSearch
+    }
+  }
+  
+  // Fall back to legacy type field if available
+  if (system?.type === SystemRole.enum.RECORD_SEARCH) {
     return integrationMessages.recordSearch
   }
+  
   return integrationMessages.healthSystem
 }
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -299,7 +309,7 @@ export const GetHistory = ({
     ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) ? (
-      intl.formatMessage(getSystemType(item.system?.type || ''))
+      intl.formatMessage(getSystemType(item.system))
     ) : (
       item.user && intl.formatMessage(item.user.role.label)
     ),
