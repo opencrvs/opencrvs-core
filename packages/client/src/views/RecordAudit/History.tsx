@@ -124,10 +124,6 @@ const GetNameWithAvatar = ({
   )
 }
 
-function getSystemType(system: { type?: string; scopes?: string[] } | undefined) {
-  // Return generic integration type message
-  return integrationMessages.type
-}
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const getIndexByAction = (histories: any, index: number): number => {
   const newHistories = [...histories]
@@ -297,7 +293,7 @@ export const GetHistory = ({
     ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) ? (
-      intl.formatMessage(getSystemType(item.system))
+      intl.formatMessage(integrationMessages.type)
     ) : (
       item.user && intl.formatMessage(item.user.role.label)
     ),
