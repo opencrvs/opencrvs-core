@@ -12,7 +12,6 @@ import { AvatarSmall } from '@client/components/Avatar'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
-import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { ILocation } from '@client/offline/reducer'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { Avatar, History, RegStatus } from '@client/utils/gateway'
@@ -46,7 +45,6 @@ import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'qs'
 import { SystemRole } from '@opencrvs/commons/client'
-import { getSystemTypeFromScopes } from '@client/views/SysAdmin/Config/Systems/systemScopes'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -294,11 +292,7 @@ export const GetHistory = ({
     ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) ? (
-      intl.formatMessage(integrationMessages.type, {
-        type: item.system?.scopes 
-          ? getSystemTypeFromScopes(item.system.scopes)
-          : 'HEALTH'
-      })
+      item.system?.name || ''
     ) : (
       item.user && intl.formatMessage(item.user.role.label)
     ),
