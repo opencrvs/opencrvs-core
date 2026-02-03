@@ -365,6 +365,7 @@ export const SystemSchema = Joi.object({
   integratingSystemType: Joi.string(),
   shaSecret: Joi.string(),
   clientId: Joi.string(),
+  scopes: Joi.array().items(Joi.string()),
   settings: settingsSchema
 })
 

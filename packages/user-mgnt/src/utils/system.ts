@@ -54,6 +54,7 @@ export const pickSystem = (system: MongooseQueriedSystem) => {
     // TODO: client_id and sha_secret should be camelCased in the Mongoose-model
     shaSecret: system.sha_secret,
     clientId: system.client_id,
+    scopes: system.scope,
     settings: pickSettings(system)
   }
 }
