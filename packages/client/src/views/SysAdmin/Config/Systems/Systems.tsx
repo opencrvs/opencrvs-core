@@ -223,22 +223,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
       }
     ]
 
-    // Show edit permissions for systems with webhook settings
-    if (system.settings?.webhook && system.settings.webhook.length > 0) {
-      menuItems.push({
-        handler: () => {
-          setSystemToShowPermission(system)
-          setBirthPermissions(
-            populatePermissions(system.settings!.webhook!, EventType.Birth)
-          )
-          setDeathPermissions(
-            populatePermissions(system.settings!.webhook!, EventType.Death)
-          )
-        },
-        label: intl.formatMessage(buttonMessages.edit)
-      })
-    }
-
     menuItems.push({
       handler: () => {
         setSystemToToggleActivation(system)

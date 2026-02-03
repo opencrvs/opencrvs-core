@@ -24,7 +24,6 @@ export function getSystemScopesFromType(
     [SystemType.Health]: ['record.create', 'record.notify'],
     [SystemType.NationalId]: [SCOPES.NATIONALID],
     [SystemType.RecordSearch]: [SCOPES.RECORDSEARCH],
-    [SystemType.Webhook]: [SCOPES.WEBHOOK],
     [SystemType.ImportExport]: [
       SCOPES.RECORD_IMPORT,
       SCOPES.RECORD_EXPORT,
