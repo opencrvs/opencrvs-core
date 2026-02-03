@@ -24,7 +24,6 @@ export function useDashboardIds() {
     const configurableScopes = DashboardScope.safeParse(parsed)
     if (configurableScopes.success) {
       const data = configurableScopes.data
-
       acc.push(...data.options.id)
     }
     return acc

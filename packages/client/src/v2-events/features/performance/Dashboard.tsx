@@ -24,6 +24,7 @@ import {
   useNavigationHistory
 } from '@client/v2-events/components/NavigationStack'
 import { getToken } from '@client/utils/authUtils'
+import { useDashboardIds } from '@client/hooks/useDashboardIds'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -32,6 +33,7 @@ const StyledIFrame = styled(IframeResizer)`
 `
 interface IdashboardView {
   dashboard: {
+    id: string
     context?: {
       auth: 'REQUEST_AUTH_TOKEN'
     }
@@ -61,6 +63,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
 
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const allowedDashboardIds = useDashboardIds()
   const { eventId, slug, eventType, workqueue, ...rest } = Object.fromEntries(
     searchParams.entries()
   )
@@ -79,6 +82,11 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
 
   // ---- Send token to wrapper iframe when ready ----
   useEffect(() => {
+    // Do not send token if dashboard is not allowed by scopes
+    if (!allowedDashboardIds.includes(dashboard.id)) {
+      return
+    }
+
     if (!token || dashboard.context?.auth !== 'REQUEST_AUTH_TOKEN') {
       return
     }
@@ -107,7 +115,13 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
     window.addEventListener('message', handleMessage)
 
     return () => window.removeEventListener('message', handleMessage)
-  }, [dashboard.context?.auth, dashboard.url, token])
+  }, [
+    allowedDashboardIds,
+    dashboard.context?.auth,
+    dashboard.id,
+    dashboard.url,
+    token
+  ])
 
   return (
     <>
