@@ -38,10 +38,26 @@ const notifiedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Edit']: AssertType.DISABLED
     }
   },
-
+  {
+    name: 'AssignedToSelf',
+    recordDownloaded: true,
+    actions: [
+      ActionType.CREATE,
+      AssignmentStatus.ASSIGNED_TO_SELF,
+      ActionType.NOTIFY,
+      ActionType.UNASSIGN,
+      AssignmentStatus.ASSIGNED_TO_SELF
+    ],
+    expected: {
+      ...getHiddenActions(),
+      ['Unassign']: AssertType.ENABLED,
+      ['Edit']: AssertType.ENABLED
+    }
+  },
   {
     name: 'AssignedToOthers',
     recordDownloaded: false,
@@ -54,7 +70,7 @@ const notifiedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ['Edit']: AssertType.DISABLED
     }
   }
 ]

@@ -9,9 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
-import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
+import * as z from 'zod/v4'
+import {
+  getScopes,
+  getUUID,
+  SCOPES,
+  UUID,
+  RecordScopeV2
+} from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -33,7 +38,11 @@ import {
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
-import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
+import {
+  userOnlyProcedure,
+  router,
+  userAndSystemProcedure
+} from '@events/router/trpc'
 import {
   getEventConfigurationById,
   getInMemoryEventConfigurations
@@ -59,8 +68,7 @@ import { UserContext } from '../../context'
 import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
-
-extendZodWithOpenApi(z)
+import { customActionProcedures } from './actions/custom'
 
 export const eventRouter = router({
   config: router({
@@ -68,7 +76,7 @@ export const eventRouter = router({
      * Event configurations are intentionally available to all user types.
      * Some of the dynamic scopes require knowledge of available types.
      */
-    get: publicProcedure
+    get: userOnlyProcedure
       .meta({
         openapi: {
           summary: 'List event configurations',
@@ -84,7 +92,7 @@ export const eventRouter = router({
         getInMemoryEventConfigurations(options.ctx.token)
       )
   }),
-  create: systemProcedure
+  create: userAndSystemProcedure
     .meta({
       openapi: {
         summary: 'Create event',
@@ -96,6 +104,7 @@ export const eventRouter = router({
     })
     .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.CREATE]))
     .input(EventInput)
+    .use(middleware.requireLocationForSystemUserEventCreate)
     .use(middleware.eventTypeAuthorization)
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
@@ -108,29 +117,30 @@ export const eventRouter = router({
         transactionId: input.transactionId,
         eventInput: input,
         user: ctx.user,
+        createdAtLocation: input.createdAtLocation,
         config
       })
     }),
-  get: publicProcedure
+  get: userOnlyProcedure
     .input(UUID)
-    .use(middleware.userCanReadEvent)
+    // @ts-expect-error: middleware.userCanReadEvent does not have proper type definitions but works as intended
+    .use(middleware.userCanReadEventV2)
     .query(async ({ ctx }) => {
-      const event = ctx.event
-
+      const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
         token: ctx.token,
-        eventType: event.type
+        eventType
       })
 
       const updatedEvent = await processAction(
         {
           type: ActionType.READ,
-          eventId: event.id,
+          eventId,
           transactionId: getUUID(),
           declaration: {}
         },
         {
-          event,
+          eventId,
           user: ctx.user,
           token: ctx.token,
           status: ActionStatus.Accepted,
@@ -140,7 +150,7 @@ export const eventRouter = router({
 
       return updatedEvent
     }),
-  getDuplicates: publicProcedure
+  getDuplicates: userOnlyProcedure
     .use(requiresAnyOfScopes([], ['record.declared.review-duplicates']))
     .input(EventIdParam)
     .use(middleware.eventTypeAuthorization)
@@ -150,7 +160,7 @@ export const eventRouter = router({
 
       return getDuplicateEvents(event, ctx)
     }),
-  delete: publicProcedure
+  delete: userOnlyProcedure
     .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.DELETE]))
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
@@ -167,10 +177,10 @@ export const eventRouter = router({
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
-    list: publicProcedure
+    list: userOnlyProcedure
       .output(z.array(Draft))
       .query(async (options) => getDraftsByUserId(options.ctx.user.id)),
-    create: publicProcedure
+    create: userOnlyProcedure
       .input(DraftInput)
       .use(middleware.requireAssignment)
       .output(Draft)
@@ -216,22 +226,23 @@ export const eventRouter = router({
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     declare: router(declareActionProcedures()),
-    validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
+    edit: router(getDefaultActionProcedures(ActionType.EDIT)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
     register: router(getDefaultActionProcedures(ActionType.REGISTER)),
     printCertificate: router(
       getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
     ),
+    custom: router(customActionProcedures()),
     assignment: router({
-      assign: publicProcedure
+      assign: userOnlyProcedure
         .input(AssignActionInput)
         .use(middleware.validateAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
           return assignRecord({ input, user, token })
         }),
-      unassign: publicProcedure
+      unassign: userOnlyProcedure
         .input(UnassignActionInput)
         .use(middleware.validateAction)
         .mutation(async ({ input, ctx }) => {
@@ -249,7 +260,7 @@ export const eventRouter = router({
       reject: router(getDefaultActionProcedures(ActionType.REJECT_CORRECTION))
     }),
     duplicate: router({
-      markAsDuplicate: publicProcedure
+      markAsDuplicate: userOnlyProcedure
         .input(MarkAsDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
@@ -266,7 +277,7 @@ export const eventRouter = router({
             configuration
           )
         }),
-      markNotDuplicate: publicProcedure
+      markNotDuplicate: userOnlyProcedure
         .input(MarkNotDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
@@ -285,7 +296,7 @@ export const eventRouter = router({
         })
     })
   }),
-  search: systemProcedure
+  search: userAndSystemProcedure
     .meta({
       openapi: {
         summary: 'Search for events',
@@ -295,7 +306,9 @@ export const eventRouter = router({
       }
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
-    .use(requiresAnyOfScopes([SCOPES.RECORDSEARCH], ['search']))
+    .use(
+      requiresAnyOfScopes([SCOPES.RECORDSEARCH], undefined, ['record.search'])
+    )
     .input(SearchQuery)
     .output(
       z.object({
@@ -306,34 +319,35 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
       const scopes = getScopes(ctx.token)
+
       const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
-      const allAccessForEveryEventType = Object.fromEntries(
-        eventConfigs.map(({ id }) => [id, 'all' as const])
-      )
 
       if (isRecordSearchSystemClient) {
-        return findRecordsByQuery(
-          input,
+        return findRecordsByQuery({
+          search: input,
           eventConfigs,
-          allAccessForEveryEventType,
-          ctx.user.primaryOfficeId
-        )
+          user: ctx.user,
+          acceptedScopes: [
+            {
+              type: 'record.search',
+              options: {}
+            }
+          ]
+        })
       }
 
-      const searchScope = findScope(scopes, 'search')
-
-      // Only to satisfy type checking, as findScope will return undefined if no scope is found
-      if (!searchScope) {
-        throw new Error('No search scope provided')
+      if (ctx.acceptedScopes) {
+        return findRecordsByQuery({
+          search: input,
+          eventConfigs,
+          user: ctx.user,
+          acceptedScopes: ctx.acceptedScopes as RecordScopeV2[]
+        })
       }
-      return findRecordsByQuery(
-        input,
-        eventConfigs,
-        searchScope.options,
-        ctx.user.primaryOfficeId
-      )
+
+      throw new Error('No search scope provided')
     }),
-  bulkImport: systemProcedure
+  bulkImport: userAndSystemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({
       openapi: {
@@ -346,7 +360,7 @@ export const eventRouter = router({
     .input(z.array(EventDocument))
     .output(z.any())
     .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
-  reindex: systemProcedure
+  reindex: userAndSystemProcedure
     .input(z.void())
     .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
     .output(z.void())

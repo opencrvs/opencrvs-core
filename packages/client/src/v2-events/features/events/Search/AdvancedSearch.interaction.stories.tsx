@@ -15,6 +15,7 @@ import { userEvent, within, expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { waitFor } from '@testing-library/dom'
+import * as selectEvent from 'react-select-event'
 import {
   ActionType,
   footballClubMembershipEvent,
@@ -92,18 +93,13 @@ export const AdvancedSearchStory: Story = {
     })
 
     await step('Search button disabled with incomplete fields', async () => {
-      const searchButton = (
-        await canvas.findAllByRole('button', { name: 'Search' })
-      ).find((btn) => btn.id === 'search')
+      const searchButton = await canvas.findByTestId('search')
+
       await expect(searchButton).toBeVisible()
       await expect(searchButton).toBeDisabled()
     })
 
     await step('Fill in required fields and enable search', async () => {
-      const searchButton = (
-        await canvas.findAllByRole('button', { name: 'Search' })
-      ).find((btn) => btn.id === 'search')
-
       const accordion = await canvas.findByTestId(
         'accordion-advancedSearch.form.registrationDetails'
       )
@@ -119,18 +115,20 @@ export const AdvancedSearchStory: Story = {
         'Ibombo District Office'
       )
       await userEvent.click(locationOption[0])
+      const searchButton = await canvas.findByTestId('search')
+
       await expect(searchButton).toBeDisabled()
 
       const statusWrapper = await canvas.findByTestId('select__event____status')
-      const statusInput = within(statusWrapper).getByRole('textbox')
-      await userEvent.click(statusInput)
-      const statusOption = await canvas.findAllByText('Any status')
-      await userEvent.click(statusOption[0])
 
-      await expect(searchButton).toBeEnabled()
-      if (searchButton) {
-        await userEvent.click(searchButton)
-      }
+      await userEvent.click(statusWrapper)
+      await selectEvent.select(statusWrapper, 'Any status')
+
+      await waitFor(async () => {
+        await expect(canvas.getByTestId('search')).toBeEnabled()
+      })
+
+      await userEvent.click(searchButton)
     })
   }
 }
@@ -167,7 +165,7 @@ async function adjustYearLabel(
 
 export const AdvancedSearchDateRangePicker: Story = {
   parameters: {
-    userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})

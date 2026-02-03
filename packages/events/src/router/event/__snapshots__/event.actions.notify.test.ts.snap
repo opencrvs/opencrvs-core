@@ -19,17 +19,7 @@ exports[`event.actions.notify > Can create a record with partial address 1`] = `
 }
 `;
 
-exports[`event.actions.notify > Can not create a record with partial address when addressType is missing 1`] = `[TRPCError: [{"message":"Invalid input","id":"applicant.address","value":{"country":"FAR"}}]]`;
-
-exports[`event.actions.notify > Can not create a record with wrong address 1`] = `
-{
-  "applicant.address": {
-    "addressType": "INTERNATIONAL",
-    "administrativeArea": "27160bbd-32d1-4625-812f-860226bfb92a",
-    "country": "FAR",
-  },
-}
-`;
+exports[`event.actions.notify > Can not create a record with partial address when addressType is missing 1`] = `[TRPCError: [{"message":"Required","id":"applicant.address","value":{"country":"FAR"}}]]`;
 
 exports[`event.actions.notify > NOTIFY action fails if payload includes field that is not in the declaration 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"hello"}]]`;
 
@@ -37,23 +27,25 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
 
 exports[`event.actions.notify > System client receives error for malformed input 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"this should cause an error"}]]`;
 
-exports[`event.actions.notify > system user > should require createdAtLocation for system user 1`] = `[TRPCError: createdAtLocation is required and must be a valid office id]`;
+exports[`event.actions.notify > system user > should require createdAtLocation for system user 1`] = `[TRPCError: createdAtLocation is required and must be a valid location id]`;
 
 exports[`event.actions.notify > system user > should require createdAtLocation for system user 2`] = `
 [TRPCError: [
   {
-    "validation": "uuid",
-    "code": "invalid_string",
-    "message": "Invalid uuid",
+    "origin": "string",
+    "code": "invalid_format",
+    "format": "uuid",
+    "pattern": "/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/",
     "path": [
       "createdAtLocation"
-    ]
+    ],
+    "message": "Invalid UUID"
   }
 ]]
 `;
 
-exports[`event.actions.notify > system user > should require createdAtLocation for system user 3`] = `[TRPCError: insert or update on table "event_actions" violates foreign key constraint "event_actions_created_at_location_fkey"]`;
+exports[`event.actions.notify > system user > should require createdAtLocation for system user 3`] = `[TRPCError: createdAtLocation must be a valid location id]`;
 
-exports[`event.actions.notify > system user > should require createdAtLocation for system user 4`] = `[TRPCError: createdAtLocation must be an office location]`;
+exports[`event.actions.notify > system user > should require createdAtLocation for system user 4`] = `[TRPCError: createdAtLocation must be a valid location id]`;
 
 exports[`event.actions.notify > system user > system user should not be able to perform action on assigned event 1`] = `[TRPCError: System user can not perform action on assigned event]`;

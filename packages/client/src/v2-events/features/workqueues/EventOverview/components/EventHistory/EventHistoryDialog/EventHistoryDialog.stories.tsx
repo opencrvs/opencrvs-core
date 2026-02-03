@@ -105,12 +105,6 @@ const fullEvent = {
     {
       ...actionBase,
       id: generateUuid(prng),
-      type: ActionType.VALIDATE,
-      declaration
-    },
-    {
-      ...actionBase,
-      id: generateUuid(prng),
       type: ActionType.REGISTER,
       declaration
     }
@@ -146,6 +140,7 @@ type Story = StoryObj<typeof EventHistoryDialog>
 export const Created: Story = {
   args: {
     ...argbase,
+    title: 'Draft',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -157,6 +152,7 @@ export const Created: Story = {
 export const Notified: Story = {
   args: {
     ...argbase,
+    title: 'Sent incomplete',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -168,6 +164,7 @@ export const Notified: Story = {
 export const Read: Story = {
   args: {
     ...argbase,
+    title: 'Viewed',
     action: { ...argbase.action, id: generateUuid(prng), type: ActionType.READ }
   }
 }
@@ -198,19 +195,6 @@ const declareAction = generateActionDocument({
   }
 })
 
-const validateAction = generateActionDocument({
-  configuration: tennisClubMembershipEvent,
-  action: ActionType.VALIDATE,
-  rng: prng,
-  defaults: {
-    createdAt: addDays(new Date(createActionCreatedAt), 2).toISOString(),
-    id: generateUuid(prng)
-  },
-  declarationOverrides: {
-    'applicant.email': 'mail.that.updated@opencrvs.org'
-  }
-})
-
 const registerAction = generateActionDocument({
   configuration: tennisClubMembershipEvent,
   action: ActionType.REGISTER,
@@ -236,6 +220,7 @@ const eventWhenDeclareUpdatesDeclaration = {
 export const Declared: Story = {
   args: {
     ...argbase,
+    title: 'Sent for review',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -246,41 +231,9 @@ export const Declared: Story = {
 
 export const DeclaredOnDeclarationUpdate: Story = {
   args: {
+    title: 'Sent for review',
     fullEvent: eventWhenDeclareUpdatesDeclaration,
     action: declareAction
-  }
-}
-
-const eventWhenValidateUpdatesDeclaration = {
-  trackingId: generateUuid(prng),
-  type: tennisClubMembershipEvent.id,
-  actions: [createAction, declareAction, validateAction],
-  createdAt: createActionCreatedAt,
-  id: generateUuid(prng),
-  updatedAt: addDays(new Date(createActionCreatedAt), 2).toISOString()
-}
-
-export const Validated: Story = {
-  args: {
-    ...argbase,
-    action: {
-      ...argbase.action,
-      id: generateUuid(prng),
-      type: ActionType.VALIDATE
-    }
-  }
-}
-
-const updateActionForValidate = expandWithClientSpecificActions(
-  eventWhenValidateUpdatesDeclaration,
-  getTestValidatorContext(),
-  tennisClubMembershipEvent
-).find((a) => a.type === DECLARATION_ACTION_UPDATE)
-
-export const ValidatedOnDeclarationUpdate: Story = {
-  args: {
-    fullEvent: eventWhenValidateUpdatesDeclaration,
-    action: updateActionForValidate
   }
 }
 
@@ -498,48 +451,6 @@ const newFullEvent = {
       assignedTo: '68cbd26ec6476156546958e5'
     },
     {
-      id: '0a38f1e0-b7eb-4aeb-9290-a9d82fcda252' as UUID,
-      transactionId: 'c5e7515b-4b2f-4e6b-8158-74d71ce2cbc5',
-      createdByUserType: 'user' as const,
-      createdAt: '2025-09-26T06:57:38.800Z',
-      createdBy: '68cbd26ec6476156546958e5',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: '07cd7e8c-fa6e-4828-8d79-035dab47adc5' as UUID,
-      declaration: {
-        'applicant.dob': '2025-05-22',
-        'applicant.name': {
-          surname: 'last',
-          firstname: 'first',
-          middlename: 'middle'
-        },
-        'recommender.id': '123123',
-        'senior-pass.id': '123123', // Senior pass ID was added on the previous action. Still visible on the change set of record audit. Should not be visible.
-        'recommender.name': {
-          surname: 'rec last', // Recommender added, visible correctly.
-          firstname: 'rec first',
-          middlename: ''
-        },
-        'recommender.none': false, // Should be visible.
-        'applicant.image.label': 'picture text'
-      },
-      annotation: {},
-      status: 'Requested' as const,
-      type: 'VALIDATE' as const
-    },
-    {
-      id: '9ef1c7e9-b761-4d5a-a0da-80a9e4eb096a' as UUID,
-      transactionId: 'c5e7515b-4b2f-4e6b-8158-74d71ce2cbc5',
-      createdByUserType: 'user' as const,
-      createdAt: '2025-09-26T06:57:38.868Z',
-      createdBy: '68cbd26ec6476156546958e5',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: '07cd7e8c-fa6e-4828-8d79-035dab47adc5' as UUID,
-      declaration: {},
-      status: 'Accepted' as const,
-      originalActionId: '0a38f1e0-b7eb-4aeb-9290-a9d82fcda252' as UUID,
-      type: 'VALIDATE' as const
-    },
-    {
       id: 'cdaf8cb4-f01e-45c4-b744-56261a71291c' as UUID,
       transactionId: 'c5e7515b-4b2f-4e6b-8158-74d71ce2cbc5',
       createdByUserType: 'user' as const,
@@ -622,55 +533,6 @@ const newFullEvent = {
       status: 'Accepted' as const,
       type: 'ASSIGN' as const,
       assignedTo: '68cbd26ec6476156546958e5'
-    },
-    {
-      id: '4f50fcad-586f-4794-baa6-008b4a335f10' as UUID,
-      transactionId: '9d7c6402-69b1-41a5-8114-d0af76bc7d41',
-      createdByUserType: 'user' as const,
-      createdAt: '2025-09-26T06:59:44.323Z',
-      createdBy: '68cbd26ec6476156546958e5',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: '07cd7e8c-fa6e-4828-8d79-035dab47adc5' as UUID,
-      declaration: {
-        'applicant.dob': '2025-05-22',
-        'applicant.name': {
-          surname: 'last',
-          firstname: 'FIRST CAPITALIZED', // Changes name, should show.
-          middlename: 'middle'
-        },
-        'recommender.id': '123123', // Should not show since present on previous actions.
-        'senior-pass.id': '123123', // Should not show since present on previous actions.
-        'recommender.name': {
-          surname: 'rec last', // Recommender added on previous VALIDATE action, should not be visible.
-          firstname: 'rec first',
-          middlename: ''
-        },
-        'recommender.none': false, // Should never be visible
-        'applicant.image.label': 'picture text222' // Changes image label, shown correctly.
-      },
-      annotation: {
-        'review.comment': 'dfsdfdsf', // should show in review section
-        'review.signature': {
-          path: '/ocrvs/7774a11b-ad7b-4cf2-8433-79ab72f25cc3/c9dfff3c-394e-4095-a5b6-2429d7492436.png',
-          type: 'image/png',
-          originalFilename: 'signature-review____signature-1758869981775.png'
-        }
-      },
-      status: 'Requested' as const,
-      type: 'VALIDATE' as const // Second VALIDATE. After rejection, previous action must be resent.
-    },
-    {
-      id: '3307ab9d-8d0a-4a42-819e-547df61cc297' as UUID,
-      transactionId: '9d7c6402-69b1-41a5-8114-d0af76bc7d41',
-      createdByUserType: 'user' as const,
-      createdAt: '2025-09-26T06:59:44.410Z',
-      createdBy: '68cbd26ec6476156546958e5',
-      createdByRole: 'REGISTRATION_AGENT',
-      createdAtLocation: '07cd7e8c-fa6e-4828-8d79-035dab47adc5' as UUID,
-      declaration: {},
-      status: 'Accepted' as const,
-      originalActionId: '4f50fcad-586f-4794-baa6-008b4a335f10' as UUID,
-      type: 'VALIDATE' as const
     },
     {
       id: 'b15c3e45-6404-4dd6-99eb-e57a240f9e26' as UUID,
@@ -815,28 +677,8 @@ const updateActions = expandWithClientSpecificActions(
 export const DeclarationUpdateOnDeclare: Story = {
   args: {
     fullEvent: newFullEvent,
+    title: 'Updated',
     action: updateActions[0]
-  }
-}
-
-export const DeclarationUpdateOnValidate: Story = {
-  args: {
-    fullEvent: newFullEvent,
-    action: updateActions[1]
-  }
-}
-
-export const DeclarationUpdateOnSecondValidate: Story = {
-  args: {
-    fullEvent: newFullEvent,
-    action: updateActions[2]
-  }
-}
-
-export const DeclarationUpdateOnRegister: Story = {
-  args: {
-    fullEvent: newFullEvent,
-    action: updateActions[3]
   }
 }
 
@@ -1036,6 +878,7 @@ const updateActionsForNotifyActions = expandWithClientSpecificActions(
 export const DeclarationUpdateNotify: Story = {
   args: {
     fullEvent: eventWithNotifyActions,
+    title: 'Updated',
     action: updateActionsForNotifyActions[0]
   }
 }
@@ -1043,7 +886,7 @@ export const DeclarationUpdateNotify: Story = {
 const eventWhenRegisterUpdatesDeclaration = {
   trackingId: generateUuid(prng),
   type: tennisClubMembershipEvent.id,
-  actions: [createAction, declareAction, validateAction, registerAction],
+  actions: [createAction, declareAction, registerAction],
   createdAt: createActionCreatedAt,
   id: generateUuid(prng),
   updatedAt: addDays(new Date(createActionCreatedAt), 3).toISOString()
@@ -1052,6 +895,7 @@ const eventWhenRegisterUpdatesDeclaration = {
 export const Registered: Story = {
   args: {
     ...argbase,
+    title: 'Registered',
     action: {
       ...argbase.action,
       id: eventWhenRegisterUpdatesDeclaration.id,
@@ -1068,6 +912,7 @@ const updateActionForRegister = expandWithClientSpecificActions(
 
 export const RegisteredOnDeclarationUpdate: Story = {
   args: {
+    title: 'Updated',
     fullEvent: eventWhenRegisterUpdatesDeclaration,
     action: updateActionForRegister
   }
@@ -1177,24 +1022,6 @@ const notDuplicateUpdateEvent = generateEventDocument({
       }
     },
     {
-      type: ActionType.VALIDATE,
-      user: {
-        role: TestUserRole.enum.LOCAL_REGISTRAR,
-        id: generator.user.id.localRegistrar
-      },
-      declarationOverrides: {
-        'applicant.dob': '1999-11-11',
-        'applicant.name': {
-          surname: 'Drinkwater',
-          firstname: 'Updated Danny', // updated when marked as not duplicate, should be visible in updated modal
-          middlename: ''
-        },
-        'senior-pass.id': '23213213',
-        'recommender.none': true,
-        'applicant.image.label': ''
-      }
-    },
-    {
       type: ActionType.UNASSIGN
     },
     {
@@ -1238,6 +1065,7 @@ const updateActionForNotDuplicateActions = expandWithClientSpecificActions(
 // Should see updated name in the modal
 export const NotDuplicateOnDeclarationUpdate: Story = {
   args: {
+    title: 'Updated',
     fullEvent: notDuplicateUpdateEvent,
     action: updateActionForNotDuplicateActions
   }
@@ -1246,6 +1074,7 @@ export const NotDuplicateOnDeclarationUpdate: Story = {
 export const Rejected: Story = {
   args: {
     ...argbase,
+    title: 'Rejected',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1260,6 +1089,7 @@ export const Rejected: Story = {
 export const Archived: Story = {
   args: {
     ...argbase,
+    title: 'Archived',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1274,6 +1104,7 @@ export const Archived: Story = {
 export const MarkedAsDuplicate: Story = {
   args: {
     ...argbase,
+    title: 'Archived',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1288,6 +1119,7 @@ export const MarkedAsDuplicate: Story = {
 export const Certified: Story = {
   args: {
     ...argbase,
+    title: 'Certified',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1318,12 +1150,6 @@ export const Certified: Story = {
         {
           ...actionBase,
           id: generateUuid(prng),
-          type: ActionType.VALIDATE,
-          declaration
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
           type: ActionType.REGISTER,
           declaration
         }
@@ -1338,6 +1164,7 @@ export const Certified: Story = {
 export const CertifiedBySomeoneElse: Story = {
   args: {
     ...argbase,
+    title: 'Certified',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1374,12 +1201,6 @@ export const CertifiedBySomeoneElse: Story = {
         {
           ...actionBase,
           id: generateUuid(prng),
-          type: ActionType.VALIDATE,
-          declaration
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
           type: ActionType.REGISTER,
           declaration
         }
@@ -1394,6 +1215,7 @@ export const CertifiedBySomeoneElse: Story = {
 export const RequestCorrection: Story = {
   args: {
     ...argbase,
+    title: 'Correction requested',
     action: requestCorrectionAction,
     fullEvent: {
       id: getUUID(),
@@ -1408,12 +1230,6 @@ export const RequestCorrection: Story = {
           ...actionBase,
           id: generateUuid(prng),
           type: ActionType.DECLARE,
-          declaration
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
-          type: ActionType.VALIDATE,
           declaration
         },
         {
@@ -1434,6 +1250,7 @@ export const RequestCorrection: Story = {
 export const UpdateAction: Story = {
   args: {
     ...argbase,
+    title: 'Updated',
     action: updateAction,
     fullEvent: {
       id: getUUID(),
@@ -1455,12 +1272,6 @@ export const UpdateAction: Story = {
         {
           ...actionBase,
           id: generateUuid(prng),
-          type: ActionType.VALIDATE,
-          declaration: {}
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
           type: ActionType.REGISTER,
           declaration: {}
         }
@@ -1475,6 +1286,7 @@ export const UpdateAction: Story = {
 export const RecordCorrected: Story = {
   args: {
     ...argbase,
+    title: 'Record corrected',
     action: {
       ...requestCorrectionAction,
       annotation: {
@@ -1495,12 +1307,6 @@ export const RecordCorrected: Story = {
           ...actionBase,
           id: generateUuid(prng),
           type: ActionType.DECLARE,
-          declaration
-        },
-        {
-          ...actionBase,
-          id: generateUuid(prng),
-          type: ActionType.VALIDATE,
           declaration
         },
         {
@@ -1536,6 +1342,7 @@ export const RecordCorrected: Story = {
 export const RejectCorrection: Story = {
   args: {
     ...argbase,
+    title: 'Correction rejected',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1548,6 +1355,7 @@ export const RejectCorrection: Story = {
 export const ApproveCorrection: Story = {
   args: {
     ...argbase,
+    title: 'Correction approved',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1559,6 +1367,7 @@ export const ApproveCorrection: Story = {
 export const Assigned: Story = {
   args: {
     ...argbase,
+    title: 'Assigned',
     action: {
       ...argbase.action,
       id: generateUuid(prng),
@@ -1571,6 +1380,7 @@ export const Assigned: Story = {
 export const Unassigned: Story = {
   args: {
     ...argbase,
+    title: 'Unassigned',
     action: {
       ...argbase.action,
       id: generateUuid(prng),

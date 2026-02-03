@@ -10,7 +10,7 @@
  */
 /* eslint-disable max-lines */
 import { isArray, isNil, isPlainObject, isString } from 'lodash'
-import { parse as parseQuery, stringify } from 'query-string'
+import { parse as parseQuery, stringify } from 'qs'
 import { useSelector } from 'react-redux'
 import { validate as validateEmail } from 'email-validator'
 import {
@@ -32,7 +32,8 @@ import {
   EventStatus,
   AdvancedSearchConfigWithFieldsResolved,
   METADATA_FIELD_PREFIX,
-  ValidatorContext
+  ValidatorContext,
+  getAcceptedScopesByType
 } from '@opencrvs/commons/client'
 import { findScope, getAllUniqueFields } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
@@ -762,11 +763,18 @@ export function buildQuickSearchQuery(
  */
 export function checkScopeForEventSearch(eventId: string) {
   const scopes = useSelector(getScope)
-  const searchScopes = findScope(scopes ?? [], 'search')
 
-  const isEventSearchAllowed =
-    searchScopes &&
-    Object.keys(searchScopes.options).some((id) => eventId === id)
+  const searchScopes = getAcceptedScopesByType({
+    acceptedScopes: ['record.search'],
+    scopes: scopes ?? []
+  })
+
+  const isEventSearchAllowed = searchScopes.some(
+    (scope) =>
+      scope.options?.event?.includes(eventId) ||
+      // Unless specified, event search is allowed for all events
+      scope.options?.event === undefined
+  )
 
   return isEventSearchAllowed
 }
@@ -791,7 +799,7 @@ export function serializeSearchParams(
     (acc, [key, value]) => {
       const serialized = serializeValue(value)
       // If we don't care about the empty objects, we might be able to keep it as simple as this:
-      if (!isNil(serialized)) {
+      if (!isNil(serialized) && !(serialized === '')) {
         acc[key] = serialized
       }
 
@@ -799,7 +807,11 @@ export function serializeSearchParams(
     },
     {} as Record<string, unknown>
   )
-  return stringify(simplifiedValue, { skipEmptyString: true })
+  return stringify(simplifiedValue, {
+    // Configs are to match query-string behavior. qs adds indices by default for arrays. Otherwise they are arbitrary.
+    indices: false,
+    sort: (a, b) => a.localeCompare(b)
+  })
 }
 
 function tryParse(value: unknown): unknown {
@@ -824,7 +836,9 @@ function tryParse(value: unknown): unknown {
 export function deserializeSearchParams(
   queryParams: string
 ): Record<string, unknown> {
-  const parsedParams = parseQuery(queryParams)
+  const parsedParams = parseQuery(queryParams, {
+    ignoreQueryPrefix: true
+  })
 
   const deserialized = Object.entries(parsedParams).reduce(
     (acc, [key, value]) => {

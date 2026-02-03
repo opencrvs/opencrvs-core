@@ -9,53 +9,49 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import {
-  findScope,
-  getScopes,
-  SearchScopeAccessLevels,
+  RecordScopeV2,
   WorkqueueConfig,
   WorkqueueCountInput,
   WorkqueueCountOutput
 } from '@opencrvs/commons'
-import { router, publicProcedure } from '@events/router/trpc'
+import { router, userOnlyProcedure } from '@events/router/trpc'
 import {
   getInMemoryEventConfigurations,
   getInMemoryWorkqueueConfigurations
 } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
-import { requireScopeForWorkqueues } from '@events/router/middleware'
+import {
+  requiresAnyOfScopes,
+  requireScopeForWorkqueues
+} from '@events/router/middleware'
 
 export const workqueueRouter = router({
   config: router({
-    list: publicProcedure
+    list: userOnlyProcedure
       .input(z.void())
       .output(z.array(WorkqueueConfig))
       .query(async (options) => {
         return getInMemoryWorkqueueConfigurations(options.ctx.token)
       })
   }),
-  count: publicProcedure
+  count: userOnlyProcedure
     .input(WorkqueueCountInput)
     .use(requireScopeForWorkqueues)
+    .use(requiresAnyOfScopes([], undefined, ['record.search']))
     .output(WorkqueueCountOutput)
     .query(async ({ ctx, input }) => {
-      const scopes = getScopes(ctx.token)
-      const searchScope = findScope(scopes, 'search')
-      // Only to satisfy type checking, as findScope will return undefined if no scope is found
-      if (!searchScope) {
+      if (!ctx.acceptedScopes) {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
-      const searchScopeOptions = searchScope.options as Record<
-        string,
-        SearchScopeAccessLevels
-      >
-      return getEventCount(
-        input,
-        await getInMemoryEventConfigurations(ctx.token),
-        searchScopeOptions,
-        ctx.user.primaryOfficeId
-      )
+
+      return getEventCount({
+        queries: input,
+        user: ctx.user,
+        eventConfigs: await getInMemoryEventConfigurations(ctx.token),
+        acceptedScopes: ctx.acceptedScopes as RecordScopeV2[]
+      })
     })
 })

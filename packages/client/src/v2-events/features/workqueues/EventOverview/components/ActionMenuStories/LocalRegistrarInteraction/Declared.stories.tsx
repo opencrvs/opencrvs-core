@@ -38,10 +38,11 @@ const declaredScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.DISABLED,
-      [ActionType.ARCHIVE]: AssertType.DISABLED
+      ['Assign']: AssertType.ENABLED,
+      ['Register']: AssertType.DISABLED,
+      ['Archive']: AssertType.DISABLED,
+      ['Reject']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED
     }
   },
   {
@@ -56,10 +57,11 @@ const declaredScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.ENABLED,
-      [ActionType.ARCHIVE]: AssertType.ENABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Register']: AssertType.ENABLED,
+      ['Archive']: AssertType.ENABLED,
+      ['Reject']: AssertType.ENABLED,
+      ['Edit']: AssertType.ENABLED
     }
   },
   {
@@ -74,10 +76,11 @@ const declaredScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.VALIDATE]: AssertType.DISABLED,
-      [ActionType.ARCHIVE]: AssertType.DISABLED
+      ['Unassign']: AssertType.ENABLED,
+      ['Register']: AssertType.DISABLED,
+      ['Archive']: AssertType.DISABLED,
+      ['Reject']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED
     }
   }
 ]

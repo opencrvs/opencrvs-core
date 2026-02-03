@@ -47,7 +47,6 @@ test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page fi
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -68,7 +67,6 @@ test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -102,7 +100,6 @@ test(`PRINT_CERTIFICATE action can be added to registered event`, async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -122,7 +119,6 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -141,7 +137,6 @@ test(`PRINT_CERTIFICATE is idempotent`, async () => {
 
   const event = await createEvent(client, generator, [
     ActionType.DECLARE,
-    ActionType.VALIDATE,
     ActionType.REGISTER
   ])
 
@@ -157,22 +152,4 @@ test(`PRINT_CERTIFICATE is idempotent`, async () => {
   )
 
   expect(firstResponse).toEqual(secondResponse)
-})
-
-test(`PRINT_CERTIFICATE is not allowed if the event is waiting for correction`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER,
-    ActionType.REQUEST_CORRECTION
-  ])
-
-  await expect(
-    client.event.actions.printCertificate.request(
-      generator.event.actions.printCertificate(event.id)
-    )
-  ).rejects.toThrowErrorMatchingSnapshot()
 })

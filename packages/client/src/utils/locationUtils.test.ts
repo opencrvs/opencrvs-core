@@ -16,11 +16,18 @@ import {
   filterLocations,
   generateLocationName,
   getJurisidictionType,
-  isOfficeUnderJurisdiction,
-  getLocationNameMapOfFacility
+  getLocationNameMapOfFacility,
+  createSearchOptions,
+  isOfficeUnderJurisdiction
 } from '@client/utils/locationUtils'
 import { createIntl } from 'react-intl'
 import { ILanguage } from '@client/i18n/reducer'
+import {
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+  V2_DEFAULT_MOCK_LOCATIONS,
+  V2_DEFAULT_MOCK_LOCATIONS_MAP
+} from '../tests/v2-events/administrative-hierarchy-mock'
+import { UUID } from '@opencrvs/commons/client'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {
@@ -183,30 +190,64 @@ describe('locationUtil tests', () => {
 
 describe('isOfficeUnderJurisdiction', () => {
   it('returns true if the other office is under jurisdiction of the given office', () => {
-    const officeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // office in Chittagong
-    const otherOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // office in Chittagong -> Chandpur
+    const officeId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find(
+        (l) => l.name === 'Central Provincial Office'
+      )?.id
+    )
+    const otherOfficeId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Ibombo District Office')
+        ?.id
+    )
 
     expect(
-      isOfficeUnderJurisdiction(
+      isOfficeUnderJurisdiction({
         officeId,
         otherOfficeId,
-        mockOfflineData.locations,
-        mockOfflineData.offices
-      )
+        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+      })
     ).toEqual(true)
   })
 
   it('returns false if the given other office is not under the jurisdiction of the given office', () => {
-    const officeId = '0d8474da-0361-4d32-979e-af91f012340a' // office in Chittagong
-    const otherOfficeId = '93259d69-71af-488f-8ada-32d06678df17' // office in Dhaka
+    const officeId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Isango District Office')
+        ?.id
+    )
+    const otherOfficeId = UUID.parse(
+      V2_DEFAULT_MOCK_LOCATIONS.find((l) => l.name === 'Ibombo District Office')
+        ?.id
+    )
 
     expect(
-      isOfficeUnderJurisdiction(
+      isOfficeUnderJurisdiction({
         officeId,
         otherOfficeId,
-        mockOfflineData.locations,
-        mockOfflineData.offices
-      )
+        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+      })
     ).toEqual(false)
+  })
+})
+
+describe('createSearchOptions', () => {
+  it('creates search options for locations and administrative areas', () => {
+    const options = createSearchOptions({
+      locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+      administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP
+    })
+
+    expect(options).toMatchSnapshot()
+  })
+
+  it('filters search options for both locations and administrative areas', () => {
+    const options = createSearchOptions({
+      locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+      administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+      filter: (f) => f.name.includes('Ibombo')
+    })
+
+    expect(options).toMatchSnapshot()
   })
 })

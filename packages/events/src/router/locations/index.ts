@@ -9,42 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { Location, LocationType, SCOPES, UUID } from '@opencrvs/commons'
-import { router, systemProcedure } from '@events/router/trpc'
+import * as z from 'zod/v4'
+import { Location, SCOPES, UUID } from '@opencrvs/commons'
+import { router, userAndSystemProcedure } from '@events/router/trpc'
 import {
+  getLocationHierarchy,
   getLocations,
-  setLocations,
-  syncLocations
+  setLocations
 } from '@events/service/locations/locations'
 import { requiresAnyOfScopes } from '../middleware'
 
 export const locationRouter = router({
-  sync: systemProcedure
-    .use(
-      requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
-    )
-    .input(z.void())
-    .output(z.void())
-    .meta({
-      openapi: {
-        summary: 'Sync locations between V1 and V2',
-        method: 'POST',
-        path: '/sync-locations',
-        tags: ['events'],
-        protect: true
-      }
-    })
-    .mutation(async () => {
-      await syncLocations()
-    }),
-  list: systemProcedure
+  list: userAndSystemProcedure
     .input(
       z
         .object({
           isActive: z.boolean().optional(),
           locationIds: z.array(UUID).optional(),
-          locationType: LocationType.optional()
+          locationType: z.string().optional(),
+          externalId: z.string().optional()
         })
         .optional()
     )
@@ -53,10 +36,11 @@ export const locationRouter = router({
       getLocations({
         isActive: input?.isActive,
         locationIds: input?.locationIds,
-        locationType: input?.locationType
+        locationType: input?.locationType,
+        externalId: input?.externalId
       })
     ),
-  set: systemProcedure
+  set: userAndSystemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
     )
@@ -64,5 +48,11 @@ export const locationRouter = router({
     .output(z.void())
     .mutation(async ({ input }) => {
       await setLocations(input)
+    }),
+  getLocationHierarchy: userAndSystemProcedure
+    .input(z.object({ locationId: UUID }))
+    .output(z.array(UUID))
+    .query(async ({ input }) => {
+      return getLocationHierarchy(input.locationId)
     })
 })

@@ -24,8 +24,9 @@ import {
   isUpdatableDeclaration
 } from '@client/declarations/utils'
 import { isOfficeUnderJurisdiction } from '@client/utils/locationUtils'
-import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
 export const RECORD_ALLOWED_SCOPES = {
   UPDATE: [
@@ -72,8 +73,12 @@ export function usePermissions() {
   const userScopes = useSelector(getScope)
   const currentUser = useSelector(getUserDetails)
   const userPrimaryOffice = currentUser?.primaryOffice
-  const locations = useSelector(getOfflineData).locations
-  const offices = useSelector(getOfflineData).offices
+
+  const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
+
   const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
 
   const roleScopes = (role: string) =>
@@ -111,12 +116,12 @@ export function usePermissions() {
       return user.primaryOffice.id === userPrimaryOffice?.id
     }
     if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdiction(
-        userPrimaryOffice.id,
-        user.primaryOffice.id,
+      return isOfficeUnderJurisdiction({
+        officeId: userPrimaryOffice.id,
+        otherOfficeId: user.primaryOffice.id,
         locations,
-        offices
-      )
+        administrativeAreas
+      })
     }
     if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
       return user.id === currentUser?.id
@@ -144,12 +149,12 @@ export function usePermissions() {
       if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
         return false
       }
-      return isOfficeUnderJurisdiction(
-        userPrimaryOffice.id,
-        user.primaryOffice.id,
+      return isOfficeUnderJurisdiction({
+        officeId: userPrimaryOffice.id,
+        otherOfficeId: user.primaryOffice.id,
         locations,
-        offices
-      )
+        administrativeAreas
+      })
     }
 
     return false
@@ -173,12 +178,12 @@ export function usePermissions() {
     }
 
     if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdiction(
-        userPrimaryOffice.id,
-        office.id,
+      return isOfficeUnderJurisdiction({
+        officeId: userPrimaryOffice.id,
+        otherOfficeId: office.id,
         locations,
-        offices
-      )
+        administrativeAreas
+      })
     }
     return false
   }
@@ -191,12 +196,12 @@ export function usePermissions() {
       return true
     }
     if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdiction(
-        userPrimaryOffice.id,
-        office.id,
+      return isOfficeUnderJurisdiction({
+        officeId: userPrimaryOffice.id,
+        otherOfficeId: office.id,
         locations,
-        offices
-      )
+        administrativeAreas
+      })
     }
     return false
   }

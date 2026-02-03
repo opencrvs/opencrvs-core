@@ -14,6 +14,7 @@ import { cloneDeep } from 'lodash'
 import {
   ActionDocument,
   ActionType,
+  AdministrativeArea,
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
@@ -25,7 +26,8 @@ import {
   LanguageConfig,
   Location,
   PrintCertificateAction,
-  UserOrSystem
+  UserOrSystem,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -66,13 +68,15 @@ export const usePrintableCertificate = ({
   event,
   config,
   locations,
+  administrativeAreas,
   users,
   certificateConfig,
   language
 }: {
   event: EventDocument
   config: EventConfig
-  locations: Location[]
+  locations: Map<UUID, Location>
+  administrativeAreas: Map<UUID, AdministrativeArea>
   users: UserOrSystem[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
@@ -115,6 +119,7 @@ export const usePrintableCertificate = ({
     $actions: getAcceptedActions(event),
     review: true,
     locations,
+    administrativeAreas,
     users,
     language,
     config,
@@ -150,6 +155,7 @@ export const usePrintableCertificate = ({
       $declaration: declarationWithResolvedImages,
       $actions: event.actions as ActionDocument[],
       locations,
+      administrativeAreas,
       review: false,
       users,
       language,

@@ -34,17 +34,14 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       ActionType.REQUEST_CORRECTION
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.HIDDEN,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
-      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN
+      ['Print']: AssertType.HIDDEN,
+      ['Correct record']: AssertType.HIDDEN
     }
   },
   {
@@ -54,16 +51,13 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.REQUEST_CORRECTION
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.HIDDEN,
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
-      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN
+      ['Print']: AssertType.HIDDEN,
+      ['Correct record']: AssertType.HIDDEN
     }
   },
   {
@@ -73,7 +67,6 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
-      ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS,
@@ -81,9 +74,8 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
-      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN
+      ['Print']: AssertType.HIDDEN,
+      ['Correct record']: AssertType.HIDDEN
     }
   }
 ]

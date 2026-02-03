@@ -10,7 +10,13 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, generateEventDocument, SCOPES } from '@opencrvs/commons'
+import {
+  ActionType,
+  createPrng,
+  encodeScope,
+  generateEventDocument,
+  SCOPES
+} from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createSystemTestClient, setupTestCase } from '@events/tests/utils'
 
@@ -50,14 +56,20 @@ describe('bulkImport', () => {
     const client = createSystemTestClient('test-system', [
       SCOPES.RECORD_IMPORT,
       SCOPES.RECORD_READ,
-      `search[event=${tennisClubMembershipEvent.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [tennisClubMembershipEvent.id]
+        }
+      })
     ])
     const event1 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
       actions: [
         { type: ActionType.CREATE, user },
         { type: ActionType.DECLARE, user }
-      ]
+      ],
+      rng: createPrng(871)
     })
 
     const event2 = generateEventDocument({
@@ -65,7 +77,8 @@ describe('bulkImport', () => {
       actions: [
         { type: ActionType.CREATE, user },
         { type: ActionType.DECLARE, user }
-      ]
+      ],
+      rng: createPrng(872)
     })
     await client.event.bulkImport([event1, event2])
 

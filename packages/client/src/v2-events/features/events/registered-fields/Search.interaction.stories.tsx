@@ -21,7 +21,12 @@ import {
 import { http, HttpResponse } from 'msw'
 import React from 'react'
 import styled from 'styled-components'
-import { defineConditional, field, FieldType } from '@opencrvs/commons/client'
+import {
+  defineConditional,
+  field,
+  FieldType,
+  FieldConfig
+} from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
@@ -47,7 +52,7 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-const searchFields = [
+const searchFields: FieldConfig[] = [
   {
     id: 'child.brn-search',
     type: FieldType.SEARCH,
@@ -55,6 +60,16 @@ const searchFields = [
       defaultMessage: 'Birth registration number',
       description: 'BRN for child',
       id: 'event.birth.child.brn.label'
+    },
+    placeholder: {
+      defaultMessage: 'Enter birth registration number',
+      description: 'Placeholder for BRN search',
+      id: 'event.birth.child.brn.placeholder'
+    },
+    helperText: {
+      defaultMessage: 'Enter a 10-digit birth registration number',
+      description: 'Helper text for BRN search',
+      id: 'event.birth.child.brn.helper'
     },
     configuration: {
       validation: {
@@ -82,7 +97,7 @@ const searchFields = [
         }
       },
       query: {
-        type: 'or',
+        type: 'or' as const,
         clauses: [
           {
             'legalStatuses.REGISTERED.registrationNumber': {
@@ -150,7 +165,7 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
         handlers: {
           nidApi: [
             http.post('/api/events/events/search', async () => {
-              await new Promise((resolve) => setTimeout(resolve, 2000))
+              await new Promise((resolve) => setTimeout(resolve, 2500))
               return HttpResponse.json({
                 results: [],
                 total: 0
@@ -163,24 +178,27 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement)
 
-      await userEvent.type(
-        await canvas.findByTestId('text__firstname'),
-        'firstname'
-      )
+      const firstname = await canvas.findByTestId('text__firstname')
+      const surname = await canvas.findByTestId('text__surname')
 
-      await userEvent.type(
-        await canvas.findByTestId('text__surname'),
-        'surname'
-      )
+      await userEvent.type(firstname, 'firstname')
 
-      await userEvent.type(
-        await canvas.findByTestId('search-input'),
-        '456988542'
-      )
+      firstname.blur()
+
+      await userEvent.type(surname, 'surname')
+
+      const searchInput = await canvas.findByTestId('search-input')
+
+      await userEvent.type(searchInput, '456988542')
+
+      searchInput.blur()
 
       await canvas.findByTestId('search-input-error')
 
-      await userEvent.type(await canvas.findByTestId('search-input'), '1')
+      await userEvent.type(searchInput, '1')
+
+      searchInput.blur()
+
       await waitFor(async () =>
         expect(
           canvas.queryByTestId('search-input-error')
@@ -197,13 +215,9 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
         { timeout: 3000 }
       )
 
-      // names should not clear because search was not successfull
-      await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
-        'firstname'
-      )
-      await expect(await canvas.findByTestId('text__surname')).toHaveValue(
-        'surname'
-      )
+      // names should not clear because search was not successful
+      await expect(firstname).toHaveValue('firstname')
+      await expect(surname).toHaveValue('surname')
     },
     render: function Component(args) {
       return (

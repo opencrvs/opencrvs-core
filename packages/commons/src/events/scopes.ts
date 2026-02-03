@@ -11,10 +11,10 @@
 import { intersection } from 'lodash'
 import {
   ConfigurableScopeType,
-  findScope,
   getAuthorizedEventsFromScopes,
+  Scope,
   RecordScopeType,
-  Scope
+  findScopes
 } from '../scopes'
 import {
   ClientSpecificAction,
@@ -30,13 +30,9 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.READ]: ['record.read'],
   [ActionType.CREATE]: ['record.create'],
   [ActionType.NOTIFY]: ['record.notify'],
-  [ActionType.DECLARE]: [
-    'record.declare',
-    'record.declared.validate',
-    'record.register'
-  ],
+  [ActionType.DECLARE]: ['record.declare', 'record.register'],
+  [ActionType.EDIT]: ['record.declared.edit'],
   [ActionType.DELETE]: ['record.declare'],
-  [ActionType.VALIDATE]: ['record.declared.validate', 'record.register'],
   [ActionType.REGISTER]: ['record.register'],
   [ActionType.PRINT_CERTIFICATE]: ['record.registered.print-certified-copies'],
   [ActionType.REQUEST_CORRECTION]: [
@@ -54,7 +50,8 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.REJECT]: ['record.declared.reject'],
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
-  [ActionType.DUPLICATE_DETECTED]: []
+  [ActionType.DUPLICATE_DETECTED]: [],
+  [ActionType.CUSTOM]: []
 } satisfies Record<DisplayableAction, RecordScopeType[] | AlwaysAllowed>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
@@ -64,15 +61,29 @@ export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
 export function configurableEventScopeAllowed(
   scopes: Scope[],
   allowedConfigurableScopes: ConfigurableScopeType[],
-  eventType: string
+  eventType: string,
+  customActionType?: string
 ) {
   // Find the scopes that are authorized for the given action
-  const parsedScopes = allowedConfigurableScopes
-    .map((scope) => findScope(scopes, scope))
-    .filter((scope) => scope !== undefined)
+  const parsedScopes = allowedConfigurableScopes.flatMap((scope) =>
+    findScopes(scopes, scope)
+  )
 
-  // Ensure that the given event type is authorized in the found scopes
-  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+  if (!customActionType) {
+    const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+    return authorizedEvents.includes(eventType)
+  }
+
+  const scopesWithCorrectCustomActionType = parsedScopes.filter(
+    ({ options }) =>
+      'customActionType' in options &&
+      options.customActionType.includes(customActionType as string)
+  )
+
+  const authorizedEvents = getAuthorizedEventsFromScopes(
+    scopesWithCorrectCustomActionType
+  )
+
   return authorizedEvents.includes(eventType)
 }
 
@@ -91,7 +102,8 @@ export function configurableEventScopeAllowed(
 export function isActionInScope(
   scopes: Scope[],
   action: DisplayableAction,
-  eventType: string
+  eventType: string,
+  customActionType?: string
 ) {
   const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
 
@@ -108,7 +120,8 @@ export function isActionInScope(
   return configurableEventScopeAllowed(
     scopes,
     allowedConfigurableScopes,
-    eventType
+    eventType,
+    customActionType
   )
 }
 

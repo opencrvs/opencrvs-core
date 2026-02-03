@@ -141,6 +141,8 @@ export const ReviewWithParentFieldChanges: Story = {
         canvas.getByTestId('change-button-applicant.address')
       )
 
+      await canvas.findByText('Who is applying for the membership?')
+
       // make senior-pass page available meeting conditional with applicant dob
       await userEvent.clear(canvas.getByTestId('applicant____dob-dd'))
       await userEvent.type(canvas.getByTestId('applicant____dob-dd'), '10')
@@ -305,7 +307,6 @@ const eventWithAddress = generateEventDocument({
   actions: [
     { type: ActionType.CREATE },
     { type: ActionType.DECLARE },
-    { type: ActionType.VALIDATE },
     { type: ActionType.REGISTER }
   ]
 })

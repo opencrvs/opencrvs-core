@@ -16,7 +16,7 @@ import {
   eventQueryDataGenerator,
   Clause
 } from '@opencrvs/commons'
-import { v2BirthEvent } from '@opencrvs/commons/fixtures'
+import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import { field, and, or, not } from '@opencrvs/commons/events/deduplication'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
@@ -119,7 +119,7 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
           },
           73
         ),
-        v2BirthEvent
+        ChildOnboardingEvent
       ),
       doc_as_upsert: true
     },
@@ -129,7 +129,7 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
   const results = await searchForDuplicates(
     eventQueryDataGenerator({ declaration: newEvent }, 37),
     DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
-    v2BirthEvent
+    ChildOnboardingEvent
   )
 
   return results
@@ -143,13 +143,13 @@ describe('deduplication query input conversion', () => {
           'child.name': { firstname: 'John', surname: 'Smith' }
         }
       }),
-      v2BirthEvent
+      ChildOnboardingEvent
     )
     expect(
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(similarNamedChild),
-        v2BirthEvent
+        ChildOnboardingEvent
       )
     ).toMatchSnapshot()
   })
@@ -161,13 +161,13 @@ describe('deduplication query input conversion', () => {
           'child.dob': '2011-11-11'
         }
       }),
-      v2BirthEvent
+      ChildOnboardingEvent
     )
     expect(
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(childDobWithin5Days),
-        v2BirthEvent
+        ChildOnboardingEvent
       )
     ).toMatchSnapshot()
   })
@@ -179,13 +179,13 @@ describe('deduplication query input conversion', () => {
           'mother.name': { firstname: 'Janet', surname: 'Smith' }
         }
       }),
-      v2BirthEvent
+      ChildOnboardingEvent
     )
     expect(
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(similarNamedMother),
-        v2BirthEvent
+        ChildOnboardingEvent
       )
     ).toMatchSnapshot()
   })
@@ -197,13 +197,13 @@ describe('deduplication query input conversion', () => {
           'mother.dob': '1999-11-11'
         }
       }),
-      v2BirthEvent
+      ChildOnboardingEvent
     )
     expect(
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(similarAgedMother),
-        v2BirthEvent
+        ChildOnboardingEvent
       )
     ).toMatchSnapshot()
   })
@@ -217,13 +217,13 @@ describe('deduplication query input conversion', () => {
             'mother.age': { age: 19, asOfDateRef: 'child.dob' }
           }
         }),
-        v2BirthEvent
+        ChildOnboardingEvent
       )
       expect(
         generateElasticsearchQuery(
           encodedEventIndex,
           Clause.parse(similarAgedMother),
-          v2BirthEvent
+          ChildOnboardingEvent
         )
       ).toMatchSnapshot()
     })
@@ -235,13 +235,13 @@ describe('deduplication query input conversion', () => {
             'mother.age': { age: 11, asOfDateRef: 'child.dob' }
           }
         }),
-        v2BirthEvent
+        ChildOnboardingEvent
       )
       expect(
         generateElasticsearchQuery(
           encodedEventIndex,
           Clause.parse(similarAgedMother),
-          v2BirthEvent
+          ChildOnboardingEvent
         )
       ).toMatchSnapshot()
     })
@@ -255,13 +255,13 @@ describe('deduplication query input conversion', () => {
           'mother.nid': '1232314352'
         }
       }),
-      v2BirthEvent
+      ChildOnboardingEvent
     )
     expect(
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(motherIdMatchesIfGiven),
-        v2BirthEvent
+        ChildOnboardingEvent
       )
     ).toMatchSnapshot()
   })
@@ -273,13 +273,13 @@ describe('deduplication query input conversion', () => {
           'child.name': { firstname: 'John', surname: 'Smith' }
         }
       }),
-      v2BirthEvent
+      ChildOnboardingEvent
     )
     expect(
       generateElasticsearchQuery(
         encodedEventIndex,
         Clause.parse(exactNamedChild),
-        v2BirthEvent
+        ChildOnboardingEvent
       )
     ).toMatchSnapshot()
   })
@@ -329,7 +329,7 @@ describe('deduplication tests', () => {
       index: getEventIndexName(),
       id: event.id,
       body: {
-        doc: encodeEventIndex(event, v2BirthEvent),
+        doc: encodeEventIndex(event, ChildOnboardingEvent),
         doc_as_upsert: true
       },
       refresh: 'wait_for'
@@ -342,7 +342,7 @@ describe('deduplication tests', () => {
     const matchResultForDuplicateEvent = await searchForDuplicates(
       duplicateEvent,
       DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
-      v2BirthEvent
+      ChildOnboardingEvent
     )
     expect(matchResultForDuplicateEvent).toHaveLength(1)
 
@@ -354,7 +354,7 @@ describe('deduplication tests', () => {
     const matchResultForEventWithSameId = await searchForDuplicates(
       duplicateEventWithSameId,
       DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
-      v2BirthEvent
+      ChildOnboardingEvent
     )
     expect(matchResultForEventWithSameId).toHaveLength(0)
   })

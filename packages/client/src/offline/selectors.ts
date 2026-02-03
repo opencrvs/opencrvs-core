@@ -8,17 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  IOfflineDataState,
-  IOfflineData,
-  CRVSOffice,
-  AdminStructure,
-  Facility
-} from '@client/offline/reducer'
+import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { createSelector } from '@reduxjs/toolkit'
 import { merge } from 'lodash'
-import { IndexMap } from '@client/utils'
 
 const getOfflineState = (store: IStoreState): IOfflineDataState => store.offline
 
@@ -29,13 +22,7 @@ function getKey<K extends keyof IOfflineDataState>(store: IStoreState, key: K) {
 export function isOfflineDataLoaded(
   state: Partial<IOfflineData>
 ): state is IOfflineData {
-  const hasAllRequiredData =
-    state.facilities &&
-    state.locations &&
-    state.config &&
-    state.forms &&
-    state.templates &&
-    state.languages
+  const hasAllRequiredData = state.config && state.templates && state.languages
 
   const isOfflineDataLoaded = Boolean(hasAllRequiredData)
   if (isOfflineDataLoaded) merge(window.config, state.config)
@@ -61,14 +48,6 @@ export const getLanguage = createSelector(
 export const getCertificateTemplates = createSelector(
   getOfflineData,
   (data) => data.templates.certificates
-)
-export const getLocations = createSelector(
-  getOfflineData,
-  (data): IndexMap<AdminStructure | Facility | CRVSOffice> => ({
-    ...data.locations,
-    ...data.facilities,
-    ...data.offices
-  })
 )
 export const getCountryLogoFile = createSelector(
   getOfflineData,

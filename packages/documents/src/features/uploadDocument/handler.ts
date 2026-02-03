@@ -36,13 +36,18 @@ export type IFileInfo = {
 
 const HapiSchema = z.object({
   filename: z.string().min(1, 'Filename is required'),
-  headers: z.record(z.string()),
+  headers: z.record(z.string(), z.string()),
   bytes: z.number().optional()
 })
 
 const FileSchema = z
   .custom<Readable & { hapi: z.infer<typeof HapiSchema> }>((val) => {
-    return '_readableState' in val && 'hapi' in val
+    return (
+      typeof val === 'object' &&
+      val !== null &&
+      '_readableState' in val &&
+      'hapi' in val
+    )
   }, 'Not a readable stream or missing hapi field')
   .refine(
     (val) => HapiSchema.safeParse(val.hapi).success,

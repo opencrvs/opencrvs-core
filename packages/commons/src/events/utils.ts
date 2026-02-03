@@ -24,12 +24,7 @@ import {
   orderBy,
   isEqual
 } from 'lodash'
-import {
-  ActionType,
-  DeclarationActionType,
-  DeclarationActions,
-  writeActions
-} from './ActionType'
+import { ActionType, DeclarationActionType, writeActions } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import {
@@ -48,7 +43,11 @@ import {
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID, UUID } from '../uuid'
-import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
+import {
+  ActionConfig,
+  actionConfigTypes,
+  ActionConfigTypes
+} from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
@@ -58,12 +57,6 @@ import { subDays, subYears, format } from 'date-fns'
 export function ageToDate(age: number, asOfDate: DateValue) {
   const date = new Date(asOfDate)
   return DateValue.parse(format(subYears(date, age), 'yyyy-MM-dd'))
-}
-
-function isDeclarationActionConfig(
-  action: ActionConfig
-): action is DeclarationActionConfig {
-  return DeclarationActions.safeParse(action.type).success
 }
 
 export function getDeclarationFields(
@@ -78,6 +71,63 @@ export function getDeclarationPages(configuration: EventConfig) {
 
 export function getDeclaration(configuration: EventConfig) {
   return configuration.declaration
+}
+
+export function isActionConfigType(
+  type: ActionType
+): type is ActionConfigTypes {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return actionConfigTypes.has(type as any)
+}
+
+// @TODO: refactor this function to return typed ActionConfig depending on given actionType. Perhaps this function should also throw an error if the action config is not found.
+export function getActionConfig({
+  eventConfiguration,
+  actionType,
+  customActionType
+}: {
+  eventConfiguration: EventConfig
+  actionType: ActionType
+  customActionType?: string
+}): ActionConfig | undefined {
+  return eventConfiguration.actions.find((a) => {
+    // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
+    if (a.type === ActionType.CUSTOM && customActionType) {
+      return a.customActionType === customActionType
+    }
+
+    // Notify uses the declare action config
+    if (actionType === ActionType.NOTIFY) {
+      return a.type === ActionType.DECLARE
+    }
+
+    // For correction approval/rejection, we use the correction request action config
+    if (
+      actionType === ActionType.APPROVE_CORRECTION ||
+      actionType === ActionType.REJECT_CORRECTION
+    ) {
+      return a.type === ActionType.REQUEST_CORRECTION
+    }
+
+    return a.type === actionType
+  })
+}
+
+export function getCustomActionFields(
+  eventConfiguration: EventConfig,
+  customActionType: string
+): FieldConfig[] {
+  const actionConfig = getActionConfig({
+    eventConfiguration,
+    customActionType,
+    actionType: ActionType.CUSTOM
+  })
+
+  if (!actionConfig || !('form' in actionConfig)) {
+    return []
+  }
+
+  return actionConfig.form
 }
 
 export function getPrintCertificatePages(configuration: EventConfig) {
@@ -100,7 +150,11 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
     return actionConfig.printForm.pages.flatMap(({ fields }) => fields)
   }
 
-  if (isDeclarationActionConfig(actionConfig)) {
+  if (actionConfig.type === ActionType.CUSTOM) {
+    return actionConfig.form
+  }
+
+  if ('review' in actionConfig) {
     return actionConfig.review.fields
   }
 
@@ -148,21 +202,31 @@ export function getActionReview(
   configuration: EventConfig,
   actionType: ActionType
 ) {
-  const [actionConfig] = configuration.actions.filter(
-    (a): a is DeclarationActionConfig => a.type === actionType
-  )
+  const actionConfig = getActionConfig({
+    eventConfiguration: configuration,
+    actionType
+  })
 
-  return getOrThrow(
-    actionConfig.review,
-    `No review config found for ${actionType}`
-  )
+  if (!actionConfig) {
+    throw 'Tried to get action review for an action that is not a declaration action'
+  }
+
+  if ('review' in actionConfig) {
+    return actionConfig.review
+  }
+
+  return undefined
 }
 
 export function getActionReviewFields(
   configuration: EventConfig,
   actionType: DeclarationActionType
 ) {
-  return getActionReview(configuration, actionType).fields
+  const review = getActionReview(configuration, actionType)
+  if (!review) {
+    return []
+  }
+  return review.fields
 }
 
 export function isPageVisible(
@@ -279,7 +343,7 @@ export function createEmptyDraft(
       declaration: {},
       annotation: {},
       createdAt: new Date().toISOString(),
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdBy: '@todo',
       status: ActionStatus.Accepted,
       transactionId: '@todo',
@@ -613,4 +677,14 @@ export function aggregateActionDeclarations(event: EventDocument): EventState {
 
     return getCompleteActionDeclaration(declaration, event, action)
   }, {})
+}
+
+export function aggregateActionAnnotations(event: EventDocument): EventState {
+  return event.actions.reduce((ann, sortedAction) => {
+    if (!('annotation' in sortedAction) || !sortedAction.annotation) {
+      return ann
+    }
+
+    return deepMerge(ann, sortedAction.annotation)
+  }, {} as EventState)
 }

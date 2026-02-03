@@ -26,6 +26,7 @@ import { and, field as dedupField } from '../events/deduplication'
 
 export const tennisClubMembershipEvent = defineConfig({
   id: TENNIS_CLUB_MEMBERSHIP,
+  declaration: TENNIS_CLUB_DECLARATION_FORM,
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
@@ -77,14 +78,13 @@ export const tennisClubMembershipEvent = defineConfig({
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
     {
-      type: ActionType.VALIDATE,
+      type: ActionType.REJECT,
       label: {
-        defaultMessage: 'Validate',
+        defaultMessage: 'Reject',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.validate.label'
-      },
-      review: TENNIS_CLUB_DECLARATION_REVIEW
+        id: 'event.tennis-club-membership.action.reject.label'
+      }
     },
     {
       type: ActionType.REGISTER,
@@ -93,8 +93,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.register.label'
-      },
-      review: TENNIS_CLUB_DECLARATION_REVIEW
+      }
     },
     {
       type: ActionType.REQUEST_CORRECTION,
@@ -312,15 +311,6 @@ export const tennisClubMembershipEvent = defineConfig({
       }
     },
     {
-      type: ActionType.APPROVE_CORRECTION,
-      label: {
-        defaultMessage: 'Approve correction',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.correction.approve.label'
-      }
-    },
-    {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
         id: 'event.tennis-club-membership.action.collect-certificate.label',
@@ -329,24 +319,6 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from'
       },
       printForm: PRINT_CERTIFICATE_FORM
-    },
-    {
-      type: ActionType.ARCHIVE,
-      label: {
-        id: 'event.tennis-club-membership.action.archive.label',
-        defaultMessage: 'Archive',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      }
-    },
-    {
-      type: ActionType.REJECT,
-      label: {
-        id: 'event.tennis-club-membership.action.reject.label',
-        defaultMessage: 'Reject',
-        description:
-          'This is shown as the action name anywhere the user can trigger the action from'
-      }
     }
   ],
   advancedSearch: [
@@ -383,8 +355,7 @@ export const tennisClubMembershipEvent = defineConfig({
       },
       fields: [field('recommender.name').fuzzy()]
     }
-  ],
-  declaration: TENNIS_CLUB_DECLARATION_FORM
+  ]
 })
 
 /** @knipignore */

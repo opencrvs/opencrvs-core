@@ -1,0 +1,82 @@
+# Actions
+
+Actions represent operations performed on an event record, such as a birth declaration. They determine the resulting state of the record and include, for example, form data submitted to that record.
+
+## Core actions
+
+Core actions, as the name suggests, are defined within the core and are available for all event types. They often contain specific UI elements or logic. In v2.0, the available core actions are:
+
+- `CREATE`
+- `READ`
+- `ASSIGN` & `UNASSIGN`
+- `DELETE`
+- `NOTIFY`
+- `DECLARE`\*, `VALIDATE`\* & `REGISTER`\*
+- `REJECT`\*
+- `ARCHIVE`
+- `PRINT_CERTIFICATE`\*
+- `REQUEST_CORRECTION`\*, `APPROVE_CORRECTION` & `REJECT_CORRECTION`
+- `DUPLICATE_DETECTED`, `MARK_AS_DUPLICATE` & `MARK_AS_NOT_DUPLICATE`
+
+_\* are configurable core actions, this is related to the action configurations section below_
+
+Core actions can also change the event’s status, which custom actions cannot do.  
+In v2.0, the available event statuses are:
+
+`CREATED`, `NOTIFIED`, `DECLARED`, `REGISTERED`, `ARCHIVED`
+
+The status is applied by the corresponding action.
+
+> [!NOTE]
+> Beyond v2.0, we will review which core actions could be removed (and implemented instead as custom actions within our Farajaland configuration). We expect the following actions may be transitioned to custom actions: `VALIDATE`, `REJECT`
+
+## Custom actions
+
+Custom actions are non-core actions that are defined only in the country configuration using `ActionType.CUSTOM`. All custom actions are “quick actions”, executed via a dialog on the event overview page. They can be configured with flag configurations, action conditionals, and a custom form displayed in the dialog.
+
+All custom actions are configurable.
+
+<!-- TODO: add screenshot of custom action dialog here -->
+
+## Action configurations
+
+All custom actions and certain core actions are configurable.
+
+Actions are configured on a per–event-type basis, meaning different event types do not share action configurations.
+
+Below we describe two configuration options: flag configurations and action conditionals. It is important to note that additional configuration options are available and that many core actions have configuration options specific to their action type.
+
+### Flag configurations
+
+Flag configurations define flags that should be added to or removed from a record when an action is executed. They can be applied either unconditionally (if no conditionals are specified) or conditionally based on factors such as form data, the role of the executing user, or the record’s current status or flags.
+
+**Example:** Adding the flag `approval-required-for-late-registration` when `child.dob` is more than 365 days in the past:
+
+```js
+flags: [
+  {
+    id: 'approval-required-for-late-registration',
+    operation: 'add',
+    conditional: not(field('child.dob').isAfter().days(365).inPast())
+  }
+]
+```
+
+### Action conditionals
+
+Action conditionals determine whether an action should be visible or enabled based on the record’s status or flags.
+
+Action conditionals support two different types of conditional types: `ConditionalType.SHOW` & `ConditionalType.ENABLE`.
+
+When executing an action, our backend also checks that the action conditions are met: if `SHOW` or `ENABLE` condition is not met, the backend will return HTTP 409.
+
+**Example:** Showing an action only when the record has the approval-required-for-late-registration flag:
+
+```js
+conditionals: [
+  {
+    type: ConditionalType.SHOW,
+    conditional: flag('approval-required-for-late-registration')
+  }
+]
+```

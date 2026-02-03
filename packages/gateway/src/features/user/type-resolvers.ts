@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import { AppRouter } from '../../v2-events/events/router'
+import { env } from '@gateway/environment'
 import {
   IAuthHeader,
   Roles,
@@ -33,6 +34,9 @@ import {
 } from '@opencrvs/commons/types'
 import { getTokenPayload, scopesInclude } from './utils'
 import { Scope, SCOPES } from '@opencrvs/commons/authentication'
+import { createTRPCClient, httpLink } from '@trpc/client'
+import superjson from 'superjson'
+
 interface IAuditHistory {
   auditedBy: string
   auditedOn: number
@@ -182,8 +186,32 @@ export const userTypeResolvers: GQLResolver = {
     email(userModel: IUserModelData) {
       return userModel.emailForNotification
     },
-    async primaryOffice(userModel: IUserModelData, _, { dataSources }) {
-      return dataSources.locationsAPI.getLocation(userModel.primaryOfficeId)
+    async primaryOffice(userModel: IUserModelData, _, { headers }) {
+      const client = createTRPCClient<AppRouter>({
+        links: [
+          httpLink({
+            url: `${env.EVENTS_URL}/trpc`,
+            transformer: superjson,
+            headers() {
+              return {
+                Authorization: headers.Authorization
+              }
+            }
+          })
+        ]
+      })
+
+      const [office] = await client.locations.list.query(
+        {
+          locationIds: [userModel.primaryOfficeId]
+        },
+        {
+          context: {
+            headers
+          }
+        }
+      )
+      return office
     },
     async localRegistrar(
       userModel: IUserModelData,

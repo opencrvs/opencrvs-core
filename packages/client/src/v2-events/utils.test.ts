@@ -247,9 +247,7 @@ const testCases = [
       user: {
         name: '',
         role: '',
-        id: '',
-        district: '',
-        province: ''
+        id: ''
       },
       $window: {
         location: {
@@ -268,8 +266,6 @@ const testCases = [
     defaultValue: 'Hello',
     systemVariables: {
       user: {
-        district: '',
-        province: '',
         name: '',
         role: '',
         id: ''
@@ -287,29 +283,6 @@ const testCases = [
     field: TextField
   },
   {
-    currentValue: 'Hello world',
-    defaultValue: '$user.district',
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        role: '',
-        district: '',
-        province: '',
-        id: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: 'Hello world',
-    field: TextField
-  },
-  {
     currentValue: undefined,
     defaultValue: {
       country: 'FAR',
@@ -319,8 +292,6 @@ const testCases = [
       user: {
         name: 'Jon Doe',
         role: 'Field Agent',
-        district: '',
-        province: '',
         id: ''
       },
       $window: {
@@ -359,9 +330,7 @@ const testCasesForDefaultValue = [
       user: {
         name: 'Jon Doe',
         role: '',
-        id: '',
-        province: '',
-        district: ''
+        id: ''
       },
       $window: {
         location: {
@@ -382,9 +351,7 @@ const testCasesForDefaultValue = [
         firstname: 'Jon',
         surname: 'Doe',
         role: '',
-        id: '',
-        province: '',
-        district: ''
+        id: ''
       },
       $window: {
         location: {
@@ -409,9 +376,7 @@ const testCasesForDefaultValue = [
         firstname: 'Jon',
         surname: 'Doe',
         role: '',
-        id: '',
-        province: '',
-        district: ''
+        id: ''
       },
       $window: {
         location: {
@@ -434,9 +399,7 @@ const testCasesForDefaultValue = [
         firstname: 'Jon',
         surname: 'Doe',
         role: '',
-        id: '',
-        province: '',
-        district: ''
+        id: ''
       },
       $window: {
         location: {

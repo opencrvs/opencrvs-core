@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { SerializedUserField } from './serializers/user/serializer'
 import {
   AnyOfStatus,
@@ -18,7 +18,6 @@ import {
   Exact,
   ExactStatus,
   QueryInput,
-  Within,
   ExactUserType
 } from './EventIndex'
 
@@ -39,16 +38,12 @@ export const SerializedQueryExpression = z
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     'legalStatuses.REGISTERED.createdAt': z.optional(DateCondition),
-    'legalStatuses.REGISTERED.createdAtLocation': z.optional(
-      z.union([Within, Exact])
-    ),
+    'legalStatuses.DECLARED.createdAtLocation': z.optional(SerializableWithin),
+    'legalStatuses.REGISTERED.createdAtLocation':
+      z.optional(SerializableWithin),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
-    createdAtLocation: z.optional(
-      z.union([SerializableWithin, SerializableExact])
-    ),
-    updatedAtLocation: z.optional(
-      z.union([SerializableWithin, SerializableExact])
-    ),
+    createdAtLocation: z.optional(SerializableWithin),
+    updatedAtLocation: z.optional(SerializableWithin),
     assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(SerializableExact),
     createdByUserType: ExactUserType,

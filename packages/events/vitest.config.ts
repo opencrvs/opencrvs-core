@@ -13,6 +13,10 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
+    coverage: {
+      provider: 'v8', // or 'istanbul'
+      reporter: ['text', 'json', 'json-summary']
+    },
     globals: true,
     testTimeout: 60000,
     hookTimeout: 60000,

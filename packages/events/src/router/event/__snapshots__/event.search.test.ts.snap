@@ -36,6 +36,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
       "createdByUserType": "[sanitized]",
     },
   },
+  "placeOfEvent": "[sanitized]",
   "potentialDuplicates": [],
   "status": "DECLARED",
   "trackingId": "[sanitized]",
@@ -83,6 +84,7 @@ exports[`Returns events based on the updatedAt column 2`] = `
       "createdByUserType": "[sanitized]",
     },
   },
+  "placeOfEvent": "[sanitized]",
   "potentialDuplicates": [],
   "status": "DECLARED",
   "trackingId": "[sanitized]",
@@ -95,126 +97,284 @@ exports[`Returns events based on the updatedAt column 2`] = `
 `;
 
 exports[`Returns relevant events in right order 1`] = `
-{
-  "assignedTo": "[sanitized]",
-  "createdAt": "[sanitized]",
-  "createdAtLocation": "[sanitized]",
-  "createdBy": "[sanitized]",
-  "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-  "createdByUserType": "[sanitized]",
-  "dateOfEvent": "[sanitized]",
-  "declaration": {
-    "applicant.age": 19,
-    "applicant.dobUnknown": true,
-    "applicant.email": "test@opencrvs.org",
-    "applicant.image": {
-      "originalFilename": "abcd.png",
-      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-      "type": "image/png",
+[
+  {
+    "assignedTo": "[sanitized]",
+    "createdAt": "[sanitized]",
+    "createdAtLocation": "[sanitized]",
+    "createdBy": "[sanitized]",
+    "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+    "createdByUserType": "[sanitized]",
+    "dateOfEvent": "[sanitized]",
+    "declaration": {
+      "applicant.age": 19,
+      "applicant.dobUnknown": true,
+      "applicant.email": "test@opencrvs.org",
+      "applicant.image": {
+        "originalFilename": "abcd.png",
+        "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "type": "image/png",
+      },
+      "applicant.name": {
+        "firstname": "Jane",
+        "surname": "Zarathustra",
+      },
+      "recommender.none": true,
     },
-    "applicant.name": {
-      "firstname": "Chris",
-      "surname": "Sarthua",
+    "flags": [
+      "rejected",
+    ],
+    "id": "[sanitized]",
+    "legalStatuses": {
+      "DECLARED": {
+        "acceptedAt": "[sanitized]",
+        "createdAt": "[sanitized]",
+        "createdAtLocation": "[sanitized]",
+        "createdBy": "[sanitized]",
+        "createdByRole": "REGISTRATION_AGENT",
+        "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+        "createdByUserType": "[sanitized]",
+      },
     },
-    "recommender.none": true,
+    "placeOfEvent": "[sanitized]",
+    "potentialDuplicates": [],
+    "status": "DECLARED",
+    "trackingId": "[sanitized]",
+    "type": "tennis-club-membership",
+    "updatedAt": "[sanitized]",
+    "updatedAtLocation": "[sanitized]",
+    "updatedBy": "[sanitized]",
+    "updatedByUserRole": "REGISTRATION_AGENT",
   },
-  "flags": [],
-  "id": "[sanitized]",
-  "legalStatuses": {
-    "DECLARED": {
-      "acceptedAt": "[sanitized]",
-      "createdAt": "[sanitized]",
-      "createdAtLocation": "[sanitized]",
-      "createdBy": "[sanitized]",
-      "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-      "createdByUserType": "[sanitized]",
+  {
+    "assignedTo": "[sanitized]",
+    "createdAt": "[sanitized]",
+    "createdAtLocation": "[sanitized]",
+    "createdBy": "[sanitized]",
+    "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+    "createdByUserType": "[sanitized]",
+    "dateOfEvent": "[sanitized]",
+    "declaration": {
+      "applicant.age": 19,
+      "applicant.dobUnknown": true,
+      "applicant.email": "test@opencrvs.org",
+      "applicant.image": {
+        "originalFilename": "abcd.png",
+        "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+        "type": "image/png",
+      },
+      "applicant.name": {
+        "firstname": "Chris",
+        "surname": "Sarthua",
+      },
+      "recommender.none": true,
     },
+    "flags": [],
+    "id": "[sanitized]",
+    "legalStatuses": {
+      "DECLARED": {
+        "acceptedAt": "[sanitized]",
+        "createdAt": "[sanitized]",
+        "createdAtLocation": "[sanitized]",
+        "createdBy": "[sanitized]",
+        "createdByRole": "REGISTRATION_AGENT",
+        "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+        "createdByUserType": "[sanitized]",
+      },
+    },
+    "placeOfEvent": "[sanitized]",
+    "potentialDuplicates": [],
+    "status": "DECLARED",
+    "trackingId": "[sanitized]",
+    "type": "tennis-club-membership",
+    "updatedAt": "[sanitized]",
+    "updatedAtLocation": "[sanitized]",
+    "updatedBy": "[sanitized]",
+    "updatedByUserRole": "REGISTRATION_AGENT",
   },
-  "potentialDuplicates": [],
-  "status": "DECLARED",
-  "trackingId": "[sanitized]",
-  "type": "tennis-club-membership",
-  "updatedAt": "[sanitized]",
-  "updatedAtLocation": "[sanitized]",
-  "updatedBy": "[sanitized]",
-  "updatedByUserRole": "REGISTRATION_AGENT",
-}
-`;
-
-exports[`Returns relevant events in right order 2`] = `
-{
-  "assignedTo": "[sanitized]",
-  "createdAt": "[sanitized]",
-  "createdAtLocation": "[sanitized]",
-  "createdBy": "[sanitized]",
-  "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-  "createdByUserType": "[sanitized]",
-  "dateOfEvent": "[sanitized]",
-  "declaration": {
-    "applicant.age": 19,
-    "applicant.dobUnknown": true,
-    "applicant.email": "test@opencrvs.org",
-    "applicant.image": {
-      "originalFilename": "abcd.png",
-      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-      "type": "image/png",
-    },
-    "applicant.name": {
-      "firstname": "John",
-      "surname": "Brown",
-    },
-    "recommender.none": true,
-  },
-  "flags": [
-    "pending-certification",
-  ],
-  "id": "[sanitized]",
-  "legalStatuses": {
-    "DECLARED": {
-      "acceptedAt": "[sanitized]",
-      "createdAt": "[sanitized]",
-      "createdAtLocation": "[sanitized]",
-      "createdBy": "[sanitized]",
-      "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-      "createdByUserType": "[sanitized]",
-    },
-    "REGISTERED": {
-      "acceptedAt": "[sanitized]",
-      "createdAt": "[sanitized]",
-      "createdAtLocation": "[sanitized]",
-      "createdBy": "[sanitized]",
-      "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-      "createdByUserType": "[sanitized]",
-      "registrationNumber": "[sanitized]",
-    },
-  },
-  "potentialDuplicates": [],
-  "status": "REGISTERED",
-  "trackingId": "[sanitized]",
-  "type": "tennis-club-membership",
-  "updatedAt": "[sanitized]",
-  "updatedAtLocation": "[sanitized]",
-  "updatedBy": "[sanitized]",
-  "updatedByUserRole": "REGISTRATION_AGENT",
-}
+]
 `;
 
 exports[`Throws when date field is invalid 1`] = `
 [TRPCError: [
   {
-    "code": "invalid_string",
-    "validation": "date",
-    "message": "Invalid date",
+    "code": "invalid_union",
+    "errors": [
+      [
+        {
+          "code": "invalid_union",
+          "errors": [
+            [
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "origin": "string",
+                      "code": "invalid_format",
+                      "format": "date",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))$/",
+                      "path": [],
+                      "message": "Invalid ISO date"
+                    }
+                  ],
+                  [
+                    {
+                      "origin": "string",
+                      "code": "invalid_format",
+                      "format": "datetime",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))T(?:(?:[01]\\\\d|2[0-3]):[0-5]\\\\d(?::[0-5]\\\\d(?:\\\\.\\\\d+)?)?(?:Z))$/",
+                      "path": [],
+                      "message": "Invalid ISO datetime"
+                    }
+                  ]
+                ],
+                "path": [
+                  "term"
+                ],
+                "message": "Invalid input"
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "range"
+                ],
+                "path": [
+                  "type"
+                ],
+                "message": "Invalid input: expected \\"range\\""
+              },
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ],
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ]
+                ],
+                "path": [
+                  "gte"
+                ],
+                "message": "Invalid input"
+              },
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ],
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ]
+                ],
+                "path": [
+                  "lte"
+                ],
+                "message": "Invalid input"
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "timePeriod"
+                ],
+                "path": [
+                  "type"
+                ],
+                "message": "Invalid input: expected \\"timePeriod\\""
+              },
+              {
+                "code": "invalid_value",
+                "values": [
+                  "last7Days",
+                  "last30Days",
+                  "last90Days",
+                  "last365Days"
+                ],
+                "path": [
+                  "term"
+                ],
+                "message": "Invalid option: expected one of \\"last7Days\\"|\\"last30Days\\"|\\"last90Days\\"|\\"last365Days\\""
+              }
+            ]
+          ],
+          "path": [
+            "updatedAt"
+          ],
+          "message": "Invalid input"
+        }
+      ],
+      [
+        {
+          "code": "invalid_union",
+          "errors": [
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "and"
+                ],
+                "path": [],
+                "message": "Invalid input: expected \\"and\\""
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "or"
+                ],
+                "path": [],
+                "message": "Invalid input: expected \\"or\\""
+              }
+            ]
+          ],
+          "path": [
+            "type"
+          ],
+          "message": "Invalid input"
+        },
+        {
+          "expected": "array",
+          "code": "invalid_type",
+          "path": [
+            "clauses"
+          ],
+          "message": "Invalid input: expected array, received undefined"
+        }
+      ]
+    ],
     "path": [
       "query",
       "clauses",
-      0,
-      "updatedAt",
-      "term"
-    ]
+      0
+    ],
+    "message": "Invalid input"
   }
 ]]
 `;
@@ -222,16 +382,158 @@ exports[`Throws when date field is invalid 1`] = `
 exports[`Throws when one of the date range fields has invalid date 1`] = `
 [TRPCError: [
   {
-    "code": "invalid_string",
-    "validation": "date",
-    "message": "Invalid date",
+    "code": "invalid_union",
+    "errors": [
+      [
+        {
+          "code": "invalid_union",
+          "errors": [
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "exact"
+                ],
+                "path": [
+                  "type"
+                ],
+                "message": "Invalid input: expected \\"exact\\""
+              },
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ],
+                  [
+                    {
+                      "expected": "string",
+                      "code": "invalid_type",
+                      "path": [],
+                      "message": "Invalid input: expected string, received undefined"
+                    }
+                  ]
+                ],
+                "path": [
+                  "term"
+                ],
+                "message": "Invalid input"
+              }
+            ],
+            [
+              {
+                "code": "invalid_union",
+                "errors": [
+                  [
+                    {
+                      "origin": "string",
+                      "code": "invalid_format",
+                      "format": "date",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))$/",
+                      "path": [],
+                      "message": "Invalid ISO date"
+                    }
+                  ],
+                  [
+                    {
+                      "origin": "string",
+                      "code": "invalid_format",
+                      "format": "datetime",
+                      "pattern": "/^(?:(?:\\\\d\\\\d[2468][048]|\\\\d\\\\d[13579][26]|\\\\d\\\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\\\d|30)|(?:02)-(?:0[1-9]|1\\\\d|2[0-8])))T(?:(?:[01]\\\\d|2[0-3]):[0-5]\\\\d(?::[0-5]\\\\d(?:\\\\.\\\\d+)?)?(?:Z))$/",
+                      "path": [],
+                      "message": "Invalid ISO datetime"
+                    }
+                  ]
+                ],
+                "path": [
+                  "gte"
+                ],
+                "message": "Invalid input"
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "timePeriod"
+                ],
+                "path": [
+                  "type"
+                ],
+                "message": "Invalid input: expected \\"timePeriod\\""
+              },
+              {
+                "code": "invalid_value",
+                "values": [
+                  "last7Days",
+                  "last30Days",
+                  "last90Days",
+                  "last365Days"
+                ],
+                "path": [
+                  "term"
+                ],
+                "message": "Invalid option: expected one of \\"last7Days\\"|\\"last30Days\\"|\\"last90Days\\"|\\"last365Days\\""
+              }
+            ]
+          ],
+          "path": [
+            "updatedAt"
+          ],
+          "message": "Invalid input"
+        }
+      ],
+      [
+        {
+          "code": "invalid_union",
+          "errors": [
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "and"
+                ],
+                "path": [],
+                "message": "Invalid input: expected \\"and\\""
+              }
+            ],
+            [
+              {
+                "code": "invalid_value",
+                "values": [
+                  "or"
+                ],
+                "path": [],
+                "message": "Invalid input: expected \\"or\\""
+              }
+            ]
+          ],
+          "path": [
+            "type"
+          ],
+          "message": "Invalid input"
+        },
+        {
+          "expected": "array",
+          "code": "invalid_type",
+          "path": [
+            "clauses"
+          ],
+          "message": "Invalid input: expected array, received undefined"
+        }
+      ]
+    ],
     "path": [
       "query",
       "clauses",
-      0,
-      "updatedAt",
-      "gte"
-    ]
+      0
+    ],
+    "message": "Invalid input"
   }
 ]]
 `;
@@ -240,12 +542,12 @@ exports[`Throws when searching by unrelated properties 1`] = `
 [TRPCError: [
   {
     "code": "custom",
-    "message": "At least one query field must be specified.",
     "path": [
       "query",
       "clauses",
       0
-    ]
+    ],
+    "message": "At least one query field must be specified."
   }
 ]]
 `;
@@ -253,16 +555,15 @@ exports[`Throws when searching by unrelated properties 1`] = `
 exports[`Throws when searching with empty clauses 1`] = `
 [TRPCError: [
   {
+    "origin": "array",
     "code": "too_small",
     "minimum": 1,
-    "type": "array",
     "inclusive": true,
-    "exact": false,
-    "message": "At least one clause is required.",
     "path": [
       "query",
       "clauses"
-    ]
+    ],
+    "message": "At least one clause is required."
   }
 ]]
 `;
@@ -270,13 +571,12 @@ exports[`Throws when searching with empty clauses 1`] = `
 exports[`Throws when searching without payload 1`] = `
 [TRPCError: [
   {
-    "code": "invalid_type",
     "expected": "object",
-    "received": "undefined",
+    "code": "invalid_type",
     "path": [
       "query"
     ],
-    "message": "Required"
+    "message": "Invalid input: expected object, received undefined"
   }
 ]]
 `;
@@ -319,6 +619,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdByUserType": "[sanitized]",
       },
     },
+    "placeOfEvent": "[sanitized]",
     "potentialDuplicates": [],
     "status": "DECLARED",
     "trackingId": "[sanitized]",
@@ -364,6 +665,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdByUserType": "[sanitized]",
       },
     },
+    "placeOfEvent": "[sanitized]",
     "potentialDuplicates": [],
     "status": "DECLARED",
     "trackingId": "[sanitized]",
@@ -414,6 +716,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdByUserType": "[sanitized]",
       },
     },
+    "placeOfEvent": "[sanitized]",
     "potentialDuplicates": [],
     "status": "DECLARED",
     "trackingId": "[sanitized]",
@@ -459,6 +762,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdByUserType": "[sanitized]",
       },
     },
+    "placeOfEvent": "[sanitized]",
     "potentialDuplicates": [],
     "status": "DECLARED",
     "trackingId": "[sanitized]",
@@ -504,6 +808,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "createdByUserType": "[sanitized]",
       },
     },
+    "placeOfEvent": "[sanitized]",
     "potentialDuplicates": [],
     "status": "DECLARED",
     "trackingId": "[sanitized]",
@@ -516,7 +821,7 @@ exports[`User only sees tennis club membership events within their jurisdiction 
 ]
 `;
 
-exports[`User with my-jurisdiction scope can see events from other offices based on their scopes 1`] = `
+exports[`User with "location" scope can see events from other offices based on their scopes 1`] = `
 {
   "assignedTo": "[sanitized]",
   "createdAt": "[sanitized]",
@@ -553,6 +858,7 @@ exports[`User with my-jurisdiction scope can see events from other offices based
       "createdByUserType": "[sanitized]",
     },
   },
+  "placeOfEvent": "[sanitized]",
   "potentialDuplicates": [],
   "status": "DECLARED",
   "trackingId": "[sanitized]",
@@ -564,9 +870,10 @@ exports[`User with my-jurisdiction scope can see events from other offices based
 }
 `;
 
-exports[`User with my-jurisdiction scope only sees events created by system user to their primary office 1`] = `
+exports[`User with "location" scope only sees events created by system user to their primary office 1`] = `
 {
   "createdAt": "[sanitized]",
+  "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
@@ -589,6 +896,7 @@ exports[`User with my-jurisdiction scope only sees events created by system user
   ],
   "id": "[sanitized]",
   "legalStatuses": {},
+  "placeOfEvent": "[sanitized]",
   "potentialDuplicates": [],
   "status": "NOTIFIED",
   "trackingId": "[sanitized]",
@@ -600,7 +908,7 @@ exports[`User with my-jurisdiction scope only sees events created by system user
 }
 `;
 
-exports[`User with my-jurisdiction scope only sees events from their primary office 1`] = `
+exports[`User with "location" scope only sees events from their primary office 1`] = `
 {
   "assignedTo": "[sanitized]",
   "createdAt": "[sanitized]",
@@ -637,6 +945,7 @@ exports[`User with my-jurisdiction scope only sees events from their primary off
       "createdByUserType": "[sanitized]",
     },
   },
+  "placeOfEvent": "[sanitized]",
   "potentialDuplicates": [],
   "status": "DECLARED",
   "trackingId": "[sanitized]",

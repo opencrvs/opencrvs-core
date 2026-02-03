@@ -119,11 +119,11 @@ export const WithEnableCondition: StoryObj<{}> = {
     {
       type: ConditionalType.ENABLE,
       conditional: and(
-        user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
+        user.hasRole(TestUserRole.enum.LOCAL_REGISTRAR),
         not(event.hasAction(ActionType.DECLARE))
       )
     },
-    getTestValidatorContext(TestUserRole.Enum.LOCAL_REGISTRAR, {
+    getTestValidatorContext(TestUserRole.enum.LOCAL_REGISTRAR, {
       ...tennisClubMembershipEventDocument,
       actions: tennisClubMembershipEventDocument.actions.filter(
         (action) => action.type === ActionType.CREATE
@@ -143,12 +143,12 @@ export const WithDisableCondition: StoryObj<{}> = {
     {
       type: ConditionalType.ENABLE,
       conditional: and(
-        user.hasRole(TestUserRole.Enum.LOCAL_REGISTRAR),
+        user.hasRole(TestUserRole.enum.LOCAL_REGISTRAR),
         not(event.hasAction(ActionType.DECLARE))
       )
     },
     getTestValidatorContext(
-      TestUserRole.Enum.LOCAL_REGISTRAR,
+      TestUserRole.enum.LOCAL_REGISTRAR,
       tennisClubMembershipEventDocument
     )
   ),

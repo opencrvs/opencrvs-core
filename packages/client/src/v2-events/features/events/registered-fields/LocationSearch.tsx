@@ -15,8 +15,9 @@ import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import {
   FieldPropsWithoutReferenceValue,
   Location,
-  LocationType,
-  joinValues
+  UUID,
+  joinValues,
+  AdministrativeArea
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -24,6 +25,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 interface SearchLocation {
   id: string
@@ -31,42 +33,55 @@ interface SearchLocation {
   displayLabel: string
 }
 
-const resourceTypeMap: Record<
-  'locations' | 'facilities' | 'offices',
-  LocationType
-> = {
-  locations: 'ADMIN_STRUCTURE',
-  facilities: 'HEALTH_FACILITY',
-  offices: 'CRVS_OFFICE'
-}
+/**
+ * @deprecated
+ *  In v2.0 resource mapping will be dynamic.
+ */
+const resourceTypeMap: Record<'locations' | 'facilities' | 'offices', string> =
+  {
+    locations: 'ADMIN_STRUCTURE',
+    facilities: 'HEALTH_FACILITY',
+    offices: 'CRVS_OFFICE'
+  }
 
-function useAdministrativeAreas(
+function useCreateSearchOptions(
   searchableResource: ('locations' | 'facilities' | 'offices')[]
 ) {
   const { getLocations } = useLocations()
-  const [allLocations] = getLocations.useSuspenseQuery({})
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const locations = getLocations.useSuspenseQuery({})
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   return React.useMemo(() => {
-    const resourceLocations = allLocations.filter(
-      ({ locationType }) =>
-        locationType &&
+    const searchableResources: (Location | AdministrativeArea)[] = []
+
+    if (searchableResource.includes('locations')) {
+      searchableResources.push(...Array.from(administrativeAreas.values()))
+    }
+
+    for (const [, location] of locations) {
+      if (
+        location.locationType &&
         searchableResource.some(
           (r) =>
             resourceTypeMap[r satisfies keyof typeof resourceTypeMap] ===
-            locationType
+            location.locationType
         )
-    )
+      ) {
+        searchableResources.push(location)
+      }
+    }
 
-    return resourceLocations.map((location) => ({
-      id: location.id,
-      searchableText: location.name.toLowerCase(),
-      displayLabel: location.name
+    return searchableResources.map((resource) => ({
+      id: resource.id,
+      searchableText: resource.name.toLowerCase(),
+      displayLabel: resource.name
     }))
-  }, [searchableResource, allLocations])
+  }, [searchableResource, locations, administrativeAreas])
 }
 
 /**
- * @deprecated -- Use/replace with SearchableSelect 1.10 onwards.
+ * @deprecated -- Replace internals using SearchableSelect v2.0 onwards.
  */
 function LocationSearchInput({
   onChange,
@@ -81,15 +96,13 @@ function LocationSearchInput({
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
 }) {
-  const locationList = useAdministrativeAreas(searchableResource)
-  const selectedLocation = locationList.find(
-    (location) => location.id === value
-  )
+  const options = useCreateSearchOptions(searchableResource)
+  const selectedOption = options.find((option) => option.id === value)
 
   return (
     <LocationSearchComponent
       buttonLabel="Health facility"
-      locationList={locationList}
+      locationList={options}
       searchHandler={(location: SearchLocation) => {
         if (location.id === '0') {
           onChange(undefined)
@@ -98,7 +111,7 @@ function LocationSearchInput({
 
         onChange(location.id)
       }}
-      selectedLocation={selectedLocation}
+      selectedLocation={selectedOption}
       onBlur={(...args) => {
         /*
          * This is here purely for legacy reasons.
@@ -115,11 +128,12 @@ function toCertificateVariables(
   value: Stringifiable | undefined | null,
   context: {
     intl: IntlShape
-    locations: Location[]
+    locations: Map<UUID, Location>
+    administrativeAreas: Map<UUID, AdministrativeArea>
     adminLevels?: AdminStructureItem[]
   }
 ) {
-  const { intl, locations, adminLevels = [] } = context
+  const { intl, locations, administrativeAreas, adminLevels = [] } = context
   const appConfigAdminLevels = adminLevels.map((level) => level.id)
 
   if (!value) {
@@ -136,12 +150,18 @@ function toCertificateVariables(
     description: 'Country name'
   })
 
-  const locationId = value.toString()
-  const location = locations.find((loc) => loc.id === locationId)
+  const locationId = UUID.safeParse(value.toString()).data
+  const location = locationId
+    ? (locations.get(locationId) ?? administrativeAreas.get(locationId))
+    : undefined
+
+  const parentAdministrativeAreaId =
+    (location as Location | undefined)?.administrativeAreaId ??
+    (location as AdministrativeArea | undefined)?.parentId
 
   const adminLevelHierarchy = getAdminLevelHierarchy(
-    locationId,
-    locations,
+    parentAdministrativeAreaId,
+    administrativeAreas,
     appConfigAdminLevels,
     'withNames'
   )
@@ -156,16 +176,20 @@ function toCertificateVariables(
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
   const { config } = useSelector(getOfflineData)
-  const [locations] = getLocations.useSuspenseQuery()
+
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const adminLevels = config.ADMIN_STRUCTURE
 
   const certificateVars = toCertificateVariables(value, {
     intl,
     locations,
+    administrativeAreas,
     adminLevels
   })
-
   const { name, country } = certificateVars
 
   const resolvedAdminLevels = adminLevels
@@ -173,11 +197,6 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     .filter(Boolean)
     .reverse()
 
-  const location = locations.find(({ id }) => id === value.toString())
-
-  if (location?.locationType === LocationType.Enum.ADMIN_STRUCTURE) {
-    return joinValues([...resolvedAdminLevels, country], ', ')
-  }
   return joinValues([name, ...resolvedAdminLevels, country], ', ')
 }
 
