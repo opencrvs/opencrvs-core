@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { type estypes } from '@elastic/elasticsearch'
+import { estypes } from '@elastic/elasticsearch'
 import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
-  AgeValue,
   AddressFieldValue,
   EventConfig,
   EventDocument,
@@ -43,7 +42,10 @@ import {
   encodeEventIndex,
   encodeFieldId,
   NAME_QUERY_KEY,
-  removeSecuredFields
+  AGE_DOB_QUERY_KEY,
+  removeSecuredFields,
+  IndexedAgeFieldValue,
+  IndexedNameFieldValue
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
@@ -153,9 +155,10 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: {
           age: { type: 'double' },
-          asOfDateRef: { type: 'keyword' }
+          asOfDateRef: { type: 'keyword' },
+          [AGE_DOB_QUERY_KEY]: { type: 'date' }
         } satisfies {
-          [K in keyof AgeValue]: estypes.MappingProperty
+          [K in keyof Required<IndexedAgeFieldValue>]: estypes.MappingProperty
         }
       }
     case FieldType.SIGNATURE:
@@ -173,8 +176,11 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: {
           firstname: { type: 'text', analyzer: 'classic' },
+          middlename: { type: 'text', analyzer: 'classic' },
           surname: { type: 'text', analyzer: 'classic' },
           [NAME_QUERY_KEY]: { type: 'text', analyzer: 'classic' }
+        } satisfies {
+          [K in keyof Required<IndexedNameFieldValue>]: estypes.MappingProperty
         }
       }
     case FieldType.FILE_WITH_OPTIONS:

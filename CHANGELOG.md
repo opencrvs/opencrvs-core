@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.9.7
+
+### New features
+
+- In deduplication, the dateRange matcher now supports both `AGE` and `DATE` field.
+- The dateRange matcher supports a new `matchAgainst` option, which can reference either a date field or an age field. When provided, the matcher compares the source field against the specified `matchAgainst` field instead of only matching against itself.
+
+```ts
+field('mother.dob').dateRangeMatches({
+  days: 365,
+  matchAgainst: 'mother.age'
+})
+```
+
 ## 1.9.6
 
 ### New features
@@ -7,6 +21,10 @@
 - NUMBER_WITH_UNIT Input, which is a number input with a configurable selectable unit of measurement.
 - `now()` magic function, which can be used as a dynamic `defaultValue` for DATE and TIME inputs and resolves to the current date/time at runtime.
 - The document upload and preview feature now supports PDF files in addition to image formats (JPEG, PNG, JPG), allowing PDFs to be viewed alongside existing DECLARED and REGISTERED documents.
+
+### Bug fixes
+
+- Ensure rejected actions are considered when detecting pending actions. [#11588](https://github.com/opencrvs/opencrvs-core/issues/11588)
 
 ## 1.9.5
 
