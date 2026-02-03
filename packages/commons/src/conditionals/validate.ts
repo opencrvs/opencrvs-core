@@ -29,8 +29,10 @@ import {
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
-import { ageToDate } from '../events/utils'
-import { ActionType, EventDocument } from '../client'
+import { ageToDate, IndexMap } from '../events/utils'
+import { ActionType } from '../events/ActionType'
+import { EventDocument } from '../events/EventDocument'
+import { FieldType } from '../events/FieldType'
 
 const ajv = new Ajv({
   $data: true,
@@ -556,6 +558,42 @@ export function runStructuralValidations({
   return fieldValidationResult
 }
 
+type FieldError<T> =
+  | T[]
+  | {
+      [id: string]: FieldError<T> | undefined
+    }
+export type FieldErrors<T> = IndexMap<FieldError<T>>
+
+export function flattenFieldError<T>(errors: FieldError<T>): T[] {
+  if (Array.isArray(errors)) {
+    return errors
+  }
+  return Object.values(errors)
+    .filter((e): e is FieldError<T> => e !== undefined)
+    .flatMap(flattenFieldError)
+}
+
+export function mapFieldErrors<T, R>(
+  errors: FieldErrors<T>,
+  fn: (err: T) => R
+): FieldErrors<R> {
+  return Object.entries(errors).reduce(
+    (mappedErrors: FieldErrors<R>, [key, value]) => {
+      if (!value) {
+        return mappedErrors
+      }
+      if (Array.isArray(value)) {
+        mappedErrors[key] = value.map(fn)
+        return mappedErrors
+      }
+      mappedErrors[key] = mapFieldErrors(value, fn)
+      return mappedErrors
+    },
+    {}
+  )
+}
+
 export function runFieldValidations({
   field,
   values,
@@ -564,12 +602,29 @@ export function runFieldValidations({
   field: FieldConfig
   values: ActionUpdate
   context: ValidatorContext
-}) {
+}): FieldError<{ message: TranslationConfig }> {
   if (
     !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return []
+  }
+
+  if (field.type === FieldType.FIELD_GROUP) {
+    const subFieldErrors: Record<
+      string,
+      FieldError<{ message: TranslationConfig }>
+    > = field.fields.reduce((acc, subField) => {
+      return {
+        ...acc,
+        [subField.id]: runFieldValidations({
+          field: subField,
+          values,
+          context
+        })
+      }
+    }, {})
+    return subFieldErrors
   }
 
   const conditionalParameters = {

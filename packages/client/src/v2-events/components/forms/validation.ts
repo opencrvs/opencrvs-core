@@ -14,19 +14,20 @@ import {
   EventState,
   isPageVisible,
   FormConfig,
-  IndexMap,
   runStructuralValidations,
   ValidatorContext,
   runFieldValidations,
   omitHiddenFields,
-  omitHiddenPaginatedFields
+  omitHiddenPaginatedFields,
+  FieldErrors,
+  flattenFieldError
 } from '@opencrvs/commons/client'
 
-interface FieldError {
+interface ErrorMessage {
   message: MessageDescriptor
 }
 
-export type IntlErrors = IndexMap<FieldError[]>
+export type IntlErrors = FieldErrors<ErrorMessage>
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
@@ -34,7 +35,7 @@ export function getValidationErrorsForForm(
   context: ValidatorContext
 ) {
   return fields.reduce((errorsForAllFields: IntlErrors, field) => {
-    if ((errorsForAllFields[field.id] ?? []).length > 0) {
+    if (flattenFieldError(errorsForAllFields[field.id] ?? []).length > 0) {
       return errorsForAllFields
     }
 
@@ -55,7 +56,7 @@ export function getStructuralValidationErrorsForForm(
   context: ValidatorContext
 ) {
   return fields.reduce((errorsForAllFields: IntlErrors, field) => {
-    if ((errorsForAllFields[field.id] ?? []).length > 0) {
+    if (flattenFieldError(errorsForAllFields[field.id] ?? []).length > 0) {
       return errorsForAllFields
     }
 
@@ -106,13 +107,13 @@ export function validationErrorsInActionFormExist({
       )
 
       return Object.values(formErrors).some(
-        (fieldErrors) => (fieldErrors ?? []).length > 0
+        (fieldErrors) => flattenFieldError(fieldErrors ?? []).length > 0
       )
     })
 
   const hasAnnotationValidationErrors = Object.values(
     getValidationErrorsForForm(reviewFields, visibleAnnotationFields, context)
-  ).some((fieldErrors) => (fieldErrors ?? []).length > 0)
+  ).some((fieldErrors) => flattenFieldError(fieldErrors ?? []).length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors
 }
