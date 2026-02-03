@@ -10,6 +10,9 @@
  */
 import React, { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useField } from 'formik'
+import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 import {
   alwaysTrue,
   ConditionalType,
@@ -23,24 +26,28 @@ import {
   TextField,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { ITextInputProps as ComponentTextInputProps } from '@opencrvs/components'
+import { Text } from '@client/v2-events/features/events/registered-fields'
+import { InputField } from '@client/components/form/InputField'
 
-interface Props {
-  id: string
+interface NameInputProps
+  extends Omit<ComponentTextInputProps, 'onChange' | 'value'> {
   onChange: (newValue: NameFieldValue) => void
+  value?: NameFieldValue
   configuration?: NameField['configuration']
   validation: FieldConfig['validation']
-  value?: NameFieldValue
-  disabled?: boolean
   validatorContext: ValidatorContext
 }
 
-const defailtNameFieldValue: NameFieldValue = {
+const defaultValue: NameFieldValue = {
   firstname: '',
   middlename: '',
   surname: ''
 }
+
+const InputFieldWithBottomMargin = styled(InputField)`
+  margin-bottom: 22px;
+`
 
 function FocusNameInputsOnHash({
   id,
@@ -115,16 +122,30 @@ function FocusNameInputsOnHash({
   return null
 }
 
-function NameInput(props: Props) {
+function NameInput(props: NameInputProps) {
   const {
     id,
+    name,
+    onBlur,
     onChange,
     disabled,
-    value = {},
+    error,
+    touched,
+    value = defaultValue,
     configuration,
     validatorContext
   } = props
 
+  const [firstnameInput, firstnameMeta, firstnameHelper] = useField<string>(
+    `${name}.firstname`
+  )
+  const [middlenameInput, middlenameMeta, middlenameHelper] = useField<string>(
+    `${name}.middlename`
+  )
+  const [surnameInput, surnameMeta, surnameHelper] = useField<string>(
+    `${name}.surname`
+  )
+  const intl = useIntl()
   const { maxLength, order } = configuration || {}
 
   const nameConfig = configuration?.name || {
@@ -140,6 +161,29 @@ function NameInput(props: Props) {
 
   const validators = props.validation || []
   const nameOrder = order || defaultNameOrder
+
+  const firstnameLabel = intl.formatMessage(
+    nameConfig.firstname?.label || {
+      defaultMessage: 'First name(s)',
+      description: 'This is the label for the firstname field',
+      id: 'field.name.firstname.label'
+    }
+  )
+  const middlenameLabel = intl.formatMessage(
+    nameConfig.middlename?.label || {
+      defaultMessage: 'Middle name',
+      description: 'This is the label for the middlename field',
+      id: 'field.name.middlename.label'
+    }
+  )
+
+  const surnameLabel = intl.formatMessage(
+    nameConfig.surname?.label || {
+      defaultMessage: 'Surname',
+      description: 'This is the label for the surname field',
+      id: 'field.name.surname.label'
+    }
+  )
 
   const fields: TextField[] = nameOrder.map((field) => {
     switch (field) {
@@ -207,17 +251,51 @@ function NameInput(props: Props) {
 
   return (
     <>
-      <FormFieldGenerator
-        fields={fields}
-        id={id}
-        initialValues={{ ...value }}
-        parentId={id}
-        validatorContext={validatorContext}
-        onChange={(values) => {
-          onChange(mergeWithoutNullsOrUndefined(defailtNameFieldValue, values))
-        }}
-      />
-      <FocusNameInputsOnHash id={id} value={value} />
+      <InputFieldWithBottomMargin
+        error={firstnameMeta.error}
+        id={`${id}.firstname`}
+        label={firstnameLabel}
+        required={!!nameConfig.firstname?.required}
+        touched={firstnameMeta.touched}
+      >
+        <Text.Input
+          {...firstnameInput}
+          // isDisabled={inputProps.disabled}
+          type="text"
+          value={firstnameMeta.value}
+          onChange={(val) => onChange({ ...value, firstname: val ?? '' })}
+        />
+      </InputFieldWithBottomMargin>
+      <InputFieldWithBottomMargin
+        error={middlenameMeta.error}
+        id={`${id}.middlename`}
+        label={middlenameLabel}
+        required={!!nameConfig.middlename?.required}
+        touched={middlenameMeta.touched}
+      >
+        <Text.Input
+          {...middlenameInput}
+          // isDisabled={inputProps.disabled}
+          type="text"
+          value={middlenameMeta.value}
+          onChange={(val) => onChange({ ...value, middlename: val ?? '' })}
+        />
+      </InputFieldWithBottomMargin>
+      <InputFieldWithBottomMargin
+        error={surnameMeta.error}
+        id={`${id}.surname`}
+        label={surnameLabel}
+        required={!!nameConfig.surname?.required}
+        touched={surnameMeta.touched}
+      >
+        <Text.Input
+          {...surnameInput}
+          // isDisabled={inputProps.disabled}
+          type="text"
+          value={surnameMeta.value}
+          onChange={(val) => onChange({ ...value, surname: val ?? '' })}
+        />
+      </InputFieldWithBottomMargin>
     </>
   )
 }
