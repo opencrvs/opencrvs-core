@@ -11762,6 +11762,8 @@ components:
                 boost:
                   default: 1
                   type: number
+                matchAgainst:
+                  type: string
               required:
                 - fuzziness
                 - boost
@@ -11788,6 +11790,8 @@ components:
                   type: number
                 value:
                   type: string
+                matchAgainst:
+                  type: string
               required:
                 - boost
               additionalProperties: false
@@ -11813,6 +11817,8 @@ components:
                 boost:
                   default: 1
                   type: number
+                matchAgainst:
+                  type: string
               required:
                 - days
                 - boost
