@@ -56,7 +56,7 @@ describe('render create system integrations', () => {
         variables: {
           system: {
             name: 'Sweet Health Org',
-            type: 'HEALTH'
+            scopes: ['notification-api']
           }
         }
       },
@@ -67,7 +67,7 @@ describe('render create system integrations', () => {
             system: {
               client: '4090df15-f4e5-4f16-ae7e-bb518129d493',
               name: 'Sweet Health Org',
-              type: 'HEALTH'
+              scopes: ['notification-api']
             }
           }
         }
@@ -131,7 +131,7 @@ describe('render create webhook system integrations', () => {
         query: registerSystem,
         variables: {
           system: {
-            type: 'WEBHOOK',
+            scopes: ['webhook'],
             name: 'Sweet Webhook',
             settings: {
               dailyQuota: 0,
@@ -156,7 +156,7 @@ describe('render create webhook system integrations', () => {
             system: {
               client: '4090df15-f4e5-4f16-ae7e-bb518129d493',
               name: 'Sweet Webhook',
-              type: 'WEBHOOK'
+              scopes: ['webhook']
             }
           }
         }
