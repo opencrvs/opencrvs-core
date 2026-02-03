@@ -237,7 +237,6 @@ const LiteralScopes = z.union([
 // Configurable scopes are for example:
 // - user.create[role=first-role|second-role]
 // - record.notify[event=birth]
-// - record.notify
 // - record.registered.print-certified-copies[event=birth|tennis-club-membership]
 const rawConfigurableScopeRegex =
   /^([a-zA-Z][a-zA-Z0-9.-]*(?:\.[a-zA-Z0-9.-]+)*)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
@@ -296,15 +295,9 @@ export type RecordScopeType = z.infer<typeof RecordScopeType>
 export const RecordScope = z
   .object({
     type: RecordScopeType,
-    options: z
-      .object({
-        event: z
-          .array(z.string())
-          .describe('Event type, e.g. birth, death')
-          .optional()
-      })
-      .optional()
-      .default({})
+    options: z.object({
+      event: z.array(z.string()).describe('Event type, e.g. birth, death')
+    })
   })
   .describe(
     "Scopes used to check user's permission to perform actions on a record."
@@ -446,7 +439,7 @@ export function parseConfigurableScope(scope: string) {
 
   // Different options are separated by commas, and each option value is separated by a pipe e.g.:
   // record.digitise[event=birth|tennis-club-membership, my-jurisdiction]
-  const options = rawOptions ? getScopeOptions(rawOptions) : {}
+  const options = getScopeOptions(rawOptions)
 
   const parsedScope = {
     type,
