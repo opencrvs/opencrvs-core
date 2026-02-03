@@ -18,8 +18,7 @@ import { GET_USER_AUDIT_LOG } from '@client/user/queries'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import type {
   GQLUserAuditLogItemWithComposition,
-  GQLUserAuditLogResultItem,
-  GQLUserAuditLogResultSet
+  GQLUserAuditLogResultItem
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import { Table } from '@opencrvs/components/lib/Table'
@@ -63,6 +62,7 @@ const HistoryHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 16px 0 8px 0;
 `
 
 const RecentActionsHolder = styled.div`
@@ -222,6 +222,8 @@ function UserAuditHistoryComponent(props: Props) {
   }
 
   function getActionMessage(auditLog: UserAuditLogResultItem) {
+    // @TODO CIHAN:
+    console.log('auditLog', auditLog)
     const actionDescriptor = getUserAuditDescription(auditLog.action)
     return actionDescriptor ? props.intl.formatMessage(actionDescriptor) : ''
   }
