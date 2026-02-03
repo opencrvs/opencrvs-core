@@ -61,7 +61,7 @@ export const ResolvedRecordScopeV2 = z
         .array(z.string())
         .describe('Event type, e.g. birth, death')
         .optional(),
-      eventLocation: UUID.nullish(),
+      placeOfEvent: UUID.nullish(),
       declaredIn: UUID.nullish(),
       declaredBy: z.string().or(z.undefined()).optional(),
       registeredIn: UUID.nullish(),
@@ -81,7 +81,7 @@ export const RecordScopeV2 = z
           .array(z.string())
           .optional()
           .describe('Event type, e.g. birth, death'),
-        eventLocation: JurisdictionFilter.optional(),
+        placeOfEvent: JurisdictionFilter.optional(),
         declaredIn: JurisdictionFilter.optional(),
         declaredBy: UserFilter.optional(),
         registeredIn: JurisdictionFilter.optional(),

@@ -465,10 +465,7 @@ export function resolveRecordActionScopeToIds(
     type,
     options: {
       event: options.event,
-      eventLocation: getLocationIdsFromScopeOptions(
-        options.eventLocation,
-        user
-      ),
+      placeOfEvent: getLocationIdsFromScopeOptions(options.placeOfEvent, user),
       declaredIn: getLocationIdsFromScopeOptions(options.declaredIn, user),
       declaredBy:
         options.declaredBy === UserFilter.enum.user ? user.id : undefined,
