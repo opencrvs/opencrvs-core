@@ -389,9 +389,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
                     onClick={() =>
                       navigate({
                         pathname: routes.TEAM_USER_LIST,
-                        search: stringify({
-                          locationId: user.primaryOffice.id
-                        })
+                        search: stringify({ locationId: user.primaryOffice.id })
                       })
                     }
                   >

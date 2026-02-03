@@ -21,24 +21,9 @@ export enum UserStatus {
   DISABLED
 }
 
-const AuditDescriptionMapping: {
+const systemActionDescriptionMapping: {
   [key: string]: MessageDescriptor
 } = {
-  IN_PROGRESS: messages.inProgressAuditAction,
-  DECLARED: messages.declaredAuditAction,
-  VALIDATED: messages.validatedAuditAction,
-  DECLARATION_UPDATED: messages.updatedAuditAction,
-  REGISTERED: messages.registeredAuditAction,
-  REJECTED: messages.rejectedAuditAction,
-  CERTIFIED: messages.certifiedAuditAction,
-  ISSUED: messages.issuedAuditAction,
-  ASSIGNED: messages.assignedAuditAction,
-  UNASSIGNED: messages.unAssignedAuditAction,
-  CORRECTED: messages.correctedAuditAction,
-  REQUESTED_CORRECTION: messages.requestedCorrectionAuditAction,
-  APPROVED_CORRECTION: messages.approvedCorrectionAuditAction,
-  REJECTED_CORRECTION: messages.rejectedCorrectedAuditAction,
-  ARCHIVED: messages.archivedAuditAction,
   LOGGED_IN: messages.loggedInAuditAction,
   LOGGED_OUT: messages.loggedOutAuditAction,
   PHONE_NUMBER_CHANGED: messages.phoneNumberChangedAuditAction,
@@ -51,15 +36,7 @@ const AuditDescriptionMapping: {
   PASSWORD_RESET: messages.passwordResetAuditAction,
   USERNAME_REMINDER: messages.userNameReminderAuditAction,
   USERNAME_REMINDER_BY_ADMIN: messages.usernameReminderByAdmin,
-  PASSWORD_RESET_BY_ADMIN: messages.passwordResetByAdmin,
-  RETRIEVED: messages.retrievedAuditAction,
-  VIEWED: messages.viewedAuditAction,
-  REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
-  REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
-  REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
-  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction,
-  MARKED_AS_DUPLICATE: messages.markedAsDuplicate,
-  MARKED_AS_NOT_DUPLICATE: messages.markedAsNotDuplicate
+  PASSWORD_RESET_BY_ADMIN: messages.passwordResetByAdmin
 }
 
 export const getAddressName = (
@@ -96,7 +73,7 @@ export const getAddressNameV2 = (
 export function getUserAuditDescription(
   status: string
 ): MessageDescriptor | undefined {
-  return AuditDescriptionMapping[status] || undefined
+  return systemActionDescriptionMapping[status] || undefined
 }
 
 export function checkExternalValidationStatus(status?: string | null): boolean {

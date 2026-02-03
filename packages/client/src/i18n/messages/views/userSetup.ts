@@ -8,85 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IUserSetupMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  confirmPassword: MessageDescriptor
-  hasCases: MessageDescriptor
-  hasNumber: MessageDescriptor
-  header: MessageDescriptor
-  instruction: MessageDescriptor
-  labelAssignedOffice: MessageDescriptor
-  labelBanglaName: MessageDescriptor
-  labelEnglishName: MessageDescriptor
-  match: MessageDescriptor
-  minLength: MessageDescriptor
-  mismatch: MessageDescriptor
-  newPassword: MessageDescriptor
-  passwordRequired: MessageDescriptor
-  setupCompleteTitle: MessageDescriptor
-  userSetupInstruction: MessageDescriptor
-  userSetupIntroduction: MessageDescriptor
-  userSetupRevieTitle: MessageDescriptor
-  userSetupReviewHeader: MessageDescriptor
-  userSetupReviewInstruction: MessageDescriptor
-  userSetupWelcomeTitle: MessageDescriptor
-  validationMsg: MessageDescriptor
-  waiting: MessageDescriptor
-  assignedOffice: MessageDescriptor
-  roleType: MessageDescriptor
-  phoneNumber: MessageDescriptor
-  userName: MessageDescriptor
-  nid: MessageDescriptor
-  startDate: MessageDescriptor
-  auditSectionTitle: MessageDescriptor
-  auditActionColumnTitle: MessageDescriptor
-  auditTrackingIDColumnTitle: MessageDescriptor
-  auditDeviceIpAddressColumnTitle: MessageDescriptor
-  auditEventTypeColumnTitle: MessageDescriptor
-  auditDateColumnTitle: MessageDescriptor
-  noAuditFound: MessageDescriptor
-  inProgressAuditAction: MessageDescriptor
-  declaredAuditAction: MessageDescriptor
-  validatedAuditAction: MessageDescriptor
-  updatedAuditAction: MessageDescriptor
-  registeredAuditAction: MessageDescriptor
-  rejectedAuditAction: MessageDescriptor
-  certifiedAuditAction: MessageDescriptor
-  issuedAuditAction: MessageDescriptor
-  showMoreAuditList: MessageDescriptor
-  assignedAuditAction: MessageDescriptor
-  unAssignedAuditAction: MessageDescriptor
-  correctedAuditAction: MessageDescriptor
-  requestedCorrectionAuditAction: MessageDescriptor
-  approvedCorrectionAuditAction: MessageDescriptor
-  rejectedCorrectedAuditAction: MessageDescriptor
-  archivedAuditAction: MessageDescriptor
-  loggedInAuditAction: MessageDescriptor
-  loggedOutAuditAction: MessageDescriptor
-  phoneNumberChangedAuditAction: MessageDescriptor
-  emailAddressChangedAuditAction: MessageDescriptor
-  passwordChangedAuditAction: MessageDescriptor
-  reactivateAuditAction: MessageDescriptor
-  deactivateAuditAction: MessageDescriptor
-  createUserAuditAction: MessageDescriptor
-  editUserAuditAction: MessageDescriptor
-  passwordResetAuditAction: MessageDescriptor
-  usernameReminderByAdmin: MessageDescriptor
-  passwordResetByAdmin: MessageDescriptor
-  userNameReminderAuditAction: MessageDescriptor
-  retrievedAuditAction: MessageDescriptor
-  viewedAuditAction: MessageDescriptor
-  reInstatedInProgressAuditAction: MessageDescriptor
-  reInstatedInReviewAuditAction: MessageDescriptor
-  reInStatedRejectedAuditAction: MessageDescriptor
-  sentForApprovalAuditAction: MessageDescriptor
-  markedAsDuplicate: MessageDescriptor
-  markedAsNotDuplicate: MessageDescriptor
-}
-
-const messagesToDefine: IUserSetupMessages = {
+export const messages = defineMessages({
   confirmPassword: {
     defaultMessage: 'Confirm new password',
     description: 'Confirm password label',
@@ -264,85 +188,10 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Text for audit list',
     id: 'user.profile.audit.list.noDataFound'
   },
-  inProgressAuditAction: {
-    defaultMessage: 'Sent incomplete',
-    description: 'Description for incomplete declaration',
-    id: 'user.profile.audit.description.inProgress'
-  },
-  declaredAuditAction: {
-    defaultMessage: 'Declaration started',
-    description: 'Description for complete declaration',
-    id: 'user.profile.audit.description.declared'
-  },
-  validatedAuditAction: {
-    defaultMessage: 'Sent for approval',
-    description: 'Description for validated declaration',
-    id: 'user.profile.audit.description.validated'
-  },
-  updatedAuditAction: {
-    defaultMessage: 'Updated',
-    description: 'Description for updated declaration',
-    id: 'user.profile.audit.description.updated'
-  },
-  registeredAuditAction: {
-    defaultMessage: 'Registered',
-    description: 'Description for registered declaration',
-    id: 'user.profile.audit.description.registered'
-  },
-  rejectedAuditAction: {
-    defaultMessage: 'Rejected',
-    description: 'Description for rejected declaration',
-    id: 'user.profile.audit.description.rejected'
-  },
-  certifiedAuditAction: {
-    defaultMessage: 'Certified',
-    description: 'Description for certified declaration',
-    id: 'user.profile.audit.description.certified'
-  },
-  issuedAuditAction: {
-    defaultMessage: 'Issued',
-    description: 'Description for Issued declaration',
-    id: 'user.profile.audit.description.issued'
-  },
   showMoreAuditList: {
     defaultMessage: 'Show next {pageSize} of {totalItems}',
     description: 'Label for show more link',
     id: 'user.profile.auditList.showMore'
-  },
-  assignedAuditAction: {
-    defaultMessage: 'Assigned',
-    description: 'Description for declaration assignment',
-    id: 'user.profile.auditList.assigned'
-  },
-  unAssignedAuditAction: {
-    defaultMessage: 'Unassigned',
-    description: 'Description for declaration not assigned to self',
-    id: 'user.profile.auditList.unAssigned'
-  },
-  correctedAuditAction: {
-    defaultMessage: 'Corrected Record',
-    description: 'Description for declaration corrected',
-    id: 'user.profile.auditList.corrected'
-  },
-  requestedCorrectionAuditAction: {
-    defaultMessage: 'Requested correction',
-    description: 'Description for record correction being requested',
-    id: 'user.profile.auditList.requestedCorrectionAuditAction'
-  },
-  approvedCorrectionAuditAction: {
-    defaultMessage: 'Approved correction request',
-    description: 'Description for record correction being approved',
-    id: 'user.profile.auditList.approvedCorrectionAuditAction'
-  },
-  rejectedCorrectedAuditAction: {
-    defaultMessage: 'Rejected correction request',
-    description: 'Description for record correction being rejected',
-    id: 'user.profile.auditList.rejectedCorrectedAuditAction'
-  },
-  archivedAuditAction: {
-    defaultMessage: 'Archived',
-    description: 'Description for declaration archived',
-    id: 'user.profile.auditList.archived'
   },
   loggedInAuditAction: {
     defaultMessage: 'Logged in',
@@ -408,51 +257,5 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Sent username reminder',
     description: 'Description for send username reminder audit action',
     id: 'user.profile.auditList.usernameReminderByAdmin'
-  },
-  retrievedAuditAction: {
-    defaultMessage: 'Retrieved',
-    description: 'Description for declaration retrieved audit action',
-    id: 'user.profile.auditList.retrieved'
-  },
-  viewedAuditAction: {
-    defaultMessage: 'Viewed',
-    description: 'Description for declaration viewed audit action',
-    id: 'user.profile.auditList.viewed'
-  },
-  reInstatedInProgressAuditAction: {
-    defaultMessage: 'Reinstated to in progress',
-    description:
-      'Description for sending registration from Reinstated to In progress audit action',
-    id: 'user.profile.auditList.reInstatedToInProgress'
-  },
-  reInstatedInReviewAuditAction: {
-    defaultMessage: 'Reinstated to ready for review',
-    description:
-      'Description for sending registration from Reinstated to In review audit action',
-    id: 'user.profile.auditList.reInstatedToInReview'
-  },
-  reInStatedRejectedAuditAction: {
-    defaultMessage: 'Reinstated to requires updates',
-    description:
-      'Description for sending registration from Reinstated to require updates audit action',
-    id: 'user.profile.auditList.reInstatedToUpdate'
-  },
-  sentForApprovalAuditAction: {
-    defaultMessage: 'Sent for approval',
-    description:
-      'Description for sending registration for approval audit action',
-    id: 'user.profile.auditList.sentForApproval'
-  },
-  markedAsDuplicate: {
-    defaultMessage: 'Marked as duplicate',
-    description: 'Description for marked as duplicate in audit action',
-    id: 'user.profile.auditList.markedAsDuplicate'
-  },
-  markedAsNotDuplicate: {
-    defaultMessage: 'Marked as not duplicate',
-    description: 'Description for marked as not duplicate in audit action',
-    id: 'user.profile.auditList.markedAsNotDuplicate'
   }
-}
-
-export const messages: IUserSetupMessages = defineMessages(messagesToDefine)
+})
