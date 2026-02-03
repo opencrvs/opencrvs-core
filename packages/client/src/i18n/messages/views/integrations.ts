@@ -82,8 +82,8 @@ const messagesToDefine = {
   },
   type: {
     id: 'integrations.client.type',
-    defaultMessage: 'Type',
-    description: 'Label for type of client'
+    defaultMessage: 'Integration',
+    description: 'Label shown when an integration system initiated an action'
   },
   label: {
     id: 'integrations.label',
