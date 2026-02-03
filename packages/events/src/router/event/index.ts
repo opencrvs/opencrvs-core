@@ -75,7 +75,7 @@ export const eventRouter = router({
      * Event configurations are intentionally available to all user types.
      * Some of the dynamic scopes require knowledge of available types.
      */
-    get: userOnlyProcedure
+    get: userAndSystemProcedure
       .meta({
         openapi: {
           summary: 'List event configurations',
