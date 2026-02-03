@@ -46,6 +46,7 @@ import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'qs'
 import { SystemRole } from '@opencrvs/commons/client'
+import { getSystemTypeFromScopes } from '@client/views/SysAdmin/Config/Systems/systemScopes'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -293,7 +294,11 @@ export const GetHistory = ({
     ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) ? (
-      intl.formatMessage(integrationMessages.type)
+      intl.formatMessage(integrationMessages.type, {
+        type: item.system?.scopes 
+          ? getSystemTypeFromScopes(item.system.scopes)
+          : 'HEALTH'
+      })
     ) : (
       item.user && intl.formatMessage(item.user.role.label)
     ),

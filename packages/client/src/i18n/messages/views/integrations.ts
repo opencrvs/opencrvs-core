@@ -82,7 +82,7 @@ const messagesToDefine = {
   },
   type: {
     id: 'integrations.client.type',
-    defaultMessage: 'Integration',
+    defaultMessage: '{type, select, HEALTH {Health integration} NATIONAL_ID {National id} RECORD_SEARCH {Record search} REINDEX {Reindex} IMPORT_EXPORT {Import/Export} CITIZEN_PORTAL {Citizen portal} other {Unknown}}',
     description: 'Label shown when an integration system initiated an action'
   },
   label: {

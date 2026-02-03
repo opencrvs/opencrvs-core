@@ -38,3 +38,40 @@ export function getSystemScopesFromType(
   return baseScopes[systemType]
 }
 
+/**
+ * Derives SystemType from scopes array for display purposes
+ * Used in audit history to show appropriate type label
+ */
+export function getSystemTypeFromScopes(scopes: string[]): string {
+  // Check for unique identifying scopes
+  if (scopes.includes(SCOPES.NATIONALID)) {
+    return 'NATIONAL_ID'
+  }
+  if (scopes.includes(SCOPES.RECORDSEARCH) && !scopes.includes(SCOPES.RECORD_IMPORT)) {
+    return 'RECORD_SEARCH'
+  }
+  if (scopes.includes(SCOPES.RECORD_IMPORT)) {
+    return 'IMPORT_EXPORT'
+  }
+  if (scopes.includes(SCOPES.RECORD_REINDEX) && scopes.length === 1) {
+    return 'REINDEX'
+  }
+  // Check for citizen portal scopes
+  if (
+    scopes.includes('record.read') ||
+    scopes.some((s) => s.startsWith('record.read'))
+  ) {
+    return 'CITIZEN_PORTAL'
+  }
+  // Default to HEALTH for record.create/record.notify
+  if (
+    scopes.includes('record.create') ||
+    scopes.includes('record.notify')
+  ) {
+    return 'HEALTH'
+  }
+
+  // Default fallback
+  return 'HEALTH'
+}
+
