@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 8cb7cdeb-478c-4476-83e8-6ef4b442d482
+                transactionId: 510ddf77-a567-481d-a3a0-97202ae7b40f
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 0985b797-87e6-4ca2-9f4b-3351ab7fe8cd
+                transactionId: f82ba5ec-c44a-4eda-b4a9-e456e9efc394
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9829,6 +9829,8 @@ components:
                 boost:
                   type: number
                   default: 1
+                matchAgainst:
+                  type: string
               required:
                 - fuzziness
                 - boost
@@ -9854,6 +9856,8 @@ components:
                   type: number
                   default: 1
                 value:
+                  type: string
+                matchAgainst:
                   type: string
               required:
                 - boost
@@ -9881,6 +9885,8 @@ components:
                 boost:
                   type: number
                   default: 1
+                matchAgainst:
+                  type: string
               required:
                 - days
                 - boost
