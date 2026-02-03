@@ -1519,7 +1519,7 @@ test('User with "location" scope only sees events from their primary office', as
       type: 'record.search',
       options: {
         event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1542,7 +1542,7 @@ test('User with "location" scope only sees events from their primary office', as
       type: 'record.search',
       options: {
         event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1590,7 +1590,7 @@ test('User with "location" scope only sees events created by system user to thei
       type: 'record.search',
       options: {
         event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1628,7 +1628,7 @@ test('User without an event in the scope should not be able to view events of th
       type: 'record.search',
       options: {
         event: ['birth'],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1648,7 +1648,7 @@ test('User without an event in the scope should not be able to view events of th
       type: 'record.search',
       options: {
         event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1676,7 +1676,7 @@ test('User with "location" scope can see events from other offices based on thei
       type: 'record.search',
       options: {
         event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1693,7 +1693,7 @@ test('User with "location" scope can see events from other offices based on thei
       type: 'record.search',
       options: {
         event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1772,7 +1772,7 @@ test('User with "all" scope sees events from all offices', async () => {
       type: 'record.search',
       options: {
         event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1807,7 +1807,7 @@ test('User with both "all" and "my-jurisdiction" scopes sees all matching events
       type: 'record.search',
       options: {
         event: ['birth'],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1819,7 +1819,7 @@ test('User with both "all" and "my-jurisdiction" scopes sees all matching events
       type: 'record.search',
       options: {
         event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
@@ -1847,7 +1847,7 @@ test('User only sees tennis club membership events within their jurisdiction', a
       type: 'record.search',
       options: {
         event: [TENNIS_CLUB_MEMBERSHIP],
-        eventLocation: 'location'
+        placeOfEvent: 'location'
       }
     })
   ])
