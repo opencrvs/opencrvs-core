@@ -12,6 +12,7 @@
 import {
   ConfigurableScopeType,
   EventConfig,
+  IAuthHeader,
   joinUrl,
   logger,
   Scope,
@@ -79,7 +80,7 @@ let inMemoryEventConfigurations: EventConfig[] | null = null
  * Fetches event configurations from country config service
  */
 async function getEventConfigurations(
-  authHeader: Record<string, string>
+  authHeader: IAuthHeader
 ): Promise<EventConfig[]> {
   const url = joinUrl(COUNTRY_CONFIG_URL, '/events')
 
@@ -102,7 +103,7 @@ async function getEventConfigurations(
  * Gets event configurations, using cache in production
  */
 export async function getInMemoryEventConfigurations(
-  authHeader: Record<string, string>
+  authHeader: IAuthHeader
 ): Promise<EventConfig[]> {
   if (!PRODUCTION) {
     logger.info(
@@ -138,11 +139,12 @@ export function getSystemScopesFromType(
   }
 
   const literalScopes = DEFAULT_SCOPES_BY_TYPE[type]
-  const configurableScopes = CONFIGURABLE_SCOPES_BY_TYPE[type].map((scope) =>
-    stringifyScope({
-      type: scope,
-      options: { event: eventIds }
-    })
+  const configurableScopes = CONFIGURABLE_SCOPES_BY_TYPE[type].map(
+    (scope: ConfigurableScopeType) =>
+      stringifyScope({
+        type: scope as 'record.create' | 'record.notify',
+        options: { event: eventIds }
+      })
   )
 
   return [...literalScopes, ...configurableScopes]

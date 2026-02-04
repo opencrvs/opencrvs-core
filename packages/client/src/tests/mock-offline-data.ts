@@ -29,24 +29,13 @@ export const validImageB64String =
 
 const systems: System[] = [
   {
-    name: 'WebHook 1',
+    name: 'Health Integration 1',
     status: SystemStatus.Active,
-    type: SystemType.Webhook,
+    type: SystemType.Health,
     _id: '63998b6efbd0f8bad7708033',
     shaSecret: 'c37d4f5d-4c12-4016-9c7e-d810d2f871df',
     clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
-    settings: {
-      webhook: [
-        {
-          event: 'birth',
-          permissions: ['informant-details', 'supporting-documents']
-        },
-        {
-          event: 'death',
-          permissions: ['deceased-details', 'death-encounter']
-        }
-      ]
-    }
+    settings: {}
   },
   {
     _id: '63a01ffe607915acacc2f553',
