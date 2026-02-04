@@ -87,6 +87,39 @@ paths:
         "401": *a1
         "403": *a2
         "500": *a3
+  /events/{eventId}:
+    get:
+      operationId: event-get
+      summary: Fetch full event document
+      tags:
+        - events
+      security:
+        - Authorization: []
+      parameters:
+        - in: path
+          name: eventId
+          schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          required: true
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventDocument"
+        "400": *a4
+        "401": *a1
+        "403": *a2
+        "404": &a5
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.NOT_FOUND"
+        "500": *a3
   /events/notifications:
     post:
       operationId: event-actions-notify-request
@@ -624,6 +657,84 @@ paths:
               schema: {}
         "401": *a1
         "403": *a2
+        "500": *a3
+  /locations:
+    get:
+      operationId: locations-list
+      summary: List locations
+      description: Retrieve a list of locations based on provided filters.
+      tags:
+        - locations
+      security:
+        - Authorization: []
+      parameters:
+        - in: query
+          name: isActive
+          schema:
+            type: boolean
+        - in: query
+          name: locationIds
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+              pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        - in: query
+          name: locationType
+          schema:
+            type: string
+        - in: query
+          name: externalId
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    name:
+                      type: string
+                    externalId:
+                      anyOf:
+                        - type: string
+                        - type: "null"
+                    administrativeAreaId:
+                      anyOf:
+                        - type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        - type: "null"
+                    validUntil:
+                      anyOf:
+                        - type: string
+                          format: date-time
+                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                        - type: "null"
+                    locationType:
+                      anyOf:
+                        - type: string
+                        - type: "null"
+                  required:
+                    - id
+                    - name
+                    - administrativeAreaId
+                    - validUntil
+                    - locationType
+                  additionalProperties: false
+        "400": *a4
+        "401": *a1
+        "403": *a2
+        "404": *a5
         "500": *a3
   /sync-administrative-hierarchy:
     post:
@@ -13653,6 +13764,39 @@ components:
         code:
           description: The error code
           example: BAD_REQUEST
+          type: string
+        issues:
+          description: An array of issues that were responsible for the error
+          example: []
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+            additionalProperties: false
+      required:
+        - message
+        - code
+      additionalProperties: false
+    error.NOT_FOUND:
+      title: Not found error (404)
+      description: The error information
+      example:
+        code: NOT_FOUND
+        message: Not found
+        issues: []
+      type: object
+      properties:
+        message:
+          description: The error message
+          example: Not found
+          type: string
+        code:
+          description: The error code
+          example: NOT_FOUND
           type: string
         issues:
           description: An array of issues that were responsible for the error
