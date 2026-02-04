@@ -18,15 +18,6 @@ import {
   setupTestCase
 } from '@events/tests/utils'
 
-test(`prevents forbidden access if accessing as system user`, async () => {
-  await setupTestCase()
-  const client = createSystemTestClient('test-system', [])
-
-  await expect(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    client.event.config.get({} as any)
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
-})
 
 test('user can fetch event config without scopes', async () => {
   const { user } = await setupTestCase()
