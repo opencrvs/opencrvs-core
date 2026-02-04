@@ -24,13 +24,13 @@ enum SystemStatus {
 # The actual permissions are determined by the scopes array stored in the database.
 # Gateway converts the type to appropriate scopes when creating a system.
 # WEBHOOK type has been deprecated and removed.
+# REINDEX is hidden from UI - it's managed internally.
 enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
   IMPORT_EXPORT
   CITIZEN_PORTAL
-  REINDEX
 }
 
 enum IntegratingSystemType {

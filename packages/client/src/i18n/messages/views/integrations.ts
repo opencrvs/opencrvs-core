@@ -368,14 +368,9 @@ const messagesToDefine = {
   integrationType: {
     id: 'integrations.type',
     defaultMessage:
-      '{type, select, HEALTH {Health integration} NATIONAL_ID {National ID} RECORD_SEARCH {Record search} REINDEX {Reindex} IMPORT_EXPORT {Import/Export} CITIZEN_PORTAL {Citizen portal} other {Custom}}',
+      '{type, select, HEALTH {Health integration} NATIONAL_ID {National ID} RECORD_SEARCH {Record search} IMPORT_EXPORT {Import/Export} CITIZEN_PORTAL {Citizen portal} other {Custom}}',
     description:
       'Label for integration type using ICU MessageFormat select for all types'
-  },
-  reindex: {
-    id: 'integrations.type.reindex',
-    defaultMessage: 'Reindex',
-    description: 'Label for reindex type system'
   }
 }
 

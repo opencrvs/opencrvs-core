@@ -220,8 +220,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
     IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport),
-    CITIZEN_PORTAL: intl.formatMessage(integrationMessages.citizenPortal),
-    REINDEX: 'Reindex'
+    CITIZEN_PORTAL: intl.formatMessage(integrationMessages.citizenPortal)
   }
 
   const systemToLabel = (system: System) => {

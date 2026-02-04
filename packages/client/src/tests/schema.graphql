@@ -1726,7 +1726,6 @@ enum SystemType {
   RECORD_SEARCH
   IMPORT_EXPORT
   CITIZEN_PORTAL
-  REINDEX
 }
 
 enum TelecomSystem {

@@ -26,18 +26,19 @@ import { COUNTRY_CONFIG_URL, PRODUCTION } from '@gateway/constants'
  * Client-facing system integration types.
  * These are the types shown to users in the admin UI.
  * Gateway converts these to appropriate scopes.
+ * Note: REINDEX is hidden from UI - it's managed internally.
  */
 export type SystemIntegrationType =
   | 'HEALTH'
   | 'NATIONAL_ID'
   | 'RECORD_SEARCH'
   | 'IMPORT_EXPORT'
-  | 'REINDEX'
   | 'CITIZEN_PORTAL'
 
 /**
  * Default scopes for each system integration type.
  * These are the base scopes that each type gets.
+ * Note: REINDEX is hidden from UI - it's managed internally.
  */
 const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, Scope[]> = {
   HEALTH: [SCOPES.NOTIFICATION_API],
@@ -50,7 +51,6 @@ const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, Scope[]> = {
     SCOPES.USER_DATA_SEEDING,
     SCOPES.RECORD_REINDEX
   ],
-  REINDEX: [SCOPES.RECORD_REINDEX],
   CITIZEN_PORTAL: ['record.read', 'record.create', 'record.notify']
 }
 
@@ -67,7 +67,6 @@ const CONFIGURABLE_SCOPES_BY_TYPE: Record<
   NATIONAL_ID: [],
   RECORD_SEARCH: [],
   IMPORT_EXPORT: [],
-  REINDEX: [],
   CITIZEN_PORTAL: []
 }
 
