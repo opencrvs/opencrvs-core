@@ -20,8 +20,6 @@ import styled from 'styled-components'
 import {
   applyDraftToEventIndex,
   deepDropNulls,
-  EventConfig,
-  EventIndex,
   EventStatus
 } from '@opencrvs/commons/client'
 import {
@@ -88,17 +86,10 @@ const messages = defineMessages({
   }
 })
 
-function EventOverviewTabs({
-  configuration,
-  event
-}: {
-  configuration: EventConfig
-  event: EventIndex
-}) {
+function EventOverviewTabs() {
   const intl = useIntl()
   const navigate = useNavigate()
   const location = useLocation()
-
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
 
@@ -187,18 +178,8 @@ export function EventOverviewLayout({
     <Frame
       header={
         <AppBar
-          appBarRowTwo={
-            <EventOverviewTabs
-              configuration={eventConfiguration}
-              event={event}
-            />
-          }
-          desktopCenter={
-            <EventOverviewTabs
-              configuration={eventConfiguration}
-              event={event}
-            />
-          }
+          appBarRowTwo={<EventOverviewTabs />}
+          desktopCenter={<EventOverviewTabs />}
           desktopRight={
             <Stack>
               <DownloadButton
