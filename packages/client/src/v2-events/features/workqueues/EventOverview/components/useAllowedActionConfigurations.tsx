@@ -175,7 +175,6 @@ export const actionLabels = {
   }
 } as const
 
-
 interface ActionConfig {
   label: TranslationConfig
   icon: IconProps['name']
@@ -272,7 +271,11 @@ function useViewableActionConfigurations(
     event.type
   )
 
-  const { quickActionModal, onQuickAction } = useQuickActionModal(event.id, eventConfiguration, event.type)
+  const { quickActionModal, onQuickAction } = useQuickActionModal(
+    event.id,
+    eventConfiguration,
+    event.type
+  )
 
   const getAction = (type: ActionType) => {
     return eventConfiguration.actions.find((action) => action.type === type)
@@ -358,7 +361,9 @@ function useViewableActionConfigurations(
       },
       [ActionType.DECLARE]: {
         icon: getAction(ActionType.DECLARE)?.icon ?? ('PencilLine' as const),
-        label: hasDeclarationDraftOpen ? buttonMessages.update : actionLabels[ActionType.DECLARE],
+        label: hasDeclarationDraftOpen
+          ? buttonMessages.update
+          : actionLabels[ActionType.DECLARE],
         onClick: (workqueue) => {
           clearEphemeralFormState()
           return navigate(
@@ -368,7 +373,7 @@ function useViewableActionConfigurations(
             )
           )
         },
-        disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
+        disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen)
       },
       [ActionType.EDIT]: {
         icon: 'PencilLine' as const,
@@ -388,8 +393,8 @@ function useViewableActionConfigurations(
           handleRejection(() =>
             workqueue
               ? navigate(
-                ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
-              )
+                  ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueue })
+                )
               : navigate(ROUTES.V2.buildPath({}))
           ),
         disabled: !isDownloadedAndAssignedToUser
@@ -511,7 +516,10 @@ function useCustomActionConfigs(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const scopes = useSelector(getScope) ?? []
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { customActionModal, onCustomAction } = useCustomActionModal(event.id, eventConfiguration)
+  const { customActionModal, onCustomAction } = useCustomActionModal(
+    event.id,
+    eventConfiguration
+  )
   const { useFindEventFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
@@ -611,6 +619,7 @@ export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
 ): [React.ReactNode, ActionMenuItem[]] {
+  console.time(event.id)
   const isPending = event.flags.some((flag) => flag.endsWith(':requested'))
   const { isActionAllowed } = useUserAllowedActions(event.type)
   const drafts = useDrafts()
@@ -678,6 +687,7 @@ export function useAllowedActionConfigurations(
     return [null, []]
   }
 
+  console.timeEnd(event.id)
   // If user has no other actions than assign or unassign, return no actions.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
   return [

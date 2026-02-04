@@ -17,7 +17,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { emptyMessage, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEventConfigurations } from '../events/useEventConfiguration'
 import { useEvents } from '../events/useEvents/useEvents'
-import { SearchResultComponent } from '../events/Search/SearchResult'
+import { SearchResultComponent } from '../events/Search/SearchResult/SearchResult'
 
 export function Outbox() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)

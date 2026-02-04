@@ -15,11 +15,10 @@ import { useWindowSize } from '@opencrvs/components/src/hooks'
 import { Link as TextButton } from '@opencrvs/components'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { IconWithNameEvent } from '@client/v2-events/components/IconWithNameEvent'
+import { ExtendedEventStatuses } from './utils'
 
 export function SearchResultItemTitle({
   event,
-  isInOutbox,
-  isInDrafts,
   status,
   onClick,
   type
@@ -30,8 +29,6 @@ export function SearchResultItemTitle({
     meta?: Record<string, unknown>
   }
   type: string
-  isInOutbox?: boolean
-  isInDrafts?: boolean
   status: React.ComponentProps<typeof IconWithName>['status']
   onClick: () => void
 }) {
@@ -50,7 +47,10 @@ export function SearchResultItemTitle({
       />
     )
 
-  if (isInOutbox && !isInDrafts) {
+  if (
+    status === ExtendedEventStatuses.OUTBOX ||
+    status === ExtendedEventStatuses.DRAFT
+  ) {
     return renderIconWithName()
   }
 
