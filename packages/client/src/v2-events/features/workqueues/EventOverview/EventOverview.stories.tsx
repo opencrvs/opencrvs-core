@@ -121,6 +121,51 @@ export const Overview: Story = {
   }
 }
 
+export const OverviewMobile: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile' },
+    offline: {
+      events: [defaultEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: defaultEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument({
+                eventId: defaultEvent.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Amelie',
+                    surname: 'Poulain'
+                  }
+                }
+              })
+            ]
+          })
+        ]
+      }
+    }
+  }
+}
+
 export const WithAcceptedRegisterEvent: Story = {
   parameters: {
     reactRouter: {
