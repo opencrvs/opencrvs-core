@@ -22,7 +22,6 @@ import { Db, MongoClient } from 'mongodb'
  * - RECORD_SEARCH: ['recordsearch']
  * - IMPORT_EXPORT: ['record.import', 'record.export', 'recordsearch', 'user.data-seeding', 'record.reindex']
  * - REINDEX: ['record.reindex']
- * - CITIZEN_PORTAL: ['record.read', 'record.create', 'record.notify']
  * - WEBHOOK: (deprecated - will be removed)
  */
 
@@ -37,8 +36,7 @@ const DEFAULT_SCOPES_BY_TYPE: Record<string, string[]> = {
     'user.data-seeding',
     'record.reindex'
   ],
-  REINDEX: ['record.reindex'],
-  CITIZEN_PORTAL: ['record.read', 'record.create', 'record.notify']
+  REINDEX: ['record.reindex']
 }
 
 export const up = async (db: Db, client: MongoClient) => {

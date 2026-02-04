@@ -33,7 +33,6 @@ export type SystemIntegrationType =
   | 'NATIONAL_ID'
   | 'RECORD_SEARCH'
   | 'IMPORT_EXPORT'
-  | 'CITIZEN_PORTAL'
 
 /**
  * Default scopes for each system integration type.
@@ -50,8 +49,7 @@ const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, Scope[]> = {
     SCOPES.RECORDSEARCH,
     SCOPES.USER_DATA_SEEDING,
     SCOPES.RECORD_REINDEX
-  ],
-  CITIZEN_PORTAL: ['record.read', 'record.create', 'record.notify']
+  ]
 }
 
 /**
@@ -66,9 +64,7 @@ const CONFIGURABLE_SCOPES_BY_TYPE: Record<
   HEALTH: ['record.create', 'record.notify'],
   NATIONAL_ID: [],
   RECORD_SEARCH: [],
-  IMPORT_EXPORT: [],
-  CITIZEN_PORTAL: []
-}
+  IMPORT_EXPORT: []}
 
 /**
  * In-memory cache for event configurations (production only)
