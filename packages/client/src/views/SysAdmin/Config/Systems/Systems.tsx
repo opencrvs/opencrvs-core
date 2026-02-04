@@ -259,7 +259,8 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook),
-    IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport)
+    IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport),
+    CITIZEN_PORTAL: intl.formatMessage(integrationMessages.citizenPortal)
   }
 
   const systemToLabel = (system: System) => {
@@ -557,6 +558,12 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                         integrationMessages.eventNotification
                       ),
                       value: SystemRole.enum.HEALTH
+                    },
+                    {
+                      label: intl.formatMessage(
+                        integrationMessages.citizenPortal
+                      ),
+                      value: SystemRole.enum.CITIZEN_PORTAL
                     },
                     {
                       label: intl.formatMessage(

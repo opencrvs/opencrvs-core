@@ -183,7 +183,7 @@ export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
 }
 
 export function findLocalEventDocument(eventId: string) {
-  return getQueryData(trpcOptionsProxy.event.get, eventId)
+  return getQueryData(trpcOptionsProxy.event.get, { eventId })
 }
 
 /*
@@ -227,7 +227,7 @@ export function clearPendingDraftCreationRequests(eventId: string) {
 
 export function setEventData(id: string, data: EventDocument) {
   updateLocalEventIndex(id, data)
-  queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
+  queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey({ eventId: id }), data)
   updateDraftsWithEvent(id, data)
 }
 
@@ -260,7 +260,7 @@ async function deleteEventData(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
   queryClient.removeQueries({
-    queryKey: trpcOptionsProxy.event.get.queryKey(id)
+    queryKey: trpcOptionsProxy.event.get.queryKey({ eventId: id })
   })
 
   await removeCachedFiles(updatedEvent)

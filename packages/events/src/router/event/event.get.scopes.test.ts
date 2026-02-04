@@ -244,12 +244,12 @@ test('Check scopes against get.event', async () => {
           | { success: true; event: EventDocument }
           | { success: false; event: EventDocument } // fetched as admin because the test user could not access it.
         try {
-          const response = await testClient.event.get(eventId)
+          const response = await testClient.event.get({eventId})
           result = { success: true, event: response }
         } catch (error) {
           if (error instanceof EventNotFoundError) {
             const eventFetchedAsAdmin =
-              await clientReadingAllEvents.event.get(eventId)
+              await clientReadingAllEvents.event.get({eventId})
 
             result = { success: false, event: eventFetchedAsAdmin }
           } else {

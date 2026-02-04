@@ -72,7 +72,7 @@ describe('event.create', () => {
     const client = createTestClient(user)
     const event = await client.event.create(generator.event.create())
 
-    const fetchedEvent = await client.event.get(event.id)
+    const fetchedEvent = await client.event.get({eventId: event.id})
 
     const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
     expect(fetchedEventWithoutReadAction).toEqual(event.actions)
@@ -95,7 +95,7 @@ describe('event.create', () => {
     // trackingId should be 6 characters long and include only uppercase letters and numbers
     expect(event.trackingId).toMatch(/^[A-Z0-9]{6}$/)
 
-    const fetchedEvent = await client.event.get(event.id)
+    const fetchedEvent = await client.event.get({eventId: event.id})
     expect(fetchedEvent.trackingId).toMatch(/^[A-Z0-9]{6}$/)
   })
 
@@ -204,7 +204,7 @@ describe('event.create', () => {
         `record.read[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
-      const fetchedEvent = await userClient.event.get(event.id)
+      const fetchedEvent = await userClient.event.get({eventId: event.id})
 
       const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
       expect(fetchedEventWithoutReadAction).toEqual(event.actions)

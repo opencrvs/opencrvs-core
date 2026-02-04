@@ -54,7 +54,8 @@ export async function tokenExchangeHandler(
   if (decodedOrError._tag === 'Left') {
     return oauthResponse.invalidSubjectToken(h)
   }
-  const { sub } = decodedOrError.right
+
+  const { sub, userType } = decodedOrError.right
 
   const rejectScopeOfUserAssignedRole = decodedOrError.right.scope.find((s) =>
     s.startsWith('record.declared.reject')
@@ -64,6 +65,7 @@ export async function tokenExchangeHandler(
   const recordToken = await createTokenForActionConfirmation(
     { eventId, actionId },
     sub as UUID,
+    userType as 'user' | 'system',
     rejectScopeOfUserAssignedRole
   )
 
