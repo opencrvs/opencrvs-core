@@ -13,6 +13,11 @@ import fetch from '@gateway/fetch'
 import { USER_MANAGEMENT_URL, WEBHOOKS_URL } from '@gateway/constants'
 import { getSystem, hasScope } from '@gateway/features/user/utils'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import {
+  getSystemScopesFromType,
+  getInMemoryEventConfigurations,
+  isValidSystemIntegrationType
+} from './scopes'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -63,9 +68,32 @@ export const resolvers: GQLResolver = {
         return Promise.reject(new Error('User is not allowed to create client'))
       }
 
+      const { type, name, integratingSystemType, settings } = system!
+
+      // Validate the type
+      if (!isValidSystemIntegrationType(type)) {
+        throw new Error(`Invalid system integration type: ${type}`)
+      }
+
+      // Get event configurations to build configurable scopes
+      const eventConfigurations = await getInMemoryEventConfigurations(authHeader)
+      const eventIds = eventConfigurations.map((config) => config.id)
+
+      // Convert type to scopes
+      const scope = getSystemScopesFromType(type, eventIds)
+
+      // Build the payload with type, name, and computed scopes
+      const payload = {
+        type,
+        name,
+        scope,
+        ...(integratingSystemType && { integratingSystemType }),
+        ...(settings && { settings })
+      }
+
       const res = await fetch(`${USER_MANAGEMENT_URL}registerSystem`, {
         method: 'POST',
-        body: JSON.stringify(system),
+        body: JSON.stringify(payload),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader

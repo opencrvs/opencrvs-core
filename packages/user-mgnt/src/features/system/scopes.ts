@@ -8,6 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/**
+ * @deprecated This file is deprecated and will be removed.
+ * The scope conversion logic has been moved to gateway.
+ * Gateway now handles the type→scopes conversion.
+ * See: packages/gateway/src/features/systems/scopes.ts
+ */
 import {
   ConfigurableScopeType,
   Scope,
@@ -26,8 +32,7 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
     SCOPES.RECORDSEARCH,
     SCOPES.USER_DATA_SEEDING,
     SCOPES.RECORD_REINDEX
-  ], // TODO Should we call this MIGRATION or keep it generic?
-  WEBHOOK: [SCOPES.WEBHOOK],
+  ],
   REINDEX: [SCOPES.RECORD_REINDEX],
   CITIZEN_PORTAL: ['record.read', 'record.create', 'record.notify']
 } satisfies Record<SystemRole, Scope[]>
@@ -36,12 +41,14 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES = {
   HEALTH: ['record.create', 'record.notify'],
   NATIONAL_ID: [],
   RECORD_SEARCH: [],
-  WEBHOOK: [],
   REINDEX: [],
   IMPORT_EXPORT: [],
   CITIZEN_PORTAL: []
 } satisfies Record<SystemRole, ConfigurableScopeType[]>
 
+/**
+ * @deprecated Use gateway's getSystemScopesFromType instead
+ */
 export function getSystemIntegrationRoleScopes(
   role: SystemRole,
   eventIds: string[]

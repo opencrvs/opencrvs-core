@@ -13,19 +13,11 @@ import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
-import {
-  EventType,
-  System,
-  SystemStatus,
-  SystemType,
-  WebhookPermission
-} from '@client/utils/gateway'
-import { Label } from '@client/views/Settings/items/components'
+import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
 import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import {
   Alert,
-  CheckboxGroup,
   InputField,
   Link,
   ListViewItemSimplified,
@@ -40,7 +32,6 @@ import {
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -71,13 +62,6 @@ const StyledSpinner = styled(Spinner)`
 const Field = styled.div`
   margin-top: 16px;
 `
-const populatePermissions = (
-  webhooks: WebhookPermission[] = [],
-  type: string
-) => {
-  const { __typename, ...rest } = webhooks.find((ite) => ite.event === type)!
-  return rest
-}
 
 /**
  *
@@ -128,14 +112,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     modalVisible: false,
     selectedClient: null
   })
-
-  const [selectedTab, setSelectedTab] = React.useState(EventType.Birth)
-
-  const checkboxHandler = (permissions: string[], event: EventType) => {
-    event === EventType.Birth
-      ? setBirthPermissions({ event, permissions })
-      : setDeathPermissions({ event, permissions })
-  }
 
   const toggleModal = useCallback(() => {
     setShowModal((prev) => !prev)
@@ -222,21 +198,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
       }
     ]
 
-    if (system.type === SystemRole.enum.WEBHOOK) {
-      menuItems.push({
-        handler: () => {
-          setSystemToShowPermission(system)
-          setBirthPermissions(
-            populatePermissions(system.settings!.webhook!, EventType.Birth)
-          )
-          setDeathPermissions(
-            populatePermissions(system.settings!.webhook!, EventType.Death)
-          )
-        },
-        label: intl.formatMessage(buttonMessages.edit)
-      })
-    }
-
     menuItems.push({
       handler: () => {
         setSystemToToggleActivation(system)
@@ -254,19 +215,17 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     return menuItems
   }
 
-  const systemTypeLabels = {
+  const systemTypeLabels: Record<string, string> = {
     HEALTH: intl.formatMessage(integrationMessages.eventNotification),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
-    WEBHOOK: intl.formatMessage(integrationMessages.webhook),
     IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport),
-    CITIZEN_PORTAL: intl.formatMessage(integrationMessages.citizenPortal)
+    CITIZEN_PORTAL: intl.formatMessage(integrationMessages.citizenPortal),
+    REINDEX: 'Reindex'
   }
 
   const systemToLabel = (system: System) => {
-    return system.type !== 'REINDEX'
-      ? systemTypeLabels[system.type]
-      : 'INVALID_SYSTEM_TYPE__REINDEX'
+    return systemTypeLabels[system.type] || system.type
   }
 
   return (
@@ -572,10 +531,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                       value: SystemRole.enum.RECORD_SEARCH
                     },
                     {
-                      label: intl.formatMessage(integrationMessages.webhook),
-                      value: SystemRole.enum.WEBHOOK
-                    },
-                    {
                       label: intl.formatMessage(
                         integrationMessages.importExport
                       ),
@@ -618,132 +573,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                   documentation.opencrvs.org
                 </Link>
               </PaddedAlert>
-            )}
-
-            {newSystemType === SystemRole.enum.WEBHOOK && (
-              <>
-                <PaddedAlert type="info">
-                  {intl.formatMessage(integrationMessages.webhookDescription)}
-                  {'\n'}
-                  <Link
-                    onClick={() => {
-                      window.open(
-                        'https://documentation.opencrvs.org/',
-                        '_blank'
-                      )
-                    }}
-                    font="bold16"
-                  >
-                    documentation.opencrvs.org
-                  </Link>
-                </PaddedAlert>
-                <Field>
-                  <InputField
-                    id="select-input"
-                    touched={false}
-                    label={intl.formatMessage(integrationMessages.label)}
-                  >
-                    <div>
-                      <Label>
-                        {intl.formatMessage(
-                          integrationMessages.webhookPermissionsDescription
-                        )}
-                      </Label>
-                      <FormTabs
-                        sections={[
-                          {
-                            id: EventType.Birth,
-                            title: intl.formatMessage(integrationMessages.birth)
-                          },
-                          {
-                            id: EventType.Death,
-                            title: intl.formatMessage(integrationMessages.death)
-                          }
-                        ]}
-                        activeTabId={selectedTab}
-                        onTabClick={(tabId: EventType) => setSelectedTab(tabId)}
-                      />
-                      {selectedTab === EventType.Birth ? (
-                        <CheckboxGroup
-                          id="birthCheckboxGroup"
-                          options={[
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.childDetails
-                              ),
-                              value: 'child-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.motherDetails
-                              ),
-                              value: 'mother-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.fatherDetails
-                              ),
-                              value: 'father-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.informantDetails
-                              ),
-                              value: 'informant-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.documentDetails
-                              ),
-                              value: 'supporting-documents'
-                            }
-                          ]}
-                          name="test-checkbox-group1"
-                          value={birthPermissions.permissions ?? []}
-                          onChange={(newValue) => {
-                            checkboxHandler(newValue, EventType.Birth)
-                          }}
-                        />
-                      ) : (
-                        <CheckboxGroup
-                          id="deathCheckboxGroup"
-                          options={[
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.deceasedDetails
-                              ),
-                              value: 'deceased-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.deathEventDetails
-                              ),
-                              value: 'death-encounter'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.informantDetails
-                              ),
-                              value: 'informant-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.documentDetails
-                              ),
-                              value: 'supporting-documents'
-                            }
-                          ]}
-                          name="test-checkbox-group1"
-                          value={deathPermissions.permissions ?? []}
-                          onChange={(newValue) => {
-                            checkboxHandler(newValue, EventType.Death)
-                          }}
-                        />
-                      )}
-                    </div>
-                  </InputField>
-                </Field>
-              </>
             )}
           </>
         )}

@@ -289,13 +289,7 @@ export function useSystems() {
         system: {
           type: newSystemType,
           name: newClientName,
-          integratingSystemType: undefined,
-          ...(newSystemType === SystemRole.enum.WEBHOOK && {
-            settings: {
-              dailyQuota: 0,
-              webhook: [birthPermissions, deathPermissions]
-            }
-          })
+          integratingSystemType: undefined
         }
       }
     })
