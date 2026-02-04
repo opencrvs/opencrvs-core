@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: a6f346d4-0311-490a-8e3d-3065acb6687d
+                transactionId: 18478864-3a8b-4c4e-bcf0-9cc188924379
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 77f3f3fc-9a25-4db0-8085-f49a27bf90d5
+                transactionId: 5ac42966-e420-4fba-b71f-aca121515688
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4948,6 +4948,68 @@ components:
                         - $userField
                     - type: string
                       minLength: 1
+            fields:
+              type: array
+              items:
+                type: object
+                properties:
+                  label:
+                    description: Human-readable label of the field.
+                    allOf:
+                      - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    anyOf:
+                      - type: boolean
+                      - type: object
+                        properties:
+                          message:
+                            description: Custom required validation message
+                            allOf:
+                              - $ref: "#/components/schemas/TranslationConfig"
+                        required:
+                          - message
+                    default: false
+                    description: Indicates whether the field is mandatory.
+                  conditionals:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FieldConditional"
+                    default: *a8
+                    description: Conditions determining when the field is shown or enabled. By
+                      default, the field is always shown and enabled.
+                  id:
+                    anyOf:
+                      - type: string
+                        enum:
+                          - firstname
+                      - type: string
+                        enum:
+                          - middlename
+                      - type: string
+                        enum:
+                          - surname
+                  type:
+                    type: string
+                    enum:
+                      - TEXT
+                    default: TEXT
+                  configuration:
+                    type: object
+                    properties:
+                      maxLength:
+                        type: number
+                        description: Maximum length of the text
+                      prefix:
+                        $ref: "#/components/schemas/TranslationConfig"
+                      postfix:
+                        $ref: "#/components/schemas/TranslationConfig"
+                    default: {}
+                required:
+                  - label
+                  - id
+                  - type
+                  - configuration
+                description: Text input
             configuration:
               type: object
               properties:
