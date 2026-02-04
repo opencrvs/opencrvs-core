@@ -74,15 +74,13 @@ export async function registerSystem(
     // Set default settings based on type if not provided
     if (type === 'RECORD_SEARCH' && !settings) {
       settings = {
-        dailyQuota: RECORD_SEARCH_QUOTA,
-        webhook: []
+        dailyQuota: RECORD_SEARCH_QUOTA
       }
     }
 
     if (type === 'IMPORT_EXPORT' && !settings) {
       settings = {
-        dailyQuota: 1000000, // Arbitrary high number
-        webhook: []
+        dailyQuota: 1000000
       }
     }
 

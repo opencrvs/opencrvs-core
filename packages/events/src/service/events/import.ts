@@ -31,6 +31,7 @@ function mapEventActions(actions: EventDocument['actions']) {
     createdAtLocation: action.createdAtLocation ?? null,
     originalActionId: action.originalActionId ?? null,
     createdBySignature: action.createdBySignature ?? null,
+    createdByRole: action.createdByRole ?? null,
     customActionType: (action as any).customActionType ?? null
     /* eslint-enable @typescript-eslint/no-explicit-any */
   }))

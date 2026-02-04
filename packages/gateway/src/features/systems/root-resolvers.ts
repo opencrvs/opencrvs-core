@@ -76,7 +76,8 @@ export const resolvers: GQLResolver = {
       }
 
       // Get event configurations to build configurable scopes
-      const eventConfigurations = await getInMemoryEventConfigurations(authHeader)
+      const eventConfigurations =
+        await getInMemoryEventConfigurations(authHeader)
       const eventIds = eventConfigurations.map((config) => config.id)
 
       // Convert type to scopes
@@ -155,6 +156,7 @@ export const resolvers: GQLResolver = {
           ...authHeader
         }
       })
+
       if (res.status !== 200) {
         throw new Error(`No System found by given clientId`)
       }

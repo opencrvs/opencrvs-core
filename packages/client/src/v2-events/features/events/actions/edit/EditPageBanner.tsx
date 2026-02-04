@@ -82,7 +82,7 @@ export function EditPageBanner() {
     createdByUserType,
     createdBy,
     type: ActionType.DECLARE,
-    createdByRole
+    createdByRole: createdByRole ?? undefined
   })
 
   const message =

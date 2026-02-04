@@ -28,7 +28,6 @@ import {
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
-  SystemRole,
   UserOrSystem,
   InteractiveFieldType,
   FieldConfig,
@@ -57,7 +56,7 @@ type AllKeys<T> = T extends T ? keyof T : never
  */
 export const getUserIdsFromActions = (
   actions: ActionDocument[],
-  ignoreRoles?: SystemRole[]
+  ignoreRoles?: string[]
 ) => {
   const userIdFields = [
     'createdBy',

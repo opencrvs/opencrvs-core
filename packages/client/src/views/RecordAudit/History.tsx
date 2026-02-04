@@ -45,7 +45,6 @@ import { useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'qs'
-import { SystemRole } from '@opencrvs/commons/client'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -124,12 +123,6 @@ const GetNameWithAvatar = ({
   )
 }
 
-function getSystemType(type: string | undefined) {
-  if (type === SystemRole.enum.RECORD_SEARCH) {
-    return integrationMessages.recordSearch
-  }
-  return integrationMessages.healthSystem
-}
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const getIndexByAction = (histories: any, index: number): number => {
   const newHistories = [...histories]
@@ -299,7 +292,9 @@ export const GetHistory = ({
     ) : isVerifiedAction(item) ? (
       <div />
     ) : isSystemInitiated(item) ? (
-      intl.formatMessage(getSystemType(item.system?.type || ''))
+      intl.formatMessage(integrationMessages.integrationType, {
+        type: item.system?.type
+      })
     ) : (
       item.user && intl.formatMessage(item.user.role.label)
     ),

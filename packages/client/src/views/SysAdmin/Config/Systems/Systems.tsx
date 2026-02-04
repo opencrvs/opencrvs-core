@@ -16,6 +16,7 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
 import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
+import { z } from 'zod'
 import {
   Alert,
   InputField,
@@ -41,7 +42,6 @@ import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
-import { SystemRole } from '@opencrvs/commons/client'
 
 interface ToggleModal {
   modalVisible: boolean
@@ -63,8 +63,14 @@ const Field = styled.div`
   margin-top: 16px;
 `
 
+const SystemRole = z.enum([
+  'HEALTH',
+  'NATIONAL_ID',
+  'RECORD_SEARCH',
+  'IMPORT_EXPORT'
+])
+
 /**
- *
  * Wrapper component that adds Frame around the page if withFrame is true.
  * Created only for minimising impact of possible regression during v2 regression test period.
  */
@@ -215,16 +221,10 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     return menuItems
   }
 
-  const systemTypeLabels: Record<string, string> = {
-    HEALTH: intl.formatMessage(integrationMessages.eventNotification),
-    RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
-    NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
-    IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport),
-    CITIZEN_PORTAL: intl.formatMessage(integrationMessages.citizenPortal)
-  }
-
   const systemToLabel = (system: System) => {
-    return systemTypeLabels[system.type] || system.type
+    return intl.formatMessage(integrationMessages.integrationType, {
+      type: system.type
+    })
   }
 
   return (
@@ -513,25 +513,24 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                   options={[
                     {
                       label: intl.formatMessage(
-                        integrationMessages.eventNotification
+                        integrationMessages.integrationType,
+                        {
+                          type: SystemRole.enum.HEALTH
+                        }
                       ),
                       value: SystemRole.enum.HEALTH
                     },
                     {
                       label: intl.formatMessage(
-                        integrationMessages.citizenPortal
-                      ),
-                      value: SystemRole.enum.CITIZEN_PORTAL
-                    },
-                    {
-                      label: intl.formatMessage(
-                        integrationMessages.recordSearch
+                        integrationMessages.integrationType,
+                        { type: SystemRole.enum.RECORD_SEARCH }
                       ),
                       value: SystemRole.enum.RECORD_SEARCH
                     },
                     {
                       label: intl.formatMessage(
-                        integrationMessages.importExport
+                        integrationMessages.integrationType,
+                        { type: SystemRole.enum.IMPORT_EXPORT }
                       ),
                       value: SystemRole.enum.IMPORT_EXPORT
                     }

@@ -87,7 +87,7 @@ function isFlagConditionMet(
     $user: {
       sub: '',
       exp: '',
-      role: action.createdByRole,
+      role: action.createdByRole || undefined,
       algorithm: '',
       scope: [],
       userType: action.createdByUserType

@@ -348,19 +348,21 @@ export const userCanReadEventV2: MiddlewareFunction<
   const system = SystemContext.safeParse(ctx.user)
   const humanUser = UserContext.safeParse(ctx.user)
   const isSystemUser = system.success
+  console.log({isSystemUser});
 
-  if (isSystemUser) {
-    if (!inScope(ctx.token, [SCOPES.RECORD_READ])) {
-      throw new TRPCError({ code: 'FORBIDDEN' })
-    }
-    return next({
-      ctx: {
-        ...ctx,
-        eventId: input.eventId,
-        eventType: event.type
-      }
-    })
-  }
+
+  // if (isSystemUser) {
+  //   if (!inScope(ctx.token, [SCOPES.RECORD_READ])) {
+  //     throw new TRPCError({ code: 'FORBIDDEN' })
+  //   }
+  //   return next({
+  //     ctx: {
+  //       ...ctx,
+  //       eventId: input.eventId,
+  //       eventType: event.type
+  //     }
+  //   })
+  // }
 
   // 1. If no accepted scopes are found, fall back to V1 style check based on CREATE action.
   // This will be removed once we have migrated countryconfigs to use V2 scopes only.

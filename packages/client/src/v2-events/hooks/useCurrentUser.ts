@@ -16,6 +16,7 @@ import { getAdminLevelHierarchy, getUsersFullName } from '../utils'
 import { useLocations } from './useLocations'
 import { useUsers } from './useUsers'
 import { useAdministrativeAreas } from './useAdministrativeAreas'
+import { User } from '@opencrvs/commons/client'
 
 export function useCurrentUser() {
   const { config } = useSelector(getOfflineData)
@@ -23,7 +24,7 @@ export function useCurrentUser() {
 
   const loggedInUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
-  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
+  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '') as [User]
 
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()

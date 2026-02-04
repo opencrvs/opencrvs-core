@@ -30,7 +30,7 @@ enum SystemType {
   HEALTH
   RECORD_SEARCH
   IMPORT_EXPORT
-  CITIZEN_PORTAL
+  CUSTOM
 }
 
 enum IntegratingSystemType {

@@ -30,7 +30,6 @@ import {
   UpdatePermissionsMutationVariables,
   WebhookPermission
 } from '@client/utils/gateway'
-import { SystemRole } from '@opencrvs/commons/client'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as mutations from './mutations'

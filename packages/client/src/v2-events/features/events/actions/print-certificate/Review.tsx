@@ -26,10 +26,11 @@ import {
   EventConfig,
   getOrThrow,
   getAcceptedActions,
-  SystemRole,
   getUUID,
   UUID,
-  PrintCertificateAction
+  PrintCertificateAction,
+  TokenUserType,
+  User
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -166,7 +167,7 @@ export function Review() {
   const validatorContext = useValidatorContext(fullEvent)
   const actions = getAcceptedActions(fullEvent)
 
-  const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
+  const userIds = getUserIdsFromActions(actions, [])
 
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
@@ -191,7 +192,9 @@ export function Review() {
     throw new Error('User details are not available')
   }
 
-  const userFromUsersList = users.find((user) => user.id === userDetails.id)
+  const userFromUsersList = users.find((user) => user.id === userDetails.id) as
+    | User
+    | undefined
   if (!userFromUsersList) {
     throw new Error(`User with id ${userDetails.id} not found in users list`)
   }
@@ -200,7 +203,7 @@ export function Review() {
     type: ActionType.PRINT_CERTIFICATE,
     id: getUUID(),
     transactionId: getUUID(),
-    createdByUserType: 'user',
+    createdByUserType: TokenUserType.enum.user,
     createdAt: new Date().toISOString(),
     createdBy: userFromUsersList.id,
     createdByRole: userFromUsersList.role,

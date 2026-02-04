@@ -17,7 +17,7 @@ import { Db, MongoClient } from 'mongodb'
  * 2. Remove WEBHOOK type systems (deprecated)
  *
  * Scope mapping from type:
- * - HEALTH: ['notification-api', 'record.create[event=*]', 'record.notify[event=*]']
+ * - HEALTH: ['notification-api', 'record.create', 'record.notify']
  * - NATIONAL_ID: ['nationalId']
  * - RECORD_SEARCH: ['recordsearch']
  * - IMPORT_EXPORT: ['record.import', 'record.export', 'recordsearch', 'user.data-seeding', 'record.reindex']
