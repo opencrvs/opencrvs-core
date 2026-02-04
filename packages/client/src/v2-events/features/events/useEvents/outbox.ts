@@ -14,6 +14,7 @@ import * as z from 'zod'
 import { TRPCClientError } from '@trpc/client'
 import {
   applyDeclarationToEventIndex,
+  EventIndex,
   getCurrentEventState
 } from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
@@ -36,6 +37,10 @@ function hasConflict(error: unknown) {
     return error.data.code === 'CONFLICT'
   }
   return false
+}
+
+export type OutboxEventIndex = EventIndex & {
+  meta?: Record<string, unknown>
 }
 
 export function useOutbox() {

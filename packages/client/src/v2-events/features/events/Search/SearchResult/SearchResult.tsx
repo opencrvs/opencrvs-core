@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState, PropsWithChildren } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
+import { orderBy } from 'lodash'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
@@ -19,7 +20,8 @@ import {
   EventConfig,
   WorkqueueColumn,
   CtaActionType,
-  TranslationConfig
+  TranslationConfig,
+  UUID
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -55,7 +57,6 @@ export const SearchResultComponent = ({
   tabBarContent,
   actions = [],
   emptyMessage,
-  allowRetry,
   totalResults
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
@@ -64,7 +65,6 @@ export const SearchResultComponent = ({
   limit?: number
   offset?: number
   title: string
-  allowRetry?: boolean
   totalResults: number
   tabBarContent?: React.ReactNode
   actions?: CtaActionType[]
@@ -119,22 +119,21 @@ export const SearchResultComponent = ({
 
   const isWideScreen = windowWidth > theme.grid.breakpoints.lg
 
-  const rows = processEventsToRows({
-    events,
-    eventConfigs,
-    drafts,
-    outbox,
-    actions,
-    allowRetry: !!allowRetry,
-    slug: slug || '',
-    isWideScreen,
-    isOnline,
+  const rows = orderBy(
+    processEventsToRows({
+      events,
+      eventConfigs,
+      drafts,
+      outbox,
+      actions,
+      redirectParam: slug || '',
+      isWideScreen,
+      isOnline,
+      intl
+    }),
     sortedCol,
-    sortOrder,
-    getEventTitle,
-    intl,
-    navigate
-  })
+    sortOrder
+  )
 
   const currentPageNumber = Math.floor(offset / limit) + 1
   const totalPages = totalResults ? Math.ceil(totalResults / limit) : 0

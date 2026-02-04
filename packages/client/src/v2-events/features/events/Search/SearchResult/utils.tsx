@@ -9,20 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
-import { IntlShape } from 'react-intl'
+import { defineMessages, IntlShape } from 'react-intl'
 import {
   defaultWorkqueueColumns,
   Draft,
-  EventDocument,
   EventIndex,
   EventStatus,
   WorkqueueColumn
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, SORT_ORDER } from '@opencrvs/components'
-import { ActionCta } from '../ActionCta'
-import RetryButton from '../../../../components/RetryButton'
-import { DownloadButton } from '../../../../components/DownloadButton'
 
 const messages = defineMessages({
   noRecord: {
@@ -63,7 +58,11 @@ export const ExtendedEventStatuses = {
   DRAFT: 'DRAFT'
 } as const
 
-export function getEventStatus({
+/**
+ *
+ * @returns event status, correcting for local outbox and draft statuses
+ */
+export function getLocalEventStatus({
   eventId,
   currentStatus,
   outbox,
@@ -86,41 +85,6 @@ export function getEventStatus({
   }
 
   return currentStatus
-}
-
-export function buildEventActions(
-  event: any,
-  actions: any[],
-  allowRetry: boolean,
-  isWideScreen: boolean,
-  slug: string,
-  isDraft: boolean
-) {
-  const actionConfigsWithoutDownloadButton = isWideScreen
-    ? actions
-        .map((actionType) => ({
-          actionComponent: (
-            <ActionCta
-              actionType={actionType}
-              event={event}
-              redirectParam={slug}
-            />
-          )
-        }))
-        .concat(
-          allowRetry ? { actionComponent: <RetryButton event={event} /> } : []
-        )
-    : []
-
-  return actionConfigsWithoutDownloadButton.concat({
-    actionComponent: (
-      <DownloadButton
-        key={`DownloadButton-${event.id}`}
-        event={event}
-        isDraft={isDraft}
-      />
-    )
-  })
 }
 
 export interface Column {
@@ -227,8 +191,8 @@ export function changeSortedColumn(
 export function createSortFunction(
   sortedCol: (typeof COLUMNS)[keyof typeof COLUMNS],
   sortOrder: (typeof SORT_ORDER)[keyof typeof SORT_ORDER],
-  setSortedCol: (col: keyof typeof COLUMNS) => void,
-  setSortOrder: (order: keyof typeof SORT_ORDER) => void
+  setSortedCol: (col: (typeof COLUMNS)[keyof typeof COLUMNS]) => void,
+  setSortOrder: (order: (typeof SORT_ORDER)[keyof typeof SORT_ORDER]) => void
 ) {
   return function getSortFunction(column: string) {
     if (!Object.values(COLUMNS).includes(column as any)) {

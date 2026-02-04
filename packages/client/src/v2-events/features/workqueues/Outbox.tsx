@@ -44,7 +44,6 @@ export function Outbox() {
 
   return (
     <SearchResultComponent
-      allowRetry={true}
       columns={outboxColumns}
       eventConfigs={eventConfigs}
       queryData={outbox}

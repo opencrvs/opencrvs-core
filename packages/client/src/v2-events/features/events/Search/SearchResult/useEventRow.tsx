@@ -9,25 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
-import { orderBy, first } from 'lodash'
+import { defineMessages, IntlShape } from 'react-intl'
+import { first } from 'lodash'
 import {
   EventIndex,
   EventConfig,
   deepDropNulls,
   applyDraftToEventIndex,
-  CtaActionType
+  CtaActionType,
+  getEventConfigById,
+  Draft
 } from '@opencrvs/commons/client'
-import { SORT_ORDER } from '@opencrvs/components'
-import { ROUTES } from '@client/v2-events/routes'
 
-import { CoreWorkqueues } from '../../../../utils'
 import { formattedDuration } from '../../../../../utils/date-formatting'
 import { DownloadButton } from '../../../../components/DownloadButton'
 import { ActionCta } from '../ActionCta'
 import RetryButton from '../../../../components/RetryButton'
-import { getEventStatus } from './utils'
+import { OutboxEventIndex } from '../../useEvents/outbox'
+import { ExtendedEventStatuses, getLocalEventStatus } from './utils'
 import { SearchResultItemTitle } from './SearchResultItemTitle'
 
 const messages = defineMessages({
@@ -64,14 +63,19 @@ const messages = defineMessages({
   }
 })
 
-export function buildEventActions(
-  event: any,
-  actions: CtaActionType[],
-  allowRetry: boolean,
-  isWideScreen: boolean,
-  slug: string,
-  isDraft: boolean
-) {
+export function buildAvailableActionComponents({
+  event,
+  localEventStatus,
+  actions,
+  isWideScreen,
+  redirectParam
+}: {
+  event: EventIndex
+  localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
+  actions: CtaActionType[]
+  isWideScreen: boolean
+  redirectParam: string
+}) {
   const actionConfigsWithoutDownloadButton = isWideScreen
     ? actions
         .map((actionType) => ({
@@ -79,12 +83,14 @@ export function buildEventActions(
             <ActionCta
               actionType={actionType}
               event={event}
-              redirectParam={slug}
+              redirectParam={redirectParam}
             />
           )
         }))
         .concat(
-          allowRetry ? { actionComponent: <RetryButton event={event} /> } : []
+          localEventStatus === ExtendedEventStatuses.OUTBOX
+            ? { actionComponent: <RetryButton event={event} /> }
+            : []
         )
     : []
 
@@ -93,88 +99,10 @@ export function buildEventActions(
       <DownloadButton
         key={`DownloadButton-${event.id}`}
         event={event}
-        isDraft={isDraft}
+        isDraft={localEventStatus === ExtendedEventStatuses.DRAFT}
       />
     )
   })
-}
-
-export function createEventRow({
-  event,
-  eventConfig,
-  outbox,
-  drafts,
-  actions,
-  allowRetry,
-  slug,
-  isWideScreen,
-  isOnline
-}: {
-  event: any
-  eventConfig: EventConfig
-  outbox: any[]
-  drafts: any[]
-  actions: CtaActionType[]
-  allowRetry: boolean
-  slug: string
-  isWideScreen: boolean
-  isOnline: boolean
-  navigate: any
-  intl: any
-}) {
-  const intl = useIntl()
-  const navigate = useNavigate()
-
-  const { meta, ...eventData } = event
-
-  const status = getEventStatus({
-    eventId: eventData.id,
-    currentStatus: eventData.status,
-    outbox,
-    drafts
-  })
-
-  const actionConfigs = buildEventActions(
-    eventData,
-    actions,
-    allowRetry,
-    isWideScreen,
-    slug,
-    slug === CoreWorkqueues.DRAFT
-  )
-
-  const type = intl.formatMessage(eventConfig.label)
-
-  const handleTitleClick = () => {
-    navigate(
-      ROUTES.V2.EVENTS.EVENT.buildPath(
-        { eventId: eventData.id },
-        { workqueue: slug }
-      )
-    )
-  }
-
-  return {
-    ...eventData,
-    actions: actionConfigs,
-    label: eventConfig.label,
-    type,
-    createdAt: formattedDuration(new Date(eventData.createdAt)),
-    updatedAt: formattedDuration(new Date(eventData.updatedAt)),
-    status: intl.formatMessage(messages.eventStatus, { status }),
-    title: (
-      <SearchResultItemTitle
-        event={eventData}
-        status={status}
-        type={type}
-        onClick={handleTitleClick}
-      />
-    ),
-    outbox: intl.formatMessage(
-      isOnline ? messages.processingAction : messages.waitingForAction,
-      { action: typeof meta?.actionType === 'string' ? meta.actionType : '' }
-    )
-  }
 }
 
 export function processEventsToRows({
@@ -183,62 +111,73 @@ export function processEventsToRows({
   drafts,
   outbox,
   actions,
-  allowRetry,
-  slug,
+  redirectParam,
   isWideScreen,
   isOnline,
-  sortedCol,
-  sortOrder,
-  getEventTitle,
-  intl,
-  navigate
+  intl
 }: {
   events: EventIndex[]
   eventConfigs: EventConfig[]
-  drafts: any[]
-  outbox: any[]
-  actions: CtaActionType[]
-  allowRetry: boolean
-  slug: string
+  drafts: Draft[]
+  outbox: OutboxEventIndex[]
+  actions: CtaActionType[] // can be reduced to one?
+  redirectParam: string
   isWideScreen: boolean
   isOnline: boolean
-  sortedCol: string
-  sortOrder: (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
-  getEventTitle: (config: EventConfig, event: EventIndex) => any
-  intl: any
-  navigate: any
+  intl: IntlShape
 }) {
-  const rows = events.map((event) => {
-    const eventConfig = eventConfigs.find(({ id }) => id === event.type)
-    if (!eventConfig) {
-      throw new Error('Event configuration not found for event:' + event.type)
-    }
+  return events.map((event) => {
+    const eventConfig = getEventConfigById(eventConfigs, event.type)
 
     const draft = first(drafts.filter((d) => d.eventId === event.id))
     const eventWithDraft = draft
       ? deepDropNulls(applyDraftToEventIndex(event, draft, eventConfig))
       : event
 
-    const { useFallbackTitle, title } = getEventTitle(
-      eventConfig,
-      eventWithDraft
-    )
-    const processedEvent = { ...eventWithDraft, title, useFallbackTitle }
-
-    return createEventRow({
-      event: processedEvent,
-      eventConfig,
+    const localEventStatus = getLocalEventStatus({
+      eventId: eventWithDraft.id,
+      currentStatus: eventWithDraft.status,
       outbox,
-      drafts,
-      actions,
-      allowRetry,
-      slug,
-      isWideScreen,
-      isOnline,
-      intl,
-      navigate
+      drafts
     })
-  })
 
-  return orderBy(rows, sortedCol, sortOrder)
+    const actionComponents = buildAvailableActionComponents({
+      event: eventWithDraft,
+      localEventStatus: eventWithDraft.status,
+      actions,
+      isWideScreen,
+      redirectParam
+    })
+
+    const outboxMeta = outbox.find((o) => o.id === eventWithDraft.id)?.meta
+
+    return {
+      ...eventWithDraft,
+      actions: actionComponents,
+      label: eventConfig.label,
+      type: intl.formatMessage(eventConfig.label),
+      createdAt: formattedDuration(new Date(eventWithDraft.createdAt)),
+      updatedAt: formattedDuration(new Date(eventWithDraft.updatedAt)),
+      status: intl.formatMessage(messages.eventStatus, {
+        status: localEventStatus
+      }),
+      title: (
+        <SearchResultItemTitle
+          event={eventWithDraft}
+          eventConfig={eventConfig}
+          localEventStatus={localEventStatus}
+          redirectParam={redirectParam}
+        />
+      ),
+      outbox: intl.formatMessage(
+        isOnline ? messages.processingAction : messages.waitingForAction,
+        {
+          action:
+            typeof outboxMeta?.actionType === 'string'
+              ? outboxMeta.actionType
+              : ''
+        }
+      )
+    }
+  })
 }
