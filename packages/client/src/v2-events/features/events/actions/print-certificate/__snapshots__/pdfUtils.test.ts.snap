@@ -11,9 +11,8 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
   "createdAt": "1 February 2000",
   "createdAtLocation": {
     "country": "Farajaland",
-    "district": "Embe",
-    "name": "HQ Office",
-    "province": "Pualula",
+    "name": "Central Provincial Office",
+    "province": "Central",
   },
   "createdBy": {
     "fullHonorificName": "1st Order Honorable Kennedy Mweene",
@@ -34,9 +33,9 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
   "updatedAt": "2 February 2000",
   "updatedAtLocation": {
     "country": "Farajaland",
-    "district": "Embe",
-    "name": "HQ Office",
-    "province": "Pualula",
+    "district": "Isamba",
+    "name": "Isamba District Office",
+    "province": "Central",
   },
   "updatedBy": {
     "fullHonorificName": "1st Order Honorable Kennedy Mweene",

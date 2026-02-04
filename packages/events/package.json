@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/events",
-  "version": "1.9.4",
+  "version": "1.9.7",
   "description": "OpenCRVS Events service",
   "license": "MPL-2.0",
   "private": true,
@@ -9,7 +9,7 @@
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && vitest run --coverage",
     "test:watch": "vitest",
-    "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
+    "lint": "CI=true eslint -c eslint.config.js --fix --max-warnings=0",
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.router.json",

@@ -14,11 +14,16 @@ import {
   ActionCreationMetadata,
   AddressFieldValue,
   AddressType,
+  ageToDate,
+  AgeValue,
+  DateValue,
   EventConfig,
   EventIndex,
+  EventState,
   FieldType,
   FieldValue,
   getDeclarationFieldById,
+  isAgeFieldType,
   isNameFieldType,
   NameFieldValue,
   QueryInputType,
@@ -31,12 +36,13 @@ import {
   UserFilter,
   ResolvedRecordScopeV2
 } from '@opencrvs/commons'
-import { getLocationHierarchyRaw } from '@events/storage/postgres/events/locations'
+import { getAdministrativeHierarchyById } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcUserContext } from '../../context'
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
 export const NAME_QUERY_KEY = '__fullname'
+export const AGE_DOB_QUERY_KEY = '__derived_dob'
 
 export function encodeFieldId(fieldId: string) {
   return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
@@ -46,14 +52,19 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
-type IndexedNameFieldValue = NameFieldValue & {
+export type IndexedNameFieldValue = NameFieldValue & {
   [NAME_QUERY_KEY]?: string
+}
+
+export type IndexedAgeFieldValue = AgeValue & {
+  [AGE_DOB_QUERY_KEY]?: string
 }
 
 function addIndexFieldsToValue(
   eventConfig: EventConfig,
   fieldId: string,
-  value: FieldValue
+  value: FieldValue,
+  declaration: EventState
 ) {
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
 
@@ -62,6 +73,17 @@ function addIndexFieldsToValue(
       ...field.value,
       [NAME_QUERY_KEY]: Object.values(field.value).join(' ')
     } satisfies IndexedNameFieldValue
+  }
+  if (isAgeFieldType(field) && field.value) {
+    const maybeAsOfDate = DateValue.safeParse(
+      declaration[field.value.asOfDateRef]
+    )
+    if (maybeAsOfDate.success) {
+      return {
+        ...field.value,
+        [AGE_DOB_QUERY_KEY]: ageToDate(field.value.age, maybeAsOfDate.data)
+      } satisfies IndexedAgeFieldValue
+    }
   }
 
   return value
@@ -76,7 +98,12 @@ export function encodeEventIndex(
     declaration: Object.entries(event.declaration).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [encodeFieldId(key)]: addIndexFieldsToValue(eventConfig, key, value)
+        [encodeFieldId(key)]: addIndexFieldsToValue(
+          eventConfig,
+          key,
+          value,
+          event.declaration
+        )
       }),
       {}
     )
@@ -94,6 +121,17 @@ function isIndexedNameFieldValue(
   )
 }
 
+function isIndexedAgeFieldValue(
+  value: FieldValue
+): value is IndexedAgeFieldValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    AGE_DOB_QUERY_KEY in value &&
+    typeof value[AGE_DOB_QUERY_KEY] === 'string'
+  )
+}
+
 function stripIndexFieldsFromValue(
   eventConfig: EventConfig,
   fieldId: string,
@@ -103,6 +141,9 @@ function stripIndexFieldsFromValue(
 
   if (isIndexedNameFieldValue(field.value)) {
     return _.omit(field.value, [NAME_QUERY_KEY])
+  }
+  if (isIndexedAgeFieldValue(field.value)) {
+    return _.omit(field.value, [AGE_DOB_QUERY_KEY])
   }
 
   return value
@@ -197,7 +238,7 @@ type ToArrayFields<T, K extends PropertyKey> = T extends unknown
 /**
  * Event index type where all location fields are arrays representing full location hierarchy.
  */
-export type EventIndexWithLocationHierarchy = Omit<
+export type EventIndexWithAdministrativeHierarchy = Omit<
   ToArrayFields<EventIndex, 'createdAtLocation' | 'updatedAtLocation'>,
   'legalStatuses'
 > & {
@@ -212,72 +253,77 @@ export type EventIndexWithLocationHierarchy = Omit<
 }
 
 /**
- * Expands leaf-level location UUIDs into full administrative hierarchies for Elasticsearch indexing.
+ * Expands leaf-level hierarchy UUIDs into full administrative hierarchies for Elasticsearch indexing.
  *
- * It takes an event with single location UUIDs (leaf-level) (ex: event.createdAtLocation) and expands each into an array representing the
+ * Takes an event with single location UUIDs (leaf-level) (ex: event.createdAtLocation) and expands each into an array representing the
  * complete administrative hierarchy from top to bottom.
  *
  * Example: { locationId: location_uuid }
  *       → { locationId: [province_uuid, district_uuid, location_uuid] }
  *
- * Uses an in-memory cache to avoid redundant database lookups for the same location hierarchies.
+ * Example: { administrativeArea: admin_area_uuid }
+ *      → { administrativeArea: [parent_uuid, admin_area_uuid] }
+ *
+ * Uses an in-memory cache to avoid redundant database lookups for the same administrative hierarchies.
  *
  * @param eventConfig Event configuration containing field definitions
- * @param event Event index with leaf-level location UUIDs
- * @param locationHierarchyCache Optional in-memory cache for location hierarchies, to avoid redundant lookups
- * @returns Event index with full location hierarchies (arrays of UUIDs from top to leaf)
+ * @param event Event index with leaf-level UUIDs
+ * @param administrativeHierarchy Optional in-memory cache for administrative hierarchies, to avoid redundant lookups
+ * @returns Event index with resolved hierarchies (arrays of UUIDs from top to leaf)
  */
-export async function getEventIndexWithLocationHierarchy(
+export async function getEventIndexWithAdministrativeHierarchy(
   eventConfig: EventConfig,
   event: EventIndex,
-  locationHierarchyCache?: Map<string, string[]>
+  administrativeHierarchy?: Map<string, string[]>
 ) {
-  const buildFullLocationHierarchy = async (
-    locationId: UUID
+  const buildAdministrativeHierarchyById = async (
+    id: UUID
   ): Promise<string[]> => {
-    if (!locationId) {
+    if (!id) {
       return []
     }
-    if (locationHierarchyCache && locationHierarchyCache.has(locationId)) {
-      return locationHierarchyCache.get(locationId) || [locationId]
+
+    if (administrativeHierarchy && administrativeHierarchy.has(id)) {
+      return administrativeHierarchy.get(id) || [id]
     }
-    const hierarchyRows = await getLocationHierarchyRaw(locationId)
-    if (locationHierarchyCache) {
-      locationHierarchyCache.set(locationId, hierarchyRows)
+
+    const hierarchy = await getAdministrativeHierarchyById(id)
+    if (administrativeHierarchy) {
+      administrativeHierarchy.set(id, hierarchy)
     }
-    return hierarchyRows
+    return hierarchy
   }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const tempEvent = { ...event, declaration: { ...event.declaration } } as any
   // Normalize top-level locations
   if (event.createdAtLocation) {
-    tempEvent.createdAtLocation = await buildFullLocationHierarchy(
+    tempEvent.createdAtLocation = await buildAdministrativeHierarchyById(
       event.createdAtLocation
     )
   }
 
   if (event.placeOfEvent) {
-    tempEvent.placeOfEvent = await buildFullLocationHierarchy(
+    tempEvent.placeOfEvent = await buildAdministrativeHierarchyById(
       event.placeOfEvent
     )
   }
 
   if (event.updatedAtLocation) {
-    tempEvent.updatedAtLocation = await buildFullLocationHierarchy(
+    tempEvent.updatedAtLocation = await buildAdministrativeHierarchyById(
       event.updatedAtLocation
     )
   }
 
   if (event.legalStatuses.DECLARED?.createdAtLocation) {
     tempEvent.legalStatuses.DECLARED.createdAtLocation =
-      await buildFullLocationHierarchy(
+      await buildAdministrativeHierarchyById(
         event.legalStatuses.DECLARED.createdAtLocation
       )
   }
 
   if (event.legalStatuses.REGISTERED?.createdAtLocation) {
     tempEvent.legalStatuses.REGISTERED.createdAtLocation =
-      await buildFullLocationHierarchy(
+      await buildAdministrativeHierarchyById(
         event.legalStatuses.REGISTERED.createdAtLocation
       )
   }
@@ -299,9 +345,10 @@ export async function getEventIndexWithLocationHierarchy(
       if (parsed.success && parsed.data.addressType === AddressType.DOMESTIC) {
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const address: Record<string, any> = parsed.data
-        address.administrativeArea = await buildFullLocationHierarchy(
+        address.administrativeArea = await buildAdministrativeHierarchyById(
           address.administrativeArea
         )
+
         tempEvent.declaration[k] = address
         continue
       }
@@ -311,7 +358,9 @@ export async function getEventIndexWithLocationHierarchy(
     const uuid = UUID.safeParse(value)
 
     if (uuid.success) {
-      tempEvent.declaration[k] = await buildFullLocationHierarchy(uuid.data)
+      tempEvent.declaration[k] = await buildAdministrativeHierarchyById(
+        uuid.data
+      )
     }
   }
 
@@ -359,6 +408,10 @@ export function declarationReference(fieldName: string) {
 
 export function nameQueryKey(fieldName: string) {
   return `${fieldName}.${NAME_QUERY_KEY}`
+}
+
+export function ageQueryKey(fieldName: string) {
+  return `${fieldName}.${AGE_DOB_QUERY_KEY}`
 }
 
 export function generateQueryForAddressField(
@@ -442,6 +495,12 @@ function getLocationIdsFromScopeOptions(
   throw new Error(`Unknown jurisdiction filter: ${filter}`)
 }
 
+/**
+ *
+ * @param scope V2 scope
+ * @param user User context
+ * @returns Resolves location-based scope options to actual IDs based on user context.
+ */
 export function resolveRecordActionScopeToIds(
   scope: RecordScopeV2,
   user: TrpcUserContext
@@ -451,10 +510,7 @@ export function resolveRecordActionScopeToIds(
     type,
     options: {
       event: options.event,
-      eventLocation: getLocationIdsFromScopeOptions(
-        options.eventLocation,
-        user
-      ),
+      placeOfEvent: getLocationIdsFromScopeOptions(options.placeOfEvent, user),
       declaredIn: getLocationIdsFromScopeOptions(options.declaredIn, user),
       declaredBy:
         options.declaredBy === UserFilter.enum.user ? user.id : undefined,

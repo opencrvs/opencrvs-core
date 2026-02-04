@@ -15,6 +15,7 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   ActionType,
   AddressType,
+  AdministrativeArea,
   createPrng,
   EventConfig,
   EventDocument,
@@ -29,9 +30,10 @@ import {
   LocationType,
   QueryType,
   TENNIS_CLUB_MEMBERSHIP,
-  TestUserRole
+  TestUserRole,
+  UUID
 } from '@opencrvs/commons/events'
-import { SCOPES } from '@opencrvs/commons'
+import { encodeScope, SCOPES } from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
@@ -73,28 +75,43 @@ test('records are indexed with full location hierarchy', async () => {
 
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${TENNIS_CLUB_MEMBERSHIP},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
   const esClient = getOrCreateClient()
 
-  // --- Setup locations -------------------------------------------------------
   const locationRng = createPrng(842)
 
-  const parentLocation = {
-    ...generator.locations.set(1, locationRng)[0],
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    name: 'Parent location'
+  const parentAdministrativeArea = {
+    ...generator.administrativeAreas.set(1, locationRng)[0],
+    name: 'Administrative Area'
+  }
+
+  const childAdministrativeArea = {
+    validUntil: null,
+    externalId: null,
+    name: 'Child Administrative Area',
+    id: user.administrativeAreaId as UUID,
+    parentId: parentAdministrativeArea.id
   }
 
   const childLocation = {
     ...generator.locations.set(1, locationRng)[0],
     id: user.primaryOfficeId,
-    parentId: parentLocation.id,
+    administrativeAreaId: childAdministrativeArea.id,
     name: 'Child location',
     locationType: LocationType.enum.CRVS_OFFICE
-  }
+  } satisfies Location
 
-  await seed.locations([parentLocation, childLocation])
+  await seed.administrativeAreas([
+    parentAdministrativeArea,
+    childAdministrativeArea
+  ])
+  await seed.locations([childLocation])
 
   // --- Create & move event through lifecycle --------------------------------
   const createdEvent = await client.event.create(
@@ -124,17 +141,37 @@ test('records are indexed with full location hierarchy', async () => {
     id: createdEvent.id,
     type: TENNIS_CLUB_MEMBERSHIP,
     status: 'DECLARED',
-    createdAtLocation: [parentLocation.id, childLocation.id],
-    updatedAtLocation: [parentLocation.id, childLocation.id],
-    placeOfEvent: [parentLocation.id, childLocation.id],
+    createdAtLocation: [
+      parentAdministrativeArea.id,
+      childAdministrativeArea.id,
+      childLocation.id
+    ],
+    updatedAtLocation: [
+      parentAdministrativeArea.id,
+      childAdministrativeArea.id,
+      childLocation.id
+    ],
+    placeOfEvent: [
+      parentAdministrativeArea.id,
+      childAdministrativeArea.id,
+      childLocation.id
+    ],
     legalStatuses: {
       DECLARED: {
-        createdAtLocation: [parentLocation.id, childLocation.id]
+        createdAtLocation: [
+          parentAdministrativeArea.id,
+          childAdministrativeArea.id,
+          childLocation.id
+        ]
       }
     },
     declaration: {
       applicant____address: {
-        administrativeArea: [parentLocation.id, childLocation.id]
+        administrativeArea: [
+          parentAdministrativeArea.id,
+          childAdministrativeArea.id
+          // administrative area should not include location id
+        ]
       }
     }
   })
@@ -601,13 +638,17 @@ describe('withJurisdictionFilters', () => {
     term: { someField: 'someValue' }
   }
 
-  test('returns original query if no my-jurisdiction and no userOfficeId', () => {
-    const options = { birth: 'all' as const }
-
+  test('returns original query if no scope filters are applied', () => {
     const result = withJurisdictionFilters({
       query: baseQuery,
-      options,
-      userOfficeId: undefined
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth']
+          }
+        }
+      ]
     })
 
     expect(result).toEqual({
@@ -615,55 +656,46 @@ describe('withJurisdictionFilters', () => {
         must: [baseQuery],
         filter: {
           bool: {
-            minimum_should_match: 1,
+            should: [{ bool: { must: [{ terms: { type: ['birth'] } }] } }],
+            minimum_should_match: 1
+          }
+        }
+      }
+    })
+  })
+
+  test('returns original query if no "location"scopes are available for multiple events', () => {
+    const result = withJurisdictionFilters({
+      query: baseQuery,
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth', 'death']
+          }
+        }
+      ]
+    })
+
+    expect(result).toEqual({
+      bool: {
+        must: [baseQuery],
+        filter: {
+          bool: {
             should: [
               {
                 bool: {
                   must: [
                     {
-                      term: {
-                        type: 'birth'
+                      terms: {
+                        type: ['birth', 'death']
                       }
                     }
-                  ],
-                  should: undefined
+                  ]
                 }
               }
-            ]
-          }
-        },
-        should: undefined
-      }
-    })
-  })
-
-  test('returns original query if no my-jurisdiction scopes are available for multiple events', () => {
-    const options = { birth: 'all' as const, death: 'all' as const }
-
-    const result = withJurisdictionFilters({
-      query: baseQuery,
-      options,
-      userOfficeId: undefined
-    })
-
-    expect(result).toEqual({
-      bool: {
-        must: [baseQuery],
-        filter: {
-          bool: {
-            minimum_should_match: 1,
-            should: [
-              {
-                bool: {
-                  must: [{ term: { type: 'birth' } }]
-                }
-              },
-              {
-                bool: {
-                  must: [{ term: { type: 'death' } }]
-                }
-              }
-            ]
+            ],
+            minimum_should_match: 1
           }
         }
       }
@@ -671,15 +703,23 @@ describe('withJurisdictionFilters', () => {
   })
 
   test('adds filters for my-jurisdiction eventTypes only', () => {
-    const options = {
-      birth: 'my-jurisdiction' as const,
-      death: 'all' as const
-    }
-
     const result = withJurisdictionFilters({
       query: baseQuery,
-      options,
-      userOfficeId: 'office-123'
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['death']
+          }
+        },
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth'],
+            placeOfEvent: 'office-123' as UUID
+          }
+        }
+      ]
     })
 
     expect(result).toEqual({
@@ -687,38 +727,54 @@ describe('withJurisdictionFilters', () => {
         must: [baseQuery],
         filter: {
           bool: {
-            minimum_should_match: 1,
             should: [
               {
                 bool: {
                   must: [
-                    { term: { type: 'birth' } },
-                    { term: { updatedAtLocation: 'office-123' } }
+                    {
+                      terms: {
+                        type: ['death']
+                      }
+                    }
                   ]
                 }
               },
               {
                 bool: {
-                  must: [{ term: { type: 'death' } }]
+                  must: [
+                    {
+                      terms: {
+                        type: ['birth']
+                      }
+                    },
+                    {
+                      term: {
+                        placeOfEvent: 'office-123'
+                      }
+                    }
+                  ]
                 }
               }
-            ]
+            ],
+            minimum_should_match: 1
           }
         }
       }
     })
   })
 
-  test('returns filtered query if multiple events are marked as my-jurisdiction', () => {
-    const options = {
-      birth: 'my-jurisdiction' as const,
-      death: 'my-jurisdiction' as const
-    }
-
+  test('returns filtered query if multiple events are marked as "location"', () => {
     const result = withJurisdictionFilters({
       query: baseQuery,
-      options,
-      userOfficeId: 'office-123'
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth', 'death'],
+            placeOfEvent: 'office-123' as UUID
+          }
+        }
+      ]
     })
 
     expect(result).toEqual({
@@ -726,25 +782,25 @@ describe('withJurisdictionFilters', () => {
         must: [baseQuery],
         filter: {
           bool: {
-            minimum_should_match: 1,
             should: [
               {
                 bool: {
                   must: [
-                    { term: { type: 'birth' } },
-                    { term: { updatedAtLocation: 'office-123' } }
-                  ]
-                }
-              },
-              {
-                bool: {
-                  must: [
-                    { term: { type: 'death' } },
-                    { term: { updatedAtLocation: 'office-123' } }
+                    {
+                      terms: {
+                        type: ['birth', 'death']
+                      }
+                    },
+                    {
+                      term: {
+                        placeOfEvent: 'office-123'
+                      }
+                    }
                   ]
                 }
               }
-            ]
+            ],
+            minimum_should_match: 1
           }
         }
       }
@@ -752,40 +808,62 @@ describe('withJurisdictionFilters', () => {
   })
 
   test('returns filtered query if multiple events are marked with different jurisdiction access', () => {
-    const options = {
-      birth: 'my-jurisdiction' as const,
-      death: 'all' as const
-    }
-
     const result = withJurisdictionFilters({
       query: baseQuery,
-      options,
-      userOfficeId: 'office-123'
+      scopesV2: [
+        {
+          type: 'record.search',
+          options: {
+            event: ['birth'],
+            placeOfEvent: 'office-123' as UUID
+          }
+        },
+        {
+          type: 'record.search',
+          options: {
+            event: ['death']
+          }
+        }
+      ]
     })
 
     expect(result).toEqual({
       bool: {
+        must: [baseQuery],
         filter: {
           bool: {
-            minimum_should_match: 1,
             should: [
               {
                 bool: {
                   must: [
-                    { term: { type: 'birth' } },
-                    { term: { updatedAtLocation: 'office-123' } }
+                    {
+                      terms: {
+                        type: ['birth']
+                      }
+                    },
+                    {
+                      term: {
+                        placeOfEvent: 'office-123'
+                      }
+                    }
                   ]
                 }
               },
               {
                 bool: {
-                  must: [{ term: { type: 'death' } }]
+                  must: [
+                    {
+                      terms: {
+                        type: ['death']
+                      }
+                    }
+                  ]
                 }
               }
-            ]
+            ],
+            minimum_should_match: 1
           }
-        },
-        must: [baseQuery]
+        }
       }
     })
   })
@@ -843,15 +921,15 @@ describe('placeOfEvent location hierarchy handling', () => {
   let declarationWithHomeAddress: EventState
   let generator: Awaited<ReturnType<typeof setupTestCase>>['generator']
   let seed: Awaited<ReturnType<typeof setupTestCase>>['seed']
-  let grandParentLocation: Location
-  let parentLocation: Location
+  let grandParentAdministrativeArea: AdministrativeArea
+  let parentAdministrativeArea: AdministrativeArea
   let childOffice: Location
   let modifiedEventConfig: EventConfig
   beforeEach(async () => {
     // Setup: Generate location IDs upfront
     const prng = createPrng(942)
     const childOfficeId = generateUuid(prng)
-    const parentLocationId = generateUuid(prng)
+    const parentAdministrativeAreaId = generateUuid(prng)
 
     // Setup: Configure event with conditional address fields
     const createAddressField = (
@@ -971,33 +1049,40 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     client = createTestClient(user, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${TENNIS_CLUB_MEMBERSHIP},access=all]`,
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
       SCOPES.RECORD_REINDEX
     ])
     esClient = getOrCreateClient()
 
     // Setup: Create location hierarchy (grandparent -> parent -> child office)
-    grandParentLocation = {
-      ...generator.locations.set(1, prng)[0],
-      locationType: LocationType.enum.ADMIN_STRUCTURE,
-      name: 'Grand Parent locations'
+    grandParentAdministrativeArea = {
+      ...generator.administrativeAreas.set(1, prng)[0],
+      name: 'Grand Parent administrative area'
     }
-    parentLocation = {
-      ...generator.locations.set(1, prng)[0],
-      id: parentLocationId,
-      parentId: grandParentLocation.id,
-      locationType: LocationType.enum.ADMIN_STRUCTURE,
-      name: 'Parent location'
+    parentAdministrativeArea = {
+      ...generator.administrativeAreas.set(1, prng)[0],
+      id: parentAdministrativeAreaId,
+      parentId: grandParentAdministrativeArea.id,
+      name: 'Parent administrative area'
     }
     childOffice = {
       ...generator.locations.set(1, prng)[0],
       id: user.primaryOfficeId,
-      parentId: parentLocationId,
+      administrativeAreaId: parentAdministrativeAreaId,
       name: 'Child location',
       locationType: LocationType.enum.CRVS_OFFICE
     }
 
-    await seed.locations([grandParentLocation, parentLocation, childOffice])
+    await seed.administrativeAreas([
+      grandParentAdministrativeArea,
+      parentAdministrativeArea
+    ])
+    await seed.locations([childOffice])
 
     declarationWithHomeAddress = {
       ...generateActionDeclarationInput(
@@ -1010,9 +1095,9 @@ describe('placeOfEvent location hierarchy handling', () => {
         country: 'FAR',
         streetLevelDetails: { town: 'Gazipur' },
         addressType: AddressType.DOMESTIC,
-        administrativeArea: parentLocationId
+        administrativeArea: parentAdministrativeAreaId
       },
-      locationId: parentLocationId
+      locationId: parentAdministrativeAreaId
     }
   })
 
@@ -1041,21 +1126,24 @@ describe('placeOfEvent location hierarchy handling', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       status: 'DECLARED',
       createdAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
       updatedAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
-      placeOfEvent: [grandParentLocation.id, parentLocation.id],
+      placeOfEvent: [
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id
+      ],
       legalStatuses: {
         DECLARED: {
           createdAtLocation: [
-            grandParentLocation.id,
-            parentLocation.id,
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id,
             childOffice.id
           ]
         }
@@ -1067,7 +1155,10 @@ describe('placeOfEvent location hierarchy handling', () => {
           streetLevelDetails: {
             town: 'Gazipur'
           },
-          administrativeArea: [grandParentLocation.id, parentLocation.id]
+          administrativeArea: [
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id
+          ]
         }
       }
     })
@@ -1080,7 +1171,7 @@ describe('placeOfEvent location hierarchy handling', () => {
     expect(results).toHaveLength(1)
     expect(results[0].createdAtLocation).toEqual(childOffice.id)
     expect(results[0].updatedAtLocation).toEqual(childOffice.id)
-    expect(results[0].placeOfEvent).toEqual(parentLocation.id)
+    expect(results[0].placeOfEvent).toEqual(parentAdministrativeArea.id)
     expect(results[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
       childOffice.id
     )
@@ -1104,9 +1195,9 @@ describe('placeOfEvent location hierarchy handling', () => {
             country: 'FAR',
             streetLevelDetails: { town: 'Dhaka' },
             addressType: AddressType.DOMESTIC,
-            administrativeArea: grandParentLocation.id
+            administrativeArea: grandParentAdministrativeArea.id
           },
-          locationId: grandParentLocation.id
+          locationId: grandParentAdministrativeArea.id
         }
       })
     )
@@ -1119,7 +1210,9 @@ describe('placeOfEvent location hierarchy handling', () => {
     expect(updatedResults).toHaveLength(1)
     expect(updatedResults[0].createdAtLocation).toEqual(childOffice.id)
     expect(updatedResults[0].updatedAtLocation).toEqual(childOffice.id)
-    expect(updatedResults[0].placeOfEvent).toEqual(grandParentLocation.id)
+    expect(updatedResults[0].placeOfEvent).toEqual(
+      grandParentAdministrativeArea.id
+    )
     expect(updatedResults[0].legalStatuses.DECLARED?.createdAtLocation).toEqual(
       childOffice.id
     )
@@ -1158,21 +1251,24 @@ describe('placeOfEvent location hierarchy handling', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       status: 'DECLARED',
       createdAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
       updatedAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
-      placeOfEvent: [grandParentLocation.id, parentLocation.id],
+      placeOfEvent: [
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id
+      ],
       legalStatuses: {
         DECLARED: {
           createdAtLocation: [
-            grandParentLocation.id,
-            parentLocation.id,
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id,
             childOffice.id
           ]
         }
@@ -1184,7 +1280,10 @@ describe('placeOfEvent location hierarchy handling', () => {
           streetLevelDetails: {
             town: 'Gazipur'
           },
-          administrativeArea: [grandParentLocation.id, parentLocation.id]
+          administrativeArea: [
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id
+          ]
         }
       }
     }
@@ -1282,21 +1381,25 @@ describe('placeOfEvent location hierarchy handling', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       status: 'DECLARED',
       createdAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
       updatedAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
-      placeOfEvent: [grandParentLocation.id, parentLocation.id, childOffice.id],
+      placeOfEvent: [
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
+        childOffice.id
+      ],
       legalStatuses: {
         DECLARED: {
           createdAtLocation: [
-            grandParentLocation.id,
-            parentLocation.id,
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id,
             childOffice.id
           ]
         }
@@ -1350,21 +1453,25 @@ describe('placeOfEvent location hierarchy handling', () => {
       type: TENNIS_CLUB_MEMBERSHIP,
       status: 'DECLARED',
       createdAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
       updatedAtLocation: [
-        grandParentLocation.id,
-        parentLocation.id,
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
         childOffice.id
       ],
-      placeOfEvent: [grandParentLocation.id, parentLocation.id, childOffice.id],
+      placeOfEvent: [
+        grandParentAdministrativeArea.id,
+        parentAdministrativeArea.id,
+        childOffice.id
+      ],
       legalStatuses: {
         DECLARED: {
           createdAtLocation: [
-            grandParentLocation.id,
-            parentLocation.id,
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id,
             childOffice.id
           ]
         }
@@ -1376,7 +1483,10 @@ describe('placeOfEvent location hierarchy handling', () => {
           streetLevelDetails: {
             town: 'Gazipur'
           },
-          administrativeArea: [grandParentLocation.id, parentLocation.id]
+          administrativeArea: [
+            grandParentAdministrativeArea.id,
+            parentAdministrativeArea.id
+          ]
         }
       }
     }

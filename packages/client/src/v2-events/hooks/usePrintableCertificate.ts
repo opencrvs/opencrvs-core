@@ -14,11 +14,13 @@ import { cloneDeep } from 'lodash'
 import {
   ActionDocument,
   ActionType,
+  AdministrativeArea,
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
   EventState,
   FieldType,
+  getAcceptedActions,
   getCurrentEventState,
   isMinioUrl,
   LanguageConfig,
@@ -66,6 +68,7 @@ export const usePrintableCertificate = ({
   event,
   config,
   locations,
+  administrativeAreas,
   users,
   certificateConfig,
   language
@@ -73,6 +76,7 @@ export const usePrintableCertificate = ({
   event: EventDocument
   config: EventConfig
   locations: Map<UUID, Location>
+  administrativeAreas: Map<UUID, AdministrativeArea>
   users: UserOrSystem[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
@@ -112,9 +116,10 @@ export const usePrintableCertificate = ({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
     $declaration: declaration,
-    $actions: event.actions as ActionDocument[],
+    $actions: getAcceptedActions(event),
     review: true,
     locations,
+    administrativeAreas,
     users,
     language,
     config,
@@ -150,6 +155,7 @@ export const usePrintableCertificate = ({
       $declaration: declarationWithResolvedImages,
       $actions: event.actions as ActionDocument[],
       locations,
+      administrativeAreas,
       review: false,
       users,
       language,

@@ -40,6 +40,7 @@ export const User = z.object({
   ),
   primaryOfficeId: UUID,
   administrativeAreaId: UUID.nullish(),
+  device: z.string().optional(),
   fullHonorificName: z.string().optional(),
   type: TokenUserType.extract(['user'])
 })
@@ -51,7 +52,8 @@ export const SystemRole = z.enum([
   'RECORD_SEARCH',
   'REINDEX',
   'WEBHOOK',
-  'IMPORT_EXPORT'
+  'IMPORT_EXPORT',
+  'CITIZEN_PORTAL'
 ])
 
 export const System = z.object({

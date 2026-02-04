@@ -10,43 +10,33 @@
  */
 
 import * as z from 'zod/v4'
-import { Location, LocationType, SCOPES, UUID } from '@opencrvs/commons'
+import { Location, SCOPES, UUID } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import {
-  getChildLocations,
   getLocationHierarchy,
   getLocations,
-  setLocations,
-  syncLocations
+  setLocations
 } from '@events/service/locations/locations'
 import { requiresAnyOfScopes } from '../middleware'
 
 export const locationRouter = router({
-  sync: userAndSystemProcedure
-    .use(
-      requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
-    )
-    .input(z.void())
-    .output(z.void())
+  list: userAndSystemProcedure
     .meta({
       openapi: {
-        summary: 'Sync locations between V1 and V2',
-        method: 'POST',
-        path: '/sync-locations',
-        tags: ['events'],
+        summary: 'List locations',
+        description: 'Retrieve a list of locations based on provided filters.',
+        method: 'GET',
+        path: '/locations',
+        tags: ['locations'],
         protect: true
       }
     })
-    .mutation(async () => {
-      await syncLocations()
-    }),
-  list: userAndSystemProcedure
     .input(
       z
         .object({
           isActive: z.boolean().optional(),
           locationIds: z.array(UUID).optional(),
-          locationType: LocationType.optional(),
+          locationType: z.string().optional(),
           externalId: z.string().optional()
         })
         .optional()
@@ -60,14 +50,6 @@ export const locationRouter = router({
         externalId: input?.externalId
       })
     ),
-  getChild: userAndSystemProcedure
-    .input(
-      z.object({
-        parentId: UUID
-      })
-    )
-    .output(z.array(Location))
-    .query(async ({ input }) => getChildLocations(input.parentId)),
   set: userAndSystemProcedure
     .use(
       requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
@@ -78,7 +60,6 @@ export const locationRouter = router({
       await setLocations(input)
     }),
   getLocationHierarchy: userAndSystemProcedure
-
     .input(z.object({ locationId: UUID }))
     .output(z.array(UUID))
     .query(async ({ input }) => {

@@ -59,6 +59,7 @@ import { useOnlineStatus } from '@client/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useAdministrativeAreas } from '../../../../hooks/useAdministrativeAreas'
 
 const CertificateContainer = styled.div`
   svg {
@@ -171,7 +172,9 @@ export function Review() {
   const [users] = getUsers.useSuspenseQuery(userIds)
 
   const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
   const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const { certificateTemplates, language } = useAppConfig()
   const certificateConfig = certificateTemplates.find(
@@ -203,7 +206,7 @@ export function Review() {
     createdByRole: userFromUsersList.role,
     status: 'Accepted',
     declaration: {},
-    annotation: null,
+    annotation,
     originalActionId: null,
     createdBySignature: userFromUsersList.signature,
     createdAtLocation: userDetails.primaryOffice.id as UUID,
@@ -216,6 +219,7 @@ export function Review() {
     event: { ...fullEvent, actions: actionsWithAnOptimisticPrintAction },
     config: eventConfiguration,
     locations,
+    administrativeAreas,
     users,
     certificateConfig,
     language

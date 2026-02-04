@@ -8,6 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { UUID } from '../uuid'
 
-export const CreatedAtLocation = UUID.nullish()
+import * as config from '@events/service/config/config'
+import { setAdministrativeHierarchy } from '../../storage/postgres/administrative-hierarchy/administrative-hierarchy'
+
+export async function syncAdministrativeHierarchy() {
+  const administrativeAreas = await config.fetchAdministrativeAreas()
+  const locations = await config.getLocations()
+
+  await setAdministrativeHierarchy({
+    administrativeAreas,
+    locations
+  })
+}

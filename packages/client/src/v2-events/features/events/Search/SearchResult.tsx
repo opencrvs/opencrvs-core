@@ -22,7 +22,7 @@ import {
   WorkqueueColumn,
   deepDropNulls,
   applyDraftToEventIndex,
-  WorkqueueActionsWithDefault,
+  CtaActionType,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
@@ -152,7 +152,7 @@ const messages = defineMessages({
   noRecord: {
     id: 'search.noRecord',
     defaultMessage:
-      'No records {slug, select, draft {in my draft} outbox {require processing} other {{title}}}',
+      'No records {slug, select, draft {in drafts} outbox {require processing} other {{title}}}',
     description: 'The no record text'
   },
   noResult: {
@@ -209,7 +209,7 @@ export const SearchResultComponent = ({
   allowRetry?: boolean
   totalResults: number
   tabBarContent?: React.ReactNode
-  actions?: WorkqueueActionsWithDefault[]
+  actions?: CtaActionType[]
   emptyMessage?: TranslationConfig
 }>) => {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
@@ -456,9 +456,9 @@ export const SearchResultComponent = ({
       title: contentTitle.toLowerCase()
     })
   } else {
-    if (params.keys) {
+    if (params.term) {
       noResultText = intl.formatMessage(messages.noResultFor, {
-        searchTerm: params.keys
+        searchTerm: params.term
       })
     } else {
       noResultText = intl.formatMessage(messages.noResult)

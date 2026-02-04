@@ -33,12 +33,14 @@ import {
   FileFieldWithOptionValue,
   HttpFieldValue,
   IdReaderFieldValue,
+  NumberWithUnitFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
 
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
+import { SerializedNowDateTime } from './serializers/date/serializer'
 
 const FieldId = z
   .string()
@@ -157,7 +159,7 @@ export type Divider = z.infer<typeof Divider>
 
 export const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: z.union([NonEmptyTextValue, SerializedUserField]).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -261,7 +263,9 @@ export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: DateValue.optional(),
+  defaultValue: SerializedNowDateTime.or(DateValue)
+    .optional()
+    .describe('Default date value(yyyy-MM-dd)'),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
@@ -287,7 +291,9 @@ export type AgeField = z.infer<typeof AgeField>
 
 const TimeField = BaseField.extend({
   type: z.literal(FieldType.TIME),
-  defaultValue: TimeValue.optional(),
+  defaultValue: SerializedNowDateTime.or(TimeValue)
+    .optional()
+    .describe('Default time value (HH-mm)'),
   configuration: z
     .object({
       use12HourFormat: z
@@ -375,6 +381,11 @@ const File = BaseField.extend({
       acceptedFileTypes: MimeType.array()
         .optional()
         .describe('List of allowed file formats for the signature'),
+      maxImageSize: z
+        .object({
+          targetSize: z.object({ width: z.number(), height: z.number() })
+        })
+        .optional(),
       style: z
         .object({
           width: z
@@ -400,6 +411,23 @@ export const SelectOption = z.object({
     .union([z.string(), TranslationConfig])
     .describe('The label of the option')
 })
+
+const NumberWithUnitField = BaseField.extend({
+  type: z.literal(FieldType.NUMBER_WITH_UNIT),
+  defaultValue: NumberWithUnitFieldValue.optional(),
+  options: z
+    .array(SelectOption)
+    .describe('A list of options for the unit select'),
+  configuration: z
+    .object({
+      min: z.number().optional().describe('Minimum value of the number field'),
+      max: z.number().optional().describe('Maximum value of the number field'),
+      numberFieldPlaceholder: TranslationConfig.optional().describe(
+        'Placeholder for the number field'
+      )
+    })
+    .optional()
+}).describe('Number with unit input')
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
@@ -487,9 +515,9 @@ const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
   defaultValue: z
     .object({
-      firstname: NonEmptyTextValue.optional(),
-      middlename: NonEmptyTextValue.optional(),
-      surname: NonEmptyTextValue.optional()
+      firstname: SerializedUserField.or(NonEmptyTextValue).optional(),
+      middlename: SerializedUserField.or(NonEmptyTextValue).optional(),
+      surname: SerializedUserField.or(NonEmptyTextValue).optional()
     })
     .optional(),
   configuration: z
@@ -554,13 +582,13 @@ const AdministrativeAreaConfiguration = z
   })
   .describe('Administrative area options')
 
-const AdministrativeArea = BaseField.extend({
+const AdministrativeAreaField = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: AdministrativeAreaConfiguration
 }).describe('Administrative area input field e.g. facility, office')
 
-export type AdministrativeArea = z.infer<typeof AdministrativeArea>
+export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
 
 const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
@@ -582,6 +610,11 @@ const FileUploadWithOptions = BaseField.extend({
         .number()
         .describe('Maximum file size in bytes')
         .default(DEFAULT_MAX_FILE_SIZE_BYTES),
+      maxImageSize: z
+        .object({
+          targetSize: z.object({ width: z.number(), height: z.number() })
+        })
+        .optional(),
       acceptedFileTypes: MimeType.array()
         .optional()
         .describe('List of allowed file formats for the signature')
@@ -871,6 +904,7 @@ export const FieldConfig = z
     Address,
     TextField,
     NumberField,
+    NumberWithUnitField,
     TextAreaField,
     AgeField,
     DateField,
@@ -888,7 +922,7 @@ export const FieldConfig = z
     Checkbox,
     File,
     Country,
-    AdministrativeArea,
+    AdministrativeAreaField,
     Divider,
     LocationInput,
     Facility,
@@ -925,6 +959,7 @@ export type LocationField = z.infer<typeof LocationInput>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
+export type NumberWithUnitField = z.infer<typeof NumberWithUnitField>
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
   Extract<FieldConfig, { type: T }>,

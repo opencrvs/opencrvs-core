@@ -11,6 +11,7 @@
 
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import { useField } from 'formik'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
@@ -24,6 +25,8 @@ import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
+import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
+import { useImageProcessing } from '@client/utils/imageUtils'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
@@ -75,7 +78,8 @@ function DocumentUploaderWithOption({
   error,
   hideOnEmptyOption,
   autoSelectOnlyOption,
-  maxFileSize
+  maxFileSize,
+  maxImageSize
 }: {
   name: string
   description?: string
@@ -88,7 +92,9 @@ function DocumentUploaderWithOption({
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number
+  maxImageSize?: FileUploadWithOptions['configuration']['maxImageSize']
 }) {
+  const [, , helpers] = useField(name)
   const intl = useIntlWithFormData()
   const documentTypeRequiredErrorMessage = intl.formatMessage(
     DocumentTypeRequiredError
@@ -103,9 +109,13 @@ function DocumentUploaderWithOption({
     undefined
   )
   const [unselectedOptionError, setUnselectedOptionError] = useState('')
+  const [modal, openModal] = useImageEditorModal({
+    targetSize: maxImageSize?.targetSize
+  })
 
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
+  const { processImageFile } = useImageProcessing()
 
   const { uploadFile } = useFileUpload(name, {
     onSuccess: ({ type, originalFilename, path, id }) => {
@@ -132,12 +142,22 @@ function DocumentUploaderWithOption({
     return typeof label === 'string' ? label : intl.formatMessage(label)
   }
 
-  const onComplete = (newFile: File | null) => {
+  const onComplete = async (newFile: File | null) => {
     if (newFile) {
       if (selectedOption) {
+        const processedFile = await processImageFile(
+          newFile,
+          openModal,
+          maxImageSize,
+          error
+        )
+
+        if (!processedFile) {
+          return
+        }
         setFilesBeingProcessed((prev) => [...prev, { label: selectedOption }])
 
-        uploadFile(newFile, selectedOption)
+        uploadFile(processedFile, selectedOption)
       } else {
         setUnselectedOptionError(documentTypeRequiredErrorMessage)
       }
@@ -203,7 +223,7 @@ function DocumentUploaderWithOption({
     setSelectedOption(remainingOptions[0].value)
   }
 
-  const errorMessage = error || unselectedOptionError || fileChangeError || ''
+  const errorMessage = unselectedOptionError || fileChangeError || ''
 
   return (
     <UploadWrapper>
@@ -232,6 +252,7 @@ function DocumentUploaderWithOption({
             type={'SELECT'}
             value={selectedOption}
             onChange={(val) => {
+              void helpers.setTouched(true)
               setSelectedOption(val)
               setUnselectedOptionError('')
             }}
@@ -258,6 +279,7 @@ function DocumentUploaderWithOption({
           }}
         />
       )}
+      {modal}
     </UploadWrapper>
   )
 }
@@ -315,7 +337,23 @@ function DocumentWithOptionOutput({
   )
 }
 
+function toCertificateVariables(value: FileFieldWithOptionValue | undefined) {
+  const parsed = FileFieldWithOptionValue.safeParse(value)
+
+  if (parsed.success) {
+    return parsed.data.reduce(
+      (acc, file) => ({
+        ...acc,
+        [file.option]: new URL(file.path, window.config.MINIO_BASE_URL).href
+      }),
+      {}
+    )
+  }
+
+  return {}
+}
 export const FileWithOption = {
   Input: DocumentUploaderWithOption,
-  Output: DocumentWithOptionOutput
+  Output: DocumentWithOptionOutput,
+  toCertificateVariables
 }

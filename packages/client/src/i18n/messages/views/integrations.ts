@@ -225,6 +225,11 @@ const messagesToDefine = {
     defaultMessage: 'Import/Export',
     description: 'Label for import/export type system'
   },
+  citizenPortal: {
+    id: 'integrations.type.citizenPortal',
+    defaultMessage: 'Citizen portal',
+    description: 'Label for citizen portal type system'
+  },
   healthSystem: {
     id: 'integrations.type.healthSystem',
     defaultMessage: 'Health integration',

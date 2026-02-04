@@ -26,7 +26,8 @@ import {
   ActionUpdate,
   TestUserRole,
   AddressType,
-  deepMerge
+  deepMerge,
+  encodeScope
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -92,7 +93,7 @@ describe('Adding actions', () => {
     )
     await client.event.actions.register.request(generatedRegistration)
 
-    const updatedEvent = await client.event.get(originalEvent.id)
+    const updatedEvent = await client.event.get({eventId: originalEvent.id})
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -171,7 +172,7 @@ describe('Action drafts', () => {
 
     const draftEvents = await client.event.draft.list()
 
-    const event = await client.event.get(originalEvent.id)
+    const event = await client.event.get({eventId: originalEvent.id})
     // this triggers READ action
     expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
 
@@ -341,7 +342,7 @@ describe('Action updates', () => {
       transactionId: getUUID()
     })
 
-    const event = await client.event.get(originalEvent.id)
+    const event = await client.event.get({eventId: originalEvent.id})
     const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(eventState.declaration).toMatchSnapshot()
   })
@@ -406,7 +407,12 @@ describe('Action updates', () => {
 
     const client = createTestClient(user, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${multiFileConfig.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [multiFileConfig.id]
+        }
+      })
     ])
 
     const originalEvent = await client.event.create({
@@ -477,7 +483,12 @@ describe('Action updates', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${multiFileConfig.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [multiFileConfig.id]
+        }
+      })
     ])
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
@@ -575,7 +586,7 @@ test('PRINT_CERTIFICATE action can include a valid content.templateId property i
   )
   expect(result).toBeDefined()
 
-  const updatedEvent = await client.event.get(originalEvent.id)
+  const updatedEvent = await client.event.get({eventId: originalEvent.id})
   const printAction = updatedEvent.actions.find(
     (action) => action.type === ActionType.PRINT_CERTIFICATE
   ) as PrintCertificateAction
@@ -628,6 +639,15 @@ test('Can not add action with same [transactionId, type, status]', async () => {
 
   await client.event.actions.reject.request(
     generator.event.actions.reject(originalEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(originalEvent.id)
   )
 
   const eventBeforeDuplicateAttempt =
@@ -688,7 +708,7 @@ describe('Conditionals based on user role', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: locations[0].id,
+        administrativeArea: locations[0].administrativeAreaId,
         streetLevelDetails: {
           town: 'Example Village',
           state: 'State',
@@ -700,6 +720,7 @@ describe('Conditionals based on user role', () => {
     const users = TestUserRole.options.map((role) => {
       return seed.user({
         primaryOfficeId: locations[0].id,
+        administrativeAreaId: locations[0].administrativeAreaId,
         name: [
           {
             use: 'en',
@@ -747,6 +768,7 @@ describe('Conditionals based on user role', () => {
     const { generator, seed, locations } = await setupTestCase()
     const fieldAgent = seed.user({
       primaryOfficeId: locations[0].id,
+      administrativeAreaId: locations[0].administrativeAreaId,
       name: [
         {
           use: 'en',
@@ -761,7 +783,7 @@ describe('Conditionals based on user role', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: locations[0].id,
+        administrativeArea: locations[0].administrativeAreaId,
         streetLevelDetails: {
           town: 'Example Village',
           state: 'State',
@@ -796,7 +818,12 @@ describe('Conditionals based on user role', () => {
 
     const registrationAgentClient = createTestClient(registrationAgent, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${tennisClubMembershipEvent.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [tennisClubMembershipEvent.id]
+        }
+      })
     ])
 
     await registrationAgentClient.event.actions.assignment.assign({

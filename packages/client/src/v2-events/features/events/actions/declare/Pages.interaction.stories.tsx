@@ -198,10 +198,10 @@ export const SaveAndExit: Story = {
       await userEvent.click(modal.getByRole('button', { name: /Confirm/ }))
     })
 
-    await step('Navigate to My drafts workqueue', async () => {
+    await step('Navigate to Drafts workqueue', async () => {
       await waitFor(
         async () =>
-          userEvent.click(canvas.getByRole('button', { name: /My drafts/ })),
+          userEvent.click(canvas.getByRole('button', { name: /Drafts/ })),
         { timeout: 5000 }
       )
     })
@@ -217,10 +217,7 @@ export const SaveAndExit: Story = {
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
     await expect(recordInCreatedState).not.toBeInTheDocument()
 
-    const reviewButton = canvas.queryByRole('button', { name: 'Review' })
-    await expect(reviewButton).not.toBeInTheDocument()
-    // Draft status should not affect the action.
-    await canvas.findByRole('button', { name: 'Declare' })
+    await canvas.findByRole('button', { name: 'Update' })
   }
 }
 
@@ -310,16 +307,14 @@ export const DraftShownInForm: Story = {
 
     await waitFor(
       async () =>
-        userEvent.click(
-          await canvas.findByRole('button', { name: /My drafts/ })
-        ),
+        userEvent.click(await canvas.findByRole('button', { name: /Drafts/ })),
       { timeout: 5000 }
     )
     await userEvent.click(await canvas.findByText('Clearly Draft'))
 
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
 
-    await userEvent.click(await canvas.findByText(/Declare/))
+    await userEvent.click(await canvas.findByText(/Update/))
   }
 }
 

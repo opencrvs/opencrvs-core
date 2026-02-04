@@ -57,7 +57,7 @@ test('Should not add any new actions when assigned to the same user', async () =
 
   expect(response2).toEqual(response)
 
-  const finalEvent = await client.event.get(originalEvent.id)
+  const finalEvent = await client.event.get({eventId: originalEvent.id})
 
   expect(finalEvent.actions.map(({ type }) => type)).toEqual([
     ActionType.CREATE,

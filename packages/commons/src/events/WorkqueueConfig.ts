@@ -11,7 +11,6 @@
 
 import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
-import { Conditional } from './Conditional'
 import { event } from './event'
 import {
   defineWorkqueuesColumns,
@@ -44,15 +43,9 @@ export const mandatoryColumns = defineWorkqueuesColumns([
   }
 ])
 
-export const WorkqueueActionsWithDefault = z.enum([
-  ...workqueueActions.options,
-  'DEFAULT',
-  ActionType.READ
-] as const)
-
-export type WorkqueueActionsWithDefault = z.infer<
-  typeof WorkqueueActionsWithDefault
->
+/** Workqueue Call-to-action -button action type */
+export const CtaActionType = z.enum([...workqueueActions.options, ActionType.READ] as const)
+export type CtaActionType = z.infer<typeof CtaActionType>
 
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
@@ -64,12 +57,11 @@ export const WorkqueueConfig = z
       'Title of the workflow (both in navigation and on the page)'
     ),
     query: CountryConfigQueryType,
-    actions: z.array(
-      z.object({
-        type: WorkqueueActionsWithDefault,
-        conditionals: z.array(Conditional).optional()
-      })
-    ),
+    /** This action object used to contain a conditionals option, but it was not used anywhere.
+     *  It's also debatable whether it should be an array, or just a single action. */
+    actions: z
+      .array(z.object({ type: CtaActionType }))
+      .describe('Workqueue call-to-action button configuration.'),
     columns: z.array(WorkqueueColumn).default(mandatoryColumns),
     icon: AvailableIcons,
     emptyMessage: TranslationConfig.optional()
@@ -87,12 +79,9 @@ export const WorkqueueConfigInput = z.object({
     'Title of the workflow (both in navigation and on the page)'
   ),
   query: CountryConfigQueryInputType,
-  actions: z.array(
-    z.object({
-      type: WorkqueueActionsWithDefault,
-      conditionals: z.array(Conditional).optional()
-    })
-  ),
+  actions: z
+    .array(z.object({ type: CtaActionType }))
+    .describe('Workqueue call-to-action button configuration.'),
   columns: z.array(WorkqueueColumn).default(mandatoryColumns),
   icon: AvailableIcons,
   emptyMessage: TranslationConfig.optional()

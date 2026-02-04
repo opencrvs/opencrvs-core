@@ -14,7 +14,6 @@ import * as z from 'zod/v4'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
-  AgeValue,
   AddressFieldValue,
   EventConfig,
   EventDocument,
@@ -26,7 +25,6 @@ import {
   getDeclarationFields,
   WorkqueueCountInput,
   getEventConfigById,
-  SearchScopeAccessLevels,
   SearchQuery,
   DateRangeField,
   SelectDateRangeField
@@ -43,11 +41,14 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
-  EventIndexWithLocationHierarchy,
-  getEventIndexWithLocationHierarchy,
+  EventIndexWithAdministrativeHierarchy,
+  getEventIndexWithAdministrativeHierarchy,
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
+  AGE_DOB_QUERY_KEY,
   removeSecuredFields,
+  IndexedAgeFieldValue,
+  IndexedNameFieldValue,
   resolveRecordActionScopeToIds,
   valueFromTotal
 } from './utils'
@@ -100,10 +101,17 @@ function mapFieldTypeToElasticsearch(
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
-    case FieldType.EMAIL:
     case FieldType.TIME:
     case FieldType.ALPHA_HIDDEN:
       return { type: 'text' }
+    case FieldType.NUMBER_WITH_UNIT:
+      return {
+        type: 'object',
+        properties: {
+          numericValue: { type: 'double' },
+          unit: { type: 'text' }
+        }
+      }
     case FieldType.EMAIL:
       return {
         type: 'keyword',
@@ -154,9 +162,10 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: {
           age: { type: 'double' },
-          asOfDateRef: { type: 'keyword' }
+          asOfDateRef: { type: 'keyword' },
+          [AGE_DOB_QUERY_KEY]: { type: 'date' }
         } satisfies {
-          [K in keyof AgeValue]: estypes.MappingProperty
+          [K in keyof Required<IndexedAgeFieldValue>]: estypes.MappingProperty
         }
       }
     case FieldType.SIGNATURE:
@@ -174,8 +183,11 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: {
           firstname: { type: 'text', analyzer: 'classic' },
+          middlename: { type: 'text', analyzer: 'classic' },
           surname: { type: 'text', analyzer: 'classic' },
           [NAME_QUERY_KEY]: { type: 'text', analyzer: 'classic' }
+        } satisfies {
+          [K in keyof Required<IndexedNameFieldValue>]: estypes.MappingProperty
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
@@ -257,6 +269,7 @@ export async function createIndex(
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
           updatedAtLocation: { type: 'keyword' },
+          placeOfEvent: { type: 'keyword' },
           updatedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
@@ -362,8 +375,9 @@ export async function indexEventsInBulk(
     batch.map(async (doc) => {
       const config = getEventConfigById(configs, doc.type)
       const eventIndex = eventToEventIndex(doc, config)
+
       const eventIndexWithLocationHierarchy =
-        await getEventIndexWithLocationHierarchy(
+        await getEventIndexWithAdministrativeHierarchy(
           config,
           eventIndex,
           locationHierarchyCache
@@ -384,13 +398,14 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
   const eventIndex = eventToEventIndex(event, config)
-  const eventIndexWithLocationHierarchy =
-    await getEventIndexWithLocationHierarchy(config, eventIndex)
-  return esClient.index<EventIndexWithLocationHierarchy>({
+
+  const eventIndexWithAdministrativeHierarchy =
+    await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
+  return esClient.index<EventIndexWithAdministrativeHierarchy>({
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventIndexWithLocationHierarchy,
+    document: eventIndexWithAdministrativeHierarchy,
     refresh: 'wait_for'
   })
 }
@@ -459,28 +474,24 @@ export async function getIndexedEvents(
 export async function findRecordsByQuery({
   search,
   eventConfigs,
-  options,
   user,
   acceptedScopes
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
-  options?: Record<string, SearchScopeAccessLevels>
   user: TrpcUserContext
-  acceptedScopes?: RecordScopeV2[]
+  acceptedScopes: RecordScopeV2[]
 }) {
   const esClient = getOrCreateClient()
 
   const { query, limit, offset } = search
 
-  const resolvedScopes = acceptedScopes?.map((scope) =>
+  const resolvedScopes = acceptedScopes.map((scope) =>
     resolveRecordActionScopeToIds(scope, user)
   )
 
   const esQuery = withJurisdictionFilters({
     query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
-    options,
-    userOfficeId: user.primaryOfficeId,
     scopesV2: resolvedScopes
   })
 
@@ -537,20 +548,31 @@ const MsearchResponseSchema = z.object({
   })
 })
 
-export async function getEventCount(
-  queries: WorkqueueCountInput,
-  eventConfigs: EventConfig[],
-  options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined
-) {
+export async function getEventCount({
+  queries,
+  eventConfigs,
+  user,
+  acceptedScopes
+}: {
+  queries: WorkqueueCountInput
+  eventConfigs: EventConfig[]
+  user: TrpcUserContext
+  acceptedScopes: RecordScopeV2[]
+}) {
   const esClient = getOrCreateClient()
 
   const esQueries = queries.map(async (query) =>
     buildElasticQueryFromSearchPayload(query.query, eventConfigs)
   )
+  const resolvedScopes = acceptedScopes.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
+  )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters({ query, options, userOfficeId })
+    withJurisdictionFilters({
+      query,
+      scopesV2: resolvedScopes
+    })
   )
   const { responses } = await esClient.msearch({
     searches: filteredQueries.flatMap((query) => [

@@ -39,11 +39,6 @@ const flagMessages = {
     defaultMessage: 'Incomplete',
     description: 'Flag label for incomplete'
   },
-  [InherentFlags.PENDING_CERTIFICATION]: {
-    id: 'flags.builtin.pending-certification.label',
-    defaultMessage: 'Pending certification',
-    description: 'Flag label for pending certification'
-  },
   [InherentFlags.EDIT_IN_PROGRESS]: {
     id: 'flags.builtin.edit-in-progress.label',
     defaultMessage: 'Edit in progress',

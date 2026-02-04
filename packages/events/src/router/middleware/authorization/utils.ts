@@ -18,7 +18,7 @@ import {
   UserFilter,
   JurisdictionFilter
 } from '@opencrvs/commons'
-import { EventIndexWithLocationHierarchy } from '../../../service/indexing/utils'
+import { EventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { UserContext } from '../../../context'
 
 /**
@@ -28,7 +28,7 @@ import { UserContext } from '../../../context'
  *
  */
 function canAccessEventWithScope(
-  event: Partial<EventIndexWithLocationHierarchy>,
+  event: Partial<EventIndexWithAdministrativeHierarchy>,
   scope: ResolvedRecordScopeV2,
   user: UserContext
 ): boolean {
@@ -101,7 +101,7 @@ function canAccessEventWithScope(
  * One of the scopes must allow access for the event to be accessible.
  */
 export function canAccessEventWithScopes(
-  event: Partial<EventIndexWithLocationHierarchy>,
+  event: Partial<EventIndexWithAdministrativeHierarchy>,
   scopes: ResolvedRecordScopeV2[],
   user: UserContext
 ) {
