@@ -22,9 +22,11 @@ function ParagraphInput({
 }) {
   const fontVariant = configuration.styles?.fontVariant
   const hint = configuration.styles?.hint
+  const textAlign = configuration.styles?.textAlign
 
   return (
     <TextComponent
+      align={textAlign}
       color={hint ? 'grey500' : 'copy'}
       element="p"
       variant={fontVariant ?? 'reg16'}
