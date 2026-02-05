@@ -65,9 +65,10 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
       .filter((event) => !findLocalEventDocument(event.eventId))
       .map(async (draft) =>
         queryClient.prefetchQuery({
-          queryKey: trpcOptionsProxy.event.get.queryKey(draft.eventId),
-          queryFn: trpcOptionsProxy.event.get.queryOptions(draft.eventId)
-            .queryFn
+          queryKey: trpcOptionsProxy.event.get.queryKey({ eventId: draft.eventId }),
+          queryFn: trpcOptionsProxy.event.get.queryOptions({
+            eventId: draft.eventId
+          }).queryFn
         })
       )
 

@@ -28,7 +28,8 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
     SCOPES.RECORD_REINDEX
   ], // TODO Should we call this MIGRATION or keep it generic?
   WEBHOOK: [SCOPES.WEBHOOK],
-  REINDEX: [SCOPES.RECORD_REINDEX]
+  REINDEX: [SCOPES.RECORD_REINDEX],
+  CITIZEN_PORTAL: ['record.read', 'record.create', 'record.notify']
 } satisfies Record<SystemRole, Scope[]>
 
 const DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES = {
@@ -37,7 +38,8 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES = {
   RECORD_SEARCH: [],
   WEBHOOK: [],
   REINDEX: [],
-  IMPORT_EXPORT: []
+  IMPORT_EXPORT: [],
+  CITIZEN_PORTAL: []
 } satisfies Record<SystemRole, ConfigurableScopeType[]>
 
 export function getSystemIntegrationRoleScopes(

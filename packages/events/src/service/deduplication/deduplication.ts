@@ -29,6 +29,7 @@ import {
   getEventIndexName
 } from '@events/storage/elasticsearch'
 import {
+  ageQueryKey,
   declarationReference,
   decodeEventIndex,
   EncodedEventIndex,
@@ -44,6 +45,7 @@ import { getEventsAuditTrailed } from '../../storage/postgres/events/events'
  * The `and` query resolves to null if any of the sub-queries is null,
  * while the `or` query resolves to null if all of the sub-queries are null
  */
+
 export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
   queryInput: ClauseOutput,
@@ -99,19 +101,28 @@ export function generateElasticsearchQuery(
       }
     }
   }
-  const rawFieldId = queryInput.fieldId
-  const fieldConfig = getDeclarationFieldById(eventConfig, rawFieldId)
-  const encodedFieldId = encodeFieldId(rawFieldId)
-  const valuePath =
-    fieldConfig.type === FieldType.NAME
-      ? nameQueryKey(encodedFieldId)
-      : encodedFieldId
 
-  const queryKey = declarationReference(valuePath)
-  const queryValue = get(eventIndex.declaration, valuePath)
+  function resolveFieldPath(fieldId: string): string {
+    const fieldConfig = getDeclarationFieldById(eventConfig, fieldId)
+    const encodedFieldId = encodeFieldId(fieldId)
+    if (fieldConfig.type == FieldType.NAME) {
+      return nameQueryKey(encodedFieldId)
+    }
+    if (fieldConfig.type == FieldType.AGE) {
+      return ageQueryKey(encodedFieldId)
+    }
+    return encodedFieldId
+  }
+
+  const matchAgainst = queryInput.options.matchAgainst ?? queryInput.fieldId
+  const queryKey = declarationReference(resolveFieldPath(matchAgainst))
+  const queryValue = get(
+    eventIndex.declaration,
+    resolveFieldPath(queryInput.fieldId)
+  )
   if (!queryValue) {
     logger.warn(
-      `No value found for field ${rawFieldId} in the current event. Skipping query clause.`
+      `No value found for field ${queryInput.fieldId} in the current event. Skipping query clause.`
     )
     return null
   }
@@ -130,7 +141,7 @@ export function generateElasticsearchQuery(
       if (!isPrimitiveQueryValue(queryValue)) {
         logger.warn(
           queryValue,
-          `Invalid query value found for fuzzy matching ${rawFieldId}. Expected string, number or boolean`
+          `Invalid query value found for fuzzy matching ${queryInput.fieldId}. Expected string, number or boolean`
         )
         return null
       }
@@ -149,7 +160,7 @@ export function generateElasticsearchQuery(
       if (!isPrimitiveQueryValue(queryValue)) {
         logger.warn(
           queryValue,
-          `Invalid query value for found for strict matching ${rawFieldId}. Expected string, number or boolean`
+          `Invalid query value for found for strict matching ${queryInput.fieldId}. Expected string, number or boolean`
         )
         return null
       }
@@ -165,7 +176,7 @@ export function generateElasticsearchQuery(
       if (!dateValue.success) {
         logger.warn(
           queryValue,
-          `Invalid query value for found for dateRange matching ${rawFieldId}. Expected date in YYYY-MM-DD format`
+          `Invalid query value for found for dateRange matching ${queryInput.fieldId}. Expected date in YYYY-MM-DD format`
         )
         return null
       }
