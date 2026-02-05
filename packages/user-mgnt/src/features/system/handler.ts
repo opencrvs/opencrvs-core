@@ -74,15 +74,10 @@ export async function registerSystem(
     const token = getTokenPayload(authorization.split(' ')[1])
     const userId = token.sub
     const systemAdminUser = await User.findById(userId)
-    const existingSystem = await System.findOne({ type: type })
 
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
       logger.error('active system admin user details cannot be found')
       throw unauthorized()
-    }
-
-    if (existingSystem && existingSystem.type === 'NATIONAL_ID') {
-      throw new Error('System with NATIONAL_ID already exists !')
     }
 
     // Use the scopes passed from gateway
