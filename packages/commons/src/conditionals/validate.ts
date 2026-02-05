@@ -19,7 +19,10 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
-import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
+import {
+  mapFieldTypeToZod,
+  isFieldGroupFieldType
+} from '../events/FieldTypeMapping'
 import {
   DateValue,
   FieldUpdateValue,
@@ -32,7 +35,6 @@ import { UUID } from '../uuid'
 import { ageToDate, IndexMap } from '../events/utils'
 import { ActionType } from '../events/ActionType'
 import { EventDocument } from '../events/EventDocument'
-import { FieldType } from '../events/FieldType'
 
 const ajv = new Ajv({
   $data: true,
@@ -559,18 +561,18 @@ export function runStructuralValidations({
 }
 
 type FieldError<T> =
-  | T[]
+  | T
   | {
       [id: string]: FieldError<T> | undefined
     }
 export type FieldErrors<T> = IndexMap<FieldError<T>>
 
-export function flattenFieldError<T>(errors: FieldError<T>): T[] {
+export function flattenFieldError<T>(errors: FieldError<T[]>): T[] {
   if (Array.isArray(errors)) {
     return errors
   }
   return Object.values(errors)
-    .filter((e): e is FieldError<T> => e !== undefined)
+    .filter((e): e is FieldError<T[]> => e !== undefined)
     .flatMap(flattenFieldError)
 }
 
@@ -584,7 +586,7 @@ export function mapFieldErrors<T, R>(
         return mappedErrors
       }
       if (Array.isArray(value)) {
-        mappedErrors[key] = value.map(fn)
+        mappedErrors[key] = fn(value)
         return mappedErrors
       }
       mappedErrors[key] = mapFieldErrors(value, fn)
@@ -595,40 +597,22 @@ export function mapFieldErrors<T, R>(
 }
 
 export function runFieldValidations({
-  field,
-  values,
+  field: config,
+  form,
+  value,
   context
 }: {
   field: FieldConfig
-  values: ActionUpdate
+  value: FieldUpdateValue
+  form: ActionUpdate
   context: ValidatorContext
-}): FieldError<{ message: TranslationConfig }> {
-  if (
-    !isFieldVisible(field, values, context) ||
-    isFieldEmptyAndNotRequired(field, values)
-  ) {
+}): FieldError<Array<{ message: TranslationConfig }>> {
+  const field = { config, value }
+  if (!isFieldVisible(field.config, form, context)) {
     return []
   }
-
-  if (field.type === FieldType.FIELD_GROUP) {
-    const subFieldErrors: Record<
-      string,
-      FieldError<{ message: TranslationConfig }>
-    > = field.fields.reduce((acc, subField) => {
-      return {
-        ...acc,
-        [subField.id]: runFieldValidations({
-          field: subField,
-          values,
-          context
-        })
-      }
-    }, {})
-    return subFieldErrors
-  }
-
   const conditionalParameters = {
-    $form: values,
+    $form: form,
     $now: formatISO(new Date(), { representation: 'date' }),
     /**
      * In real use cases, there can be hundreds of thousands of locations.
@@ -642,13 +626,43 @@ export function runFieldValidations({
     $user: context.user
   }
 
+  if (isFieldGroupFieldType(field)) {
+    const subFieldErrors: FieldError<Array<{ message: TranslationConfig }>> =
+      field.config.fields.reduce((acc, subField) => {
+        return {
+          ...acc,
+          [subField.id]: runFieldValidations({
+            field: subField,
+            value: field.value[subField.id],
+            form,
+            context
+          })
+        }
+      }, {})
+
+    if (flattenFieldError(subFieldErrors).length !== 0) {
+      return subFieldErrors
+    }
+
+    // run group validations only when subfields do not contain any errors
+    return runCustomFieldValidations({
+      field: field.config,
+      conditionalParameters
+    })
+  }
+
+  // FIELD_GROUP does not need the "required" property
+  if (isFieldEmptyAndNotRequired(field.config, form)) {
+    return []
+  }
+
   const fieldValidationResult = validateFieldInput({
-    field,
-    value: values[field.id]
+    field: field.config,
+    value
   })
 
   const customValidationResults = runCustomFieldValidations({
-    field,
+    field: field.config,
     conditionalParameters
   })
 

@@ -27,7 +27,7 @@ interface ErrorMessage {
   message: MessageDescriptor
 }
 
-export type IntlErrors = FieldErrors<ErrorMessage>
+export type IntlErrors = FieldErrors<ErrorMessage[]>
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
@@ -43,7 +43,8 @@ export function getValidationErrorsForForm(
       ...errorsForAllFields,
       [field.id]: runFieldValidations({
         field,
-        values,
+        value: values[field.id],
+        form: values,
         context
       })
     }
