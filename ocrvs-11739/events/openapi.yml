@@ -13835,7 +13835,6 @@ components:
                     - createdAt
                     - createdBy
                     - acceptedAt
-                    - createdByRole
                   additionalProperties: false
                 - type: "null"
             REGISTERED:
@@ -13888,7 +13887,6 @@ components:
                     - createdAt
                     - createdBy
                     - acceptedAt
-                    - createdByRole
                     - registrationNumber
                   additionalProperties: false
                 - type: "null"
