@@ -16,7 +16,8 @@ import {
   FieldConfig,
   EventStatus,
   ActionType,
-  ValidatorContext
+  ValidatorContext,
+  omitHiddenPaginatedFields
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -41,10 +42,14 @@ export function useReviewActionConfig({
   validatorContext: ValidatorContext
 }) {
   const events = useEvents()
-
+  const formWithoutHiddenFields = omitHiddenPaginatedFields(
+    formConfig,
+    declaration,
+    validatorContext
+  )
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    form: declaration,
+    form: formWithoutHiddenFields,
     annotation,
     reviewFields,
     context: validatorContext
@@ -60,14 +65,14 @@ export function useReviewActionConfig({
         if (status === EventStatus.Enum.NOTIFIED) {
           return events.customActions.registerOnDeclare.mutate({
             eventId,
-            declaration,
+            declaration: formWithoutHiddenFields,
             transactionId: uuid(),
             annotation
           })
         }
         return events.customActions.registerOnValidate.mutate({
           eventId,
-          declaration,
+          declaration: formWithoutHiddenFields,
           transactionId: uuid(),
           annotation
         })
@@ -87,14 +92,14 @@ export function useReviewActionConfig({
         if (status === EventStatus.Enum.NOTIFIED) {
           return events.customActions.validateOnDeclare.mutate({
             eventId,
-            declaration,
+            declaration: formWithoutHiddenFields,
             annotation,
             transactionId: uuid()
           })
         }
         return events.actions.validate.mutate({
           eventId,
-          declaration,
+          declaration: formWithoutHiddenFields,
           annotation,
           transactionId: uuid()
         })

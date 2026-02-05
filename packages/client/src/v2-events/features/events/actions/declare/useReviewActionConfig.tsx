@@ -15,7 +15,8 @@ import {
   DeclarationFormConfig,
   FieldConfig,
   ActionType,
-  ValidatorContext
+  ValidatorContext,
+  omitHiddenPaginatedFields
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -39,9 +40,14 @@ export function useReviewActionConfig({
 }) {
   const events = useEvents()
   const { isActionAllowed } = useUserAllowedActions(eventType)
+  const formWithoutHiddenFields = omitHiddenPaginatedFields(
+    formConfig,
+    declaration,
+    validatorContext
+  )
   const incomplete = validationErrorsInActionFormExist({
     formConfig,
-    form: declaration,
+    form: formWithoutHiddenFields,
     annotation,
     context: validatorContext,
     reviewFields
@@ -59,7 +65,7 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) => {
         events.actions.notify.mutate({
           eventId,
-          declaration,
+          declaration: formWithoutHiddenFields,
           annotation,
           transactionId: uuid()
         })
@@ -76,7 +82,7 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.customActions.registerOnDeclare.mutate({
           eventId,
-          declaration,
+          declaration: formWithoutHiddenFields,
           transactionId: uuid(),
           annotation
         }),
@@ -94,7 +100,7 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.customActions.validateOnDeclare.mutate({
           eventId,
-          declaration,
+          declaration: formWithoutHiddenFields,
           transactionId: uuid(),
           annotation
         }),
@@ -112,7 +118,7 @@ export function useReviewActionConfig({
       onConfirm: (eventId: string) =>
         events.actions.declare.mutate({
           eventId,
-          declaration,
+          declaration: formWithoutHiddenFields,
           annotation,
           transactionId: uuid()
         }),

@@ -22,7 +22,8 @@ import {
   getActionAnnotation,
   getDeclaration,
   getActionReview,
-  InherentFlags
+  InherentFlags,
+  omitHiddenPaginatedFields
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -150,9 +151,14 @@ export function Review() {
       )
     })
     if (confirmedRegistration) {
+      const formWithoutHiddenFields = omitHiddenPaginatedFields(
+        formConfig,
+        form,
+        validatorContext
+      )
       registerMutation.mutate({
         eventId,
-        declaration: form,
+        declaration: formWithoutHiddenFields,
         transactionId: uuid(),
         annotation
       })

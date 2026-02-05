@@ -65,6 +65,7 @@ export async function registerOnDeclare({
   transactionId,
   annotation
 }: CustomMutationParams) {
+  console.trace('registerOnDeclare')
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
@@ -117,6 +118,7 @@ export async function validateOnDeclare({
   declaration,
   annotation
 }: CustomMutationParams) {
+  console.trace('validateOnDeclare')
   const declaredEvent = await trpcClient.event.actions.declare.request.mutate({
     declaration,
     annotation,
@@ -155,6 +157,7 @@ export async function registerOnValidate({
   declaration,
   annotation
 }: CustomMutationParams) {
+  console.trace('registerOnDeclare')
   const maybeDuplicateEvent =
     await trpcClient.event.actions.validate.request.mutate({
       declaration,

@@ -192,7 +192,7 @@ export function createEventActionMutationFn<
   }
 
   const defaultMutationFn = mutationOptions.mutationFn
-
+  console.trace('createEventActionMutationFn')
   return waitUntilEventIsCreated<inferInput<P>, inferOutput<P>>(
     async ({ eventType, ...params }) => {
       const response = await defaultMutationFn({
