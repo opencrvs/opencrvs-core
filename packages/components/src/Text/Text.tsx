@@ -16,7 +16,7 @@ import styled from 'styled-components'
 import type { Property } from 'csstype'
 
 type Element = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span'
-type Align = 'left' | 'center' | 'right'
+type Align = 'left' | 'center' | 'right' | 'start' | 'end'
 
 export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Typographic variant. Defines how the text looks like */

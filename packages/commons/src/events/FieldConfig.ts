@@ -336,7 +336,7 @@ const HtmlFontVariant = z.enum([
 
 export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
 
-const ParagraphTextAlign = z.enum(['left', 'center', 'right'])
+const ParagraphTextAlign = z.enum(['left', 'center', 'right', 'start', 'end'])
 
 const ParagraphConfiguration = z
   .object({
