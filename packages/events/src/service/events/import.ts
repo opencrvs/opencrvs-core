@@ -20,18 +20,18 @@ function mapEventActions(actions: EventDocument['actions']) {
     actionType: type,
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    annotation: (action as any).annotation ?? null,
-    content: (action as any).content ?? null,
+    annotation: (action as any).annotation ?? undefined,
+    content: (action as any).content ?? undefined,
     declaration: (action as any).declaration ?? undefined,
-    reasonIsDuplicate: (action as any).reason?.isDuplicate ?? null,
-    reasonMessage: (action as any).reason?.message ?? null,
-    registrationNumber: (action as any).registrationNumber ?? null,
-    assignedTo: (action as any).assignedTo ?? null,
-    requestId: (action as any).requestId ?? null,
+    reasonIsDuplicate: (action as any).reason?.isDuplicate ?? undefined,
+    reasonMessage: (action as any).reason?.message ?? undefined,
+    registrationNumber: (action as any).registrationNumber ?? undefined,
+    assignedTo: (action as any).assignedTo ?? undefined,
+    requestId: (action as any).requestId ?? undefined,
     createdAtLocation: action.createdAtLocation ?? null,
     originalActionId: action.originalActionId ?? null,
-    createdBySignature: action.createdBySignature ?? null,
     createdByRole: action.createdByRole ?? null,
+    createdBySignature: action.createdBySignature ?? null,
     customActionType: (action as any).customActionType ?? null
     /* eslint-enable @typescript-eslint/no-explicit-any */
   }))
