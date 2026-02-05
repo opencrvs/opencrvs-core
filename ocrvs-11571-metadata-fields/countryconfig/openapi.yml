@@ -376,7 +376,8 @@ paths:
                                         \
                                         \    in the country-config >
                                         event.advancedSearch configuration. For
-                                        example: field(\"child.dob\", {
+                                        example:
+                                        event.declaration(\"child.dob\", {
                                         searchCriteriaLabelPrefix:
                                         TranslationConfig }).
 
@@ -662,7 +663,8 @@ paths:
                                         \
                                         \    in the country-config >
                                         event.advancedSearch configuration. For
-                                        example: field(\"child.dob\", {
+                                        example:
+                                        event.declaration(\"child.dob\", {
                                         searchCriteriaLabelPrefix:
                                         TranslationConfig }).
 
@@ -1144,7 +1146,7 @@ components:
 
                             \    in the
                             country-config > event.advancedSearch configuration.
-                            For example: field(\"child.dob\", {
+                            For example: event.declaration(\"child.dob\", {
                             searchCriteriaLabelPrefix: TranslationConfig }).
 
                             \    "
@@ -1389,7 +1391,7 @@ components:
 
                             \    in the
                             country-config > event.advancedSearch configuration.
-                            For example: field(\"child.dob\", {
+                            For example: event.declaration(\"child.dob\", {
                             searchCriteriaLabelPrefix: TranslationConfig }).
 
                             \    "

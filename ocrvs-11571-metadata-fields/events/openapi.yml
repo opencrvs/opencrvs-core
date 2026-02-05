@@ -366,7 +366,8 @@ paths:
 
                                         \    in the country-config >
                                         event.advancedSearch configuration. For
-                                        example: field(\"child.dob\", {
+                                        example:
+                                        event.declaration(\"child.dob\", {
                                         searchCriteriaLabelPrefix:
                                         TranslationConfig }).
 
@@ -619,7 +620,8 @@ paths:
 
                                         \    in the country-config >
                                         event.advancedSearch configuration. For
-                                        example: field(\"child.dob\", {
+                                        example:
+                                        event.declaration(\"child.dob\", {
                                         searchCriteriaLabelPrefix:
                                         TranslationConfig }).
 
@@ -755,7 +757,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: e79a5990-1842-4729-9448-6c2e3e2cbb7e
+                transactionId: 7c3c7e2e-c87b-40ea-95ba-4171f98de84b
                 type: birth
       responses:
         "200":
@@ -841,7 +843,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 351660f2-8a4e-4a75-a459-574f87e70716
+                transactionId: 2aac8e57-7a51-4731-9674-11479b1fa49e
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1777,7 +1779,8 @@ components:
                             the desired prefix
 
                             \    in the country-config > event.advancedSearch
-                            configuration. For example: field(\"child.dob\", {
+                            configuration. For example:
+                            event.declaration(\"child.dob\", {
                             searchCriteriaLabelPrefix: TranslationConfig }).
 
                             \    "
@@ -2008,7 +2011,8 @@ components:
                             the desired prefix
 
                             \    in the country-config > event.advancedSearch
-                            configuration. For example: field(\"child.dob\", {
+                            configuration. For example:
+                            event.declaration(\"child.dob\", {
                             searchCriteriaLabelPrefix: TranslationConfig }).
 
                             \    "
