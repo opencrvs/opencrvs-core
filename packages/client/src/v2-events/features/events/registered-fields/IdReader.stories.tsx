@@ -98,7 +98,7 @@ const fieldsWithQrReader = [
   {
     id: 'name',
     type: FieldType.NAME,
-    parent: field('id-reader'),
+    parent: event.declaration('id-reader'),
     label: {
       id: 'events.name.label',
       defaultMessage: 'Fields',
@@ -110,7 +110,7 @@ const fieldsWithQrReader = [
         conditional: never()
       }
     ],
-    value: field('id-reader').get('name')
+    value: event.declaration('id-reader').get('name')
   }
 ]
 
@@ -155,7 +155,7 @@ const fieldsWithQrReaderAndLinkButton = [
   {
     id: 'name',
     type: FieldType.NAME,
-    parent: field('id-reader'),
+    parent: event.declaration('id-reader'),
     label: {
       id: 'events.name.label',
       defaultMessage: 'Fields',
@@ -167,12 +167,12 @@ const fieldsWithQrReaderAndLinkButton = [
         conditional: never()
       }
     ],
-    value: field('id-reader').get('name')
+    value: event.declaration('id-reader').get('name')
   },
   {
     id: 'name',
     type: FieldType.NAME,
-    parent: field('id-reader'),
+    parent: event.declaration('id-reader'),
     label: {
       id: 'events.name.label',
       defaultMessage: 'Fields',
@@ -185,10 +185,13 @@ const fieldsWithQrReaderAndLinkButton = [
       },
       {
         type: ConditionalType.SHOW,
-        conditional: field('id-reader').get('name').isEqualTo('John Doe')
+        conditional: event
+          .declaration('id-reader')
+          .get('name')
+          .isEqualTo('John Doe')
       }
     ],
-    value: field('id-reader').get('name')
+    value: event.declaration('id-reader').get('name')
   }
 ]
 

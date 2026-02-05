@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { field } from '../events/field'
+import { event } from '../events/event'
 
-describe('field() helper', () => {
+describe('event.declaration() helper', () => {
   const fieldId = 'some.field'
 
   it('should return correct config for range()', () => {
-    const result = field(fieldId).range()
+    const result = event.declaration(fieldId).range()
     expect(result).toEqual({
       fieldId: 'some.field',
       config: { type: 'range' },
@@ -24,7 +24,7 @@ describe('field() helper', () => {
   })
 
   it('should return correct config for exact()', () => {
-    const result = field(fieldId).exact()
+    const result = event.declaration(fieldId).exact()
     expect(result).toEqual({
       fieldId: 'some.field',
       config: { type: 'exact' },
@@ -33,7 +33,7 @@ describe('field() helper', () => {
   })
 
   it('should return correct config for fuzzy()', () => {
-    const result = field(fieldId).fuzzy()
+    const result = event.declaration(fieldId).fuzzy()
     expect(result).toEqual({
       fieldId: 'some.field',
       config: { type: 'fuzzy' },
@@ -42,7 +42,7 @@ describe('field() helper', () => {
   })
 
   it('should handle different fieldIds correctly', () => {
-    const result = field('user.age').range()
+    const result = event.declaration('user.age').range()
     expect(result).toEqual({
       fieldId: 'user.age',
       config: { type: 'range' },

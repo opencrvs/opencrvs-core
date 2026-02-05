@@ -22,7 +22,7 @@ import {
 import { ConditionalType } from '../events/Conditional'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
-import { field } from '../events/field'
+import { event } from '../events/event'
 import { AddressType } from '../events/CompositeFieldValue'
 import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
 import { EventStatus } from '../events/EventMetadata'
@@ -650,7 +650,9 @@ export const PRINT_CERTIFICATE_FORM = defineActionForm({
       id: 'collector.identity.verify',
       type: PageTypes.enum.VERIFICATION,
       requireCompletionToContinue: true,
-      conditional: field('collector.requesterId').isEqualTo('INFORMANT'),
+      conditional: event
+        .declaration('collector.requesterId')
+        .isEqualTo('INFORMANT'),
       title: {
         id: 'event.tennis-club-membership.action.print.verifyIdentity',
         defaultMessage: 'Verify their identity',
@@ -731,15 +733,15 @@ export const TENNIS_CLUB_DECLARATION_REVIEW = {
 
 function isInternationalAddress() {
   return and(
-    not(field('country').isUndefined()),
-    field('addressType').isEqualTo(AddressType.INTERNATIONAL)
+    not(event.declaration('country').isUndefined()),
+    event.declaration('addressType').isEqualTo(AddressType.INTERNATIONAL)
   )
 }
 
 function isDomesticAddress() {
   return and(
-    not(field('country').isUndefined()),
-    field('addressType').isEqualTo(AddressType.DOMESTIC)
+    not(event.declaration('country').isUndefined()),
+    event.declaration('addressType').isEqualTo(AddressType.DOMESTIC)
   )
 }
 export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
@@ -777,9 +779,9 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           },
           validation: [
             {
-              validator: field('applicant.name').object({
-                firstname: field('firstname').isValidEnglishName(),
-                surname: field('surname').isValidEnglishName()
+              validator: event.declaration('applicant.name').object({
+                firstname: event.declaration('firstname').isValidEnglishName(),
+                surname: event.declaration('surname').isValidEnglishName()
               }),
               message: {
                 defaultMessage:
@@ -814,13 +816,13 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 description: 'This is the error message for invalid date',
                 id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.error'
               },
-              validator: field('applicant.dob').isBefore().now()
+              validator: event.declaration('applicant.dob').isBefore().now()
             }
           ],
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: field('applicant.dobUnknown').isFalsy()
+              conditional: event.declaration('applicant.dobUnknown').isFalsy()
             }
           ],
           label: {
@@ -858,7 +860,9 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: field('applicant.dobUnknown').isEqualTo(true)
+              conditional: event
+                .declaration('applicant.dobUnknown')
+                .isEqualTo(true)
             }
           ]
         },
@@ -891,8 +895,9 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                 description: 'Error message when generic field is invalid',
                 id: 'error.invalid'
               },
-              validator:
-                field('applicant.address').isValidAdministrativeLeafLevel()
+              validator: event
+                .declaration('applicant.address')
+                .isValidAdministrativeLeafLevel()
             }
           ],
           configuration: {
@@ -900,7 +905,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               {
                 id: 'town',
                 required: false,
-                parent: field('country'),
+                parent: event.declaration('country'),
                 label: {
                   id: 'field.address.town.label',
                   defaultMessage: 'Town',
@@ -911,7 +916,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                     type: ConditionalType.SHOW,
                     conditional: and(
                       isDomesticAddress(),
-                      not(field('district').isUndefined())
+                      not(event.declaration('district').isUndefined())
                     )
                   }
                 ],
@@ -920,7 +925,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               {
                 id: 'residentialArea',
                 required: false,
-                parent: field('country'),
+                parent: event.declaration('country'),
                 label: {
                   id: 'field.address.residentialArea.label',
                   defaultMessage: 'Residential Area',
@@ -931,7 +936,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                     type: ConditionalType.SHOW,
                     conditional: and(
                       isDomesticAddress(),
-                      not(field('district').isUndefined())
+                      not(event.declaration('district').isUndefined())
                     )
                   }
                 ],
@@ -940,7 +945,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               {
                 id: 'street',
                 required: false,
-                parent: field('country'),
+                parent: event.declaration('country'),
                 label: {
                   id: 'field.address.street.label',
                   defaultMessage: 'Street',
@@ -951,7 +956,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                     type: ConditionalType.SHOW,
                     conditional: and(
                       isDomesticAddress(),
-                      not(field('district').isUndefined())
+                      not(event.declaration('district').isUndefined())
                     )
                   }
                 ],
@@ -960,7 +965,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               {
                 id: 'number',
                 required: false,
-                parent: field('country'),
+                parent: event.declaration('country'),
                 label: {
                   id: 'field.address.number.label',
                   defaultMessage: 'Number',
@@ -971,7 +976,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                     type: ConditionalType.SHOW,
                     conditional: and(
                       isDomesticAddress(),
-                      not(field('district').isUndefined())
+                      not(event.declaration('district').isUndefined())
                     )
                   }
                 ],
@@ -980,7 +985,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               {
                 id: 'zipCode',
                 required: false,
-                parent: field('country'),
+                parent: event.declaration('country'),
                 label: {
                   id: 'field.address.postcodeOrZip.label',
                   defaultMessage: 'Postcode / Zip',
@@ -991,7 +996,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                     type: ConditionalType.SHOW,
                     conditional: and(
                       isDomesticAddress(),
-                      not(field('district').isUndefined())
+                      not(event.declaration('district').isUndefined())
                     )
                   }
                 ],
@@ -1005,7 +1010,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
                     conditional: isInternationalAddress()
                   }
                 ],
-                parent: field('country'),
+                parent: event.declaration('country'),
                 required: true,
                 label: {
                   id: 'field.address.state.label',
@@ -1016,7 +1021,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               },
               {
                 id: 'district2',
-                parent: field('country'),
+                parent: event.declaration('country'),
                 conditionals: [
                   {
                     type: ConditionalType.SHOW,
@@ -1033,7 +1038,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               },
               {
                 id: 'cityOrTown',
-                parent: field('country'),
+                parent: event.declaration('country'),
                 conditionals: [
                   {
                     type: ConditionalType.SHOW,
@@ -1050,7 +1055,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               },
               {
                 id: 'addressLine1',
-                parent: field('country'),
+                parent: event.declaration('country'),
                 conditionals: [
                   {
                     type: ConditionalType.SHOW,
@@ -1067,7 +1072,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               },
               {
                 id: 'addressLine2',
-                parent: field('country'),
+                parent: event.declaration('country'),
                 conditionals: [
                   {
                     type: ConditionalType.SHOW,
@@ -1084,7 +1089,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               },
               {
                 id: 'addressLine3',
-                parent: field('country'),
+                parent: event.declaration('country'),
                 conditionals: [
                   {
                     type: ConditionalType.SHOW,
@@ -1101,7 +1106,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
               },
               {
                 id: 'postcodeOrZip',
-                parent: field('country'),
+                parent: event.declaration('country'),
                 conditionals: [
                   {
                     type: ConditionalType.SHOW,
@@ -1141,7 +1146,10 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
     },
     {
       id: 'senior-pass',
-      conditional: field('applicant.dob').isBefore().date('1950-01-01'),
+      conditional: event
+        .declaration('applicant.dob')
+        .isBefore()
+        .date('1950-01-01'),
       title: {
         id: 'event.tennis-club-membership.action.declare.form.section.senior-pass.title',
         defaultMessage: 'Assign senior pass for applicant',
@@ -1162,7 +1170,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           id: 'senior-pass.recommender',
           type: 'CHECKBOX',
           required: true,
-          parent: field('recommender.none'),
+          parent: event.declaration('recommender.none'),
           defaultValue: false,
           conditionals: [],
           label: {
@@ -1200,7 +1208,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: field('recommender.none').isFalsy()
+              conditional: event.declaration('recommender.none').isFalsy()
             }
           ],
           label: {
@@ -1216,7 +1224,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: field('recommender.none').isFalsy()
+              conditional: event.declaration('recommender.none').isFalsy()
             }
           ],
           label: {

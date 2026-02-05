@@ -201,7 +201,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.QUERY_PARAM_READER:
     case FieldType.LOADER:
       /**
-       * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
+       * HTTP values are redirected to other fields via `value: event.declaration('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
        * The field still lands in `_source`.
        */
       return {

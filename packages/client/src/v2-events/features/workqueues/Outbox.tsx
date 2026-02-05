@@ -34,11 +34,11 @@ export function Outbox() {
         defaultMessage: 'Date of Event',
         description: 'Label for workqueue column: dateOfEvent'
       },
-      value: event.field('dateOfEvent')
+      value: event.event.declaration('dateOfEvent')
     },
     {
       label: emptyMessage,
-      value: event.field('outbox')
+      value: event.event.declaration('outbox')
     }
   ])
 

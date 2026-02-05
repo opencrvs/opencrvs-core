@@ -33,8 +33,8 @@ import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 
 const informantOtherThanMother = and(
-  not(field('informant.relation').inArray(['MOTHER'])),
-  not(field('informant.relation').isFalsy())
+  not(event.declaration('informant.relation').inArray(['MOTHER'])),
+  not(event.declaration('informant.relation').isFalsy())
 )
 
 const informant = defineFormPage({
@@ -74,7 +74,7 @@ const informant = defineFormPage({
           conditional: informantOtherThanMother
         }
       ],
-      parent: field('informant.relation')
+      parent: event.declaration('informant.relation')
     },
     {
       id: 'informant.dob',
@@ -83,13 +83,16 @@ const informant = defineFormPage({
       validation: [
         {
           message: generateTranslationConfig('Must be a valid Birthdate'),
-          validator: field('informant.dob').isBefore().now()
+          validator: event.declaration('informant.dob').isBefore().now()
         },
         {
           message: generateTranslationConfig(
             "Birth date must be before child's birth date"
           ),
-          validator: field('informant.dob').isBefore().date(field('child.dob'))
+          validator: event
+            .declaration('informant.dob')
+            .isBefore()
+            .date(event.declaration('child.dob'))
         }
       ],
       label: generateTranslationConfig('Date of birth'),
@@ -97,12 +100,12 @@ const informant = defineFormPage({
         {
           type: ConditionalType.SHOW,
           conditional: and(
-            not(field('informant.dobUnknown').isEqualTo(true)),
+            not(event.declaration('informant.dobUnknown').isEqualTo(true)),
             informantOtherThanMother
           )
         }
       ],
-      parent: field('informant.relation')
+      parent: event.declaration('informant.relation')
     },
     {
       id: 'informant.dobUnknown',
@@ -118,7 +121,7 @@ const informant = defineFormPage({
           conditional: never()
         }
       ],
-      parent: field('informant.relation')
+      parent: event.declaration('informant.relation')
     },
     {
       id: 'informant.age',
@@ -132,12 +135,12 @@ const informant = defineFormPage({
         {
           type: ConditionalType.SHOW,
           conditional: and(
-            field('informant.dobUnknown').isEqualTo(true),
+            event.declaration('informant.dobUnknown').isEqualTo(true),
             informantOtherThanMother
           )
         }
       ],
-      parent: field('informant.relation')
+      parent: event.declaration('informant.relation')
     }
   ]
 })
