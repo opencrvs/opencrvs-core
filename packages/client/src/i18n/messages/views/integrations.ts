@@ -192,11 +192,6 @@ const messagesToDefine = {
     defaultMessage: 'Informant Details (No PII)',
     description: 'Label for informant details no PII'
   },
-  healthSystem: {
-    id: 'integrations.type.healthSystem',
-    defaultMessage: 'Health integration',
-    description: 'Label for health system type'
-  },
   healthnotificationAlertDescription: {
     id: 'integrations.eventNotificationDescription',
     defaultMessage:
