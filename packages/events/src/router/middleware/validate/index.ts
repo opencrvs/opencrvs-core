@@ -57,6 +57,7 @@ import {
   getVerificationPageErrors,
   throwWhenNotEmpty
 } from './utils'
+import { isNull } from 'lodash'
 
 export function getFieldErrors(
   fields: FieldConfig[],
@@ -80,13 +81,14 @@ export function getFieldErrors(
     )
     .map((field) => field.id)
 
-  // Add errors if there are any hidden fields sent in the payloa
+  // Add errors if there are any hidden fields with non null values sent in the payload
+  // (null values are ignored as they nullify the hidden fields)
   const hiddenFieldErrors = hiddenFieldIds.flatMap((fieldId) => {
-    if (data[fieldId as keyof typeof data]) {
+    if (!isNull(data[fieldId]) && data[fieldId]) {
       return {
         message: errorMessages.hiddenField.defaultMessage,
         id: fieldId,
-        value: data[fieldId as keyof typeof data]
+        value: data[fieldId]
       }
     }
 

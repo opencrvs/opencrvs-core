@@ -76,53 +76,6 @@ function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
   }
 }
 
-// Merge actionUpdate with the existing declaration to avoid losing dependent fields.
-// For example: if the correction payload contains only `informant.name`, but not `informant.relation`,
-// running omitHiddenPaginatedFields on the payload alone would remove `informant.name` (since its parent `informant.relation` is missing).
-// By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
-function getCleanedDeclarationDiff({
-  eventConfiguration,
-  originalDeclaration,
-  declarationDiff,
-  validatorContext
-}: {
-  eventConfiguration: EventConfig
-  originalDeclaration?: EventState
-  declarationDiff?: EventState
-  validatorContext: ValidatorContext
-}): ActionUpdate | undefined {
-  if (isEmpty(declarationDiff)) {
-    return declarationDiff
-  }
-
-  // If there's no original declaration, just clean the update and return it
-  if (isEmpty(originalDeclaration)) {
-    return omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
-      declarationDiff,
-      validatorContext
-    )
-  }
-
-  // Merge original + updates so we get the final event state
-  // (Needed because omitHiddenPaginatedFields func requires a full snapshot, not partial)
-  const merged = deepMerge(originalDeclaration, declarationDiff)
-
-  // Remove any hidden/paginated fields from the merged declaration
-  // (Ensures we only consider fields relevant to the event configuration)
-  const cleanedDeclaration = omitHiddenPaginatedFields(
-    eventConfiguration.declaration,
-    merged,
-    validatorContext
-  )
-
-  // From the update, keep only fields that are valid in the cleaned declaration
-  // (Prevents applying updates to hidden/invalid fields)
-  return Object.fromEntries(
-    Object.entries(declarationDiff).filter(([key]) => key in cleanedDeclaration)
-  )
-}
-
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.declare.request
@@ -451,15 +404,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
     return {
       ...params,
-      declaration: getCleanedDeclarationDiff({
-        eventConfiguration,
-        originalDeclaration,
-        declarationDiff: params.declaration,
-        validatorContext: {
-          ...validatorContext,
-          event: findLocalEventDocument(eventId)
-        }
-      }),
+      declaration: params.declaration,
       annotation
     }
   }
@@ -512,12 +457,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
       return mutation.mutate({
         ...params,
         eventConfiguration,
-        declaration: getCleanedDeclarationDiff({
-          eventConfiguration,
-          originalDeclaration,
-          declarationDiff: params.declaration,
-          validatorContext: { ...validatorContext, event: localEvent }
-        })
+        declaration: params.declaration
       })
     }
   }

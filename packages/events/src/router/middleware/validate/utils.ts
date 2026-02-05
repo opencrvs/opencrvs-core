@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import _ from 'lodash'
+import _, { isNull } from 'lodash'
 import {
   ActionUpdate,
   errorMessages,
@@ -90,13 +90,16 @@ export function getInvalidUpdateKeys<T>({
   const updateEntries = flattenEntries(update)
   const cleanedKeys = flattenEntries(cleaned).map(([key]) => key)
 
-  return updateEntries
-    .filter(([key]) => !cleanedKeys.includes(key))
-    .map(([key, value]) => ({
-      message: errorMessages.hiddenField.defaultMessage,
-      id: key,
-      value
-    }))
+  return (
+    updateEntries
+      // Hidden fields with non-null values are invalid (null values are ignored as they nullify the hidden fields)
+      .filter(([key, value]) => !cleanedKeys.includes(key) && !isNull(value))
+      .map(([key, value]) => ({
+        message: errorMessages.hiddenField.defaultMessage,
+        id: key,
+        value
+      }))
+  )
 }
 
 export async function getValidatorContext(

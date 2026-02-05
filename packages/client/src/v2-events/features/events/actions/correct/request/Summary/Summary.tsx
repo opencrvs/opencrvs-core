@@ -128,7 +128,8 @@ export function Summary() {
         validatorContext
       )
       const isHidden = !isFieldVisible(field, form, validatorContext)
-      return wasVisible && isHidden
+      // make sure uncorrectable fields are not included in the payload even if they get hidden
+      return wasVisible && isHidden && !field.uncorrectable
     })
 
     const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
