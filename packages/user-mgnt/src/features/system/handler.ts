@@ -11,7 +11,7 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
+import { QA_ENV } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
@@ -61,27 +61,13 @@ export async function registerSystem(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRegisterSystemPayload
-  const { name, type, integratingSystemType, scope } = payload
-  let { settings } = payload
+  const { settings, name, type, integratingSystemType, scope } = payload
 
   try {
     // Validate that scopes are provided
     if (!scope || scope.length === 0) {
       logger.error('Scopes are required for system registration')
       return h.response('Scopes are required').code(400)
-    }
-
-    // Set default settings based on type if not provided
-    if (type === 'RECORD_SEARCH' && !settings) {
-      settings = {
-        dailyQuota: RECORD_SEARCH_QUOTA
-      }
-    }
-
-    if (type === 'IMPORT_EXPORT' && !settings) {
-      settings = {
-        dailyQuota: 1000000
-      }
     }
 
     const authorization = request.headers.authorization as string

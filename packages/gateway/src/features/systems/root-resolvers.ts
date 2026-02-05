@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
+import { GQLResolver, GQLSystemType } from '@gateway/graphql/schema'
 import fetch from '@gateway/fetch'
-import { USER_MANAGEMENT_URL, WEBHOOKS_URL } from '@gateway/constants'
+import { RECORD_SEARCH_QUOTA, USER_MANAGEMENT_URL, WEBHOOKS_URL } from '@gateway/constants'
 import { getSystem, hasScope } from '@gateway/features/user/utils'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import {
@@ -68,7 +68,8 @@ export const resolvers: GQLResolver = {
         return Promise.reject(new Error('User is not allowed to create client'))
       }
 
-      const { type, name, integratingSystemType, settings } = system!
+      const { type, name, integratingSystemType } = system!
+      let { settings } = system!
 
       // Validate the type
       if (!isValidSystemIntegrationType(type)) {
@@ -79,6 +80,20 @@ export const resolvers: GQLResolver = {
       const eventConfigurations =
         await getInMemoryEventConfigurations(authHeader)
       const eventIds = eventConfigurations.map((config) => config.id)
+
+      // Set default settings based on type if not provided
+      if (type === GQLSystemType.RECORD_SEARCH && !settings) {
+        settings = {
+          dailyQuota: RECORD_SEARCH_QUOTA
+        }
+      }
+
+      if (type === GQLSystemType.IMPORT_EXPORT && !settings) {
+        settings = {
+          dailyQuota: 1000000
+        }
+      }
+
 
       // Convert type to scopes
       const scope = getSystemScopesFromType(type, eventIds)
