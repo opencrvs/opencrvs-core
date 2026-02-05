@@ -37,7 +37,8 @@ import {
   isPageVisible,
   runFieldValidations,
   FieldTypesToHideInReview,
-  ValidatorContext
+  ValidatorContext,
+  flattenErrors
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -326,11 +327,14 @@ function FormReview({
                 />
               )
 
-              const errors = runFieldValidations({
-                field,
-                values: form,
-                context: validatorContext
-              })
+              const errors = flattenErrors(
+                runFieldValidations({
+                  field,
+                  value: form[field.id],
+                  form,
+                  context: validatorContext
+                })
+              )
 
               const errorDisplay =
                 errors.length > 0 ? (

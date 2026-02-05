@@ -19,7 +19,7 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
-import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
+import { mapFieldTypeToZod, isNameFieldType } from '../events/FieldTypeMapping'
 import {
   DateValue,
   FieldUpdateValue,
@@ -32,7 +32,6 @@ import { UUID } from '../uuid'
 import { ageToDate, IndexMap } from '../events/utils'
 import { ActionType } from '../events/ActionType'
 import { EventDocument } from '../events/EventDocument'
-import { FieldType } from '../events/FieldType'
 
 const ajv = new Ajv({
   $data: true,
@@ -559,18 +558,18 @@ export function runStructuralValidations({
 }
 
 type FieldError<T> =
-  | T[]
+  | T
   | {
       [id: string]: FieldError<T> | undefined
     }
 export type FormErrors<T> = IndexMap<FieldError<T>>
 
-export function flattenErrors<T>(errors: FieldError<T>): T[] {
+export function flattenErrors<T>(errors: FieldError<T[]>): T[] {
   if (Array.isArray(errors)) {
     return errors
   }
   return Object.values(errors)
-    .filter((e): e is FieldError<T> => e !== undefined)
+    .filter((e): e is FieldError<T[]> => e !== undefined)
     .flatMap(flattenErrors)
 }
 
@@ -584,7 +583,7 @@ export function mapErrors<T, R>(
         return mappedErrors
       }
       if (Array.isArray(value)) {
-        mappedErrors[key] = value.map(fn)
+        mappedErrors[key] = fn(value)
         return mappedErrors
       }
       mappedErrors[key] = mapErrors(value, fn)
@@ -595,39 +594,64 @@ export function mapErrors<T, R>(
 }
 
 export function runFieldValidations({
-  field,
-  values,
+  field: config,
+  form,
+  value,
   context
 }: {
   field: FieldConfig
-  values: ActionUpdate
+  value: FieldUpdateValue
+  form: ActionUpdate
   context: ValidatorContext
-}): FieldError<{ message: TranslationConfig }> {
-  if (field.type === FieldType.NAME) {
-    const subFieldErrors: Record<
-      string,
-      FieldError<{ message: TranslationConfig }>
-    > = (field.fields ?? []).reduce((acc, subField) => {
+}): FieldError<Array<{ message: TranslationConfig }>> {
+  const field = { config, value }
+  if (isNameFieldType(field)) {
+    const subFieldErrors: FieldError<Array<{ message: TranslationConfig }>> = (
+      field.config.fields ?? []
+    ).reduce((acc, subField) => {
       return {
         ...acc,
         [subField.id]: runFieldValidations({
           field: subField,
-          values,
+          value: field.value[subField.id],
+          form,
           context
         })
       }
     }, {})
-    return subFieldErrors
+    if (flattenErrors(subFieldErrors).length !== 0) {
+      return subFieldErrors
+    }
+    const conditionalParameters = {
+      $form: form,
+      $now: formatISO(new Date(), { representation: 'date' }),
+      /**
+       * In real use cases, there can be hundreds of thousands of locations.
+       * Make sure that the context contains only the locations that are needed for validation.
+       * E.g. if the user is a leaf admin, only the leaf locations under their admin structure are needed.
+       *
+       * Loading few megabytes of locations to memory just for validation is not efficient and will choke the application.
+       */
+      $leafAdminStructureLocationIds:
+        context.leafAdminStructureLocationIds ?? [],
+      $online: isOnline(),
+      $user: context.user
+    }
+
+    return runCustomFieldValidations({
+      field: field.config,
+      conditionalParameters
+    })
   }
   if (
-    !isFieldVisible(field, values, context) ||
-    isFieldEmptyAndNotRequired(field, values)
+    !isFieldVisible(field.config, form, context) ||
+    isFieldEmptyAndNotRequired(field.config, form)
   ) {
     return []
   }
 
   const conditionalParameters = {
-    $form: values,
+    $form: form,
     $now: formatISO(new Date(), { representation: 'date' }),
     /**
      * In real use cases, there can be hundreds of thousands of locations.
@@ -642,12 +666,12 @@ export function runFieldValidations({
   }
 
   const fieldValidationResult = validateFieldInput({
-    field,
-    value: values[field.id]
+    field: field.config,
+    value
   })
 
   const customValidationResults = runCustomFieldValidations({
-    field,
+    field: field.config,
     conditionalParameters
   })
 

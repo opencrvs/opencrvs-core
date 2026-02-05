@@ -21,6 +21,7 @@ import {
   getValidatorsForField,
   joinValues,
   NameField,
+  NameFieldUpdateValue,
   NameFieldValue,
   not,
   TextField,
@@ -134,6 +135,8 @@ function NameInput(props: NameInputProps) {
     configuration,
     validatorContext
   } = props
+
+  const [, nameMeta] = useField<NameFieldUpdateValue>(name ?? '')
 
   const [firstnameInput, firstnameMeta, firstnameHelper] = useField<string>(
     `${name}.firstname`
@@ -249,7 +252,13 @@ function NameInput(props: NameInputProps) {
   })
 
   return (
-    <>
+    <InputField
+      error={typeof nameMeta.error === 'string' ? nameMeta.error : undefined}
+      id={name as string}
+      touched={
+        firstnameMeta.touched || middlenameMeta.touched || surnameMeta.touched
+      }
+    >
       <InputFieldWithBottomMargin
         error={firstnameMeta.error}
         id={`${name}.firstname`}
@@ -295,7 +304,7 @@ function NameInput(props: NameInputProps) {
           onChange={(val) => onChange({ ...value, surname: val ?? '' })}
         />
       </InputFieldWithBottomMargin>
-    </>
+    </InputField>
   )
 }
 

@@ -220,18 +220,15 @@ export const GeneratedInputField = React.memo(
       )
 
       return (
-        // We are showing errors to underlying text input, so we need to ignore them here
-        <InputField {...omit(field.inputFieldProps, 'error')}>
-          <Name.Input
-            configuration={field.config.configuration}
-            disabled={disabled}
-            name={fieldDefinition.id}
-            validation={validation}
-            validatorContext={validatorContext}
-            value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
-          />
-        </InputField>
+        <Name.Input
+          configuration={field.config.configuration}
+          disabled={disabled}
+          name={fieldDefinition.id}
+          validation={validation}
+          validatorContext={validatorContext}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
       )
     }
 

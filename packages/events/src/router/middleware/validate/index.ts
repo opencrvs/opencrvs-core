@@ -99,7 +99,8 @@ export function getFieldErrors(
     const fieldErrors = flattenErrors(
       runFieldValidations({
         field,
-        values: data,
+        value: data[field.id],
+        form: data,
         context
       })
     )

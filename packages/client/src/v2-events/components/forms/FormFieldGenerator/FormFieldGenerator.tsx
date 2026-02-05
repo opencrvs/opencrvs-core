@@ -15,6 +15,7 @@ import { Formik, FormikTouched } from 'formik'
 import { isEqual, noop } from 'lodash'
 import { useIntl } from 'react-intl'
 import {
+  deepMerge,
   EventConfig,
   EventState,
   FieldConfig,
@@ -94,12 +95,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               {}
             )
           : touched
-
-        setAllTouchedFields({
-          ...touchedFields,
-          ...newlyTouchedFields
-        })
       }
+      setAllTouchedFields(deepMerge(touchedFields, touched))
     }
 
     const formikOnChange = (values: EventState) =>
@@ -124,7 +121,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
                 makeFormikFieldIdsOpenCRVSCompatible(values),
                 validatorContext
               ),
-              ({ message }) => intl.formatMessage(message)
+              (errs) => errs[0]?.message && intl.formatMessage(errs[0].message)
             )
           )
         }

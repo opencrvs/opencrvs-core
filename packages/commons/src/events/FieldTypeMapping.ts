@@ -360,7 +360,7 @@ export const isNumberWithUnitFieldType = (field: {
 
 export const isNameFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
 }): field is { value: NameFieldValue; config: NameField } => {
   return field.config.type === FieldType.NAME
 }
