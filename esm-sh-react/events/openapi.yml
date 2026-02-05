@@ -5731,6 +5731,15 @@ components:
                     hint:
                       description: When true, paragraph is styled as a hint with grey color
                       type: boolean
+                    textAlign:
+                      description: Text alignment for the paragraph
+                      type: string
+                      enum:
+                        - left
+                        - center
+                        - right
+                        - start
+                        - end
                   additionalProperties: false
               additionalProperties: false
           required:
