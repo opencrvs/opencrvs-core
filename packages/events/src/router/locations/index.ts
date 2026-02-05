@@ -21,6 +21,16 @@ import { requiresAnyOfScopes } from '../middleware'
 
 export const locationRouter = router({
   list: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'List locations',
+        description: 'Retrieve a list of locations based on provided filters.',
+        method: 'GET',
+        path: '/locations',
+        tags: ['locations'],
+        protect: true
+      }
+    })
     .input(
       z
         .object({

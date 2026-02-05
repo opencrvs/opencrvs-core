@@ -27,6 +27,9 @@ import {
   fieldConfigsToActionPayload,
   tennisClubMembershipEvent
 } from '../client'
+import { generateActionDocument } from './test.utils'
+
+/* eslint-disable max-lines */
 
 const commonAction = {
   status: 'Requested' as const,
@@ -523,6 +526,48 @@ describe('getPendingAction', () => {
     ).toThrowError(
       'Expected exactly one pending action, but found action-id-4, action-id-5'
     )
+  })
+
+  it('handles the history having rejected action', () => {
+    const actionSequence = [
+      {
+        type: ActionType.CREATE,
+        status: 'Accepted' as const
+      },
+      {
+        id: 'action-id-2' as UUID,
+        type: ActionType.DECLARE,
+        status: 'Requested' as const
+      },
+      {
+        type: ActionType.DECLARE,
+        status: 'Accepted' as const,
+        originalActionId: 'action-id-2' as UUID
+      },
+      {
+        id: 'action-id-5' as UUID,
+        type: ActionType.REGISTER,
+        status: 'Requested' as const
+      },
+      {
+        type: ActionType.REGISTER,
+        status: 'Rejected' as const,
+        originalActionId: 'action-id-5' as UUID
+      },
+      {
+        type: ActionType.REJECT,
+        status: 'Requested' as const,
+        content: { reason: 'Please reconsider' }
+      }
+    ].map(({ type, ...defaults }) =>
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: type,
+        defaults
+      })
+    )
+    const lastAction = actionSequence[actionSequence.length - 1]
+    expect(getPendingAction(actionSequence)).toMatchObject(lastAction)
   })
 })
 

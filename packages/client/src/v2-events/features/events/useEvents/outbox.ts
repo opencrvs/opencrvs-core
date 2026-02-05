@@ -16,9 +16,9 @@ import { TRPCClientError } from '@trpc/client'
 import {
   applyDeclarationToEventIndex,
   EventIndex,
-  getCurrentEventState
+  getCurrentEventState,
+  EventState
 } from '@opencrvs/commons/client'
-import { EventState } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { useEventConfigurations } from '../useEventConfiguration'
 
@@ -73,8 +73,9 @@ export function useOutbox() {
         }
 
         const { eventId, declaration } = parsedVariables.data
-
-        const event = queryClient.getQueryData(trpc.event.get.queryKey(eventId))
+        const event = queryClient.getQueryData(
+          trpc.event.get.queryKey({ eventId })
+        )
 
         if (!event) {
           return null

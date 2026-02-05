@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/client",
-  "version": "1.9.6",
+  "version": "1.9.7",
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
@@ -16,7 +16,7 @@
     "lint": "yarn lint:css && yarn lint:ts",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "lint:ts": "NODE_OPTIONS=--max_old_space_size=8000 CI=true eslint -c eslint.config.js --max-warnings=0",
-    "test:compilation": "NODE_OPTIONS=\"--max-old-space-size=8192\" tsc --noEmit",
+    "test:compilation": "NODE_OPTIONS=\"--max-old-space-size=8192\" tsc --project tsconfig.build.json --noEmit",
     "extract:translations": "bash extract-translations.sh",
     "generate-gateway-types": "NODE_OPTIONS=--dns-result-order=ipv4first graphql-codegen --config codegen.ts && prettier --write src/utils/gateway.ts",
     "build:clean": "rm -rf build",

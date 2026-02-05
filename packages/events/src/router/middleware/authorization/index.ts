@@ -40,7 +40,7 @@ import {
   ResolvedRecordScopeV2
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
-import { TrpcContext, UserContext } from '@events/context'
+import { SystemContext, TrpcContext, UserContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
@@ -339,18 +339,28 @@ export const userCanReadEventV2: MiddlewareFunction<
   OpenApiMeta,
   TrpcContext,
   TrpcContext & { eventId: UUID; eventType: string },
-  UUID
+  EventIdParam
 > = async ({ next, ctx, input }) => {
-  const humanUser = UserContext.safeParse(ctx.user)
-
-  if (!humanUser.success) {
-    throw new EventNotFoundError(input)
-  }
-
   const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
   const acceptedScopes = getAcceptedScopesFromToken(ctx.token, ['record.read'])
-  const event = await getEventById(input)
+  const event = await getEventById(input.eventId)
+  const system = SystemContext.safeParse(ctx.user)
+  const humanUser = UserContext.safeParse(ctx.user)
+  const isSystemUser = system.success
+
+  if (isSystemUser) {
+    if (!inScope(ctx.token, [SCOPES.RECORD_READ])) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+    return next({
+      ctx: {
+        ...ctx,
+        eventId: input.eventId,
+        eventType: event.type
+      }
+    })
+  }
 
   // 1. If no accepted scopes are found, fall back to V1 style check based on CREATE action.
   // This will be removed once we have migrated countryconfigs to use V2 scopes only.
@@ -381,13 +391,13 @@ export const userCanReadEventV2: MiddlewareFunction<
       return next({
         ctx: {
           ...ctx,
-          eventId: input,
+          eventId: input.eventId,
           eventType: event.type
         }
       })
     }
 
-    throw new EventNotFoundError(input)
+    throw new EventNotFoundError(input.eventId)
   }
 
   const eventConfig = eventConfigs.find((c) => c.id === event.type)
@@ -402,6 +412,9 @@ export const userCanReadEventV2: MiddlewareFunction<
   const eventIndexWithLocationHierarchy =
     await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
 
+  if (!humanUser.success) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
   const hasAccess = canAccessEventWithScopes(
     eventIndexWithLocationHierarchy,
     acceptedScopes as ResolvedRecordScopeV2[],
@@ -409,13 +422,12 @@ export const userCanReadEventV2: MiddlewareFunction<
   )
 
   if (!hasAccess) {
-    throw new EventNotFoundError(input)
+    throw new EventNotFoundError(input.eventId)
   }
-
   return next({
     ctx: {
       ...ctx,
-      eventId: input,
+      eventId: input.eventId,
       eventType: event.type
     }
   })

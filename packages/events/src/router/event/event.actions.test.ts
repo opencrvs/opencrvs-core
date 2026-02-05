@@ -93,7 +93,7 @@ describe('Adding actions', () => {
     )
     await client.event.actions.register.request(generatedRegistration)
 
-    const updatedEvent = await client.event.get(originalEvent.id)
+    const updatedEvent = await client.event.get({eventId: originalEvent.id})
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -172,7 +172,7 @@ describe('Action drafts', () => {
 
     const draftEvents = await client.event.draft.list()
 
-    const event = await client.event.get(originalEvent.id)
+    const event = await client.event.get({eventId: originalEvent.id})
     // this triggers READ action
     expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
 
@@ -342,7 +342,7 @@ describe('Action updates', () => {
       transactionId: getUUID()
     })
 
-    const event = await client.event.get(originalEvent.id)
+    const event = await client.event.get({eventId: originalEvent.id})
     const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(eventState.declaration).toMatchSnapshot()
   })
@@ -586,7 +586,7 @@ test('PRINT_CERTIFICATE action can include a valid content.templateId property i
   )
   expect(result).toBeDefined()
 
-  const updatedEvent = await client.event.get(originalEvent.id)
+  const updatedEvent = await client.event.get({eventId: originalEvent.id})
   const printAction = updatedEvent.actions.find(
     (action) => action.type === ActionType.PRINT_CERTIFICATE
   ) as PrintCertificateAction
