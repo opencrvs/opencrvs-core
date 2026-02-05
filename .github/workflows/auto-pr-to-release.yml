@@ -35,7 +35,7 @@ jobs:
       matrix: ${{ steps.resolve-applicable-versions.outputs.matrix }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -118,7 +118,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get PR details from workflow dispatch
         if: ${{ github.event_name == 'workflow_dispatch' }}
