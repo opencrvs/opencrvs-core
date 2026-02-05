@@ -130,8 +130,6 @@ export async function getUserOrSystem(
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
-    console.log(e);
-
     logger.info(
       `No system found for id: ${id}. User/system has probably been removed. Will return undefined.`
     )

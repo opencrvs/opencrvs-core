@@ -36,7 +36,8 @@ import {
   hasAnyOfScopes,
   AnyScope,
   getCurrentEventState,
-  ResolvedRecordScopeV2
+  ResolvedRecordScopeV2,
+  canUserReadEvent
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext, UserContext } from '@events/context'

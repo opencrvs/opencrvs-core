@@ -50,6 +50,7 @@ export const ActionCreationMetadata = z.object({
     .describe('Timestamp when the action request was accepted.'),
   createdByRole: z
     .string()
+    .nullable()
     .describe('Role of the user at the time of action request creation.'),
   createdBySignature: z
     .string()
