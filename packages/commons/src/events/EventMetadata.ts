@@ -51,6 +51,7 @@ export const ActionCreationMetadata = z.object({
   createdByRole: z
     .string()
     .nullable()
+    .optional()
     .describe('Role of the user at the time of action request creation.'),
   createdBySignature: z
     .string()

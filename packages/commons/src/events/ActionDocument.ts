@@ -59,6 +59,7 @@ export const ActionBase = z.object({
   createdByRole: z
     .string()
     .nullish()
+    .optional()
     .describe('Role of the user who created the action.'),
   createdBySignature: z
     .string()
