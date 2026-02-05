@@ -151,6 +151,7 @@ const v1ToV2ConfigScopeTypeMap: Record<LegacyScopeType, string> = {
   workqueue: 'workqueue',
   'user.create': 'user.create',
   'user.edit': 'user.edit',
+  'dashboard.view': 'dashboard.view',
   'record.create': 'record.create',
   'record.read': 'record.read',
   'record.declare': 'record.declare',

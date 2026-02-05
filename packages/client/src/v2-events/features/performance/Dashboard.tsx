@@ -24,6 +24,7 @@ import {
   useNavigationHistory
 } from '@client/v2-events/components/NavigationStack'
 import { getToken } from '@client/utils/authUtils'
+import { useDashboardIds } from '@client/hooks/useDashboardIds'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -32,9 +33,9 @@ const StyledIFrame = styled(IframeResizer)`
 `
 interface IdashboardView {
   dashboard: {
-    origin: string
+    id: string
     context?: {
-      auth: 'postMessage'
+      auth: 'REQUEST_AUTH_TOKEN'
     }
     title: {
       id: string
@@ -46,6 +47,15 @@ interface IdashboardView {
   icon?: JSX.Element
 }
 
+function isValidAbsoluteURL(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.origin !== 'null'
+  } catch {
+    return false
+  }
+}
+
 function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
   const intl = useIntl()
   const title = intl.formatMessage(dashboard.title)
@@ -53,6 +63,7 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
 
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const allowedDashboardIds = useDashboardIds()
   const { eventId, slug, eventType, workqueue, ...rest } = Object.fromEntries(
     searchParams.entries()
   )
@@ -71,12 +82,22 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
 
   // ---- Send token to wrapper iframe when ready ----
   useEffect(() => {
-    if (!token || dashboard.context?.auth !== 'postMessage') {
+    // Do not send token if dashboard is not allowed by scopes
+    if (!allowedDashboardIds.includes(dashboard.id)) {
       return
     }
 
+    if (!token || dashboard.context?.auth !== 'REQUEST_AUTH_TOKEN') {
+      return
+    }
+
+    if (!isValidAbsoluteURL(dashboard.url)) {
+      throw new Error(`Invalid dashboard URL: ${dashboard.url}`)
+    }
+
+    const dashboardOrigin = new URL(dashboard.url).origin
     const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== dashboard.origin) {
+      if (event.origin !== dashboardOrigin) {
         return
       }
 
@@ -94,7 +115,13 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
     window.addEventListener('message', handleMessage)
 
     return () => window.removeEventListener('message', handleMessage)
-  }, [dashboard.context?.auth, dashboard.origin, token])
+  }, [
+    allowedDashboardIds,
+    dashboard.context?.auth,
+    dashboard.id,
+    dashboard.url,
+    token
+  ])
 
   return (
     <>
