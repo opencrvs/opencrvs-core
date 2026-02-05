@@ -13,6 +13,7 @@ import { defineConfig } from '../events/defineConfig'
 import { ActionType, DeclarationActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
+import { field } from '../events/field'
 import { event } from '../events/event'
 import { TENNIS_CLUB_MEMBERSHIP } from '../events/Constants'
 import {
@@ -356,10 +357,10 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'advancedSearch.form.registrationDetails'
       },
       fields: [
-        event.metadata('legalStatuses.REGISTERED.createdAtLocation').exact(),
-        event.metadata('legalStatuses.REGISTERED.acceptedAt').range(),
-        event.metadata('status').exact(),
-        event.metadata('updatedAt').range()
+        event('legalStatuses.REGISTERED.createdAtLocation').exact(),
+        event('legalStatuses.REGISTERED.acceptedAt').range(),
+        event('status').exact(),
+        event('updatedAt').range()
       ]
     },
     {
@@ -369,9 +370,9 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'event.tennis-club-membership.search.applicants'
       },
       fields: [
-        event.declarationField('applicant.name').fuzzy(),
-        event.declarationField('applicant.dob').range(),
-        event.declarationField('applicant.email').exact()
+        field('applicant.name').fuzzy(),
+        field('applicant.dob').range(),
+        field('applicant.email').exact()
       ]
     },
     {
@@ -380,7 +381,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description: 'Recommender details search field section title',
         id: 'event.tennis-club-membership.search.recommender'
       },
-      fields: [event.declarationField('recommender.name').fuzzy()]
+      fields: [field('recommender.name').fuzzy()]
     }
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
