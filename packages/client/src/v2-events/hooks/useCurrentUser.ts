@@ -10,13 +10,13 @@
  */
 
 import { useSelector } from 'react-redux'
+import { User } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { getAdminLevelHierarchy, getUsersFullName } from '../utils'
 import { useLocations } from './useLocations'
 import { useUsers } from './useUsers'
 import { useAdministrativeAreas } from './useAdministrativeAreas'
-import { User } from '@opencrvs/commons/client'
 
 export function useCurrentUser() {
   const { config } = useSelector(getOfflineData)
