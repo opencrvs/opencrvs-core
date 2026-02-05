@@ -4995,6 +4995,15 @@ components:
                     hint:
                       description: When true, paragraph is styled as a hint with grey color
                       type: boolean
+                    textAlign:
+                      description: Text alignment for the paragraph
+                      type: string
+                      enum:
+                        - left
+                        - center
+                        - right
+                        - start
+                        - end
                   additionalProperties: false
               additionalProperties: false
           required:
@@ -11351,6 +11360,8 @@ components:
                 boost:
                   default: 1
                   type: number
+                matchAgainst:
+                  type: string
               required:
                 - fuzziness
                 - boost
@@ -11377,6 +11388,8 @@ components:
                   type: number
                 value:
                   type: string
+                matchAgainst:
+                  type: string
               required:
                 - boost
               additionalProperties: false
@@ -11402,6 +11415,8 @@ components:
                 boost:
                   default: 1
                   type: number
+                matchAgainst:
+                  type: string
               required:
                 - days
                 - boost
