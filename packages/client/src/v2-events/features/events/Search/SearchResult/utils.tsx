@@ -10,14 +10,28 @@
  */
 
 import { defineMessages, IntlShape } from 'react-intl'
+import React from 'react'
+import { first } from 'lodash'
+import { ColumnContentAlignment, SORT_ORDER } from '@opencrvs/components'
 import {
   defaultWorkqueueColumns,
-  Draft,
-  EventIndex,
   EventStatus,
-  WorkqueueColumn
+  WorkqueueColumn,
+  EventIndex,
+  EventConfig,
+  deepDropNulls,
+  applyDraftToEventIndex,
+  CtaActionType,
+  getEventConfigById,
+  Draft
 } from '@opencrvs/commons/client'
-import { ColumnContentAlignment, SORT_ORDER } from '@opencrvs/components'
+
+import { formattedDuration } from '../../../../../utils/date-formatting'
+import { DownloadButton } from '../../../../components/DownloadButton'
+import { ActionCta } from '../ActionCta'
+import RetryButton from '../../../../components/RetryButton'
+import { OutboxEventIndex } from '../../useEvents/outbox'
+import { SearchResultItemTitle } from './SearchResultItemTitle'
 
 const messages = defineMessages({
   noRecord: {
@@ -195,7 +209,7 @@ export function createSortFunction(
   setSortOrder: (order: (typeof SORT_ORDER)[keyof typeof SORT_ORDER]) => void
 ) {
   return function getSortFunction(column: string) {
-    if (!Object.values(COLUMNS).includes(column as any)) {
+    if (!Object.values(COLUMNS).some((col) => col === column)) {
       return undefined
     }
 
@@ -295,4 +309,130 @@ export function getNoResultsText({
     }
   }
   return noResultText
+}
+
+export function buildAvailableActionComponents({
+  event,
+  localEventStatus,
+  actions,
+  isWideScreen,
+  redirectParam
+}: {
+  event: EventIndex
+  localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
+  actions: CtaActionType[]
+  isWideScreen: boolean
+  redirectParam: string
+}) {
+  const actionConfigs: Array<{ actionComponent: () => React.ReactNode }> = []
+
+  if (isWideScreen) {
+    actions.forEach((actionType: CtaActionType) => {
+      actionConfigs.push({
+        actionComponent: () => (
+          <ActionCta
+            key={actionType}
+            actionType={actionType}
+            event={event}
+            redirectParam={redirectParam}
+          />
+        )
+      })
+    })
+
+    if (localEventStatus === ExtendedEventStatuses.OUTBOX) {
+      actionConfigs.push({
+        actionComponent: () => <RetryButton key="retry" event={event} />
+      })
+    }
+  }
+
+  actionConfigs.push({
+    actionComponent: () => (
+      <DownloadButton
+        key={`DownloadButton-${event.id}`}
+        event={event}
+        isDraft={localEventStatus === ExtendedEventStatuses.DRAFT}
+      />
+    )
+  })
+
+  return actionConfigs
+}
+export function processEventsToRows({
+  events,
+  eventConfigs,
+  drafts,
+  outbox,
+  actions,
+  redirectParam,
+  isWideScreen,
+  isOnline,
+  formatMessage
+}: {
+  events: EventIndex[]
+  eventConfigs: EventConfig[]
+  drafts: Draft[]
+  outbox: OutboxEventIndex[]
+  actions: CtaActionType[] // can be reduced to one?
+  redirectParam: string
+  isWideScreen: boolean
+  isOnline: boolean
+  formatMessage: IntlShape['formatMessage']
+}) {
+  return events.map((event) => {
+    console.log(`Processing event ${event.id}`)
+    const eventConfig = getEventConfigById(eventConfigs, event.type)
+
+    const draft = first(drafts.filter((d) => d.eventId === event.id))
+    const eventWithDraft = draft
+      ? deepDropNulls(applyDraftToEventIndex(event, draft, eventConfig))
+      : event
+
+    const localEventStatus = getLocalEventStatus({
+      eventId: eventWithDraft.id,
+      currentStatus: eventWithDraft.status,
+      outbox,
+      drafts
+    })
+
+    const actionComponents = buildAvailableActionComponents({
+      event: eventWithDraft,
+      localEventStatus: eventWithDraft.status,
+      actions,
+      isWideScreen,
+      redirectParam
+    })
+
+    const outboxMeta = outbox.find((o) => o.id === eventWithDraft.id)?.meta
+
+    return {
+      ...eventWithDraft,
+      actions: actionComponents,
+      label: eventConfig.label,
+      type: formatMessage(eventConfig.label),
+      createdAt: formattedDuration(new Date(eventWithDraft.createdAt)),
+      updatedAt: formattedDuration(new Date(eventWithDraft.updatedAt)),
+      status: formatMessage(messages.eventStatus, {
+        status: localEventStatus
+      }),
+      title: (
+        <SearchResultItemTitle
+          event={eventWithDraft}
+          eventConfig={eventConfig}
+          localEventStatus={localEventStatus}
+          redirectParam={redirectParam}
+        />
+      ),
+      outbox: formatMessage(
+        isOnline ? messages.processingAction : messages.waitingForAction,
+        {
+          action:
+            typeof outboxMeta?.actionType === 'string'
+              ? outboxMeta.actionType
+              : ''
+        }
+      )
+    }
+  })
 }

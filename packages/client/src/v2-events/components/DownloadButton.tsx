@@ -76,6 +76,7 @@ export function DownloadButton({
   event,
   isDraft = false
 }: DownloadButtonProps) {
+  console.log(`DownloadButton rendering for event ${event.id}`)
   const intl = useIntl()
 
   const isOnline = useOnlineStatus()
@@ -93,6 +94,9 @@ export function DownloadButton({
     enabled: !!event.assignedTo
   }).data
 
+  console.log(
+    `DownloadButton Calling useAllowedActionConfigurations for event ${event.id}`
+  )
   const [_, actionMenuItems] = useAllowedActionConfigurations(
     event,
     authentication

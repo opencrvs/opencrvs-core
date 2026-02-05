@@ -50,6 +50,7 @@ function ActionCtaComponent({
   actionType: CtaActionType
   redirectParam?: string
 }) {
+  console.log(`ActionCta rendering for event ${event.id}, action ${actionType}`)
   const intl = useIntl()
   const maybeAuth = useAuthentication()
   const auth = getOrThrow(
@@ -58,6 +59,9 @@ function ActionCtaComponent({
   )
   const navigate = useNavigate()
 
+  console.log(
+    `ActionCta Calling useAllowedActionConfigurations for event ${event.id}`
+  )
   const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
   const config = allowedActionConfigs.find((item) => item.type === actionType)
 

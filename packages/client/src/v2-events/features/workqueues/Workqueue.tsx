@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import {
   useTypedParams,
@@ -45,6 +45,12 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const eventConfigs = useEventConfigurations()
   const workqueues = useCountryConfigWorkqueueConfigurations()
 
+  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
+
+  if (!workqueueConfig) {
+    throw new Error('Workqueue configuration not found for' + workqueueSlug)
+  }
+
   const { getResult } = useWorkqueue(workqueueSlug)
   const outbox = useOutbox()
 
@@ -54,18 +60,22 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   }).useSuspenseQuery()
 
   const { total, results } = data
-  const events = results.filter(
-    (event) => !outbox.find(({ id }) => id === event.id)
-  )
 
   const intl = useIntl()
-  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
+
+  const actions = useMemo(
+    () => workqueueConfig.actions.map(({ type }) => type),
+    [workqueueConfig.actions]
+  )
+
+  const events = useMemo(
+    () => results.filter((event) => !outbox.find(({ id }) => id === event.id)),
+    [results, outbox]
+  )
 
   if (!workqueueConfig) {
     throw new Error('Workqueue configuration not found for' + workqueueSlug)
   }
-
-  const actions = workqueueConfig.actions.map(({ type }) => type)
 
   return (
     <SearchResultComponent

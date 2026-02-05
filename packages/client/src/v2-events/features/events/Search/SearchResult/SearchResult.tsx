@@ -8,7 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, PropsWithChildren } from 'react'
+import React, {
+  useState,
+  useMemo,
+  PropsWithChildren,
+  useRef,
+  useEffect
+} from 'react'
 import { useIntl } from 'react-intl'
 import { orderBy } from 'lodash'
 import { useTheme } from 'styled-components'
@@ -20,8 +26,7 @@ import {
   EventConfig,
   WorkqueueColumn,
   CtaActionType,
-  TranslationConfig,
-  UUID
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -34,16 +39,15 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useOnlineStatus } from '@client/utils'
-import { useEventTitle } from '../../useEvents/useEventTitle'
 import { deserializeSearchParams, serializeSearchParams } from '../utils'
 import {
   COLUMNS,
   createSortFunction,
   getColumns,
   getDefaultColumns,
-  getNoResultsText
+  getNoResultsText,
+  processEventsToRows
 } from './utils'
-import { processEventsToRows } from './useEventRow'
 
 const WithTestId = styled.div.attrs({ 'data-testid': 'search-result' })``
 
@@ -70,6 +74,7 @@ export const SearchResultComponent = ({
   actions?: CtaActionType[]
   emptyMessage?: TranslationConfig
 }>) => {
+  console.log('SearchResultComponent rendering')
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
 
@@ -77,7 +82,11 @@ export const SearchResultComponent = ({
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
 
-  const { getEventTitle } = useEventTitle()
+  // Add this to track re-renders
+  const renderCount = useRef(0)
+  renderCount.current += 1
+  console.log(`SearchResultComponent render #${renderCount.current}`)
+
   const isOnline = useOnlineStatus()
   const params = deserializeSearchParams(location.search) as Record<
     string,
@@ -119,24 +128,39 @@ export const SearchResultComponent = ({
 
   const isWideScreen = windowWidth > theme.grid.breakpoints.lg
 
-  const rows = orderBy(
-    processEventsToRows({
-      events,
-      eventConfigs,
-      drafts,
-      outbox,
-      actions,
-      redirectParam: slug || '',
-      isWideScreen,
-      isOnline,
-      intl
-    }),
+  const rows = useMemo(() => {
+    return orderBy(
+      processEventsToRows({
+        events,
+        eventConfigs,
+        drafts,
+        outbox,
+        actions,
+        redirectParam: slug || '',
+        isWideScreen,
+        isOnline,
+        formatMessage: intl.formatMessage
+      }),
+      sortedCol,
+      sortOrder
+    )
+  }, [
+    events,
+    eventConfigs,
+    drafts,
+    outbox,
+    actions,
+    slug,
+    isWideScreen,
+    isOnline,
+    intl.formatMessage,
     sortedCol,
     sortOrder
-  )
+  ])
 
   const currentPageNumber = Math.floor(offset / limit) + 1
   const totalPages = totalResults ? Math.ceil(totalResults / limit) : 0
+
   const isShowPagination = totalPages > 1
 
   const noResultText = getNoResultsText({
@@ -146,8 +170,9 @@ export const SearchResultComponent = ({
     searchTerm: params.term
   })
 
-  const responsiveColumns = isWideScreen
-    ? [
+  const responsiveColumns = useMemo(() => {
+    if (isWideScreen) {
+      return [
         ...getDefaultColumns(intl, sortedCol, getSortFunction),
         ...getColumns({
           isWideScreen,
@@ -163,18 +188,21 @@ export const SearchResultComponent = ({
           alignment: ColumnContentAlignment.RIGHT
         }
       ]
-    : [
-        {
-          ...getDefaultColumns(intl, sortedCol, getSortFunction)[0],
-          width: 70
-        },
-        {
-          width: 30,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.RIGHT
-        }
-      ]
+    }
+
+    return [
+      {
+        ...getDefaultColumns(intl, sortedCol, getSortFunction)[0],
+        width: 70
+      },
+      {
+        width: 30,
+        key: COLUMNS.ACTIONS,
+        isActionColumn: true,
+        alignment: ColumnContentAlignment.RIGHT
+      }
+    ]
+  }, [isWideScreen, intl, columns, sortedCol, getSortFunction])
 
   return (
     <WithTestId>
