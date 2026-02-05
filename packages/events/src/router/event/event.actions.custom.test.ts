@@ -174,7 +174,7 @@ describe('event.actions.custom', () => {
       client.event.actions.custom.request(payload)
     ).rejects.toMatchSnapshot()
 
-    const event = await client.event.get(payload.eventId)
+    const event = await client.event.get({eventId: payload.eventId})
 
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
@@ -188,7 +188,7 @@ describe('event.actions.custom', () => {
       client.event.actions.custom.request(payload)
     ).resolves.not.toThrow()
 
-    const event = await client.event.get(payload.eventId)
+    const event = await client.event.get({eventId: payload.eventId})
 
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
@@ -210,7 +210,7 @@ describe('event.actions.custom', () => {
       client.event.actions.custom.request(customPayload)
     ).resolves.not.toThrow()
 
-    const event = await client.event.get(customPayload.eventId)
+    const event = await client.event.get({eventId: customPayload.eventId})
 
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
@@ -258,7 +258,7 @@ describe('event.actions.custom', () => {
         client.event.actions.custom.request(payload)
       ).resolves.not.toThrow()
 
-      const event = await client.event.get(payload.eventId)
+      const event = await client.event.get({eventId: payload.eventId})
 
       expect(
         sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)

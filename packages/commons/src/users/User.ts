@@ -52,7 +52,8 @@ export const SystemRole = z.enum([
   'RECORD_SEARCH',
   'REINDEX',
   'WEBHOOK',
-  'IMPORT_EXPORT'
+  'IMPORT_EXPORT',
+  'CITIZEN_PORTAL'
 ])
 
 export const System = z.object({
