@@ -139,7 +139,7 @@ function User({ action }: { action: EventHistoryActionDocument }) {
     createdByUserType: action.createdByUserType,
     createdBy: action.createdBy,
     type: action.type,
-    createdByRole: action.createdByRole ?? undefined
+    createdByRole: action.createdByRole
   })
 
   if (type !== 'user') {
@@ -367,7 +367,7 @@ function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         createdByUserType: action.createdByUserType,
         createdBy: action.createdBy,
         type: action.type,
-        createdByRole: action.createdByRole ?? undefined
+        createdByRole: action.createdByRole
       })
 
       // Only configurable action types should call getActionConfig
