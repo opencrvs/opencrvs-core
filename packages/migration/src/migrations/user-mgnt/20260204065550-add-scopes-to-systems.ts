@@ -26,7 +26,7 @@ import { Db, MongoClient } from 'mongodb'
  */
 
 const DEFAULT_SCOPES_BY_TYPE: Record<string, string[]> = {
-  HEALTH: ['notification-api'],
+  HEALTH: ['notification-api', 'record.create', 'record.notify'],
   NATIONAL_ID: ['nationalId'],
   RECORD_SEARCH: ['recordsearch'],
   IMPORT_EXPORT: [
