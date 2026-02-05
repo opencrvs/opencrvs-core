@@ -128,9 +128,7 @@ components:
                     type: string
                   createdByRole:
                     description: Role of the user who created the action.
-                    anyOf:
-                      - type: string
-                      - type: "null"
+                    type: string
                   createdBySignature:
                     description: Reference to the signature of the user who created the action.
                     anyOf:
@@ -256,9 +254,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -350,9 +346,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -454,9 +448,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -568,9 +560,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -662,9 +652,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -765,9 +753,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -869,9 +855,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -963,9 +947,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1061,9 +1043,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1155,9 +1135,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1253,9 +1231,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1347,9 +1323,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1444,9 +1418,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1551,9 +1523,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1645,9 +1615,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1746,9 +1714,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1840,9 +1806,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -1941,9 +1905,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -13096,9 +13058,7 @@ components:
                     type: string
                   createdByRole:
                     description: Role of the user who created the action.
-                    anyOf:
-                      - type: string
-                      - type: "null"
+                    type: string
                   createdBySignature:
                     description: Reference to the signature of the user who created the action.
                     anyOf:
@@ -13226,9 +13186,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -13321,9 +13279,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -13427,9 +13383,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -13544,9 +13498,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -13639,9 +13591,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -13744,9 +13694,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -13850,9 +13798,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -13945,9 +13891,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14044,9 +13988,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14139,9 +14081,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14238,9 +14178,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14333,9 +14271,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14431,9 +14367,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14540,9 +14474,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14635,9 +14567,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14738,9 +14668,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14833,9 +14761,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
@@ -14936,9 +14862,7 @@ components:
           type: string
         createdByRole:
           description: Role of the user who created the action.
-          anyOf:
-            - type: string
-            - type: "null"
+          type: string
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
