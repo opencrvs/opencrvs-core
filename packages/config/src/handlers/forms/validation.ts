@@ -351,7 +351,7 @@ const form = z.object({
               sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
             ).length === 0,
           (sec) => ({
-            message: `Field names in a section should all be unique. Duplicate field(s): ${findDuplicates(
+            message: `Field names in a section should all be unique. Duplicate event.declaration(s): ${findDuplicates(
               sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
             ).join(', ')} found`
           })

@@ -318,7 +318,9 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                   conditionals: [
                     {
                       type: ConditionalType.DISPLAY_ON_REVIEW,
-                      conditional: field('firstname').isValidEnglishName()
+                      conditional: event
+                        .declaration('firstname')
+                        .isValidEnglishName()
                     }
                   ],
                   label: {
@@ -334,11 +336,15 @@ export const ReviewWithConditionallyHiddenFields: Story = {
                   conditionals: [
                     {
                       type: ConditionalType.SHOW,
-                      conditional: field('firstname').isEqualTo('Mia∞$∞©@£$')
+                      conditional: event
+                        .declaration('firstname')
+                        .isEqualTo('Mia∞$∞©@£$')
                     },
                     {
                       type: ConditionalType.DISPLAY_ON_REVIEW,
-                      conditional: field('favourite-animal').isEqualTo('cat')
+                      conditional: event
+                        .declaration('favourite-animal')
+                        .isEqualTo('cat')
                     }
                   ],
                   label: {

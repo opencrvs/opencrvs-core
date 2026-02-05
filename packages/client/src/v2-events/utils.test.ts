@@ -94,7 +94,7 @@ const AddressField = {
       {
         id: 'town',
         required: false,
-        parent: field('country'),
+        parent: event.declaration('country'),
         label: {
           id: 'field.address.town.label',
           defaultMessage: 'Town',
@@ -106,7 +106,7 @@ const AddressField = {
       {
         id: 'residentialArea',
         required: false,
-        parent: field('country'),
+        parent: event.declaration('country'),
         label: {
           id: 'field.address.residentialArea.label',
           defaultMessage: 'Residential Area',
@@ -118,7 +118,7 @@ const AddressField = {
       {
         id: 'street',
         required: false,
-        parent: field('country'),
+        parent: event.declaration('country'),
         label: {
           id: 'field.address.street.label',
           defaultMessage: 'Street',
@@ -130,7 +130,7 @@ const AddressField = {
       {
         id: 'number',
         required: false,
-        parent: field('country'),
+        parent: event.declaration('country'),
         label: {
           id: 'field.address.number.label',
           defaultMessage: 'Number',
@@ -142,7 +142,7 @@ const AddressField = {
       {
         id: 'zipCode',
         required: false,
-        parent: field('country'),
+        parent: event.declaration('country'),
         label: {
           id: 'field.address.postcodeOrZip.label',
           defaultMessage: 'Postcode / Zip',
@@ -154,7 +154,7 @@ const AddressField = {
       {
         id: 'state',
         conditionals: [],
-        parent: field('country'),
+        parent: event.declaration('country'),
         required: true,
         label: {
           id: 'field.address.state.label',
@@ -165,7 +165,7 @@ const AddressField = {
       },
       {
         id: 'district2',
-        parent: field('country'),
+        parent: event.declaration('country'),
         conditionals: [],
         required: true,
         label: {
@@ -177,7 +177,7 @@ const AddressField = {
       },
       {
         id: 'cityOrTown',
-        parent: field('country'),
+        parent: event.declaration('country'),
         conditionals: [],
         required: false,
         label: {
@@ -189,7 +189,7 @@ const AddressField = {
       },
       {
         id: 'addressLine1',
-        parent: field('country'),
+        parent: event.declaration('country'),
         conditionals: [],
         required: false,
         label: {
@@ -201,7 +201,7 @@ const AddressField = {
       },
       {
         id: 'addressLine2',
-        parent: field('country'),
+        parent: event.declaration('country'),
         conditionals: [],
         required: false,
         label: {
@@ -213,7 +213,7 @@ const AddressField = {
       },
       {
         id: 'addressLine3',
-        parent: field('country'),
+        parent: event.declaration('country'),
         conditionals: [],
         required: false,
         label: {
@@ -225,7 +225,7 @@ const AddressField = {
       },
       {
         id: 'postcodeOrZip',
-        parent: field('country'),
+        parent: event.declaration('country'),
         conditionals: [],
         required: false,
         label: {

@@ -110,7 +110,7 @@ const fields = [
       description: 'This is the label for fetch individual information field'
     },
     configuration: {
-      trigger: field(`storybook.query-params`),
+      trigger: event.declaration(`storybook.query-params`),
       url: '/api/nid',
       timeout: 5000,
       method: 'POST',
@@ -118,7 +118,9 @@ const fields = [
         'Content-Type': 'application/json'
       },
       params: {
-        nidReverse: field(`storybook.query-params`).get('data.nid-reverse')
+        nidReverse: event
+          .declaration(`storybook.query-params`)
+          .get('data.nid-reverse')
       },
       errorValue: {
         verificationStatus: 'failed'
@@ -128,12 +130,15 @@ const fields = [
   {
     id: `storybook.verify-nid-http-fetch-loader`,
     type: FieldType.LOADER,
-    parent: field(`storybook.verify-nid-http-fetch`),
+    parent: event.declaration(`storybook.verify-nid-http-fetch`),
     conditionals: [
       {
         type: ConditionalType.SHOW,
         conditional: not(
-          field(`storybook.verify-nid-http-fetch`).get('loading').isFalsy()
+          event
+            .declaration(`storybook.verify-nid-http-fetch`)
+            .get('loading')
+            .isFalsy()
         )
       }
     ],
@@ -164,8 +169,14 @@ const fields = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          field(`storybook.verify-nid-http-fetch`).get('loading').isFalsy(),
-          field(`storybook.verify-nid-http-fetch`).get('data').isFalsy()
+          event
+            .declaration(`storybook.verify-nid-http-fetch`)
+            .get('loading')
+            .isFalsy(),
+          event
+            .declaration(`storybook.verify-nid-http-fetch`)
+            .get('data')
+            .isFalsy()
         )
       }
     ],
@@ -203,8 +214,8 @@ const fields = [
     id: 'storybook.verified',
     type: FieldType.VERIFICATION_STATUS,
     parent: [
-      field('storybook.verify-nid-http-fetch'),
-      field('storybook.id-reader')
+      event.declaration('storybook.verify-nid-http-fetch'),
+      event.declaration('storybook.id-reader')
     ],
     label: {
       id: 'storybook.verified.status',
@@ -226,20 +237,20 @@ const fields = [
         description: 'Description text of the status'
       }
     },
-    value: field(`storybook.verify-nid-http-fetch`).get(
-      'data.verificationStatus'
-    )
+    value: event
+      .declaration(`storybook.verify-nid-http-fetch`)
+      .get('data.verificationStatus')
   },
   {
     parent: [
-      field('storybook.id-reader'),
-      field('storybook.verify-nid-http-fetch')
+      event.declaration('storybook.id-reader'),
+      event.declaration('storybook.verify-nid-http-fetch')
     ],
     id: 'storybook.nid',
     type: FieldType.TEXT,
     value: [
-      field('storybook.id-reader').get('data.nid'),
-      field('storybook.verify-nid-http-fetch').get('data.nid')
+      event.declaration('storybook.id-reader').get('data.nid'),
+      event.declaration('storybook.verify-nid-http-fetch').get('data.nid')
     ],
     label: {
       id: 'storybook.nid.label',

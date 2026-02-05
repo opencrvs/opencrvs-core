@@ -54,7 +54,7 @@ test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page fi
   await expect(
     client.event.actions.printCertificate.request(
       generator.event.actions.printCertificate(event.id, {
-        // The tennis club membership print certificate form has a verification page with conditional 'field('collector.requesterId').isEqualTo('INFORMANT')'
+        // The tennis club membership print certificate form has a verification page with conditional 'event.declaration('collector.requesterId').isEqualTo('INFORMANT')'
         // Thus if the requester is set as INFORMANT and verification page result is not set, we should see a validation error.
         annotation: { 'collector.requesterId': 'INFORMANT' }
       })

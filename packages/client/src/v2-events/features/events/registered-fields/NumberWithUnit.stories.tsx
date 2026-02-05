@@ -169,10 +169,16 @@ export const SymptomDuration: StoryObj<typeof FormFieldGenerator> = {
                   id: 'event.birth.action.declare.form.section.child.field.birthDuration.error'
                 },
                 validator: and(
-                  field('child.birthDuration')
+                  event
+                    .declaration('child.birthDuration')
                     .get('numericValue')
                     .isGreaterThan(0),
-                  not(field('child.birthDuration').get('unit').isFalsy())
+                  not(
+                    event
+                      .declaration('child.birthDuration')
+                      .get('unit')
+                      .isFalsy()
+                  )
                 )
               }
             ]

@@ -64,7 +64,7 @@ const fetchNidFields: FieldConfig[] = [
       id: 'event.birth.child.nid.label'
     },
     configuration: {
-      trigger: field('child.http-button'),
+      trigger: event.declaration('child.http-button'),
       url: '/api/nid',
       timeout: 5000,
       method: 'POST',
@@ -91,22 +91,22 @@ const fetchNidFields: FieldConfig[] = [
           description: 'Error message when NID request fails',
           id: 'event.birth.child.nid-fetch-failure'
         },
-        validator: field('child.http-fetch').get('error').isFalsy()
+        validator: event.declaration('child.http-fetch').get('error').isFalsy()
       }
     ],
     conditionals: [
       {
         type: ConditionalType.ENABLE,
         conditional: and(
-          field('child.http-fetch').isUndefined(),
+          event.declaration('child.http-fetch').isUndefined(),
           user.isOnline()
         )
       },
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          field('child.http-fetch').get('loading').isFalsy(),
-          field('child.http-fetch').get('data').isFalsy()
+          event.declaration('child.http-fetch').get('loading').isFalsy(),
+          event.declaration('child.http-fetch').get('data').isFalsy()
         )
       }
     ],
@@ -134,7 +134,10 @@ const fetchNidFields: FieldConfig[] = [
       },
       {
         type: ConditionalType.SHOW,
-        conditional: field('child.http-fetch').get('loading').isEqualTo(true)
+        conditional: event
+          .declaration('child.http-fetch')
+          .get('loading')
+          .isEqualTo(true)
       }
     ],
     configuration: {
@@ -161,7 +164,7 @@ const fetchNidFields: FieldConfig[] = [
       },
       {
         type: ConditionalType.SHOW,
-        conditional: not(field('child.http-text').isFalsy())
+        conditional: not(event.declaration('child.http-text').isFalsy())
       }
     ],
     configuration: {
@@ -176,7 +179,7 @@ const fetchNidFields: FieldConfig[] = [
   {
     id: 'child.http-text',
     type: FieldType.TEXT,
-    parent: field('child.http-fetch'),
+    parent: event.declaration('child.http-fetch'),
     label: {
       defaultMessage: 'Generate NID',
       description: 'Generate NID',
@@ -185,14 +188,17 @@ const fetchNidFields: FieldConfig[] = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: field('child.http-fetch').get('error').isFalsy()
+        conditional: event
+          .declaration('child.http-fetch')
+          .get('error')
+          .isFalsy()
       },
       {
         type: ConditionalType.ENABLE,
         conditional: never()
       }
     ],
-    value: field('child.http-fetch').get('data')
+    value: event.declaration('child.http-fetch').get('data')
   },
   {
     id: 'child.http-text-manual',
@@ -206,9 +212,9 @@ const fetchNidFields: FieldConfig[] = [
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          not(field('child.http-fetch').isUndefined()),
-          field('child.http-fetch').get('loading').isFalsy(),
-          field('child.http-fetch').get('data').isFalsy()
+          not(event.declaration('child.http-fetch').isUndefined()),
+          event.declaration('child.http-fetch').get('loading').isFalsy(),
+          event.declaration('child.http-fetch').get('data').isFalsy()
         )
       }
     ]
@@ -253,7 +259,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
               id: 'event.birth.child.nid.label'
             },
             configuration: {
-              trigger: field('child.http-button'),
+              trigger: event.declaration('child.http-button'),
               url: '/api/nid',
               timeout: 5000,
               method: 'POST',
@@ -277,15 +283,18 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
               {
                 type: ConditionalType.ENABLE,
                 conditional: and(
-                  field('child.http-fetch').isUndefined(),
+                  event.declaration('child.http-fetch').isUndefined(),
                   user.isOnline()
                 )
               },
               {
                 type: ConditionalType.SHOW,
                 conditional: and(
-                  field('child.http-fetch').get('loading').isFalsy(),
-                  field('child.http-fetch').get('data').isFalsy()
+                  event
+                    .declaration('child.http-fetch')
+                    .get('loading')
+                    .isFalsy(),
+                  event.declaration('child.http-fetch').get('data').isFalsy()
                 )
               }
             ],
@@ -313,7 +322,8 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
               },
               {
                 type: ConditionalType.SHOW,
-                conditional: field('child.http-fetch')
+                conditional: event
+                  .declaration('child.http-fetch')
                   .get('loading')
                   .isEqualTo(true)
               }
@@ -342,7 +352,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
               },
               {
                 type: ConditionalType.SHOW,
-                conditional: not(field('child.http-text').isFalsy())
+                conditional: not(event.declaration('child.http-text').isFalsy())
               }
             ],
             configuration: {
@@ -357,7 +367,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
           {
             id: 'child.http-text',
             type: FieldType.TEXT,
-            parent: field('child.http-fetch'),
+            parent: event.declaration('child.http-fetch'),
             label: {
               defaultMessage: 'Generate NID',
               description: 'Generate NID',
@@ -369,7 +379,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
                 conditional: never()
               }
             ],
-            value: field('child.http-fetch').get('data')
+            value: event.declaration('child.http-fetch').get('data')
           }
         ]}
         id="my-form"

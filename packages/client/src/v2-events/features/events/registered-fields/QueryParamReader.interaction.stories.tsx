@@ -66,7 +66,7 @@ const defaultFields: FieldConfig[] = [
       id: 'applicant.http-fetch.label'
     },
     configuration: {
-      trigger: field('applicant.query-param-reader'),
+      trigger: event.declaration('applicant.query-param-reader'),
       url: '/api/user-info',
       timeout: 5000,
       method: 'GET',
@@ -78,7 +78,7 @@ const defaultFields: FieldConfig[] = [
   {
     id: 'applicant.firstname',
     type: FieldType.TEXT,
-    parent: field('applicant.http-fetch'),
+    parent: event.declaration('applicant.http-fetch'),
     label: {
       defaultMessage: 'First name',
       description: 'First name label',
@@ -90,12 +90,12 @@ const defaultFields: FieldConfig[] = [
         conditional: never()
       }
     ],
-    value: field('applicant.http-fetch').get('data.firstName')
+    value: event.declaration('applicant.http-fetch').get('data.firstName')
   },
   {
     id: 'applicant.familyName',
     type: FieldType.TEXT,
-    parent: field('applicant.http-fetch'),
+    parent: event.declaration('applicant.http-fetch'),
     label: {
       defaultMessage: 'Surname',
       description: 'Family name label',
@@ -107,7 +107,7 @@ const defaultFields: FieldConfig[] = [
         conditional: never()
       }
     ],
-    value: field('applicant.http-fetch').get('data.familyName')
+    value: event.declaration('applicant.http-fetch').get('data.familyName')
   }
 ]
 
@@ -133,7 +133,7 @@ const testHttpFetch = {
     id: 'test.http-fetch.label'
   },
   configuration: {
-    trigger: field('test.query-param-reader'),
+    trigger: event.declaration('test.query-param-reader'),
     url: '/api/test',
     timeout: 5000,
     method: 'GET' as const,
@@ -141,8 +141,12 @@ const testHttpFetch = {
       'Content-Type': 'application/json'
     },
     params: {
-      token: field('test.query-param-reader').get('data.auth_token'),
-      session: field('test.query-param-reader').get('data.client_session')
+      token: event
+        .declaration('test.query-param-reader')
+        .get('data.auth_token'),
+      session: event
+        .declaration('test.query-param-reader')
+        .get('data.client_session')
     }
   }
 }
@@ -150,7 +154,7 @@ const testHttpFetch = {
 const tokenTextField = {
   id: 'test.token',
   type: FieldType.TEXT,
-  parent: field('test.http-fetch'),
+  parent: event.declaration('test.http-fetch'),
   label: {
     defaultMessage: 'Token',
     description: 'Token label',
@@ -162,13 +166,13 @@ const tokenTextField = {
       conditional: never()
     }
   ],
-  value: field('test.http-fetch').get('data.token')
+  value: event.declaration('test.http-fetch').get('data.token')
 }
 
 const sessionTextField = {
   id: 'test.session',
   type: FieldType.TEXT,
-  parent: field('test.http-fetch'),
+  parent: event.declaration('test.http-fetch'),
   label: {
     defaultMessage: 'Session',
     description: 'Session label',
@@ -180,7 +184,7 @@ const sessionTextField = {
       conditional: never()
     }
   ],
-  value: field('test.http-fetch').get('data.session')
+  value: event.declaration('test.http-fetch').get('data.session')
 }
 
 const forwardedParams: FieldConfig[] = [
