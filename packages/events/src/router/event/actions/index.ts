@@ -94,7 +94,7 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Notify an event',
         method: 'POST',
-        path: '/events/{eventId}/notifications',
+        path: '/events/{eventId}/notify',
         tags: ['events'],
         protect: true
       }
