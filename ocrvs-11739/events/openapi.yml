@@ -120,7 +120,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/error.NOT_FOUND"
         "500": *a3
-  /events/{eventId}/notifications:
+  /events/{eventId}/notify:
     post:
       operationId: event-actions-notify-request
       summary: Notify an event
