@@ -2,8 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict bbzKICKkbpiY9kVHem1Rw51NqwbFNoTNV4VLOjnp6kLMTEDgiTWlEiPRVw0zPcU
-
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
 -- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
@@ -27,20 +25,6 @@ CREATE SCHEMA app;
 
 
 ALTER SCHEMA app OWNER TO events_migrator;
-
---
--- Name: tablefunc; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS tablefunc WITH SCHEMA public;
-
-
---
--- Name: EXTENSION tablefunc; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION tablefunc IS 'functions that manipulate whole tables, including crosstab';
-
 
 --
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
@@ -600,6 +584,3 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict bbzKICKkbpiY9kVHem1Rw51NqwbFNoTNV4VLOjnp6kLMTEDgiTWlEiPRVw0zPcU
-

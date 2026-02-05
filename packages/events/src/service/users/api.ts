@@ -73,7 +73,7 @@ type SystemAPIResult = {
   sha_secret: string
 }
 
-export async function getSystem(
+async function getSystem(
   systemId: string,
   token: string
 ): Promise<SystemAPIResult> {
