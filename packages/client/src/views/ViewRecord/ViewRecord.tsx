@@ -137,20 +137,25 @@ export const ViewRecord = () => {
   const form = useSelector(getReviewForm)
   const userDetails = useSelector(getUserDetails)
   const offlineData = useSelector(getOfflineData)
-  // @todo: validate
   const { declarationId } = useParams<{ declarationId: string }>()
+
+  const isUUID =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      declarationId || ''
+    )
 
   const { loading, error, data } = useQuery<FetchViewRecordByCompositionQuery>(
     FETCH_VIEW_RECORD_BY_COMPOSITION,
     {
       variables: { id: declarationId },
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
+      skip: !isUUID
     }
   )
 
-  if (loading) return <LoadingState />
+  if (!isUUID || error) return <GenericErrorToast />
 
-  if (error) return <GenericErrorToast />
+  if (loading) return <LoadingState />
 
   const eventData = data?.fetchRegistrationForViewing
   const eventType = ((data?.fetchRegistrationForViewing?.registration?.type &&
@@ -218,7 +223,7 @@ export const ViewRecord = () => {
       <ReviewSection
         form={form[eventType]}
         viewRecord
-        submitClickEvent={() => {}}
+        submitClickEvent={() => { }}
         pageRoute={''}
         draft={declaration}
         userDetails={userDetails}

@@ -193,50 +193,70 @@ function ReinstateButton({
   const intl = useIntl()
   const dispatch = useDispatch()
   const declaration = useDeclaration(declarationId)
+  const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
 
   if (!declaration) {
     return <Navigate to={HOME} />
   }
 
-  /* TODO: handle error */
   return (
-    <Mutation<
-      MarkEventAsReinstatedMutation,
-      MarkEventAsReinstatedMutationVariables
-    >
-      mutation={
-        declaration.event === EventType.Birth
-          ? REINSTATE_BIRTH_DECLARATION
-          : REINSTATE_DEATH_DECLARATION
-      }
-      // update the store and indexDb with the latest status of the declaration
-      onCompleted={() => {
-        refetchDeclarationInfo?.()
-        dispatch(deleteDeclaration(declaration.id, client))
-      }}
-    >
-      {(reinstateDeclaration) => (
-        <PrimaryButton
-          id="reinstate_confirm"
-          key="reinstate_confirm"
-          size="medium"
-          onClick={() => {
-            reinstateDeclaration({ variables: { id: declaration.id } })
-            dispatch(
-              modifyDeclaration({
-                ...declaration,
-                submissionStatus: SUBMISSION_STATUS.REINSTATING
-              })
-            )
-            toggleDisplayDialog()
-          }}
-        >
-          {intl.formatMessage(
-            recordAuditMessages.reinstateDeclarationDialogConfirm
-          )}
-        </PrimaryButton>
-      )}
-    </Mutation>
+    <>
+      <Mutation<
+        MarkEventAsReinstatedMutation,
+        MarkEventAsReinstatedMutationVariables
+      >
+        mutation={
+          declaration.event === EventType.Birth
+            ? REINSTATE_BIRTH_DECLARATION
+            : REINSTATE_DEATH_DECLARATION
+        }
+        // update the store and indexDb with the latest status of the declaration
+        onCompleted={() => {
+          refetchDeclarationInfo?.()
+          dispatch(deleteDeclaration(declaration.id, client))
+        }}
+        onError={() => {
+          setIsErrorDismissed(false)
+        }}
+      >
+        {(reinstateDeclaration, { error }) => (
+          <>
+            {error && !isErrorDismissed && (
+              <Toast
+                type="warning"
+                onClose={() => setIsErrorDismissed(true)}
+                actionText={intl.formatMessage(buttonMessages.retry)}
+                onActionClick={() => {
+                  reinstateDeclaration({ variables: { id: declaration.id } })
+                  setIsErrorDismissed(false)
+                }}
+              >
+                {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+              </Toast>
+            )}
+            <PrimaryButton
+              id="reinstate_confirm"
+              key="reinstate_confirm"
+              size="medium"
+              onClick={() => {
+                reinstateDeclaration({ variables: { id: declaration.id } })
+                dispatch(
+                  modifyDeclaration({
+                    ...declaration,
+                    submissionStatus: SUBMISSION_STATUS.REINSTATING
+                  })
+                )
+                toggleDisplayDialog()
+              }}
+            >
+              {intl.formatMessage(
+                recordAuditMessages.reinstateDeclarationDialogConfirm
+              )}
+            </PrimaryButton>
+          </>
+        )}
+      </Mutation>
+    </>
   )
 }
 
@@ -394,7 +414,7 @@ function RecordAuditBody({
               isValidatedOnReview={isValidatedOnReview}
               color={
                 STATUSTOCOLOR[
-                  (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
+                (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
                 ]
               }
             />
@@ -425,8 +445,8 @@ function RecordAuditBody({
         title={
           declaration.status && ARCHIVED.includes(declaration.status)
             ? intl.formatMessage(
-                recordAuditMessages.reinstateDeclarationDialogTitle
-              )
+              recordAuditMessages.reinstateDeclarationDialogTitle
+            )
             : intl.formatMessage(recordAuditMessages.confirmationTitle)
         }
         contentHeight={96}
@@ -469,8 +489,8 @@ function RecordAuditBody({
       >
         {declaration.status && ARCHIVED.includes(declaration.status)
           ? intl.formatMessage(
-              recordAuditMessages.reinstateDeclarationDialogDescription
-            )
+            recordAuditMessages.reinstateDeclarationDialogDescription
+          )
           : intl.formatMessage(recordAuditMessages.confirmationBody)}
       </ResponsiveModal>
     </>
@@ -575,17 +595,17 @@ const BodyContent = ({
       ''
     let declaration =
       draft &&
-      (draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-        draft.submissionStatus === SUBMISSION_STATUS.DRAFT)
+        (draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+          draft.submissionStatus === SUBMISSION_STATUS.DRAFT)
         ? {
-            ...getDraftDeclarationData(draft, resources, intl, trackingId),
-            assignment: draft?.assignmentStatus
-          }
+          ...getDraftDeclarationData(draft, resources, intl, trackingId),
+          assignment: draft?.assignmentStatus
+        }
         : getWQDeclarationData(
-            workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
-            intl,
-            trackingId
-          )
+          workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
+          intl,
+          trackingId
+        )
     const wqStatus = workqueueDeclaration?.registration
       ?.status as SUBMISSION_STATUS
     const draftStatus =
