@@ -30,8 +30,8 @@ import {
 import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
-import { useAllowedActionConfigurations } from '../features/workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { AssignModal } from './AssignModal'
+import { useResolveActionConditionals } from '../features/workqueues/EventOverview/components/useGetActionConfiguration'
 
 interface DownloadButtonProps {
   id?: string
@@ -76,7 +76,6 @@ export function DownloadButton({
   event,
   isDraft = false
 }: DownloadButtonProps) {
-  console.log(`DownloadButton rendering for event ${event.id}`)
   const intl = useIntl()
 
   const isOnline = useOnlineStatus()
@@ -88,19 +87,15 @@ export function DownloadButton({
     'Authentication is not available but is required'
   )
 
+  const assign = useResolveActionConditionals(event, ActionType.ASSIGN)
+  const unassign = useResolveActionConditionals(event, ActionType.UNASSIGN)
+
   const { getEvent, actions } = useEvents()
   const users = useUsers()
   const user = users.getUser.useQuery(event.assignedTo || '', {
     enabled: !!event.assignedTo
   }).data
 
-  console.log(
-    `DownloadButton Calling useAllowedActionConfigurations for event ${event.id}`
-  )
-  const [_, actionMenuItems] = useAllowedActionConfigurations(
-    event,
-    authentication
-  )
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const eventDocument = getEvent.useFindEventFromCache(event.id)
@@ -166,10 +161,10 @@ export function DownloadButton({
     }
 
     if (assignmentStatus === AssignmentStatus.UNASSIGNED) {
-      const assign = await openModal<boolean>((close) => (
+      const assignModal = await openModal<boolean>((close) => (
         <AssignModal close={close} />
       ))
-      if (assign) {
+      if (assignModal) {
         void download()
       }
     }
@@ -188,8 +183,8 @@ export function DownloadButton({
         className={className}
         disabled={
           !(
-            actionMenuItems.find(({ type }) => type === ActionType.UNASSIGN) ||
-            actionMenuItems.find(({ type }) => type === ActionType.ASSIGN) ||
+            assign.enabled ||
+            unassign.enabled ||
             assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
           )
         }

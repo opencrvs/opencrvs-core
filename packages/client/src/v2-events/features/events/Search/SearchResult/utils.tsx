@@ -314,35 +314,35 @@ export function getNoResultsText({
 export function buildAvailableActionComponents({
   event,
   localEventStatus,
-  actions,
+  action,
   isWideScreen,
   redirectParam
 }: {
   event: EventIndex
   localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
-  actions: CtaActionType[]
+  action: { type: CtaActionType }
   isWideScreen: boolean
   redirectParam: string
 }) {
   const actionConfigs: Array<{ actionComponent: () => React.ReactNode }> = []
 
   if (isWideScreen) {
-    actions.forEach((actionType: CtaActionType) => {
-      actionConfigs.push({
-        actionComponent: () => (
-          <ActionCta
-            key={actionType}
-            actionType={actionType}
-            event={event}
-            redirectParam={redirectParam}
-          />
-        )
-      })
+    actionConfigs.push({
+      actionComponent: () => (
+        <ActionCta
+          key={'ActionCta-' + event.id}
+          actionType={action.type}
+          event={event}
+          redirectParam={redirectParam}
+        />
+      )
     })
 
     if (localEventStatus === ExtendedEventStatuses.OUTBOX) {
       actionConfigs.push({
-        actionComponent: () => <RetryButton key="retry" event={event} />
+        actionComponent: () => (
+          <RetryButton key={'RetryButton-' + event.id} event={event} />
+        )
       })
     }
   }
@@ -364,7 +364,7 @@ export function processEventsToRows({
   eventConfigs,
   drafts,
   outbox,
-  actions,
+  action,
   redirectParam,
   isWideScreen,
   isOnline,
@@ -374,14 +374,13 @@ export function processEventsToRows({
   eventConfigs: EventConfig[]
   drafts: Draft[]
   outbox: OutboxEventIndex[]
-  actions: CtaActionType[] // can be reduced to one?
+  action: { type: CtaActionType }
   redirectParam: string
   isWideScreen: boolean
   isOnline: boolean
   intl: IntlShape
 }) {
   return events.map((event) => {
-    console.log(`Processing event ${event.id}`)
     const eventConfig = getEventConfigById(eventConfigs, event.type)
 
     const draft = first(drafts.filter((d) => d.eventId === event.id))
@@ -399,7 +398,7 @@ export function processEventsToRows({
     const actionComponents = buildAvailableActionComponents({
       event: eventWithDraft,
       localEventStatus: eventWithDraft.status,
-      actions,
+      action,
       isWideScreen,
       redirectParam
     })

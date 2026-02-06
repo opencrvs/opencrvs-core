@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 
 import {
   useTypedParams,
@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
+import { precompileActionSchemas } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 import { ROUTES } from '@client/v2-events/routes'
@@ -39,12 +40,16 @@ const FabContainer = styled.div`
     display: none;
   }
 `
-
 function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
+  const renderCount = useRef(0)
+  renderCount.current += 1
+
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
-  const workqueues = useCountryConfigWorkqueueConfigurations()
 
+  precompileActionSchemas(eventConfigs)
+
+  const workqueues = useCountryConfigWorkqueueConfigurations()
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
   if (!workqueueConfig) {
@@ -63,11 +68,6 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
 
   const intl = useIntl()
 
-  const actions = useMemo(
-    () => workqueueConfig.actions.map(({ type }) => type),
-    [workqueueConfig.actions]
-  )
-
   const events = useMemo(
     () => results.filter((event) => !outbox.find(({ id }) => id === event.id)),
     [results, outbox]
@@ -79,8 +79,8 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
 
   return (
     <SearchResultComponent
-      key={`${workqueueSlug}-${outbox.length}`}
-      actions={actions}
+      key={workqueueSlug}
+      action={workqueueConfig.action}
       columns={workqueueConfig.columns}
       emptyMessage={workqueueConfig.emptyMessage}
       eventConfigs={eventConfigs}
@@ -93,6 +93,9 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
 }
 
 function WorkqueueContent() {
+  const renderCount = useRef(0)
+  renderCount.current += 1
+
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   if (!workqueueSlug) {
     throw new Error('Workqueue slug is required')
@@ -107,6 +110,9 @@ function WorkqueueContent() {
 }
 
 export function WorkqueueContainer() {
+  const renderCount = useRef(0)
+  renderCount.current += 1
+
   return (
     <>
       <WorkqueueContent />

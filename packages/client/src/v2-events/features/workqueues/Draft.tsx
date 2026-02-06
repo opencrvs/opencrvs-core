@@ -69,7 +69,7 @@ export function Draft() {
   return (
     <SearchResultComponent
       key={`${CoreWorkqueues.DRAFT}-${outboxIds.length}`}
-      actions={WORKQUEUE_DRAFT.actions.map(({ type }) => type)}
+      action={WORKQUEUE_DRAFT.action}
       columns={mandatoryColumns}
       eventConfigs={eventConfigs}
       queryData={currentPageDrafts}

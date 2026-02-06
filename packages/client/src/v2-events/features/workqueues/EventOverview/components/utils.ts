@@ -19,6 +19,11 @@ import {
 import { IconProps } from '@opencrvs/components'
 
 export const actionLabels = {
+  [ActionType.READ]: {
+    defaultMessage: 'Review',
+    description: 'Review action label',
+    id: 'actions.read'
+  },
   [ActionType.NOTIFY]: {
     defaultMessage: 'Notify',
     description: 'Notify action label',

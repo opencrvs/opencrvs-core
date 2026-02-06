@@ -143,6 +143,7 @@ export function useViewableActionConfigurations(
           if (!assign) {
             return
           }
+
           await events.actions.assignment.assign.mutate({
             eventId,
             assignedTo: authentication.sub,

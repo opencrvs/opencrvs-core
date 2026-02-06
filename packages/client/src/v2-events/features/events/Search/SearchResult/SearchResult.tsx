@@ -8,13 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, {
-  useState,
-  useMemo,
-  PropsWithChildren,
-  useRef,
-  useEffect
-} from 'react'
+import React, { useState, useMemo, PropsWithChildren, useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { orderBy } from 'lodash'
 import { useTheme } from 'styled-components'
@@ -50,7 +44,6 @@ import {
 } from './utils'
 
 const WithTestId = styled.div.attrs({ 'data-testid': 'search-result' })``
-
 export const SearchResultComponent = ({
   columns,
   queryData: events,
@@ -59,7 +52,7 @@ export const SearchResultComponent = ({
   offset = 0,
   title: contentTitle,
   tabBarContent,
-  actions = [],
+  action,
   emptyMessage,
   totalResults
 }: PropsWithChildren<{
@@ -71,21 +64,15 @@ export const SearchResultComponent = ({
   title: string
   totalResults: number
   tabBarContent?: React.ReactNode
-  actions?: CtaActionType[]
+  action: { type: CtaActionType }
   emptyMessage?: TranslationConfig
 }>) => {
-  console.log('SearchResultComponent rendering')
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
 
   const navigate = useNavigate()
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
-
-  // Add this to track re-renders
-  const renderCount = useRef(0)
-  renderCount.current += 1
-  console.log(`SearchResultComponent render #${renderCount.current}`)
 
   const isOnline = useOnlineStatus()
   const params = deserializeSearchParams(location.search) as Record<
@@ -108,6 +95,7 @@ export const SearchResultComponent = ({
 
   const { getOutbox } = useEvents()
   const { getAllRemoteDrafts } = useDrafts()
+
   const outbox = getOutbox()
   const drafts = getAllRemoteDrafts()
 
@@ -119,11 +107,15 @@ export const SearchResultComponent = ({
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
   >(SORT_ORDER.DESCENDING)
 
-  const getSortFunction = createSortFunction(
-    sortedCol,
-    sortOrder,
-    setSortedCol,
-    setSortOrder
+  const getSortFunction = useCallback(
+    (column: string) =>
+      createSortFunction(
+        sortedCol,
+        sortOrder,
+        setSortedCol,
+        setSortOrder
+      )(column),
+    [sortedCol, sortOrder]
   )
 
   const isWideScreen = windowWidth > theme.grid.breakpoints.lg
@@ -135,11 +127,11 @@ export const SearchResultComponent = ({
         eventConfigs,
         drafts,
         outbox,
-        actions,
+        action,
         redirectParam: slug || '',
         isWideScreen,
         isOnline,
-        formatMessage: intl.formatMessage
+        intl
       }),
       sortedCol,
       sortOrder
@@ -149,11 +141,11 @@ export const SearchResultComponent = ({
     eventConfigs,
     drafts,
     outbox,
-    actions,
+    action,
     slug,
     isWideScreen,
     isOnline,
-    intl.formatMessage,
+    intl,
     sortedCol,
     sortOrder
   ])

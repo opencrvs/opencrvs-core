@@ -41,7 +41,7 @@ const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.ARCHIVED
 ]
 
-function getAvailableAssignmentActions(
+export function getAvailableAssignmentActions(
   event: EventIndex,
   authentication: ITokenPayload
 ) {
@@ -77,7 +77,7 @@ function getAvailableAssignmentActions(
 }
 
 /** Actions might have configured SHOW or ENABLE conditionals. Let's apply their effects here. */
-function applyActionConditionalEffects({
+export function applyActionConditionalEffects({
   event,
   action,
   validatorContext,
@@ -100,6 +100,7 @@ function applyActionConditionalEffects({
   }
 
   const hidden = !isActionVisible(actionConfig, event, validatorContext)
+
   const disabled = !isActionEnabled(actionConfig, event, validatorContext)
 
   return {

@@ -300,7 +300,7 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Outbox',
     description: 'Title of outbox workqueue'
   },
-  actions: [],
+  action: { type: ActionType.READ },
   slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
 }
@@ -311,7 +311,7 @@ export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  actions: [{ type: ActionType.DECLARE }],
+  action: { type: ActionType.DECLARE },
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }
