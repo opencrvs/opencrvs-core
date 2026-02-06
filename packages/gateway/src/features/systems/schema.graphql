@@ -25,6 +25,7 @@ enum SystemStatus {
 # Gateway converts the type to appropriate scopes when creating a system.
 # WEBHOOK type has been deprecated and removed.
 # REINDEX is hidden from UI - it's managed internally.
+# IMPORT_EXPORT is deprecated - existing systems can be displayed but new ones cannot be created.
 enum SystemType {
   NATIONAL_ID
   HEALTH

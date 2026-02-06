@@ -277,3 +277,39 @@ describe('delete system integration', () => {
     )
   })
 })
+
+describe('registerSystem mutation', () => {
+  let authHeaderSysAdmin: { Authorization: string }
+  beforeEach(() => {
+    fetch.resetMocks()
+    const sysAdminToken = jwt.sign(
+      { scope: [SCOPES.CONFIG_UPDATE_ALL] },
+      readFileSync('./test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderSysAdmin = {
+      Authorization: `Bearer ${sysAdminToken}`
+    }
+  })
+
+  it('should reject IMPORT_EXPORT system type', async () => {
+    const response = resolvers.Mutation!.registerSystem(
+      {},
+      {
+        system: {
+          name: 'Test Import Export System',
+          type: 'IMPORT_EXPORT'
+        }
+      },
+      { headers: authHeaderSysAdmin }
+    )
+    await expect(response).rejects.toThrowError(
+      'Invalid system integration type: IMPORT_EXPORT'
+    )
+  })
+})

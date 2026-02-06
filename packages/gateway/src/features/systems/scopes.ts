@@ -27,35 +27,30 @@ import { COUNTRY_CONFIG_URL, PRODUCTION } from '@gateway/constants'
  * These are the types shown to users in the admin UI.
  * Gateway converts these to appropriate scopes.
  * Note: REINDEX is hidden from UI - it's managed internally.
+ * Note: IMPORT_EXPORT is deprecated and cannot be created via registerSystem.
  */
 export type SystemIntegrationType =
   | 'HEALTH'
   | 'NATIONAL_ID'
   | 'RECORD_SEARCH'
-  | 'IMPORT_EXPORT'
 
 /**
  * Default scopes for each system integration type.
  * These are the base scopes that each type gets.
  * Note: REINDEX is hidden from UI - it's managed internally.
+ * Note: IMPORT_EXPORT is deprecated and removed from valid types.
  */
 const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, Scope[]> = {
   HEALTH: [SCOPES.NOTIFICATION_API],
   NATIONAL_ID: [SCOPES.NATIONALID],
-  RECORD_SEARCH: [SCOPES.RECORDSEARCH],
-  IMPORT_EXPORT: [
-    SCOPES.RECORD_IMPORT,
-    SCOPES.RECORD_EXPORT,
-    SCOPES.RECORDSEARCH,
-    SCOPES.USER_DATA_SEEDING,
-    SCOPES.RECORD_REINDEX
-  ]
+  RECORD_SEARCH: [SCOPES.RECORDSEARCH]
 }
 
 /**
  * Configurable scopes that need to be expanded with event IDs.
  * For example, HEALTH type gets record.create and record.notify scopes
  * that are expanded for each configured event type.
+ * Note: IMPORT_EXPORT is deprecated and removed from valid types.
  */
 const CONFIGURABLE_SCOPES_BY_TYPE: Record<
   SystemIntegrationType,
@@ -63,8 +58,8 @@ const CONFIGURABLE_SCOPES_BY_TYPE: Record<
 > = {
   HEALTH: ['record.create', 'record.notify'],
   NATIONAL_ID: [],
-  RECORD_SEARCH: [],
-  IMPORT_EXPORT: []}
+  RECORD_SEARCH: []
+}
 
 /**
  * In-memory cache for event configurations (production only)

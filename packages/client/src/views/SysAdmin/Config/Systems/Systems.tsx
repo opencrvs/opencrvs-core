@@ -65,8 +65,7 @@ const Field = styled.div`
 const SystemRole = z.enum([
   'HEALTH',
   'NATIONAL_ID',
-  'RECORD_SEARCH',
-  'IMPORT_EXPORT'
+  'RECORD_SEARCH'
 ])
 
 /**
@@ -511,16 +510,16 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                     {
                       label: intl.formatMessage(
                         integrationMessages.integrationType,
-                        { type: SystemRole.enum.RECORD_SEARCH }
+                        { type: SystemRole.enum.NATIONAL_ID }
                       ),
-                      value: SystemRole.enum.RECORD_SEARCH
+                      value: SystemRole.enum.NATIONAL_ID
                     },
                     {
                       label: intl.formatMessage(
                         integrationMessages.integrationType,
-                        { type: SystemRole.enum.IMPORT_EXPORT }
+                        { type: SystemRole.enum.RECORD_SEARCH }
                       ),
-                      value: SystemRole.enum.IMPORT_EXPORT
+                      value: SystemRole.enum.RECORD_SEARCH
                     }
                   ]}
                   id={'permissions-selectors'}
