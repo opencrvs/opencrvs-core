@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { ResponsiveModal, Button } from '@opencrvs/components'
+import { Icon, Dialog, Button, Text } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 
@@ -18,34 +18,36 @@ export function AssignModal({ close }: { close: (result: boolean) => void }) {
   const intl = useIntl()
 
   return (
-    <ResponsiveModal
-      autoHeight
-      preventClickOnParent
-      show
+    <Dialog
       actions={[
-        <Button
-          key="assign-btn"
-          id="assign"
-          type="positive"
-          onClick={() => close(true)}
-        >
-          {intl.formatMessage(buttonMessages.assign)}
-        </Button>,
         <Button
           key="cancel-btn"
           id="cancel"
+          size="medium"
           type="tertiary"
           onClick={() => close(false)}
         >
           {intl.formatMessage(buttonMessages.cancel)}
+        </Button>,
+        <Button
+          key="assign-btn"
+          id="assign"
+          size="medium"
+          type="positive"
+          onClick={() => close(true)}
+        >
+          {intl.formatMessage(buttonMessages.assign)}
         </Button>
       ]}
-      handleClose={() => close(false)}
       id="assignment"
-      responsive={false}
+      isOpen={true}
       title={intl.formatMessage(conflictsMessages.assignTitle)}
+      titleIcon={<Icon color="copy" name="PushPin" size="large" />}
+      onClose={() => close(false)}
     >
-      {intl.formatMessage(conflictsMessages.assignDesc)}
-    </ResponsiveModal>
+      <Text color="grey500" element="p" variant="reg16">
+        {intl.formatMessage(conflictsMessages.assignDesc)}
+      </Text>
+    </Dialog>
   )
 }
