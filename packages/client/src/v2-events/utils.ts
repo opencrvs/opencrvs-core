@@ -55,8 +55,7 @@ type AllKeys<T> = T extends T ? keyof T : never
  * Used for fetching user data in bulk.
  */
 export const getUserIdsFromActions = (
-  actions: ActionDocument[],
-  ignoreRoles?: string[]
+  actions: ActionDocument[]
 ) => {
   const userIdFields = [
     'createdBy',
@@ -64,10 +63,6 @@ export const getUserIdsFromActions = (
   ] satisfies AllKeys<ActionDocument>[]
 
   const userIds = actions
-    .filter(
-      ({ createdByRole }) =>
-        !ignoreRoles?.some((role) => role === createdByRole)
-    )
     .flatMap((action) =>
       userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
     )

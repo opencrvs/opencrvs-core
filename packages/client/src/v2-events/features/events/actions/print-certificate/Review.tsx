@@ -167,7 +167,7 @@ export function Review() {
   const validatorContext = useValidatorContext(fullEvent)
   const actions = getAcceptedActions(fullEvent)
 
-  const userIds = getUserIdsFromActions(actions, [])
+  const userIds = getUserIdsFromActions(actions)
 
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
