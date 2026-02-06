@@ -20,13 +20,13 @@ import {
   deepDropNulls
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
+import { messages } from '@client/v2-events/layouts/EventOverview/index'
 import { useDrafts } from '../../drafts/useDrafts'
 import { DuplicateWarning } from '../../events/actions/dedup/DuplicateWarning'
 import { EventSummary } from './components/EventSummary'
@@ -73,14 +73,10 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
       flags: eventIndex.flags
     }
 
-  const { getEventTitle } = useEventTitle()
-  const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
-
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
-      size={ContentSize.LARGE}
-      title={title}
+      size={ContentSize.NORMAL}
+      title={intl.formatMessage(messages.summary)}
       titleColor={event.id ? 'copy' : 'grey600'}
     >
       <EventSummary
@@ -133,9 +129,8 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
-      size={ContentSize.LARGE}
-      title={title}
+      size={ContentSize.NORMAL}
+      title={intl.formatMessage(messages.summary)}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}
     >
       <EventSummary

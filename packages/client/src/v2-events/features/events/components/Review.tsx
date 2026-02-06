@@ -44,13 +44,10 @@ import { buttonMessages } from '@client/i18n/messages'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
-const ValidationError = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
-  display: inline-block;
-  text-transform: lowercase;
-
-  &::first-letter {
-    text-transform: uppercase;
+const ReviewContainter = styled.div`
+  padding: 0px 32px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0px 24px;
   }
 `
 
@@ -72,36 +69,7 @@ const Row = styled.div<{
     padding: 0;
   }
 `
-const HeaderContainer = styled.div`
-  padding: 16px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-`
-const HeaderContent = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: left;
-  gap: 16px;
-  align-items: center;
-  ${({ theme }) => theme.fonts.h2}
-  color: ${({ theme }) => theme.colors.copy};
-`
 
-const TitleContainer = styled.div`
-  ${({ theme }) => theme.fonts.bold14}
-  color: ${({ theme }) => theme.colors.supportingCopy};
-  text-transform: uppercase;
-`
-const SubjectContainer = styled.div`
-  ${({ theme }) => theme.fonts.h2}
-  overflow-wrap: anywhere;
-`
-const RightColumn = styled.div`
-  width: 40%;
-  border-radius: 4px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
 const LeftColumn = styled.div`
   flex-grow: 1;
   max-width: 840px;
@@ -122,22 +90,55 @@ const Card = styled.div`
   }
 `
 
-const FormData = styled.div`
-  padding-top: 24px;
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
+const Header = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: 16px 24px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px;
+    display: none;
   }
 `
 
-const ReviewContainter = styled.div`
-  padding: 0px 32px;
+const SubHeaderContainer = styled.div`
+  position: relative;
+  margin: 0 32px;
+  padding: 24px 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: ${({ theme }) => theme.colors.copy};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0;
+    margin: 0 32px;
   }
 `
+
+const FormData = styled.div`
+  padding: 24px 0px;
+`
+
 const DeclarationDataContainer = styled.div``
+
+const ValidationError = styled.span`
+  color: ${({ theme }) => theme.colors.negative};
+  display: inline-block;
+  text-transform: lowercase;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+`
+
+const RightColumn = styled.div`
+  width: 40%;
+  border-radius: 4px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
 
 const reviewMessages = defineMessages({
   changeAllButton: {
@@ -182,37 +183,47 @@ const reviewMessages = defineMessages({
   },
   rejectModalTitle: {
     id: 'rejectModal.title',
-    defaultMessage: 'Reason for rejection?',
+    defaultMessage: 'Reject?',
     description: 'The title for reject modal'
   },
   rejectModalMarkAsDuplicate: {
     id: 'rejectModal.markAsDuplicate',
     defaultMessage: 'Mark as a duplicate',
     description: 'The label for mark as duplicate checkbox of reject modal'
+  },
+  recordTabTitle: {
+    id: 'recordTab.title',
+    defaultMessage: 'Record',
+    description: 'The label for page title for the record tab'
   }
 })
 
-function ReviewHeader({ title }: { title: string }) {
+function SubHeader({ title }: { title: string }) {
   const countryLogoFile = useSelector(getCountryLogoFile)
   const intl = useIntl()
 
   return (
-    <HeaderContainer>
-      <HeaderContent>
-        {countryLogoFile && <CountryLogo size="small" src={countryLogoFile} />}
-        <Stack
-          alignItems="flex-start"
-          direction="column"
-          gap={6}
-          justify-content="flex-start"
+    <SubHeaderContainer>
+      {countryLogoFile && <CountryLogo size="small" src={countryLogoFile} />}
+      <Stack
+        alignItems="flex-start"
+        direction="column"
+        gap={6}
+        justify-content="flex-start"
+      >
+        <Text
+          color="supportingCopy"
+          element="h2"
+          id="header_title"
+          variant="h4"
         >
-          <TitleContainer id={`header_title`}>
-            {intl.formatMessage(reviewMessages.govtName)}
-          </TitleContainer>
-          <SubjectContainer id={`header_subject`}>{title}</SubjectContainer>
-        </Stack>
-      </HeaderContent>
-    </HeaderContainer>
+          {intl.formatMessage(reviewMessages.govtName)}
+        </Text>
+        <Text color="copy" element="h3" id={`header_subject`} variant="h3">
+          {title}
+        </Text>
+      </Stack>
+    </SubHeaderContainer>
   )
 }
 
@@ -443,12 +454,19 @@ function ReviewComponent({
   const hasReviewFieldsToUpdate =
     annotation && onAnnotationChange && reviewFields && reviewFields.length > 0
 
+  const intl = useIntl()
+
   return (
     <Row>
       <LeftColumn>
         {banner}
         <Card>
-          <ReviewHeader title={title} />
+          <Header>
+            <Text color="copy" element="h1" id={`header_title`} variant="h2">
+              {intl.formatMessage(reviewMessages.recordTabTitle)}
+            </Text>
+          </Header>
+          <SubHeader title={title} />
           <FormReview
             form={form}
             formConfig={formConfig}
@@ -678,7 +696,7 @@ function RejectActionModal({
         })
       }}
     >
-      {intl.formatMessage(reviewMessages.rejectModalSendForUpdate)}
+      {intl.formatMessage(buttonMessages.reject)}
     </Button>
   ]
 
