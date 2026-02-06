@@ -67,6 +67,7 @@ export function useViewableActionConfigurations(
 
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
+
   const [assignModal, openAssignModal] = useModal()
   const intl = useIntl()
 

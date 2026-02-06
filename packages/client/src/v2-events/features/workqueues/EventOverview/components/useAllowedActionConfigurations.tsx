@@ -77,7 +77,7 @@ export function getAvailableAssignmentActions(
 }
 
 /** Actions might have configured SHOW or ENABLE conditionals. Let's apply their effects here. */
-export function applyActionConditionalEffects({
+function applyActionConditionalEffects({
   event,
   action,
   validatorContext,

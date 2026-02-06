@@ -83,6 +83,47 @@ export function sortActions(
   })
 }
 
+function ActionMenuItems({
+  items,
+  eventConfiguration,
+  redirectParam,
+  onAction
+}: {
+  items: ActionMenuItem[]
+  eventConfiguration: EventConfig
+  redirectParam?: string
+  onAction?: () => void
+}) {
+  const sortedActions = sortActions(items, eventConfiguration)
+  const intl = useIntl()
+
+  if (sortedActions.length === 0) {
+    return (
+      <DropdownMenu.Label>
+        <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
+      </DropdownMenu.Label>
+    )
+  }
+
+  return sortedActions.map((action) => {
+    return (
+      <DropdownMenu.Item
+        key={
+          'customActionType' in action ? action.customActionType : action.type
+        }
+        disabled={'disabled' in action ? action.disabled : false}
+        onClick={async () => {
+          await action.onClick(redirectParam)
+          onAction?.()
+        }}
+      >
+        <Icon color="currentColor" name={action.icon} size="small" />
+        {intl.formatMessage(action.label)}
+      </DropdownMenu.Item>
+    )
+  })
+}
+
 export function ActionMenu({
   eventId,
   onAction
@@ -95,6 +136,7 @@ export function ActionMenu({
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
+
   const { searchEventById } = useEvents()
 
   const maybeAuth = useAuthentication()
@@ -103,63 +145,33 @@ export function ActionMenu({
     'Authentication is not available but is required'
   )
 
-  const getEventQuery = searchEventById.useSuspenseQuery(eventId)
+  const [eventIndex] = searchEventById.useSuspenseQuery(eventId)
 
-  const eventResults = getEventQuery
-
-  if (eventResults.total === 0) {
+  if (!eventIndex) {
     throw new Error(`Event ${eventId} not found`)
   }
-  const eventState = eventResults.results[0]
 
-  const assignedToUser = getUser.useQuery(eventState.assignedTo || '', {
-    enabled: !!eventState.assignedTo
+  const assignedToUser = getUser.useQuery(eventIndex.assignedTo || '', {
+    enabled: !!eventIndex.assignedTo
   }).data
+
   const assignedUserFullName = assignedToUser
     ? getUsersFullName(assignedToUser.name, intl.locale)
     : ''
+
   const assignedOffice = assignedToUser?.primaryOfficeId
   const assignedOfficeName =
     (assignedOffice && locations.get(assignedOffice)?.name) || ''
 
   const [modals, actionMenuItems] = useAllowedActionConfigurations(
-    eventState,
+    eventIndex,
     auth
   )
 
-  const { eventConfiguration } = useEventConfiguration(eventState.type)
+  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
 
   const assignedToOther =
-    eventState.assignedTo && eventState.assignedTo !== auth.sub
-
-  function ActionMenuItems() {
-    const sortedActions = sortActions(actionMenuItems, eventConfiguration)
-    if (sortedActions.length === 0) {
-      return (
-        <DropdownMenu.Label>
-          <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
-        </DropdownMenu.Label>
-      )
-    }
-
-    return sortedActions.map((action) => {
-      return (
-        <DropdownMenu.Item
-          key={
-            'customActionType' in action ? action.customActionType : action.type
-          }
-          disabled={'disabled' in action ? action.disabled : false}
-          onClick={async () => {
-            await action.onClick(workqueue)
-            onAction?.()
-          }}
-        >
-          <Icon color="currentColor" name={action.icon} size="small" />
-          {intl.formatMessage(action.label)}
-        </DropdownMenu.Item>
-      )
-    })
-  }
+    eventIndex.assignedTo && eventIndex.assignedTo !== auth.sub
 
   return (
     <>
@@ -185,7 +197,12 @@ export function ActionMenu({
               <DropdownMenu.Separator />
             </>
           )}
-          <ActionMenuItems />
+          <ActionMenuItems
+            eventConfiguration={eventConfiguration}
+            items={actionMenuItems}
+            redirectParam={workqueue}
+            onAction={onAction}
+          />
         </DropdownMenu.Content>
       </DropdownMenu>
       {modals}
