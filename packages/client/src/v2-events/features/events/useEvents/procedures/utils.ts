@@ -167,10 +167,10 @@ export function setQueryDefaults<
     ) => QueryOutput
   }
 ) {
-  queryClient.setQueryDefaults(
-    query.queryKey(),
-    options as Parameters<typeof queryClient.setQueryDefaults>[1]
-  )
+  queryClient.setQueryDefaults(query.queryKey(), {
+    ...(options as Parameters<typeof queryClient.setQueryDefaults>[1]),
+    networkMode: 'online'
+  })
 }
 
 export function createEventActionMutationFn<
