@@ -13,13 +13,9 @@ import { MessageDescriptor, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { Dialog, Text } from '@opencrvs/components'
-import {
-  DangerButton,
-  PrimaryButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
 import { Icon, IconProps } from '@opencrvs/components/src/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { Button } from '@opencrvs/components/lib/Button'
 import {
   ActionType,
   CustomActionConfig,
@@ -104,9 +100,6 @@ function QuickActionModal({
   const eventDocument = getEvent.useGetOrDownloadEvent(eventId)
   const event = getCurrentEventState(eventDocument, eventConfiguration)
 
-  const ConfirmButton =
-    config.confirmButtonType === 'danger' ? DangerButton : PrimaryButton
-
   const handleChange = (values: Record<string, FieldUpdateValue>) => {
     setModalValues((prev) => ({
       ...prev,
@@ -125,24 +118,25 @@ function QuickActionModal({
   return (
     <Dialog
       actions={[
-        <TertiaryButton
+        <Button
           key="cancel"
           id="cancel-btn"
+          type="tertiary"
           onClick={() => close({ result: false })}
         >
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <ConfirmButton
+        </Button>,
+        <Button
           key="confirm"
-          bg={'primaryBlue'}
           disabled={errorsOnField.length > 0}
           id="confirm-btn"
+          type="primary"
           onClick={() => close({ result: true, values: modalValues })}
         >
           {intl.formatMessage(
             config.confirmButtonLabel || buttonMessages.confirm
           )}
-        </ConfirmButton>
+        </Button>
       ]}
       id={`quick-action-modal-${config.label.id}`}
       isOpen={true}
@@ -159,7 +153,6 @@ function QuickActionModal({
         />
       }
       variant={'large'}
-      width={898}
       onClose={() => close({ result: false })}
     >
       <Stack alignItems="left" direction="column" gap={16}>

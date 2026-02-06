@@ -11,7 +11,7 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { ResponsiveModal, Stack, Table } from '@opencrvs/components'
+import { Dialog, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
@@ -120,15 +120,13 @@ export function EventHistoryDialog({
   const duplicateOf = prepareDuplicateOf(action, history)
 
   return (
-    <ResponsiveModal
-      autoHeight
+    <Dialog
       actions={[]}
-      handleClose={close}
       id="event-history-modal"
-      responsive={true}
-      show={true}
+      isOpen={true}
       title={title}
-      width={1024}
+      variant="large"
+      onClose={close}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg19">
@@ -192,6 +190,6 @@ export function EventHistoryDialog({
         fullEvent={fullEvent}
         validatorContext={validatorContext}
       />
-    </ResponsiveModal>
+    </Dialog>
   )
 }

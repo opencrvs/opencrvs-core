@@ -37,8 +37,8 @@ export function AvatarSmall({ name, avatar, ...props }: IProps) {
   if (!error && (name || avatar)) {
     return (
       <AvatarImage
-        width={36}
-        height={36}
+        width={32}
+        height={32}
         src={
           avatar
             ? avatar.data
