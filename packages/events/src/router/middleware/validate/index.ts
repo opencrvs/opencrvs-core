@@ -143,11 +143,12 @@ function validateDeclarationUpdateAction({
 
   // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
   // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
-  const cleanedDeclaration = omitHiddenPaginatedFields(
-    declarationConfig,
-    completeDeclaration,
-    context
-  )
+  const cleanedDeclaration = omitHiddenPaginatedFields({
+    formConfig: declarationConfig,
+    values: completeDeclaration,
+    validatorContext: context,
+    keepHiddenNulls: true
+  })
 
   // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
   // Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.

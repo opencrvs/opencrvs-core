@@ -97,11 +97,12 @@ function getCleanedDeclarationDiff({
 
   // If there's no original declaration, just clean the update and return it
   if (isEmpty(originalDeclaration)) {
-    return omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
-      declarationDiff,
-      validatorContext
-    )
+    return omitHiddenPaginatedFields({
+      formConfig: eventConfiguration.declaration,
+      values: declarationDiff,
+      validatorContext,
+      keepHiddenNulls: true
+    })
   }
 
   // Merge original + updates so we get the final event state
@@ -110,11 +111,12 @@ function getCleanedDeclarationDiff({
 
   // Remove any hidden/paginated fields from the merged declaration
   // (Ensures we only consider fields relevant to the event configuration)
-  const cleanedDeclaration = omitHiddenPaginatedFields(
-    eventConfiguration.declaration,
-    merged,
-    validatorContext
-  )
+  const cleanedDeclaration = omitHiddenPaginatedFields({
+    formConfig: eventConfiguration.declaration,
+    values: merged,
+    validatorContext,
+    keepHiddenNulls: true
+  })
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
