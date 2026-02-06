@@ -15,7 +15,6 @@ import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
-import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import { z } from 'zod'
 import {
   Alert,
@@ -124,23 +123,12 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }, [])
 
   const {
-    closePermissionModal,
     systemToDeleteData,
     deleteSystem,
     systemToDelete,
     setSystemToDelete,
     systemToDeleteLoading,
     systemToDeleteError,
-    updatePermissionsData,
-    updatePermissionsLoading,
-    updatePermissionsError,
-    updatePermissions,
-    systemToShowPermission,
-    setSystemToShowPermission,
-    birthPermissions,
-    setBirthPermissions,
-    deathPermissions,
-    setDeathPermissions,
     existingSystems,
     deactivateSystem,
     systemToToggleActivation,
@@ -649,19 +637,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
         )}
       </ResponsiveModal>
 
-      {systemToShowPermission && (
-        <WebhookModal
-          system={systemToShowPermission}
-          loading={updatePermissionsLoading}
-          updatePermissions={updatePermissions}
-          birthPermissions={birthPermissions}
-          deathPermissions={deathPermissions}
-          setBirthPermissions={setBirthPermissions}
-          setDeathPermissions={setDeathPermissions}
-          closeModal={closePermissionModal}
-        />
-      )}
-
       {systemToDelete && (
         <DeleteSystemModal
           system={systemToDelete}
@@ -689,15 +664,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           {intl.formatMessage(integrationMessages.deactivateClientStatus)}
         </Toast>
       )}
-      {updatePermissionsData && (
-        <Toast
-          type="success"
-          id="updaPermissionsSuccess"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.updatePermissionsMsg)}
-        </Toast>
-      )}
 
       {systemToDeleteData && (
         <Toast
@@ -713,7 +679,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
         deactivateSystemError ||
         registerSystemError ||
         refreshTokenError ||
-        updatePermissionsError ||
         systemToDeleteError) && (
         <Toast
           type="error"
