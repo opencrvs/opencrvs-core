@@ -20,7 +20,7 @@ import {
   getCurrentEventState,
   RegisterActionInput
 } from '@opencrvs/commons/events'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
@@ -84,7 +84,8 @@ export const detectDuplicate: MiddlewareFunction<
   const createdByDetails = {
     createdBy: user.id,
     createdByUserType: user.type,
-    createdByRole: user.role,
+    createdByRole:
+      user.type === TokenUserType.enum.user ? user.role : undefined,
     createdAtLocation: user.primaryOfficeId,
     createdBySignature: user.signature
   }

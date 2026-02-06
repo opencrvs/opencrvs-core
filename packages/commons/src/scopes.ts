@@ -29,6 +29,7 @@ export const SCOPES = {
   RECORD_IMPORT: 'record.import',
   RECORD_EXPORT: 'record.export',
   RECORD_REINDEX: 'record.reindex',
+  INTEGRATION_CREATE: 'integration.create',
 
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
@@ -124,7 +125,8 @@ const IntegrationScopes = z.union([
   z.literal(SCOPES.WEBHOOK),
   z.literal(SCOPES.NATIONALID),
   z.literal(SCOPES.NOTIFICATION_API),
-  z.literal(SCOPES.RECORDSEARCH)
+  z.literal(SCOPES.RECORDSEARCH),
+  z.literal(SCOPES.INTEGRATION_CREATE)
 ])
 
 // Internal operations

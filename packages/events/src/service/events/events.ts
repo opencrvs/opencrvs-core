@@ -227,7 +227,7 @@ export async function createEvent({
     trackingId: generateTrackingId(),
     createdBy: user.id,
     createdByUserType: user.type,
-    createdByRole: user.role,
+    createdByRole: user.type === TokenUserType.enum.user ? user.role : undefined,
     createdBySignature: user.signature,
     createdAtLocation: eventLocation
   })
@@ -269,11 +269,11 @@ export function buildAction(
     annotation: input.annotation,
     ...('content' in input ? { content: input.content } : {}),
     createdBy: user.id,
-    createdByRole: user.role,
+    createdByRole: user.type === TokenUserType.enum.user ? user.role : undefined,
     createdByUserType: user.type,
     createdBySignature: user.signature,
     createdAtLocation:
-      user.type === 'system' ? input.createdAtLocation : user.primaryOfficeId,
+      user.type === TokenUserType.enum.system ? input.createdAtLocation : user.primaryOfficeId,
     originalActionId: input.originalActionId
   }
   switch (input.type) {

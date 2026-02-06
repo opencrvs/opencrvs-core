@@ -27,7 +27,6 @@ import {
   getUUID,
   Scope,
   SCOPES,
-  SystemRole,
   TokenUserType,
   TokenWithBearer
 } from '@opencrvs/commons'
@@ -134,7 +133,7 @@ export function createTestToken({
   userId: string
   scopes: Scope[]
   userType?: TokenUserType
-  role: string
+  role?: string
 }): TokenWithBearer {
   const token = jwt.sign(
     { scope: scopes, sub: userId, userType, role },
@@ -184,14 +183,12 @@ export function createSystemTestClient(
   const token = createTestToken({
     userId: systemId,
     scopes,
-    role: 'TEST_SYSTEM_ROLE',
     userType: TokenUserType.enum.system
   })
 
   const caller = createCaller({
     user: SystemContext.parse({
       id: systemId,
-      role: SystemRole.enum.HEALTH,
       primaryOfficeId: undefined,
       type: TokenUserType.enum.system
     }),
