@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import { expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { graphql, HttpResponse } from 'msw'
 import superjson from 'superjson'
@@ -74,7 +75,11 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
     const canvas = within(canvasElement)
 
     await canvas.findByText("Applicant's name")
-    await canvas.findByText('Riku This value is from a draft')
+
+    await expect(
+      await canvas.findByTestId('row-value-applicant.name')
+    ).toHaveTextContent('Riku This value is from a draft')
+
     await canvas.findByText(
       'Member declaration for Riku This value is from a draft'
     )
