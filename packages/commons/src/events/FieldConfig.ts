@@ -336,6 +336,8 @@ const HtmlFontVariant = z.enum([
 
 export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
 
+const ParagraphTextAlign = z.enum(['left', 'center', 'right', 'start', 'end'])
+
 const ParagraphConfiguration = z
   .object({
     styles: z
@@ -346,7 +348,10 @@ const ParagraphConfiguration = z
         hint: z
           .boolean()
           .optional()
-          .describe('When true, paragraph is styled as a hint with grey color')
+          .describe('When true, paragraph is styled as a hint with grey color'),
+        textAlign: ParagraphTextAlign.optional().describe(
+          'Text alignment for the paragraph'
+        )
       })
       .optional()
   })
