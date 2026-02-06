@@ -585,7 +585,9 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
                   conditionals: [
                     {
                       type: ConditionalType.ENABLE,
-                      conditional: field('applicant.age').isEqualTo(40)
+                      conditional: event
+                        .declaration('applicant.age')
+                        .isEqualTo(40)
                     }
                   ]
                 }

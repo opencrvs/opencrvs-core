@@ -16,9 +16,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { SelectOption, ValidationConfig } from './FieldConfig'
 
 /**
- * Entry point for defining conditional logic or configuration for a form field.
- * @param fieldId - The ID of the field to define rules or config for.
- * @returns An object combining conditional methods and configuration builders.
+ * @deprecated Use `event.declaration` instead
  */
 export function field(
   fieldId: string,

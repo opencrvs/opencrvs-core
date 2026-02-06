@@ -70,7 +70,7 @@ const BaseField = z.object({
     label would be "Applicant Applicant's First Name", which is redundant and awkward.
 
     By setting searchCriteriaLabelPrefix to a translation config object, we can explicitly define the desired prefix
-    in the country-config > event.advancedSearch configuration. For example: field("child.dob", { searchCriteriaLabelPrefix: TranslationConfig }).
+    in the country-config > event.advancedSearch configuration. For example: event.declaration("child.dob", { searchCriteriaLabelPrefix: TranslationConfig }).
     `
   ),
   conditionals: z

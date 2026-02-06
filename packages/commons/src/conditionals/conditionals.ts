@@ -97,7 +97,7 @@ export function alwaysTrue(): AjvJSONSchema {
 /**
  * Universal boolean connector to be used with any type of conditional. (user, event, field)
  *
- * @example and(field('foo').isEqualTo('bar'), field('baz').isUndefined())
+ * @example and(event.declaration('foo').isEqualTo('bar'), event.declaration('baz').isUndefined())
  */
 export function and(...conditions: AjvJSONSchema[]): JSONSchema {
   return defineConditional({
@@ -110,7 +110,7 @@ export function and(...conditions: AjvJSONSchema[]): JSONSchema {
 /**
  * Universal boolean connector to be used with any type of conditional. (user, event, field)
  *
- * @example or(field('foo').isEqualTo('bar'), field('baz').isUndefined())
+ * @example or(event.declaration('foo').isEqualTo('bar'), event.declaration('baz').isUndefined())
  */
 export function or(...conditions: AjvJSONSchema[]): JSONSchema {
   return defineConditional({
@@ -123,7 +123,7 @@ export function or(...conditions: AjvJSONSchema[]): JSONSchema {
 /**
  * Universal boolean connector to be used with any type of conditional. (user, event, field)
  *
- * @example not(field('foo').isEqualTo('bar'))
+ * @example not(event.declaration('foo').isEqualTo('bar'))
  */
 export function not(condition: AjvJSONSchema): JSONSchema {
   return defineConditional({
@@ -398,7 +398,7 @@ function defineComparison(
  *
  * @param fieldId - The field ID condition is applied to.
  * @example to combine multiple conditions, utilise connectors like `and`, `or`, `not`:
- *  and(field('foo').isEqualTo('bar'), field('baz').isUndefined())
+ *  and(event.declaration('foo').isEqualTo('bar'), event.declaration('baz').isUndefined())
  *
  */
 
@@ -611,7 +611,7 @@ export function createFieldConditionals(fieldId: string) {
     },
     /**
      * Use case: Some fields are rendered when selection is not made, or boolean false is explicitly selected.
-     * @example field('recommender.none').isFalsy() vs not(field('recommender.none').isEqualTo(true))
+     * @example event.declaration('recommender.none').isFalsy() vs not(event.declaration('recommender.none').isEqualTo(true))
      * @returns whether the field is falsy (undefined, false, null, empty string)
      *
      * NOTE: For now, this only works with string, boolean, and null types. 0 is still allowed.
@@ -769,11 +769,11 @@ export function createFieldConditionals(fieldId: string) {
     getId: () => ({ fieldId }),
     /**
      * @deprecated
-     * use field(fieldId).get(nestedProperty) instead
+     * use event.declaration(fieldId).get(nestedProperty) instead
      * with 'and' combinator e.g.
      * and(
-     *   field('child.name').get('firstname').isEqualTo('John'),
-     *   field('child.name').get('surname').isEqualTo('Doe')
+     *   event.declaration('child.name').get('firstname').isEqualTo('John'),
+     *   event.declaration('child.name').get('surname').isEqualTo('Doe')
      * )
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

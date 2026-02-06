@@ -66,7 +66,9 @@ const overriddenEventConfig = {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: field('applicant.contactMethod').isEqualTo('PHONE')
+              conditional: event
+                .declaration('applicant.contactMethod')
+                .isEqualTo('PHONE')
             }
           ]
         })
@@ -77,7 +79,9 @@ const overriddenEventConfig = {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: field('applicant.contactMethod').isEqualTo('EMAIL')
+              conditional: event
+                .declaration('applicant.contactMethod')
+                .isEqualTo('EMAIL')
             }
           ]
         })

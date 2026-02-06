@@ -113,7 +113,7 @@ const searchFields = [
             id: 'event.birth.child.brn.totalResults.label',
             description: 'Total results from BRN search'
           },
-          value: field('child.brn-search').get('data.total')
+          value: event.declaration('child.brn-search').get('data.total')
         }
       ]
     }
@@ -122,13 +122,10 @@ const searchFields = [
     id: 'child.name',
     type: FieldType.NAME,
     required: true,
-    parent: field('child.brn-search'),
-    value: field('child.brn-search').getByPath([
-      'data',
-      'firstResult',
-      'declaration',
-      'child.name'
-    ]),
+    parent: event.declaration('child.brn-search'),
+    value: event
+      .declaration('child.brn-search')
+      .getByPath(['data', 'firstResult', 'declaration', 'child.name']),
     hideLabel: true,
     label: {
       defaultMessage: "child's name",

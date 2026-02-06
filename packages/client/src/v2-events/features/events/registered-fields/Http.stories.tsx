@@ -66,7 +66,7 @@ const fetchBrnFields: FieldConfig[] = [
       id: 'event.marriage.groom.brn.label'
     },
     configuration: {
-      trigger: field('groom.http-button'),
+      trigger: event.declaration('groom.http-button'),
       url: '/api/brn',
       timeout: 5000,
       method: 'POST',
@@ -90,15 +90,15 @@ const fetchBrnFields: FieldConfig[] = [
       {
         type: ConditionalType.ENABLE,
         conditional: and(
-          field('groom.http-fetch').isUndefined(),
+          event.declaration('groom.http-fetch').isUndefined(),
           user.isOnline()
         )
       },
       {
         type: ConditionalType.SHOW,
         conditional: and(
-          field('groom.http-fetch').get('loading').isFalsy(),
-          field('groom.http-fetch').get('data').isFalsy()
+          event.declaration('groom.http-fetch').get('loading').isFalsy(),
+          event.declaration('groom.http-fetch').get('data').isFalsy()
         )
       }
     ],
@@ -126,7 +126,10 @@ const fetchBrnFields: FieldConfig[] = [
       },
       {
         type: ConditionalType.SHOW,
-        conditional: field('groom.http-fetch').get('loading').isEqualTo(true)
+        conditional: event
+          .declaration('groom.http-fetch')
+          .get('loading')
+          .isEqualTo(true)
       }
     ],
     configuration: {
@@ -153,7 +156,7 @@ const fetchBrnFields: FieldConfig[] = [
       },
       {
         type: ConditionalType.SHOW,
-        conditional: not(field('groom.brn').isFalsy())
+        conditional: not(event.declaration('groom.brn').isFalsy())
       }
     ],
     configuration: {
@@ -168,7 +171,7 @@ const fetchBrnFields: FieldConfig[] = [
   {
     id: 'groom.brn',
     type: FieldType.TEXT,
-    parent: field('groom.http-fetch'),
+    parent: event.declaration('groom.http-fetch'),
     label: {
       defaultMessage: 'Fetch BRN',
       description: 'Fetch BRN',
@@ -180,7 +183,7 @@ const fetchBrnFields: FieldConfig[] = [
         conditional: never()
       }
     ],
-    value: field('groom.http-fetch').get('data.brn')
+    value: event.declaration('groom.http-fetch').get('data.brn')
   }
 ]
 

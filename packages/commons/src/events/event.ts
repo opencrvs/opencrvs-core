@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defineConditional } from '../conditionals/conditionals'
+import { createFieldConfig } from '../field-config/field-configuration'
+import {
+  createFieldConditionals,
+  defineConditional
+} from '../conditionals/conditionals'
 import { createEventFieldConfig } from '../event-config/event-configuration'
 import { ActionType } from './ActionType'
 import { EventFieldIdInput } from './AdvancedSearchConfig'
@@ -17,13 +21,12 @@ import {
   WorkqueueColumnKeys,
   WorkqueueColumnValue
 } from './WorkqueueColumnConfig'
+import { SelectOption, ValidationConfig } from 'src/client'
+import { FieldConditional } from './Conditional'
+import { TranslationConfig } from './TranslationConfig'
 
 /**
- * Creates a function that acts like a callable + static method container.
- *
- * @example
- * event('status') // → returns search config
- * event.hasAction('CLICKED') // → returns conditional
+ * @deprecated Use `event.metadata` instead
  */
 function eventFn(fieldId: EventFieldIdInput) {
   return createEventFieldConfig(fieldId)
@@ -157,6 +160,35 @@ const event = Object.assign(eventFn, {
   field(field: WorkqueueColumnKeys): WorkqueueColumnValue {
     return {
       $event: field
+    }
+  },
+  /**
+   * Creates a function that acts like a callable + static method container.
+   * @param fieldId - The ID of the event metadata field to create a search config for.
+   * @example
+   * event('status') // → returns search config
+   * event.hasAction('CLICKED') // → returns conditional
+   */
+  metadata(fieldId: EventFieldIdInput) {
+    return createEventFieldConfig(fieldId)
+  },
+  /**
+   * Entry point for defining conditional logic or configuration for a form field.
+   * @param fieldId - The ID of the field to define rules or config for.
+   * @returns An object combining conditional methods and configuration builders.
+   */
+  declaration(
+    fieldId: string,
+    options: {
+      options?: SelectOption[]
+      conditionals?: FieldConditional[]
+      validations?: ValidationConfig[]
+      searchCriteriaLabelPrefix?: TranslationConfig
+    } = {}
+  ) {
+    return {
+      ...createFieldConditionals(fieldId),
+      ...createFieldConfig(fieldId, options)
     }
   }
 })
