@@ -36,9 +36,9 @@ import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { useUserAllowedActions } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useUserAllowedActions'
 import { useModal } from '../../../../hooks/useModal'
-import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { actionLabels } from '../../../workqueues/EventOverview/components/utils'
 import { register } from './register'
 import { archive } from './archive'
 
@@ -88,7 +88,7 @@ function QuickActionModal({
   close,
   config,
   eventId,
-  eventConfiguration,
+  eventConfiguration
 }: {
   close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
@@ -182,7 +182,11 @@ function QuickActionModal({
   )
 }
 
-export function useQuickActionModal(eventId: UUID, eventConfiguration: EventConfig, eventType: string) {
+export function useQuickActionModal(
+  eventId: UUID,
+  eventConfiguration: EventConfig,
+  eventType: string
+) {
   const [quickActionModal, openModal] = useModal()
   const navigate = useNavigate()
   const { actions, customActions } = useEvents()
@@ -242,7 +246,10 @@ const customActionConfigBase: Partial<ModalConfig> = {
   }
 }
 
-export function useCustomActionModal(eventId: UUID, eventConfiguration: EventConfig) {
+export function useCustomActionModal(
+  eventId: UUID,
+  eventConfiguration: EventConfig
+) {
   const [customActionModal, openModal] = useModal()
   const navigate = useNavigate()
   const { actions } = useEvents()

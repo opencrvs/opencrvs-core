@@ -44,7 +44,10 @@ export const mandatoryColumns = defineWorkqueuesColumns([
 ])
 
 /** Workqueue Call-to-action -button action type */
-export const CtaActionType = z.enum([...workqueueActions.options, ActionType.READ] as const)
+export const CtaActionType = z.enum([
+  ...workqueueActions.options,
+  ActionType.READ
+] as const)
 export type CtaActionType = z.infer<typeof CtaActionType>
 
 /**
@@ -57,11 +60,11 @@ export const WorkqueueConfig = z
       'Title of the workflow (both in navigation and on the page)'
     ),
     query: CountryConfigQueryType,
-    /** This action object used to contain a conditionals option, but it was not used anywhere.
-     *  It's also debatable whether it should be an array, or just a single action. */
-    actions: z
-      .array(z.object({ type: CtaActionType }))
-      .describe('Workqueue call-to-action button configuration.'),
+    action: z
+      .object({ type: CtaActionType })
+      .describe(
+        'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
+      ),
     columns: z.array(WorkqueueColumn).default(mandatoryColumns),
     icon: AvailableIcons,
     emptyMessage: TranslationConfig.optional()
@@ -79,9 +82,11 @@ export const WorkqueueConfigInput = z.object({
     'Title of the workflow (both in navigation and on the page)'
   ),
   query: CountryConfigQueryInputType,
-  actions: z
-    .array(z.object({ type: CtaActionType }))
-    .describe('Workqueue call-to-action button configuration.'),
+  action: z
+    .object({ type: CtaActionType })
+    .describe(
+      'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
+    ),
   columns: z.array(WorkqueueColumn).default(mandatoryColumns),
   icon: AvailableIcons,
   emptyMessage: TranslationConfig.optional()

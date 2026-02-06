@@ -20,8 +20,8 @@ import {
   validateActionOrder,
   validateActionFlags,
   validatePlaceOfEvent,
-  validateAdvancedSearchConfig,
-  validateDateOfEvent
+  validateDateOfEvent,
+  validateAdvancedSearchConfig
 } from './eventConfigValidation'
 
 /**

@@ -10,54 +10,67 @@
  */
 import React from 'react'
 import { useTheme } from 'styled-components'
-import { EventIndex } from '@opencrvs/commons/client'
+import { useNavigate } from 'react-router-dom'
+import { EventConfig, EventIndex } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import { Link as TextButton } from '@opencrvs/components'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { IconWithNameEvent } from '@client/v2-events/components/IconWithNameEvent'
+import { ROUTES } from '@client/v2-events/routes'
+import { useEventTitle } from '../../useEvents/useEventTitle'
+import { ExtendedEventStatuses } from './utils'
 
 export function SearchResultItemTitle({
   event,
-  isInOutbox,
-  isInDrafts,
-  status,
-  onClick,
-  type
+  localEventStatus,
+  eventConfig,
+  redirectParam
 }: {
-  event: EventIndex & {
-    title: string | null
-    useFallbackTitle: boolean
-    meta?: Record<string, unknown>
-  }
-  type: string
-  isInOutbox?: boolean
-  isInDrafts?: boolean
-  status: React.ComponentProps<typeof IconWithName>['status']
-  onClick: () => void
+  event: EventIndex
+  localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
+  eventConfig: EventConfig
+  redirectParam?: string
 }) {
   const theme = useTheme()
   const { width } = useWindowSize()
+  const navigate = useNavigate()
+  const { getEventTitle } = useEventTitle()
+  const { title, useFallbackTitle } = getEventTitle(
+    eventConfig,
+    event as EventIndex
+  )
+
   const isWideScreen = width > theme.grid.breakpoints.lg
   const renderIconWithName = () =>
     isWideScreen ? (
-      <IconWithName flags={event.flags} name={event.title} status={status} />
+      <IconWithName flags={event.flags} name={title} status={event.status} />
     ) : (
       <IconWithNameEvent
-        event={type}
+        event={event.type}
         flags={event.flags}
-        name={event.title}
-        status={status}
+        name={title}
+        status={event.status}
       />
     )
 
-  if (isInOutbox && !isInDrafts) {
+  if (
+    localEventStatus === ExtendedEventStatuses.OUTBOX ||
+    localEventStatus === ExtendedEventStatuses.DRAFT
+  ) {
     return renderIconWithName()
   }
 
   return (
     <TextButton
-      color={event.useFallbackTitle ? 'red' : 'primary'}
-      onClick={onClick}
+      color={useFallbackTitle ? 'red' : 'primary'}
+      onClick={() => {
+        navigate(
+          ROUTES.V2.EVENTS.EVENT.buildPath(
+            { eventId: event.id },
+            { workqueue: redirectParam }
+          )
+        )
+      }}
     >
       {renderIconWithName()}
     </TextButton>

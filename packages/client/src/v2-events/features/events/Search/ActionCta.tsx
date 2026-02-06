@@ -12,17 +12,11 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import {
-  EventIndex,
-  CtaActionType,
-  getOrThrow,
-  ActionType
-} from '@opencrvs/commons/client'
+import { EventIndex, CtaActionType } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
-import { useAuthentication } from '@client/utils/userUtils'
 import { ROUTES } from '@client/v2-events/routes'
-import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { withSuspense } from '../../../components/withSuspense'
+import { useGetActionConfiguration } from '../../workqueues/EventOverview/components/useGetActionConfiguration'
 
 const StyledButton = styled(Button)`
   max-width: 150px;
@@ -51,17 +45,12 @@ function ActionCtaComponent({
   redirectParam?: string
 }) {
   const intl = useIntl()
-  const maybeAuth = useAuthentication()
-  const auth = getOrThrow(
-    maybeAuth,
-    'Authentication is not available but is required'
-  )
   const navigate = useNavigate()
 
-  const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
-  const config = allowedActionConfigs.find((item) => item.type === actionType)
+  const config = useGetActionConfiguration(event, actionType)
 
-  if (!config || actionType === ActionType.READ) {
+  // @TODO: should not happen
+  if (!config) {
     return (
       <StyledButton
         type="primary"

@@ -15,18 +15,22 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
-import { SearchQueryParams, mandatoryColumns, ActionType } from '@opencrvs/commons/client'
+import {
+  SearchQueryParams,
+  mandatoryColumns,
+  ActionType
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
-import { SearchResultComponent } from './SearchResult'
 import {
   buildSearchQuery,
   toAdvancedSearchQueryType,
   deserializeSearchParams,
   resolveAdvancedSearchConfig
-} from './utils'
+} from '../utils'
+import { SearchResultComponent } from './SearchResult'
 
 export const SearchResultIndex = () => {
   const intl = useIntl()

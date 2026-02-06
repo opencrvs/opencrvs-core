@@ -80,7 +80,7 @@ export function isActionConfigType(
   return actionConfigTypes.has(type as any)
 }
 
-// @TODO: refactor this function to return typed ActionConfig depending on given actionType. Perhaps this function should also throw an error if the action config is not found.
+// @TODO: refactor this function to return typed ActionConfig depending on given actionType.
 export function getActionConfig({
   eventConfiguration,
   actionType,
@@ -90,7 +90,7 @@ export function getActionConfig({
   actionType: ActionType
   customActionType?: string
 }): ActionConfig | undefined {
-  return eventConfiguration.actions.find((a) => {
+  const actionConfiguration = eventConfiguration.actions.find((a) => {
     // We can have multiple custom actions configured, we specify the custom action with 'customActionType'
     if (a.type === ActionType.CUSTOM && customActionType) {
       return a.customActionType === customActionType
@@ -111,6 +111,9 @@ export function getActionConfig({
 
     return a.type === actionType
   })
+
+  // @TODO: unassigned not found at least.
+  return actionConfiguration
 }
 
 export function getCustomActionFields(
