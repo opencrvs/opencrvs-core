@@ -31,16 +31,16 @@ import {
   ConfigurableScopes,
   getAuthorizedEventsFromScopes,
   getTokenPayload,
-  canUserReadEvent,
   hasScope,
   SCOPES,
   hasAnyOfScopes,
   AnyScope,
   getCurrentEventState,
-  ResolvedRecordScopeV2
+  ResolvedRecordScopeV2,
+  canUserReadEvent
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
-import { SystemContext, TrpcContext, UserContext } from '@events/context'
+import { TrpcContext, UserContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
@@ -345,22 +345,7 @@ export const userCanReadEventV2: MiddlewareFunction<
 
   const acceptedScopes = getAcceptedScopesFromToken(ctx.token, ['record.read'])
   const event = await getEventById(input.eventId)
-  const system = SystemContext.safeParse(ctx.user)
   const humanUser = UserContext.safeParse(ctx.user)
-  const isSystemUser = system.success
-
-  if (isSystemUser) {
-    if (!inScope(ctx.token, [SCOPES.RECORD_READ])) {
-      throw new TRPCError({ code: 'FORBIDDEN' })
-    }
-    return next({
-      ctx: {
-        ...ctx,
-        eventId: input.eventId,
-        eventType: event.type
-      }
-    })
-  }
 
   // 1. If no accepted scopes are found, fall back to V1 style check based on CREATE action.
   // This will be removed once we have migrated countryconfigs to use V2 scopes only.

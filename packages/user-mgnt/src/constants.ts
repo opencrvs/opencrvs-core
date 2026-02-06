@@ -22,7 +22,5 @@ export const DOCUMENTS_URL = env.DOCUMENTS_URL
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const SENTRY_DSN = env.SENTRY_DSN
 export const QA_ENV = env.QA_ENV
-export const RECORD_SEARCH_QUOTA = env.RECORD_SEARCH_QUOTA
-
 export const FHIR_URL = env.FHIR_URL
 export const METRICS_URL = env.METRICS_URL

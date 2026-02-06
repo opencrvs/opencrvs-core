@@ -10,7 +10,7 @@
  */
 import { model, Schema, Document } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
-import { integratingSystemTypes, types } from '@user-mgnt/utils/system'
+import { integratingSystemTypes } from '@user-mgnt/utils/system'
 
 export interface ISystem {
   name: string
@@ -28,7 +28,8 @@ export interface ISystem {
     webhook: WebHook[]
   }
   creationDate?: number
-  type: keyof typeof types
+  /** Type is now just an annotation - scopes are the source of truth for permissions */
+  type: string
 }
 
 export enum EventType {
@@ -76,16 +77,9 @@ const systemSchema = new Schema({
     dailyQuota: { type: Number, default: 0 }
   },
   creationDate: { type: Number, default: Date.now },
+  /** Type is now just an annotation - scopes are the source of truth for permissions */
   type: {
-    type: String,
-    enum: [
-      types.HEALTH,
-      types.NATIONAL_ID,
-      types.RECORD_SEARCH,
-      types.WEBHOOK,
-      types.IMPORT_EXPORT,
-      types.CITIZEN_PORTAL
-    ]
+    type: String
   },
   integratingSystemType: {
     type: String,

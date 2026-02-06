@@ -1961,7 +1961,8 @@ export enum SystemType {
   NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
   Reindex = 'REINDEX',
-  Webhook = 'WEBHOOK'
+  Webhook = 'WEBHOOK',
+  Custom = 'CUSTOM'
 }
 
 export enum TelecomSystem {

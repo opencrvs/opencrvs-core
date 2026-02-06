@@ -981,9 +981,8 @@ export const enum GQLSystemType {
   NATIONAL_ID = 'NATIONAL_ID',
   HEALTH = 'HEALTH',
   RECORD_SEARCH = 'RECORD_SEARCH',
-  WEBHOOK = 'WEBHOOK',
   IMPORT_EXPORT = 'IMPORT_EXPORT',
-  REINDEX = 'REINDEX'
+  CUSTOM = 'CUSTOM'
 }
 
 export const enum GQLIntegratingSystemType {

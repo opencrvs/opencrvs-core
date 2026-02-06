@@ -1074,10 +1074,8 @@ enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
-  WEBHOOK
   IMPORT_EXPORT
-  CITIZEN_PORTAL
-  REINDEX
+  CUSTOM
 }
 
 enum IntegratingSystemType {

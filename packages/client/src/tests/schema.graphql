@@ -943,7 +943,7 @@ input MedicalPractitionerInput {
 }
 
 union MixedTotalMetricsResult =
-    TotalMetricsByRegistrar
+  | TotalMetricsByRegistrar
   | TotalMetricsByLocation
   | TotalMetricsByTime
 
@@ -1724,7 +1724,8 @@ enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
-  WEBHOOK
+  IMPORT_EXPORT
+  CUSTOM
 }
 
 enum TelecomSystem {
@@ -1813,7 +1814,7 @@ type UserAuditLogItemWithComposition implements AuditLogItemBase {
 }
 
 union UserAuditLogResultItem =
-    UserAuditLogItemWithComposition
+  | UserAuditLogItemWithComposition
   | UserAuditLogItem
 
 type UserAuditLogResultSet {
