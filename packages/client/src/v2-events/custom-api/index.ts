@@ -266,7 +266,7 @@ export async function makeCorrectionOnRequest({
     transactionId: getUUID(),
     eventId,
     requestId,
-    annotation: {
+    content: {
       isImmediateCorrection: true
     }
   })

@@ -204,6 +204,14 @@ export type RejectCorrectionActionInput = z.infer<
 export const ApproveCorrectionActionInput = BaseActionInput.extend(
   z.object({
     requestId: z.string(),
+    content: z
+      .object({
+        isImmediateCorrection: z
+          .boolean()
+          .optional()
+          .describe('Whether the correction is immediate or a requested one.')
+      })
+      .optional(),
     type: z
       .literal(ActionType.APPROVE_CORRECTION)
       .default(ActionType.APPROVE_CORRECTION)
