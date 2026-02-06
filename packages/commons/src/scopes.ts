@@ -171,7 +171,7 @@ const CorrectionScopes = z.union([
 ])
 
 // Search
-export const SearchScopes = z.union([
+const SearchScopes = z.union([
   z.literal(SCOPES.SEARCH_BIRTH_MY_JURISDICTION),
   z.literal(SCOPES.SEARCH_BIRTH),
   z.literal(SCOPES.SEARCH_DEATH_MY_JURISDICTION),
@@ -274,6 +274,13 @@ const SearchScope = z.object({
   })
 })
 
+export const DashboardScope = z.object({
+  type: z.literal('dashboard.view'),
+  options: z.object({
+    id: z.array(z.string())
+  })
+})
+
 export type SearchScope = z.infer<typeof SearchScope>
 
 export const RecordScopeType = z.enum([
@@ -325,6 +332,7 @@ const ConfigurableRawScopes = z.discriminatedUnion('type', [
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
+  DashboardScope,
   RecordScope,
   CustomActionScope
 ])
