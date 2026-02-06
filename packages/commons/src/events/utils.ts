@@ -22,7 +22,8 @@ import {
   uniqBy,
   cloneDeep,
   orderBy,
-  isEqual
+  isEqual,
+  isNull
 } from 'lodash'
 import {
   ActionType,
@@ -216,11 +217,17 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
   return fn(base)
 }
 
-export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
-  formConfig: FormConfig,
-  values: T,
+export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>({
+  formConfig,
+  values,
+  validatorContext,
+  keepHiddenNulls
+}: {
+  formConfig: FormConfig
+  values: T
   validatorContext: ValidatorContext
-) {
+  keepHiddenNulls?: boolean
+}) {
   const visibleFields = formConfig.pages
     .filter((p) => isPageVisible(p, values, validatorContext))
     .flatMap((p) => p.fields)
@@ -228,6 +235,12 @@ export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
   const hiddenFields = formConfig.pages
     .filter((p) => !isPageVisible(p, values, validatorContext))
     .flatMap((p) => p.fields)
+    .filter((p) => {
+      if (keepHiddenNulls && isNull(values[p.id])) {
+        return false
+      }
+      return true
+    })
 
   const valuesExceptHiddenPage = omitBy(values, (_, fieldId) => {
     return hiddenFields.some((f) => f.id === fieldId)
