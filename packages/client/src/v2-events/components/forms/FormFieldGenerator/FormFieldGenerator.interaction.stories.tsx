@@ -61,9 +61,7 @@ const fields = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: not(
-          event.declaration('tennis-member.dobUnknown').isEqualTo(true)
-        )
+        conditional: not(field('tennis-member.dobUnknown').isEqualTo(true))
       }
     ]
   },
@@ -90,9 +88,7 @@ const fields = [
     conditionals: [
       {
         type: ConditionalType.SHOW,
-        conditional: event
-          .declaration('tennis-member.dobUnknown')
-          .isEqualTo(true)
+        conditional: field('tennis-member.dobUnknown').isEqualTo(true)
       }
     ]
   }
@@ -199,8 +195,8 @@ const tennisFamilyMembership = [
     id: `tennis.membership.child.surname`,
     type: FieldType.TEXT,
     label: generateTranslationConfig('child surname'),
-    parent: event.declaration('tennis.membership.parent.surname'),
-    value: event.declaration('tennis.membership.parent.surname')
+    parent: field('tennis.membership.parent.surname'),
+    value: field('tennis.membership.parent.surname')
   }
 ]
 
@@ -310,7 +306,7 @@ const tennisStyleFields = [
     type: FieldType.TEXT,
     required: true,
     label: generateTranslationConfig('first name'),
-    parent: event.declaration('tennis.style')
+    parent: field('tennis.style')
   }
 ] satisfies FieldConfig[]
 

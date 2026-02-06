@@ -32,7 +32,7 @@ export function createSearchConfig<T extends {}>(baseField: T) {
     /**
      * Creates a configuration for exact matching of the specified field.
      * @returns  An object containing the field ID and a configuration object with a type of 'exact'.
-     * @example event.declaration('dob').exact()
+     * @example field('dob').exact()
      * // {
      * //   ...
      * //   config: { type: 'exact' }
@@ -45,7 +45,7 @@ export function createSearchConfig<T extends {}>(baseField: T) {
     /**
      * Creates a configuration for fuzzy matching of the specified field.
      * @returns  An object containing the field ID and a configuration object with a type of 'exact'.
-     * @example event.declaration('name').fuzzy()
+     * @example field('name').fuzzy()
      * // {
      * //   ...
      * //   config: { type: 'fuzzy' }
@@ -58,7 +58,7 @@ export function createSearchConfig<T extends {}>(baseField: T) {
     /**
      * Creates a configuration for matching locations and the child locations
      * @returns  An object containing the field ID and a configuration object with a type of 'within'.
-     * @example event.declaration('createdAtLocation').within()
+     * @example field('createdAtLocation').within()
      * // {
      * //   ...
      * //   config: { type: 'within' }

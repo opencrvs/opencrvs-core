@@ -84,11 +84,12 @@ const recommenderOptions = [
 ]
 const recommenderOtherThanClubMembers = and(
   not(
-    event
-      .declaration('recommender.relation')
-      .inArray([RecommenderType.COACH, RecommenderType.MEMBER])
+    field('recommender.relation').inArray([
+      RecommenderType.COACH,
+      RecommenderType.MEMBER
+    ])
   ),
-  not(event.declaration('recommender.relation').isFalsy())
+  not(field('recommender.relation').isFalsy())
 )
 
 const overriddenEventConfig = {
@@ -114,7 +115,7 @@ const overriddenEventConfig = {
             hideLabel: true,
             required: true,
             label: generateTranslationConfig("Recommender's name"),
-            parent: event.declaration('recommender.relation')
+            parent: field('recommender.relation')
           },
           {
             id: 'recommender.dob',
@@ -123,16 +124,15 @@ const overriddenEventConfig = {
             validation: [
               {
                 message: generateTranslationConfig('Must be a valid Birthdate'),
-                validator: event.declaration('recommender.dob').isBefore().now()
+                validator: field('recommender.dob').isBefore().now()
               },
               {
                 message: generateTranslationConfig(
                   "Birth date must be before child's birth date"
                 ),
-                validator: event
-                  .declaration('recommender.dob')
+                validator: field('recommender.dob')
                   .isBefore()
-                  .date(event.declaration('child.dob'))
+                  .date(field('child.dob'))
               }
             ],
             label: generateTranslationConfig('Date of birth'),
@@ -140,11 +140,11 @@ const overriddenEventConfig = {
               {
                 type: ConditionalType.SHOW,
                 conditional: not(
-                  event.declaration('recommender.dobUnknown').isEqualTo(true)
+                  field('recommender.dobUnknown').isEqualTo(true)
                 )
               }
             ],
-            parent: event.declaration('recommender.relation')
+            parent: field('recommender.relation')
           },
           {
             id: 'recommender.dobUnknown',
@@ -160,7 +160,7 @@ const overriddenEventConfig = {
                 conditional: never()
               }
             ],
-            parent: event.declaration('recommender.relation')
+            parent: field('recommender.relation')
           },
           {
             id: 'recommender.age',
@@ -173,12 +173,10 @@ const overriddenEventConfig = {
             conditionals: [
               {
                 type: ConditionalType.SHOW,
-                conditional: event
-                  .declaration('recommender.dobUnknown')
-                  .isEqualTo(true)
+                conditional: field('recommender.dobUnknown').isEqualTo(true)
               }
             ],
-            parent: event.declaration('recommender.relation')
+            parent: field('recommender.relation')
           }
         ]
       }

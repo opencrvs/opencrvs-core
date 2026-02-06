@@ -51,10 +51,10 @@ export function field(fieldId: string) {
         type: 'strict',
         options
       }) satisfies ClauseInput,
-    /**
+     /**
      * Creates a date range matcher that finds records where date field fall within a specified range.
      *
-     * By default, matches against the field specified in `event.declaration()` (e.g., 'mother.dob').
+     * By default, matches against the field specified in `field()` (e.g., 'mother.dob').
      * When `matchAgainst` is provided, it overwrites the default field and searches against that field with OR logic .
      *
      * @param options - Configuration for the date range matching
@@ -68,18 +68,18 @@ export function field(fieldId: string) {
      *
      * @example
      * // Matches only against mother.dob (±365 days)
-     * event.declaration('mother.dob').dateRangeMatches({ days: 365 })
+     * field('mother.dob').dateRangeMatches({ days: 365 })
      *
      * @example
      * // Matches against mother.age OR spouse.dob, not mother.dob
-     * event.declaration('mother.dob').dateRangeMatches({
+     * field('mother.dob').dateRangeMatches({
      *   days: 365,
-     *   matchAgainst: $event.declaration('mother.age')
+     *   matchAgainst: $field('mother.age')
      * })
      *
      * @example
      * // With custom pivot and boost
-     * event.declaration('mother.dob').dateRangeMatches({
+     * field('mother.dob').dateRangeMatches({
      *   days: 730,
      *   pivot: 365,
      *   boost: 2

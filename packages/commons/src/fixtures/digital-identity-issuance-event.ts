@@ -12,7 +12,7 @@ import { defineConfig } from '../events/defineConfig'
 import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
-import { event } from '../events/event'
+import { field } from '../events/field'
 import {
   defineActionForm,
   defineDeclarationForm
@@ -48,7 +48,7 @@ export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
             id: 'event.digital-identity.certificate.fetch.label'
           },
           configuration: {
-            trigger: event.declaration('identity.http-button'),
+            trigger: field('identity.http-button'),
             url: '/api/digital-identity/certificate',
             timeout: 5000,
             method: 'POST',
@@ -72,18 +72,15 @@ export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
             {
               type: ConditionalType.ENABLE,
               conditional: and(
-                event.declaration('identity.http-fetch').isUndefined(),
+                field('identity.http-fetch').isUndefined(),
                 user.isOnline()
               )
             },
             {
               type: ConditionalType.SHOW,
               conditional: and(
-                event
-                  .declaration('identity.http-fetch')
-                  .get('loading')
-                  .isFalsy(),
-                event.declaration('identity.http-fetch').get('data').isFalsy()
+                field('identity.http-fetch').get('loading').isFalsy(),
+                field('identity.http-fetch').get('data').isFalsy()
               )
             }
           ],
@@ -111,8 +108,7 @@ export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
             },
             {
               type: ConditionalType.SHOW,
-              conditional: event
-                .declaration('identity.http-fetch')
+              conditional: field('identity.http-fetch')
                 .get('loading')
                 .isEqualTo(true)
             }
@@ -141,9 +137,7 @@ export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
             },
             {
               type: ConditionalType.SHOW,
-              conditional: not(
-                event.declaration('identity.certificateId').isFalsy()
-              )
+              conditional: not(field('identity.certificateId').isFalsy())
             }
           ],
           configuration: {
@@ -158,7 +152,7 @@ export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
         {
           id: 'identity.certificateId',
           type: FieldType.TEXT,
-          parent: event.declaration('identity.http-fetch'),
+          parent: field('identity.http-fetch'),
           label: {
             defaultMessage: 'Certificate ID',
             description: 'Issued digital identity certificate identifier',
@@ -170,9 +164,7 @@ export const PRINT_DIGITAL_ID_CERTIFICATE_FORM = defineActionForm({
               conditional: never()
             }
           ],
-          value: event
-            .declaration('identity.http-fetch')
-            .get('data.certificateId')
+          value: field('identity.http-fetch').get('data.certificateId')
         }
       ]
     }

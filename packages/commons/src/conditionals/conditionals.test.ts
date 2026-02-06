@@ -24,6 +24,7 @@ import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
 import { ActionStatus, EventState } from '../events/ActionDocument'
+import { field } from '../events/field'
 import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
 import { UUID } from '../uuid'
@@ -71,8 +72,8 @@ describe('"universal" conditionals', () => {
     expect(
       validate(
         and(
-          event.declaration('applicant.name').isEqualTo('John Doe'),
-          event.declaration('applicant.dob').isAfter().date('1989-01-01')
+          field('applicant.name').isEqualTo('John Doe'),
+          field('applicant.dob').isAfter().date('1989-01-01')
         ),
         getFieldParams()
       )
@@ -81,8 +82,8 @@ describe('"universal" conditionals', () => {
     expect(
       validate(
         and(
-          event.declaration('applicant.name').isEqualTo('John Doe'),
-          event.declaration('applicant.dob').isAfter().date('1991-01-01')
+          field('applicant.name').isEqualTo('John Doe'),
+          field('applicant.dob').isAfter().date('1991-01-01')
         ),
         getFieldParams()
       )
@@ -93,8 +94,8 @@ describe('"universal" conditionals', () => {
     expect(
       validate(
         or(
-          event.declaration('applicant.name').isEqualTo('John Doe'),
-          event.declaration('applicant.dob').isAfter().date('1989-01-01')
+          field('applicant.name').isEqualTo('John Doe'),
+          field('applicant.dob').isAfter().date('1989-01-01')
         ),
         getFieldParams()
       )
@@ -103,8 +104,8 @@ describe('"universal" conditionals', () => {
     expect(
       validate(
         or(
-          event.declaration('applicant.name').isEqualTo('John Doe'),
-          event.declaration('applicant.dob').isAfter().date('1991-01-01')
+          field('applicant.name').isEqualTo('John Doe'),
+          field('applicant.dob').isAfter().date('1991-01-01')
         ),
         getFieldParams()
       )
@@ -113,8 +114,8 @@ describe('"universal" conditionals', () => {
     expect(
       validate(
         or(
-          event.declaration('applicant.name').isEqualTo('Jack Doe'),
-          event.declaration('applicant.dob').isAfter().date('1991-01-01')
+          field('applicant.name').isEqualTo('Jack Doe'),
+          field('applicant.dob').isAfter().date('1991-01-01')
         ),
         getFieldParams()
       )
@@ -124,25 +125,21 @@ describe('"universal" conditionals', () => {
   it('validates "not" conditional', () => {
     expect(
       validate(
-        not(event.declaration('applicant.name').isEqualTo('John Doe')),
+        not(field('applicant.name').isEqualTo('John Doe')),
         getFieldParams()
       )
     ).toBe(false)
 
     expect(
       validate(
-        not(event.declaration('applicant.name').isEqualTo('Jack Doe')),
+        not(field('applicant.name').isEqualTo('Jack Doe')),
         getFieldParams()
       )
     ).toBe(true)
 
     expect(
       validate(
-        not(
-          event
-            .declaration('applicant.name')
-            .isEqualTo(event.declaration('informant.name'))
-        ),
+        not(field('applicant.name').isEqualTo(field('informant.name'))),
         getFieldParams({
           'applicant.name': 'John Doe',
           'informant.name': 'John Doe'
@@ -152,11 +149,7 @@ describe('"universal" conditionals', () => {
 
     expect(
       validate(
-        not(
-          event
-            .declaration('applicant.name')
-            .isEqualTo(event.declaration('informant.name'))
-        ),
+        not(field('applicant.name').isEqualTo(field('informant.name'))),
         getFieldParams({
           'applicant.name': 'John Doe',
           'informant.name': 'Jane Doe'
@@ -170,9 +163,9 @@ describe('object combinator', () => {
   it('can be used for validation composite inputs that produce objects', () => {
     expect(
       validate(
-        event.declaration('child.name').object({
-          firstname: event.declaration('firstname').isValidEnglishName(),
-          surname: event.declaration('surname').isValidEnglishName()
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
         }),
         getFieldParams({
           'child.name': {
@@ -185,9 +178,9 @@ describe('object combinator', () => {
 
     expect(
       validate(
-        event.declaration('child.name').object({
-          firstname: event.declaration('firstname').isValidEnglishName(),
-          surname: event.declaration('surname').isValidEnglishName()
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
         }),
         getFieldParams()
       )
@@ -195,9 +188,9 @@ describe('object combinator', () => {
 
     expect(
       validate(
-        event.declaration('child.name').object({
-          firstname: event.declaration('firstname').isValidEnglishName(),
-          surname: event.declaration('surname').isValidEnglishName()
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
         }),
         getFieldParams({
           'child.name': {
@@ -210,8 +203,8 @@ describe('object combinator', () => {
   it('fully supports global variables like $now even in the nested levels', () => {
     expect(
       validate(
-        event.declaration('child.details').object({
-          data: event.declaration('data').isBefore().now()
+        field('child.details').object({
+          data: field('data').isBefore().now()
         }),
         getFieldParams({
           'child.details': {
@@ -223,8 +216,8 @@ describe('object combinator', () => {
 
     expect(
       validate(
-        event.declaration('child.details').object({
-          data: event.declaration('data').isBefore().now()
+        field('child.details').object({
+          data: field('data').isBefore().now()
         }),
         getFieldParams({
           'child.details': {
@@ -236,8 +229,8 @@ describe('object combinator', () => {
 
     expect(
       validate(
-        event.declaration('child.details').object({
-          data: event.declaration('data').isEqualTo(event.declaration('random'))
+        field('child.details').object({
+          data: field('data').isEqualTo(field('random'))
         }),
         getFieldParams({
           random: 'value',
@@ -250,8 +243,8 @@ describe('object combinator', () => {
 
     expect(
       validate(
-        event.declaration('child.details').object({
-          data: event.declaration('data').isEqualTo(event.declaration('random'))
+        field('child.details').object({
+          data: field('data').isEqualTo(field('random'))
         }),
         getFieldParams({
           random: 'value',
@@ -267,78 +260,59 @@ describe('object combinator', () => {
 describe('date comparisons', () => {
   it("throws an error if validation context doesn't contain $now", () => {
     expect(() =>
-      validate(
-        event.declaration('applicant.dob').isAfter().days(30).inFuture(),
-        {
-          ...getFieldParams({
-            'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
-          }),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          $now: undefined as any // $now is not defined ❌
-        }
-      )
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
+        }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        $now: undefined as any // $now is not defined ❌
+      })
     ).toThrowError()
   })
 
   it('validates comparisons to where date is expected to be after certain date', () => {
     expect(
-      validate(
-        event.declaration('applicant.dob').isAfter().days(30).inFuture(),
-        {
-          ...getFieldParams({
-            'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
-          }),
-          $now: '1990-01-01'
-        }
-      )
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
+        }),
+        $now: '1990-01-01'
+      })
     ).toBe(true)
 
     expect(
-      validate(
-        event.declaration('applicant.dob').isAfter().days(30).inFuture(),
-        {
-          ...getFieldParams({
-            'applicant.dob': '1990-01-12' // needs to be after 1990-02-01 ❌
-          }),
-          $now: '1990-01-01'
-        }
-      )
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-01-12' // needs to be after 1990-02-01 ❌
+        }),
+        $now: '1990-01-01'
+      })
     ).toBe(false)
   })
   it('validates comparisons to where date is expected to be before certain date', () => {
     expect(
-      validate(
-        event.declaration('applicant.dob').isBefore().days(30).inFuture(),
-        {
-          ...getFieldParams({
-            'applicant.dob': '1990-02-12' // needs to be before 1990-07-06 ✅
-          }),
-          $now: '1990-06-06'
-        }
-      )
+      validate(field('applicant.dob').isBefore().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-02-12' // needs to be before 1990-07-06 ✅
+        }),
+        $now: '1990-06-06'
+      })
     ).toBe(true)
 
     expect(
-      validate(
-        event.declaration('applicant.dob').isBefore().days(30).inFuture(),
-        {
-          ...getFieldParams({
-            'applicant.dob': '1990-09-07' // needs to be before 1990-07-06 ❌
-          }),
-          $now: '1990-06-06'
-        }
-      )
+      validate(field('applicant.dob').isBefore().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-09-07' // needs to be before 1990-07-06 ❌
+        }),
+        $now: '1990-06-06'
+      })
     ).toBe(false)
   })
 
   it('validates comparisons to where date is expected to be certain days before certain date reference', () => {
     expect(
       validate(
-        event
-          .declaration('mother.dob')
-          .isBefore()
-          .days(6570)
-          .fromDate(event.declaration('child.dob')),
+        field('mother.dob').isBefore().days(6570).fromDate(field('child.dob')),
         {
           ...getFieldParams({
             'child.dob': '1990-01-01',
@@ -350,11 +324,7 @@ describe('date comparisons', () => {
 
     expect(
       validate(
-        event
-          .declaration('mother.dob')
-          .isBefore()
-          .days(6570)
-          .fromDate(event.declaration('child.dob')),
+        field('mother.dob').isBefore().days(6570).fromDate(field('child.dob')),
         {
           ...getFieldParams({
             'child.dob': '1990-01-01',
@@ -370,8 +340,7 @@ describe('age asDob comparisons', () => {
   it('validates comparisons where dob from age field is expected to be before a certain time', () => {
     expect(
       validate(
-        event
-          .declaration('applicant.age')
+        field('applicant.age')
           .asDob()
           .isBefore()
           .days(18 * 365)
@@ -388,8 +357,7 @@ describe('age asDob comparisons', () => {
 
     expect(
       validate(
-        event
-          .declaration('applicant.age')
+        field('applicant.age')
           .asDob()
           .isBefore()
           .days(18 * 365)
@@ -408,8 +376,7 @@ describe('age asDob comparisons', () => {
   it('validates comparisons where dob from age field is expected to be after a certain time', () => {
     expect(
       validate(
-        event
-          .declaration('applicant.age')
+        field('applicant.age')
           .asDob()
           .isAfter()
           .days(18 * 365)
@@ -426,8 +393,7 @@ describe('age asDob comparisons', () => {
 
     expect(
       validate(
-        event
-          .declaration('applicant.age')
+        field('applicant.age')
           .asDob()
           .isAfter()
           .days(18 * 365)
@@ -445,76 +411,55 @@ describe('age asDob comparisons', () => {
 
   it('validates comparisons where dob from age field is expected to be after a certain date', () => {
     expect(
-      validate(
-        event.declaration('applicant.age').asDob().isAfter().date('1970-01-01'),
-        {
-          ...getFieldParams({
-            // dob is 1973-01-01
-            'applicant.age': { age: 17, asOfDateRef: 'some.field' }
-          }),
-          $now: '1990-01-01'
-        }
-      )
+      validate(field('applicant.age').asDob().isAfter().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
     ).toBe(true)
 
     expect(
-      validate(
-        event.declaration('applicant.age').asDob().isAfter().date('1970-01-01'),
-        {
-          ...getFieldParams({
-            // dob is 1963-01-01
-            'applicant.age': { age: 27, asOfDateRef: 'some.field' }
-          }),
-          $now: '1990-01-01'
-        }
-      )
+      validate(field('applicant.age').asDob().isAfter().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1963-01-01
+          'applicant.age': { age: 27, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
     ).toBe(false)
   })
 
   it('validates comparisons where dob from age field is expected to be before a certain date', () => {
     expect(
-      validate(
-        event
-          .declaration('applicant.age')
-          .asDob()
-          .isBefore()
-          .date('1980-01-01'),
-        {
-          ...getFieldParams({
-            // dob is 1973-01-01
-            'applicant.age': { age: 17, asOfDateRef: 'some.field' }
-          }),
-          $now: '1990-01-01'
-        }
-      )
+      validate(field('applicant.age').asDob().isBefore().date('1980-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
     ).toBe(true)
 
     expect(
-      validate(
-        event
-          .declaration('applicant.age')
-          .asDob()
-          .isBefore()
-          .date('1970-01-01'),
-        {
-          ...getFieldParams({
-            // dob is 1973-01-01
-            'applicant.age': { age: 17, asOfDateRef: 'some.field' }
-          }),
-          $now: '1990-01-01'
-        }
-      )
+      validate(field('applicant.age').asDob().isBefore().date('1970-01-01'), {
+        ...getFieldParams({
+          // dob is 1973-01-01
+          'applicant.age': { age: 17, asOfDateRef: 'some.field' }
+        }),
+        $now: '1990-01-01'
+      })
     ).toBe(false)
   })
 
   it('validates comparisons where dob from age field is expected to be before dob from another age field', () => {
     expect(
       validate(
-        event
-          .declaration('applicant.age')
+        field('applicant.age')
           .asDob()
           .isBefore()
-          .date(event.declaration('referrer.age').asDob()),
+          .date(field('referrer.age').asDob()),
         {
           ...getFieldParams({
             // dob is 1973-01-01
@@ -537,11 +482,10 @@ describe('age asDob comparisons', () => {
 
     expect(
       validate(
-        event
-          .declaration('applicant.age')
+        field('applicant.age')
           .asDob()
           .isBefore()
-          .date(event.declaration('referrer.age').asDob()),
+          .date(field('referrer.age').asDob()),
         {
           ...getFieldParams({
             // dob is 1973-01-01
@@ -568,7 +512,7 @@ describe('age asAge comparisons', () => {
   it('validates comparisons where age is expected to be equal to a certain value', () => {
     expect(
       validate(
-        event.declaration('applicant.age').asAge().isEqualTo(20),
+        field('applicant.age').asAge().isEqualTo(20),
         getFieldParams({
           'applicant.age': { age: 20, asOfDateRef: 'some.field' }
         })
@@ -577,7 +521,7 @@ describe('age asAge comparisons', () => {
 
     expect(
       validate(
-        event.declaration('applicant.age').asAge().isEqualTo(20),
+        field('applicant.age').asAge().isEqualTo(20),
         getFieldParams({
           'applicant.age': { age: 22, asOfDateRef: 'some.field' }
         })
@@ -588,10 +532,7 @@ describe('age asAge comparisons', () => {
   it('validates comparisons where age is expected to be equal to another age field', () => {
     expect(
       validate(
-        event
-          .declaration('applicant.age')
-          .asAge()
-          .isEqualTo(event.declaration('referrer.age').asAge()),
+        field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
         getFieldParams({
           'applicant.age': { age: 20, asOfDateRef: 'some.field' },
           'referrer.age': { age: 20, asOfDateRef: 'some.field' }
@@ -601,10 +542,7 @@ describe('age asAge comparisons', () => {
 
     expect(
       validate(
-        event
-          .declaration('applicant.age')
-          .asAge()
-          .isEqualTo(event.declaration('referrer.age').asAge()),
+        field('applicant.age').asAge().isEqualTo(field('referrer.age').asAge()),
         getFieldParams({
           'applicant.age': { age: 20, asOfDateRef: 'some.field' },
           'referrer.age': { age: 25, asOfDateRef: 'some.field' }
@@ -616,7 +554,7 @@ describe('age asAge comparisons', () => {
   it('validates comparisons where age is expected to be less than a certain value', () => {
     expect(
       validate(
-        event.declaration('applicant.age').asAge().isLessThan(25),
+        field('applicant.age').asAge().isLessThan(25),
         getFieldParams({
           'applicant.age': { age: 20, asOfDateRef: 'some.field' }
         })
@@ -625,7 +563,7 @@ describe('age asAge comparisons', () => {
 
     expect(
       validate(
-        event.declaration('applicant.age').asAge().isLessThan(25),
+        field('applicant.age').asAge().isLessThan(25),
         getFieldParams({
           'applicant.age': { age: 30, asOfDateRef: 'some.field' }
         })
@@ -636,10 +574,9 @@ describe('age asAge comparisons', () => {
   it('validates comparisons where age is expected to be less than another age field', () => {
     expect(
       validate(
-        event
-          .declaration('applicant.age')
+        field('applicant.age')
           .asAge()
-          .isLessThan(event.declaration('referrer.age').asAge()),
+          .isLessThan(field('referrer.age').asAge()),
         getFieldParams({
           'applicant.age': { age: 20, asOfDateRef: 'some.field' },
           'referrer.age': { age: 22, asOfDateRef: 'some.field' }
@@ -649,10 +586,9 @@ describe('age asAge comparisons', () => {
 
     expect(
       validate(
-        event
-          .declaration('applicant.age')
+        field('applicant.age')
           .asAge()
-          .isLessThan(event.declaration('referrer.age').asAge()),
+          .isLessThan(field('referrer.age').asAge()),
         getFieldParams({
           'applicant.age': { age: 20, asOfDateRef: 'some.field' },
           'referrer.age': { age: 18, asOfDateRef: 'some.field' }
@@ -664,7 +600,7 @@ describe('age asAge comparisons', () => {
   it('validates comparisons where age is expected to be between a certain value range', () => {
     expect(
       validate(
-        event.declaration('applicant.age').asAge().isBetween(16, 25),
+        field('applicant.age').asAge().isBetween(16, 25),
         getFieldParams({
           'applicant.age': { age: 20, asOfDateRef: 'some.field' }
         })
@@ -673,7 +609,7 @@ describe('age asAge comparisons', () => {
 
     expect(
       validate(
-        event.declaration('applicant.age').asAge().isBetween(16, 25),
+        field('applicant.age').asAge().isBetween(16, 25),
         getFieldParams({
           'applicant.age': { age: 30, asOfDateRef: 'some.field' }
         })
@@ -686,7 +622,7 @@ describe('leaf level validations', () => {
   it('validates leaf level fields', () => {
     expect(
       validate(
-        event.declaration('applicant.address').isValidAdministrativeLeafLevel(),
+        field('applicant.address').isValidAdministrativeLeafLevel(),
         getFieldParams()
       )
     ).toBe(true)
@@ -697,7 +633,7 @@ describe('"field" conditionals', () => {
   it('validates "field.isAfter" conditional', () => {
     expect(
       validate(
-        event.declaration('applicant.dob').isAfter().date('1990-01-03'),
+        field('applicant.dob').isAfter().date('1990-01-03'),
         getFieldParams()
       )
     ).toBe(false)
@@ -705,14 +641,14 @@ describe('"field" conditionals', () => {
     // seems to be inclusive
     expect(
       validate(
-        event.declaration('applicant.dob').isAfter().date('1990-01-02'),
+        field('applicant.dob').isAfter().date('1990-01-02'),
         getFieldParams()
       )
     ).toBe(true)
 
     expect(
       validate(
-        event.declaration('applicant.dob').isAfter().date('1990-01-01'),
+        field('applicant.dob').isAfter().date('1990-01-01'),
         getFieldParams()
       )
     ).toBe(true)
@@ -720,10 +656,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the comparable field is after the reference field
     expect(
       validate(
-        event
-          .declaration('mother.dob')
-          .isAfter()
-          .date(event.declaration('child.dob')),
+        field('mother.dob').isAfter().date(field('child.dob')),
         getFieldParams({
           'child.dob': '1990-01-02',
           'mother.dob': '1990-02-03'
@@ -734,10 +667,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the comparable field is before the reference field
     expect(
       validate(
-        event
-          .declaration('mother.dob')
-          .isAfter()
-          .date(event.declaration('child.dob')),
+        field('mother.dob').isAfter().date(field('child.dob')),
         getFieldParams({
           'child.dob': '1990-01-02',
           'mother.dob': '1990-01-01'
@@ -748,10 +678,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the comparable field is undefined
     expect(
       validate(
-        event
-          .declaration('mother.dob')
-          .isAfter()
-          .date(event.declaration('child.dob')),
+        field('mother.dob').isAfter().date(field('child.dob')),
         getFieldParams({
           'child.dob': '1990-01-02'
         })
@@ -761,10 +688,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the reference field is undefined
     expect(
       validate(
-        event
-          .declaration('mother.dob')
-          .isAfter()
-          .date(event.declaration('child.dob')),
+        field('mother.dob').isAfter().date(field('child.dob')),
         getFieldParams({
           'mother.dob': '1990-01-02'
         })
@@ -774,10 +698,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the comparable field is wrong format
     expect(
       validate(
-        event
-          .declaration('mother.dob')
-          .isAfter()
-          .date(event.declaration('child.dob')),
+        field('mother.dob').isAfter().date(field('child.dob')),
         getFieldParams({
           'child.dob': '1990-01-02',
           'mother.dob': '1990-01-03123'
@@ -788,10 +709,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the reference field is wrong format
     expect(
       validate(
-        event
-          .declaration('mother.dob')
-          .isAfter()
-          .date(event.declaration('child.dob')),
+        field('mother.dob').isAfter().date(field('child.dob')),
         getFieldParams({
           'child.dob': '1990-01-021231',
           'mother.dob': '1990-01-03'
@@ -803,7 +721,7 @@ describe('"field" conditionals', () => {
   it('validates "field.isBefore" conditional', () => {
     expect(
       validate(
-        event.declaration('applicant.dob').isBefore().date('1990-01-03'),
+        field('applicant.dob').isBefore().date('1990-01-03'),
         getFieldParams()
       )
     ).toBe(true)
@@ -811,14 +729,14 @@ describe('"field" conditionals', () => {
     // seems to be exclusive
     expect(
       validate(
-        event.declaration('applicant.dob').isBefore().date('1990-01-02'),
+        field('applicant.dob').isBefore().date('1990-01-02'),
         getFieldParams()
       )
     ).toBe(true)
 
     expect(
       validate(
-        event.declaration('applicant.dob').isBefore().date('1990-01-01'),
+        field('applicant.dob').isBefore().date('1990-01-01'),
         getFieldParams()
       )
     ).toBe(false)
@@ -826,10 +744,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the comparable field is before the reference field
     expect(
       validate(
-        event
-          .declaration('child.dob')
-          .isBefore()
-          .date(event.declaration('mother.dob')),
+        field('child.dob').isBefore().date(field('mother.dob')),
         getFieldParams({
           'mother.dob': '1990-01-02',
           'child.dob': '1990-01-01'
@@ -840,10 +755,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the comparable field is after the reference field
     expect(
       validate(
-        event
-          .declaration('child.dob')
-          .isBefore()
-          .date(event.declaration('mother.dob')),
+        field('child.dob').isBefore().date(field('mother.dob')),
         getFieldParams({
           'mother.dob': '1990-01-02',
           'child.dob': '1990-01-03'
@@ -854,10 +766,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the comparable field is undefined
     expect(
       validate(
-        event
-          .declaration('child.dob')
-          .isBefore()
-          .date(event.declaration('mother.dob')),
+        field('child.dob').isBefore().date(field('mother.dob')),
         getFieldParams({
           'mother.dob': '1990-01-02'
         })
@@ -867,10 +776,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the reference field is undefined
     expect(
       validate(
-        event
-          .declaration('child.dob')
-          .isBefore()
-          .date(event.declaration('mother.dob')),
+        field('child.dob').isBefore().date(field('mother.dob')),
         getFieldParams({
           'child.dob': '1990-01-02'
         })
@@ -880,10 +786,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the comparable field is wrong format
     expect(
       validate(
-        event
-          .declaration('child.dob')
-          .isBefore()
-          .date(event.declaration('mother.dob')),
+        field('child.dob').isBefore().date(field('mother.dob')),
         getFieldParams({
           'mother.dob': '1990-01-02',
           'child.dob': '1990-01-03123'
@@ -894,10 +797,7 @@ describe('"field" conditionals', () => {
     // Reference to another field, when the reference field is wrong format
     expect(
       validate(
-        event
-          .declaration('child.dob')
-          .isBefore()
-          .date(event.declaration('mother.dob')),
+        field('child.dob').isBefore().date(field('mother.dob')),
         getFieldParams({
           'mother.dob': '1990-01-021231',
           'child.dob': '1990-01-03'
@@ -908,31 +808,23 @@ describe('"field" conditionals', () => {
 
   it('validates "field.isEqualTo" conditional', () => {
     expect(
-      validate(
-        event.declaration('applicant.name').isEqualTo('John Doe'),
-        getFieldParams()
-      )
+      validate(field('applicant.name').isEqualTo('John Doe'), getFieldParams())
     ).toBe(true)
 
     expect(
+      validate(field('applicant.name').isEqualTo('Jane Doe'), getFieldParams())
+    ).toBe(false)
+
+    expect(
       validate(
-        event.declaration('applicant.name').isEqualTo('Jane Doe'),
+        field('applicant.field.not.exist').isEqualTo('Jane Doe'),
         getFieldParams()
       )
     ).toBe(false)
 
     expect(
       validate(
-        event.declaration('applicant.field.not.exist').isEqualTo('Jane Doe'),
-        getFieldParams()
-      )
-    ).toBe(false)
-
-    expect(
-      validate(
-        event
-          .declaration('applicant.name')
-          .isEqualTo(event.declaration('informant.name')),
+        field('applicant.name').isEqualTo(field('informant.name')),
         getFieldParams({
           'applicant.name': 'John Doe',
           'informant.name': 'John Doe'
@@ -942,9 +834,7 @@ describe('"field" conditionals', () => {
 
     expect(
       validate(
-        event
-          .declaration('applicant.name')
-          .isEqualTo(event.declaration('informant.name')),
+        field('applicant.name').isEqualTo(field('informant.name')),
         getFieldParams({
           'applicant.name': 'John Doe',
           'informant.name': 'Jane Doe'
@@ -954,9 +844,7 @@ describe('"field" conditionals', () => {
 
     expect(
       validate(
-        event
-          .declaration('applicant.name')
-          .isEqualTo(event.declaration('informant.name')),
+        field('applicant.name').isEqualTo(field('informant.name')),
         getFieldParams({
           'applicant.name': 'John Doe'
         })
@@ -965,9 +853,7 @@ describe('"field" conditionals', () => {
 
     expect(
       validate(
-        event
-          .declaration('applicant.name')
-          .isEqualTo(event.declaration('informant.name')),
+        field('applicant.name').isEqualTo(field('informant.name')),
         getFieldParams({
           'informant.name': 'Jane Doe'
         })
@@ -976,9 +862,7 @@ describe('"field" conditionals', () => {
 
     expect(
       validate(
-        event
-          .declaration('my.boolean')
-          .isEqualTo(event.declaration('other.boolean')),
+        field('my.boolean').isEqualTo(field('other.boolean')),
         getFieldParams({
           'my.boolean': true,
           'other.boolean': true
@@ -988,9 +872,7 @@ describe('"field" conditionals', () => {
 
     expect(
       validate(
-        event
-          .declaration('my.boolean')
-          .isEqualTo(event.declaration('other.boolean')),
+        field('my.boolean').isEqualTo(field('other.boolean')),
         getFieldParams({
           'my.boolean': true,
           'other.boolean': false
@@ -1000,9 +882,7 @@ describe('"field" conditionals', () => {
 
     expect(
       validate(
-        event
-          .declaration('my.boolean')
-          .isEqualTo(event.declaration('other.boolean')),
+        field('my.boolean').isEqualTo(field('other.boolean')),
         getFieldParams({
           'my.boolean': true
         })
@@ -1011,9 +891,7 @@ describe('"field" conditionals', () => {
 
     expect(
       validate(
-        event
-          .declaration('my.boolean')
-          .isEqualTo(event.declaration('other.boolean')),
+        field('my.boolean').isEqualTo(field('other.boolean')),
         getFieldParams({
           'other.boolean': false
         })
@@ -1023,14 +901,11 @@ describe('"field" conditionals', () => {
 
   it('validates "field.isUndefined" conditional', () => {
     expect(
-      validate(
-        event.declaration('applicant.name').isUndefined(),
-        getFieldParams()
-      )
+      validate(field('applicant.name').isUndefined(), getFieldParams())
     ).toBe(false)
     expect(
       validate(
-        event.declaration('applicant.field.not.exist').isUndefined(),
+        field('applicant.field.not.exist').isUndefined(),
         getFieldParams()
       )
     ).toBe(true)
@@ -1039,14 +914,14 @@ describe('"field" conditionals', () => {
   it('validates "field.inArray" conditional', () => {
     expect(
       validate(
-        event.declaration('applicant.name').inArray(['Jack Doe', 'Jane Doe']),
+        field('applicant.name').inArray(['Jack Doe', 'Jane Doe']),
         getFieldParams()
       )
     ).toBe(false)
 
     expect(
       validate(
-        event.declaration('applicant.name').inArray(['John Doe', 'Jane Doe']),
+        field('applicant.name').inArray(['John Doe', 'Jane Doe']),
         getFieldParams()
       )
     ).toBe(true)
@@ -1072,36 +947,26 @@ describe('"field" conditionals', () => {
     } satisfies FormConditionalParameters
 
     expect(
-      validate(
-        event.declaration('some.id.not.defined.in.form').isFalsy(),
-        falsyFormParams
-      )
+      validate(field('some.id.not.defined.in.form').isFalsy(), falsyFormParams)
     ).toBe(true)
-    expect(
-      validate(event.declaration('empty.string').isFalsy(), falsyFormParams)
-    ).toBe(true)
-    expect(
-      validate(event.declaration('null.value').isFalsy(), falsyFormParams)
-    ).toBe(true)
-    expect(
-      validate(event.declaration('undefined.value').isFalsy(), falsyFormParams)
-    ).toBe(true)
-    expect(
-      validate(event.declaration('false.value').isFalsy(), falsyFormParams)
-    ).toBe(true)
+    expect(validate(field('empty.string').isFalsy(), falsyFormParams)).toBe(
+      true
+    )
+    expect(validate(field('null.value').isFalsy(), falsyFormParams)).toBe(true)
+    expect(validate(field('undefined.value').isFalsy(), falsyFormParams)).toBe(
+      true
+    )
+    expect(validate(field('false.value').isFalsy(), falsyFormParams)).toBe(true)
 
     expect(
-      validate(
-        event.declaration('deep.value').get('foo.bar').isFalsy(),
-        falsyFormParams
-      )
+      validate(field('deep.value').get('foo.bar').isFalsy(), falsyFormParams)
     ).toBe(true)
 
     expect(
       validate(
         and(
-          event.declaration('deep.value').get('foo.bar').isFalsy(),
-          event.declaration('deep.value').get('foo.baz').isFalsy()
+          field('deep.value').get('foo.bar').isFalsy(),
+          field('deep.value').get('foo.baz').isFalsy()
         ),
         falsyFormParams
       )
@@ -1124,29 +989,18 @@ describe('"field" conditionals', () => {
     }
 
     expect(
-      validate(
-        event.declaration('deep.nonvalue').get('foo.bar').isFalsy(),
-        falsyFormParams
-      )
+      validate(field('deep.nonvalue').get('foo.bar').isFalsy(), falsyFormParams)
     ).toBe(true)
 
     expect(
-      validate(
-        event.declaration('deep.value').get('some.value').isFalsy(),
-        falsyFormParams
-      )
+      validate(field('deep.value').get('some.value').isFalsy(), falsyFormParams)
     ).toBe(true)
 
     expect(
-      validate(
-        event.declaration('deep.value').get('some').isFalsy(),
-        falsyFormParams
-      )
+      validate(field('deep.value').get('some').isFalsy(), falsyFormParams)
     ).toBe(false)
 
-    expect(
-      validate(event.declaration('deep.value').isFalsy(), falsyFormParams)
-    ).toBe(false)
+    expect(validate(field('deep.value').isFalsy(), falsyFormParams)).toBe(false)
   })
 })
 
@@ -1356,9 +1210,9 @@ describe('"valid name" conditionals', () => {
       expect(
         validate(
           and(
-            event.declaration('child').get('firstname').isValidEnglishName(),
-            event.declaration('child').get('middlename').isValidEnglishName(),
-            event.declaration('child').get('surname').isValidEnglishName()
+            field('child').get('firstname').isValidEnglishName(),
+            field('child').get('middlename').isValidEnglishName(),
+            field('child').get('surname').isValidEnglishName()
           ),
           params
         )
@@ -1373,10 +1227,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1389,10 +1240,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1405,10 +1253,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1421,10 +1266,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1437,10 +1279,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1453,10 +1292,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1469,10 +1305,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1485,10 +1318,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1501,10 +1331,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(false)
     })
 
@@ -1517,10 +1344,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1533,10 +1357,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
 
@@ -1549,10 +1370,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(true)
     })
   })
@@ -1567,10 +1385,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(false)
     })
 
@@ -1583,10 +1398,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(false)
     })
 
@@ -1599,10 +1411,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(false)
     })
 
@@ -1615,10 +1424,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(false)
     })
 
@@ -1631,10 +1437,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(false)
     })
 
@@ -1647,10 +1450,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(false)
     })
 
@@ -1663,10 +1463,7 @@ describe('"valid name" conditionals', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.firstName').isValidEnglishName(),
-          params
-        )
+        validate(field('child.firstName').isValidEnglishName(), params)
       ).toBe(false)
     })
   })
@@ -1683,10 +1480,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.weightAtBirth').isBetween(0, 10),
-          params
-        )
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
       ).toBe(true)
     })
 
@@ -1699,10 +1493,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.weightAtBirth').isBetween(0, 10),
-          params
-        )
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
       ).toBe(true)
     })
 
@@ -1715,10 +1506,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.weightAtBirth').isBetween(0, 10),
-          params
-        )
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
       ).toBe(true)
     })
   })
@@ -1733,10 +1521,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.weightAtBirth').isBetween(0, 10),
-          params
-        )
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
       ).toBe(false)
     })
 
@@ -1749,10 +1534,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.weightAtBirth').isBetween(0, 10),
-          params
-        )
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
       ).toBe(false)
     })
   })
@@ -1767,10 +1549,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.weightAtBirth').isBetween(0, 10),
-          params
-        )
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
       ).toBe(true)
     })
 
@@ -1783,10 +1562,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.weightAtBirth').isBetween(0, 10),
-          params
-        )
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
       ).toBe(false)
     })
 
@@ -1799,10 +1575,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('child.weightAtBirth').isBetween(0, 10),
-          params
-        )
+        validate(field('child.weightAtBirth').isBetween(0, 10), params)
       ).toBe(false)
     })
   })
@@ -1817,10 +1590,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('adult.heightInFeet').isBetween(5, 8),
-          params
-        )
+        validate(field('adult.heightInFeet').isBetween(5, 8), params)
       ).toBe(true)
     })
 
@@ -1833,10 +1603,7 @@ describe('"range number" conditional', () => {
         $online: false
       }
       expect(
-        validate(
-          event.declaration('adult.heightInFeet').isBetween(5, 8),
-          params
-        )
+        validate(field('adult.heightInFeet').isBetween(5, 8), params)
       ).toBe(false)
     })
   })
@@ -1852,10 +1619,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(true)
   })
 
@@ -1867,10 +1631,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(true)
   })
 
@@ -1882,10 +1643,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 
@@ -1897,10 +1655,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 
@@ -1912,10 +1667,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 
@@ -1927,10 +1679,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 
@@ -1942,10 +1691,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 
@@ -1957,10 +1703,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 
@@ -1972,10 +1715,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 
@@ -1987,10 +1727,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 
@@ -2002,10 +1739,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 
@@ -2017,10 +1751,7 @@ describe('Matches conditional validation', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.phoneNo').matches(PHONE_NUMBER_REGEX),
-        params
-      )
+      validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
   })
 })
@@ -2034,10 +1765,7 @@ describe('Subfield nesting', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('applicant.http').get('success').isEqualTo(true),
-        params
-      )
+      validate(field('applicant.http').get('success').isEqualTo(true), params)
     ).toBe(true)
   })
 
@@ -2045,18 +1773,9 @@ describe('Subfield nesting', () => {
     expect(
       validate(
         or(
-          event
-            .declaration('applicant.name')
-            .get('firstname')
-            .isValidEnglishName(),
-          event
-            .declaration('applicant.name')
-            .get('middlename')
-            .isValidEnglishName(),
-          event
-            .declaration('applicant.name')
-            .get('surname')
-            .isValidEnglishName()
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
         ),
         {
           $form: {
@@ -2071,18 +1790,9 @@ describe('Subfield nesting', () => {
     expect(
       validate(
         or(
-          event
-            .declaration('applicant.name')
-            .get('firstname')
-            .isValidEnglishName(),
-          event
-            .declaration('applicant.name')
-            .get('middlename')
-            .isValidEnglishName(),
-          event
-            .declaration('applicant.name')
-            .get('surname')
-            .isValidEnglishName()
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
         ),
         {
           $form: {
@@ -2097,18 +1807,9 @@ describe('Subfield nesting', () => {
     expect(
       validate(
         and(
-          event
-            .declaration('applicant.name')
-            .get('firstname')
-            .isValidEnglishName(),
-          event
-            .declaration('applicant.name')
-            .get('middlename')
-            .isValidEnglishName(),
-          event
-            .declaration('applicant.name')
-            .get('surname')
-            .isValidEnglishName()
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
         ),
         {
           $form: {
@@ -2123,18 +1824,9 @@ describe('Subfield nesting', () => {
     expect(
       validate(
         and(
-          event
-            .declaration('applicant.name')
-            .get('firstname')
-            .isValidEnglishName(),
-          event
-            .declaration('applicant.name')
-            .get('middlename')
-            .isValidEnglishName(),
-          event
-            .declaration('applicant.name')
-            .get('surname')
-            .isValidEnglishName()
+          field('applicant.name').get('firstname').isValidEnglishName(),
+          field('applicant.name').get('middlename').isValidEnglishName(),
+          field('applicant.name').get('surname').isValidEnglishName()
         ),
         {
           $form: {
@@ -2168,7 +1860,7 @@ describe('isGreaterThan and isLessThan conditionals', () => {
 
     expect(
       validate(
-        event.declaration('family.numberOfChildren').isGreaterThan({
+        field('family.numberOfChildren').isGreaterThan({
           $$field: 'family.numberOfDependents',
           $$subfield: []
         }),
@@ -2190,7 +1882,7 @@ describe('isGreaterThan and isLessThan conditionals', () => {
 
     expect(
       validate(
-        event.declaration('family.numberOfChildren').isGreaterThan({
+        field('family.numberOfChildren').isGreaterThan({
           $$field: 'family.numberOfDependents',
           $$subfield: []
         }),
@@ -2209,10 +1901,7 @@ describe('isGreaterThan and isLessThan conditionals', () => {
     }
 
     expect(
-      validate(
-        event.declaration('employee.salary').isGreaterThan(10000),
-        params
-      )
+      validate(field('employee.salary').isGreaterThan(10000), params)
     ).toBe(false)
   })
 
@@ -2225,10 +1914,7 @@ describe('isGreaterThan and isLessThan conditionals', () => {
     }
 
     expect(
-      validate(
-        event.declaration('employee.salary').isGreaterThan(10000),
-        params
-      )
+      validate(field('employee.salary').isGreaterThan(10000), params)
     ).toBe(true)
   })
 
@@ -2246,7 +1932,7 @@ describe('isGreaterThan and isLessThan conditionals', () => {
 
     expect(
       validate(
-        event.declaration('person.yearsMarried').isLessThan({
+        field('person.yearsMarried').isLessThan({
           $$field: 'person.yearsSinceGraduation',
           $$subfield: []
         }),
@@ -2268,7 +1954,7 @@ describe('isGreaterThan and isLessThan conditionals', () => {
 
     expect(
       validate(
-        event.declaration('person.yearsMarried').isLessThan({
+        field('person.yearsMarried').isLessThan({
           $$field: 'person.yearsSinceGraduation',
           $$subfield: []
         }),
@@ -2287,10 +1973,7 @@ describe('isGreaterThan and isLessThan conditionals', () => {
     }
 
     expect(
-      validate(
-        event.declaration('employee.vacationDays').isLessThan(30),
-        params
-      )
+      validate(field('employee.vacationDays').isLessThan(30), params)
     ).toBe(false)
   })
 
@@ -2303,10 +1986,7 @@ describe('isGreaterThan and isLessThan conditionals', () => {
     }
 
     expect(
-      validate(
-        event.declaration('employee.vacationDays').isLessThan(30),
-        params
-      )
+      validate(field('employee.vacationDays').isLessThan(30), params)
     ).toBe(true)
   })
 
@@ -2318,10 +1998,7 @@ describe('isGreaterThan and isLessThan conditionals', () => {
       $online: false
     }
     expect(
-      validate(
-        event.declaration('employee.salary').isGreaterThan(10000),
-        params
-      )
+      validate(field('employee.salary').isGreaterThan(10000), params)
     ).toBe(false)
   })
 })

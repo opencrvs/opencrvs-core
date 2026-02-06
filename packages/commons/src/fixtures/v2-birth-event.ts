@@ -15,7 +15,7 @@ import {
 } from '../events/EventConfigInput'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
-import { event } from '../events/event'
+import { field } from '../events/field'
 import { BIRTH_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
 import { TranslationConfig } from '../events/TranslationConfig'
@@ -78,9 +78,7 @@ const mother = defineFormPage({
       conditionals: [
         {
           type: 'SHOW',
-          conditional: not(
-            event.declaration('mother.dobUnknown').isEqualTo(true)
-          )
+          conditional: not(field('mother.dobUnknown').isEqualTo(true))
         }
       ]
     },
@@ -97,12 +95,12 @@ const mother = defineFormPage({
       analytics: true,
       label: generateTranslationConfig('Age of mother'),
       configuration: {
-        asOfDate: event.declaration('child.dob')
+        asOfDate: field('child.dob')
       },
       conditionals: [
         {
           type: 'SHOW',
-          conditional: event.declaration('mother.dobUnknown').isEqualTo(true)
+          conditional: field('mother.dobUnknown').isEqualTo(true)
         }
       ]
     },

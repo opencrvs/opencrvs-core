@@ -55,10 +55,7 @@ const fields = [
     },
     validation: [
       {
-        validator: event
-          .declaration('storybook.age')
-          .asAge()
-          .isBetween(12, 120),
+        validator: field('storybook.age').asAge().isBetween(12, 120),
         message: {
           defaultMessage: 'Age must be between 12 and 120',
           description: 'Error message for invalid age',

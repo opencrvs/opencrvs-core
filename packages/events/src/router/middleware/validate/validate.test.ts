@@ -95,7 +95,7 @@ describe('getFieldErrors()', () => {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: event.declaration('test.text').isEqualTo('helloooo')
+              conditional: field('test.text').isEqualTo('helloooo')
             }
           ]
         }
@@ -123,7 +123,7 @@ describe('getFieldErrors()', () => {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: event.declaration('test.text').isEqualTo('helloooo')
+              conditional: field('test.text').isEqualTo('helloooo')
             }
           ]
         }
@@ -235,7 +235,7 @@ describe('getFieldErrors()', () => {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: event.declaration('test.text').isEqualTo('helloooo')
+              conditional: field('test.text').isEqualTo('helloooo')
             }
           ]
         }
@@ -263,7 +263,7 @@ describe('getFieldErrors()', () => {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: event.declaration('test.text').isEqualTo('helloooo')
+              conditional: field('test.text').isEqualTo('helloooo')
             }
           ]
         },
@@ -279,7 +279,7 @@ describe('getFieldErrors()', () => {
           conditionals: [
             {
               type: ConditionalType.SHOW,
-              conditional: event.declaration('test.other').isEqualTo('helloooo')
+              conditional: field('test.other').isEqualTo('helloooo')
             }
           ]
         }
@@ -311,7 +311,7 @@ describe('getFieldErrors()', () => {
                 defaultMessage: 'Failed validation!',
                 description: 'Test Field Validation Message Description'
               },
-              validator: event.declaration('test.input').isEqualTo('helloooo')
+              validator: field('test.input').isEqualTo('helloooo')
             }
           ]
         }
@@ -342,7 +342,7 @@ describe('getFieldErrors()', () => {
                 defaultMessage: 'Failed validation!',
                 description: 'Test Field Validation Message Description'
               },
-              validator: event.declaration('test.input').isEqualTo('helloooo')
+              validator: field('test.input').isEqualTo('helloooo')
             }
           ]
         }
