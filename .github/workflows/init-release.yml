@@ -81,7 +81,7 @@ jobs:
             })
 
       - name: Checkout the release branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: "release/${{ inputs.version }}"
 

@@ -64,12 +64,12 @@ jobs:
         runner: ${{ (inputs.build_arm == true && fromJSON('["ubuntu-24.04", "ubuntu-24.04-arm"]')) || fromJSON('["ubuntu-24.04"]') }}
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: ${{ github.event.inputs.branch_tag_name }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -166,12 +166,12 @@ jobs:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: "${{ github.event.inputs.branch_tag_name }}"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -253,7 +253,7 @@ jobs:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: |
             trivy.yaml
@@ -292,7 +292,7 @@ jobs:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: |
             trivy.yaml
