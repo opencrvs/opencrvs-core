@@ -94,7 +94,7 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Notify an event',
         method: 'POST',
-        path: '/events/notifications',
+        path: '/events/{eventId}/notify',
         tags: ['events'],
         protect: true
       }
@@ -130,7 +130,7 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Request correction for an event',
         method: 'POST',
-        path: '/events/correction/request',
+        path: '/events/{eventId}/correction/request',
         tags: ['events'],
         protect: true
       }
@@ -143,7 +143,7 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Approve correction for an event',
         method: 'POST',
-        path: '/events/correction/approve',
+        path: '/events/{eventId}/correction/approve',
         tags: ['events'],
         protect: true
       }
@@ -156,7 +156,7 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Reject correction for an event',
         method: 'POST',
-        path: '/events/correction/reject',
+        path: '/events/{eventId}/correction/reject',
         tags: ['events'],
         protect: true
       }
@@ -483,8 +483,11 @@ export function getDefaultActionProcedures(
           originalActionId: actionId,
           type: actionType,
           createdBy: ctx.user.id,
-          createdByUserType: TokenUserType.enum.user,
-          createdByRole: ctx.user.role,
+          createdByUserType: ctx.user.type,
+          createdByRole:
+            ctx.user.type === TokenUserType.enum.user
+              ? ctx.user.role
+              : undefined,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,
           eventType: event.type

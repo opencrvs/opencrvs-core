@@ -85,7 +85,7 @@ CREATE TABLE app.event_action_drafts (
     declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
     annotation jsonb,
     created_by text NOT NULL,
-    created_by_role text NOT NULL,
+    created_by_role text,
     created_by_user_type app.user_type NOT NULL,
     created_by_signature text,
     created_at_location uuid NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE app.event_actions (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     created_at_location uuid,
     created_by text NOT NULL,
-    created_by_role text NOT NULL,
+    created_by_role text,
     created_by_signature text,
     created_by_user_type app.user_type NOT NULL,
     declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
@@ -584,5 +584,3 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 --
 -- PostgreSQL database dump complete
 --
-
-

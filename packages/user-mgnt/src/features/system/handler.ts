@@ -11,23 +11,21 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { getSystemIntegrationRoleScopes } from './scopes'
-import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
+import { QA_ENV } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger, SystemRole } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import System, { WebhookPermissions } from '@user-mgnt/model/system'
 import User from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
-import { pickSystem, types } from '@user-mgnt/utils/system'
+import { pickSystem } from '@user-mgnt/utils/system'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
 import uuid from 'uuid/v4'
-import { getInMemoryEventConfigurations } from './countryconfig'
 
 export enum EventType {
   Birth = 'birth',
@@ -41,12 +39,21 @@ interface WebHookPayload {
 
 interface IRegisterSystemPayload {
   name: string
-  settings: {
-    dailyQuota: number
-    webhook: WebHookPayload[]
+  settings?: {
+    dailyQuota?: number
+    webhook?: WebHookPayload[]
   }
-  type: SystemRole
-  integratingSystemType: string
+  /**
+   * Type is now just an annotation - it's stored for display purposes only.
+   * Scopes are the source of truth for permissions.
+   */
+  type: string
+  /**
+   * Scopes are now passed directly from gateway.
+   * Gateway is responsible for converting type to scopes.
+   */
+  scope: string[]
+  integratingSystemType?: string
 }
 
 export async function registerSystem(
@@ -54,53 +61,27 @@ export async function registerSystem(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRegisterSystemPayload
-  const { name, type, integratingSystemType } = payload
-  let { settings } = payload
+  const { settings, name, type, integratingSystemType, scope } = payload
 
   try {
-    if (type === types.WEBHOOK && !settings) {
-      logger.error('Webhook payloads are required !')
-      return h.response('Webhook payloads are required !').code(400)
-    }
-
-    if (type === types.RECORD_SEARCH && !settings) {
-      settings = {
-        dailyQuota: RECORD_SEARCH_QUOTA,
-        webhook: []
-      }
-    }
-
-    if (type === types.IMPORT_EXPORT && !settings) {
-      settings = {
-        dailyQuota: 1000000, //Arbitrary high number, should we make this configurable?
-        webhook: []
-      }
+    // Validate that scopes are provided
+    if (!scope || scope.length === 0) {
+      logger.error('Scopes are required for system registration')
+      return h.response('Scopes are required').code(400)
     }
 
     const authorization = request.headers.authorization as string
     const token = getTokenPayload(authorization.split(' ')[1])
     const userId = token.sub
     const systemAdminUser = await User.findById(userId)
-    const existingSystem = await System.findOne({ type: type })
 
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
       logger.error('active system admin user details cannot be found')
       throw unauthorized()
     }
 
-    if (existingSystem && existingSystem.type === types.NATIONAL_ID) {
-      throw new Error('System with NATIONAL_ID already exists !')
-    }
-
-    const eventConfigurations =
-      await getInMemoryEventConfigurations(authorization)
-    const eventIds = eventConfigurations.map((eventConfig) => eventConfig.id)
-    const systemScopes = getSystemIntegrationRoleScopes(type, eventIds)
-
-    if (!systemScopes) {
-      logger.error('scope doesnt exist')
-      return h.response().code(400)
-    }
+    // Use the scopes passed from gateway
+    const systemScopes = [...scope]
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
@@ -134,39 +115,6 @@ export async function registerSystem(
       )
     }
 
-    if (
-      [
-        types.WEBHOOK,
-        types.RECORD_SEARCH,
-        types.IMPORT_EXPORT,
-        types.CITIZEN_PORTAL
-      ].includes(type)
-    ) {
-      const systemDetails = {
-        client_id,
-        name: name || systemAdminUser.username,
-        createdBy: userId,
-        username: systemAdminUser.username,
-        status: statuses.ACTIVE,
-        scope: systemScopes,
-        practitionerId,
-        secretHash: hash,
-        salt,
-        sha_secret,
-        settings,
-        type
-      }
-      const newSystem = await System.create(systemDetails)
-
-      return h
-        .response({
-          // NOTE! Client secret is visible for only this response and then forever gone
-          clientSecret,
-          system: pickSystem(newSystem)
-        })
-        .code(201)
-    }
-
     const systemDetails = {
       client_id,
       name: name || systemAdminUser.username,
@@ -179,7 +127,8 @@ export async function registerSystem(
       salt,
       sha_secret,
       type,
-      integratingSystemType
+      ...(settings && { settings }),
+      ...(integratingSystemType && { integratingSystemType })
     }
     const newSystem = await System.create(systemDetails)
 
@@ -460,6 +409,7 @@ export const reqUpdateSystemSchema = Joi.object({
 export const reqRegisterSystemSchema = Joi.object({
   type: Joi.string().required(),
   name: Joi.string().required(),
+  scope: Joi.array().items(Joi.string()).required(),
   integratingSystemType: Joi.string(),
   settings: Joi.object({
     dailyQuota: Joi.number(),

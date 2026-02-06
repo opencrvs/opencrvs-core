@@ -32,7 +32,7 @@ export default interface EventActionDraftsTable {
 
   createdBy: ColumnType<string, string, string>
 
-  createdByRole: ColumnType<string, string, string>
+  createdByRole: ColumnType<string | null, string | null, string | null>
 
   createdByUserType: ColumnType<UserType, UserType, UserType>
 

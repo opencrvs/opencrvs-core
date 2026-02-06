@@ -32,7 +32,7 @@ const messages = defineMessages({
   role: {
     id: 'event.history.role',
     defaultMessage:
-      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} HEALTH {Health integration} IMPORT_EXPORT {Import integration} CITIZEN_PORTAL {Citizen Portal} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
+      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} other {Unknown}}',
     description: 'Role of the user in the event history'
   }
 })
@@ -58,18 +58,19 @@ export function useUserDetails() {
     name: string
     role: string | undefined
   } => {
-    const role = intl.formatMessage(messages.role, {
-      role: createdByRole || ''
-    })
 
     if (createdByUserType === 'system') {
       const system = systems.find((s) => s._id === createdBy)
       return {
         type: 'integration',
         name: system?.name ?? intl.formatMessage(messages.systemDefaultName),
-        role
+        role: undefined
       } as const
     }
+
+    const role = intl.formatMessage(messages.role, {
+      role: createdByRole || ''
+    })
 
     if (type === ActionType.DUPLICATE_DETECTED) {
       return {
