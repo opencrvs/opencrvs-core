@@ -11,6 +11,7 @@
 import React from 'react'
 import { IntlShape } from 'react-intl'
 import { useSelector } from 'react-redux'
+import { useField, useFormikContext } from 'formik'
 import {
   EventState,
   AddressFieldValue,
@@ -27,12 +28,15 @@ import {
   AddressType,
   isFieldDisplayedOnReview,
   AddressField,
-  AdministrativeArea,
+  AdministrativeArea as AdministrativeAreaField,
   DefaultAddressFieldValue,
   LocationType,
   ValidatorContext,
   RequireConfig,
-  DomesticAddressFieldValue
+  Country,
+  DomesticAddressFieldValue,
+  TextField,
+  SelectField
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -44,12 +48,12 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { get } from 'lodash'
+import { InputField } from '@client/components/form/InputField'
+import { AdministrativeArea } from './AdministrativeArea'
 
 // ADDRESS field may not contain another ADDRESS field
-type FieldConfigWithoutAddress = Exclude<
-  FieldConfig,
-  { type: typeof FieldType.ADDRESS }
->
+type AddressSubfield = Country | TextField | AdministrativeAreaField
 
 type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
@@ -69,7 +73,7 @@ const COUNTRY_FIELD = {
     description: 'This is the label for the field'
   },
   type: FieldType.COUNTRY
-} as const satisfies FieldConfigWithoutAddress
+} as const satisfies AddressSubfield
 
 const ADDRESS_TYPE_FIELD = {
   id: 'addressType',
@@ -85,7 +89,7 @@ const ADDRESS_TYPE_FIELD = {
     id: 'messages.emptyString'
   },
   type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
+} as const satisfies AddressSubfield
 
 const ADMINISTRATIVE_AREA_FIELD = {
   id: 'administrativeArea',
@@ -101,7 +105,7 @@ const ADMINISTRATIVE_AREA_FIELD = {
     id: 'messages.emptyString'
   },
   type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
+} as const satisfies AddressSubfield
 
 const STREET_LEVEL_DETAILS_FIELD = {
   id: 'streetLevelDetails',
@@ -117,7 +121,7 @@ const STREET_LEVEL_DETAILS_FIELD = {
     id: 'messages.emptyString'
   },
   type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
+} as const satisfies AddressSubfield
 
 const ALL_ADDRESS_FIELDS = [
   COUNTRY_FIELD,
@@ -136,7 +140,7 @@ function isDomesticAddress() {
 function generateAdminStructureFields(
   inputArray: AdminStructureItem[],
   required: RequireConfig
-): AdministrativeArea[] {
+): AdministrativeAreaField[] {
   return inputArray.map((item, index) => {
     const { id, label } = item
     const isFirst = index === 0
@@ -156,7 +160,7 @@ function generateAdminStructureFields(
       }
     ]
 
-    const configuration: AdministrativeArea['configuration'] = {
+    const configuration: AdministrativeAreaField['configuration'] = {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE
     }
 
@@ -164,7 +168,7 @@ function generateAdminStructureFields(
       configuration.partOf = { $declaration: prevItem.id }
     }
 
-    const field: AdministrativeArea = {
+    const field: AdministrativeAreaField = {
       id,
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
@@ -217,6 +221,34 @@ function getAdministrativeArea(value?: AddressFieldValue) {
   return value?.addressType === AddressType.DOMESTIC
     ? value.administrativeArea
     : undefined
+}
+
+function AdminAreaInput({ fieldConfig, partOfRef }: { fieldConfig: AdministrativeAreaField, partOfRef?: string }) {
+  const [input, meta, helper] = useField<string>(fieldConfig.id)
+  const { values } = useFormikContext<object>()
+  const intl = useIntl()
+  return (
+    <InputField
+      id={fieldConfig.id}
+      error={meta.error}
+      label={intl.formatMessage(fieldConfig.label)}
+      touched={meta.touched}
+      htmlFor={fieldConfig.id}
+    >
+      <AdministrativeArea.Input
+        {...field.config}
+        disabled={disabled}
+        partOf={typeof partOf === 'string' ? partOf : null}
+        value={field.value}
+        onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+      />
+    </InputField>
+  )
+}
+
+function AddressInput2({ addressFieldConfig }: { addressFieldConfig: AddressField }) {
+  const { config: { ADMIN_STRUCTURE } } = useSelector(getOfflineData)
+  const [countryInput, countryMeta, countryHelper ] = useField<string>(`${addressFieldConfig.id}.country`)
 }
 
 /**
@@ -376,7 +408,7 @@ function AddressOutput({
   const [locations] = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const customAddressFields = configuration?.configuration
-    ?.streetAddressForm as FieldConfigWithoutAddress[]
+    ?.streetAddressForm as AddressSubfield[]
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
 
   if (!value) {
