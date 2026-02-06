@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { Dialog, Button, Text } from '@opencrvs/components'
+import { Icon, Dialog, Button, Text } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 
@@ -54,6 +54,7 @@ export function UnassignModal({
       ]}
       isOpen={true}
       title={intl.formatMessage(conflictsMessages.unassignTitle)}
+      titleIcon={<Icon color="primary" name="ArrowCircleDown" size="large" />}
       onClose={() => close(false)}
     >
       <Text color="grey500" element="p" variant="reg16">
