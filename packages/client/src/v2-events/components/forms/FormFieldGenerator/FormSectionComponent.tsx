@@ -462,6 +462,7 @@ export function FormSectionComponent({
                   allKnownFields={allFieldsWithDotSeparator}
                   disabled={isDisabled}
                   error={isDisabled ? '' : error}
+                  eventConfig={eventConfig}
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}
