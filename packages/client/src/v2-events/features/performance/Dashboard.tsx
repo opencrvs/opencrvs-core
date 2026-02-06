@@ -97,13 +97,22 @@ function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
 
     const dashboardOrigin = new URL(dashboard.url).origin
     const handleMessage = (event: MessageEvent) => {
+      console.log('[postMessage debug]', {
+        expectedOrigin: dashboardOrigin,
+        actualOrigin: event.origin,
+        data: event.data,
+        sourceExists: !!event.source
+      })
+
       if (event.origin !== dashboardOrigin) {
+        console.warn('[postMessage] origin mismatch')
         return
       }
 
       // this is the real sender window
       const sourceWindow = event.source as Window | null
       if (!sourceWindow) {
+        console.warn('[postMessage] missing source window')
         return
       }
 
