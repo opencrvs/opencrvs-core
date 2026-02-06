@@ -18,12 +18,17 @@ import {
   EventConfig,
   EventState,
   FieldConfig,
+  FieldType,
   FieldValue,
+  getDeclarationFields,
   joinValues,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
+import {
+  FIELD_SEPARATOR,
+  makeFormikFieldIdOpenCRVSCompatible
+} from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import { useDefaultValues } from '@client/v2-events/hooks/useDefaultValues'
 import {
@@ -81,17 +86,33 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
 
       if (newlyTouched && newlyTouched.length > 0) {
         const newlyTouchedFields = parentId
-          ? newlyTouched.reduce(
-              (prev, fieldId) => ({
+          ? newlyTouched.reduce((prev, fieldId) => {
+              let markParentDirty = false
+              if (eventConfig) {
+                const fieldConfig = getDeclarationFields(eventConfig).find(
+                  (x) => x.id === makeFormikFieldIdOpenCRVSCompatible(parentId)
+                )
+                /**
+                 * For NAME fields with hideSubFieldError enabled, we need to mark its parent as dirty to ensure proper validation error
+                 * message is shown at Name field level, since subfield validation error message is hidden
+                 */
+                markParentDirty =
+                  fieldConfig?.type === FieldType.NAME &&
+                  !!fieldConfig.configuration?.showParentFieldError
+              }
+
+              return {
                 ...prev,
                 /**
                  * If we are touching  `firstname` from `child____name`,
                  * we mark `child____name____firstname` as dirty
                  */
-                [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true
-              }),
-              {}
-            )
+                [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true,
+                ...(markParentDirty && {
+                  [parentId]: true
+                })
+              }
+            }, {})
           : touched
 
         setAllTouchedFields({
