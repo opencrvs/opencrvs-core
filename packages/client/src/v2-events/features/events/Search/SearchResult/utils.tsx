@@ -368,7 +368,7 @@ export function processEventsToRows({
   redirectParam,
   isWideScreen,
   isOnline,
-  formatMessage
+  intl
 }: {
   events: EventIndex[]
   eventConfigs: EventConfig[]
@@ -378,7 +378,7 @@ export function processEventsToRows({
   redirectParam: string
   isWideScreen: boolean
   isOnline: boolean
-  formatMessage: IntlShape['formatMessage']
+  intl: IntlShape
 }) {
   return events.map((event) => {
     console.log(`Processing event ${event.id}`)
@@ -410,10 +410,10 @@ export function processEventsToRows({
       ...eventWithDraft,
       actions: actionComponents,
       label: eventConfig.label,
-      type: formatMessage(eventConfig.label),
+      type: intl.formatMessage(eventConfig.label),
       createdAt: formattedDuration(new Date(eventWithDraft.createdAt)),
       updatedAt: formattedDuration(new Date(eventWithDraft.updatedAt)),
-      status: formatMessage(messages.eventStatus, {
+      status: intl.formatMessage(messages.eventStatus, {
         status: localEventStatus
       }),
       title: (
@@ -424,7 +424,7 @@ export function processEventsToRows({
           redirectParam={redirectParam}
         />
       ),
-      outbox: formatMessage(
+      outbox: intl.formatMessage(
         isOnline ? messages.processingAction : messages.waitingForAction,
         {
           action:

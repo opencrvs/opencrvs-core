@@ -120,58 +120,36 @@ export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
 ): [React.ReactNode, ActionMenuItem[]] {
-  console.time(`${event.id} - TOTAL`)
-
-  console.time(`${event.id} - 1. flags check`)
   const isPending = event.flags.some((flag) => flag.endsWith(':requested'))
-  console.timeEnd(`${event.id} - 1. flags check`)
 
-  console.time(`${event.id} - 2. useUserAllowedActions`)
   const { isActionAllowed } = useUserAllowedActions(event.type)
-  console.timeEnd(`${event.id} - 2. useUserAllowedActions`)
 
-  console.time(`${event.id} - 3. useDrafts`)
   const drafts = useDrafts()
-  console.timeEnd(`${event.id} - 3. useDrafts`)
 
-  console.time(`${event.id} - 4. useValidatorContext`)
   const validatorContext = useValidatorContext()
-  console.timeEnd(`${event.id} - 4. useValidatorContext`)
 
-  console.time(`${event.id} - 5. useEventConfiguration`)
   const { eventConfiguration } = useEventConfiguration(event.type)
-  console.timeEnd(`${event.id} - 5. useEventConfiguration`)
 
-  console.time(`${event.id} - 6. find openDraft`)
   const openDraft = drafts
     .getAllRemoteDrafts()
     .find((draft) => draft.eventId === event.id)
-  console.timeEnd(`${event.id} - 6. find openDraft`)
 
-  console.time(`${event.id} - 7. useViewableActionConfigurations`)
   const { config, modals } = useViewableActionConfigurations(
     event,
     authentication,
     openDraft
   )
-  console.timeEnd(`${event.id} - 7. useViewableActionConfigurations`)
 
-  console.time(`${event.id} - 8. allowedActionConfigs useMemo`)
   const allowedActionConfigs: ActionMenuItem[] = useMemo(() => {
-    console.time(`${event.id} - 8a. getAvailableAssignmentActions`)
     const availableAssignmentActions = getAvailableAssignmentActions(
       event,
       authentication
     )
-    console.timeEnd(`${event.id} - 8a. getAvailableAssignmentActions`)
 
-    console.time(`${event.id} - 8b. getAvailableActionsForEvent`)
     const availableEventActions = getAvailableActionsForEvent(event)
-    console.timeEnd(`${event.id} - 8b. getAvailableActionsForEvent`)
 
     const openDraftAction = openDraft ? [openDraft.action.type] : []
 
-    console.time(`${event.id} - 8c. filter and map`)
     const result = [
       ...availableAssignmentActions,
       ...availableEventActions,
@@ -185,42 +163,43 @@ export function useAllowedActionConfigurations(
       )
       .filter((action) => isActionAllowed(action))
       .map((a) => ({ ...config[a], type: a }))
-    console.timeEnd(`${event.id} - 8c. filter and map`)
+
     return result
   }, [openDraft, config, isActionAllowed, event, authentication])
-  console.timeEnd(`${event.id} - 8. allowedActionConfigs useMemo`)
 
-  console.time(`${event.id} - 9. useCustomActionConfigs`)
   const { customActionModal, customActionConfigs } = useCustomActionConfigs(
     event,
     authentication
   )
-  console.timeEnd(`${event.id} - 9. useCustomActionConfigs`)
 
-  console.time(`${event.id} - 10. applyActionConditionalEffects`)
-  const allActionConfigs = [...allowedActionConfigs, ...customActionConfigs]
-    .map((action) =>
-      applyActionConditionalEffects({
-        event,
-        action,
-        validatorContext,
-        eventConfiguration
-      })
-    )
-    .filter((a: ActionConfig) => !a.hidden)
-  console.timeEnd(`${event.id} - 10. applyActionConditionalEffects`)
+  const allActionConfigs = useMemo(
+    () =>
+      [...allowedActionConfigs, ...customActionConfigs]
+        .map((action) =>
+          applyActionConditionalEffects({
+            event,
+            action,
+            validatorContext,
+            eventConfiguration
+          })
+        )
+        .filter((a: ActionConfig) => !a.hidden),
+    [
+      allowedActionConfigs,
+      customActionConfigs,
+      event,
+      validatorContext,
+      eventConfiguration
+    ]
+  )
 
-  console.time(`${event.id} - 11. hasOnlyMetaActions`)
   const hasOnlyMetaActions = allActionConfigs.every(({ type }) =>
     isMetaAction(type)
   )
-  console.timeEnd(`${event.id} - 11. hasOnlyMetaActions`)
 
   if (isPending) {
     return [null, []]
   }
-
-  console.timeEnd(`${event.id} - TOTAL`)
 
   return [
     [modals, customActionModal],

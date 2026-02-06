@@ -52,43 +52,41 @@ export function useViewableActionConfigurations(
   authentication: ITokenPayload,
   draft?: Draft
 ) {
-  console.time(`${event.id} - useViewable TOTAL`)
-
-  console.time(`${event.id} - useViewable 1. hooks setup`)
   const events = useEvents()
+
   const { useFindEventFromCache } = events.getEvent
 
   const navigate = useNavigate()
   const isOnline = useOnlineStatus()
-  const { clearEphemeralFormState } = useEventFormNavigation()
-  const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
+
+  const {
+    clearEphemeralFormState,
+    modal: deleteModal,
+    deleteDeclaration
+  } = useEventFormNavigation()
+
+  const cachedEvent = useFindEventFromCache(event.id)
+  const isDownloaded = Boolean(cachedEvent.data)
   const [assignModal, openAssignModal] = useModal()
   const intl = useIntl()
+
   const { getUser } = useUsers()
+
   const { getLocations } = useLocations()
-  console.timeEnd(`${event.id} - useViewable 1. hooks setup`)
 
-  console.time(`${event.id} - useViewable 2. locations query`)
   const locations = getLocations.useSuspenseQuery()
-  console.timeEnd(`${event.id} - useViewable 2. locations query`)
 
-  console.time(`${event.id} - useViewable 3. assignedToUser query`)
   const assignedToUser = getUser.useQuery(event.assignedTo || '', {
     enabled: !!event.assignedTo
   })
-  console.timeEnd(`${event.id} - useViewable 3. assignedToUser query`)
 
-  console.time(`${event.id} - useViewable 4. compute names`)
   const assignedUserFullName = assignedToUser.data
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
   const assignedOffice = assignedToUser.data?.primaryOfficeId
   const assignedOfficeName =
     (assignedOffice && locations.get(assignedOffice)?.name) || ''
-  console.timeEnd(`${event.id} - useViewable 4. compute names`)
 
-  console.time(`${event.id} - useViewable 5. more hooks`)
-  const { modal: deleteModal, deleteDeclaration } = useEventFormNavigation()
   const onDelete = useCallback(
     async (workqueue?: string) => {
       await deleteDeclaration(event.id, workqueue)
@@ -100,13 +98,10 @@ export function useViewableActionConfigurations(
     event.type,
     false
   )
-  const { refetch: refetchEvent } = events.getEvent.useFindEventFromCache(
-    event.id
-  )
-  const { eventConfiguration } = useEventConfiguration(event.type)
-  console.timeEnd(`${event.id} - useViewable 5. more hooks`)
+  const { refetch: refetchEvent } = cachedEvent
 
-  console.time(`${event.id} - useViewable 6. compute flags`)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
@@ -123,23 +118,17 @@ export function useViewableActionConfigurations(
     ActionType.REQUEST_CORRECTION,
     event.type
   )
-  console.timeEnd(`${event.id} - useViewable 6. compute flags`)
 
-  console.time(`${event.id} - useViewable 7. useQuickActionModal`)
   const { quickActionModal, onQuickAction } = useQuickActionModal(
     event.id,
     eventConfiguration,
     event.type
   )
-  console.timeEnd(`${event.id} - useViewable 7. useQuickActionModal`)
 
-  console.time(`${event.id} - useViewable 8. getAction helper`)
   const getAction = (type: ActionType) => {
     return eventConfiguration.actions.find((action) => action.type === type)
   }
-  console.timeEnd(`${event.id} - useViewable 8. getAction helper`)
 
-  console.time(`${event.id} - useViewable 9. build config object`)
   const result = {
     modals: [assignModal, deleteModal, rejectionModal, quickActionModal],
     config: {
@@ -337,9 +326,6 @@ export function useViewableActionConfigurations(
       }
     } satisfies Record<ActionMenuActionType, ActionConfig>
   }
-  console.timeEnd(`${event.id} - useViewable 9. build config object`)
-
-  console.timeEnd(`${event.id} - useViewable TOTAL`)
 
   return result
 }

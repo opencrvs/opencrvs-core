@@ -31,7 +31,13 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
-import { ActionConfig, ActionType, EventIndex, EventDocument } from '../client'
+import {
+  ActionConfig,
+  ActionType,
+  EventIndex,
+  EventDocument,
+  EventConfig
+} from '../client'
 
 const ajv = new Ajv({
   $data: true,
@@ -195,6 +201,30 @@ ajv.addKeyword({
     return locations.some((location) => location.id === locationIdInput)
   }
 })
+
+let schemasCompiled = false
+
+export function precompileActionSchemas(eventConfigurations: EventConfig[]) {
+  if (schemasCompiled) {
+    return
+  }
+
+  schemasCompiled = true
+
+  for (const config of eventConfigurations) {
+    for (const action of config.actions) {
+      if (action.conditionals) {
+        for (const conditional of action.conditionals) {
+          const schema = conditional.conditional
+          if (schema.$id && !ajv.getSchema(schema.$id)) {
+            ajv.compile(schema)
+          }
+        }
+      }
+    }
+  }
+  console.log('Precompiled schemas for actions')
+}
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
@@ -484,7 +514,6 @@ function zodToIntlErrorMap(
 
   switch (issue.code) {
     case 'too_small': {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (issue.message === undefined) {
         return createIntlError(requiredMessage)
       }
