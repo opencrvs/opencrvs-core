@@ -163,7 +163,6 @@ export function useAllowedActionConfigurations(
           workqueueActions.safeParse(action).success
       )
       .filter((action) => isActionAllowed(action))
-      // @ts-ignore
       .map((a) => ({ ...config[a], type: a }))
 
     return result

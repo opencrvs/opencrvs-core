@@ -327,8 +327,18 @@ export function useViewableActionConfigurations(
         },
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
+      },
+      [ActionType.READ]: {
+        label: actionLabels[ActionType.READ],
+        icon: 'Eye' as const,
+        onClick: (workqueue?: string) =>
+          navigate(
+            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
+          ),
+        // @TODO
+        disabled: false,
+        hidden: false
       }
-      // @ts-ignore
     } satisfies Record<ActionMenuActionType, ActionConfig>
   }
 

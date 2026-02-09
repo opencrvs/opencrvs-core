@@ -26,10 +26,17 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useUserAllowedActions } from './useUserAllowedActions'
 import { actionLabels, ActionMenuItem } from './utils'
 import { useActionOnClick } from './useActionOnClick'
 import { getAvailableAssignmentActions } from './useAllowedActionConfigurations'
+
+export const reviewLabel = {
+  id: 'buttons.review',
+  defaultMessage: 'Review',
+  description: 'Label for review CTA button'
+}
 
 /**
  * Resolves "internal" conditionals for actions. e.g. ensures user is online when needed, or the event is downloaded and assigned to the user for certain actions.
@@ -37,7 +44,8 @@ import { getAvailableAssignmentActions } from './useAllowedActionConfigurations'
 function useResolveInternalActionConditions(
   event: EventIndex,
   actionType: CtaActionType | ClientSpecificAction,
-  userId: string
+  userId: string,
+  isDeclareDraftOpen: boolean
 ) {
   const events = useEvents()
   const isOnline = useOnlineStatus()
@@ -53,9 +61,6 @@ function useResolveInternalActionConditions(
   const isAssignmentInProgress = events.actions.assignment.assign.isAssigning(
     event.id
   )
-
-  // @todo
-  const hasDeclarationDraftOpen = true
 
   const eventIsWaitingForCorrection = event.flags.includes(
     InherentFlags.CORRECTION_REQUESTED
@@ -89,7 +94,7 @@ function useResolveInternalActionConditions(
       }
     case ActionType.DECLARE:
       return {
-        enabled: isDownloadedAndAssignedToUser && !hasDeclarationDraftOpen,
+        enabled: isDownloadedAndAssignedToUser || isDeclareDraftOpen,
         visible: true
       }
     case ActionType.EDIT:
@@ -140,7 +145,8 @@ function useResolveInternalActionConditions(
  */
 export function useResolveActionConditionals(
   event: EventIndex,
-  actionType: CtaActionType
+  actionType: CtaActionType,
+  isDeclareDraftOpen: boolean
 ) {
   const validatorContext = useValidatorContext()
   const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
@@ -190,7 +196,8 @@ export function useResolveActionConditionals(
   const internalConditions = useResolveInternalActionConditions(
     event,
     actionType,
-    validatorContext.user?.sub || ''
+    validatorContext.user?.sub || '',
+    isDeclareDraftOpen
   )
 
   return {
@@ -204,15 +211,34 @@ export function useGetActionConfiguration(
   event: EventIndex,
   actionType: CtaActionType
 ): ActionMenuItem {
+  const { getAllRemoteDrafts } = useDrafts()
+  const drafts = getAllRemoteDrafts()
+  const eventId = event.id
+
+  const isDeclareDraftOpen = useMemo(
+    () =>
+      drafts.some(
+        (draft) =>
+          draft.action.type === ActionType.DECLARE && draft.eventId === eventId
+      ),
+    [drafts, eventId]
+  )
+
   const { eventConfiguration } = useEventConfiguration(event.type)
   const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
-  const { enabled, visible } = useResolveActionConditionals(event, actionType)
+  const { enabled, visible } = useResolveActionConditionals(
+    event,
+    actionType,
+    isDeclareDraftOpen
+  )
 
   const { onClick } = useActionOnClick(event)
+  const replaceLabelForDeclareDraft =
+    isDeclareDraftOpen && actionType === ActionType.DECLARE
 
   return {
-    label: actionLabels[actionType],
+    label: replaceLabelForDeclareDraft ? reviewLabel : actionLabels[actionType],
     type: actionType,
     icon: actionConfig?.icon || 'Offline',
     onClick: async (workqueue?: string) => onClick(actionType, workqueue),

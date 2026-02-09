@@ -144,8 +144,15 @@ export function ActionMenu({
     'Authentication is not available but is required'
   )
 
-  // @ts-ignore
-  const eventIndex = searchEventById.useSuspenseQuery(eventId)?.results[0]
+  const getEventQuery = searchEventById.useSuspenseQuery(eventId)
+
+  const eventResults = getEventQuery
+
+  if (eventResults.total === 0) {
+    throw new Error(`Event ${eventId} not found`)
+  }
+
+  const eventIndex = eventResults.results[0]
 
   if (!eventIndex) {
     throw new Error(`Event ${eventId} not found`)
