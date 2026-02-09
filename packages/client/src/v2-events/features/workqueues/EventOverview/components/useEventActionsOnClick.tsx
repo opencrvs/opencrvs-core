@@ -37,6 +37,11 @@ import { useQuickActionModal } from '@client/v2-events/features/events/actions/q
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 import { useAuthentication } from '@client/utils/userUtils'
 
+/**
+ * Given an event,
+ * returns onClick handlers for actions and any modals needed for those actions.
+ * Used to support both workqueue item CTA button and action menu items.
+ */
 export function useEventActionsOnClick(event: EventIndex) {
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(

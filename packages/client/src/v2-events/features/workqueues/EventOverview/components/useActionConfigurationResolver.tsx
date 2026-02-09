@@ -22,7 +22,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useUserAllowedActions } from './useUserAllowedActions'
 import { actionIcons, actionLabels, ActionMenuItem } from './utils'
-import { useEventActionsOnClick } from './useActionOnClick'
+import { useEventActionsOnClick } from './useEventActionsOnClick'
 import { resolveActionConditionals } from './resolveActionConditionals'
 
 const reviewLabel = {
