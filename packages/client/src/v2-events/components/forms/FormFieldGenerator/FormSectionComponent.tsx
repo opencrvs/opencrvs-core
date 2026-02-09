@@ -249,13 +249,20 @@ export function FormSectionComponent({
             return undefined
           }
 
+          if (!listenerFieldConfig) {
+            return undefined
+          }
+
           const isReferenceVisible = isFieldVisible(
             referenceFieldConfig,
             makeFormikFieldIdsOpenCRVSCompatible(fieldValues),
             validatorContext
           )
 
-          if (!isReferenceVisible || !listenerFieldConfig) {
+          const shouldResolveHiddenReference =
+            referenceFieldConfig.type === FieldType.ID_READER
+
+          if (!isReferenceVisible && !shouldResolveHiddenReference) {
             return undefined
           }
 
