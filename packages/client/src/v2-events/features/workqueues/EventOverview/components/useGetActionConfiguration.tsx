@@ -61,7 +61,7 @@ export function useResolveInternalActionConditions(
   switch (actionType) {
     case ActionType.ASSIGN:
       return {
-        enabled: isOnline && eventIsWaitingForCorrection,
+        enabled: isOnline && !eventIsWaitingForCorrection,
         visible: true
       }
     case ActionType.UNASSIGN:
@@ -91,7 +91,8 @@ export function useResolveInternalActionConditions(
       }
     case ActionType.EDIT:
       return {
-        enabled: isDownloadedAndAssignedToUser
+        enabled: isDownloadedAndAssignedToUser,
+        visible: true
       }
     case ActionType.REJECT:
       return {
