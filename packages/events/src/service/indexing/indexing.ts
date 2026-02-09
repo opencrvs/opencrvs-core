@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { type estypes } from '@elastic/elasticsearch'
+import { estypes } from '@elastic/elasticsearch'
 import * as z from 'zod/v4'
 import {
   ActionCreationMetadata,
@@ -46,11 +46,14 @@ import {
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
   AGE_DOB_QUERY_KEY,
+  AGE_DOB_QUERY_KEY,
   removeSecuredFields,
   IndexedAgeFieldValue,
   IndexedNameFieldValue,
   resolveRecordActionScopeToIds,
-  valueFromTotal
+  valueFromTotal,
+  IndexedAgeFieldValue,
+  IndexedNameFieldValue
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
