@@ -88,7 +88,7 @@ export const SearchResultIndex = () => {
 
   return (
     <SearchResultComponent
-      actions={[ActionType.READ]}
+      action={{ type: ActionType.READ }}
       columns={mandatoryColumns}
       eventConfigs={[eventConfig]}
       queryData={queryData.results}

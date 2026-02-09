@@ -34,7 +34,7 @@ function QuickSearchComponent({ term }: { term: string }) {
 
   return (
     <SearchResultComponent
-      actions={[ActionType.READ]}
+      action={{ type: ActionType.READ }}
       columns={mandatoryColumns}
       eventConfigs={eventConfigurations}
       queryData={queryData.results}

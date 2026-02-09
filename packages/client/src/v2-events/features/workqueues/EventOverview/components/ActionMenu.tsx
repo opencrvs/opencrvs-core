@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -30,10 +30,8 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import {
-  ActionMenuItem,
-  useAllowedActionConfigurations
-} from './useAllowedActionConfigurations'
+import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
+import { ActionMenuItem } from './utils'
 
 /** This is the default order of actions if no actionOrder is defined in event configuration. */
 const DEFAULT_ACTION_ORDER = [
@@ -49,7 +47,8 @@ const DEFAULT_ACTION_ORDER = [
   ActionType.REQUEST_CORRECTION,
   ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
   ActionType.CUSTOM,
-  ActionType.UNASSIGN
+  ActionType.UNASSIGN,
+  ActionType.READ
 ]
 
 export function sortActions(
@@ -145,6 +144,7 @@ export function ActionMenu({
     'Authentication is not available but is required'
   )
 
+  // @ts-ignore
   const [eventIndex] = searchEventById.useSuspenseQuery(eventId)
 
   if (!eventIndex) {

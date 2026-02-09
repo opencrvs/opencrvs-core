@@ -328,6 +328,7 @@ export function useViewableActionConfigurations(
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
+      // @ts-ignore
     } satisfies Record<ActionMenuActionType, ActionConfig>
   }
 
