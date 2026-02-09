@@ -145,7 +145,7 @@ export function ActionMenu({
   )
 
   // @ts-ignore
-  const [eventIndex] = searchEventById.useSuspenseQuery(eventId)
+  const eventIndex = searchEventById.useSuspenseQuery(eventId)?.results[0]
 
   if (!eventIndex) {
     throw new Error(`Event ${eventId} not found`)
