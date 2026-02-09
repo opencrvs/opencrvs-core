@@ -10,11 +10,9 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { EventIndex, CtaActionType } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
-import { ROUTES } from '@client/v2-events/routes'
 import { withSuspense } from '../../../components/withSuspense'
 import { useGetActionConfiguration } from '../../workqueues/EventOverview/components/useGetActionConfiguration'
 
@@ -25,12 +23,6 @@ const StyledButton = styled(Button)`
   display: block;
   text-overflow: ellipsis;
 `
-
-const reviewLabel = {
-  id: 'buttons.review',
-  defaultMessage: 'Review',
-  description: 'Label for review CTA button'
-}
 
 /**
  * @returns next available action cta based on the given event.

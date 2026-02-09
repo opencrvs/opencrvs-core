@@ -93,6 +93,22 @@ export const actionLabels = {
   }
 } as const
 
+export const actionIcons: Record<ActionMenuActionType, IconProps['name']> = {
+  [ActionType.ASSIGN]: 'PushPin',
+  [ActionType.UNASSIGN]: 'ArrowCircleDown',
+  [ActionType.ARCHIVE]: 'Archive',
+  [ActionType.MARK_AS_DUPLICATE]: 'PencilLine',
+  [ActionType.DELETE]: 'Trash',
+  [ActionType.DECLARE]: 'PencilLine',
+  [ActionType.EDIT]: 'PencilLine',
+  [ActionType.REJECT]: 'FileX',
+  [ActionType.REGISTER]: 'PencilLine',
+  [ActionType.PRINT_CERTIFICATE]: 'Printer',
+  [ActionType.REQUEST_CORRECTION]: 'NotePencil',
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: 'NotePencil',
+  [ActionType.READ]: 'Eye'
+}
+
 export interface ActionConfig {
   label: TranslationConfig
   icon: IconProps['name']

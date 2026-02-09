@@ -33,6 +33,7 @@ import { useUserAllowedActions } from './useUserAllowedActions'
 import { ActionMenuItem, ActionMenuActionType, ActionConfig } from './utils'
 import { useCustomActionConfigs } from './useCustomActionConfigs'
 import { useViewableActionConfigurations } from './useViewableActionConfigurations'
+import { useGetActionMenuConfigurations } from './useGetActionConfiguration'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -121,89 +122,43 @@ export function useAllowedActionConfigurations(
   event: EventIndex,
   authentication: ITokenPayload
 ): [React.ReactNode, ActionMenuItem[]] {
+  // @TODO: this should not be needed at this level.
   const isPending = event.flags.some((flag) => flag.endsWith(':requested'))
 
-  const { isActionAllowed } = useUserAllowedActions(event.type)
-
-  const drafts = useDrafts()
-
-  const validatorContext = useValidatorContext()
-
-  const { eventConfiguration } = useEventConfiguration(event.type)
-
-  const openDraft = drafts
-    .getAllRemoteDrafts()
-    .find((draft) => draft.eventId === event.id)
-
-  const { config, modals } = useViewableActionConfigurations(
-    event,
-    authentication,
-    openDraft
-  )
-
-  const allowedActionConfigs: ActionMenuItem[] = useMemo(() => {
-    const availableAssignmentActions = getAvailableAssignmentActions(
-      event,
-      authentication
-    )
-
-    const availableEventActions = getAvailableActionsForEvent(event)
-
-    const openDraftAction = openDraft ? [openDraft.action.type] : []
-
-    const result = [
-      ...availableAssignmentActions,
-      ...availableEventActions,
-      ...openDraftAction
-    ]
-      .filter((action, index, self) => self.indexOf(action) === index)
-      .filter(
-        (action): action is ActionMenuActionType =>
-          ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
-          workqueueActions.safeParse(action).success
-      )
-      .filter((action) => isActionAllowed(action))
-      .map((a) => ({ ...config[a], type: a }))
-
-    return result
-  }, [openDraft, config, isActionAllowed, event, authentication])
+  const { modals, actions } = useGetActionMenuConfigurations(event)
 
   const { customActionModal, customActionConfigs } = useCustomActionConfigs(
     event,
     authentication
   )
 
-  const allActionConfigs = useMemo(
-    () =>
-      [...allowedActionConfigs, ...customActionConfigs]
-        .map((action) =>
-          applyActionConditionalEffects({
-            event,
-            action,
-            validatorContext,
-            eventConfiguration
-          })
-        )
-        .filter((a: ActionConfig) => !a.hidden),
-    [
-      allowedActionConfigs,
-      customActionConfigs,
+  const validatorContext = useValidatorContext()
+  const eventConfiguration = useEventConfiguration(
+    event.type
+  ).eventConfiguration
+
+  const allowedCustomActionConfigs = customActionConfigs.map((ca) =>
+    applyActionConditionalEffects({
       event,
+      action: ca,
       validatorContext,
       eventConfiguration
-    ]
+    })
   )
 
-  const hasOnlyMetaActions = allActionConfigs.every(({ type }) =>
-    isMetaAction(type)
+  const allActions = useMemo(
+    () =>
+      [...actions, ...allowedCustomActionConfigs].filter(
+        (action) => !action.hidden
+      ),
+    [actions, allowedCustomActionConfigs]
   )
+
+  const hasOnlyMetaActions = allActions.every(({ type }) => isMetaAction(type))
 
   if (isPending) {
     return [null, []]
   }
 
-  return [
-    [modals, customActionModal],
-    hasOnlyMetaActions ? [] : allActionConfigs
-  ]
+  return [[modals, customActionModal], hasOnlyMetaActions ? [] : allActions]
 }

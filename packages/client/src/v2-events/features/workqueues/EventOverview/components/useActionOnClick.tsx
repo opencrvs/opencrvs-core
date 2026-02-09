@@ -37,7 +37,7 @@ import { useQuickActionModal } from '@client/v2-events/features/events/actions/q
 import { useRejectionModal } from '@client/v2-events/features/events/actions/reject/useRejectionModal'
 import { useAuthentication } from '@client/utils/userUtils'
 
-export function useActionOnClick(event: EventIndex) {
+export function useEventActionsOnClick(event: EventIndex) {
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(
     maybeAuth,
@@ -46,11 +46,18 @@ export function useActionOnClick(event: EventIndex) {
 
   const navigate = useNavigate()
   const events = useEvents()
-  const { clearEphemeralFormState, deleteDeclaration } =
-    useEventFormNavigation()
+  const {
+    clearEphemeralFormState,
+    deleteDeclaration,
+    modal: deleteModal
+  } = useEventFormNavigation()
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { handleRejection } = useRejectionModal(event.id, event.type, false)
-  const { onQuickAction } = useQuickActionModal(
+  const { handleRejection, rejectionModal } = useRejectionModal(
+    event.id,
+    event.type,
+    false
+  )
+  const { onQuickAction, quickActionModal } = useQuickActionModal(
     event.id,
     eventConfiguration,
     event.type
@@ -221,5 +228,8 @@ export function useActionOnClick(event: EventIndex) {
     ]
   )
 
-  return { onClick, modals: [assignModal] }
+  return {
+    onClick,
+    modals: [assignModal, deleteModal, rejectionModal, quickActionModal]
+  }
 }
