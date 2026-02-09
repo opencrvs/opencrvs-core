@@ -107,9 +107,11 @@ export function useViewableActionConfigurations(
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
   const hasDeclarationDraftOpen = draft?.action.type === ActionType.DECLARE
+
   const eventIsWaitingForCorrection = event.flags.includes(
     InherentFlags.CORRECTION_REQUESTED
   )
+
   const eventId = event.id
   const isAssignmentInProgress = events.actions.assignment.assign.isAssigning(
     event.id

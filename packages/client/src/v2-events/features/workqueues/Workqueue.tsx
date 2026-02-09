@@ -41,9 +41,6 @@ const FabContainer = styled.div`
   }
 `
 function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
-  const renderCount = useRef(0)
-  renderCount.current += 1
-
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
 
@@ -93,9 +90,6 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
 }
 
 function WorkqueueContent() {
-  const renderCount = useRef(0)
-  renderCount.current += 1
-
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   if (!workqueueSlug) {
     throw new Error('Workqueue slug is required')
@@ -110,9 +104,6 @@ function WorkqueueContent() {
 }
 
 export function WorkqueueContainer() {
-  const renderCount = useRef(0)
-  renderCount.current += 1
-
   return (
     <>
       <WorkqueueContent />

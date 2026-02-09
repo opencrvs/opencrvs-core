@@ -31,7 +31,10 @@ import { actionLabels, ActionMenuItem } from './utils'
 import { useActionOnClick } from './useActionOnClick'
 import { getAvailableAssignmentActions } from './useAllowedActionConfigurations'
 
-export function useResolveInternalActionConditions(
+/**
+ * Resolves "internal" conditionals for actions. e.g. ensures user is online when needed, or the event is downloaded and assigned to the user for certain actions.
+ */
+function useResolveInternalActionConditions(
   event: EventIndex,
   actionType: CtaActionType | ClientSpecificAction,
   userId: string

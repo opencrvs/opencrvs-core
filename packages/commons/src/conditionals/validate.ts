@@ -204,6 +204,10 @@ ajv.addKeyword({
 
 let schemasCompiled = false
 
+/**
+ * Precompiles action conditional schemas from the event configurations to improve performance of condition validation later on.
+ * Best called once on application startup before any condition validation is done.
+ */
 export function precompileActionSchemas(eventConfigurations: EventConfig[]) {
   if (schemasCompiled) {
     return
@@ -223,7 +227,6 @@ export function precompileActionSchemas(eventConfigurations: EventConfig[]) {
       }
     }
   }
-  console.log('Precompiled schemas for actions')
 }
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {

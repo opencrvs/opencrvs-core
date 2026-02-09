@@ -73,10 +73,9 @@ export const ExtendedEventStatuses = {
 } as const
 
 /**
- *
  * @returns event status, correcting for local outbox and draft statuses
  */
-export function getLocalEventStatus({
+function getLocalEventStatus({
   eventId,
   currentStatus,
   outbox,
@@ -131,7 +130,7 @@ export const COLUMNS = {
   NONE: 'none'
 } as const
 
-export function changeSortedColumn(
+function changeSortedColumn(
   columnName: string,
   presentSortedCol: (typeof COLUMNS)[keyof typeof COLUMNS],
   presentSortOrder: (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
@@ -311,7 +310,7 @@ export function getNoResultsText({
   return noResultText
 }
 
-export function buildAvailableActionComponents({
+function buildAvailableActionComponents({
   event,
   localEventStatus,
   action,
@@ -359,6 +358,10 @@ export function buildAvailableActionComponents({
 
   return actionConfigs
 }
+
+/**
+ * Given events with their configs, returns Workqueue row data with necessary transformations and computed fields
+ */
 export function processEventsToRows({
   events,
   eventConfigs,
