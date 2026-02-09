@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.8
+
+### New features
+
+- Introduced `showParentFieldError` flag in NAME field configuration to consolidate validation error messages at the parent field level (instead of displaying separate errors below firstname, middlename, and surname subfields), improving UX by providing clearer, centralized validation feedback
+
 ## 1.9.7
 
 ### New features
