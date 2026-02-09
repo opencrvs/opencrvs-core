@@ -10,6 +10,7 @@
  */
 
 import { useSelector } from 'react-redux'
+import { User } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { getAdminLevelHierarchy, getUsersFullName } from '../utils'
@@ -23,7 +24,7 @@ export function useCurrentUser() {
 
   const loggedInUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
-  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
+  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '') as [User]
 
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()

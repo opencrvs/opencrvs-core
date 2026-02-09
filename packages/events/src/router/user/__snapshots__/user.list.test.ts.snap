@@ -100,7 +100,6 @@ exports[`Returns both normal users and system users 1`] = `
   {
     "id": "[sanitized]",
     "name": "My health system integration",
-    "role": "HEALTH",
     "type": "system",
   },
 ]

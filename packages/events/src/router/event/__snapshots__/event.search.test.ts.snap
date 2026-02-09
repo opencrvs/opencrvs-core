@@ -904,7 +904,6 @@ exports[`User with "location" scope only sees events created by system user to t
   "updatedAt": "[sanitized]",
   "updatedAtLocation": "[sanitized]",
   "updatedBy": "[sanitized]",
-  "updatedByUserRole": "HEALTH",
 }
 `;
 

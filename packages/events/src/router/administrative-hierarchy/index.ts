@@ -22,14 +22,5 @@ export const administrativeHierarchyRouter = router({
     )
     .input(z.void())
     .output(z.void())
-    .meta({
-      openapi: {
-        summary: 'Sync administrative hierarchy between V1 and V2',
-        method: 'POST',
-        path: '/sync-administrative-hierarchy',
-        tags: ['events'],
-        protect: true
-      }
-    })
     .mutation(syncAdministrativeHierarchy)
 })

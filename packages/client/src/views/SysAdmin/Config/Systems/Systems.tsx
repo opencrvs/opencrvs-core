@@ -13,19 +13,11 @@ import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
-import {
-  EventType,
-  System,
-  SystemStatus,
-  SystemType,
-  WebhookPermission
-} from '@client/utils/gateway'
-import { Label } from '@client/views/Settings/items/components'
+import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
-import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
+import { z } from 'zod'
 import {
   Alert,
-  CheckboxGroup,
   InputField,
   Link,
   ListViewItemSimplified,
@@ -40,7 +32,6 @@ import {
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
-import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -50,7 +41,6 @@ import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
-import { SystemRole } from '@opencrvs/commons/client'
 
 interface ToggleModal {
   modalVisible: boolean
@@ -71,16 +61,15 @@ const StyledSpinner = styled(Spinner)`
 const Field = styled.div`
   margin-top: 16px;
 `
-const populatePermissions = (
-  webhooks: WebhookPermission[] = [],
-  type: string
-) => {
-  const { __typename, ...rest } = webhooks.find((ite) => ite.event === type)!
-  return rest
-}
+
+const SystemRole = z.enum([
+  'HEALTH',
+  'NATIONAL_ID',
+  'RECORD_SEARCH',
+  'IMPORT_EXPORT'
+])
 
 /**
- *
  * Wrapper component that adds Frame around the page if withFrame is true.
  * Created only for minimising impact of possible regression during v2 regression test period.
  */
@@ -129,36 +118,17 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     selectedClient: null
   })
 
-  const [selectedTab, setSelectedTab] = React.useState(EventType.Birth)
-
-  const checkboxHandler = (permissions: string[], event: EventType) => {
-    event === EventType.Birth
-      ? setBirthPermissions({ event, permissions })
-      : setDeathPermissions({ event, permissions })
-  }
-
   const toggleModal = useCallback(() => {
     setShowModal((prev) => !prev)
   }, [])
 
   const {
-    closePermissionModal,
     systemToDeleteData,
     deleteSystem,
     systemToDelete,
     setSystemToDelete,
     systemToDeleteLoading,
     systemToDeleteError,
-    updatePermissionsData,
-    updatePermissionsLoading,
-    updatePermissionsError,
-    updatePermissions,
-    systemToShowPermission,
-    setSystemToShowPermission,
-    birthPermissions,
-    setBirthPermissions,
-    deathPermissions,
-    setDeathPermissions,
     existingSystems,
     deactivateSystem,
     systemToToggleActivation,
@@ -222,21 +192,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
       }
     ]
 
-    if (system.type === SystemRole.enum.WEBHOOK) {
-      menuItems.push({
-        handler: () => {
-          setSystemToShowPermission(system)
-          setBirthPermissions(
-            populatePermissions(system.settings!.webhook!, EventType.Birth)
-          )
-          setDeathPermissions(
-            populatePermissions(system.settings!.webhook!, EventType.Death)
-          )
-        },
-        label: intl.formatMessage(buttonMessages.edit)
-      })
-    }
-
     menuItems.push({
       handler: () => {
         setSystemToToggleActivation(system)
@@ -254,19 +209,10 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     return menuItems
   }
 
-  const systemTypeLabels = {
-    HEALTH: intl.formatMessage(integrationMessages.eventNotification),
-    RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
-    NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
-    WEBHOOK: intl.formatMessage(integrationMessages.webhook),
-    IMPORT_EXPORT: intl.formatMessage(integrationMessages.importExport),
-    CITIZEN_PORTAL: intl.formatMessage(integrationMessages.citizenPortal)
-  }
-
   const systemToLabel = (system: System) => {
-    return system.type !== 'REINDEX'
-      ? systemTypeLabels[system.type]
-      : 'INVALID_SYSTEM_TYPE__REINDEX'
+    return intl.formatMessage(integrationMessages.integrationType, {
+      type: system.type
+    })
   }
 
   return (
@@ -555,29 +501,24 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                   options={[
                     {
                       label: intl.formatMessage(
-                        integrationMessages.eventNotification
+                        integrationMessages.integrationType,
+                        {
+                          type: SystemRole.enum.HEALTH
+                        }
                       ),
                       value: SystemRole.enum.HEALTH
                     },
                     {
                       label: intl.formatMessage(
-                        integrationMessages.citizenPortal
-                      ),
-                      value: SystemRole.enum.CITIZEN_PORTAL
-                    },
-                    {
-                      label: intl.formatMessage(
-                        integrationMessages.recordSearch
+                        integrationMessages.integrationType,
+                        { type: SystemRole.enum.RECORD_SEARCH }
                       ),
                       value: SystemRole.enum.RECORD_SEARCH
                     },
                     {
-                      label: intl.formatMessage(integrationMessages.webhook),
-                      value: SystemRole.enum.WEBHOOK
-                    },
-                    {
                       label: intl.formatMessage(
-                        integrationMessages.importExport
+                        integrationMessages.integrationType,
+                        { type: SystemRole.enum.IMPORT_EXPORT }
                       ),
                       value: SystemRole.enum.IMPORT_EXPORT
                     }
@@ -618,132 +559,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                   documentation.opencrvs.org
                 </Link>
               </PaddedAlert>
-            )}
-
-            {newSystemType === SystemRole.enum.WEBHOOK && (
-              <>
-                <PaddedAlert type="info">
-                  {intl.formatMessage(integrationMessages.webhookDescription)}
-                  {'\n'}
-                  <Link
-                    onClick={() => {
-                      window.open(
-                        'https://documentation.opencrvs.org/',
-                        '_blank'
-                      )
-                    }}
-                    font="bold16"
-                  >
-                    documentation.opencrvs.org
-                  </Link>
-                </PaddedAlert>
-                <Field>
-                  <InputField
-                    id="select-input"
-                    touched={false}
-                    label={intl.formatMessage(integrationMessages.label)}
-                  >
-                    <div>
-                      <Label>
-                        {intl.formatMessage(
-                          integrationMessages.webhookPermissionsDescription
-                        )}
-                      </Label>
-                      <FormTabs
-                        sections={[
-                          {
-                            id: EventType.Birth,
-                            title: intl.formatMessage(integrationMessages.birth)
-                          },
-                          {
-                            id: EventType.Death,
-                            title: intl.formatMessage(integrationMessages.death)
-                          }
-                        ]}
-                        activeTabId={selectedTab}
-                        onTabClick={(tabId: EventType) => setSelectedTab(tabId)}
-                      />
-                      {selectedTab === EventType.Birth ? (
-                        <CheckboxGroup
-                          id="birthCheckboxGroup"
-                          options={[
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.childDetails
-                              ),
-                              value: 'child-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.motherDetails
-                              ),
-                              value: 'mother-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.fatherDetails
-                              ),
-                              value: 'father-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.informantDetails
-                              ),
-                              value: 'informant-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.documentDetails
-                              ),
-                              value: 'supporting-documents'
-                            }
-                          ]}
-                          name="test-checkbox-group1"
-                          value={birthPermissions.permissions ?? []}
-                          onChange={(newValue) => {
-                            checkboxHandler(newValue, EventType.Birth)
-                          }}
-                        />
-                      ) : (
-                        <CheckboxGroup
-                          id="deathCheckboxGroup"
-                          options={[
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.deceasedDetails
-                              ),
-                              value: 'deceased-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.deathEventDetails
-                              ),
-                              value: 'death-encounter'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.informantDetails
-                              ),
-                              value: 'informant-details'
-                            },
-                            {
-                              label: intl.formatMessage(
-                                integrationMessages.documentDetails
-                              ),
-                              value: 'supporting-documents'
-                            }
-                          ]}
-                          name="test-checkbox-group1"
-                          value={deathPermissions.permissions ?? []}
-                          onChange={(newValue) => {
-                            checkboxHandler(newValue, EventType.Death)
-                          }}
-                        />
-                      )}
-                    </div>
-                  </InputField>
-                </Field>
-              </>
             )}
           </>
         )}
@@ -822,19 +637,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
         )}
       </ResponsiveModal>
 
-      {systemToShowPermission && (
-        <WebhookModal
-          system={systemToShowPermission}
-          loading={updatePermissionsLoading}
-          updatePermissions={updatePermissions}
-          birthPermissions={birthPermissions}
-          deathPermissions={deathPermissions}
-          setBirthPermissions={setBirthPermissions}
-          setDeathPermissions={setDeathPermissions}
-          closeModal={closePermissionModal}
-        />
-      )}
-
       {systemToDelete && (
         <DeleteSystemModal
           system={systemToDelete}
@@ -862,15 +664,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           {intl.formatMessage(integrationMessages.deactivateClientStatus)}
         </Toast>
       )}
-      {updatePermissionsData && (
-        <Toast
-          type="success"
-          id="updaPermissionsSuccess"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.updatePermissionsMsg)}
-        </Toast>
-      )}
 
       {systemToDeleteData && (
         <Toast
@@ -886,7 +679,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
         deactivateSystemError ||
         registerSystemError ||
         refreshTokenError ||
-        updatePermissionsError ||
         systemToDeleteError) && (
         <Toast
           type="error"

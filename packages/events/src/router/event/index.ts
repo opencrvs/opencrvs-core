@@ -357,14 +357,6 @@ export const eventRouter = router({
     }),
   bulkImport: userAndSystemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
-    .meta({
-      openapi: {
-        summary: 'Import multiple full event records',
-        method: 'POST',
-        path: '/events/bulk-import',
-        tags: ['events']
-      }
-    })
     .input(z.array(EventDocument))
     .output(z.any())
     .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
