@@ -215,7 +215,7 @@ export function useGetActionConfiguration(
     label: actionLabels[actionType],
     type: actionType,
     icon: actionConfig?.icon || 'Offline',
-    onClick: (workqueue?: string) => onClick(actionType, workqueue),
+    onClick: async (workqueue?: string) => onClick(actionType, workqueue),
     disabled: !enabled,
     hidden: !visible
   }

@@ -285,10 +285,6 @@ export const getHiddenActions = () =>
     (acc, action) => {
       const label = actionLabels[action as keyof typeof actionLabels]
 
-      if (!label) {
-        return acc
-      }
-
       acc[label.defaultMessage] = AssertType.HIDDEN
       return acc
     },

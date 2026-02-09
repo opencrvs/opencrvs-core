@@ -81,7 +81,10 @@ export function useActionOnClick(event: EventIndex) {
   const eventId = event.id
 
   const onClick = useCallback(
-    (actionType: CtaActionType | ClientSpecificAction, workqueue?: string) => {
+    async (
+      actionType: CtaActionType | ClientSpecificAction,
+      workqueue?: string
+    ) => {
       switch (actionType) {
         case ActionType.ASSIGN:
           return (async () => {

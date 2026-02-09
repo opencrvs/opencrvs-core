@@ -45,28 +45,8 @@ function ActionCtaComponent({
   redirectParam?: string
 }) {
   const intl = useIntl()
-  const navigate = useNavigate()
 
   const config = useGetActionConfiguration(event, actionType)
-
-  // @TODO: should not happen
-  if (!config) {
-    return (
-      <StyledButton
-        type="primary"
-        onClick={() => {
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
-              { eventId: event.id },
-              { workqueue: redirectParam }
-            )
-          )
-        }}
-      >
-        {intl.formatMessage(reviewLabel)}
-      </StyledButton>
-    )
-  }
 
   return (
     <StyledButton

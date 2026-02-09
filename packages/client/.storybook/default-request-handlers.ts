@@ -1247,7 +1247,7 @@ export const handlers = {
 
       return [generator.user.localRegistrar().v2]
     }),
-    tRPCMsw.user.get.query((id) => {
+    tRPCMsw.user.get.query(() => {
       const generator = testDataGenerator()
 
       return generator.user.localRegistrar().v2
@@ -1257,7 +1257,7 @@ export const handlers = {
     tRPCMsw.event.get.query(() => {
       return tennisClubMembershipEventDocument
     }),
-    tRPCMsw.event.search.query((input) => {
+    tRPCMsw.event.search.query(() => {
       return { results: [], total: 0 }
     })
   ],
@@ -2318,7 +2318,7 @@ export const handlers = {
     })
   ],
   workqueues: [
-    tRPCMsw.workqueue.count.query((input) => {
+    tRPCMsw.workqueue.count.query((input: { slug: string }[]) => {
       if (input.length === 0) {
         /** Ensure we catch situations where no input is provided before merging anything. */
         throw new Error('No input provided.')
