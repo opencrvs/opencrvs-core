@@ -2027,38 +2027,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -2287,38 +2309,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -2479,38 +2523,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -2643,38 +2709,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -2834,38 +2922,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -3004,38 +3114,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -3181,38 +3313,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -3351,38 +3505,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -3522,38 +3698,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -3701,38 +3899,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -3878,38 +4098,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -4063,38 +4305,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -4245,38 +4509,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -4422,38 +4708,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -4573,38 +4881,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -4765,38 +5095,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -5087,38 +5439,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -5238,38 +5612,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -5389,38 +5785,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -5541,38 +5959,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -5763,38 +6203,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -5914,38 +6376,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -6087,38 +6571,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -6235,38 +6741,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -6401,38 +6929,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -6552,38 +7102,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -6703,38 +7275,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -6883,38 +7477,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -7042,38 +7658,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -7275,38 +7913,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -7337,23 +7997,34 @@ components:
                           value:
                             anyOf:
                               - anyOf:
-                                  - $ref: "#/components/schemas/TranslationConfig"
-                                  - type: string
-                              - description: Reference to a field by its ID
+                                  - anyOf:
+                                      - $ref: "#/components/schemas/TranslationConfig"
+                                      - type: string
+                                  - description: Reference to a field by its ID
+                                    type: object
+                                    properties:
+                                      $$field:
+                                        description: Unique identifier for the field
+                                        type: string
+                                      $$subfield:
+                                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                                          e.g. `["foo", "bar"]` in `{ foo: {
+                                          bar: 3 } }`'
+                                        type: array
+                                        items:
+                                          type: string
+                                    required:
+                                      - $$field
+                                    additionalProperties: false
+                              - description: Custom evaluation function for computed field values
                                 type: object
                                 properties:
-                                  $$field:
-                                    description: Unique identifier for the field
+                                  $$code:
+                                    description: Serialized function string that will be evaluated at runtime with
+                                      the field value and context
                                     type: string
-                                  $$subfield:
-                                    description: 'If the FieldValue is an object, subfield can be used to refer to
-                                      e.g. `["foo", "bar"]` in `{ foo: { bar: 3
-                                      } }`'
-                                    type: array
-                                    items:
-                                      type: string
                                 required:
-                                  - $$field
+                                  - $$code
                                 additionalProperties: false
                         required:
                           - id
@@ -7479,38 +8150,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -7645,38 +8338,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -7806,38 +8521,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -7932,6 +8669,16 @@ components:
                               type: string
                         required:
                           - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
                         additionalProperties: false
                 timeout:
                   description: Request timeout in milliseconds
@@ -8052,38 +8799,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -8216,38 +8985,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -8385,38 +9176,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -8544,40 +9357,62 @@ components:
                           multiple references are provided, the first truthy
                           value is used.
                         anyOf:
-                          - description: Reference to a field by its ID
-                            type: object
-                            properties:
-                              $$field:
-                                description: Unique identifier for the field
-                                type: string
-                              $$subfield:
-                                description: 'If the FieldValue is an object, subfield can be used to refer to
-                                  e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                  }`'
-                                type: array
-                                items:
-                                  type: string
-                            required:
-                              - $$field
-                            additionalProperties: false
+                          - anyOf:
+                              - description: Reference to a field by its ID
+                                type: object
+                                properties:
+                                  $$field:
+                                    description: Unique identifier for the field
+                                    type: string
+                                  $$subfield:
+                                    description: 'If the FieldValue is an object, subfield can be used to refer to
+                                      e.g. `["foo", "bar"]` in `{ foo: { bar: 3
+                                      } }`'
+                                    type: array
+                                    items:
+                                      type: string
+                                required:
+                                  - $$field
+                                additionalProperties: false
+                              - description: Custom evaluation function for computed field values
+                                type: object
+                                properties:
+                                  $$code:
+                                    description: Serialized function string that will be evaluated at runtime with
+                                      the field value and context
+                                    type: string
+                                required:
+                                  - $$code
+                                additionalProperties: false
                           - type: array
                             items:
-                              description: Reference to a field by its ID
-                              type: object
-                              properties:
-                                $$field:
-                                  description: Unique identifier for the field
-                                  type: string
-                                $$subfield:
-                                  description: 'If the FieldValue is an object, subfield can be used to refer to
-                                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
-                                    }`'
-                                  type: array
-                                  items:
-                                    type: string
-                              required:
-                                - $$field
-                              additionalProperties: false
+                              anyOf:
+                                - description: Reference to a field by its ID
+                                  type: object
+                                  properties:
+                                    $$field:
+                                      description: Unique identifier for the field
+                                      type: string
+                                    $$subfield:
+                                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                                        e.g. `["foo", "bar"]` in `{ foo: { bar:
+                                        3 } }`'
+                                      type: array
+                                      items:
+                                        type: string
+                                  required:
+                                    - $$field
+                                  additionalProperties: false
+                                - description: Custom evaluation function for computed field values
+                                  type: object
+                                  properties:
+                                    $$code:
+                                      description: Serialized function string that will be evaluated at runtime with
+                                        the field value and context
+                                      type: string
+                                  required:
+                                    - $$code
+                                  additionalProperties: false
                       analytics:
                         description: Indicates whether the field is included in analytics. When enabled,
                           its value becomes available in the analytics
@@ -8719,38 +9554,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -8880,38 +9737,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -9037,38 +9916,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -9287,38 +10188,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -9431,38 +10354,60 @@ components:
                 it is copied from the parent field when changed. If multiple
                 references are provided, the first truthy value is used.
               anyOf:
-                - description: Reference to a field by its ID
-                  type: object
-                  properties:
-                    $$field:
-                      description: Unique identifier for the field
-                      type: string
-                    $$subfield:
-                      description: 'If the FieldValue is an object, subfield can be used to refer to
-                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      type: array
-                      items:
-                        type: string
-                  required:
-                    - $$field
-                  additionalProperties: false
+                - anyOf:
+                    - description: Reference to a field by its ID
+                      type: object
+                      properties:
+                        $$field:
+                          description: Unique identifier for the field
+                          type: string
+                        $$subfield:
+                          description: 'If the FieldValue is an object, subfield can be used to refer to
+                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - $$field
+                      additionalProperties: false
+                    - description: Custom evaluation function for computed field values
+                      type: object
+                      properties:
+                        $$code:
+                          description: Serialized function string that will be evaluated at runtime with
+                            the field value and context
+                          type: string
+                      required:
+                        - $$code
+                      additionalProperties: false
                 - type: array
                   items:
-                    description: Reference to a field by its ID
-                    type: object
-                    properties:
-                      $$field:
-                        description: Unique identifier for the field
-                        type: string
-                      $$subfield:
-                        description: 'If the FieldValue is an object, subfield can be used to refer to
-                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - $$field
-                    additionalProperties: false
+                    anyOf:
+                      - description: Reference to a field by its ID
+                        type: object
+                        properties:
+                          $$field:
+                            description: Unique identifier for the field
+                            type: string
+                          $$subfield:
+                            description: 'If the FieldValue is an object, subfield can be used to refer to
+                              e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            type: array
+                            items:
+                              type: string
+                        required:
+                          - $$field
+                        additionalProperties: false
+                      - description: Custom evaluation function for computed field values
+                        type: object
+                        properties:
+                          $$code:
+                            description: Serialized function string that will be evaluated at runtime with
+                              the field value and context
+                            type: string
+                        required:
+                          - $$code
+                        additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
                 its value becomes available in the analytics dashboard.
@@ -9628,38 +10573,60 @@ components:
             it is copied from the parent field when changed. If multiple
             references are provided, the first truthy value is used.
           anyOf:
-            - description: Reference to a field by its ID
-              type: object
-              properties:
-                $$field:
-                  description: Unique identifier for the field
-                  type: string
-                $$subfield:
-                  description: 'If the FieldValue is an object, subfield can be used to refer to
-                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                  type: array
-                  items:
-                    type: string
-              required:
-                - $$field
-              additionalProperties: false
+            - anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                  additionalProperties: false
+                - description: Custom evaluation function for computed field values
+                  type: object
+                  properties:
+                    $$code:
+                      description: Serialized function string that will be evaluated at runtime with
+                        the field value and context
+                      type: string
+                  required:
+                    - $$code
+                  additionalProperties: false
             - type: array
               items:
-                description: Reference to a field by its ID
-                type: object
-                properties:
-                  $$field:
-                    description: Unique identifier for the field
-                    type: string
-                  $$subfield:
-                    description: 'If the FieldValue is an object, subfield can be used to refer to
-                      e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                    type: array
-                    items:
-                      type: string
-                required:
-                  - $$field
-                additionalProperties: false
+                anyOf:
+                  - description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                    additionalProperties: false
+                  - description: Custom evaluation function for computed field values
+                    type: object
+                    properties:
+                      $$code:
+                        description: Serialized function string that will be evaluated at runtime with
+                          the field value and context
+                        type: string
+                    required:
+                      - $$code
+                    additionalProperties: false
         analytics:
           description: Indicates whether the field is included in analytics. When enabled,
             its value becomes available in the analytics dashboard.
