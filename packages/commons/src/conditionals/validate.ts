@@ -195,6 +195,53 @@ ajv.addKeyword({
     return locations.some((location) => location.id === locationIdInput)
   }
 })
+/*
+ * Custom keyword for executing country-configured custom client-side validation functions.
+ * The function is serialized as a string in the JSON Schema and deserialized just-in-time.
+ * 
+ * Example schema:
+ * {
+ *   "type": "object",
+ *   "properties": {
+ *     "age": {
+ *       "type": "number",
+ *       "customClientValidator": "(value, ctx) => value >= 18"
+ *     }
+ *   }
+ * }
+ */
+ajv.addKeyword({
+  keyword: 'customClientValidator',
+  type: ['string', 'number', 'boolean', 'object', 'array', 'null'],
+  schemaType: 'string',
+  $data: false,
+  errors: false,
+  validate(
+    schema: string,
+    data: unknown,
+    _: unknown,
+    dataContext?: { rootData: unknown; instancePath: string }
+  ) {
+    if (!schema || typeof schema !== 'string') {
+      return true
+    }
+
+    try {
+      const validatorFn = new Function(
+        'value',
+        'context',
+        `return (${schema})(value, context)`
+      )
+
+      const context = dataContext?.rootData || {}
+      const result = validatorFn(data, context)
+
+      return Boolean(result)
+    } catch (error) {
+      return false
+    }
+  }
+})
 
 function isAgeValue(value: unknown): value is AgeValue {
   return (
