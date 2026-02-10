@@ -102,3 +102,35 @@ export function useActionConfigurationResolver(event: EventIndex) {
 
   return { resolveAction, modals }
 }
+
+/**
+ * Given event and action type, determines if the action should be enabled and visible for the user.
+ */
+export function useResolveActionConditionals(
+  event: EventIndex,
+  actionType: CtaActionType,
+  isDeclareDraftOpen: boolean
+) {
+  const validatorContext = useValidatorContext()
+  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
+    event.type
+  )
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const events = useEvents()
+  const isOnline = useOnlineStatus()
+  const { useFindEventFromCache } = events.getEvent
+  const cachedEvent = useFindEventFromCache(event.id)
+  const isDownloaded = Boolean(cachedEvent.data)
+
+  return resolveActionConditionals({
+    event,
+    actionType,
+    isDeclareDraftOpen,
+    validatorContext,
+    isActionAllowedForUser,
+    eventConfiguration,
+    isOnline,
+    isDownloaded,
+    isAssigning: events.actions.assignment.assign.isAssigning(event.id)
+  })
+}

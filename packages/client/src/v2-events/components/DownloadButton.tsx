@@ -31,7 +31,7 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
 import { AssignModal } from './AssignModal'
-import { useGetActionConfiguration } from '../features/workqueues/EventOverview/components/useGetActionConfiguration'
+import { useResolveActionConditionals } from '../features/workqueues/EventOverview/components/useActionConfigurationResolver'
 
 interface DownloadButtonProps {
   id?: string
@@ -87,8 +87,12 @@ export function DownloadButton({
     'Authentication is not available but is required'
   )
 
-  const assign = useGetActionConfiguration(event, ActionType.ASSIGN)
-  const unassign = useGetActionConfiguration(event, ActionType.UNASSIGN)
+  const assign = useResolveActionConditionals(event, ActionType.ASSIGN, false)
+  const unassign = useResolveActionConditionals(
+    event,
+    ActionType.UNASSIGN,
+    false
+  )
 
   const { getEvent, actions } = useEvents()
   const users = useUsers()
@@ -182,9 +186,11 @@ export function DownloadButton({
         )}
         className={className}
         disabled={
-          assign.disabled ||
-          unassign.disabled ||
-          assignmentStatus == AssignmentStatus.ASSIGNED_TO_SELF
+          !(
+            assign.enabled ||
+            unassign.enabled ||
+            assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
+          )
         }
         id={`${id}-icon${isFailed ? `-failed` : ``}`}
         type="icon"

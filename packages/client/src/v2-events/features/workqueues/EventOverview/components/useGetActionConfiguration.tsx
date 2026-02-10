@@ -10,7 +10,7 @@
  */
 import { useMemo } from 'react'
 import { CtaActionType, EventIndex } from '@opencrvs/commons/client'
-import { useActionConfigurationResolver } from './useActionConfigResolver'
+import { useActionConfigurationResolver } from './useActionConfigurationResolver'
 
 /**
  * Given an event and action type, returns the configuration for the action item.
