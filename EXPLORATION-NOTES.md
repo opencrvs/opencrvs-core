@@ -179,8 +179,50 @@ function isFieldReference(value: unknown): value is FieldReference {
 }
 ```
 
-**Client-side resolution:** Happens in `packages/client/src/v2-events/` (need to explore further for exact location).
+**Client-side resolution:** `packages/client/src/v2-events/components/forms/FormFieldGenerator/utils.ts`
 
+**Key Functions:**
+1. **`parseFieldReferenceToValue(fieldReference, fieldValues)`**
+   - Resolves a FieldReference to its actual value from form data
+   - Uses lodash `get()` for nested path traversal
+   - Implementation:
+     ```typescript
+     return fieldReference.$$subfield && fieldReference.$$subfield.length > 0
+       ? get(fieldValues[fieldReference.$$field], fieldReference.$$subfield)
+       : fieldValues[fieldReference.$$field]
+     ```
+
+2. **`parseFieldReferencesInConfiguration(configuration, form)`**
+   - Resolves FieldReferences within HTTP field configurations
+   - Iterates through `params` object, replacing FieldReferences with actual values
+
+**Usage Locations (8 files found):**
+1. **`packages/client/src/v2-events/components/forms/FormFieldGenerator/utils.ts`**
+   - Main resolution logic
+
+2. **`packages/client/src/v2-events/components/forms/FormFieldGenerator/GeneratedInputField.tsx`**
+   - Calls `parseFieldReferencesInConfiguration()` for HTTP fields (line 730)
+
+3. **`packages/client/src/v2-events/features/events/registered-fields/Http.tsx`**
+   - Uses `parseFieldReferenceToValue()` to resolve HTTP body params (line 75)
+
+4. **`packages/client/src/v2-events/features/events/registered-fields/Data.tsx`**
+   - Local `isFieldReference()` type guard (line 34)
+   - Resolves FieldReferences in static data entries (lines 57, 156)
+
+5. **`packages/client/src/v2-events/components/forms/FormFieldGenerator/FormSectionComponent.tsx`**
+   - (Import/usage context)
+
+6-8. **Story/test files:**
+   - `FormFieldGenerator-2.interaction.stories.tsx`
+   - `Pages.interaction.stories.tsx`
+   - `AgeField.interaction.stories.tsx`
+
+**Resolution Pattern:**
+- FieldReferences are **NOT resolved during JSON Schema generation**
+- They remain as `{ $$field: string, $$subfield: string[] }` objects in the transmitted config
+- Resolution happens **just-in-time in React components** when rendering fields or executing HTTP requests
+- Uses form state snapshot at render time
 ---
 
 ## 5. How does form config travel from countryconfig to core? Endpoint?
