@@ -143,15 +143,21 @@ type LegacyRecordValidationInput = {
 
 export async function createTokenForActionConfirmation(
   input: ActionConfirmationInput | LegacyRecordValidationInput,
-  userId: UUID
+  userId: UUID,
+  userType: TokenUserType,
+  userRejectScope: string | undefined = undefined
 ) {
   return sign(
     {
-      scope: ['record.confirm-registration', 'record.reject-registration'],
+      scope: [
+        'record.confirm-registration',
+        'record.reject-registration',
+        userRejectScope
+      ].filter(Boolean),
       eventId: 'eventId' in input ? input.eventId : undefined,
       actionId: 'actionId' in input ? input.actionId : undefined,
       recordId: 'recordId' in input ? input.recordId : undefined,
-      userType: TokenUserType.enum.user
+      userType
     },
     cert,
     {
@@ -239,7 +245,8 @@ const tokenPayload = t.type({
   // role: t.string,
   iat: t.number,
   exp: t.number,
-  aud: t.array(t.string)
+  aud: t.array(t.string),
+  userType: t.string
 })
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>

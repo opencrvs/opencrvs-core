@@ -18,7 +18,7 @@ import { FieldType } from '../events/FieldType'
 import { CHILD_ONBOARDING_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { createFieldConditionals } from '../conditionals/conditionals'
+import { createFieldConditionals, not } from '../conditionals/conditionals'
 import { field } from '../events/field'
 
 function generateTranslationConfig(message: string): TranslationConfig {
@@ -131,7 +131,34 @@ const mother = defineFormPage({
       secured: true,
       validation: [],
       label: generateTranslationConfig('Date of birth'),
+      conditionals: [
+        {
+          type: 'SHOW',
+          conditional: not(field('mother.dobUnknown').isEqualTo(true))
+        }
+      ]
+    },
+    {
+      id: 'mother.dobUnknown',
+      type: 'CHECKBOX',
+      label: generateTranslationConfig('Exact date of birth unknown'),
       conditionals: []
+    },
+    {
+      id: 'mother.age',
+      type: FieldType.AGE,
+      required: true,
+      analytics: true,
+      label: generateTranslationConfig('Age of mother'),
+      configuration: {
+        asOfDate: field('child.dob')
+      },
+      conditionals: [
+        {
+          type: 'SHOW',
+          conditional: field('mother.dobUnknown').isEqualTo(true)
+        }
+      ]
     },
     {
       id: 'mother.idType',

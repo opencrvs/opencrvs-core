@@ -316,7 +316,7 @@ describe('Declare action', () => {
 
     const data = generator.event.actions.declare(eventId)
     await client.event.actions.declare.request(data)
-    const updatedEvent = await client.event.get(eventId)
+    const updatedEvent = await client.event.get({eventId})
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),

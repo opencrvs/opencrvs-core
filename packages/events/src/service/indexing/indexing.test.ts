@@ -716,7 +716,7 @@ describe('withJurisdictionFilters', () => {
           type: 'record.search',
           options: {
             event: ['birth'],
-            eventLocation: 'office-123' as UUID
+            placeOfEvent: 'office-123' as UUID
           }
         }
       ]
@@ -749,7 +749,7 @@ describe('withJurisdictionFilters', () => {
                     },
                     {
                       term: {
-                        createdAtLocation: 'office-123'
+                        placeOfEvent: 'office-123'
                       }
                     }
                   ]
@@ -763,7 +763,7 @@ describe('withJurisdictionFilters', () => {
     })
   })
 
-  test('returns filtered query if multiple events are marked as my-jurisdiction', () => {
+  test('returns filtered query if multiple events are marked as "location"', () => {
     const result = withJurisdictionFilters({
       query: baseQuery,
       scopesV2: [
@@ -771,7 +771,7 @@ describe('withJurisdictionFilters', () => {
           type: 'record.search',
           options: {
             event: ['birth', 'death'],
-            eventLocation: 'office-123' as UUID
+            placeOfEvent: 'office-123' as UUID
           }
         }
       ]
@@ -793,7 +793,7 @@ describe('withJurisdictionFilters', () => {
                     },
                     {
                       term: {
-                        createdAtLocation: 'office-123'
+                        placeOfEvent: 'office-123'
                       }
                     }
                   ]
@@ -815,7 +815,7 @@ describe('withJurisdictionFilters', () => {
           type: 'record.search',
           options: {
             event: ['birth'],
-            eventLocation: 'office-123' as UUID
+            placeOfEvent: 'office-123' as UUID
           }
         },
         {
@@ -843,7 +843,7 @@ describe('withJurisdictionFilters', () => {
                     },
                     {
                       term: {
-                        createdAtLocation: 'office-123'
+                        placeOfEvent: 'office-123'
                       }
                     }
                   ]

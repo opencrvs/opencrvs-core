@@ -14,11 +14,16 @@ import {
   ActionCreationMetadata,
   AddressFieldValue,
   AddressType,
+  ageToDate,
+  AgeValue,
+  DateValue,
   EventConfig,
   EventIndex,
+  EventState,
   FieldType,
   FieldValue,
   getDeclarationFieldById,
+  isAgeFieldType,
   isNameFieldType,
   NameFieldValue,
   QueryInputType,
@@ -37,6 +42,7 @@ import { TrpcUserContext } from '../../context'
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
 export const NAME_QUERY_KEY = '__fullname'
+export const AGE_DOB_QUERY_KEY = '__derived_dob'
 
 export function encodeFieldId(fieldId: string) {
   return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
@@ -46,14 +52,19 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
-type IndexedNameFieldValue = NameFieldValue & {
+export type IndexedNameFieldValue = NameFieldValue & {
   [NAME_QUERY_KEY]?: string
+}
+
+export type IndexedAgeFieldValue = AgeValue & {
+  [AGE_DOB_QUERY_KEY]?: string
 }
 
 function addIndexFieldsToValue(
   eventConfig: EventConfig,
   fieldId: string,
-  value: FieldValue
+  value: FieldValue,
+  declaration: EventState
 ) {
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
 
@@ -62,6 +73,17 @@ function addIndexFieldsToValue(
       ...field.value,
       [NAME_QUERY_KEY]: Object.values(field.value).join(' ')
     } satisfies IndexedNameFieldValue
+  }
+  if (isAgeFieldType(field) && field.value) {
+    const maybeAsOfDate = DateValue.safeParse(
+      declaration[field.value.asOfDateRef]
+    )
+    if (maybeAsOfDate.success) {
+      return {
+        ...field.value,
+        [AGE_DOB_QUERY_KEY]: ageToDate(field.value.age, maybeAsOfDate.data)
+      } satisfies IndexedAgeFieldValue
+    }
   }
 
   return value
@@ -76,7 +98,12 @@ export function encodeEventIndex(
     declaration: Object.entries(event.declaration).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [encodeFieldId(key)]: addIndexFieldsToValue(eventConfig, key, value)
+        [encodeFieldId(key)]: addIndexFieldsToValue(
+          eventConfig,
+          key,
+          value,
+          event.declaration
+        )
       }),
       {}
     )
@@ -94,6 +121,17 @@ function isIndexedNameFieldValue(
   )
 }
 
+function isIndexedAgeFieldValue(
+  value: FieldValue
+): value is IndexedAgeFieldValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    AGE_DOB_QUERY_KEY in value &&
+    typeof value[AGE_DOB_QUERY_KEY] === 'string'
+  )
+}
+
 function stripIndexFieldsFromValue(
   eventConfig: EventConfig,
   fieldId: string,
@@ -103,6 +141,9 @@ function stripIndexFieldsFromValue(
 
   if (isIndexedNameFieldValue(field.value)) {
     return _.omit(field.value, [NAME_QUERY_KEY])
+  }
+  if (isIndexedAgeFieldValue(field.value)) {
+    return _.omit(field.value, [AGE_DOB_QUERY_KEY])
   }
 
   return value
@@ -369,6 +410,10 @@ export function nameQueryKey(fieldName: string) {
   return `${fieldName}.${NAME_QUERY_KEY}`
 }
 
+export function ageQueryKey(fieldName: string) {
+  return `${fieldName}.${AGE_DOB_QUERY_KEY}`
+}
+
 export function generateQueryForAddressField(
   fieldId: string,
   search: QueryInputType
@@ -465,10 +510,7 @@ export function resolveRecordActionScopeToIds(
     type,
     options: {
       event: options.event,
-      eventLocation: getLocationIdsFromScopeOptions(
-        options.eventLocation,
-        user
-      ),
+      placeOfEvent: getLocationIdsFromScopeOptions(options.placeOfEvent, user),
       declaredIn: getLocationIdsFromScopeOptions(options.declaredIn, user),
       declaredBy:
         options.declaredBy === UserFilter.enum.user ? user.id : undefined,

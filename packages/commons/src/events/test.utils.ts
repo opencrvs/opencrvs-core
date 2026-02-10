@@ -68,6 +68,7 @@ import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import * as z from 'zod/v4'
 import { FullDocumentPath } from '../documents'
+import { defineConfig } from './defineConfig'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
@@ -1112,3 +1113,62 @@ export const generateWorkqueues = (
       icon: 'Draft'
     }
   ])
+
+/**
+ * Backend focused event config generator for testing fields in a lightweight way.
+ *
+ * @param id - The unique identifier for the event.
+ * @param fields - Field configurations to include in the event declaration. Everything in a single page.
+ * @param placeOfEventId - Optional place of event field id.
+ * @param dateOfEventId - Optional date of event field id.
+ */
+export const generateEventConfig = ({
+  id,
+  fields,
+  placeOfEventId,
+  dateOfEventId
+}: {
+  id: string
+  fields: FieldConfig[]
+  placeOfEventId?: string
+  dateOfEventId?: string
+}): EventConfig => {
+  return defineConfig({
+    id,
+    label: generateTranslationConfig(id),
+    title: generateTranslationConfig(`${id} Event`),
+    summary: {
+      fields: []
+    },
+    placeOfEvent: placeOfEventId ? { $$field: placeOfEventId } : undefined,
+    dateOfEvent: dateOfEventId ? { $$field: dateOfEventId } : undefined,
+    declaration: {
+      label: generateTranslationConfig(`${id} Declaration`),
+      pages: [
+        {
+          id: 'page1',
+          title: generateTranslationConfig('Page 1'),
+          fields
+        }
+      ]
+    },
+    actions: [
+      {
+        type: ActionType.READ,
+        label: generateTranslationConfig('Read'),
+        review: {
+          title: generateTranslationConfig('Review Read Action'),
+          fields: []
+        }
+      },
+      {
+        type: ActionType.DECLARE,
+        label: generateTranslationConfig('Declare'),
+        review: {
+          title: generateTranslationConfig('Review Declare Action'),
+          fields: []
+        }
+      }
+    ]
+  })
+}

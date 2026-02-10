@@ -26,7 +26,6 @@ import {
   tennisClubMembershipEvent,
   getCurrentEventState,
   UUID,
-  SystemRole,
   TestUserRole,
   generateActionDocument,
   ActionDocument,
@@ -196,7 +195,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           assignedTo: '010101',
           declaration: {}
         },
@@ -213,7 +212,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           assignedTo: '010101',
           declaration: {}
         },
@@ -230,7 +229,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           declaration: {}
         },
         {
@@ -246,7 +245,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           assignedTo: null,
           declaration: {}
         },
@@ -382,7 +381,6 @@ export const WithVariousUserRoles: Story = {
           createdBy: 'system-123',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.IMPORT_EXPORT,
           declaration: {}
         },
         {

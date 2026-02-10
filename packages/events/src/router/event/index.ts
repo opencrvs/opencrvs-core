@@ -14,7 +14,6 @@ import {
   getScopes,
   getUUID,
   SCOPES,
-  UUID,
   RecordScopeV2
 } from '@opencrvs/commons'
 import {
@@ -76,7 +75,7 @@ export const eventRouter = router({
      * Event configurations are intentionally available to all user types.
      * Some of the dynamic scopes require knowledge of available types.
      */
-    get: userOnlyProcedure
+    get: userAndSystemProcedure
       .meta({
         openapi: {
           summary: 'List event configurations',
@@ -121,9 +120,18 @@ export const eventRouter = router({
         config
       })
     }),
-  get: userOnlyProcedure
-    .input(UUID)
-    // @ts-expect-error: middleware.userCanReadEvent does not have proper type definitions but works as intended
+  get: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'Fetch full event document',
+        method: 'GET',
+        path: '/events/{eventId}',
+        tags: ['events'],
+        protect: true
+      }
+    })
+    .input(EventIdParam)
+    .output(EventDocument)
     .use(middleware.userCanReadEventV2)
     .query(async ({ ctx }) => {
       const { eventId, eventType } = ctx
@@ -349,14 +357,6 @@ export const eventRouter = router({
     }),
   bulkImport: userAndSystemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
-    .meta({
-      openapi: {
-        summary: 'Import multiple full event records',
-        method: 'POST',
-        path: '/events/bulk-import',
-        tags: ['events']
-      }
-    })
     .input(z.array(EventDocument))
     .output(z.any())
     .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),

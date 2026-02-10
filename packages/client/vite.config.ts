@@ -111,7 +111,9 @@ export default defineConfig(({ mode }) => {
           ]
         }
       }),
-      tsconfigPaths(),
+      tsconfigPaths({
+        projects: ['./tsconfig.build.json']
+      }),
       VitePWAPlugin()
     ],
     test: {
