@@ -29,7 +29,8 @@ import {
   runFieldValidations,
   UUID,
   getCurrentEventState,
-  EventConfig
+  EventConfig,
+  omitHiddenFields
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
@@ -88,7 +89,7 @@ function QuickActionModal({
   close,
   config,
   eventId,
-  eventConfiguration,
+  eventConfiguration
 }: {
   close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
@@ -122,6 +123,16 @@ function QuickActionModal({
     })
   )
 
+  const confirm = () => {
+    const visibleFields = omitHiddenFields(
+      config.fields ?? [],
+      modalValues,
+      validatorContext
+    )
+
+    close({ result: true, values: visibleFields })
+  }
+
   return (
     <Dialog
       actions={[
@@ -137,7 +148,7 @@ function QuickActionModal({
           bg={'primaryBlue'}
           disabled={errorsOnField.length > 0}
           id="confirm-btn"
-          onClick={() => close({ result: true, values: modalValues })}
+          onClick={confirm}
         >
           {intl.formatMessage(
             config.confirmButtonLabel || buttonMessages.confirm
@@ -182,7 +193,11 @@ function QuickActionModal({
   )
 }
 
-export function useQuickActionModal(eventId: UUID, eventConfiguration: EventConfig, eventType: string) {
+export function useQuickActionModal(
+  eventId: UUID,
+  eventConfiguration: EventConfig,
+  eventType: string
+) {
   const [quickActionModal, openModal] = useModal()
   const navigate = useNavigate()
   const { actions, customActions } = useEvents()
@@ -242,7 +257,10 @@ const customActionConfigBase: Partial<ModalConfig> = {
   }
 }
 
-export function useCustomActionModal(eventId: UUID, eventConfiguration: EventConfig) {
+export function useCustomActionModal(
+  eventId: UUID,
+  eventConfiguration: EventConfig
+) {
   const [customActionModal, openModal] = useModal()
   const navigate = useNavigate()
   const { actions } = useEvents()
