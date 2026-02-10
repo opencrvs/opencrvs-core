@@ -290,8 +290,28 @@ describe('customClientValidator', () => {
       expect(validate(schema, invalidContext)).toBe(false)
     })
 
-    it('should validate age difference between spouses', () => {
-      const schema = field('spouse1.age').customClientValidator((value: unknown, ctx: any) => {
-        const spouse2Age = ctx.$form['spouse2.age'] as number
-        if (!spouse2Age || !value) return false
-        const ageDiff = Math.abs((value as number) - spouse2Age)
+    it("should validate informant age >= 18 for birth registration", () => {
+      const schema = field("informant.age").customClientValidator((value: unknown) => {
+        return typeof value === "number" && value >= 18
+      })
+
+      const validContext = {
+        ...mockContext,
+        $form: {
+          "informant.age": 25
+        }
+      }
+
+      const invalidContext = {
+        ...mockContext,
+        $form: {
+          "informant.age": 16
+        }
+      }
+
+      expect(validate(schema, validContext)).toBe(true)
+      expect(validate(schema, invalidContext)).toBe(false)
+    })
+
+  })
+})
