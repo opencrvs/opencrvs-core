@@ -172,7 +172,6 @@ components:
                   - createdByUserType
                   - createdAt
                   - createdBy
-                  - createdByRole
                   - status
                   - type
         trackingId:
@@ -316,7 +315,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -418,7 +416,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -531,7 +528,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -625,7 +621,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -727,7 +722,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -829,7 +823,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -923,7 +916,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1020,7 +1012,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1113,7 +1104,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1209,7 +1199,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1303,7 +1292,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1398,7 +1386,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1503,7 +1490,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1598,7 +1584,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1698,7 +1683,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1791,7 +1775,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1890,7 +1873,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -1986,7 +1968,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -6026,6 +6007,10 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                showParentFieldError:
+                  description: If true, shows the parent field error and hides the subfield error
+                  default: false
+                  type: boolean
               additionalProperties: false
           required:
             - id
@@ -13121,7 +13106,6 @@ components:
                   - createdByUserType
                   - createdAt
                   - createdBy
-                  - createdByRole
                   - status
                   - type
                 additionalProperties: false
@@ -13267,7 +13251,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13371,7 +13354,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13487,7 +13469,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13582,7 +13563,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13686,7 +13666,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13790,7 +13769,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13885,7 +13863,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -13983,7 +13960,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14077,7 +14053,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14174,7 +14149,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14269,7 +14243,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14365,7 +14338,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14472,7 +14444,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14568,7 +14539,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14670,7 +14640,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14764,7 +14733,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14865,7 +14833,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
@@ -14962,7 +14929,6 @@ components:
         - createdByUserType
         - createdAt
         - createdBy
-        - createdByRole
         - declaration
         - status
         - type
