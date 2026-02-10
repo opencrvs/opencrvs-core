@@ -810,29 +810,49 @@ export function createFieldConditionals(fieldId: string) {
     },
     /**
      * Executes a custom validation function defined by country configuration.
+     * 
+     * **Use this as a last resort when predefined toolkit methods are insufficient.**
+     * 
      * The function is serialized via toString() and transmitted as part of the JSON Schema.
      * It is deserialized just-in-time during validation on the client.
      * 
-     * **Constraints:**
-     * - Client-side only (no server-side execution)
-     * - No external references (function must be self-contained)
-     * - Receives (value, context) parameters where context contains $form, $now, $online, etc.
-     * - Must return boolean: true = valid, false = invalid
+     * @param fn - Validation function that receives the field value and form context.
+     *             Must return true if valid, false if invalid.
+     * 
+     * @returns JSONSchema conditional for AJV validation
      * 
      * @example
+     * // Simple age validation
      * field('age').customClientValidator((value, ctx) => {
      *   return value >= 18
      * })
      * 
      * @example
+     * // Cross-field validation: child DOB must be after mother DOB
      * field('child.dob').customClientValidator((value, ctx) => {
      *   const motherDob = ctx.$form['mother.dob']
      *   if (!motherDob || !value) return false
      *   return new Date(value) > new Date(motherDob)
      * })
      * 
-     * @param fn - Validation function: (value: unknown, context: Context) => boolean
-     * @returns JSONSchema conditional for AJV validation
+     * @example
+     * // Two number fields validated together
+     * field('fieldA').customClientValidator((value, ctx) => {
+     *   const fieldB = ctx.$form['fieldB']
+     *   if (!fieldB) return false
+     *   return value + fieldB > 100
+     * })
+     * 
+     * @remarks
+     * Limitations:
+     * - Client-side only. For backend validation, use country config event triggers.
+     * - Cannot reference external libraries (lodash, etc.)
+     * - Function must be pure — no side effects, no closures over external state
+     * - Function must be serialisable via toString()
+     * - Receives (value, context) parameters where context contains $form, $now, $online, etc.
+     * - Must return boolean: true = valid, false = invalid
+     * 
+     * @see https://github.com/opencrvs/opencrvs-core/issues/11653
      */
     customClientValidator(
       fn: (value: unknown, context: CommonConditionalParameters & { $form: EventState | Record<string, unknown> }) => boolean
@@ -855,21 +875,25 @@ export function createFieldConditionals(fieldId: string) {
     },
     /**
      * Defines a client-side computation function for dynamic field values.
+     * 
+     * **Use this as a last resort when predefined toolkit methods are insufficient.**
+     * 
      * The function is serialized via toString() and transmitted to the client,
      * where it is deserialized and executed to compute field values dynamically.
      * 
-     * **Constraints:**
-     * - Client-side only (no server-side execution)
-     * - No external references (function must be self-contained)
-     * - Receives (value, context) parameters where context contains $form, $now, $online, etc.
-     * - Should return the computed value (any type)
+     * @param fn - Computation function that receives the field value and form context.
+     *             Returns the computed value (any type).
+     * 
+     * @returns CodeToEvaluate object for client-side execution
      * 
      * @example
+     * // Concatenate first and last name
      * field('fullName').customClientEvaluation((value, ctx) => {
      *   return `${ctx.$form.firstName} ${ctx.$form.lastName}`
      * })
      * 
      * @example
+     * // Calculate age from date of birth
      * field('childAge').customClientEvaluation((value, ctx) => {
      *   const dob = ctx.$form['child.dob']
      *   if (!dob) return undefined
@@ -877,8 +901,16 @@ export function createFieldConditionals(fieldId: string) {
      *   return age
      * })
      * 
-     * @param fn - Computation function: (value: unknown, context: Context) => any
-     * @returns CodeToEvaluate object for client-side execution
+     * @remarks
+     * Limitations:
+     * - Client-side only. For backend computation, use country config event triggers.
+     * - Cannot reference external libraries (lodash, etc.)
+     * - Function must be pure — no side effects, no closures over external state
+     * - Function must be serialisable via toString()
+     * - Receives (value, context) parameters where context contains $form, $now, $online, etc.
+     * - Should return the computed value (any type)
+     * 
+     * @see https://github.com/opencrvs/opencrvs-core/issues/11653
      */
     customClientEvaluation(
       fn: (value: unknown, context: CommonConditionalParameters & { $form: EventState | Record<string, unknown> }) => any
