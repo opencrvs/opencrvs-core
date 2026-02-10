@@ -853,6 +853,43 @@ export function createFieldConditionals(fieldId: string) {
         required: [fieldId]
       })
     },
+    /**
+     * Defines a client-side computation function for dynamic field values.
+     * The function is serialized via toString() and transmitted to the client,
+     * where it is deserialized and executed to compute field values dynamically.
+     * 
+     * **Constraints:**
+     * - Client-side only (no server-side execution)
+     * - No external references (function must be self-contained)
+     * - Receives (value, context) parameters where context contains $form, $now, $online, etc.
+     * - Should return the computed value (any type)
+     * 
+     * @example
+     * field('fullName').customClientEvaluation((value, ctx) => {
+     *   return `${ctx.$form.firstName} ${ctx.$form.lastName}`
+     * })
+     * 
+     * @example
+     * field('childAge').customClientEvaluation((value, ctx) => {
+     *   const dob = ctx.$form['child.dob']
+     *   if (!dob) return undefined
+     *   const age = Math.floor((new Date(ctx.$now) - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000))
+     *   return age
+     * })
+     * 
+     * @param fn - Computation function: (value: unknown, context: Context) => any
+     * @returns CodeToEvaluate object for client-side execution
+     */
+    customClientEvaluation(
+      fn: (value: unknown, context: CommonConditionalParameters & { $form: EventState | Record<string, unknown> }) => any
+    ) {
+      // Serialize the function to a string
+      const serializedFn = fn.toString()
+      
+      return {
+        $$code: serializedFn
+      }
+    },
     getId: () => ({ fieldId }),
     /**
      * @deprecated
