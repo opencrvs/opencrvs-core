@@ -46,13 +46,10 @@ import {
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
   AGE_DOB_QUERY_KEY,
-  AGE_DOB_QUERY_KEY,
   removeSecuredFields,
   IndexedAgeFieldValue,
-  IndexedNameFieldValue,
   resolveRecordActionScopeToIds,
   valueFromTotal,
-  IndexedAgeFieldValue,
   IndexedNameFieldValue
 } from './utils'
 import {
