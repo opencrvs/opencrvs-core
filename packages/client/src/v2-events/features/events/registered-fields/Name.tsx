@@ -13,6 +13,7 @@ import { useLocation } from 'react-router-dom'
 import {
   alwaysTrue,
   ConditionalType,
+  EventConfig,
   FieldConfig,
   FieldType,
   getValidatorsForField,
@@ -28,6 +29,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 
 interface Props {
   id: string
+  eventConfig?: EventConfig
   onChange: (newValue: NameFieldValue) => void
   configuration?: NameField['configuration']
   validation: FieldConfig['validation']
@@ -121,6 +123,7 @@ function NameInput(props: Props) {
     onChange,
     disabled,
     value = {},
+    eventConfig,
     configuration,
     validatorContext
   } = props
@@ -160,7 +163,9 @@ function NameInput(props: Props) {
             description: 'This is the label for the firstname field',
             id: 'field.name.firstname.label'
           },
-          validation: getValidatorsForField('firstname', validators)
+          validation: configuration?.showParentFieldError
+            ? undefined
+            : getValidatorsForField('firstname', validators)
         } satisfies TextField
       case 'middlename':
         return {
@@ -179,7 +184,9 @@ function NameInput(props: Props) {
             description: 'This is the label for the middlename field',
             id: 'field.name.middlename.label'
           },
-          validation: getValidatorsForField('middlename', validators)
+          validation: configuration?.showParentFieldError
+            ? undefined
+            : getValidatorsForField('middlename', validators)
         }
       case 'surname':
         return {
@@ -198,7 +205,9 @@ function NameInput(props: Props) {
             description: 'This is the label for the surname field',
             id: 'field.name.surname.label'
           },
-          validation: getValidatorsForField('surname', validators)
+          validation: configuration?.showParentFieldError
+            ? undefined
+            : getValidatorsForField('surname', validators)
         }
       default:
         throw new Error(`Unknown field type: ${field}`)
@@ -208,6 +217,7 @@ function NameInput(props: Props) {
   return (
     <>
       <FormFieldGenerator
+        eventConfig={eventConfig}
         fields={fields}
         id={id}
         initialValues={{ ...value }}
