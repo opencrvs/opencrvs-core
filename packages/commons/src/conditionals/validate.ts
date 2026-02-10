@@ -467,6 +467,23 @@ function createIntlError(message: TranslationConfig) {
   }
 }
 
+function stripSymbolKeys(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(stripSymbolKeys)
+  }
+
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, nestedValue]) => [
+        key,
+        stripSymbolKeys(nestedValue)
+      ])
+    )
+  }
+
+  return value
+}
+
 /**
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
@@ -484,7 +501,6 @@ function zodToIntlErrorMap(
 
   switch (issue.code) {
     case 'too_small': {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (issue.message === undefined) {
         return createIntlError(requiredMessage)
       }
@@ -584,10 +600,11 @@ export function validateFieldInput({
   actionType?: ActionType
 }) {
   const zodType = mapFieldTypeToZod(field, actionType)
+  const sanitizedValue = stripSymbolKeys(value)
 
-  const rawError = zodType.safeParse(value, {
+  const rawError = zodType.safeParse(sanitizedValue, {
     // @ts-expect-error
-    error: (issue) => zodToIntlErrorMap(issue, value, field)
+    error: (issue) => zodToIntlErrorMap(issue, sanitizedValue, field)
   })
 
   // We have overridden the standard error messages
