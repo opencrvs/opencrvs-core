@@ -1699,9 +1699,6 @@ components:
                   type: array
                   items:
                     type: string
-                    enum:
-                      - country
-                      - administrativeArea
                 administrativeLevels:
                   type: array
                   items:

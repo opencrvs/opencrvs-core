@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 02c21636-0f71-4ffe-8a64-565620e6d917
+                transactionId: 7f12785a-1635-4a8f-aea5-646746a455f5
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: d499cb30-7cda-4b1b-926e-a7f7786beca1
+                transactionId: 3a46e9d3-192d-494d-87bf-adae42417244
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2318,9 +2318,6 @@ components:
                   type: array
                   items:
                     type: string
-                    enum:
-                      - country
-                      - administrativeArea
                 administrativeLevels:
                   type: array
                   items:
