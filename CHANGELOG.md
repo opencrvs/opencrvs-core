@@ -36,6 +36,32 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
 - Added configurable placeOfEvent in EventConfig, allowing multiple location fields to be defined, with only one becoming the active place of event per document (based on conditionals), enabling jurisdiction-specific search by event location (e.g., birth location, child’s home address, death location).
 
+
+#### Custom Client Validation and Evaluation
+
+- Added `field().customClientValidator()` method for defining custom client-side validation functions when predefined toolkit methods are insufficient. Functions are serialized and transmitted as part of the JSON Schema, then deserialized and executed just-in-time during validation on the client. [#11653](https://github.com/opencrvs/opencrvs-core/issues/11653)
+- Added `field().customClientEvaluation()` method for defining custom client-side computation functions for dynamic field values. Functions are serialized and transmitted to the client, where they are deserialized and executed to compute field values dynamically. [#11653](https://github.com/opencrvs/opencrvs-core/issues/11653)
+
+Both methods support cross-field validation and computation with access to form context (`$form`, `$now`, `$online`). Functions must be self-contained (no external references) and serialisable via `toString()`.
+
+Example usage:
+
+```ts
+// Cross-field validation: sum of two fields must exceed threshold
+field('fieldA').customClientValidator((value, ctx) => {
+  const fieldB = ctx.$form['fieldB']
+  return value + fieldB > 100
+})
+
+// Dynamic computation: calculate age from date of birth
+field('age').customClientEvaluation((value, ctx) => {
+  const dob = ctx.$form['dob']
+  if (!dob) return undefined
+  return Math.floor((new Date(ctx.$now) - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000))
+})
+```
+
+
 ### Improvements
 
 - Refactor the tRPC context to allow defining public procedures that don't require authentication.
