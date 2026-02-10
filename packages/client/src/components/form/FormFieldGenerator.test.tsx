@@ -13,7 +13,8 @@ import {
   selectOption,
   flushPromises,
   resizeWindow,
-  createTestComponent
+  createTestComponent,
+  TestWrapper
 } from '@client/tests/util'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
@@ -38,7 +39,7 @@ import { phoneNumberFormat, dateNotInFuture } from '@client/utils/validate'
 import { vi } from 'vitest'
 
 describe('form component', () => {
-  let component: ReactWrapper<{}, {}>
+  let component: TestWrapper
 
   beforeEach(async () => {
     const { store } = createStore()
@@ -111,6 +112,7 @@ describe('form component', () => {
 
     component = testComponent
   })
+
   describe('when user is in the moth​​er section', () => {
     it('renders the page', async () => {
       const label = await waitForElement(component, '#countryPrimary_label')

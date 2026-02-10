@@ -18,9 +18,9 @@ import {
   mockDeathDeclarationData,
   mockMarriageDeclarationData,
   TestComponentWithRouteMock,
-  flushPromises
+  flushPromises,
+  TestWrapper
 } from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
 import { validImageB64String } from '@client/tests/mock-offline-data'
 import * as React from 'react'
 import { CollectorForm } from './CollectorForm'
@@ -175,7 +175,7 @@ beforeEach(() => {
 
 describe('Certificate collector test for a birth registration without father details', () => {
   describe('Test collector group', () => {
-    let component: ReactWrapper<{}, {}>
+    let component: TestWrapper
     let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
@@ -292,7 +292,7 @@ describe('Certificate collector test for a birth registration without father det
   })
 
   describe('Test other collector group', () => {
-    let component: ReactWrapper<{}, {}>
+    let component: TestWrapper
     let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
@@ -529,7 +529,7 @@ describe('Certificate collector test for a birth registration with father detail
   const { store } = createStore()
 
   describe('Test collector group', () => {
-    let component: ReactWrapper<{}, {}>
+    let component: TestWrapper
 
     beforeEach(async () => {
       await flushPromises()
@@ -562,7 +562,7 @@ describe('Certificate collector test for a birth registration with father detail
 
 describe('Certificate collector test for a death registration', () => {
   describe('Test collector group', () => {
-    let component: ReactWrapper<{}, {}>
+    let component: TestWrapper
     let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
@@ -618,7 +618,7 @@ describe('Certificate collector test for a death registration', () => {
 
 describe('Certificate collector test for a marriage registration', () => {
   describe('Test collector group', () => {
-    let component: ReactWrapper<{}, {}>
+    let component: TestWrapper
     let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
@@ -678,7 +678,7 @@ describe('Certificate collector test for a marriage registration', () => {
 
 describe('Certificate collector test for a birth registration without father and mother details', () => {
   describe('Test collector group', () => {
-    let component: ReactWrapper<{}, {}>
+    let component: TestWrapper
 
     beforeEach(async () => {
       await flushPromises()

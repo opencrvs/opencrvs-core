@@ -67,6 +67,7 @@ import * as builtInValidators from '@client/utils/validate'
 import * as actions from '@client/profile/profileActions'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { mockOfflineData, validImageB64String } from './mock-offline-data'
+import { Component, ReactElement } from 'react'
 
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -186,7 +187,7 @@ interface ITestView {
 }
 
 export function createShallowRenderedComponent(
-  node: React.ReactElement<ITestView>
+  node: ReactElement<unknown, string>
 ) {
   return shallow(node)
 }
@@ -207,9 +208,16 @@ export const resizeWindow = (width: number, height: number) => {
   window.dispatchEvent(resizeEvent)
 }
 
-export const selectOption = (
+export type TestWrapper = ReactWrapper<
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
+  any,
+  Readonly<{}>,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  Component<{}, {}, any>
+>
+
+export const selectOption = (
+  wrapper: TestWrapper,
   selector: string,
   option: string
 ): ReactWrapper => {
@@ -1000,7 +1008,10 @@ export async function createTestComponent(
     path?: string
   },
   options?: MountRendererProps
-) {
+): Promise<{
+  component: TestWrapper
+  router: ReturnType<typeof createMemoryRouter>
+}> {
   store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
 

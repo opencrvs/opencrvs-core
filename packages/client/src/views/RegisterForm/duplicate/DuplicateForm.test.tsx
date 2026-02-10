@@ -16,13 +16,13 @@ import {
   createTestStore,
   getRegisterFormFromStore,
   selectOption,
+  TestWrapper,
   userDetails
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { EventType } from '@client/utils/gateway'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
-import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { Mock, SpyInstance, vi } from 'vitest'
 
@@ -70,7 +70,7 @@ describe('when in device of large viewport', () => {
   })
 
   describe('when user is in the review page', () => {
-    let duplicateFormComponent: ReactWrapper<{}, {}>
+    let duplicateFormComponent: TestWrapper
     beforeEach(async () => {
       const { component } = await createTestComponent(
         <ReviewSection

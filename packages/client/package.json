@@ -73,7 +73,7 @@
     "email-validator": "^2.0.4",
     "eslint-plugin-import": "^2.31.0",
     "focus-visible": "^5.0.2",
-    "formik": "^2.2.9",
+    "formik": "^2.4.9",
     "google-libphonenumber": "^3.2.32",
     "graphql": "^15.0.0",
     "graphql-tag": "^2.12.6",

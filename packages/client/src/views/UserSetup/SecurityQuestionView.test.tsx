@@ -12,16 +12,16 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
-  selectOption
+  selectOption,
+  TestWrapper
 } from '@client/tests/util'
 import { SecurityQuestion } from '@client/views/UserSetup/SecurityQuestionView'
-import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 
 const { store } = createStore()
 
 describe('Security Question Page', () => {
-  let component: ReactWrapper
+  let component: TestWrapper
   beforeEach(async () => {
     const { component: testComponent } = await createTestComponent(
       // @ts-ignore
