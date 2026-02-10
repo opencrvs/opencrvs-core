@@ -804,6 +804,51 @@ export function createFieldConditionals(fieldId: string) {
         required: [fieldId]
       })
     },
+    /**
+     * Executes a custom validation function defined by country configuration.
+     * The function is serialized via toString() and transmitted as part of the JSON Schema.
+     * It is deserialized just-in-time during validation on the client.
+     * 
+     * **Constraints:**
+     * - Client-side only (no server-side execution)
+     * - No external references (function must be self-contained)
+     * - Receives (value, context) parameters where context contains $form, $now, $online, etc.
+     * - Must return boolean: true = valid, false = invalid
+     * 
+     * @example
+     * field('age').customClientValidator((value, ctx) => {
+     *   return value >= 18
+     * })
+     * 
+     * @example
+     * field('child.dob').customClientValidator((value, ctx) => {
+     *   const motherDob = ctx.$form['mother.dob']
+     *   if (!motherDob || !value) return false
+     *   return new Date(value) > new Date(motherDob)
+     * })
+     * 
+     * @param fn - Validation function: (value: unknown, context: Context) => boolean
+     * @returns JSONSchema conditional for AJV validation
+     */
+    customClientValidator(
+      fn: (value: unknown, context: CommonConditionalParameters & { $form: EventState | Record<string, unknown> }) => boolean
+    ) {
+      // Serialize the function to a string
+      const serializedFn = fn.toString()
+      
+      return defineFormConditional({
+        type: 'object',
+        properties: {
+          [fieldId]: wrapToPath(
+            {
+              customClientValidator: serializedFn
+            },
+            this.$$subfield
+          )
+        },
+        required: [fieldId]
+      })
+    },
     getId: () => ({ fieldId }),
     /**
      * @deprecated
