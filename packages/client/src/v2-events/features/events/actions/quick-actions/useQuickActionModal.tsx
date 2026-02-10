@@ -29,7 +29,8 @@ import {
   runFieldValidations,
   UUID,
   getCurrentEventState,
-  EventConfig
+  EventConfig,
+  omitHiddenFields
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
@@ -122,6 +123,16 @@ function QuickActionModal({
     })
   )
 
+  const confirm = () => {
+    const visibleFields = omitHiddenFields(
+      config.fields ?? [],
+      modalValues,
+      validatorContext
+    )
+
+    close({ result: true, values: visibleFields })
+  }
+
   return (
     <Dialog
       actions={[
@@ -137,7 +148,7 @@ function QuickActionModal({
           bg={'primaryBlue'}
           disabled={errorsOnField.length > 0}
           id="confirm-btn"
-          onClick={() => close({ result: true, values: modalValues })}
+          onClick={confirm}
         >
           {intl.formatMessage(
             config.confirmButtonLabel || buttonMessages.confirm
