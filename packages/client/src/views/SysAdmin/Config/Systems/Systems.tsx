@@ -62,12 +62,7 @@ const Field = styled.div`
   margin-top: 16px;
 `
 
-const SystemRole = z.enum([
-  'HEALTH',
-  'NATIONAL_ID',
-  'RECORD_SEARCH',
-  'IMPORT_EXPORT'
-])
+const SystemRole = z.enum(['HEALTH', 'RECORD_SEARCH'])
 
 /**
  * Wrapper component that adds Frame around the page if withFrame is true.
@@ -514,13 +509,6 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                         { type: SystemRole.enum.RECORD_SEARCH }
                       ),
                       value: SystemRole.enum.RECORD_SEARCH
-                    },
-                    {
-                      label: intl.formatMessage(
-                        integrationMessages.integrationType,
-                        { type: SystemRole.enum.IMPORT_EXPORT }
-                      ),
-                      value: SystemRole.enum.IMPORT_EXPORT
                     }
                   ]}
                   id={'permissions-selectors'}

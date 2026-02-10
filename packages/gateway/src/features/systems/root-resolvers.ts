@@ -88,13 +88,6 @@ export const resolvers: GQLResolver = {
         }
       }
 
-      if (type === GQLSystemType.IMPORT_EXPORT && !settings) {
-        settings = {
-          dailyQuota: 1000000
-        }
-      }
-
-
       // Convert type to scopes
       const scope = getSystemScopesFromType(type, eventIds)
 
