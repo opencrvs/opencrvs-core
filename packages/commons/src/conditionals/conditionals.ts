@@ -150,6 +150,7 @@ export function never(): JSONSchema {
 }
 
 type FieldReference = { $$field: string; $$subfield: string[] }
+type CodeToEvaluate = { $$code: string }
 
 function jsonFieldPath(field: FieldReference) {
   return [field.$$field, ...field.$$subfield].join('/')
@@ -254,6 +255,9 @@ export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
 }
 
+export function isCodeToEvaluate(value: unknown): value is CodeToEvaluate {
+  return typeof value === 'object' && value !== null && '$$code' in value
+}
 /**
  * This function will output JSONSchema which looks for example like this:
  * @example

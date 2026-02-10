@@ -75,6 +75,18 @@ export const FieldReference = z
 
 export type FieldReference = z.infer<typeof FieldReference>
 
+
+export const CodeToEvaluate = z
+  .object({
+    $$code: z
+      .string()
+      .describe(
+        'Serialized function string that will be evaluated at runtime with the field value and context'
+      )
+  })
+  .describe('Custom evaluation function for computed field values')
+
+export type CodeToEvaluate = z.infer<typeof CodeToEvaluate>
 export const ValidationConfig = z.object({
   validator: Conditional,
   message: TranslationConfig
