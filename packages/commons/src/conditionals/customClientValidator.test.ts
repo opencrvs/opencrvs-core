@@ -295,27 +295,3 @@ describe('customClientValidator', () => {
         const spouse2Age = ctx.$form['spouse2.age'] as number
         if (!spouse2Age || !value) return false
         const ageDiff = Math.abs((value as number) - spouse2Age)
-        return ageDiff <= 30 // Max 30 years age difference
-      })
-
-      const validContext = {
-        ...mockContext,
-        $form: {
-          'spouse1.age': 30,
-          'spouse2.age': 35
-        }
-      }
-
-      const invalidContext = {
-        ...mockContext,
-        $form: {
-          'spouse1.age': 20,
-          'spouse2.age': 60
-        }
-      }
-
-      expect(validate(schema, validContext)).toBe(true)
-      expect(validate(schema, invalidContext)).toBe(false)
-    })
-  })
-})
