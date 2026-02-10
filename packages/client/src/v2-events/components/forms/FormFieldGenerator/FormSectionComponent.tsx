@@ -37,15 +37,15 @@ import {
   FIELD_SEPARATOR,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
-  makeFormikFieldIdOpenCRVSCompatible,
-  resolveValue
+  makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
 import { handleDefaultValue } from '@client/v2-events/hooks/useDefaultValues'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import {
   makeFormFieldIdsFormikCompatible,
-  makeFormikFieldIdsOpenCRVSCompatible
+  makeFormikFieldIdsOpenCRVSCompatible,
+  resolveValue
 } from './utils'
 import { GeneratedInputField } from './GeneratedInputField'
 
