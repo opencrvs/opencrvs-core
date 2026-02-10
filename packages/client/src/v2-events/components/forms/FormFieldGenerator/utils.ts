@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { get } from 'lodash'
+import { formatISO } from 'date-fns'
 import {
   FieldReference,
   FieldValue,
@@ -84,7 +85,7 @@ export function evaluateCode(
 
     const context = {
       $form: fieldValues,
-      $now: new Date().toISOString(),
+      $now: formatISO(new Date(), { representation: 'date' }),
       $online: typeof navigator !== 'undefined' ? navigator.onLine : true
     }
 
@@ -92,7 +93,6 @@ export function evaluateCode(
     return result
   } catch (error) {
     // Gracefully handle errors - return undefined
-    console.warn('Failed to evaluate code:', error)
     return undefined
   }
 }

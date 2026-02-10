@@ -17,13 +17,12 @@ import {
   getMixedPath,
   HttpField,
   HttpFieldValue,
-  isFieldReference, isCodeToEvaluate,
   isTemplateVariable,
   SystemVariables
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
-import { parseFieldReferenceToValue, resolveValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
+import { resolveValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 
 async function fetchWithTimeout(
   input: RequestInfo | URL,
