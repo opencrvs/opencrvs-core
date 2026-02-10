@@ -4974,6 +4974,10 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                showParentFieldError:
+                  description: If true, shows the parent field error and hides the subfield error
+                  default: false
+                  type: boolean
               additionalProperties: false
           required:
             - id
