@@ -150,6 +150,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
             ])
           )
         }
+        validateOnChange={false}
         validateOnMount={true}
         onSubmit={noop}
       >
