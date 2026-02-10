@@ -17,13 +17,13 @@ import {
   getMixedPath,
   HttpField,
   HttpFieldValue,
-  isFieldReference,
+  isFieldReference, isCodeToEvaluate,
   isTemplateVariable,
   SystemVariables
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
-import { parseFieldReferenceToValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
+import { parseFieldReferenceToValue, resolveValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 
 async function fetchWithTimeout(
   input: RequestInfo | URL,
@@ -71,10 +71,8 @@ async function fetchHttpFieldValue(
     for (const [k, v] of Object.entries(cfg.body)) {
       if (isTemplateVariable(v) && v) {
         cfg.body[k] = getMixedPath(systemVariables, v)
-      } else if (isFieldReference(v)) {
-        cfg.body[k] = parseFieldReferenceToValue(v, form)
       } else {
-        cfg.body[k] = v
+        cfg.body[k] = resolveValue(v, form)
       }
     }
   }

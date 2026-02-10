@@ -13,7 +13,9 @@ import {
   FieldReference,
   FieldValue,
   HttpField,
-  isFieldReference
+  isFieldReference,
+  CodeToEvaluate,
+  isCodeToEvaluate
 } from '@opencrvs/commons/client'
 import { IndexMap } from '@client/utils'
 import {
@@ -59,6 +61,67 @@ export function parseFieldReferenceToValue(
     : fieldValues[fieldReference.$$field]
 }
 
+/**
+ * Evaluates a CodeToEvaluate by deserializing and executing the function.
+ * The function receives the field value and a context object containing $form and other contextual data.
+ *
+ * @param codeToEvaluate - The CodeToEvaluate object with serialized function string
+ * @param fieldValue - The current value of the field
+ * @param fieldValues - All form field values for context
+ * @returns The computed value, or undefined if evaluation fails
+ */
+export function evaluateCode(
+  codeToEvaluate: CodeToEvaluate,
+  fieldValue: FieldValue | undefined,
+  fieldValues: Record<string, FieldValue>
+): any {
+  try {
+    const computationFn = new Function(
+      'value',
+      'context',
+      `return (${codeToEvaluate.$$code})(value, context)`
+    )
+
+    const context = {
+      $form: fieldValues,
+      $now: new Date().toISOString(),
+      $online: typeof navigator !== 'undefined' ? navigator.onLine : true
+    }
+
+    const result = computationFn(fieldValue, context)
+    return result
+  } catch (error) {
+    // Gracefully handle errors - return undefined
+    console.warn('Failed to evaluate code:', error)
+    return undefined
+  }
+}
+
+/**
+ * Unified resolver for FieldReference and CodeToEvaluate.
+ * This function abstracts the resolution logic for both types.
+ *
+ * @param value - The value to resolve (could be FieldReference, CodeToEvaluate, or plain value)
+ * @param fieldValues - All form field values
+ * @param currentFieldValue - The current field's value (used for CodeToEvaluate)
+ * @returns Resolved value
+ */
+export function resolveValue(
+  value: unknown,
+  fieldValues: Record<string, FieldValue>,
+  currentFieldValue?: FieldValue
+): any {
+  if (isFieldReference(value)) {
+    return parseFieldReferenceToValue(value, fieldValues)
+  }
+  
+  if (isCodeToEvaluate(value)) {
+    return evaluateCode(value, currentFieldValue, fieldValues)
+  }
+  
+  return value
+}
+
 export function parseFieldReferencesInConfiguration(
   configuration: HttpField['configuration'],
   form: Record<string, FieldValue>
@@ -69,9 +132,7 @@ export function parseFieldReferencesInConfiguration(
       ? Object.fromEntries(
           Object.entries(configuration.params).map(([key, value]) => [
             key,
-            isFieldReference(value)
-              ? parseFieldReferenceToValue(value, form)
-              : value
+            resolveValue(value, form)
           ])
         )
       : undefined

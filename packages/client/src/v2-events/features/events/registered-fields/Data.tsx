@@ -24,21 +24,15 @@ import {
   EventConfig,
   getDeclarationFields,
   DataEntry,
-  FieldReference
+  FieldReference,
+  isFieldReference,
+  isCodeToEvaluate
 } from '@opencrvs/commons/client'
+import { resolveValue } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
-
-function isFieldReference(entry: unknown): entry is FieldReference {
-  return (
-    Boolean(entry) &&
-    typeof entry === 'object' &&
-    entry !== null &&
-    '$$field' in entry
-  )
-}
 
 function getFieldFromDataEntry({
   intl,
@@ -54,10 +48,8 @@ function getFieldFromDataEntry({
   // Resolve value if it's a message descriptor
   let formattedValue: string
 
-  if (isFieldReference(rawValue)) {
-    formattedValue = rawValue.$$subfield
-      ? get(formData[rawValue.$$field], rawValue.$$subfield)
-      : formData[rawValue.$$field]
+  if (isFieldReference(rawValue) || isCodeToEvaluate(rawValue)) {
+    formattedValue = resolveValue(rawValue, formData)
   } else {
     formattedValue =
       typeof rawValue === 'object' &&
@@ -153,10 +145,8 @@ function DataInput({
 
     const value = entry.value
 
-    if (isFieldReference(value)) {
-      const resolvedValue = value.$$subfield
-        ? get(formData[value.$$field], value.$$subfield)
-        : formData[value.$$field]
+    if (isFieldReference(value) || isCodeToEvaluate(value)) {
+      const resolvedValue = resolveValue(value, formData)
 
       return getFieldFromDataEntry({
         intl,

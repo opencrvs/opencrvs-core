@@ -25,6 +25,8 @@ import {
   isNonInteractiveFieldType,
   InteractiveFieldType,
   FieldReference,
+  CodeToEvaluate,
+  isCodeToEvaluate,
   omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
@@ -116,13 +118,16 @@ function focusElementByHash() {
 }
 
 function resolveFieldReferenceValue(
-  { $$field, $$subfield }: FieldReference,
+  reference: FieldReference | CodeToEvaluate,
   fieldValues: EventState
 ): FieldValue | undefined {
-  const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible($$field)
+  if (isCodeToEvaluate(reference)) {
+    return resolveValueUtil(reference, makeFormikFieldIdsOpenCRVSCompatible(fieldValues))
+  }
+  const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible(reference.$$field)
 
-  return $$subfield && $$subfield.length > 0
-    ? get(fieldValues[referenceKeyInFormikFormat], $$subfield)
+  return reference.$$subfield && reference.$$subfield.length > 0
+    ? get(fieldValues[referenceKeyInFormikFormat], reference.$$subfield)
     : fieldValues[referenceKeyInFormikFormat]
 }
 
@@ -138,7 +143,7 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
   const fieldsByParentId: IndexMap<FieldConfig[]> = {}
 
   for (const field of fields) {
-    const parents = ([] as FieldReference[]).concat(field.parent ?? [])
+    const parents = ([] as (FieldReference | CodeToEvaluate)[]).concat(field.parent ?? [])
 
     for (const parent of parents) {
       const listenersParentId = parent.$$field
@@ -231,7 +236,7 @@ export function FormSectionComponent({
         (f) => f.id === listenerFieldOcrvsId
       )
 
-      const referencesToOtherFields = ([] as FieldReference[]).concat(
+      const referencesToOtherFields = ([] as (FieldReference | CodeToEvaluate)[]).concat(
         listenerFieldConfig?.value ?? []
       )
 
@@ -241,6 +246,11 @@ export function FormSectionComponent({
 
       const firstNonFalsyValue = compact(
         referencesToOtherFields.map((reference) => {
+          // CodeToEvaluate doesn't need field config lookup - just execute
+          if (isCodeToEvaluate(reference)) {
+            return resolveFieldReferenceValue(reference, fieldValues)
+          }
+
           const referenceFieldConfig = allFieldsWithDotSeparator.find(
             (field: FieldConfig) => field.id === reference.$$field
           )
