@@ -20,14 +20,17 @@ enum SystemStatus {
   deactivated
 }
 
+# SystemType is now just a client-side annotation for display purposes.
+# The actual permissions are determined by the scopes array stored in the database.
+# Gateway converts the type to appropriate scopes when creating a system.
+# WEBHOOK type has been deprecated and removed.
+# REINDEX is hidden from UI - it's managed internally.
 enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
-  WEBHOOK
   IMPORT_EXPORT
-  CITIZEN_PORTAL
-  REINDEX
+  CUSTOM
 }
 
 enum IntegratingSystemType {
@@ -48,6 +51,7 @@ type System {
   shaSecret: ID!
   status: SystemStatus!
   name: String!
+  # Type is now just an annotation - scopes are the source of truth for permissions
   type: SystemType!
   integratingSystemType: IntegratingSystemType
   settings: SystemSettings
@@ -74,6 +78,8 @@ input SystemSettingsInput {
 }
 input SystemInput {
   name: String!
+  # Type determines the scopes that will be assigned to the system.
+  # Gateway converts type to scopes before storing in the database.
   type: SystemType!
   settings: SystemSettingsInput
   integratingSystemType: IntegratingSystemType

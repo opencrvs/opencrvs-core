@@ -121,12 +121,6 @@ const messagesToDefine = {
     description: 'Label for death'
   },
 
-  eventNotification: {
-    id: 'integrations.type.eventNotification',
-    defaultMessage: 'Event notification',
-    description: 'Label for event notification'
-  },
-
   childDetails: {
     id: 'integrations.childDetails',
     defaultMessage: `Child's details`,
@@ -197,43 +191,6 @@ const messagesToDefine = {
     id: 'integrations.informantDetailsNoPII',
     defaultMessage: 'Informant Details (No PII)',
     description: 'Label for informant details no PII'
-  },
-
-  recordSearch: {
-    id: 'integrations.type.recordSearch',
-    defaultMessage: 'Record search',
-    description: 'Label for record search'
-  },
-
-  nationalId: {
-    id: 'integrations.type.nationalId',
-    defaultMessage: 'National id',
-    description: 'Label for national id'
-  },
-  webhook: {
-    id: 'integrations.type.webhook',
-    defaultMessage: 'Webhook',
-    description: 'Label for web hook'
-  },
-  import: {
-    id: 'integrations.type.import',
-    defaultMessage: 'Import',
-    description: 'Label for import type system'
-  },
-  importExport: {
-    id: 'integrations.type.importExport',
-    defaultMessage: 'Import/Export',
-    description: 'Label for import/export type system'
-  },
-  citizenPortal: {
-    id: 'integrations.type.citizenPortal',
-    defaultMessage: 'Citizen portal',
-    description: 'Label for citizen portal type system'
-  },
-  healthSystem: {
-    id: 'integrations.type.healthSystem',
-    defaultMessage: 'Health integration',
-    description: 'Label for health system type'
   },
   healthnotificationAlertDescription: {
     id: 'integrations.eventNotificationDescription',
@@ -364,6 +321,13 @@ const messagesToDefine = {
     id: 'integrations.integratingSystemTypeAlertOther',
     defaultMessage: 'Other copy tbd. TODO: Euan',
     description: 'Label for alert when selecting other type'
+  },
+  integrationType: {
+    id: 'integrations.type',
+    defaultMessage:
+      '{type, select, HEALTH {Health integration} NATIONAL_ID {National ID} RECORD_SEARCH {Record search} IMPORT_EXPORT {Import/Export} other {Custom}}',
+    description:
+      'Label for integration type using ICU MessageFormat select for all types'
   }
 }
 

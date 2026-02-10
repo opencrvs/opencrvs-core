@@ -17,8 +17,7 @@ import {
   IUserName,
   UserOrSystem,
   TokenUserType,
-  logger,
-  SystemRole
+  logger
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
@@ -72,10 +71,9 @@ type SystemAPIResult = {
   status: string
   scope: string[]
   sha_secret: string
-  type: SystemRole
 }
 
-export async function getSystem(
+async function getSystem(
   systemId: string,
   token: string
 ): Promise<SystemAPIResult> {
@@ -128,8 +126,7 @@ export async function getUserOrSystem(
     return {
       type: TokenUserType.enum.system,
       id,
-      name: system.name,
-      role: system.type
+      name: system.name
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
