@@ -15,6 +15,7 @@ import { Formik, FormikTouched } from 'formik'
 import { isEqual, noop } from 'lodash'
 import { useIntl } from 'react-intl'
 import {
+  AddressFieldValue,
   deepMerge,
   EventConfig,
   EventState,

@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { IntlShape } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
+import { useField, useFormikContext } from 'formik'
+import { get } from 'lodash'
 import {
   EventState,
   AddressFieldValue,
@@ -27,12 +29,17 @@ import {
   AddressType,
   isFieldDisplayedOnReview,
   AddressField,
-  AdministrativeArea,
+  AdministrativeArea as AdministrativeAreaField,
   DefaultAddressFieldValue,
   LocationType,
   ValidatorContext,
   RequireConfig,
-  DomesticAddressFieldValue
+  Country as CountryField,
+  DomesticAddressFieldValue,
+  TextField,
+  SelectField,
+  TranslationConfig,
+  FieldReference
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -44,12 +51,12 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { InputField } from '@client/components/form/InputField'
+import { AdministrativeArea } from './AdministrativeArea'
+import { SelectCountry } from './SelectCountry'
 
 // ADDRESS field may not contain another ADDRESS field
-type FieldConfigWithoutAddress = Exclude<
-  FieldConfig,
-  { type: typeof FieldType.ADDRESS }
->
+type AddressSubfield = CountryField | TextField | AdministrativeAreaField
 
 type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
@@ -69,7 +76,41 @@ const COUNTRY_FIELD = {
     description: 'This is the label for the field'
   },
   type: FieldType.COUNTRY
-} as const satisfies FieldConfigWithoutAddress
+} as const satisfies AddressSubfield
+
+function CountrySelectInput({
+  config,
+  onChange,
+  disabled
+}: {
+  config: NonNullable<NonNullable<AddressField['configuration']>['fields']>[0]
+  onChange: (val: string) => void
+  disabled?: boolean
+}) {
+  const [input, meta, helper] = useField<string>(config.id)
+  const intl = useIntl()
+  const mergedConfig: CountryField = {
+    ...COUNTRY_FIELD,
+    ...config,
+    type: FieldType.COUNTRY
+  }
+  return (
+    <InputField
+      id={config.id}
+      error={meta.error}
+      label={intl.formatMessage(mergedConfig.label)}
+      touched={meta.touched}
+      htmlFor={config.id}
+    >
+      <SelectCountry.Input
+        {...mergedConfig}
+        disabled={disabled}
+        value={input.value}
+        onChange={onChange}
+      />
+    </InputField>
+  )
+}
 
 const ADDRESS_TYPE_FIELD = {
   id: 'addressType',
@@ -85,7 +126,7 @@ const ADDRESS_TYPE_FIELD = {
     id: 'messages.emptyString'
   },
   type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
+} as const satisfies AddressSubfield
 
 const ADMINISTRATIVE_AREA_FIELD = {
   id: 'administrativeArea',
@@ -101,7 +142,7 @@ const ADMINISTRATIVE_AREA_FIELD = {
     id: 'messages.emptyString'
   },
   type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
+} as const satisfies AddressSubfield
 
 const STREET_LEVEL_DETAILS_FIELD = {
   id: 'streetLevelDetails',
@@ -117,7 +158,7 @@ const STREET_LEVEL_DETAILS_FIELD = {
     id: 'messages.emptyString'
   },
   type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
+} as const satisfies AddressSubfield
 
 const ALL_ADDRESS_FIELDS = [
   COUNTRY_FIELD,
@@ -136,7 +177,7 @@ function isDomesticAddress() {
 function generateAdminStructureFields(
   inputArray: AdminStructureItem[],
   required: RequireConfig
-): AdministrativeArea[] {
+): AdministrativeAreaField[] {
   return inputArray.map((item, index) => {
     const { id, label } = item
     const isFirst = index === 0
@@ -156,7 +197,7 @@ function generateAdminStructureFields(
       }
     ]
 
-    const configuration: AdministrativeArea['configuration'] = {
+    const configuration: AdministrativeAreaField['configuration'] = {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE
     }
 
@@ -164,7 +205,7 @@ function generateAdminStructureFields(
       configuration.partOf = { $declaration: prevItem.id }
     }
 
-    const field: AdministrativeArea = {
+    const field: AdministrativeAreaField = {
       id,
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
@@ -217,6 +258,158 @@ function getAdministrativeArea(value?: AddressFieldValue) {
   return value?.addressType === AddressType.DOMESTIC
     ? value.administrativeArea
     : undefined
+}
+
+function AdminAreaInput({
+  config,
+  partOfRef,
+  onChange,
+  label,
+  parent,
+  disabled
+}: {
+  config: NonNullable<NonNullable<AddressField['configuration']>['fields']>[0]
+  partOfRef?: string
+  disabled?: boolean
+  label: TranslationConfig
+  parent?: FieldReference
+  onChange: (val: string | null) => void
+}) {
+  const [input, meta, helper] = useField<string>(config.id)
+  const {
+    config: { ADMIN_STRUCTURE }
+  } = useSelector(getOfflineData)
+  const { values } = useFormikContext<object>()
+  const intl = useIntl()
+  const partOf = partOfRef ? get(values, partOfRef) : null
+
+  const mergedConfig: AdministrativeAreaField = {
+    ...config,
+    type: FieldType.ADMINISTRATIVE_AREA,
+    parent,
+    label,
+    configuration: {
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE
+    }
+  }
+  return (
+    <InputField
+      id={mergedConfig.id}
+      error={meta.error}
+      label={intl.formatMessage(mergedConfig.label)}
+      touched={meta.touched}
+      htmlFor={mergedConfig.id}
+    >
+      <AdministrativeArea.Input
+        {...mergedConfig}
+        disabled={disabled}
+        partOf={partOf}
+        value={input.value}
+        onChange={onChange}
+      />
+    </InputField>
+  )
+}
+
+function AddressInput2({
+  addressConfig,
+  onChange
+}: {
+  addressConfig: AddressField
+  onChange: (newValue: Partial<AddressFieldValue>) => void
+}) {
+  const [input, meta, helper] = useField<AddressFieldValue>(addressConfig.id)
+  const {
+    config: { ADMIN_STRUCTURE }
+  } = useSelector(getOfflineData)
+  const countryFieldConfig = addressConfig.configuration?.fields?.find(
+    ({ type }) => type === FieldType.COUNTRY
+  )
+  const adminAreaConfigs =
+    addressConfig.configuration?.fields?.filter(
+      ({ type }) => type === FieldType.ADMINISTRATIVE_AREA
+    ) ?? []
+
+  const handleCountryChange = (val: string) => {
+    const defaultCountry = window.config.COUNTRY || 'FAR'
+    if (val === defaultCountry) {
+      onChange({
+        country: val,
+        addressType: AddressType.DOMESTIC
+      })
+    } else {
+      onChange({
+        country: val,
+        addressType: AddressType.INTERNATIONAL
+      })
+    }
+  }
+  return (
+    <>
+      {countryFieldConfig && (
+        <CountrySelectInput
+          config={{
+            ...countryFieldConfig,
+            id: `${addressConfig.id}.${countryFieldConfig.id}`
+          }}
+          onChange={handleCountryChange}
+        />
+      )}
+      {adminAreaConfigs.map((adminConfig, i) => {
+        const config = {
+          ...adminConfig,
+          id: `${addressConfig.id}.${adminConfig.id}`
+        }
+        const label = ADMIN_STRUCTURE.find(
+          (level) => level.id === adminConfig.id
+        )?.label ?? { id: '', defaultMessage: '', description: '' }
+        const partOfRef =
+          i > 0
+            ? `${addressConfig.id}.${adminAreaConfigs[i - 1].id}`
+            : undefined
+
+        const parent =
+          i > 0
+            ? {
+                $$field: addressConfig.id,
+                $$subfield: [adminAreaConfigs[i - 1].id]
+              }
+            : countryFieldConfig && {
+                $$field: addressConfig.id,
+                $$subfield: [countryFieldConfig.id]
+              }
+
+        const handleAdminLevelChange = (
+          val: string | null,
+          adminLevel: number
+        ) => {
+          const newValue = {
+            ...input.value,
+            addressType: AddressType.DOMESTIC,
+            [adminAreaConfigs[adminLevel].id]: val
+          }
+          return onChange({
+            ...newValue,
+            administrativeArea: adminAreaConfigs.reduce(
+              //@ts-expect-error
+              (acc, { id }) => newValue[id] ?? acc,
+              undefined
+            )
+          })
+        }
+        return (
+          <AdminAreaInput
+            key={adminConfig.id}
+            config={config}
+            label={label}
+            parent={parent}
+            partOfRef={partOfRef}
+            onChange={(val) => handleAdminLevelChange(val, i)}
+          />
+        )
+      })}
+    </>
+  )
 }
 
 /**
@@ -376,7 +569,7 @@ function AddressOutput({
   const [locations] = getLocations.useSuspenseQuery()
   const { config } = useSelector(getOfflineData)
   const customAddressFields = configuration?.configuration
-    ?.streetAddressForm as FieldConfigWithoutAddress[]
+    ?.streetAddressForm as AddressSubfield[]
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
 
   if (!value) {
@@ -499,7 +692,7 @@ function toCertificateVariables(
 }
 
 export const Address = {
-  Input: withSuspense(AddressInput),
+  Input: withSuspense(AddressInput2),
   Output: AddressOutput,
   toCertificateVariables
 }

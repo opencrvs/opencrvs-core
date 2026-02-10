@@ -500,11 +500,7 @@ export const GeneratedInputField = React.memo(
         // We are showing errors to underlying inputs, so we need to ignore them here
         <InputField {...omit(field.inputFieldProps, 'error')}>
           <Address.Input
-            {...field.config}
-            configuration={field.config.configuration}
-            disabled={disabled}
-            validatorContext={validatorContext}
-            value={field.value}
+            addressConfig={field.config}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}

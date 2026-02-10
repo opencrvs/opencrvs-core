@@ -26,7 +26,7 @@ function SelectCountryInput({
   onChange,
   ...props
 }: FieldPropsWithoutReferenceValue<'COUNTRY'> & {
-  onChange: (val: string | undefined) => void
+  onChange: (val: string) => void
   value?: string
   disabled?: boolean
 }) {
