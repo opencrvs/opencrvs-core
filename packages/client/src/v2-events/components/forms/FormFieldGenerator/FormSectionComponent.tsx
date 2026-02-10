@@ -37,7 +37,8 @@ import {
   FIELD_SEPARATOR,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
-  makeFormikFieldIdOpenCRVSCompatible
+  makeFormikFieldIdOpenCRVSCompatible,
+  resolveValue
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
 import { handleDefaultValue } from '@client/v2-events/hooks/useDefaultValues'
@@ -122,7 +123,7 @@ function resolveFieldReferenceValue(
   fieldValues: EventState
 ): FieldValue | undefined {
   if (isCodeToEvaluate(reference)) {
-    return resolveValueUtil(reference, makeFormikFieldIdsOpenCRVSCompatible(fieldValues))
+    return resolveValue(reference, makeFormikFieldIdsOpenCRVSCompatible(fieldValues))
   }
   const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible(reference.$$field)
 

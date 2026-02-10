@@ -146,7 +146,7 @@ const BaseField = z
       .describe(
         'Indicates whether the field can be modified during record correction.'
       ),
-    value: FieldReference.or(z.array(FieldReference))
+    value: FieldReference.or(CodeToEvaluate).or(z.array(FieldReference.or(CodeToEvaluate)))
       .optional()
       .describe(
         'Reference to the source field or fields. When a value is defined, it is copied from the parent field when changed. If multiple references are provided, the first truthy value is used.'
@@ -698,7 +698,7 @@ export const StaticDataEntry = z
   .object({
     id: z.string().describe('ID for the data entry.'),
     label: TranslationConfig,
-    value: TranslationConfig.or(z.string()).or(FieldReference)
+    value: TranslationConfig.or(z.string()).or(FieldReference).or(CodeToEvaluate)
   })
   .describe('Static data entry')
 
@@ -770,7 +770,7 @@ const HttpField = BaseField.extend({
       .optional()
       .describe('Value to set if the request fails'),
     params: z
-      .record(z.string(), z.union([z.string(), FieldReference]))
+      .record(z.string(), z.union([z.string(), FieldReference, CodeToEvaluate]))
       .optional(),
     timeout: z
       .number()

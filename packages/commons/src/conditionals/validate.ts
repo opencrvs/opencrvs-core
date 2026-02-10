@@ -225,6 +225,10 @@ ajv.addKeyword({
     if (!schema || typeof schema !== 'string') {
       return true
     }
+    // Client-side only — skip on server
+    if (typeof window === 'undefined') {
+      return true
+    }
 
     try {
       const validatorFn = new Function(
