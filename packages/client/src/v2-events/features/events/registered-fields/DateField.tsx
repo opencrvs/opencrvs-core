@@ -76,6 +76,9 @@ function DateInput({
   onChange: (newValue: string) => void
   value: string | SerializedNowDateTime
 }) {
+  const { meta, focusInput, disabled, ignorePlaceHolder, id, onBlur, name } =
+    props
+
   // Ensure that 'now' is resolved to the current date and set in the form data.
   // Form values are updated in a single batched operation.
   // When multiple fields try to resolve `$$now` at the same time,
@@ -93,60 +96,39 @@ function DateInput({
   const resolvedValue = useResolveDefaultValue({
     defaultValue: value,
     resolver: resolveNowForDateInput,
-    fieldName: props.name
+    fieldName: name
   })
 
   const [date, setDate] = useState<DateState>({ yyyy: '', mm: '', dd: '' })
+  const prevDateRef = useRef<DateState>({ yyyy: '', mm: '', dd: '' })
   const ddRef = useRef<HTMLInputElement>(null)
   const mmRef = useRef<HTMLInputElement>(null)
   const yyyyRef = useRef<HTMLInputElement>(null)
   const { dd, mm, yyyy } = date
 
-  // @TODO CIHAN: useEffect?
+  useEffect(() => {
+    /**
+     * Component library returns '--' for empty dates when input has been touched.
+     * We limit the behavior to this component, while still allowing partial values. (e.g. '2021-01-')
+     */
+    const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
+    const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
 
-  // const change = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const segmentType = String(event.target.id.split('-').pop())
-  //   const val = event.target.value
+    const prevDate = prevDateRef.current
+    const wasPrevDateValid = isValidDateFormat(
+      `${prevDate.yyyy}-${prevDate.mm}-${prevDate.dd}`
+    )
+    const completeDate = `${date.yyyy}-${date.mm}-${date.dd}`
+    const isNewDateValid = isValidDateFormat(completeDate)
+    const dateValidityChanged = isNewDateValid !== wasPrevDateValid
 
-  //   switch (segmentType) {
-  //     case 'dd':
-  //       if (val.length > 2 || Number(val) > MAX_DAY_NUMBER) {
-  //         return
-  //       }
-  //       if (val.length > 1 && mmRef.current) {
-  //         mmRef.current.focus()
-  //       }
-  //       break
-  //     case 'mm':
-  //       if (val.length > 2 || Number(val) > MAX_MONTH_NUMBER) {
-  //         return
-  //       }
-  //       if (val.length > 1 && yyyyRef.current) {
-  //         yyyyRef.current.focus()
-  //       }
-  //       break
-  //     case 'yyyy':
-  //       if (val.length > 4 || Number(val) > MAX_YEAR_NUMBER) {
-  //         return
-  //       }
-  //       break
-  //   }
-
-  //   const updatedValue = { ...date, [segmentType]: val }
-  //   setDate(updatedValue)
-  // }
-
-  /**
-   * Component library returns '--' for empty dates when input has been touched.
-   * We limit the behavior to this component, while still allowing partial values. (e.g. '2021-01-')
-   */
-  const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
-  const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
-
-  const { meta, focusInput, disabled, ignorePlaceHolder, id, onBlur } = props
-
-  // console.log('date', JSON.stringify(date))
-  console.log('value', value)
+    // Update the stored value and validate when the date changes from invalid to valid or vice versa
+    if (dateValidityChanged) {
+      cleanOnChange(completeDate)
+      prevDateRef.current = date
+      return
+    }
+  }, [date, onChange, onBlur])
 
   return (
     <DateWrapper id={id}>
@@ -164,22 +146,10 @@ function DateInput({
         touched={meta && meta.touched}
         type="number"
         value={dd}
-        onBlur={(e) => {
-          const { target, relatedTarget } = e
+        onBlur={({ target }) => {
           const newDd = target.value
-          setDate({ ...date, dd: newDd })
-
-          const completeDate = `${date.yyyy}-${date.mm}-${newDd.length === 1 ? `0${newDd}` : newDd}`
-          if (isValidDateFormat(completeDate)) {
-            onChange(completeDate)
-            return onBlur && onBlur(e)
-          }
-
-          if (relatedTarget && relatedTarget.id === `${id}-mm`) {
-            return
-          }
-
-          return onBlur && onBlur(e)
+          // Set dd to the new value with leading 0 if needed
+          setDate({ ...date, dd: newDd.length === 1 ? `0${newDd}` : newDd })
         }}
         onChange={({ target }) => {
           if (
@@ -213,22 +183,10 @@ function DateInput({
         touched={meta && meta.touched}
         type="number"
         value={mm}
-        onBlur={(e) => {
-          const { target, relatedTarget } = e
+        onBlur={({ target }) => {
           const newMm = target.value
-          setDate({ ...date, mm: newMm })
-
-          const completeDate = `${date.yyyy}-${newMm.length === 1 ? `0${newMm}` : newMm}-${date.dd}`
-          if (isValidDateFormat(completeDate)) {
-            onChange(completeDate)
-            return onBlur && onBlur(e)
-          }
-
-          if (relatedTarget && relatedTarget.id === `${id}-yyyy`) {
-            return
-          }
-
-          return onBlur && onBlur(e)
+          // Set mm to the new value with leading 0 if needed
+          setDate({ ...date, mm: newMm.length === 1 ? `0${newMm}` : newMm })
         }}
         onChange={({ target }) => {
           if (
@@ -243,6 +201,7 @@ function DateInput({
             yyyyRef.current.focus()
           }
 
+          // @TODO CIHAN: test without this?
           setDate({ ...date, mm: target.value })
         }}
         onWheel={(event) => event.currentTarget.blur()}
@@ -260,12 +219,8 @@ function DateInput({
         touched={meta && meta.touched}
         type="number"
         value={yyyy}
-        onBlur={(e) => {
-          const target = e.target as HTMLInputElement
+        onBlur={({ target }) => {
           setDate({ ...date, yyyy: target.value })
-          const completeDate = `${target.value}-${date.mm}-${date.dd}`
-          onChange(completeDate)
-          return onBlur && onBlur(e)
         }}
         onChange={({ target }) => {
           if (
@@ -276,13 +231,6 @@ function DateInput({
           }
 
           setDate({ ...date, yyyy: target.value })
-
-          const completeDate = `${target.value}-${date.mm}-${date.dd}`
-          if (isValidDateFormat(completeDate)) {
-            onChange(completeDate)
-            // @ts-expect-error asd
-            return onBlur && onBlur(e)
-          }
         }}
         onWheel={(event) => event.currentTarget.blur()}
       />
