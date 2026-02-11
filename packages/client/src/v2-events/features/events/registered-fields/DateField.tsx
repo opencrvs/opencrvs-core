@@ -72,6 +72,7 @@ function DateInput({
   onChange,
   value = '',
   ...props
+  // @TODO CIHAN: dont rely on DateFieldProps
 }: DateFieldProps & {
   onChange: (newValue: string) => void
   value: string | SerializedNowDateTime
@@ -99,7 +100,7 @@ function DateInput({
     fieldName: name
   })
 
-  const dateSegmentVals = resolvedValue?.split('-') || []
+  const dateSegmentVals = resolvedValue.split('-')
   const initialDate = {
     yyyy: dateSegmentVals[0] || '',
     mm: dateSegmentVals[1] || '',
@@ -108,6 +109,8 @@ function DateInput({
 
   const [date, setDate] = useState<DateState>(initialDate)
   const prevDateRef = useRef<DateState>(initialDate)
+
+  /** We need to store a ref to the last blur event so we can use it in the */
   const lastBlurEventRef = useRef<React.FocusEvent<HTMLInputElement> | null>(
     null
   )
@@ -137,7 +140,7 @@ function DateInput({
       cleanOnChange(completeDate)
       prevDateRef.current = date
 
-      // This onblur expects an FocusEvent e as param. How can we make that happen?
+      // This onBlur() expects an FocusEvent e as param. We store it in a ref so we can use it in this useEffect.
       onBlur && onBlur(lastBlurEventRef.current)
       return
     }
