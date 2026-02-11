@@ -30,8 +30,8 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
-import { ActionMenuItem } from './utils'
+import { useAllowedActionConfigurations } from '../../Actions/useAllowedActionConfigurations'
+import { ActionMenuItem } from '../../Actions/utils'
 
 /** This is the default order of actions if no actionOrder is defined in event configuration. */
 const DEFAULT_ACTION_ORDER = [

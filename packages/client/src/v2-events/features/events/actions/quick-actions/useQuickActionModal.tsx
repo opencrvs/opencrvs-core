@@ -39,7 +39,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useUserAllowedActions'
 import { useModal } from '../../../../hooks/useModal'
-import { actionLabels } from '../../../workqueues/EventOverview/components/utils'
+import { actionLabels } from '../../../workqueues/Actions/utils'
 import { register } from './register'
 import { archive } from './archive'
 

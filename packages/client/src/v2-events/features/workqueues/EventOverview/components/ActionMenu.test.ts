@@ -10,7 +10,7 @@
  */
 import { ActionType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { sortActions } from './ActionMenu'
-import { ActionMenuItem } from './utils'
+import { ActionMenuItem } from '../../Actions/utils'
 
 describe('sortActions()', () => {
   it('should sort actions according to default action order if no action order is configured', () => {

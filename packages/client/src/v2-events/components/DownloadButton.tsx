@@ -34,7 +34,7 @@ import { AssignModal } from './AssignModal'
 import {
   useAssignmentActionVisibility,
   useResolveActionConditionals
-} from '../features/workqueues/EventOverview/components/useActionConfigurationResolver'
+} from '../features/workqueues/Actions/useActionConfigurationResolver'
 
 interface DownloadButtonProps {
   id?: string

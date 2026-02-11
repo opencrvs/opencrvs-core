@@ -22,7 +22,10 @@ import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { buttonMessages } from '@client/i18n/messages'
-import { useUserAllowedActions } from './useUserAllowedActions'
+import {
+  useAssignmentActions,
+  useEventActionsOnClick
+} from './useEventActionsOnClick'
 import {
   ActionCtaConfig,
   actionIcons,
@@ -30,11 +33,8 @@ import {
   ActionMenuActionType,
   ActionMenuItem
 } from './utils'
-import {
-  useAssignmentActions,
-  useEventActionsOnClick
-} from './useEventActionsOnClick'
 import { resolveActionConditionals } from './resolveActionConditionals'
+import { useUserAllowedActions } from './useUserAllowedActions'
 
 /**
  * Given event, returns resolver function for event action configuration.
