@@ -1,0 +1,36 @@
+{
+  "name": "@opencrvs/countryconfig",
+  "version": "1.9.7",
+  "description": "OpenCRVS Country Configuration service template",
+  "license": "MPL-2.0",
+  "private": true,
+  "scripts": {
+    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon -r tsconfig-paths/register src/index.ts",
+    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
+    "lint": "CI=true eslint -c eslint.config.js --fix --max-warnings=0",
+    "test:compilation": "tsc --noEmit",
+    "build": "tsc -p tsconfig.json",
+    "build:clean": "rm -rf build"
+  },
+  "dependencies": {
+    "@orpc/client": "^1.13.4",
+    "@orpc/server": "^1.13.4",
+    "envalid": "^8.0.0",
+    "@opencrvs/toolkit": "1.9.7"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.2.7",
+    "@eslint/eslintrc": "^3.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "cross-env": "^7.0.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-import-resolver-typescript": "^4.3.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.5",
+    "nodemon": "^3.0.0",
+    "prettier": "3.5.3",
+    "typescript": "5.6.3"
+  }
+}
