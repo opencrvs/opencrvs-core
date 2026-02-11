@@ -99,8 +99,18 @@ function DateInput({
     fieldName: name
   })
 
-  const [date, setDate] = useState<DateState>({ yyyy: '', mm: '', dd: '' })
-  const prevDateRef = useRef<DateState>({ yyyy: '', mm: '', dd: '' })
+  const dateSegmentVals = resolvedValue?.split('-') || []
+  const initialDate = {
+    yyyy: dateSegmentVals[0] || '',
+    mm: dateSegmentVals[1] || '',
+    dd: dateSegmentVals[2] || ''
+  }
+
+  const [date, setDate] = useState<DateState>(initialDate)
+  const prevDateRef = useRef<DateState>(initialDate)
+  const lastBlurEventRef = useRef<React.FocusEvent<HTMLInputElement> | null>(
+    null
+  )
   const ddRef = useRef<HTMLInputElement>(null)
   const mmRef = useRef<HTMLInputElement>(null)
   const yyyyRef = useRef<HTMLInputElement>(null)
@@ -123,9 +133,12 @@ function DateInput({
     const dateValidityChanged = isNewDateValid !== wasPrevDateValid
 
     // Update the stored value and validate when the date changes from invalid to valid or vice versa
-    if (dateValidityChanged) {
+    if (dateValidityChanged && lastBlurEventRef.current) {
       cleanOnChange(completeDate)
       prevDateRef.current = date
+
+      // This onblur expects an FocusEvent e as param. How can we make that happen?
+      onBlur && onBlur(lastBlurEventRef.current)
       return
     }
   }, [date, onChange, onBlur])
@@ -146,8 +159,9 @@ function DateInput({
         touched={meta && meta.touched}
         type="number"
         value={dd}
-        onBlur={({ target }) => {
-          const newDd = target.value
+        onBlur={(e) => {
+          lastBlurEventRef.current = e
+          const newDd = e.target.value
           // Set dd to the new value with leading 0 if needed
           setDate({ ...date, dd: newDd.length === 1 ? `0${newDd}` : newDd })
         }}
@@ -164,6 +178,7 @@ function DateInput({
             mmRef.current.focus()
           }
 
+          // @TODO CIHAN: test without this?
           setDate({ ...date, dd: target.value })
         }}
         onWheel={(event) => event.currentTarget.blur()}
@@ -183,8 +198,9 @@ function DateInput({
         touched={meta && meta.touched}
         type="number"
         value={mm}
-        onBlur={({ target }) => {
-          const newMm = target.value
+        onBlur={(e) => {
+          lastBlurEventRef.current = e
+          const newMm = e.target.value
           // Set mm to the new value with leading 0 if needed
           setDate({ ...date, mm: newMm.length === 1 ? `0${newMm}` : newMm })
         }}
@@ -219,8 +235,10 @@ function DateInput({
         touched={meta && meta.touched}
         type="number"
         value={yyyy}
-        onBlur={({ target }) => {
-          setDate({ ...date, yyyy: target.value })
+        onBlur={(e) => {
+          lastBlurEventRef.current = e
+          const newYyyy = e.target.value
+          setDate({ ...date, yyyy: newYyyy })
         }}
         onChange={({ target }) => {
           if (
