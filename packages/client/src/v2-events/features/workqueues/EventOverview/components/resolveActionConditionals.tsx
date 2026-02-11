@@ -83,10 +83,7 @@ function resolveInternalActionConditions({
   isDeclareDraftOpen
 }: {
   assignmentStatus: AssignmentStatus
-  actionType:
-    | WorkqueueActionType
-    | ActionMenuActionType
-    | (typeof ActionTypes.enum)['CUSTOM']
+  actionType: WorkqueueActionType | ActionMenuActionType
   isOnline: boolean
   isDownloaded: boolean
   isAssigning: boolean
@@ -148,10 +145,7 @@ export function resolveActionConditionals({
   isAssigning
 }: {
   event: EventIndex
-  actionType:
-    | WorkqueueActionType
-    | ActionMenuActionType
-    | (typeof ActionTypes.enum)['CUSTOM']
+  actionType: WorkqueueActionType | ActionMenuActionType
   isDeclareDraftOpen: boolean
   validatorContext: ValidatorContext
   isActionAllowedForUser: (action: DisplayableAction) => boolean

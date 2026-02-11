@@ -213,8 +213,8 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
         icon: actionConfig?.icon || actionIcons[actionType],
         onClick:
           actionType === ActionType.ASSIGN
-            ? () => onAssign()
-            : () => onUnassign(),
+            ? async () => onAssign()
+            : async () => onUnassign(),
         disabled: !enabled,
         hidden: !visible
       }

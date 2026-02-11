@@ -13,6 +13,7 @@ import { useMemo } from 'react'
 import {
   ActionType,
   ClientSpecificAction,
+  DisplayableAction,
   isActionInScope
 } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
@@ -34,7 +35,7 @@ export function useUserAllowedActions(eventType: string) {
 
   return {
     allowedActions,
-    isActionAllowed: (action: ActionType | ClientSpecificAction) =>
+    isActionAllowed: (action: DisplayableAction) =>
       allowedActions.includes(action)
   }
 }

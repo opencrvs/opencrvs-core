@@ -35,7 +35,7 @@ export function useCustomActionConfigs(event: EventIndex): {
   const validatorContext = useValidatorContext()
 
   const userId = getOrThrow(
-    validatorContext?.user?.sub,
+    validatorContext.user?.sub,
     'Authentication is not available but is required'
   )
 
