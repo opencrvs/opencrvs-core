@@ -16,7 +16,7 @@
     "@orpc/client": "^1.13.4",
     "@orpc/server": "^1.13.4",
     "envalid": "^8.0.0",
-    "@opencrvs/toolkit": "1.9.7"
+    "@opencrvs/toolkit": "1.9.8"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.7",

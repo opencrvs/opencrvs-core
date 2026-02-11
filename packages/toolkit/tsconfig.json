@@ -18,10 +18,11 @@
       "@opencrvs/commons/scopes": ["../commons/src/scopes.ts"],
       "@opencrvs/commons/events": ["../commons/src/events/index.ts"],
       "@opencrvs/commons/events/deduplication": ["../commons/src/events/deduplication.ts"],
-      "@opencrvs/commons/notification": ["../commons/src/notification/index.ts"]
+      "@opencrvs/commons/notification": ["../commons/src/notification/index.ts"],
+      "@opencrvs/commons/countryconfig/contract": ["../commons/src/countryconfig/contract.ts"]
     }
   },
   "references": [{ "path": "../commons/tsconfig-commonjs.json" }],
   "include": ["src/**/*.ts"],
-  "exclude": ["**/node_modules/**", "dist"]
+  "exclude": ["**/node_modules/**", "dist", "src/api/**"]
 }

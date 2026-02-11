@@ -8,23 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as z from 'zod'
-import { oc } from '@orpc/contract'
-export { implement } from '@orpc/server'
+import { contract, implement } from '@opencrvs/commons/countryconfig/contract'
 
-export const contract = {
-  example: oc
-    .input(
-      z.object({
-        name: z.string(),
-        age: z.number().int().min(0)
-      })
-    )
-    .output(
-      z.object({
-        id: z.number().int().min(0),
-        name: z.string(),
-        age: z.number().int().min(0)
-      })
-    )
-}
+export const server = implement(contract)
+export { contract }

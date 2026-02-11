@@ -34,7 +34,12 @@ cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts
 # Build api client
 npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external
 mkdir -p ./dist/commons/api
-cp -r ../events/build/types/router/router.d.ts ./dist/commons/api
+cp -r ../events/build/types/router/router.d.ts ./dist/commons/api 2>/dev/null || echo "Warning: events router types not found, skipping"
+
+# Build server (oRPC contract implementation helper)
+npx esbuild src/server/index.ts --bundle --format=cjs --outdir=./dist/server --allow-overwrite --packages=external
+mkdir -p ./dist/commons/countryconfig
+cp -r ../commons/build/dist/common/countryconfig/contract.d.ts ./dist/commons/countryconfig
 
 # Build deduplication api
 npx esbuild src/events/deduplication.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
@@ -46,10 +51,10 @@ mkdir -p ./dist/commons/notification
 cp -r ../commons/build/dist/common/notification/*.d.ts ./dist/commons/notification
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
+  [ -f dist/api/index.d.ts ] && sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
   find dist -type f -exec sed -i '' 's|@opencrvs/commons|../commons|g' {} +
 else
-  sed -i 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
+  [ -f dist/api/index.d.ts ] && sed -i 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
   find dist -type f -exec sed -i 's|@opencrvs/commons|../commons|g' {} +
 fi
 

@@ -15,7 +15,8 @@
     "./assignment": "./build/dist/common/assignment.js",
     "./client": "./build/dist/esm/client.js",
     "./events": "./build/dist/common/events/index.js",
-    "./events/deduplication": "./build/dist/common/events/deduplication.js"
+    "./events/deduplication": "./build/dist/common/events/deduplication.js",
+    "./countryconfig/contract": "./build/dist/common/countryconfig/contract.js"
   },
   "scripts": {
     "start": "yarn build:watch",
@@ -87,6 +88,8 @@
     "typescript": "5.6.3",
     "uuid": "^9.0.0",
     "wireit": "^0.14.12",
+    "@orpc/contract": "^1.13.4",
+    "@orpc/server": "^1.13.4",
     "zod": "^4.1.12",
     "zod-openapi": "^5.4.3"
   },

@@ -4,6 +4,12 @@
     "paths": {
       "src/*": [
         "./src/*"
+      ],
+      "@orpc/contract": [
+        "../../node_modules/@orpc/contract/dist/index"
+      ],
+      "@orpc/server": [
+        "../../node_modules/@orpc/server/dist/index"
       ]
     },
     "target": "es6",
