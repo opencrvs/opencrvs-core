@@ -195,7 +195,7 @@ export function resolveActionConditionals({
   const baseVisible =
     actionIsAvailableForEvent && actionIsAllowedForUser && isVisible
 
-  // 6. Run hardcoded internal business rules. @TODO: These should be conditionals.
+  // 6. Run hardcoded internal business rules.
   const internalConditions = resolveInternalActionConditions({
     actionType,
     isOnline,

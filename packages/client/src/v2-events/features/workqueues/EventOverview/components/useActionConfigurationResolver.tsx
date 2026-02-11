@@ -21,6 +21,7 @@ import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext
 import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { buttonMessages } from '@client/i18n/messages'
 import { useUserAllowedActions } from './useUserAllowedActions'
 import {
   ActionCtaConfig,
@@ -34,12 +35,6 @@ import {
   useEventActionsOnClick
 } from './useEventActionsOnClick'
 import { resolveActionConditionals } from './resolveActionConditionals'
-
-const reviewLabel = {
-  id: 'buttons.review',
-  defaultMessage: 'Review',
-  description: 'Label for review CTA button'
-}
 
 /**
  * Given event, returns resolver function for event action configuration.
@@ -90,7 +85,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
 
       return {
         label: replaceLabelForDeclareDraft
-          ? reviewLabel
+          ? buttonMessages.update
           : actionLabels[actionType],
         type: actionType,
         icon: actionConfig?.icon || actionIcons[actionType],
