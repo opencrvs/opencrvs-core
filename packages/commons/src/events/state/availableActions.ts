@@ -93,7 +93,12 @@ const ACTION_FILTERS: {
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.ASSIGN]: (flags) =>
     !flags.some((flag) => flag.endsWith(':requested')) &&
-    !flags.includes(InherentFlags.CORRECTION_REQUESTED)
+    !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ActionType.UNASSIGN]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')) &&
+    !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+  [ActionType.CUSTOM]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested'))
 }
 
 /**
