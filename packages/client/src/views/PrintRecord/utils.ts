@@ -27,7 +27,7 @@ export function createSeparateIntls(
   languages: ILanguageState,
   cache: IntlCache
 ) {
-  return (window.config.LANGUAGES.split(',') || [])
+  return window.config.LANGUAGES
     .slice(0, 2) // Support upto 2 languages
     .reverse()
     .map((locale) =>

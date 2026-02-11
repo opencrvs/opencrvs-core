@@ -8,7 +8,7 @@ OpenCRVS is also distributed under the terms of the Civil Registration
 Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" translate="no">
   <head>
     <meta charset="utf-8" />
@@ -22,7 +22,11 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     Inject configuration values from public/config.js into window
     replace this file to change runtime configuration
   -->
-    <script src="/api/countryconfig/login-config.js"></script>
+    <script type="module">
+      const response = await fetch('/api/countryconfig/login/config')
+      window.config = await response.json()
+    </script>
+
     <link rel="shortcut icon" href="/favicon.ico" />
     <!--
       Unlike "/favicon.ico" or "favicon.ico", "/favicon.ico" will

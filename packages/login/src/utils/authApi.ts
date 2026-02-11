@@ -117,7 +117,7 @@ export function request<T>(options: AxiosRequestConfig) {
 
 const getApplicationConfig = () => {
   return request<IApplicationConfigResponse>({
-    url: new URL('/publicConfig', window.config.CONFIG_API_URL).toString(),
+    url: new URL('/api/countryconfig/application/config', location.href).toString(),
     method: 'GET'
   })
 }

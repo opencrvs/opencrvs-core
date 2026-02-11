@@ -19,12 +19,46 @@ import { Roles } from '../roles'
 export { implement } from '@orpc/server'
 
 export const contract = {
-  events: oc.output(z.array(EventConfig)),
+  events: oc
+    .route({
+      path: '/events',
+      method: 'GET'
+    })
+    .output(z.array(EventConfig)),
   workqueue: oc.output(z.array(WorkqueueConfig)),
   roles: oc.output(Roles),
-  application: {
-    config: oc.output(z.any())
-  },
+  application: oc.router({
+    config: oc
+      .route({
+        path: '/config',
+        method: 'GET'
+      })
+      .output(z.any())
+  }),
+  login: oc.router({
+    content: oc
+      .route({
+        path: '/content',
+        method: 'GET'
+      })
+      .output(z.any()),
+    config: oc
+      .route({
+        path: '/config',
+        method: 'GET'
+      })
+      .output(
+        z.object({
+          AUTH_API_URL: z.string(),
+          CONFIG_API_URL: z.string(),
+          COUNTRY: z.string(),
+          LANGUAGES: z.array(z.string()),
+          CLIENT_APP_URL: z.string(),
+          COUNTRY_CONFIG_URL: z.string(),
+          SENTRY: z.string()
+        })
+      )
+  }),
   certificates: oc.output(z.any()),
   users: oc.output(z.any()),
   locations: oc.output(z.any()),

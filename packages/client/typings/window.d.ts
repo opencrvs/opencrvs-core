@@ -44,7 +44,7 @@ interface Window {
       DATE_OF_BIRTH_UNKNOWN: boolean
       V2_EVENTS: boolean
     }
-    LANGUAGES: string
+    LANGUAGES: string[]
     LOGIN_URL: string
     AUTH_URL: string
     MINIO_URL: string

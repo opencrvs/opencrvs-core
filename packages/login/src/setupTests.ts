@@ -13,7 +13,7 @@ import { vi } from 'vitest'
 const config = {
   AUTH_API_URL: 'http://localhost:4040',
   COUNTRY: 'FAR',
-  LANGUAGES: 'en,fr',
+  LANGUAGES: ['en', 'fr'],
   CLIENT_APP_URL: 'http://localhost:3000/',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   CONFIG_API_URL: 'http://localhost:2021',

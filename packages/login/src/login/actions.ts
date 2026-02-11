@@ -158,7 +158,7 @@ export const applicationConfigLoadedAction = (
   response: IApplicationConfigResponse
 ): ApplicationConfigLoaded => ({
   type: CONFIG_LOADED,
-  payload: response.config
+  payload: response
 })
 
 export const applicationConfigFailedAction = (

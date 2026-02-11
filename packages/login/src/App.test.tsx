@@ -19,7 +19,7 @@ describe('Login app step one', () => {
       AUTH_API_URL: 'http://localhost:4040/',
       CONFIG_API_URL: 'http://localhost:2021/',
       COUNTRY: 'far',
-      LANGUAGES: 'en,fr',
+      LANGUAGES: ['en', 'fr'],
       CLIENT_APP_URL: 'http://localhost:3000/',
       USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
       COUNTRY_CONFIG_URL: 'http://localhost:3040',
