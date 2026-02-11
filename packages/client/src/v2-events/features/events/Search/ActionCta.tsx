@@ -14,7 +14,7 @@ import styled from 'styled-components'
 import { EventIndex, WorkqueueActionType } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { withSuspense } from '../../../components/withSuspense'
-import { useGetWorkqueueActionConfiguration } from '../../workqueues/EventOverview/components/useGetActionConfiguration'
+import { useGetWorkqueueActionConfiguration } from '../../workqueues/Actions/useGetActionConfiguration'
 
 const StyledButton = styled(Button)`
   max-width: 150px;

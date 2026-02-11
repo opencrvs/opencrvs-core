@@ -40,7 +40,7 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useUserAllowedActions'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
