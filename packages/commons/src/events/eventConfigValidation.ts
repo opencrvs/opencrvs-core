@@ -146,6 +146,8 @@ export function validateActionOrder(
 
     const validActionTypes: string[] = [
       ...WorkqueueActionType.options,
+      ActionType.ASSIGN,
+      ActionType.UNASSIGN,
       ...customActionTypes
     ]
 

@@ -35,10 +35,7 @@ export function SearchResultItemTitle({
   const { width } = useWindowSize()
   const navigate = useNavigate()
   const { getEventTitle } = useEventTitle()
-  const { title, useFallbackTitle } = getEventTitle(
-    eventConfig,
-    event as EventIndex
-  )
+  const { title, useFallbackTitle } = getEventTitle(eventConfig, event)
 
   const isWideScreen = width > theme.grid.breakpoints.lg
   const renderIconWithName = () =>
@@ -53,10 +50,7 @@ export function SearchResultItemTitle({
       />
     )
 
-  if (
-    localEventStatus === ExtendedEventStatuses.OUTBOX ||
-    localEventStatus === ExtendedEventStatuses.DRAFT
-  ) {
+  if (localEventStatus === ExtendedEventStatuses.OUTBOX) {
     return renderIconWithName()
   }
 
