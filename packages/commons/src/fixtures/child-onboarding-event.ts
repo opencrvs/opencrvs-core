@@ -15,11 +15,11 @@ import {
 } from '../events/EventConfigInput'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
+import { field } from '../events/field'
 import { CHILD_ONBOARDING_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { createFieldConditionals, not } from '../conditionals/conditionals'
-import { field } from '../events/field'
 
 function generateTranslationConfig(message: string): TranslationConfig {
   return {
