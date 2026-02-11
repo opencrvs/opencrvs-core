@@ -21,9 +21,9 @@ import {
   EventConfig,
   deepDropNulls,
   applyDraftToEventIndex,
-  CtaActionType,
   getEventConfigById,
-  Draft
+  Draft,
+  WorkqueueActionType
 } from '@opencrvs/commons/client'
 
 import { formattedDuration } from '../../../../../utils/date-formatting'
@@ -319,7 +319,7 @@ function buildAvailableActionComponents({
 }: {
   event: EventIndex
   localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
-  action: { type: CtaActionType }
+  action: { type: WorkqueueActionType }
   isWideScreen: boolean
   redirectParam: string
 }) {
@@ -377,7 +377,7 @@ export function processEventsToRows({
   eventConfigs: EventConfig[]
   drafts: Draft[]
   outbox: OutboxEventIndex[]
-  action: { type: CtaActionType }
+  action: { type: WorkqueueActionType }
   redirectParam: string
   isWideScreen: boolean
   isOnline: boolean

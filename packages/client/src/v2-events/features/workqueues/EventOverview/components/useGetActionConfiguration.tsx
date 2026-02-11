@@ -9,32 +9,70 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useMemo } from 'react'
-import { CtaActionType, EventIndex } from '@opencrvs/commons/client'
-import { useActionConfigurationResolver } from './useActionConfigurationResolver'
+import {
+  ActionType,
+  EventIndex,
+  WorkqueueActionType
+} from '@opencrvs/commons/client'
+import {
+  useAssignmentActionConfigurationResolver,
+  useEventActionConfigurationResolver
+} from './useActionConfigurationResolver'
+import { ActionMenuActionType, ActionMenuItem } from './utils'
+import { useCustomActionConfigs } from './useCustomActionConfigs'
 
 /**
  * Given an event and action type, returns the configuration for the action item.
  * Used to determine CTA button state for search result rows.
+ *
+ * Note: This handles only a subset of action types.
+ * 1. Assignment actions or custom actions are not available for workqueue item CTAs
+ * 2. Rendering items with modals is costly and intentionally omitted. Which luckily align with point 1.
+ *
+ *
  */
-export function useGetActionConfiguration(
+export function useGetWorkqueueActionConfiguration(
   event: EventIndex,
-  actionType: CtaActionType
+  actionType: WorkqueueActionType
 ) {
-  const { resolveAction } = useActionConfigurationResolver(event)
+  const { resolveAction } = useEventActionConfigurationResolver(event)
+
   return resolveAction(actionType)
 }
 
 /**
  *
  * @returns array of action menu item configurations.
- * Excludes 'READ' action as it's used for the CTA button and not the dropdown menu.
  */
-export function useGetActionMenuConfigurations(event: EventIndex) {
-  const { resolveAction, modals } = useActionConfigurationResolver(event)
+export function useGetActionMenuActionConfigurations(event: EventIndex): {
+  modals: [React.ReactNode[], React.ReactNode]
+  actions: ActionMenuItem[]
+} {
+  const { resolveAction, modals: eventModals } =
+    useEventActionConfigurationResolver(event)
+  const { resolveAction: resolveAssignmentAction, modal: assignModal } =
+    useAssignmentActionConfigurationResolver(event)
+
+  const { customActionModal, customActionConfigs } =
+    useCustomActionConfigs(event)
+
   const actions = useMemo(
-    () => CtaActionType.exclude(['READ']).options.map(resolveAction),
-    [resolveAction]
+    () =>
+      ActionMenuActionType.options.map((actionType) => {
+        if (
+          actionType === ActionType.ASSIGN ||
+          actionType === ActionType.UNASSIGN
+        ) {
+          return resolveAssignmentAction(actionType)
+        }
+
+        return resolveAction(actionType)
+      }),
+    [resolveAction, resolveAssignmentAction]
   )
 
-  return { modals, actions }
+  return {
+    modals: [[...eventModals, assignModal], customActionModal],
+    actions: [...actions, ...customActionConfigs]
+  }
 }

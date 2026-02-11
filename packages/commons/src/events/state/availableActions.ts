@@ -90,7 +90,10 @@ const ACTION_FILTERS: {
     !flags.includes(InherentFlags.REJECTED) &&
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.ARCHIVE]: (flags) =>
-    !flags.some((flag) => flag.endsWith(':requested'))
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.ASSIGN]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')) &&
+    !flags.includes(InherentFlags.CORRECTION_REQUESTED)
 }
 
 /**

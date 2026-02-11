@@ -14,24 +14,31 @@ import {
   ActionType,
   EventIndex,
   configurableEventScopeAllowed,
-  ITokenPayload,
-  CustomActionConfig
+  CustomActionConfig,
+  getOrThrow,
+  isActionEnabled,
+  isActionVisible
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useCustomActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
+import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { ActionMenuItem } from './utils'
 
-export function useCustomActionConfigs(
-  event: EventIndex,
-  authentication: ITokenPayload
-): {
+export function useCustomActionConfigs(event: EventIndex): {
   customActionModal: React.ReactNode
   customActionConfigs: ActionMenuItem[]
 } {
   const scopes = useSelector(getScope)
+  const validatorContext = useValidatorContext()
+
+  const userId = getOrThrow(
+    validatorContext?.user?.sub,
+    'Authentication is not available but is required'
+  )
+
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { customActionModal, onCustomAction } = useCustomActionModal(
     event.id,
@@ -39,7 +46,7 @@ export function useCustomActionConfigs(
   )
   const { useFindEventFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(useFindEventFromCache(event.id).data)
-  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+  const assignmentStatus = getAssignmentStatus(event, userId)
 
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
@@ -63,16 +70,19 @@ export function useCustomActionConfigs(
         icon: action.icon ?? ('PencilLine' as const),
         onClick: async (workqueue?: string) =>
           onCustomAction(action, workqueue),
-        disabled: !isDownloadedAndAssignedToUser,
-        hidden: false,
+        disabled:
+          !isDownloadedAndAssignedToUser &&
+          isActionEnabled(action, event, validatorContext),
+        hidden: !isActionVisible(action, event, validatorContext),
         type: ActionType.CUSTOM,
         customActionType: action.customActionType
       }))
   }, [
     eventConfiguration.actions,
     scopes,
-    event.type,
     isDownloadedAndAssignedToUser,
+    validatorContext,
+    event,
     onCustomAction
   ])
 

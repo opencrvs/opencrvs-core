@@ -19,8 +19,8 @@ import {
   EventIndex,
   EventConfig,
   WorkqueueColumn,
-  CtaActionType,
-  TranslationConfig
+  TranslationConfig,
+  WorkqueueActionType
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -64,7 +64,7 @@ export const SearchResultComponent = ({
   title: string
   totalResults: number
   tabBarContent?: React.ReactNode
-  action: { type: CtaActionType }
+  action: { type: WorkqueueActionType }
   emptyMessage?: TranslationConfig
 }>) => {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)

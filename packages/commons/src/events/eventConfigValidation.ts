@@ -10,7 +10,7 @@
  */
 import * as z from 'zod/v4'
 import { EventConfig } from './EventConfig'
-import { ActionType, workqueueActions } from './ActionType'
+import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import { findAllFields, getDeclarationFields } from './utils'
 import { FieldType } from './FieldType'
@@ -145,7 +145,7 @@ export function validateActionOrder(
       .map((action) => action.customActionType)
 
     const validActionTypes: string[] = [
-      ...workqueueActions.options,
+      ...WorkqueueActionType.options,
       ...customActionTypes
     ]
 

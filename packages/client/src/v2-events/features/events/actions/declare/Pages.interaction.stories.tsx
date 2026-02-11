@@ -131,7 +131,7 @@ export const SaveAndExit: Story = {
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
           }),
-          tRPCMsw.event.search.query((input) => {
+          tRPCMsw.event.search.query(() => {
             return {
               results: [
                 getCurrentEventState(

@@ -10,61 +10,109 @@
  */
 import {
   ActionType,
+  ActionTypes,
   ClientSpecificAction,
-  CtaActionType,
+  configurableEventScopeAllowed,
+  DisplayableAction,
   EventConfig,
   EventIndex,
+  EventStatus,
   getActionConfig,
   getAvailableActionsForEvent,
   getOrThrow,
-  InherentFlags,
   isActionEnabled,
   isActionVisible,
-  ValidatorContext
+  ITokenPayload,
+  ValidatorContext,
+  WorkqueueActionType
 } from '@opencrvs/commons/client'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
-import { getAvailableAssignmentActions } from './useAllowedActionConfigurations'
+import { ActionMenuActionType } from './utils'
+
+const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
+  EventStatus.enum.NOTIFIED,
+  EventStatus.enum.DECLARED,
+  EventStatus.enum.REGISTERED,
+  EventStatus.enum.ARCHIVED
+]
+
+function getAvailableAssignmentActions(
+  event: EventIndex,
+  authentication: ITokenPayload
+) {
+  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+  const eventStatus = event.status
+
+  const mayUnassignOthers = configurableEventScopeAllowed(
+    authentication.scope,
+    ['record.unassign-others'],
+    event.type
+  )
+
+  if (!STATUSES_THAT_CAN_BE_ASSIGNED.includes(eventStatus)) {
+    return []
+  }
+
+  if (assignmentStatus === AssignmentStatus.UNASSIGNED) {
+    return [ActionType.ASSIGN]
+  }
+
+  if (
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS &&
+    mayUnassignOthers
+  ) {
+    return [ActionType.UNASSIGN]
+  }
+
+  if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
+    return [ActionType.UNASSIGN]
+  }
+
+  return []
+}
 
 /**
  * Resolves "internal" conditionals for actions. e.g. ensures user is online when needed, or the event is downloaded and assigned to the user for certain actions.
  */
 function resolveInternalActionConditions({
-  event,
   actionType,
   isOnline,
   isDownloaded,
-  userId,
+  assignmentStatus,
   isAssigning,
   isDeclareDraftOpen
 }: {
-  event: EventIndex
-  actionType: CtaActionType | ClientSpecificAction
+  assignmentStatus: AssignmentStatus
+  actionType:
+    | WorkqueueActionType
+    | ActionMenuActionType
+    | (typeof ActionTypes.enum)['CUSTOM']
   isOnline: boolean
   isDownloaded: boolean
-  userId: string
   isAssigning: boolean
   isDeclareDraftOpen: boolean
-}) {
-  const assignmentStatus = getAssignmentStatus(event, userId)
+}): {
+  enabled: boolean
+  visible: boolean
+} {
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
-  const eventIsWaitingForCorrection = event.flags.includes(
-    InherentFlags.CORRECTION_REQUESTED
-  )
 
   switch (actionType) {
     case ActionType.ASSIGN:
+    case ActionType.UNASSIGN:
       return {
-        enabled: isOnline && !eventIsWaitingForCorrection,
+        enabled: isOnline,
         visible: true
       }
-    case ActionType.UNASSIGN:
-      return { enabled: isOnline, visible: true }
     case ActionType.ARCHIVE:
     case ActionType.DELETE:
     case ActionType.EDIT:
     case ActionType.REJECT:
     case ActionType.REGISTER:
+    case ActionType.PRINT_CERTIFICATE:
+    case ActionType.REQUEST_CORRECTION:
+    case ClientSpecificAction.REVIEW_CORRECTION_REQUEST:
       return { enabled: isDownloadedAndAssignedToUser, visible: true }
     case ActionType.MARK_AS_DUPLICATE:
       return {
@@ -76,19 +124,12 @@ function resolveInternalActionConditions({
         enabled: isDownloadedAndAssignedToUser || isDeclareDraftOpen,
         visible: true
       }
-    case ActionType.PRINT_CERTIFICATE:
-    case ActionType.REQUEST_CORRECTION:
-      return {
-        enabled: isDownloadedAndAssignedToUser && !eventIsWaitingForCorrection,
-        visible: !eventIsWaitingForCorrection
-      }
-    case ClientSpecificAction.REVIEW_CORRECTION_REQUEST:
-      return {
-        enabled: isDownloadedAndAssignedToUser,
-        visible: eventIsWaitingForCorrection
-      }
     case ActionType.READ:
       return { enabled: true, visible: true }
+    default:
+      throw new Error(
+        `Unknown action type ${actionType} when resolving internal action conditionals`
+      )
   }
 }
 
@@ -107,19 +148,26 @@ export function resolveActionConditionals({
   isAssigning
 }: {
   event: EventIndex
-  actionType: CtaActionType
+  actionType:
+    | WorkqueueActionType
+    | ActionMenuActionType
+    | (typeof ActionTypes.enum)['CUSTOM']
   isDeclareDraftOpen: boolean
   validatorContext: ValidatorContext
-  isActionAllowedForUser: (action: CtaActionType) => boolean
+  isActionAllowedForUser: (action: DisplayableAction) => boolean
   eventConfiguration: EventConfig
   isOnline: boolean
   isDownloaded: boolean
   isAssigning: boolean
-}) {
+}): {
+  enabled: boolean
+  visible: boolean
+} {
   const user = getOrThrow(
     validatorContext.user,
     'Cannot determine action conditionals without user information'
   )
+
   // @todo: come up with a name or single method for these. Confusing that they are separate but both required to determine if an action is enabled/visible.
   const availableEventActions = getAvailableActionsForEvent(event)
   const availableAssignActions = getAvailableAssignmentActions(event, user)
@@ -128,6 +176,8 @@ export function resolveActionConditionals({
     ...availableEventActions,
     ...availableAssignActions
   ]
+
+  const assignmentStatus = getAssignmentStatus(event, user.sub)
 
   // 2. Check if the action is available for the event at all.
   const actionIsAvailableForEvent = allAvailableActions.includes(actionType)
@@ -153,11 +203,10 @@ export function resolveActionConditionals({
 
   // 6. Run hardcoded internal business rules. @TODO: These should be conditionals.
   const internalConditions = resolveInternalActionConditions({
-    event,
     actionType,
     isOnline,
+    assignmentStatus,
     isDownloaded,
-    userId: user.sub,
     isAssigning,
     isDeclareDraftOpen
   })

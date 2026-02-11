@@ -22,7 +22,7 @@ import {
 } from './CountryConfigQueryInput'
 import { AvailableIcons } from '../icons'
 import { QueryType } from './EventIndex'
-import { ActionType, workqueueActions } from './ActionType'
+import { WorkqueueActionType } from './ActionType'
 
 export const mandatoryColumns = defineWorkqueuesColumns([
   {
@@ -43,13 +43,6 @@ export const mandatoryColumns = defineWorkqueuesColumns([
   }
 ])
 
-/** Workqueue Call-to-action -button action type */
-export const CtaActionType = z.enum([
-  ...workqueueActions.options,
-  ActionType.READ
-] as const)
-export type CtaActionType = z.infer<typeof CtaActionType>
-
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
  */
@@ -61,7 +54,7 @@ export const WorkqueueConfig = z
     ),
     query: CountryConfigQueryType,
     action: z
-      .object({ type: CtaActionType })
+      .object({ type: WorkqueueActionType })
       .describe(
         'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
       ),
@@ -83,7 +76,7 @@ export const WorkqueueConfigInput = z.object({
   ),
   query: CountryConfigQueryInputType,
   action: z
-    .object({ type: CtaActionType })
+    .object({ type: WorkqueueActionType })
     .describe(
       'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
     ),

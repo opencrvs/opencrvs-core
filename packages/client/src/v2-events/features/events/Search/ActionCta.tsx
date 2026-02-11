@@ -11,10 +11,10 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { EventIndex, CtaActionType } from '@opencrvs/commons/client'
+import { EventIndex, WorkqueueActionType } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { withSuspense } from '../../../components/withSuspense'
-import { useGetActionConfiguration } from '../../workqueues/EventOverview/components/useGetActionConfiguration'
+import { useGetWorkqueueActionConfiguration } from '../../workqueues/EventOverview/components/useGetActionConfiguration'
 
 const StyledButton = styled(Button)`
   max-width: 150px;
@@ -25,6 +25,8 @@ const StyledButton = styled(Button)`
 `
 
 /**
+ * Component rendering CTA button for an event in search result.
+ *
  * @returns next available action cta based on the given event.
  */
 function ActionCtaComponent({
@@ -33,12 +35,12 @@ function ActionCtaComponent({
   redirectParam
 }: {
   event: EventIndex
-  actionType: CtaActionType
+  actionType: WorkqueueActionType
   redirectParam?: string
 }) {
   const intl = useIntl()
 
-  const config = useGetActionConfiguration(event, actionType)
+  const config = useGetWorkqueueActionConfiguration(event, actionType)
 
   return (
     <StyledButton

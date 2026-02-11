@@ -170,10 +170,7 @@ export function ActionMenu({
   const assignedOfficeName =
     (assignedOffice && locations.get(assignedOffice)?.name) || ''
 
-  const [modals, actionMenuItems] = useAllowedActionConfigurations(
-    eventIndex,
-    auth
-  )
+  const [modals, actionMenuItems] = useAllowedActionConfigurations(eventIndex)
 
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
 

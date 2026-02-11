@@ -16,8 +16,8 @@ import {
   EventIndex,
   getUUID,
   ClientSpecificAction,
-  CtaActionType,
-  getOrThrow
+  getOrThrow,
+  WorkqueueActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -43,14 +43,7 @@ import { useAuthentication } from '@client/utils/userUtils'
  * Used to support both workqueue item CTA button and action menu items.
  */
 export function useEventActionsOnClick(event: EventIndex) {
-  const maybeAuth = useAuthentication()
-  const authentication = getOrThrow(
-    maybeAuth,
-    'Authentication is not available but is required'
-  )
-
   const navigate = useNavigate()
-  const events = useEvents()
   const {
     clearEphemeralFormState,
     deleteDeclaration,
@@ -67,70 +60,15 @@ export function useEventActionsOnClick(event: EventIndex) {
     eventConfiguration,
     event.type
   )
-  const [assignModal, openAssignModal] = useModal()
-  const { useFindEventFromCache } = events.getEvent
-  const cachedEvent = useFindEventFromCache(event.id)
-  const { refetch: refetchEvent } = cachedEvent
-  const intl = useIntl()
-  const { getUser } = useUsers()
-  const { getLocations } = useLocations()
-  const locations = getLocations.useSuspenseQuery()
-  const assignedToUser = getUser.useQuery(event.assignedTo || '', {
-    enabled: !!event.assignedTo
-  })
-  const assignedUserFullName = assignedToUser.data
-    ? getUsersFullName(assignedToUser.data.name, intl.locale)
-    : null
-  const assignedOffice = assignedToUser.data?.primaryOfficeId
-  const assignedOfficeName =
-    (assignedOffice && locations.get(assignedOffice)?.name) || ''
-  const isDownloaded = Boolean(cachedEvent.data)
-  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
-
-  const isDownloadedAndAssignedToUser =
-    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
   const eventId = event.id
 
   const onClick = useCallback(
     async (
-      actionType: CtaActionType | ClientSpecificAction,
+      actionType: WorkqueueActionType | ClientSpecificAction,
       workqueue?: string
     ) => {
       switch (actionType) {
-        case ActionType.ASSIGN:
-          return (async () => {
-            const assign = await openAssignModal<boolean>((close) => (
-              <AssignModal close={close} />
-            ))
-            if (!assign) {
-              return
-            }
-            await events.actions.assignment.assign.mutate({
-              eventId,
-              assignedTo: authentication.sub,
-              refetchEvent
-            })
-          })()
-        case ActionType.UNASSIGN:
-          return (async () => {
-            const unassign = await openAssignModal<boolean>((close) => (
-              <UnassignModal
-                assignedSelf={isDownloadedAndAssignedToUser}
-                close={close}
-                name={assignedUserFullName}
-                officeName={assignedOfficeName}
-              />
-            ))
-            if (!unassign) {
-              return
-            }
-            await events.actions.assignment.unassign.mutateAsync({
-              eventId,
-              transactionId: getUUID(),
-              assignedTo: null
-            })
-          })()
         case ActionType.DELETE:
           return deleteDeclaration(eventId, workqueue)
         case ActionType.DECLARE:
@@ -170,13 +108,10 @@ export function useEventActionsOnClick(event: EventIndex) {
           const correctionPages = eventConfiguration.actions.find(
             (action) => action.type === ActionType.REQUEST_CORRECTION
           )?.correctionForm.pages
-
           if (!correctionPages) {
             throw new Error('No page ID found for request correction')
           }
-
           clearEphemeralFormState()
-
           if (correctionPages.length === 0) {
             return navigate(
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
@@ -185,7 +120,6 @@ export function useEventActionsOnClick(event: EventIndex) {
               )
             )
           }
-
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
               { eventId, pageId: correctionPages[0].id },
@@ -216,14 +150,7 @@ export function useEventActionsOnClick(event: EventIndex) {
       }
     },
     [
-      openAssignModal,
-      events.actions.assignment,
       eventId,
-      authentication.sub,
-      refetchEvent,
-      isDownloadedAndAssignedToUser,
-      assignedUserFullName,
-      assignedOfficeName,
       deleteDeclaration,
       clearEphemeralFormState,
       navigate,
@@ -235,6 +162,78 @@ export function useEventActionsOnClick(event: EventIndex) {
 
   return {
     onClick,
-    modals: [assignModal, deleteModal, rejectionModal, quickActionModal]
+    modals: [deleteModal, rejectionModal, quickActionModal]
   }
+}
+
+export function useAssignmentActions(event: EventIndex) {
+  const maybeAuth = useAuthentication()
+  const authentication = getOrThrow(
+    maybeAuth,
+    'Authentication is not available but is required'
+  )
+  const events = useEvents()
+  const { useFindEventFromCache } = events.getEvent
+  const cachedEvent = useFindEventFromCache(event.id)
+  const { refetch: refetchEvent } = cachedEvent
+  const isDownloaded = Boolean(cachedEvent.data)
+  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+  const isDownloadedAndAssignedToUser =
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
+  const intl = useIntl()
+  const { getUser } = useUsers()
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
+  const assignedToUser = getUser.useQuery(event.assignedTo || '', {
+    enabled: !!event.assignedTo
+  })
+  const assignedUserFullName = assignedToUser.data
+    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    : null
+  const assignedOffice = assignedToUser.data?.primaryOfficeId
+  const assignedOfficeName =
+    (assignedOffice && locations.get(assignedOffice)?.name) || ''
+  const [modal, openModal] = useModal()
+
+  const onAssign = useCallback(async () => {
+    const assign = await openModal<boolean>((close) => (
+      <AssignModal close={close} />
+    ))
+    if (!assign) {
+      return
+    }
+    await events.actions.assignment.assign.mutate({
+      eventId: event.id,
+      assignedTo: authentication.sub,
+      refetchEvent
+    })
+  }, [openModal, events, event.id, authentication.sub, refetchEvent])
+
+  const onUnassign = useCallback(async () => {
+    const unassign = await openModal<boolean>((close) => (
+      <UnassignModal
+        assignedSelf={isDownloadedAndAssignedToUser}
+        close={close}
+        name={assignedUserFullName}
+        officeName={assignedOfficeName}
+      />
+    ))
+    if (!unassign) {
+      return
+    }
+    await events.actions.assignment.unassign.mutateAsync({
+      eventId: event.id,
+      transactionId: getUUID(),
+      assignedTo: null
+    })
+  }, [
+    openModal,
+    isDownloadedAndAssignedToUser,
+    assignedUserFullName,
+    assignedOfficeName,
+    events,
+    event.id
+  ])
+
+  return { onAssign, onUnassign, modal }
 }

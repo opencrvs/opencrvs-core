@@ -9,12 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { z } from 'zod/v4'
 import {
   ActionType,
   ClientSpecificAction,
   WorkqueueActionType,
   ActionTypes,
-  TranslationConfig
+  TranslationConfig,
+  DisplayableAction
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components'
 
@@ -93,7 +95,10 @@ export const actionLabels = {
   }
 } as const
 
-export const actionIcons: Record<ActionMenuActionType, IconProps['name']> = {
+export const actionIcons: Record<
+  ActionMenuActionType | WorkqueueActionType,
+  IconProps['name']
+> = {
   [ActionType.ASSIGN]: 'PushPin',
   [ActionType.UNASSIGN]: 'ArrowCircleDown',
   [ActionType.ARCHIVE]: 'Archive',
@@ -109,7 +114,7 @@ export const actionIcons: Record<ActionMenuActionType, IconProps['name']> = {
   [ActionType.READ]: 'Eye'
 }
 
-export interface ActionConfig {
+export interface ActionCtaConfig<T extends DisplayableAction> {
   label: TranslationConfig
   icon: IconProps['name']
   /** onClick is used when clicking an action menu item. */
@@ -117,10 +122,19 @@ export interface ActionConfig {
   disabled?: boolean
   hidden?: boolean
   customActionType?: string
+  type: T
 }
 
-export type ActionMenuActionType = WorkqueueActionType | ClientSpecificAction
+export const ActionMenuActionType = z
+  .enum([
+    ...WorkqueueActionType.options,
+    ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
+    ActionType.ASSIGN,
+    ActionType.UNASSIGN
+  ])
+  .exclude([ActionType.READ])
 
-export interface ActionMenuItem extends ActionConfig {
-  type: ActionMenuActionType | (typeof ActionTypes.enum)['CUSTOM']
-}
+export type ActionMenuActionType = z.infer<typeof ActionMenuActionType>
+export type ActionMenuItem = ActionCtaConfig<
+  ActionMenuActionType | (typeof ActionTypes.enum)['CUSTOM']
+>
