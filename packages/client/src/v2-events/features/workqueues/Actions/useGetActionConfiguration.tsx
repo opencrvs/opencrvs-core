@@ -29,7 +29,6 @@ import { useCustomActionConfigs } from './useCustomActionConfigs'
  * 1. Assignment actions or custom actions are not available for workqueue item CTAs
  * 2. Rendering items with modals is costly and intentionally omitted. Which luckily align with point 1.
  *
- *
  */
 export function useGetWorkqueueActionConfiguration(
   event: EventIndex,
@@ -41,8 +40,18 @@ export function useGetWorkqueueActionConfiguration(
 }
 
 /**
- *
+ * Note: Running the function is costly. Using it in list items will wreck the performance.
  * @returns array of action menu item configurations.
+ *
+ * Note: This handles only multiple action types.
+ * 1. Assignment actions
+ * 2. Custom actions
+ * 3. Event actions/Workqueue actions.
+ *
+ * If you need only single action configuration, consider using @see useGetWorkqueueActionConfiguration.
+ * If you need only resolve conditionals, consider using @see ../resolveActionConditionals directly.
+ *
+ *
  */
 export function useGetActionMenuActionConfigurations(event: EventIndex): {
   modals: [React.ReactNode[], React.ReactNode]

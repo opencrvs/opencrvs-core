@@ -142,7 +142,13 @@ export function useResolveActionConditionals(
   })
 }
 
-export function useAssignmentActionVisibility(event: EventIndex) {
+/**
+ *
+ * Given event,
+ * @returns resolver function for assignment action configuration conditionals.
+ *
+ */
+export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const validatorContext = useValidatorContext()
   const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
@@ -154,7 +160,7 @@ export function useAssignmentActionVisibility(event: EventIndex) {
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
 
-  const resolveVisibility = useCallback(
+  const resolveConditionals = useCallback(
     (actionType: typeof ActionType.ASSIGN | typeof ActionType.UNASSIGN) => {
       const { enabled, visible } = resolveActionConditionals({
         event,
@@ -181,7 +187,7 @@ export function useAssignmentActionVisibility(event: EventIndex) {
     ]
   )
 
-  return { resolveVisibility }
+  return { resolveConditionals }
 }
 
 /**
@@ -192,14 +198,14 @@ export function useAssignmentActionVisibility(event: EventIndex) {
  */
 export function useAssignmentActionConfigurationResolver(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const { resolveVisibility } = useAssignmentActionVisibility(event)
+  const { resolveConditionals } = useResolveAssignmentActionConditionals(event)
   const { onAssign, onUnassign, modal } = useAssignmentActions(event)
 
   const resolveAction = useCallback(
     (
       actionType: typeof ActionType.ASSIGN | typeof ActionType.UNASSIGN
     ): ActionMenuItem => {
-      const { enabled, visible } = resolveVisibility(actionType)
+      const { enabled, visible } = resolveConditionals(actionType)
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
       return {
@@ -214,7 +220,7 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
         hidden: !visible
       }
     },
-    [resolveVisibility, eventConfiguration, onAssign, onUnassign]
+    [resolveConditionals, eventConfiguration, onAssign, onUnassign]
   )
 
   return { resolveAction, modal }

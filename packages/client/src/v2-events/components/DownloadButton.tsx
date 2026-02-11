@@ -32,7 +32,7 @@ import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
 import { AssignModal } from './AssignModal'
 import {
-  useAssignmentActionVisibility,
+  useResolveAssignmentActionConditionals,
   useResolveActionConditionals
 } from '../features/workqueues/Actions/useActionConfigurationResolver'
 
@@ -90,9 +90,9 @@ export function DownloadButton({
     'Authentication is not available but is required'
   )
 
-  const { resolveVisibility } = useAssignmentActionVisibility(event)
-  const unassign = resolveVisibility(ActionType.UNASSIGN)
-  const assign = resolveVisibility(ActionType.ASSIGN)
+  const { resolveConditionals } = useResolveAssignmentActionConditionals(event)
+  const unassign = resolveConditionals(ActionType.UNASSIGN)
+  const assign = resolveConditionals(ActionType.ASSIGN)
 
   const { getEvent, actions } = useEvents()
   const users = useUsers()

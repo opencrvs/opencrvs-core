@@ -39,8 +39,11 @@ import { useAuthentication } from '@client/utils/userUtils'
 
 /**
  * Given an event,
- * returns onClick handlers for actions and any modals needed for those actions.
- * Used to support both workqueue item CTA button and action menu items.
+ * @returns onClick handlers for workqueue item actions, and any modals that should be rendered alongside.
+ *
+ * Note: If you need assignment actions @see useAssignmentActions.
+ * They are intentionally separated, since assignment actions are not used everywhere (e.g. in Workqueue CTA buttons) and have additional dependencies that can be costly to run.
+ *
  */
 export function useEventActionsOnClick(event: EventIndex) {
   const navigate = useNavigate()
@@ -166,6 +169,14 @@ export function useEventActionsOnClick(event: EventIndex) {
   }
 }
 
+/**
+ * Given an event,
+ * @returns handlers for assignment actions, and any modals that should be rendered alongside.
+ *
+ * Note: If you need event actions @see useEventActionsOnClick.
+ * They are intentionally separated, since assignment actions are not used everywhere (e.g. in Workqueue CTA buttons) and have additional dependencies that can be costly to run.
+ *
+ */
 export function useAssignmentActions(event: EventIndex) {
   const maybeAuth = useAuthentication()
   const authentication = getOrThrow(

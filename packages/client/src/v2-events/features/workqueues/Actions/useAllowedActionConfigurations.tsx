@@ -15,7 +15,8 @@ import { useGetActionMenuActionConfigurations } from './useGetActionConfiguratio
 
 /**
  *
- * @returns a tuple containing modals (which must be rendered in the parent where this hook is called) and a list of action menu items based on the event state and scopes provided.
+ * @returns a tuple containing modals (which must be rendered in the parent where this hook is called)
+ *  and a list of action menu items based on the event state and scopes provided.
  */
 export function useAllowedActionConfigurations(
   event: EventIndex
