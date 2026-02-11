@@ -14,6 +14,7 @@
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { omit } from 'lodash'
+import { FormikProps } from 'formik'
 import {
   EventState,
   FieldConfig,
@@ -144,6 +145,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   readonlyMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
+  setFieldTouched: FormikProps<EventState>['setFieldTouched']
 }
 
 export const GeneratedInputField = React.memo(
@@ -160,7 +162,8 @@ export const GeneratedInputField = React.memo(
     value,
     form,
     disabled,
-    readonlyMode
+    readonlyMode,
+    setFieldTouched
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
     // If label is hidden or default message is empty, we don't need to render label
@@ -280,6 +283,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...field.inputFieldProps}>
           <DateField.Input
             {...inputProps}
+            setFieldTouched={setFieldTouched}
             value={field.value}
             onChange={(val: string) =>
               onFieldValueChange(fieldDefinition.id, val)
@@ -673,7 +677,6 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />

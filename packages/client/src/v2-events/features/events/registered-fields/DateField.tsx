@@ -13,10 +13,12 @@ import format from 'date-fns/format'
 import React, { useState, useRef, useEffect } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import styled from 'styled-components'
+import { FormikProps } from 'formik'
 import {
   DateField as DateFieldType,
   DatetimeValue,
   DateValue,
+  EventState,
   SerializedNowDateTime
 } from '@opencrvs/commons/client'
 import { IDateFieldProps as DateFieldProps } from '@opencrvs/components/lib/DateField'
@@ -71,11 +73,13 @@ function resolveNowForDateInput(value: string | SerializedNowDateTime): string {
 function DateInput({
   onChange,
   value = '',
+  setFieldTouched,
   ...props
   // @TODO CIHAN: dont rely on DateFieldProps
 }: DateFieldProps & {
   onChange: (newValue: string) => void
   value: string | SerializedNowDateTime
+  setFieldTouched: FormikProps<EventState>['setFieldTouched']
 }) {
   const { meta, focusInput, disabled, ignorePlaceHolder, id, onBlur, name } =
     props
@@ -110,10 +114,6 @@ function DateInput({
   const [date, setDate] = useState<DateState>(initialDate)
   const prevDateRef = useRef<DateState>(initialDate)
 
-  /** We need to store a ref to the last blur event so we can use it in the */
-  const lastBlurEventRef = useRef<React.FocusEvent<HTMLInputElement> | null>(
-    null
-  )
   const ddRef = useRef<HTMLInputElement>(null)
   const mmRef = useRef<HTMLInputElement>(null)
   const yyyyRef = useRef<HTMLInputElement>(null)
@@ -136,15 +136,13 @@ function DateInput({
     const dateValidityChanged = isNewDateValid !== wasPrevDateValid
 
     // Update the stored value and validate when the date changes from invalid to valid or vice versa
-    if (dateValidityChanged && lastBlurEventRef.current) {
+    if (dateValidityChanged) {
       cleanOnChange(completeDate)
       prevDateRef.current = date
-
-      // This onBlur() expects an FocusEvent e as param. We store it in a ref so we can use it in this useEffect.
-      onBlur && onBlur(lastBlurEventRef.current)
+      setFieldTouched(id, true, true)
       return
     }
-  }, [date, onChange, onBlur])
+  }, [date, onChange, onBlur, id, setFieldTouched])
 
   return (
     <DateWrapper id={id}>
@@ -159,11 +157,10 @@ function DateInput({
         max={MAX_DAY_NUMBER}
         min={1}
         placeholder={ignorePlaceHolder ? '' : 'dd'}
-        touched={meta && meta.touched}
+        touched={true}
         type="number"
         value={dd}
         onBlur={(e) => {
-          lastBlurEventRef.current = e
           const newDd = e.target.value
           // Set dd to the new value with leading 0 if needed
           setDate({ ...date, dd: newDd.length === 1 ? `0${newDd}` : newDd })
@@ -181,7 +178,6 @@ function DateInput({
             mmRef.current.focus()
           }
 
-          // @TODO CIHAN: test without this?
           setDate({ ...date, dd: target.value })
         }}
         onWheel={(event) => event.currentTarget.blur()}
@@ -198,11 +194,10 @@ function DateInput({
         maxLength={2}
         min={1}
         placeholder={ignorePlaceHolder ? '' : 'mm'}
-        touched={meta && meta.touched}
+        touched={true}
         type="number"
         value={mm}
         onBlur={(e) => {
-          lastBlurEventRef.current = e
           const newMm = e.target.value
           // Set mm to the new value with leading 0 if needed
           setDate({ ...date, mm: newMm.length === 1 ? `0${newMm}` : newMm })
@@ -220,7 +215,6 @@ function DateInput({
             yyyyRef.current.focus()
           }
 
-          // @TODO CIHAN: test without this?
           setDate({ ...date, mm: target.value })
         }}
         onWheel={(event) => event.currentTarget.blur()}
@@ -235,11 +229,10 @@ function DateInput({
         isDisabled={disabled}
         maxLength={4}
         placeholder={ignorePlaceHolder ? '' : 'yyyy'}
-        touched={meta && meta.touched}
+        touched={true}
         type="number"
         value={yyyy}
         onBlur={(e) => {
-          lastBlurEventRef.current = e
           const newYyyy = e.target.value
           setDate({ ...date, yyyy: newYyyy })
         }}

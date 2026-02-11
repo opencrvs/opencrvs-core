@@ -85,7 +85,13 @@ type AllProps = {
  */
 type UsedFormikProps = Pick<
   FormikProps<EventState>,
-  'values' | 'setTouched' | 'setValues' | 'touched' | 'resetForm' | 'setErrors'
+  | 'values'
+  | 'setTouched'
+  | 'setValues'
+  | 'touched'
+  | 'resetForm'
+  | 'setErrors'
+  | 'setFieldTouched'
 >
 
 const fadeIn = keyframes`
@@ -171,7 +177,8 @@ export function FormSectionComponent({
   onAllFieldsValidated,
   isCorrection = false,
   parentId,
-  validatorContext
+  validatorContext,
+  setFieldTouched
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
@@ -484,6 +491,7 @@ export function FormSectionComponent({
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}
+                  setFieldTouched={setFieldTouched}
                   touched={
                     /**
                      * We check the full path so that,
