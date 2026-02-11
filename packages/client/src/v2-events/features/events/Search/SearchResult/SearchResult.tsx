@@ -34,7 +34,9 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useOnlineStatus } from '@client/utils'
 import { deserializeSearchParams, serializeSearchParams } from '../utils'
+import { useEventTitle } from '../../useEvents/useEventTitle'
 import {
+  enrichEventsForWorkueue,
   COLUMNS,
   createSortFunction,
   getColumns,
@@ -95,6 +97,7 @@ export const SearchResultComponent = ({
 
   const { getOutbox } = useEvents()
   const { getAllRemoteDrafts } = useDrafts()
+  const { getEventTitle } = useEventTitle()
 
   const outbox = getOutbox()
   const drafts = getAllRemoteDrafts()
@@ -121,21 +124,30 @@ export const SearchResultComponent = ({
   const isWideScreen = windowWidth > theme.grid.breakpoints.lg
 
   const rows = useMemo(() => {
-    return orderBy(
-      processEventsToRows({
-        events,
-        eventConfigs,
-        drafts,
-        outbox,
-        action,
-        redirectParam: slug || '',
-        isWideScreen,
-        isOnline,
-        intl
-      }),
-      sortedCol,
+    const enrichedEvents = enrichEventsForWorkueue({
+      getEventTitle,
+      events,
+      eventConfigs,
+      drafts,
+      outbox
+    })
+
+    const orderedEvents = orderBy(
+      enrichedEvents,
+      (item) => item.enrichedEvent[sortedCol],
       sortOrder
     )
+
+    return processEventsToRows({
+      enrichedEvents: orderedEvents,
+      eventConfigs,
+      outbox,
+      action,
+      redirectParam: slug || '',
+      isWideScreen,
+      isOnline,
+      intl
+    })
   }, [
     events,
     eventConfigs,

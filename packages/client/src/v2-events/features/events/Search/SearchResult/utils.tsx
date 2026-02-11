@@ -360,37 +360,30 @@ function buildAvailableActionComponents({
 }
 
 /**
- * Given events with their configs, returns Workqueue row data with necessary transformations and computed fields
+ * Given events with their configs, returns Workqueue row data with necessary transformations and computed fields to perform sorting and display of actions based on local event status (accounting for outbox and drafts).
  */
-export function processEventsToRows({
+export function enrichEventsForWorkueue({
   events,
   eventConfigs,
   drafts,
   outbox,
-  action,
-  redirectParam,
-  isWideScreen,
-  isOnline,
-  intl
+  getEventTitle
 }: {
   events: EventIndex[]
   eventConfigs: EventConfig[]
   drafts: Draft[]
   outbox: OutboxEventIndex[]
-  action: { type: WorkqueueActionType }
-  redirectParam: string
-  isWideScreen: boolean
-  isOnline: boolean
-  intl: IntlShape
+  getEventTitle: (
+    eventConfig: EventConfig,
+    event: EventIndex
+  ) => { title: string | null; useFallbackTitle: boolean }
 }) {
   return events.map((event) => {
     const eventConfig = getEventConfigById(eventConfigs, event.type)
-
     const draft = first(drafts.filter((d) => d.eventId === event.id))
     const eventWithDraft = draft
       ? deepDropNulls(applyDraftToEventIndex(event, draft, eventConfig))
       : event
-
     const localEventStatus = getLocalEventStatus({
       eventId: eventWithDraft.id,
       currentStatus: eventWithDraft.status,
@@ -398,29 +391,66 @@ export function processEventsToRows({
       drafts
     })
 
+    const { title } = getEventTitle(eventConfig, eventWithDraft)
+    return {
+      enrichedEvent: { ...eventWithDraft, title },
+      localEventStatus
+    }
+  })
+}
+
+/**
+ * Given events with their configs, returns Workqueue row data with necessary transformations and computed fields
+ */
+export function processEventsToRows({
+  enrichedEvents,
+  eventConfigs,
+  outbox,
+  action,
+  redirectParam,
+  isWideScreen,
+  isOnline,
+  intl
+}: {
+  enrichedEvents: {
+    enrichedEvent: EventIndex & { title: string | null }
+    useFallbackTitle: boolean
+    localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
+  }[]
+  eventConfigs: EventConfig[]
+  outbox: OutboxEventIndex[]
+  action: { type: WorkqueueActionType }
+  redirectParam: string
+  isWideScreen: boolean
+  isOnline: boolean
+  intl: IntlShape
+}) {
+  return enrichedEvents.map(({ enrichedEvent, localEventStatus }) => {
+    const eventConfig = getEventConfigById(eventConfigs, enrichedEvent.type)
+
     const actionComponents = buildAvailableActionComponents({
-      event: eventWithDraft,
-      localEventStatus: eventWithDraft.status,
+      event: enrichedEvent,
+      localEventStatus,
       action,
       isWideScreen,
       redirectParam
     })
 
-    const outboxMeta = outbox.find((o) => o.id === eventWithDraft.id)?.meta
+    const outboxMeta = outbox.find((o) => o.id === enrichedEvent.id)?.meta
 
     return {
-      ...eventWithDraft,
+      ...enrichedEvent,
       actions: actionComponents,
       label: eventConfig.label,
       type: intl.formatMessage(eventConfig.label),
-      createdAt: formattedDuration(new Date(eventWithDraft.createdAt)),
-      updatedAt: formattedDuration(new Date(eventWithDraft.updatedAt)),
+      createdAt: formattedDuration(new Date(enrichedEvent.createdAt)),
+      updatedAt: formattedDuration(new Date(enrichedEvent.updatedAt)),
       status: intl.formatMessage(messages.eventStatus, {
         status: localEventStatus
       }),
       title: (
         <SearchResultItemTitle
-          event={eventWithDraft}
+          event={enrichedEvent}
           eventConfig={eventConfig}
           localEventStatus={localEventStatus}
           redirectParam={redirectParam}
