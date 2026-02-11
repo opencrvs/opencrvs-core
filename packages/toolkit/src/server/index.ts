@@ -8,7 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { contract, implement } from '@opencrvs/commons/countryconfig/contract'
-
-export const server = implement(contract)
-export { contract }
+export { contract, implement } from '@opencrvs/commons/countryconfig/contract'

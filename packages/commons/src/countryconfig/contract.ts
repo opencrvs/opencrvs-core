@@ -10,21 +10,32 @@
  */
 import * as z from 'zod'
 import { oc } from '@orpc/contract'
+import { EventConfig } from '../events/EventConfig'
+import { WorkqueueConfig } from '../events/WorkqueueConfig'
+import { EventDocument } from '../events/EventDocument'
+import { ActionTypes } from '../events/ActionType'
+import { Roles } from '../roles'
+
 export { implement } from '@orpc/server'
 
 export const contract = {
-  example: oc
+  events: oc.output(z.array(EventConfig)),
+  workqueue: oc.output(z.array(WorkqueueConfig)),
+  roles: oc.output(Roles),
+  application: {
+    config: oc.output(z.any())
+  },
+  certificates: oc.output(z.any()),
+  users: oc.output(z.any()),
+  locations: oc.output(z.any()),
+  trigger: oc
     .input(
       z.object({
-        name: z.string(),
-        age: z.number().int().min(0)
+        eventType: z.string(),
+        actionType: ActionTypes,
+        event: EventDocument
       })
     )
-    .output(
-      z.object({
-        id: z.number().int().min(0),
-        name: z.string(),
-        age: z.number().int().min(0)
-      })
-    )
+    .output(z.any()),
+  content: oc.output(z.any())
 }

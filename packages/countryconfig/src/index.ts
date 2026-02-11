@@ -1,7 +1,13 @@
-import { server } from '@opencrvs/toolkit/server'
+import { contract, implement } from '@opencrvs/toolkit/server'
 
-const example = server.example.handler(({ input }) => {
-  return { id: 1, name: input.name, age: input.age }
-})
+const server = implement(contract)
 
-console.log(example)
+server.events.handler(() => [])
+server.workqueue.handler(() => [])
+server.roles.handler(() => [])
+server.application.config.handler(() => ({}))
+server.certificates.handler(() => ({}))
+server.users.handler(() => [])
+server.locations.handler(() => [])
+server.trigger.handler(() => ({}))
+server.content.handler(() => ({}))

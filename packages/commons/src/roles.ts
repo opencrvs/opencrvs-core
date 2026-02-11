@@ -8,10 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Scope } from './scopes'
+import * as z from 'zod'
 
-export type Roles = Array<{
-  id: string
-  labels: Array<{ language: string; label: string }>
-  scopes: Scope[]
-}>
+export const Roles = z.array(
+  z.object({
+    id: z.string(),
+    labels: z.array(z.object({ language: z.string(), label: z.string() })),
+    scopes: z.array(z.string())
+  })
+)
+
+export type Roles = z.infer<typeof Roles>
