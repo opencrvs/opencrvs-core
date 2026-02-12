@@ -245,8 +245,6 @@ export function getDefaultColumns(
   )
 }
 
-// @todo: update when workqueue actions buttons are updated
-// @TODO: separate types for action button vs other columns
 export function getColumns({
   isWideScreen,
   intl,

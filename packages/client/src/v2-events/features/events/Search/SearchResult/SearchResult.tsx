@@ -139,8 +139,6 @@ export const SearchResultComponent = ({
       sortOrder
     )
 
-    console.log('orderedEvents', orderedEvents, sortedCol, sortOrder)
-
     return processEventsToRows({
       enrichedEvents: orderedEvents,
       eventConfigs,

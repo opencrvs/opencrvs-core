@@ -161,7 +161,6 @@ export function resolveActionConditionals({
     'Cannot determine action conditionals without user information'
   )
 
-  // @todo: come up with a name or single method for these. Confusing that they are separate but both required to determine if an action is enabled/visible.
   const availableEventActions = getAvailableActionsForEvent(event)
   const availableAssignActions = getAvailableAssignmentActions(event, user)
   // 1. Gather all available actions for the event, including assignment actions

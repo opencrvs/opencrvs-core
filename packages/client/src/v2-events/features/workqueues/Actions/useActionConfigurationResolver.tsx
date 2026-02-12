@@ -147,6 +147,7 @@ export function useResolveActionConditionals(
  * Given event,
  * @returns resolver function for assignment action configuration conditionals.
  *
+ * Separated due to limited use and poor-ish performance in list views.
  */
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)

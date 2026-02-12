@@ -44,6 +44,7 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
 
+  // If actions are not precompiled, every rendered item pays the cost of resolving action configuration conditionals, which can be expensive when there are many items in a list view.
   precompileActionSchemas(eventConfigs)
 
   const workqueues = useCountryConfigWorkqueueConfigurations()
