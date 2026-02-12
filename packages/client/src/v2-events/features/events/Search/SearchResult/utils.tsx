@@ -126,9 +126,10 @@ export const COLUMNS = {
   NOTIFICATION_SENT: 'notificationSent',
   NAME: 'title',
   TRACKING_ID: 'trackingId',
-  REGISTRATION_NO: 'registrationNumber',
-  NONE: 'none'
+  REGISTRATION_NO: 'registrationNumber'
 } as const
+
+export const DEFAULT_SORT_BY_COLUMN = COLUMNS.LAST_UPDATED
 
 function changeSortedColumn(
   columnName: string,
@@ -183,7 +184,7 @@ function changeSortedColumn(
       newSortedCol = COLUMNS.REGISTRATION_NO
       break
     default:
-      newSortedCol = COLUMNS.NONE
+      newSortedCol = DEFAULT_SORT_BY_COLUMN
   }
 
   if (newSortedCol === presentSortedCol) {
@@ -191,7 +192,7 @@ function changeSortedColumn(
       newSortOrder = SORT_ORDER.DESCENDING
     } else {
       newSortOrder = SORT_ORDER.ASCENDING
-      newSortedCol = COLUMNS.NONE
+      newSortedCol = DEFAULT_SORT_BY_COLUMN
     }
   }
 
@@ -377,7 +378,10 @@ export function enrichEventsForWorkueue({
     eventConfig: EventConfig,
     event: EventIndex
   ) => { title: string | null; useFallbackTitle: boolean }
-}) {
+}): {
+  enrichedEvent: EventIndex & { title: string | null }
+  localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
+}[] {
   return events.map((event) => {
     const eventConfig = getEventConfigById(eventConfigs, event.type)
     const draft = first(drafts.filter((d) => d.eventId === event.id))
@@ -414,7 +418,6 @@ export function processEventsToRows({
 }: {
   enrichedEvents: {
     enrichedEvent: EventIndex & { title: string | null }
-    useFallbackTitle: boolean
     localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
   }[]
   eventConfigs: EventConfig[]

@@ -20,7 +20,8 @@ import {
   EventConfig,
   WorkqueueColumn,
   TranslationConfig,
-  WorkqueueActionType
+  WorkqueueActionType,
+  getMixedPath
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -42,7 +43,8 @@ import {
   getColumns,
   getDefaultColumns,
   getNoResultsText,
-  processEventsToRows
+  processEventsToRows,
+  DEFAULT_SORT_BY_COLUMN
 } from './utils'
 
 const WithTestId = styled.div.attrs({ 'data-testid': 'search-result' })``
@@ -104,7 +106,7 @@ export const SearchResultComponent = ({
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
-  >(COLUMNS.LAST_UPDATED)
+  >(DEFAULT_SORT_BY_COLUMN)
 
   const [sortOrder, setSortOrder] = useState<
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
@@ -134,7 +136,7 @@ export const SearchResultComponent = ({
 
     const orderedEvents = orderBy(
       enrichedEvents,
-      (item) => item.enrichedEvent[sortedCol],
+      (item) => getMixedPath(item, sortedCol),
       sortOrder
     )
 
@@ -155,6 +157,7 @@ export const SearchResultComponent = ({
     outbox,
     action,
     slug,
+    getEventTitle,
     isWideScreen,
     isOnline,
     intl,
