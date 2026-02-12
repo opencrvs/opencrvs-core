@@ -89,12 +89,14 @@ function getLocalEventStatus({
   const isInOutbox = outbox.some((outboxEvent) => outboxEvent.id === eventId)
   const isInDrafts = drafts.some((draft) => draft.eventId === eventId)
 
-  if (isInOutbox) {
-    return ExtendedEventStatuses.OUTBOX
-  }
-
+  // Note: The order is intentional here. Drafts take precedence over outbox.
+  // When triggering event, there is a brief moment when both draft and outbox may exist.
   if (isInDrafts) {
     return ExtendedEventStatuses.DRAFT
+  }
+
+  if (isInOutbox) {
+    return ExtendedEventStatuses.OUTBOX
   }
 
   return currentStatus
