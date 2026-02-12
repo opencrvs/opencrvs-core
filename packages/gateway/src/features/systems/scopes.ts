@@ -28,11 +28,7 @@ import { COUNTRY_CONFIG_URL, PRODUCTION } from '@gateway/constants'
  * Gateway converts these to appropriate scopes.
  * Note: REINDEX is hidden from UI - it's managed internally.
  */
-export type SystemIntegrationType =
-  | 'HEALTH'
-  | 'NATIONAL_ID'
-  | 'RECORD_SEARCH'
-  | 'IMPORT_EXPORT'
+export type SystemIntegrationType = 'HEALTH' | 'RECORD_SEARCH'
 
 /**
  * Default scopes for each system integration type.
@@ -41,15 +37,7 @@ export type SystemIntegrationType =
  */
 const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, Scope[]> = {
   HEALTH: [SCOPES.NOTIFICATION_API],
-  NATIONAL_ID: [SCOPES.NATIONALID],
-  RECORD_SEARCH: [SCOPES.RECORDSEARCH],
-  IMPORT_EXPORT: [
-    SCOPES.RECORD_IMPORT,
-    SCOPES.RECORD_EXPORT,
-    SCOPES.RECORDSEARCH,
-    SCOPES.USER_DATA_SEEDING,
-    SCOPES.RECORD_REINDEX
-  ]
+  RECORD_SEARCH: [SCOPES.RECORDSEARCH]
 }
 
 /**
@@ -62,9 +50,8 @@ const CONFIGURABLE_SCOPES_BY_TYPE: Record<
   ConfigurableScopeType[]
 > = {
   HEALTH: ['record.create', 'record.notify'],
-  NATIONAL_ID: [],
-  RECORD_SEARCH: [],
-  IMPORT_EXPORT: []}
+  RECORD_SEARCH: []
+}
 
 /**
  * In-memory cache for event configurations (production only)
