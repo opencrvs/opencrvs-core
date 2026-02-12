@@ -91,14 +91,13 @@ function useActionGuard(
 
   // In the declare flow, user is allowed if they have permission for either DECLARE or NOTIFY;
   // otherwise strict permission by action type.
-  const hasDeclareOrNotifyPermission =
-    actionType === ActionType.DECLARE &&
-    (isActionAllowed(ActionType.DECLARE) || isActionAllowed(ActionType.NOTIFY))
+  const isPermitted =
+    actionType === ActionType.DECLARE
+      ? isActionAllowed(ActionType.DECLARE) ||
+        isActionAllowed(ActionType.NOTIFY)
+      : isActionAllowed(actionType)
 
-  const hasActionPermission =
-    actionType !== ActionType.DECLARE && isActionAllowed(actionType)
-
-  if (!hasDeclareOrNotifyPermission && !hasActionPermission) {
+  if (!isPermitted) {
     throw new Error(
       `User does not have permission to perform action ${actionType} on event ${event.id}`
     )
