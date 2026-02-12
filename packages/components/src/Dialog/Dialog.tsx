@@ -158,6 +158,7 @@ export function Dialog({
               </DialogTitle>
               <Button
                 data-testid="close-dialog"
+                id="close-btn"
                 type="icon"
                 size="medium"
                 onClick={handleClose}
