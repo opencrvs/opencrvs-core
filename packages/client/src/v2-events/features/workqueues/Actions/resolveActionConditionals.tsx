@@ -17,6 +17,7 @@ import {
   EventConfig,
   EventIndex,
   EventStatus,
+  filterActionsByFlags,
   getActionConfig,
   getAvailableActionsForEvent,
   getOrThrow,
@@ -40,6 +41,7 @@ function getAvailableAssignmentActions(
   event: EventIndex,
   authentication: ITokenPayload
 ) {
+  filterActionsByFlags
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
   const eventStatus = event.status
 
@@ -49,26 +51,23 @@ function getAvailableAssignmentActions(
     event.type
   )
 
+  let actions: ActionTypes[] = []
   if (!STATUSES_THAT_CAN_BE_ASSIGNED.includes(eventStatus)) {
     return []
   }
 
   if (assignmentStatus === AssignmentStatus.UNASSIGNED) {
-    return [ActionType.ASSIGN]
-  }
-
-  if (
+    actions = [ActionType.ASSIGN]
+  } else if (
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS &&
     mayUnassignOthers
   ) {
-    return [ActionType.UNASSIGN]
+    actions = [ActionType.UNASSIGN]
+  } else if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
+    actions = [ActionType.UNASSIGN]
   }
 
-  if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
-    return [ActionType.UNASSIGN]
-  }
-
-  return []
+  return filterActionsByFlags(actions, event.flags)
 }
 
 /**
@@ -175,10 +174,8 @@ export function resolveActionConditionals({
 
   // 2. Check if the action is available for the event at all.
   const actionIsAvailableForEvent = allAvailableActions.includes(actionType)
-
   // 3. Check if the user can perform it.
   const actionIsAllowedForUser = isActionAllowedForUser(actionType)
-
   const actionConfig = getActionConfig({ eventConfiguration, actionType })
 
   // 4. Check if the action is enabled/visible based on the configuration conditionals.

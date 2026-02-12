@@ -106,7 +106,7 @@ const ACTION_FILTERS: {
  * Some actions can be performed only if certain flags are
  * present and others only if certain flags are absent
  */
-function filterActionsByFlags(
+export function filterActionsByFlags(
   actions: DisplayableAction[],
   flags: Flag[]
 ): DisplayableAction[] {

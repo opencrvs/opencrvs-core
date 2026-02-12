@@ -172,6 +172,8 @@ export function ActionMenu({
 
   const [modals, actionMenuItems] = useAllowedActionConfigurations(eventIndex)
 
+  console.log('actionMenuItems', actionMenuItems)
+
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
 
   const assignedToOther =

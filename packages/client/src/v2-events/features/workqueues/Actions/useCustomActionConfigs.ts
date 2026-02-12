@@ -17,7 +17,8 @@ import {
   CustomActionConfig,
   getOrThrow,
   isActionEnabled,
-  isActionVisible
+  isActionVisible,
+  filterActionsByFlags
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
@@ -56,6 +57,9 @@ export function useCustomActionConfigs(event: EventIndex): {
       .filter(
         (action): action is CustomActionConfig =>
           action.type === ActionType.CUSTOM
+      )
+      .filter(
+        (action) => filterActionsByFlags([action.type], event.flags).length > 0
       )
       .filter((action) =>
         configurableEventScopeAllowed(
