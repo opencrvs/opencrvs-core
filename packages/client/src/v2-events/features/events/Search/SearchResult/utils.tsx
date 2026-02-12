@@ -126,10 +126,9 @@ export const COLUMNS = {
   NOTIFICATION_SENT: 'notificationSent',
   NAME: 'title',
   TRACKING_ID: 'trackingId',
-  REGISTRATION_NO: 'registrationNumber'
+  REGISTRATION_NO: 'registrationNumber',
+  NONE: 'none'
 } as const
-
-export const DEFAULT_SORT_BY_COLUMN = COLUMNS.LAST_UPDATED
 
 function changeSortedColumn(
   columnName: string,
@@ -184,7 +183,7 @@ function changeSortedColumn(
       newSortedCol = COLUMNS.REGISTRATION_NO
       break
     default:
-      newSortedCol = DEFAULT_SORT_BY_COLUMN
+      newSortedCol = COLUMNS.NONE
   }
 
   if (newSortedCol === presentSortedCol) {
@@ -192,7 +191,7 @@ function changeSortedColumn(
       newSortOrder = SORT_ORDER.DESCENDING
     } else {
       newSortOrder = SORT_ORDER.ASCENDING
-      newSortedCol = DEFAULT_SORT_BY_COLUMN
+      newSortedCol = COLUMNS.NONE
     }
   }
 

@@ -43,8 +43,7 @@ import {
   getColumns,
   getDefaultColumns,
   getNoResultsText,
-  processEventsToRows,
-  DEFAULT_SORT_BY_COLUMN
+  processEventsToRows
 } from './utils'
 
 const WithTestId = styled.div.attrs({ 'data-testid': 'search-result' })``
@@ -106,7 +105,7 @@ export const SearchResultComponent = ({
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
-  >(DEFAULT_SORT_BY_COLUMN)
+  >(COLUMNS.LAST_UPDATED)
 
   const [sortOrder, setSortOrder] = useState<
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
