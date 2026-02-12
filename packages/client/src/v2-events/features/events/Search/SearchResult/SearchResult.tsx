@@ -20,8 +20,7 @@ import {
   EventConfig,
   WorkqueueColumn,
   TranslationConfig,
-  WorkqueueActionType,
-  getMixedPath
+  WorkqueueActionType
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -135,9 +134,12 @@ export const SearchResultComponent = ({
 
     const orderedEvents = orderBy(
       enrichedEvents,
-      (item) => getMixedPath(item, sortedCol),
+      // @ts-expect-error --- default columns have non-matching keys like 'NONE' that will never be found.
+      (item) => item.enrichedEvent[sortedCol] ?? '',
       sortOrder
     )
+
+    console.log('orderedEvents', orderedEvents, sortedCol, sortOrder)
 
     return processEventsToRows({
       enrichedEvents: orderedEvents,
