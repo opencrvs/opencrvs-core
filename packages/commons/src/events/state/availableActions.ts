@@ -92,11 +92,9 @@ const ACTION_FILTERS: {
   [ActionType.ARCHIVE]: (flags) =>
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.ASSIGN]: (flags) =>
-    !flags.some((flag) => flag.endsWith(':requested')) &&
-    !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.UNASSIGN]: (flags) =>
-    !flags.some((flag) => flag.endsWith(':requested')) &&
-    !flags.includes(InherentFlags.CORRECTION_REQUESTED),
+    !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.CUSTOM]: (flags) =>
     !flags.some((flag) => flag.endsWith(':requested'))
 }
