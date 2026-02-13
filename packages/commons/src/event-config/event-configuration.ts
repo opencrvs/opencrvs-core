@@ -26,5 +26,11 @@ export function createEventFieldConfig(fieldId: EventFieldIdInput) {
     fieldType: 'event' as const
   }
 
-  return createSearchConfig(baseField)
+  return {
+    /**
+     * Internal reference to the event field.
+     */
+    $$event: baseField.fieldId,
+    ...createSearchConfig(baseField)
+  }
 }

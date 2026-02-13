@@ -118,7 +118,7 @@ export const FieldConfigSchema = BaseField.extend({
 })
 
 /**
- * The event fields that are available for advanced search. These are the values
+ * The event fields that are available for advanced search, date of event, summary. These are the values
  * that can be passed to the `event` function to create a field config.
  */
 export const EventFieldIdInput = z.enum([

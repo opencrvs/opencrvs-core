@@ -12,13 +12,24 @@ import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
+import {
+  AdvancedSearchConfig,
+  EventFieldId,
+  EventFieldIdInput
+} from './AdvancedSearchConfig'
 import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
+import { isFieldReference } from '../conditionals/conditionals'
 extendZodWithOpenApi(z)
+
+export const EventFieldReference = z
+  .object({ $$event: EventFieldIdInput })
+  .describe(
+    'Reference to a field defined in the event metadata, using the field id.'
+  )
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -32,9 +43,11 @@ export const EventConfig = z
       .describe(
         'Machine-readable identifier of the event (e.g. "birth", "death").'
       ),
-    dateOfEvent: FieldReference.optional().describe(
-      'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
-    ),
+    dateOfEvent: FieldReference.or(EventFieldReference)
+      .optional()
+      .describe(
+        'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
+      ),
     title: TranslationConfig.describe(
       'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
     ),
@@ -107,9 +120,13 @@ export const EventConfig = z
       })
     }
 
-    if (event.dateOfEvent) {
+    if (
+      event.dateOfEvent !== undefined &&
+      isFieldReference(event.dateOfEvent)
+    ) {
+      const dateOfEvent = event.dateOfEvent
       const eventDateFieldId = getDeclarationFields(event).find(
-        ({ id }) => id === event.dateOfEvent?.$$field
+        ({ id }) => id === dateOfEvent.$$field
       )
       if (!eventDateFieldId) {
         ctx.addIssue({
