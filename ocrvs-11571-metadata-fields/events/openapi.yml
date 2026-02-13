@@ -27,19 +27,37 @@ paths:
                       type: string
                       description: Machine-readable identifier of the event (e.g. "birth", "death").
                     dateOfEvent:
-                      type: object
-                      properties:
-                        $$field:
-                          type: string
-                          description: Unique identifier for the field
-                        $$subfield:
-                          type: array
-                          items:
-                            type: string
-                          description: 'If the FieldValue is an object, subfield can be used to refer to
-                            e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-                      required:
-                        - $$field
+                      anyOf:
+                        - type: object
+                          properties:
+                            $$field:
+                              type: string
+                              description: Unique identifier for the field
+                            $$subfield:
+                              type: array
+                              items:
+                                type: string
+                              description: 'If the FieldValue is an object, subfield can be used to refer to
+                                e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                          required:
+                            - $$field
+                            - $$subfield
+                          description: Reference to a field by its ID
+                        - type: object
+                          properties:
+                            $$event:
+                              type: string
+                              enum: &a6
+                                - trackingId
+                                - status
+                                - legalStatuses.REGISTERED.acceptedAt
+                                - legalStatuses.REGISTERED.createdAtLocation
+                                - legalStatuses.REGISTERED.registrationNumber
+                                - updatedAt
+                          required:
+                            - $$event
+                          description: Reference to a field defined in the event metadata, using the field
+                            id.
                       description: Reference to the field capturing the date of the event (e.g. date
                         of birth). Defaults to the event creation date if
                         unspecified.
@@ -366,8 +384,7 @@ paths:
 
                                         \    in the country-config >
                                         event.advancedSearch configuration. For
-                                        example:
-                                        event.declaration(\"child.dob\", {
+                                        example: field(\"child.dob\", {
                                         searchCriteriaLabelPrefix:
                                         TranslationConfig }).
 
@@ -620,8 +637,7 @@ paths:
 
                                         \    in the country-config >
                                         event.advancedSearch configuration. For
-                                        example:
-                                        event.declaration(\"child.dob\", {
+                                        example: field(\"child.dob\", {
                                         searchCriteriaLabelPrefix:
                                         TranslationConfig }).
 
@@ -686,7 +702,7 @@ paths:
                                         advanced search form.
                                     fieldId:
                                       type: string
-                                      enum: &a6
+                                      enum: &a7
                                         - event.trackingId
                                         - event.status
                                         - event.legalStatuses.REGISTERED.acceptedAt
@@ -705,7 +721,7 @@ paths:
                         required:
                           - title
                           - fields
-                      default: &a7 []
+                      default: &a8 []
                       description: Configuration of fields available in the advanced search feature.
                   required:
                     - id
@@ -757,7 +773,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 7c3c7e2e-c87b-40ea-95ba-4171f98de84b
+                transactionId: f942ace2-5161-4c7c-9594-a47c165e89b5
                 type: birth
       responses:
         "200":
@@ -843,7 +859,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 2aac8e57-7a51-4731-9674-11479b1fa49e
+                transactionId: 9769d96e-6bc4-4cd7-91a8-1dd9b92a0800
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1158,13 +1174,13 @@ paths:
                 query:
                   allOf:
                     - $ref: "#/components/schemas/QueryType"
-                  default: &a14
+                  default: &a15
                     type: and
                     clauses:
                       - eventType: tennis-club-membership
                         status:
                           type: anyOf
-                          terms: &a15
+                          terms: &a16
                             - CREATED
                             - NOTIFIED
                             - DECLARED
@@ -1286,7 +1302,7 @@ paths:
                             description: Unique identifier of the transaction.
                           createdByUserType:
                             type: string
-                            enum: &a16
+                            enum: &a17
                               - user
                               - system
                             description: Indicates whether the action was created by a human-user or by a
@@ -1322,7 +1338,7 @@ paths:
                               rejected by a third-party integration.
                           type:
                             type: string
-                            enum: &a17
+                            enum: &a18
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -1460,19 +1476,31 @@ components:
           type: string
           description: Machine-readable identifier of the event (e.g. "birth", "death").
         dateOfEvent:
-          type: object
-          properties:
-            $$field:
-              type: string
-              description: Unique identifier for the field
-            $$subfield:
-              type: array
-              items:
-                type: string
-              description: 'If the FieldValue is an object, subfield can be used to refer to
-                e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-          required:
-            - $$field
+          anyOf:
+            - type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+                - $$subfield
+              description: Reference to a field by its ID
+            - type: object
+              properties:
+                $$event:
+                  type: string
+                  enum: *a6
+              required:
+                - $$event
+              description: Reference to a field defined in the event metadata, using the field
+                id.
           description: Reference to the field capturing the date of the event (e.g. date
             of birth). Defaults to the event creation date if unspecified.
         title:
@@ -1779,8 +1807,7 @@ components:
                             the desired prefix
 
                             \    in the country-config > event.advancedSearch
-                            configuration. For example:
-                            event.declaration(\"child.dob\", {
+                            configuration. For example: field(\"child.dob\", {
                             searchCriteriaLabelPrefix: TranslationConfig }).
 
                             \    "
@@ -2011,8 +2038,7 @@ components:
                             the desired prefix
 
                             \    in the country-config > event.advancedSearch
-                            configuration. For example:
-                            event.declaration(\"child.dob\", {
+                            configuration. For example: field(\"child.dob\", {
                             searchCriteriaLabelPrefix: TranslationConfig }).
 
                             \    "
@@ -2069,7 +2095,7 @@ components:
                             advanced search form.
                         fieldId:
                           type: string
-                          enum: *a6
+                          enum: *a7
                         fieldType:
                           type: string
                           enum:
@@ -2082,7 +2108,7 @@ components:
             required:
               - title
               - fields
-          default: *a7
+          default: *a8
           description: Configuration of fields available in the advanced search feature.
       required:
         - id
@@ -2198,6 +2224,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -2214,6 +2241,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -2234,7 +2262,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: &a8 []
+              default: &a9 []
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2257,7 +2285,7 @@ components:
                 required:
                   - validator
                   - message
-              default: &a9 []
+              default: &a10 []
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2284,6 +2312,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -2300,6 +2329,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -2373,6 +2403,7 @@ components:
                               e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                         required:
                           - $$field
+                          - $$subfield
                         description: Reference to a field by its ID
                     required:
                       - id
@@ -2399,7 +2430,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: &a10
+                          enum: &a11
                             - id
                             - name
                             - role
@@ -2447,6 +2478,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -2463,6 +2495,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -2483,7 +2516,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2506,7 +2539,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2533,6 +2566,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -2549,6 +2583,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -2570,7 +2605,7 @@ components:
                   properties:
                     $userField:
                       type: string
-                      enum: *a10
+                      enum: *a11
                     $location:
                       type: string
                   required:
@@ -2621,6 +2656,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -2637,6 +2673,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -2657,7 +2694,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2680,7 +2717,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2707,6 +2744,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -2723,6 +2761,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -2780,6 +2819,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -2796,6 +2836,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -2816,7 +2857,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2839,7 +2880,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2866,6 +2907,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -2882,6 +2924,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -2965,6 +3008,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -2981,6 +3025,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -3001,7 +3046,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3024,7 +3069,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3051,6 +3096,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3067,6 +3113,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -3130,6 +3177,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3146,6 +3194,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -3166,7 +3215,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3189,7 +3238,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3216,6 +3265,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3232,6 +3282,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -3264,6 +3315,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 prefix:
                   $ref: "#/components/schemas/TranslationConfig"
@@ -3301,6 +3353,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3317,6 +3370,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -3337,7 +3391,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3360,7 +3414,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3387,6 +3441,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3403,6 +3458,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -3455,6 +3511,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3471,6 +3528,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -3491,7 +3549,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3514,7 +3572,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3541,6 +3599,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3557,6 +3616,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -3612,6 +3672,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3628,6 +3689,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -3648,7 +3710,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3671,7 +3733,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3698,6 +3760,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3714,6 +3777,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -3783,6 +3847,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3799,6 +3864,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -3819,7 +3885,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3842,7 +3908,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3869,6 +3935,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3885,6 +3952,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -3900,7 +3968,7 @@ components:
                 - SELECT_DATE_RANGE
             defaultValue:
               type: string
-              enum: &a11
+              enum: &a12
                 - last7Days
                 - last30Days
                 - last90Days
@@ -3912,7 +3980,7 @@ components:
                 properties:
                   value:
                     type: string
-                    enum: *a11
+                    enum: *a12
                     description: The value of the option
                   label:
                     description: The label of the option
@@ -3952,6 +4020,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -3968,6 +4037,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -3988,7 +4058,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4011,7 +4081,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4038,6 +4108,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4054,6 +4125,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -4078,7 +4150,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: &a12
+                      enum: &a13
                         - reg12
                         - reg14
                         - reg16
@@ -4122,6 +4194,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4138,6 +4211,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -4158,7 +4232,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4181,7 +4255,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4208,6 +4282,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4224,6 +4299,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -4297,6 +4373,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4313,6 +4390,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -4333,7 +4411,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4356,7 +4434,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4383,6 +4461,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4399,6 +4478,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -4427,7 +4507,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a12
+                      enum: *a13
               default: {}
           required:
             - id
@@ -4460,6 +4540,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4476,6 +4557,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -4496,7 +4578,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4519,7 +4601,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4546,6 +4628,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4562,6 +4645,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -4607,6 +4691,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4623,6 +4708,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -4643,7 +4729,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4666,7 +4752,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4693,6 +4779,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4709,6 +4796,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -4795,6 +4883,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4811,6 +4900,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -4831,7 +4921,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4854,7 +4944,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4881,6 +4971,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -4897,6 +4988,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -4919,7 +5011,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: *a10
+                          enum: *a11
                         $location:
                           type: string
                       required:
@@ -4932,7 +5024,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: *a10
+                          enum: *a11
                         $location:
                           type: string
                       required:
@@ -4945,7 +5037,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: *a10
+                          enum: *a11
                         $location:
                           type: string
                       required:
@@ -5029,6 +5121,10 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                showParentFieldError:
+                  type: boolean
+                  default: false
+                  description: If true, shows the parent field error and hides the subfield error
               default:
                 name:
                   firstname:
@@ -5064,6 +5160,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5080,6 +5177,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -5100,7 +5198,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5123,7 +5221,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5150,6 +5248,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5166,6 +5265,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -5211,6 +5311,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5227,6 +5328,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -5247,7 +5349,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5270,7 +5372,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5297,6 +5399,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5313,6 +5416,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -5358,6 +5462,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5374,6 +5479,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -5394,7 +5500,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5417,7 +5523,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5444,6 +5550,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5460,6 +5567,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -5506,6 +5614,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5522,6 +5631,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -5542,7 +5652,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5565,7 +5675,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5592,6 +5702,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5608,6 +5719,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -5647,7 +5759,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: &a13
+                    enum: &a14
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -5718,6 +5830,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5734,6 +5847,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -5754,7 +5868,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5777,7 +5891,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5804,6 +5918,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5820,6 +5935,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -5865,6 +5981,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5881,6 +5998,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -5901,7 +6019,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5924,7 +6042,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5951,6 +6069,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -5967,6 +6086,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -6033,6 +6153,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6049,6 +6170,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -6069,7 +6191,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6092,7 +6214,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6119,6 +6241,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6135,6 +6258,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -6177,6 +6301,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6193,6 +6318,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -6213,7 +6339,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6236,7 +6362,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6263,6 +6389,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6279,6 +6406,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -6338,6 +6466,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6354,6 +6483,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -6374,7 +6504,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6397,7 +6527,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6424,6 +6554,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6440,6 +6571,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -6485,6 +6617,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6501,6 +6634,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -6521,7 +6655,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6544,7 +6678,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6571,6 +6705,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6587,6 +6722,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -6632,6 +6768,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6648,6 +6785,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -6668,7 +6806,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6691,7 +6829,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6718,6 +6856,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6734,6 +6873,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -6764,7 +6904,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a13
+                    enum: *a14
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -6801,6 +6941,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6817,6 +6958,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -6837,7 +6979,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6860,7 +7002,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6887,6 +7029,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6903,6 +7046,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -6956,6 +7100,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -6972,6 +7117,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -6992,7 +7138,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7015,7 +7161,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7042,6 +7188,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7058,6 +7205,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -7134,7 +7282,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a13
+                    enum: *a14
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -7171,6 +7319,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7187,6 +7336,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -7207,7 +7357,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7230,7 +7380,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7257,6 +7407,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7273,6 +7424,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -7321,6 +7473,7 @@ components:
                                       } }`'
                                 required:
                                   - $$field
+                                  - $$subfield
                                 description: Reference to a field by its ID
                         required:
                           - id
@@ -7367,6 +7520,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7383,6 +7537,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -7403,7 +7558,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7426,7 +7581,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7453,6 +7608,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7469,6 +7625,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -7529,6 +7686,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7545,6 +7703,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -7565,7 +7724,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7588,7 +7747,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7615,6 +7774,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7631,6 +7791,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -7686,6 +7847,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7702,6 +7864,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -7722,7 +7885,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7745,7 +7908,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7772,6 +7935,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7788,6 +7952,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -7837,6 +8002,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 url:
                   type: string
@@ -7875,6 +8041,7 @@ components:
                               e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                         required:
                           - $$field
+                          - $$subfield
                         description: Reference to a field by its ID
                 timeout:
                   type: number
@@ -7915,6 +8082,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -7931,6 +8099,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -7951,7 +8120,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7974,7 +8143,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8001,6 +8170,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -8017,6 +8187,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -8076,6 +8247,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -8092,6 +8264,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -8112,7 +8285,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8135,7 +8308,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8162,6 +8335,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -8178,6 +8352,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -8193,7 +8368,7 @@ components:
                 - VERIFICATION_STATUS
             defaultValue:
               type: string
-              enum: &a19
+              enum: &a20
                 - verified
                 - authenticated
                 - failed
@@ -8242,6 +8417,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -8258,6 +8434,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -8278,7 +8455,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8301,7 +8478,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8328,6 +8505,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -8344,6 +8522,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -8396,6 +8575,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -8412,6 +8592,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -8432,7 +8613,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8455,7 +8636,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8482,6 +8663,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -8498,6 +8680,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -8544,6 +8727,7 @@ components:
                                   }`'
                             required:
                               - $$field
+                              - $$subfield
                             description: Reference to a field by its ID
                           - type: array
                             items:
@@ -8561,6 +8745,7 @@ components:
                                     }`'
                               required:
                                 - $$field
+                                - $$subfield
                               description: Reference to a field by its ID
                         description: Reference to the parent field or fields. When a parent field
                           changes, this field is reset.
@@ -8581,7 +8766,7 @@ components:
                         type: array
                         items:
                           $ref: "#/components/schemas/FieldConditional"
-                        default: *a8
+                        default: *a9
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
                       secured:
@@ -8604,7 +8789,7 @@ components:
                           required:
                             - validator
                             - message
-                        default: *a9
+                        default: *a10
                         description: Additional validation rules applied to the field.
                       helperText:
                         $ref: "#/components/schemas/TranslationConfig"
@@ -8632,6 +8817,7 @@ components:
                                   }`'
                             required:
                               - $$field
+                              - $$subfield
                             description: Reference to a field by its ID
                           - type: array
                             items:
@@ -8649,6 +8835,7 @@ components:
                                     }`'
                               required:
                                 - $$field
+                                - $$subfield
                               description: Reference to a field by its ID
                         description: Reference to the source field or fields. When a value is defined,
                           it is copied from the parent field when changed. If
@@ -8704,6 +8891,7 @@ components:
                                   }`'
                             required:
                               - $$field
+                              - $$subfield
                             description: Reference to a field by its ID
                           - type: array
                             items:
@@ -8721,6 +8909,7 @@ components:
                                     }`'
                               required:
                                 - $$field
+                                - $$subfield
                               description: Reference to a field by its ID
                         description: Reference to the parent field or fields. When a parent field
                           changes, this field is reset.
@@ -8741,7 +8930,7 @@ components:
                         type: array
                         items:
                           $ref: "#/components/schemas/FieldConditional"
-                        default: *a8
+                        default: *a9
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
                       secured:
@@ -8764,7 +8953,7 @@ components:
                           required:
                             - validator
                             - message
-                        default: *a9
+                        default: *a10
                         description: Additional validation rules applied to the field.
                       helperText:
                         $ref: "#/components/schemas/TranslationConfig"
@@ -8792,6 +8981,7 @@ components:
                                   }`'
                             required:
                               - $$field
+                              - $$subfield
                             description: Reference to a field by its ID
                           - type: array
                             items:
@@ -8809,6 +8999,7 @@ components:
                                     }`'
                               required:
                                 - $$field
+                                - $$subfield
                               description: Reference to a field by its ID
                         description: Reference to the source field or fields. When a value is defined,
                           it is copied from the parent field when changed. If
@@ -8877,6 +9068,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -8893,6 +9085,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -8913,7 +9106,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8936,7 +9129,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8963,6 +9156,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -8979,6 +9173,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -9033,6 +9228,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -9049,6 +9245,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -9069,7 +9266,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -9092,7 +9289,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -9119,6 +9316,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -9135,6 +9333,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -9188,6 +9387,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -9204,6 +9404,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the parent field or fields. When a parent field
                 changes, this field is reset.
@@ -9224,7 +9425,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a8
+              default: *a9
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -9247,7 +9448,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a9
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -9274,6 +9475,7 @@ components:
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
+                    - $$subfield
                   description: Reference to a field by its ID
                 - type: array
                   items:
@@ -9290,6 +9492,7 @@ components:
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                     required:
                       - $$field
+                      - $$subfield
                     description: Reference to a field by its ID
               description: Reference to the source field or fields. When a value is defined,
                 it is copied from the parent field when changed. If multiple
@@ -9328,7 +9531,7 @@ components:
                 query:
                   allOf:
                     - $ref: "#/components/schemas/QueryType"
-                  default: *a14
+                  default: *a15
                 limit:
                   type: number
                   default: 100
@@ -9461,7 +9664,7 @@ components:
             - eventType: tennis-club-membership
               status:
                 type: anyOf
-                terms: *a15
+                terms: *a16
               updatedAt:
                 type: range
                 gte: 2025-05-22
@@ -9530,7 +9733,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a15
+            enum: *a16
       required:
         - type
         - terms
@@ -9543,7 +9746,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a15
+          enum: *a16
       required:
         - type
         - term
@@ -9612,7 +9815,7 @@ components:
             - timePeriod
         term:
           type: string
-          enum: *a11
+          enum: *a12
       required:
         - type
         - term
@@ -9637,7 +9840,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a16
+          enum: *a17
       required:
         - type
         - term
@@ -10354,7 +10557,7 @@ components:
                     description: Unique identifier of the transaction.
                   createdByUserType:
                     type: string
-                    enum: *a16
+                    enum: *a17
                     description: Indicates whether the action was created by a human-user or by a
                       system-user.
                   createdAt:
@@ -10388,7 +10591,7 @@ components:
                       rejected by a third-party integration.
                   type:
                     type: string
-                    enum: *a17
+                    enum: *a18
                 required:
                   - id
                   - transactionId
@@ -10460,7 +10663,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10494,7 +10697,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: &a18
+          enum: &a19
             - Requested
             - Accepted
             - Rejected
@@ -10532,7 +10735,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10566,7 +10769,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10601,7 +10804,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10635,7 +10838,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10680,7 +10883,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10714,7 +10917,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10768,7 +10971,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10802,7 +11005,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10837,7 +11040,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10871,7 +11074,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10914,7 +11117,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10948,7 +11151,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10993,7 +11196,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11027,7 +11230,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11062,7 +11265,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11096,7 +11299,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11135,7 +11338,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11169,7 +11372,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11204,7 +11407,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11238,7 +11441,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11277,7 +11480,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11311,7 +11514,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11346,7 +11549,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11380,7 +11583,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11418,7 +11621,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11452,7 +11655,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11500,7 +11703,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11534,7 +11737,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11569,7 +11772,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11603,7 +11806,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11644,7 +11847,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a16
+          enum: *a17
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11678,7 +11881,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a18
+          enum: *a19
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11743,7 +11946,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum: *a15
+          enum: *a16
         legalStatuses:
           type: object
           properties:
@@ -11990,7 +12193,7 @@ components:
                     description: Date range with start and end dates in the format YYYY-MM-DD.
                       Inclusive start, exclusive end.
                   - type: string
-                    enum: *a11
+                    enum: *a12
                   - type: boolean
                   - type: number
                   - type: object
@@ -12071,7 +12274,7 @@ components:
                     required:
                       - loading
                   - type: string
-                    enum: *a19
+                    enum: *a20
                   - type: object
                     nullable: true
                     properties:
@@ -12179,7 +12382,7 @@ components:
                           description: Date range with start and end dates in the format YYYY-MM-DD.
                             Inclusive start, exclusive end.
                         - type: string
-                          enum: *a11
+                          enum: *a12
                         - type: boolean
                         - type: number
                         - type: object
@@ -12260,7 +12463,7 @@ components:
                           required:
                             - loading
                         - type: string
-                          enum: *a19
+                          enum: *a20
                         - type: object
                           nullable: true
                           properties:
