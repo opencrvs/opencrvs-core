@@ -23,7 +23,7 @@ import { IconProps } from '@opencrvs/components'
 export const actionLabels = {
   [ActionType.READ]: {
     defaultMessage: 'Review',
-    description: 'Review action label',
+    description: 'Action label for reading a record from the workqueue',
     id: 'actions.read'
   },
   [ActionType.NOTIFY]: {
