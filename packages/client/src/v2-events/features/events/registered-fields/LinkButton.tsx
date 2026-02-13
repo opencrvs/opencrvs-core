@@ -25,6 +25,11 @@ export function getCleanRedirectURI() {
 function setRedirectURI(url: string) {
   const parsed = new URL(url)
   if (!parsed.searchParams.has('redirect_uri')) {
+    // OAuth (e.g. E-Signet) requires the redirect_uri in the auth and token calls to match exactly.
+    // We remove search params and fragments (e.g. ?from=review, #field)
+    // because they are navigation-specific and can cause redirect URI mismatches,
+    // especially with real E-Signet which validates strictly.
+    // (see issue https://github.com/opencrvs/opencrvs-core/issues/11603).
     parsed.searchParams.set('redirect_uri', getCleanRedirectURI())
   }
   return parsed.toString()
