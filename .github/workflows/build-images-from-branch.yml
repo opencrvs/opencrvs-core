@@ -115,6 +115,7 @@ jobs:
           action: docker/build-push-action@v6
           with: |
             file: packages/Dockerfile.base
+            provenance: false
             push: true
             context: .
             tags: |
@@ -201,6 +202,7 @@ jobs:
             build-args: |
               VERSION=${{ needs.base.outputs.version }}
               BRANCH=${{ needs.base.outputs.branch }}
+            provenance: false
             push: true
             context: .
             tags: |
