@@ -9,17 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useIntl } from 'react-intl'
-import { LinkButtonField, TranslationConfig } from '@opencrvs/commons/client'
+import { LinkButtonField } from '@opencrvs/commons/client'
 import { Button, Icon } from '@opencrvs/components'
-import { useDrafts } from '../../drafts/useDrafts'
 import { throwIfUnsupportedIcon } from './Button'
+
+export function getCleanRedirectURI() {
+  const url = new URL(window.location.href)
+  url.search = ''
+  url.hash = ''
+  return url.toString()
+}
 
 function setRedirectURI(url: string) {
   const parsed = new URL(url)
   if (!parsed.searchParams.has('redirect_uri')) {
-    parsed.searchParams.set('redirect_uri', window.location.href)
+    parsed.searchParams.set('redirect_uri', getCleanRedirectURI())
   }
   return parsed.toString()
 }
