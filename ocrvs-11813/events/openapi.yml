@@ -12513,6 +12513,7 @@ components:
         - declaration
         - status
         - type
+        - content
       additionalProperties: false
     NotifiedAction:
       type: object

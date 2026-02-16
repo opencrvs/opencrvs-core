@@ -826,6 +826,7 @@ components:
         - declaration
         - status
         - type
+        - content
     NotifiedAction:
       type: object
       properties:
@@ -13771,6 +13772,7 @@ components:
         - declaration
         - status
         - type
+        - content
       additionalProperties: false
     NotifiedActionOutput:
       type: object
