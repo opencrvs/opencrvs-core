@@ -52,7 +52,13 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ClientSpecificAction.REVIEW_CORRECTION_REQUEST
   ],
   [EventStatus.enum.ARCHIVED]: [ActionType.READ, ActionType.CUSTOM]
-} as const satisfies Record<EventStatus, DisplayableAction[]>
+} as const satisfies Record<
+  EventStatus,
+  Exclude<
+    DisplayableAction,
+    typeof ActionType.ASSIGN | typeof ActionType.UNASSIGN
+  >[]
+>
 
 const ACTION_FILTERS: {
   [K in DisplayableAction]?: (flags: Flag[]) => boolean
