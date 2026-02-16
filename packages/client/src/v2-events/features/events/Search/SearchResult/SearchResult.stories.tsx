@@ -14,7 +14,8 @@ import {
   eventQueryDataGenerator,
   EventStatus,
   mandatoryColumns,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  WorkqueueActionType
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -46,6 +47,7 @@ const queryData = Array.from({ length: 12 }, (_, i) =>
 export const DefaultSearchResult: Story = {
   name: 'Default Search Result',
   args: {
+    action: { type: WorkqueueActionType.enum.READ },
     eventConfigs: [tennisClubMembershipEvent],
     queryData: [
       eventQueryDataGenerator({

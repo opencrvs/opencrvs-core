@@ -85,6 +85,13 @@ function isActionComponent(action: IAction): action is IActionComponent {
   return (action as IActionComponent).actionComponent !== undefined
 }
 
+function getActionComponent(action: IActionComponent): React.ReactElement {
+  if (typeof action.actionComponent === 'function') {
+    return action.actionComponent()
+  }
+  return action.actionComponent
+}
+
 export function ListItemAction(props: IListItemActionProps) {
   const {
     actions,
@@ -103,7 +110,7 @@ export function ListItemAction(props: IListItemActionProps) {
             isActionComponent(action) ? (
               <ActionButtonContainer key={`ActionButtonContainer-${index}`}>
                 <ActionButton>
-                  {React.cloneElement(action.actionComponent, { id })}
+                  {React.cloneElement(getActionComponent(action), { id })}
                 </ActionButton>
               </ActionButtonContainer>
             ) : (

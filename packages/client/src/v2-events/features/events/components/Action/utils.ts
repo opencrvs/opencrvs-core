@@ -11,37 +11,8 @@
 import {
   Action,
   ActionType,
-  DeclarationUpdateActionType,
-  Draft,
-  UUID
+  DeclarationUpdateActionType
 } from '@opencrvs/commons/client'
-
-export function getEventDrafts(
-  eventId: UUID,
-  localDraft: Draft,
-  drafts: Draft[]
-) {
-  return drafts
-    .filter((d) => d.eventId === eventId)
-    .concat({
-      ...localDraft,
-      /*
-       * Force the local draft always to be the latest
-       * This is to prevent a situation where the local draft gets created,
-       * then a CREATE action request finishes in the background and is stored with a later
-       * timestamp
-       */
-      createdAt: new Date().toISOString(),
-      /*
-       * If params.eventId changes (from tmp id to concrete id) then change the local draft id
-       */
-      eventId,
-      action: {
-        ...localDraft.action,
-        createdAt: new Date().toISOString()
-      }
-    })
-}
 
 export type AvailableActionTypes = Extract<
   ActionType,

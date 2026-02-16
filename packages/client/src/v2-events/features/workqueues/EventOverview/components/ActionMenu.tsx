@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -30,10 +30,8 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import {
-  ActionMenuItem,
-  useAllowedActionConfigurations
-} from './useAllowedActionConfigurations'
+import { useAllowedActionConfigurations } from '../../Actions/useAllowedActionConfigurations'
+import { ActionMenuItem } from '../../Actions/utils'
 
 /** This is the default order of actions if no actionOrder is defined in event configuration. */
 const DEFAULT_ACTION_ORDER = [
@@ -49,7 +47,8 @@ const DEFAULT_ACTION_ORDER = [
   ActionType.REQUEST_CORRECTION,
   ClientSpecificAction.REVIEW_CORRECTION_REQUEST,
   ActionType.CUSTOM,
-  ActionType.UNASSIGN
+  ActionType.UNASSIGN,
+  ActionType.READ
 ]
 
 export function sortActions(
@@ -83,6 +82,47 @@ export function sortActions(
   })
 }
 
+function ActionMenuItems({
+  items,
+  eventConfiguration,
+  redirectParam,
+  onAction
+}: {
+  items: ActionMenuItem[]
+  eventConfiguration: EventConfig
+  redirectParam?: string
+  onAction?: () => void
+}) {
+  const sortedActions = sortActions(items, eventConfiguration)
+  const intl = useIntl()
+
+  if (sortedActions.length === 0) {
+    return (
+      <DropdownMenu.Label>
+        <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
+      </DropdownMenu.Label>
+    )
+  }
+
+  return sortedActions.map((action) => {
+    return (
+      <DropdownMenu.Item
+        key={
+          'customActionType' in action ? action.customActionType : action.type
+        }
+        disabled={'disabled' in action ? action.disabled : false}
+        onClick={async () => {
+          await action.onClick(redirectParam)
+          onAction?.()
+        }}
+      >
+        <Icon color="currentColor" name={action.icon} size="small" />
+        {intl.formatMessage(action.label)}
+      </DropdownMenu.Item>
+    )
+  })
+}
+
 export function ActionMenu({
   eventId,
   onAction
@@ -95,6 +135,7 @@ export function ActionMenu({
   const { getUser } = useUsers()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
+
   const { searchEventById } = useEvents()
 
   const maybeAuth = useAuthentication()
@@ -110,56 +151,31 @@ export function ActionMenu({
   if (eventResults.total === 0) {
     throw new Error(`Event ${eventId} not found`)
   }
-  const eventState = eventResults.results[0]
 
-  const assignedToUser = getUser.useQuery(eventState.assignedTo || '', {
-    enabled: !!eventState.assignedTo
+  const eventIndex = eventResults.results[0]
+
+  if (!eventIndex) {
+    throw new Error(`Event ${eventId} not found`)
+  }
+
+  const assignedToUser = getUser.useQuery(eventIndex.assignedTo || '', {
+    enabled: !!eventIndex.assignedTo
   }).data
+
   const assignedUserFullName = assignedToUser
     ? getUsersFullName(assignedToUser.name, intl.locale)
     : ''
+
   const assignedOffice = assignedToUser?.primaryOfficeId
   const assignedOfficeName =
     (assignedOffice && locations.get(assignedOffice)?.name) || ''
 
-  const [modals, actionMenuItems] = useAllowedActionConfigurations(
-    eventState,
-    auth
-  )
+  const [modals, actionMenuItems] = useAllowedActionConfigurations(eventIndex)
 
-  const { eventConfiguration } = useEventConfiguration(eventState.type)
+  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
 
   const assignedToOther =
-    eventState.assignedTo && eventState.assignedTo !== auth.sub
-
-  function ActionMenuItems() {
-    const sortedActions = sortActions(actionMenuItems, eventConfiguration)
-    if (sortedActions.length === 0) {
-      return (
-        <DropdownMenu.Label>
-          <i>{intl.formatMessage(messages.noActionsAvailable)}</i>
-        </DropdownMenu.Label>
-      )
-    }
-
-    return sortedActions.map((action) => {
-      return (
-        <DropdownMenu.Item
-          key={
-            'customActionType' in action ? action.customActionType : action.type
-          }
-          disabled={'disabled' in action ? action.disabled : false}
-          onClick={async () => {
-            await action.onClick(workqueue)
-            onAction?.()
-          }}
-        >
-          <Icon color="currentColor" name={action.icon} size="small" />
-          {intl.formatMessage(action.label)}
-        </DropdownMenu.Item>
-      )
-    })
-  }
+    eventIndex.assignedTo && eventIndex.assignedTo !== auth.sub
 
   return (
     <>
@@ -185,7 +201,12 @@ export function ActionMenu({
               <DropdownMenu.Separator />
             </>
           )}
-          <ActionMenuItems />
+          <ActionMenuItems
+            eventConfiguration={eventConfiguration}
+            items={actionMenuItems}
+            redirectParam={workqueue}
+            onAction={onAction}
+          />
         </DropdownMenu.Content>
       </DropdownMenu>
       {modals}

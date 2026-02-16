@@ -3,22 +3,18 @@
 exports[`getAvailableActionsForEvent() returns the correct actions for "DECLARED" status with a "declared:requested" flag 1`] = `
 [
   "READ",
-  "CUSTOM",
 ]
 `;
 
 exports[`getAvailableActionsForEvent() returns the correct actions for "REGISTERED" status with a "registered:requested" flag 1`] = `
 [
   "READ",
-  "CUSTOM",
 ]
 `;
 
 exports[`getAvailableActionsForEvent() should return the correct actions for "ARCHIVED" status with no flags 1`] = `
 [
   "READ",
-  "ASSIGN",
-  "UNASSIGN",
   "CUSTOM",
 ]
 `;
@@ -77,7 +73,6 @@ exports[`getAvailableActionsForEvent() should return the correct actions for "NO
 exports[`getAvailableActionsForEvent() should return the correct actions for "REGISTERED" status with "registered:requested" correction-requested flag 1`] = `
 [
   "READ",
-  "CUSTOM",
 ]
 `;
 

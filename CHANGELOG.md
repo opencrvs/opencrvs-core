@@ -22,8 +22,9 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
 #### Workqueue configurations
 
-- The `'DEFAULT'` value is no longer supported in workqueue configuration under `actions: [{ type: CtaActionType }]`. Please ensure you specify a valid `CtaActionType` (see [WorkqueueConfig.ts](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/commons/src/events/WorkqueueConfig.ts)).
-- The `conditionals` option has been removed from workqueue configuration under `actions`. This option was previously present but had no effect.
+- `actions: [{ type: CtaActionType }]`. is deprecated in favor of `action: { type: CtaActionType }`
+- The `conditionals` option has been removed from workqueue configuration under `action`. This option was previously present but had no effect.
+- The `'DEFAULT'` value is no longer supported in workqueue `action` configuration. Please ensure you specify a valid `CtaActionType` (see [WorkqueueConfig.ts](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/commons/src/events/WorkqueueConfig.ts)).
 
 ### New features
 
