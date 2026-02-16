@@ -10,19 +10,11 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import {
-  EventIndex,
-  CtaActionType,
-  getOrThrow,
-  ActionType
-} from '@opencrvs/commons/client'
+import { EventIndex, WorkqueueActionType } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
-import { useAuthentication } from '@client/utils/userUtils'
-import { ROUTES } from '@client/v2-events/routes'
-import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { withSuspense } from '../../../components/withSuspense'
+import { useGetWorkqueueActionConfiguration } from '../../workqueues/Actions/useGetActionConfiguration'
 
 const StyledButton = styled(Button)`
   max-width: 150px;
@@ -32,13 +24,9 @@ const StyledButton = styled(Button)`
   text-overflow: ellipsis;
 `
 
-const reviewLabel = {
-  id: 'buttons.review',
-  defaultMessage: 'Review',
-  description: 'Label for review CTA button'
-}
-
 /**
+ * Component rendering CTA button for an event in search result.
+ *
  * @returns next available action cta based on the given event.
  */
 function ActionCtaComponent({
@@ -47,37 +35,12 @@ function ActionCtaComponent({
   redirectParam
 }: {
   event: EventIndex
-  actionType: CtaActionType
+  actionType: WorkqueueActionType
   redirectParam?: string
 }) {
   const intl = useIntl()
-  const maybeAuth = useAuthentication()
-  const auth = getOrThrow(
-    maybeAuth,
-    'Authentication is not available but is required'
-  )
-  const navigate = useNavigate()
 
-  const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
-  const config = allowedActionConfigs.find((item) => item.type === actionType)
-
-  if (!config || actionType === ActionType.READ) {
-    return (
-      <StyledButton
-        type="primary"
-        onClick={() => {
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
-              { eventId: event.id },
-              { workqueue: redirectParam }
-            )
-          )
-        }}
-      >
-        {intl.formatMessage(reviewLabel)}
-      </StyledButton>
-    )
-  }
+  const config = useGetWorkqueueActionConfiguration(event, actionType)
 
   return (
     <StyledButton

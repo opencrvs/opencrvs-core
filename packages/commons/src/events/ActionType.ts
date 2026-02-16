@@ -81,6 +81,8 @@ export const ActionTypes = z.enum([
   'CUSTOM'
 ])
 
+export type ActionTypes = z.infer<typeof ActionTypes>
+
 /**
  * Non-persisted actions that are used in the client to control the UI.
  */
@@ -129,19 +131,24 @@ export const writeActions = ActionTypes.exclude([
   ActionType.UNASSIGN
 ])
 
-/** Actions which are visible in action menu and workqueue */
-export const workqueueActions = ActionTypes.exclude([
+/** Actions which are availabe for Workqueue CTA menu and workqueue */
+export const WorkqueueActionType = ActionTypes.extract([
   ActionType.READ,
-  ActionType.CREATE,
-  ActionType.NOTIFY,
-  ActionType.DUPLICATE_DETECTED,
-  ActionType.MARK_AS_NOT_DUPLICATE,
-  ActionType.REJECT_CORRECTION,
-  ActionType.APPROVE_CORRECTION,
-  ActionType.CUSTOM
+  ActionType.DELETE,
+  ActionType.DECLARE,
+  ActionType.REGISTER,
+  ActionType.EDIT,
+  ActionType.REJECT,
+  ActionType.MARK_AS_DUPLICATE,
+  ActionType.ARCHIVE,
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION
 ])
+export type WorkqueueActionType = z.infer<typeof WorkqueueActionType>
 
-export type WorkqueueActionType = z.infer<typeof workqueueActions>
+/**
+ * Actions available for display in client. Superset of ActionType.
+ */
 export type DisplayableAction = ActionType | ClientSpecificAction
 
 const META_ACTIONS: DisplayableAction[] = [

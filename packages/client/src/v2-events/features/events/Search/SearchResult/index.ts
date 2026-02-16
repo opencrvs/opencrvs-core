@@ -9,13 +9,5 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { AdvancedSearch } from './AdvancedSearch'
-import { SearchResultIndex as SearchResult } from './SearchResult'
-
-const AdvancedSearchIndex = withSuspense(AdvancedSearch)
-const SearchResultIndex = withSuspense(SearchResult)
-export {
-  AdvancedSearchIndex as AdvancedSearch,
-  SearchResultIndex as SearchResult
-}
+export * from './SearchResult'
+export * from './SearchResultIndex'

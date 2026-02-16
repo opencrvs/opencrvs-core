@@ -16,7 +16,6 @@ import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
-  AssertType,
   Scenario,
   UserRoles
 } from '../ActionMenu.common'

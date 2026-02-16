@@ -51,13 +51,14 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.CUSTOM,
     ClientSpecificAction.REVIEW_CORRECTION_REQUEST
   ],
-  [EventStatus.enum.ARCHIVED]: [
-    ActionType.READ,
-    ActionType.ASSIGN,
-    ActionType.UNASSIGN,
-    ActionType.CUSTOM
-  ]
-} as const satisfies Record<EventStatus, DisplayableAction[]>
+  [EventStatus.enum.ARCHIVED]: [ActionType.READ, ActionType.CUSTOM]
+} as const satisfies Record<
+  EventStatus,
+  Exclude<
+    DisplayableAction,
+    typeof ActionType.ASSIGN | typeof ActionType.UNASSIGN
+  >[]
+>
 
 const ACTION_FILTERS: {
   [K in DisplayableAction]?: (flags: Flag[]) => boolean
@@ -90,6 +91,12 @@ const ACTION_FILTERS: {
     !flags.includes(InherentFlags.REJECTED) &&
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.ARCHIVE]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.ASSIGN]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.UNASSIGN]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.CUSTOM]: (flags) =>
     !flags.some((flag) => flag.endsWith(':requested'))
 }
 
@@ -98,7 +105,7 @@ const ACTION_FILTERS: {
  * Some actions can be performed only if certain flags are
  * present and others only if certain flags are absent
  */
-function filterActionsByFlags(
+export function filterActionsByFlags(
   actions: DisplayableAction[],
   flags: Flag[]
 ): DisplayableAction[] {
