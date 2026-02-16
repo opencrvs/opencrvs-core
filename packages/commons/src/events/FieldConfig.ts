@@ -171,7 +171,7 @@ export type Divider = z.infer<typeof Divider>
 
 export const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
-  defaultValue: z.union([NonEmptyTextValue, SerializedUserField]).optional(),
+  defaultValue: z.union([NonEmptyTextValue, SerializedUserField, FieldReference, CodeToEvaluate]).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -187,7 +187,7 @@ export type TextField = z.infer<typeof TextField>
 
 const NumberField = BaseField.extend({
   type: z.literal(FieldType.NUMBER),
-  defaultValue: NumberFieldValue.optional(),
+  defaultValue: z.union([NumberFieldValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z
     .object({
       min: z.number().optional().describe('Minimum value'),
@@ -200,7 +200,7 @@ const NumberField = BaseField.extend({
 
 const TextAreaField = BaseField.extend({
   type: z.literal(FieldType.TEXTAREA),
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -242,7 +242,7 @@ const SignatureField = BaseField.extend({
   signaturePromptLabel: TranslationConfig.describe(
     'Title of the signature modal'
   ),
-  defaultValue: SignatureFieldValue.optional(),
+  defaultValue: z.union([SignatureFieldValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -268,7 +268,7 @@ export const EmailField = BaseField.extend({
     })
     .default({ maxLength: 255 })
     .optional(),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional()
 })
 
 export type EmailField = z.infer<typeof EmailField>
@@ -291,7 +291,7 @@ export type DateField = z.infer<typeof DateField>
 
 const AgeField = BaseField.extend({
   type: z.literal(FieldType.AGE),
-  defaultValue: NumberFieldValue.optional(),
+  defaultValue: z.union([NumberFieldValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z.object({
     asOfDate: FieldReference,
     prefix: TranslationConfig.optional(),
@@ -323,7 +323,7 @@ export type TimeField = z.infer<typeof TimeField>
 
 const DateRangeField = BaseField.extend({
   type: z.literal(FieldType.DATE_RANGE),
-  defaultValue: DateRangeFieldValue.optional(),
+  defaultValue: z.union([DateRangeFieldValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z
     .object({
       notice: TranslationConfig.describe(
@@ -373,7 +373,7 @@ export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
 
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: ParagraphConfiguration
 }).describe('A read-only HTML <p> paragraph')
 
@@ -381,14 +381,14 @@ export type Paragraph = z.infer<typeof Paragraph>
 
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional()
 }).describe('A read-only header component for form pages')
 
 export type PageHeader = z.infer<typeof PageHeader>
 
 const File = BaseField.extend({
   type: z.literal(FieldType.FILE),
-  defaultValue: FileFieldValue.optional(),
+  defaultValue: z.union([FileFieldValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -431,7 +431,7 @@ export const SelectOption = z.object({
 
 const NumberWithUnitField = BaseField.extend({
   type: z.literal(FieldType.NUMBER_WITH_UNIT),
-  defaultValue: NumberWithUnitFieldValue.optional(),
+  defaultValue: z.union([NumberWithUnitFieldValue, FieldReference, CodeToEvaluate]).optional(),
   options: z
     .array(SelectOption)
     .describe('A list of options for the unit select'),
@@ -448,7 +448,7 @@ const NumberWithUnitField = BaseField.extend({
 
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
-  defaultValue: TextValue.optional(),
+  defaultValue: z.union([TextValue, FieldReference, CodeToEvaluate]).optional(),
   options: z.array(SelectOption).describe('A list of options'),
   configuration: z
     .object({
@@ -465,7 +465,7 @@ export type RadioGroup = z.infer<typeof RadioGroup>
 
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
-  defaultValue: TextValue.optional(),
+  defaultValue: z.union([TextValue, FieldReference, CodeToEvaluate]).optional(),
   items: z.array(TranslationConfig).describe('A list of items'),
   configuration: z
     .object({
@@ -482,7 +482,7 @@ export type BulletList = z.infer<typeof BulletList>
 
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
-  defaultValue: TextValue.optional(),
+  defaultValue: z.union([TextValue, FieldReference, CodeToEvaluate]).optional(),
   options: z.array(SelectOption).describe('A list of options'),
   noOptionsMessage: TranslationConfig.optional().describe(
     `
@@ -508,7 +508,7 @@ export type SelectDateRangeOption = z.infer<typeof SelectDateRangeOption>
  */
 export const SelectDateRangeField = BaseField.extend({
   type: z.literal(FieldType.SELECT_DATE_RANGE),
-  defaultValue: SelectDateRangeValue.optional(),
+  defaultValue: z.union([SelectDateRangeValue, FieldReference, CodeToEvaluate]).optional(),
   options: z.array(SelectDateRangeOption).describe('A list of options')
 }).describe('Select input with date range options')
 
@@ -565,12 +565,12 @@ const NameField = BaseField.extend({
 }).describe('Name input field')
 
 const PhoneField = BaseField.extend({
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional(),
   type: z.literal(FieldType.PHONE)
 }).describe('Phone input field')
 
 const IdField = BaseField.extend({
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional(),
   type: z.literal(FieldType.ID)
 }).describe('ID input field')
 
@@ -583,7 +583,7 @@ export type Checkbox = z.infer<typeof Checkbox>
 
 const Country = BaseField.extend({
   type: z.literal(FieldType.COUNTRY),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional()
 }).describe('Country select field')
 
 export type Country = z.infer<typeof Country>
@@ -608,7 +608,7 @@ const AdministrativeAreaConfiguration = z
 
 const AdministrativeAreaField = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: AdministrativeAreaConfiguration
 }).describe('Administrative area input field e.g. facility, office')
 
@@ -616,7 +616,7 @@ export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
 
 const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z.object({
     searchableResource: z.array(z.enum(['locations', 'facilities', 'offices']))
   })
@@ -627,7 +627,7 @@ export type LocationInput = z.infer<typeof LocationInput>
 const FileUploadWithOptions = BaseField.extend({
   type: z.literal(FieldType.FILE_WITH_OPTIONS),
   options: z.array(SelectOption).describe('A list of options'),
-  defaultValue: FileFieldWithOptionValue.optional(),
+  defaultValue: z.union([FileFieldWithOptionValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -652,14 +652,14 @@ export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: z.union([NonEmptyTextValue, FieldReference, CodeToEvaluate]).optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
@@ -691,7 +691,7 @@ const Address = BaseField.extend({
         .optional()
     })
     .optional(),
-  defaultValue: DefaultAddressFieldValue.optional()
+  defaultValue: z.union([DefaultAddressFieldValue, FieldReference, CodeToEvaluate]).optional()
 }).describe('Address input field – a combination of location and text fields')
 
 export const StaticDataEntry = z
@@ -723,7 +723,7 @@ export type DataField = z.infer<typeof DataField>
 
 const ButtonField = BaseField.extend({
   type: z.literal(FieldType.BUTTON),
-  defaultValue: ButtonFieldValue.optional(),
+  defaultValue: z.union([ButtonFieldValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z.object({
     icon: z
       .string()
@@ -758,7 +758,7 @@ export type AlphaPrintButton = z.infer<typeof AlphaPrintButton>
 
 const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
-  defaultValue: HttpFieldValue.optional(),
+  defaultValue: z.union([HttpFieldValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z.object({
     trigger: FieldReference,
     url: z.string().describe('URL to send the HTTP request to'),
@@ -837,7 +837,7 @@ export type LinkButtonField = z.infer<typeof LinkButtonField>
 
 const VerificationStatus = BaseField.extend({
   type: z.literal(FieldType.VERIFICATION_STATUS),
-  defaultValue: VerificationStatusValue.optional(),
+  defaultValue: z.union([VerificationStatusValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z.object({
     status: TranslationConfig.describe('Text to display on the status pill.'),
     description: TranslationConfig.describe(
@@ -863,7 +863,7 @@ export type QueryParamReaderField = z.infer<typeof QueryParamReaderField>
 
 const QrReaderField = BaseField.extend({
   type: z.literal(FieldType.QR_READER),
-  defaultValue: QrReaderFieldValue.optional(),
+  defaultValue: z.union([QrReaderFieldValue, FieldReference, CodeToEvaluate]).optional(),
   configuration: z
     .object({
       validator: z.any().meta({
@@ -883,7 +883,7 @@ export type QrReaderField = z.infer<typeof QrReaderField>
 
 const IdReaderField = BaseField.extend({
   type: z.literal(FieldType.ID_READER),
-  defaultValue: IdReaderFieldValue.optional(),
+  defaultValue: z.union([IdReaderFieldValue, FieldReference, CodeToEvaluate]).optional(),
   methods: z.array(
     z
       .union([QrReaderField, LinkButtonField])
@@ -895,7 +895,7 @@ export type IdReaderField = z.infer<typeof IdReaderField>
 
 const CustomField = BaseField.extend({
   type: z.literal(FieldType._EXPERIMENTAL_CUSTOM),
-  defaultValue: CustomFieldValue.optional(),
+  defaultValue: z.union([CustomFieldValue, FieldReference, CodeToEvaluate]).optional(),
   src: z.string().describe('Module source path for the custom field component'),
   configuration: z.unknown().optional()
 })
@@ -916,7 +916,7 @@ export type LoaderField = z.infer<typeof LoaderField>
 const HiddenField = BaseField.extend({
   type: z.literal(FieldType.ALPHA_HIDDEN),
   required: z.boolean().default(false).optional(),
-  defaultValue: TextValue.optional()
+  defaultValue: z.union([TextValue, FieldReference, CodeToEvaluate]).optional()
 }).describe(
   'A non-interactive, hidden field that only hold a value in the form'
 )

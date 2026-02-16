@@ -48,7 +48,7 @@ function getFieldFromDataEntry({
   let formattedValue: string
 
   if (isFieldReference(rawValue) || isCodeToEvaluate(rawValue)) {
-    formattedValue = resolveValue(rawValue, formData)
+    formattedValue = String(resolveValue(rawValue, formData) ?? '')
   } else {
     formattedValue =
       typeof rawValue === 'object' &&

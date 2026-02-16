@@ -144,7 +144,7 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
   const fieldsByParentId: IndexMap<FieldConfig[]> = {}
 
   for (const field of fields) {
-    const parents = ([] as (FieldReference | CodeToEvaluate)[]).concat(field.parent ?? [])
+    const parents = ([] as FieldReference[]).concat(field.parent ?? [])
 
     for (const parent of parents) {
       const listenersParentId = parent.$$field

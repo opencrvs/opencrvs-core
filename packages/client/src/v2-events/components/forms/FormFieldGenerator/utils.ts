@@ -24,6 +24,8 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 
+const compiledEvaluators = new Map<string, Function>()
+
 /**
  * Formik has a feature that automatically nests all form keys that have a dot in them.
  * Because our form field ids can have dots in them, we temporarily transform those dots
@@ -77,12 +79,15 @@ export function evaluateCode(
   fieldValues: Record<string, FieldValue>
 ): any {
   try {
-    const computationFn = new Function(
-      'value',
-      'context',
-      `return (${codeToEvaluate.$$code})(value, context)`
-    )
-
+    let computationFn = compiledEvaluators.get(codeToEvaluate.$$code)
+    if (!computationFn) {
+      computationFn = new Function(
+        'value',
+        'context',
+        `return (${codeToEvaluate.$$code})(value, context)`
+      )
+      compiledEvaluators.set(codeToEvaluate.$$code, computationFn)
+    }
     const context = {
       $form: fieldValues,
       $now: formatISO(new Date(), { representation: 'date' }),

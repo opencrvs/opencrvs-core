@@ -18,6 +18,7 @@ import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 import { EventStatus } from '../events/EventMetadata'
+import { CodeToEvaluate } from '../events/FieldConfig'
 
 /* eslint-disable max-lines */
 
@@ -150,7 +151,6 @@ export function never(): JSONSchema {
 }
 
 type FieldReference = { $$field: string; $$subfield: string[] }
-type CodeToEvaluate = { $$code: string }
 
 function jsonFieldPath(field: FieldReference) {
   return [field.$$field, ...field.$$subfield].join('/')

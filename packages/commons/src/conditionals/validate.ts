@@ -33,6 +33,7 @@ import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
 import { ActionConfig, ActionType, EventIndex, EventDocument } from '../client'
 
+nconst compiledValidators = new Map<string, Function>()
 const ajv = new Ajv({
   $data: true,
   allowUnionTypes: true,
@@ -231,11 +232,15 @@ ajv.addKeyword({
     }
 
     try {
-      const validatorFn = new Function(
-        'value',
-        'context',
-        `return (${schema})(value, context)`
-      )
+      let validatorFn = compiledValidators.get(schema)
+      if (!validatorFn) {
+        validatorFn = new Function(
+          'value',
+          'context',
+          `return (${schema})(value, context)`
+        )
+        compiledValidators.set(schema, validatorFn)
+      }
 
       const context = dataContext?.rootData || {}
       const result = validatorFn(data, context)
