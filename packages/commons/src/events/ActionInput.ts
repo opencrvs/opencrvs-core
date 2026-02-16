@@ -151,7 +151,8 @@ export type MarkNotDuplicateActionInput = z.infer<
 
 export const ArchiveActionInput = BaseActionInput.extend(
   z.object({
-    type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE)
+    type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE),
+    content: ReasonContent
   }).shape
 )
 export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>

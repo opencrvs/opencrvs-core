@@ -177,7 +177,10 @@ const MarkAsDuplicateAction = ActionBase.extend(
 )
 
 const ArchiveAction = ActionBase.extend(
-  z.object({ type: z.literal(ActionType.ARCHIVE) }).shape
+  z.object({
+    type: z.literal(ActionType.ARCHIVE),
+    content: ReasonContent.optional()
+  }).shape
 )
 
 const CreatedAction = ActionBase.extend(
