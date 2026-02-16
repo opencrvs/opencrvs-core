@@ -36,7 +36,7 @@ import {
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
 import { ActionMenu } from '../ActionMenu'
-import { actionLabels } from '../useAllowedActionConfigurations'
+import { actionLabels } from '../../../Actions/utils'
 
 const generator = testDataGenerator()
 
@@ -285,7 +285,7 @@ export const getHiddenActions = () =>
     (acc, action) => {
       const label = actionLabels[action as keyof typeof actionLabels]
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition        
       if (!label) {
         return acc
       }

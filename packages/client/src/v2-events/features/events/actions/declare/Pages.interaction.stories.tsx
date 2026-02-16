@@ -16,18 +16,13 @@ import * as selectEvent from 'react-select-event'
 import {
   ActionStatus,
   ActionType,
-  AddressType,
   Draft,
-  field,
   FieldConfig,
-  FieldType,
   generateEventDocument,
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  UUID,
-  user,
-  footballClubMembershipEvent
+  UUID
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -35,7 +30,6 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormData } from '../../useEventFormData'
 import { useActionAnnotation } from '../../useActionAnnotation'
-import { addLocalEventConfig, setEventData } from '../../useEvents/api'
 import { Pages } from './index'
 
 // Use an undeclared draft event for tests
@@ -137,7 +131,7 @@ export const SaveAndExit: Story = {
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
           }),
-          tRPCMsw.event.search.query((input) => {
+          tRPCMsw.event.search.query(() => {
             return {
               results: [
                 getCurrentEventState(

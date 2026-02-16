@@ -8,28 +8,34 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import { useMemo } from 'react'
-import { findScope } from '@opencrvs/commons/client'
-import { useTRPC } from '@client/v2-events/trpc'
+import {
+  ActionType,
+  ClientSpecificAction,
+  DisplayableAction,
+  isActionInScope
+} from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
 
-/**
- * @returns a list of workqueue configurations
- */
-export function useCountryConfigWorkqueueConfigurations() {
-  const trpc = useTRPC()
-  const config = useSuspenseQuery({
-    ...trpc.workqueue.config.list.queryOptions(),
-    networkMode: 'offlineFirst'
-  }).data
+const ALL_ACTIONS = [
+  ...Object.values(ActionType),
+  ...Object.values(ClientSpecificAction)
+]
 
+export function useUserAllowedActions(eventType: string) {
   const scopes = useSelector(getScope)
+  const allowedActions = useMemo(
+    () =>
+      ALL_ACTIONS.filter((action) =>
+        isActionInScope(scopes ?? [], action, eventType)
+      ),
+    [scopes, eventType]
+  )
 
-  return useMemo(() => {
-    const availableWorkqueues =
-      findScope(scopes ?? [], 'workqueue')?.options.id ?? []
-    return config.filter(({ slug }) => availableWorkqueues.includes(slug))
-  }, [config, scopes])
+  return {
+    allowedActions,
+    isActionAllowed: (action: DisplayableAction) =>
+      allowedActions.includes(action)
+  }
 }
