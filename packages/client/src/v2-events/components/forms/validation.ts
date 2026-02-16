@@ -84,11 +84,11 @@ export function validationErrorsInActionFormExist({
   reviewFields?: FieldConfig[]
 }): boolean {
   // We don't want to validate hidden fields
-  const formWithoutHiddenFields = omitHiddenPaginatedFields(
+  const formWithoutHiddenFields = omitHiddenPaginatedFields({
     formConfig,
-    form,
-    context
-  )
+    values: form,
+    validatorContext: context
+  })
 
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,

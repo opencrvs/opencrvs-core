@@ -29,7 +29,9 @@ import {
   EventState,
   EventConfig,
   getCurrentEventState,
-  ValidatorContext
+  ValidatorContext,
+  isFieldVisible,
+  getDeclarationFields
 } from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -97,23 +99,30 @@ function getCleanedDeclarationDiff({
 
   // If there's no original declaration, just clean the update and return it
   if (isEmpty(originalDeclaration)) {
-    return omitHiddenPaginatedFields(
-      eventConfiguration.declaration,
-      declarationDiff,
+    return omitHiddenPaginatedFields({
+      formConfig: eventConfiguration.declaration,
+      values: declarationDiff,
       validatorContext
-    )
+    })
   }
 
   // Merge original + updates so we get the final event state
   // (Needed because omitHiddenPaginatedFields func requires a full snapshot, not partial)
   const merged = deepMerge(originalDeclaration, declarationDiff)
 
-  // Remove any hidden/paginated fields from the merged declaration
-  // (Ensures we only consider fields relevant to the event configuration)
-  const cleanedDeclaration = omitHiddenPaginatedFields(
-    eventConfiguration.declaration,
-    merged,
-    validatorContext
+  // Strip hidden/paginated fields - only retain fields that are visible given
+  // the current event configuration and form state
+  // (null values represent intentional field removals and are preserved)
+  const cleanedDeclaration = Object.fromEntries(
+    Object.entries(merged).map(([key, value]) => {
+      const field = getDeclarationFields(eventConfiguration).find(
+        (f) => f.id === key
+      )
+      const fieldVisible =
+        field && isFieldVisible(field, merged, validatorContext)
+
+      return [key, fieldVisible ? value : null]
+    })
   )
 
   // From the update, keep only fields that are valid in the cleaned declaration

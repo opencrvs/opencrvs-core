@@ -580,11 +580,11 @@ describe('omitHiddenPaginatedFields', () => {
     const declarationConfig = getDeclaration(tennisClubMembershipEvent)
 
     const declaration = fieldConfigsToActionPayload(fields, rng)
-    const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
-      declarationConfig,
-      declaration,
-      {}
-    )
+    const declarationWithoutHiddenFields = omitHiddenPaginatedFields({
+      formConfig: declarationConfig,
+      values: declaration,
+      validatorContext: {}
+    })
 
     const missingKeys = difference(
       Object.keys(declaration),

@@ -216,11 +216,15 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
   return fn(base)
 }
 
-export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
-  formConfig: FormConfig,
-  values: T,
+export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>({
+  formConfig,
+  values,
+  validatorContext
+}: {
+  formConfig: FormConfig
+  values: T
   validatorContext: ValidatorContext
-) {
+}) {
   const visibleFields = formConfig.pages
     .filter((p) => isPageVisible(p, values, validatorContext))
     .flatMap((p) => p.fields)
