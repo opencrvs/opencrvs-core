@@ -90,6 +90,12 @@ const ACTION_FILTERS: {
     !flags.includes(InherentFlags.REJECTED) &&
     !flags.some((flag) => flag.endsWith(':requested')),
   [ActionType.ARCHIVE]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.ASSIGN]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.UNASSIGN]: (flags) =>
+    !flags.some((flag) => flag.endsWith(':requested')),
+  [ActionType.CUSTOM]: (flags) =>
     !flags.some((flag) => flag.endsWith(':requested'))
 }
 
@@ -98,7 +104,7 @@ const ACTION_FILTERS: {
  * Some actions can be performed only if certain flags are
  * present and others only if certain flags are absent
  */
-function filterActionsByFlags(
+export function filterActionsByFlags(
   actions: DisplayableAction[],
   flags: Flag[]
 ): DisplayableAction[] {
