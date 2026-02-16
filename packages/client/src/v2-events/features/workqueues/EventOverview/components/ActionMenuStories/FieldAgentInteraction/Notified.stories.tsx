@@ -39,7 +39,7 @@ const notifiedScenariosForFieldAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Assign']: AssertType.ENABLED,
-      ['Review']: AssertType.DISABLED
+      ['Edit']: AssertType.DISABLED
     }
   },
   {
@@ -55,7 +55,7 @@ const notifiedScenariosForFieldAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Unassign']: AssertType.ENABLED,
-      ['Review']: AssertType.ENABLED
+      ['Edit']: AssertType.ENABLED
     }
   },
   {
@@ -70,7 +70,7 @@ const notifiedScenariosForFieldAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      ['Review']: AssertType.DISABLED
+      ['Edit']: AssertType.DISABLED
     }
   }
 ]

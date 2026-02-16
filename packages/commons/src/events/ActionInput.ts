@@ -19,7 +19,6 @@ import {
 } from './ActionDocument'
 
 import { UUID, getUUID } from '../uuid'
-import { CreatedAtLocation } from './CreatedAtLocation'
 
 export const BaseActionInput = z.object({
   eventId: UUID,
@@ -29,7 +28,8 @@ export const BaseActionInput = z.object({
   originalActionId: UUID.optional(), // should not be part of base action.
   keepAssignment: z.boolean().optional(),
   // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
-  createdAtLocation: CreatedAtLocation.describe(
+  // @TODO: createdAtLocation should be limited to actions that system users can perform. For normal users, it should not be part of the base action.
+  createdAtLocation: UUID.nullish().describe(
     'A valid office location ID. This is required for system users performing actions. The provided location must be a leaf-location, i.e. it must not have any children locations.'
   )
 })
@@ -37,7 +37,10 @@ export const BaseActionInput = z.object({
 const CreateActionInput = BaseActionInput.extend(
   z.object({
     type: z.literal(ActionType.CREATE).default(ActionType.CREATE),
-    createdAtLocation: CreatedAtLocation
+    // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
+    createdAtLocation: UUID.nullish().describe(
+      'A valid office location ID. This is required for system users performing actions. The provided location must be a leaf-location, i.e. it must not have any children locations.'
+    )
   }).shape
 )
 
@@ -52,7 +55,11 @@ export type RegisterActionInput = z.infer<typeof RegisterActionInput>
 
 export const NotifyActionInput = BaseActionInput.extend(
   z.object({
-    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
+    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY),
+    // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
+    createdAtLocation: UUID.nullish().describe(
+      'A valid office location ID. This is required for system users performing actions. The provided location must be a leaf-location, i.e. it must not have any children locations.'
+    )
   }).shape
 ).meta({
   default: {

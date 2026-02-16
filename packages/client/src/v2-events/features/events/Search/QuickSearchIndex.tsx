@@ -12,7 +12,7 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useIntl } from 'react-intl'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
-import { mandatoryColumns } from '@opencrvs/commons/client'
+import { mandatoryColumns, ActionType } from '@opencrvs/commons/client'
 import { SearchResultComponent } from '@client/v2-events/features/events/Search/SearchResult'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -20,17 +20,13 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { ROUTES } from '@client/v2-events/routes'
 import { buildQuickSearchQuery, deserializeSearchParams } from './utils'
 
-function QuickSearchComponent({
-  searchParams
-}: {
-  searchParams: Record<string, string>
-}) {
+function QuickSearchComponent({ term }: { term: string }) {
   const intl = useIntl()
   const [typedSearchParams] = useTypedSearchParams(ROUTES.V2.SEARCH)
   const { searchEvent } = useEvents()
   const eventConfigurations = useEventConfigurations()
 
-  const query = buildQuickSearchQuery(searchParams, eventConfigurations)
+  const query = buildQuickSearchQuery(term, eventConfigurations)
   const queryData = searchEvent.useSuspenseQuery({
     query,
     ...typedSearchParams
@@ -38,7 +34,7 @@ function QuickSearchComponent({
 
   return (
     <SearchResultComponent
-      actions={['DEFAULT']}
+      actions={[ActionType.READ]}
       columns={mandatoryColumns}
       eventConfigs={eventConfigurations}
       queryData={queryData.results}
@@ -49,7 +45,7 @@ function QuickSearchComponent({
           defaultMessage: 'Search result for “{searchTerm}”'
         },
         {
-          searchTerm: searchParams.keys
+          searchTerm: term
         }
       )}
       totalResults={queryData.total}
@@ -65,11 +61,10 @@ function QuickSearch() {
     string
   >
 
-  if (!('keys' in searchParams)) {
+  if (!('term' in searchParams)) {
     return null
   }
-
-  return <QuickSearchComponent searchParams={searchParams} />
+  return <QuickSearchComponent term={searchParams.term} />
 }
 
 export const QuickSearchIndex = withSuspense(QuickSearch)

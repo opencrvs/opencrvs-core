@@ -14,18 +14,14 @@ import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import {
   EventIndex,
-  WorkqueueActionsWithDefault,
-  isMetaAction,
+  CtaActionType,
   getOrThrow,
   ActionType
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { useAuthentication } from '@client/utils/userUtils'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  useAllowedActionConfigurations,
-  reviewLabel
-} from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { withSuspense } from '../../../components/withSuspense'
 
 const StyledButton = styled(Button)`
@@ -36,6 +32,12 @@ const StyledButton = styled(Button)`
   text-overflow: ellipsis;
 `
 
+const reviewLabel = {
+  id: 'buttons.review',
+  defaultMessage: 'Review',
+  description: 'Label for review CTA button'
+}
+
 /**
  * @returns next available action cta based on the given event.
  */
@@ -45,7 +47,7 @@ function ActionCtaComponent({
   redirectParam
 }: {
   event: EventIndex
-  actionType: WorkqueueActionsWithDefault
+  actionType: CtaActionType
   redirectParam?: string
 }) {
   const intl = useIntl()
@@ -57,12 +59,7 @@ function ActionCtaComponent({
   const navigate = useNavigate()
 
   const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
-
-  const config =
-    actionType === 'DEFAULT'
-      ? allowedActionConfigs.find(({ type }) => !isMetaAction(type))
-      : // If action type is not allowed, we don't provide it.
-        allowedActionConfigs.find((item) => item.type === actionType)
+  const config = allowedActionConfigs.find((item) => item.type === actionType)
 
   if (!config || actionType === ActionType.READ) {
     return (

@@ -13,7 +13,6 @@ import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
 import {
-  Draft,
   createEmptyDraft,
   findActiveDraftForEvent,
   getActionAnnotation,
@@ -90,8 +89,15 @@ function useActionGuard(
     )
   }
 
-  // If the user may not perform the action, redirect to the unauthorized page
-  if (!isActionAllowed(actionType)) {
+  // In the declare flow, user is allowed if they have permission for either DECLARE or NOTIFY;
+  // otherwise strict permission by action type.
+  const isPermitted =
+    actionType === ActionType.DECLARE
+      ? isActionAllowed(ActionType.DECLARE) ||
+        isActionAllowed(ActionType.NOTIFY)
+      : isActionAllowed(actionType)
+
+  if (!isPermitted) {
     throw new Error(
       `User does not have permission to perform action ${actionType} on event ${event.id}`
     )
@@ -125,7 +131,7 @@ function DeclarationActionComponent({
 
   useActionGuard(actionType, event, configuration)
 
-  const remoteDraft: Draft | undefined = getRemoteDraftByEventId(event.id)
+  const remoteDraft = getRemoteDraftByEventId(event.id)
 
   const activeRemoteDraft = remoteDraft
     ? findActiveDraftForEvent(event, remoteDraft)
@@ -186,7 +192,7 @@ function DeclarationActionComponent({
     }
   }
 
-  const mergedDraft: Draft = activeRemoteDraft
+  const mergedDraft = activeRemoteDraft
     ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
     : localDraftWithAdjustedTimestamp
 

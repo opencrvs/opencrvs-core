@@ -39,7 +39,8 @@ const notifiedScenariosForRegistrationAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Assign']: AssertType.ENABLED,
-      ['Review']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED,
+      ['Reject']: AssertType.DISABLED,
       ['Archive']: AssertType.DISABLED
     }
   },
@@ -56,7 +57,8 @@ const notifiedScenariosForRegistrationAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Unassign']: AssertType.ENABLED,
-      ['Review']: AssertType.ENABLED,
+      ['Edit']: AssertType.ENABLED,
+      ['Reject']: AssertType.ENABLED,
       ['Archive']: AssertType.ENABLED
     }
   },
@@ -72,7 +74,8 @@ const notifiedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      ['Review']: AssertType.DISABLED,
+      ['Edit']: AssertType.DISABLED,
+      ['Reject']: AssertType.DISABLED,
       ['Archive']: AssertType.DISABLED
     }
   }

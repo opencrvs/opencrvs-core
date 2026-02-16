@@ -1190,7 +1190,6 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.none.label'
           }
         },
-
         {
           id: 'recommender.name',
           type: FieldType.NAME,

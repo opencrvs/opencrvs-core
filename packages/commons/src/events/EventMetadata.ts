@@ -13,7 +13,6 @@ import * as z from 'zod/v4'
 import { TranslationConfig } from './TranslationConfig'
 import { PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
-import { CreatedAtLocation } from './CreatedAtLocation'
 import { Flag } from './Flag'
 
 /**
@@ -38,7 +37,8 @@ export const ActionCreationMetadata = z.object({
   createdBy: z
     .string()
     .describe('ID of the user who created the action request.'),
-  createdAtLocation: CreatedAtLocation.describe(
+  // @TODO: createdAtLocation should be non-nullable in the future once all action requests have this field populated.
+  createdAtLocation: UUID.nullish().describe(
     'Location of the user who created the action request.'
   ),
   createdByUserType: z
@@ -50,6 +50,7 @@ export const ActionCreationMetadata = z.object({
     .describe('Timestamp when the action request was accepted.'),
   createdByRole: z
     .string()
+    .optional()
     .describe('Role of the user at the time of action request creation.'),
   createdBySignature: z
     .string()
@@ -95,7 +96,7 @@ export const EventMetadata = z.object({
     .datetime()
     .describe('The timestamp when the event was first created and saved.'),
   dateOfEvent: ZodDate.nullish(),
-  placeOfEvent: CreatedAtLocation,
+  placeOfEvent: UUID.nullish(),
   createdBy: z.string().describe('ID of the user who created the event.'),
   createdByUserType: z
     .enum(['user', 'system'])
@@ -103,8 +104,10 @@ export const EventMetadata = z.object({
     .describe('Whether the user is a normal user or a system.'),
   updatedByUserRole: z
     .string()
+    .nullish()
     .describe('Role of the user who last changed the status.'),
-  createdAtLocation: CreatedAtLocation.describe(
+  // @TODO: createdAtLocation should be non-nullable in the future once all action requests have this field populated.
+  createdAtLocation: UUID.nullish().describe(
     'Location of the user who created the event.'
   ),
   createdBySignature: z

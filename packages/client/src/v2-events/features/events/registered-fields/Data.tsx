@@ -23,11 +23,10 @@ import {
   StaticDataEntry,
   EventConfig,
   getDeclarationFields,
-  FieldValue,
   DataEntry,
-  TranslationConfig,
   FieldReference
 } from '@opencrvs/commons/client'
+import { Summary } from '@opencrvs/components/lib/Summary'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { makeFormikFieldIdOpenCRVSCompatible } from '@client/v2-events/components/forms/utils'
@@ -99,28 +98,19 @@ const Container = styled.div`
   background-color: ${({ theme }) => theme.colors.background};
   padding: 17px 20px 10px;
   border-radius: 5px;
+  ${({ theme }) => theme.fonts.reg16}
 
   label {
     ${({ theme }) => theme.fonts.h3};
     margin-bottom: 0.3rem;
     display: block;
   }
-
-  dt {
-    ${({ theme }) => theme.fonts.bold16};
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-
-  dd {
-    margin: 0 0 1.5rem;
-  }
 `
 
 const Subtitle = styled.div`
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.grey500};
-  margin: 0 0 2rem;
+  margin: 0 0 1rem;
 `
 
 /**
@@ -215,21 +205,20 @@ function DataInput({
     <Container>
       {title && <label>{title}</label>}
       {subtitle && <Subtitle>{intl.formatMessage(subtitle)}</Subtitle>}
-      <dl>
+      <Summary>
         {fields
           // We don't want to display fields that are conditionally hidden in the original form configuration
           .filter(({ config }) =>
             isFieldVisible(config, formData, validatorContext)
           )
           .map(({ config, value }) => (
-            <React.Fragment key={config.id}>
-              <dt>{intl.formatMessage(config.label)}</dt>
-              <dd>
-                <Output field={config} value={value} />
-              </dd>
-            </React.Fragment>
+            <Summary.Row
+              key={config.id}
+              label={intl.formatMessage(config.label)}
+              value={<Output field={config} value={value} />}
+            />
           ))}
-      </dl>
+      </Summary>
     </Container>
   )
 }

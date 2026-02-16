@@ -43,15 +43,9 @@ export const mandatoryColumns = defineWorkqueuesColumns([
   }
 ])
 
-export const WorkqueueActionsWithDefault = z.enum([
-  ...workqueueActions.options,
-  'DEFAULT',
-  ActionType.READ
-] as const)
-
-export type WorkqueueActionsWithDefault = z.infer<
-  typeof WorkqueueActionsWithDefault
->
+/** Workqueue Call-to-action -button action type */
+export const CtaActionType = z.enum([...workqueueActions.options, ActionType.READ] as const)
+export type CtaActionType = z.infer<typeof CtaActionType>
 
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
@@ -66,7 +60,7 @@ export const WorkqueueConfig = z
     /** This action object used to contain a conditionals option, but it was not used anywhere.
      *  It's also debatable whether it should be an array, or just a single action. */
     actions: z
-      .array(z.object({ type: WorkqueueActionsWithDefault }))
+      .array(z.object({ type: CtaActionType }))
       .describe('Workqueue call-to-action button configuration.'),
     columns: z.array(WorkqueueColumn).default(mandatoryColumns),
     icon: AvailableIcons,
@@ -86,7 +80,7 @@ export const WorkqueueConfigInput = z.object({
   ),
   query: CountryConfigQueryInputType,
   actions: z
-    .array(z.object({ type: WorkqueueActionsWithDefault }))
+    .array(z.object({ type: CtaActionType }))
     .describe('Workqueue call-to-action button configuration.'),
   columns: z.array(WorkqueueColumn).default(mandatoryColumns),
   icon: AvailableIcons,

@@ -51,7 +51,7 @@ export const Default: Story = {
         path: ROUTES.V2.SEARCH.buildPath({}),
         element: <QuickSearchIndex />
       },
-      initialPath: `${ROUTES.V2.SEARCH.buildPath({})}?keys=Search term`
+      initialPath: `${ROUTES.V2.SEARCH.buildPath({})}?term=Search term`
     },
     msw: {
       handlers: {

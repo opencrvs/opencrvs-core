@@ -136,6 +136,7 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
               title: generateTranslationConfig('title'),
               onConfirm: generateTranslationConfig('onConfirm')
             }}
+            eventType={'Tennis club membership'}
           />
         )
       })

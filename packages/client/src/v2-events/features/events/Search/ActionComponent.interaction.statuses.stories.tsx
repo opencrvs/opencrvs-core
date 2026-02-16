@@ -91,7 +91,7 @@ export const DirectsCreatedToDeclare: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.DECLARE}
                     event={createdEvent.eventQueryData}
                   />
                 </div>
@@ -137,7 +137,7 @@ export const DirectsCreatedToDeclare: Story = {
 }
 
 const notifiedEvent = createEventByStatus(EventStatus.enum.NOTIFIED)
-export const DirectsNotifiedToDeclare: Story = {
+export const DirectsNotifiedToEdit: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
@@ -162,7 +162,7 @@ export const DirectsNotifiedToDeclare: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.EDIT}
                     event={notifiedEvent.eventQueryData}
                   />
                 </div>
@@ -170,11 +170,11 @@ export const DirectsNotifiedToDeclare: Story = {
             }
           },
           {
-            path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
+            path: ROUTES.V2.EVENTS.EDIT.REVIEW.path,
             Component: () => {
               return (
                 <div>
-                  {ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+                  {ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
                     eventId: notifiedEvent.event.id
                   })}
                 </div>
@@ -189,7 +189,7 @@ export const DirectsNotifiedToDeclare: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
+      name: 'Edit'
     })
 
     await userEvent.click(actionButton)
@@ -198,7 +198,7 @@ export const DirectsNotifiedToDeclare: Story = {
     await waitFor(async () => {
       await expect(
         canvas.getByText(
-          ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+          ROUTES.V2.EVENTS.EDIT.REVIEW.buildPath({
             eventId: notifiedEvent.event.id
           })
         )
@@ -236,7 +236,7 @@ export const directsRegisteredToPrint: Story = {
               return (
                 <div>
                   <ActionCta
-                    actionType={'DEFAULT'}
+                    actionType={ActionType.PRINT_CERTIFICATE}
                     event={registeredEvent.eventQueryData}
                   />
                 </div>

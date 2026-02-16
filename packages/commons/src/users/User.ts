@@ -22,8 +22,6 @@ export type IUserName = {
   given: string[]
 }
 
-export type SystemRole = z.infer<typeof SystemRole>
-
 export const User = z.object({
   id: z.string(),
   name: z.array(
@@ -40,25 +38,16 @@ export const User = z.object({
   ),
   primaryOfficeId: UUID,
   administrativeAreaId: UUID.nullish(),
+  device: z.string().optional(),
   fullHonorificName: z.string().optional(),
   type: TokenUserType.extract(['user'])
 })
 export type User = z.infer<typeof User>
 
-export const SystemRole = z.enum([
-  'HEALTH',
-  'NATIONAL_ID',
-  'RECORD_SEARCH',
-  'REINDEX',
-  'WEBHOOK',
-  'IMPORT_EXPORT'
-])
-
 export const System = z.object({
   id: z.string(),
   name: z.string(),
   type: TokenUserType.extract(['system']),
-  role: SystemRole,
   primaryOfficeId: z.undefined().optional(),
   administrativeAreaId: z.undefined().optional(),
   signature: z.undefined().optional(),

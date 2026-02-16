@@ -51,6 +51,7 @@ export const RecordAction = z.enum([
   'record.correct',
   'record.unassign-others'
 ])
+type RecordAction = z.infer<typeof RecordAction>
 
 export const ResolvedRecordScopeV2 = z
   .object({
@@ -60,7 +61,7 @@ export const ResolvedRecordScopeV2 = z
         .array(z.string())
         .describe('Event type, e.g. birth, death')
         .optional(),
-      eventLocation: UUID.nullish(),
+      placeOfEvent: UUID.nullish(),
       declaredIn: UUID.nullish(),
       declaredBy: z.string().or(z.undefined()).optional(),
       registeredIn: UUID.nullish(),
@@ -76,8 +77,11 @@ export const RecordScopeV2 = z
     type: RecordAction,
     options: z
       .object({
-        event: z.array(z.string()).describe('Event type, e.g. birth, death'),
-        eventLocation: JurisdictionFilter.optional(),
+        event: z
+          .array(z.string())
+          .optional()
+          .describe('Event type, e.g. birth, death'),
+        placeOfEvent: JurisdictionFilter.optional(),
         declaredIn: JurisdictionFilter.optional(),
         declaredBy: UserFilter.optional(),
         registeredIn: JurisdictionFilter.optional(),
@@ -211,4 +215,24 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
     })
   }
   throw new Error(`Unsupported V1 scope type: ${v1Scope}`)
+}
+
+export function getAcceptedScopesByType({
+  acceptedScopes,
+  scopes
+}: {
+  acceptedScopes: RecordAction[]
+  scopes: (LegacyScopeType | string)[]
+}): z.infer<typeof AnyScope>[] {
+  return scopes
+    .map((scope) => {
+      const parsedScope = decodeScope(scope)
+      return parsedScope &&
+        acceptedScopes.some(
+          (acceptedScope) => acceptedScope === parsedScope.type
+        )
+        ? parsedScope
+        : null
+    })
+    .filter((scope): scope is z.infer<typeof AnyScope> => scope !== null)
 }

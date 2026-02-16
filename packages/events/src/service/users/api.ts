@@ -17,8 +17,7 @@ import {
   IUserName,
   UserOrSystem,
   TokenUserType,
-  logger,
-  SystemRole
+  logger
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
@@ -29,6 +28,7 @@ type UserAPIResult = {
     type: string
   }
   signature?: FullDocumentPath
+  device?: string
   name: IUserName[]
   username: string
   email: string
@@ -71,10 +71,9 @@ type SystemAPIResult = {
   status: string
   scope: string[]
   sha_secret: string
-  type: SystemRole
 }
 
-export async function getSystem(
+async function getSystem(
   systemId: string,
   token: string
 ): Promise<SystemAPIResult> {
@@ -111,6 +110,7 @@ export async function getUserOrSystem(
       signature: user.signature ? user.signature : undefined,
       avatar: user.avatar?.data ? user.avatar.data : undefined,
       primaryOfficeId: user.primaryOfficeId,
+      device: user.device ? user.device : undefined,
       fullHonorificName: user.fullHonorificName
         ? user.fullHonorificName
         : undefined
@@ -126,8 +126,7 @@ export async function getUserOrSystem(
     return {
       type: TokenUserType.enum.system,
       id,
-      name: system.name,
-      role: system.type
+      name: system.name
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {

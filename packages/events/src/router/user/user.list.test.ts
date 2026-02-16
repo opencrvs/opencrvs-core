@@ -10,7 +10,7 @@
  */
 
 import { http, HttpResponse, HttpResponseInit } from 'msw'
-import { SystemRole, TokenUserType } from '@opencrvs/commons'
+import { TokenUserType } from '@opencrvs/commons'
 import {
   createTestClient,
   sanitizeForSnapshot,
@@ -114,8 +114,7 @@ test('Returns both normal users and system users', async () => {
           client_id: 'string',
           status: '',
           scope: [''],
-          sha_secret: '',
-          type: SystemRole.enum.HEALTH
+          sha_secret: ''
         })
       }
 

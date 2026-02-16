@@ -27,7 +27,7 @@ const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   ],
   [EventStatus.enum.NOTIFIED]: [
     ActionType.READ,
-    ActionType.DECLARE,
+    ActionType.EDIT,
     ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
     ActionType.REJECT,
@@ -121,52 +121,18 @@ function getAvailableActionsWithoutFlagFilters(
     return [ActionType.NOTIFY, ActionType.DECLARE, ActionType.REGISTER]
   }
 
-  switch (status) {
-    case EventStatus.enum.CREATED: {
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.enum.NOTIFIED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActionsWithoutFlagFilters(
-          EventStatus.enum.CREATED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-          .filter((action) => action !== ActionType.DELETE)
-          .concat(ActionType.EDIT)
-          .concat(ActionType.ARCHIVE)
-      }
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.enum.DECLARED: {
-      if (flags.includes(InherentFlags.REJECTED)) {
-        return getAvailableActionsWithoutFlagFilters(
-          EventStatus.enum.CREATED,
-          flags.filter((flag) => flag !== InherentFlags.REJECTED)
-        )
-          .filter((action) => action !== ActionType.DELETE)
-          .concat(ActionType.EDIT)
-          .concat(ActionType.ARCHIVE)
-      }
-
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.enum.REGISTERED: {
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
-    case EventStatus.enum.ARCHIVED: {
-      return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
-    }
+  // At some point we will refactor 'Rejected' to be a countryconfig flag, at which point we can remove this silly logic.
+  if (flags.includes(InherentFlags.REJECTED)) {
+    return [
+      ActionType.READ,
+      ActionType.NOTIFY,
+      ActionType.CUSTOM,
+      ActionType.EDIT,
+      ActionType.ARCHIVE
+    ]
   }
-}
 
-export function getAvailableActions(
-  status: EventStatus,
-  flags: Flag[]
-): DisplayableAction[] {
-  return filterActionsByFlags(
-    getAvailableActionsWithoutFlagFilters(status, flags),
-    flags
-  )
+  return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
 }
 
 export function getAvailableActionsForEvent(

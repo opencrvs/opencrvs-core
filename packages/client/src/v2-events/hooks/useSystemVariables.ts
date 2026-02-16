@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { pick } from 'lodash'
 import { SystemVariables } from '@opencrvs/commons/client'
 import { useCurrentUser } from './useCurrentUser'
 
@@ -20,7 +19,7 @@ export function useSystemVariables() {
   const user = useCurrentUser()
 
   const variables = {
-    $user: user,
+    user,
     $window: {
       location: {
         href: window.location.href,

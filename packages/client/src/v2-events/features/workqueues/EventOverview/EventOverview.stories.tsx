@@ -26,7 +26,6 @@ import {
   tennisClubMembershipEvent,
   getCurrentEventState,
   UUID,
-  SystemRole,
   TestUserRole,
   generateActionDocument,
   ActionDocument,
@@ -121,6 +120,51 @@ export const Overview: Story = {
   }
 }
 
+export const OverviewMobile: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile' },
+    offline: {
+      events: [defaultEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: defaultEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument({
+                eventId: defaultEvent.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Amelie',
+                    surname: 'Poulain'
+                  }
+                }
+              })
+            ]
+          })
+        ]
+      }
+    }
+  }
+}
+
 export const WithAcceptedRegisterEvent: Story = {
   parameters: {
     reactRouter: {
@@ -196,7 +240,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           assignedTo: '010101',
           declaration: {}
         },
@@ -213,7 +257,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           assignedTo: '010101',
           declaration: {}
         },
@@ -230,7 +274,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           declaration: {}
         },
         {
@@ -246,7 +290,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           assignedTo: null,
           declaration: {}
         },
@@ -382,7 +426,6 @@ export const WithVariousUserRoles: Story = {
           createdBy: 'system-123',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.IMPORT_EXPORT,
           declaration: {}
         },
         {

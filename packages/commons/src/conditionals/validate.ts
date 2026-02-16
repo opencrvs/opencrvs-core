@@ -196,32 +196,41 @@ ajv.addKeyword({
   }
 })
 
+function isAgeValue(value: unknown): value is AgeValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'age' in value &&
+    typeof value.age === 'number'
+  )
+}
+
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
-  if ('$form' in data) {
-    data.$form = Object.fromEntries(
-      Object.entries(data.$form).map(([key, value]) => {
-        const maybeAgeValue = AgeValue.safeParse(value)
-        if (maybeAgeValue.success) {
-          const age = maybeAgeValue.data.age
-          const maybeAsOfDate = DateValue.safeParse(
-            data.$form[maybeAgeValue.data.asOfDateRef]
-          )
 
-          return [
-            key,
-            {
-              age,
-              dob: ageToDate(
-                age,
-                maybeAsOfDate.success ? maybeAsOfDate.data : data.$now
-              )
-            }
-          ]
-        }
+  if ('$form' in data) {
+    const entries = Object.entries(data.$form).map(([key, value]) => {
+      // This was previously checked with AgeValue.safeParse(), but due to performance issues we need to check "manually".
+      if (!isAgeValue(value)) {
         return [key, value]
-      })
-    )
+      }
+
+      const age = value.age
+      const maybeAsOfDate = DateValue.safeParse(data.$form[value.asOfDateRef])
+
+      return [
+        key,
+        {
+          age,
+          dob: ageToDate(
+            age,
+            maybeAsOfDate.success ? maybeAsOfDate.data : data.$now
+          )
+        }
+      ]
+    })
+
+    data.$form = Object.fromEntries(entries)
   }
 
   const result = validator(data) as boolean
@@ -332,7 +341,14 @@ export function isFieldVisible(
 
 function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
   const fieldValue = form[field.id]
-  return !field.required && (fieldValue === undefined || fieldValue === '')
+  return (
+    !field.required &&
+    (fieldValue === undefined ||
+      fieldValue === '' ||
+      (fieldValue &&
+        typeof fieldValue === 'object' &&
+        Object.values(fieldValue).every((v) => v === undefined || v === '')))
+  )
 }
 
 export function isFieldEnabled(

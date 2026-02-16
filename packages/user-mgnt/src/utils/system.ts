@@ -12,14 +12,6 @@ import { ISystemModel } from '@user-mgnt/model/system'
 import { pick } from 'lodash'
 import { Types } from 'mongoose'
 
-export const types = {
-  NATIONAL_ID: 'NATIONAL_ID',
-  HEALTH: 'HEALTH',
-  RECORD_SEARCH: 'RECORD_SEARCH',
-  WEBHOOK: 'WEBHOOK',
-  IMPORT_EXPORT: 'IMPORT_EXPORT'
-}
-
 export const integratingSystemTypes = {
   OTHER: 'OTHER',
   MOSIP: 'MOSIP'

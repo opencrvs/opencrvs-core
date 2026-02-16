@@ -15,8 +15,7 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
-  mockOfflineDataDispatch,
-  selectOption
+  mockOfflineDataDispatch
 } from '@client/tests/util'
 import { SystemList } from '@client/views/SysAdmin/Config/Systems/Systems'
 
@@ -122,117 +121,6 @@ describe('render create system integrations', () => {
   })
 })
 
-describe('render create webhook system integrations', () => {
-  let component: ReactWrapper<{}, {}>
-
-  const mocks = [
-    {
-      request: {
-        query: registerSystem,
-        variables: {
-          system: {
-            type: 'WEBHOOK',
-            name: 'Sweet Webhook',
-            settings: {
-              dailyQuota: 0,
-              webhook: [
-                {
-                  event: 'birth',
-                  permissions: ['child-details', 'mother-details']
-                },
-                {
-                  event: 'death',
-                  permissions: ['deceased-details', 'death-encounter']
-                }
-              ]
-            }
-          }
-        }
-      },
-      result: {
-        data: {
-          registerSystem: {
-            __typename: 'registerSystem',
-            system: {
-              client: '4090df15-f4e5-4f16-ae7e-bb518129d493',
-              name: 'Sweet Webhook',
-              type: 'WEBHOOK'
-            }
-          }
-        }
-      }
-    }
-  ]
-
-  beforeEach(async () => {
-    const { store } = createStore()
-
-    const { component: testComponent } = await createTestComponent(
-      <SystemList />,
-      {
-        store,
-        graphqlMocks: mocks
-      }
-    )
-    component = testComponent
-  })
-
-  it('should show the system creation modal after click the create button', async () => {
-    component.find('#createClientButton').hostNodes().simulate('click')
-    expect(component.exists('ResponsiveModal')).toBeTruthy()
-  })
-
-  it('should show the registered system modal ', async () => {
-    component.find('#createClientButton').hostNodes().simulate('click')
-
-    component
-      .find('#client_name')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Sweet Webhook' }
-      })
-    component
-      .find('#permissions-selectors')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'WEBHOOK' }
-      })
-
-    selectOption(component, '#permissions-selectors', 'Webhook')
-    ;['child-details', 'mother-details'].forEach((it) => {
-      component
-        .find(`#birthCheckboxGroup${it}`)
-        .hostNodes()
-        .simulate('change', {
-          checked: true
-        })
-    })
-
-    component.find('#tab_death').hostNodes().simulate('click')
-    component.update()
-
-    selectOption(component, '#permissions-selectors', 'Webhook')
-    ;['deceased-details', 'death-encounter'].forEach((it) => {
-      component
-        .find(`#deathCheckboxGroup${it}`)
-        .hostNodes()
-        .simulate('change', {
-          checked: true
-        })
-    })
-    component.find('#submitClientForm').hostNodes().simulate('click')
-
-    component.update()
-    await new Promise((resolve) => {
-      setTimeout(resolve, 0)
-    })
-
-    const modal = await waitForElement(component, '#createClientModal')
-
-    expect(modal.first().props().title).toEqual('Sweet Webhook')
-  })
-})
-
 describe('render toggle settings', () => {
   let component: ReactWrapper<{}, {}>
 
@@ -255,7 +143,7 @@ describe('render toggle settings', () => {
               deleteSystem: {
                 __typename: 'deleteSystem',
                 clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
-                name: 'WebHook 1'
+                name: 'Health Integration 1'
               }
             }
           }
@@ -285,7 +173,7 @@ describe('render toggle settings', () => {
         )
         .find('li')
         .hostNodes()
-        .at(3)
+        .at(2)
         .simulate('click')
 
       component.find('#delete').hostNodes().simulate('click')
@@ -344,7 +232,7 @@ describe('render toggle settings', () => {
         )
         .find('li')
         .hostNodes()
-        .at(2)
+        .at(1)
         .simulate('click')
       component.find('#confirm').hostNodes().simulate('click')
       component.update()

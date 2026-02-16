@@ -20,13 +20,11 @@ export const archive: QuickActionConfig = {
       description: 'Archive button text'
     }
   },
-  onConfirm: ({ event, actions }) => {
+  onConfirm: ({ eventId, actions }) => {
     return actions.archive.mutate({
-      eventId: event.id,
+      eventId,
       transactionId: uuid(),
-      content: {
-        reason: 'Archived from action menu'
-      }
+      content: { reason: 'Archived from action menu' }
     })
   }
 }

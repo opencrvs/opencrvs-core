@@ -1,20 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`getAvailableActions returns the correct actions for "DECLARED" status with a "declared:requested" flag 1`] = `
+exports[`getAvailableActionsForEvent() returns the correct actions for "DECLARED" status with a "declared:requested" flag 1`] = `
 [
   "READ",
   "CUSTOM",
 ]
 `;
 
-exports[`getAvailableActions returns the correct actions for "REGISTERED" status with a "registered:requested" flag 1`] = `
+exports[`getAvailableActionsForEvent() returns the correct actions for "REGISTERED" status with a "registered:requested" flag 1`] = `
 [
   "READ",
   "CUSTOM",
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "ARCHIVED" status with no flags 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "ARCHIVED" status with no flags 1`] = `
 [
   "READ",
   "ASSIGN",
@@ -23,7 +23,7 @@ exports[`getAvailableActions should return the correct actions for "ARCHIVED" st
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "CREATED" status with no flags 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "CREATED" status with no flags 1`] = `
 [
   "READ",
   "DECLARE",
@@ -33,7 +33,7 @@ exports[`getAvailableActions should return the correct actions for "CREATED" sta
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "DECLARED" status with no flags 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "DECLARED" status with no flags 1`] = `
 [
   "READ",
   "REGISTER",
@@ -44,10 +44,9 @@ exports[`getAvailableActions should return the correct actions for "DECLARED" st
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "DECLARED" status with rejected flag 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "DECLARED" status with rejected flag 1`] = `
 [
   "READ",
-  "DECLARE",
   "NOTIFY",
   "CUSTOM",
   "EDIT",
@@ -55,20 +54,19 @@ exports[`getAvailableActions should return the correct actions for "DECLARED" st
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "NOTIFIED" status with no flags 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "NOTIFIED" status with no flags 1`] = `
 [
   "READ",
-  "DECLARE",
+  "EDIT",
   "ARCHIVE",
   "REJECT",
   "CUSTOM",
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "NOTIFIED" status with rejected flag 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "NOTIFIED" status with rejected flag 1`] = `
 [
   "READ",
-  "DECLARE",
   "NOTIFY",
   "CUSTOM",
   "EDIT",
@@ -76,14 +74,14 @@ exports[`getAvailableActions should return the correct actions for "NOTIFIED" st
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "REGISTERED" status with "registered:requested" correction-requested flag 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "REGISTERED" status with "registered:requested" correction-requested flag 1`] = `
 [
   "READ",
   "CUSTOM",
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "REGISTERED" status with correction-requested flag 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "REGISTERED" status with correction-requested flag 1`] = `
 [
   "READ",
   "APPROVE_CORRECTION",
@@ -93,7 +91,7 @@ exports[`getAvailableActions should return the correct actions for "REGISTERED" 
 ]
 `;
 
-exports[`getAvailableActions should return the correct actions for "REGISTERED" status with no flags 1`] = `
+exports[`getAvailableActionsForEvent() should return the correct actions for "REGISTERED" status with no flags 1`] = `
 [
   "READ",
   "PRINT_CERTIFICATE",

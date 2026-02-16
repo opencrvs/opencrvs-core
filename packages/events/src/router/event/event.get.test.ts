@@ -32,7 +32,7 @@ test('prevents forbidden access if missing required scope', async () => {
   const client = createTestClient(user, [])
 
   const id = generateUuid()
-  await expect(client.event.get(id)).rejects.toMatchObject(
+  await expect(client.event.get({eventId: id})).rejects.toMatchObject(
     new TRPCError({
       code: 'NOT_FOUND',
       message: `Event not found with ID: ${id}`
@@ -48,7 +48,7 @@ test('prevents access if required scope does not have correct event type configu
     encodeScope({ type: 'record.read', options: { event: 'birth' } })
   ])
 
-  await expect(client.event.get(generateUuid())).rejects.toMatchSnapshot()
+  await expect(client.event.get({eventId: generateUuid()})).rejects.toMatchSnapshot()
 })
 
 test('allows access without required scope when user created the event', async () => {
@@ -63,7 +63,7 @@ test('allows access without required scope when user created the event', async (
   expect(readScopes).not.toContain(RecordScopeType.enum['record.create'])
 
   const event = await client.event.create(generator.event.create())
-  await expect(client.event.get(event.id)).resolves.not.toThrow()
+  await expect(client.event.get({eventId: event.id})).resolves.not.toThrow()
 })
 
 test('prevents access without required scope when user did not create the event', async () => {
@@ -75,7 +75,7 @@ test('prevents access without required scope when user did not create the event'
   const anotherClient = createTestClient(users[1])
 
   const event = await anotherClient.event.create(generator.event.create())
-  await expect(myClient.event.get(event.id)).rejects.toMatchObject(
+  await expect(myClient.event.get({eventId: event.id})).rejects.toMatchObject(
     new TRPCError({
       code: 'NOT_FOUND',
       message: `Event not found with ID: ${event.id}`
@@ -97,7 +97,7 @@ test('allows access with required scope when user did not create the event', asy
     })
   ])
 
-  await expect(anotherClient.event.get(event.id)).resolves.not.toThrow()
+  await expect(anotherClient.event.get({eventId: event.id})).resolves.not.toThrow()
 })
 
 test(`Returns 404 when not found`, async () => {
@@ -105,7 +105,7 @@ test(`Returns 404 when not found`, async () => {
   const client = createTestClient(user)
 
   await expect(
-    client.event.get(generateUuid())
+    client.event.get({eventId: generateUuid()})
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -115,7 +115,7 @@ test('Returns event', async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  const fetchedEvent = await client.event.get(event.id)
+  const fetchedEvent = await client.event.get({eventId: event.id})
 
   expect(fetchedEvent.id).toEqual(event.id)
 
@@ -146,6 +146,15 @@ test('Returns event with all actions', async () => {
 
   await client.event.actions.assignment.assign(assignmentInput)
 
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
   await client.event.actions.declare.request(
     generator.event.actions.declare(event.id)
   )
@@ -157,6 +166,15 @@ test('Returns event with all actions', async () => {
 
   await client.event.actions.reject.request(
     generator.event.actions.reject(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(event.id)
   )
 
   await client.event.actions.assignment.assign({
@@ -234,8 +252,8 @@ test('Returns event with all actions', async () => {
     )
   )
 
-  await client.event.get(event.id)
-  const secondTimefetchedEvent = await client.event.get(event.id)
+  await client.event.get({eventId: event.id})
+  const secondTimefetchedEvent = await client.event.get({eventId: event.id})
 
   expect(
     secondTimefetchedEvent.actions.filter(
@@ -319,14 +337,14 @@ describe('Event indexing behavior', () => {
 
     test('does not index on create and read', async () => {
       const event = await createEvent()
-      await client.event.get(event.id)
-      await client.event.get(event.id)
+      await client.event.get({eventId: event.id})
+      await client.event.get({eventId: event.id})
       expect(indexEvent).not.toHaveBeenCalled()
     })
 
     test('does not index before declare', async () => {
       const event = await createEvent()
-      await client.event.get(event.id)
+      await client.event.get({eventId: event.id})
       expect(indexEvent).not.toHaveBeenCalled()
     })
   })
@@ -358,13 +376,13 @@ describe('Event indexing behavior', () => {
     test('indexes on register (with reads)', async () => {
       const event = await createEvent()
       await declareEvent(event)
-      await client.event.get(event.id)
+      await client.event.get({eventId: event.id})
       const createAction = findCreateAction(event)
       await assignEvent(event, createAction.createdBy)
-      await client.event.get(event.id)
+      await client.event.get({eventId: event.id})
       await assignEvent(event, createAction.createdBy)
       await registerEvent(event)
-      await client.event.get(event.id)
+      await client.event.get({eventId: event.id})
       expect(indexEvent).toHaveBeenCalledTimes(6) // declare -> view -> view -> assign -> register -> view
     })
 

@@ -15,7 +15,7 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
-import { SearchQueryParams, mandatoryColumns } from '@opencrvs/commons/client'
+import { SearchQueryParams, mandatoryColumns, ActionType } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -84,7 +84,7 @@ export const SearchResultIndex = () => {
 
   return (
     <SearchResultComponent
-      actions={['DEFAULT']}
+      actions={[ActionType.READ]}
       columns={mandatoryColumns}
       eventConfigs={[eventConfig]}
       queryData={queryData.results}

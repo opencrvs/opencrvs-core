@@ -63,8 +63,10 @@ import {
   isQrReaderFieldType,
   isLoaderFieldType,
   isAgeFieldType,
+  isNumberWithUnitFieldType,
   isCustomFieldType,
-  isHiddenFieldType
+  isHiddenFieldType,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -102,6 +104,7 @@ import { IdReader } from '@client/v2-events/features/events/registered-fields/Id
 import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
 import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
 import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
+import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
 import {
@@ -116,6 +119,7 @@ import {
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
+  eventConfig?: EventConfig
   /** non-native onChange. Updates Formik state by updating the value and its dependencies */
   onFieldValueChange: (name: string, value: FieldValue | undefined) => void
   /** Optional callback that is called whenever any field value changes.
@@ -145,6 +149,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
 export const GeneratedInputField = React.memo(
   <T extends FieldConfig>({
     fieldDefinition,
+    eventConfig,
     validatorContext,
     onBlur,
     onFieldValueChange,
@@ -223,10 +228,15 @@ export const GeneratedInputField = React.memo(
 
       return (
         // We are showing errors to underlying text input, so we need to ignore them here
-        <InputField {...omit(field.inputFieldProps, 'error')}>
+        <InputField
+          {...(field.config.configuration?.showParentFieldError
+            ? field.inputFieldProps
+            : omit(field.inputFieldProps, 'error'))}
+        >
           <Name.Input
             configuration={field.config.configuration}
             disabled={disabled}
+            eventConfig={eventConfig}
             id={fieldDefinition.id}
             validation={validation}
             validatorContext={validatorContext}
@@ -432,6 +442,19 @@ export const GeneratedInputField = React.memo(
         </InputField>
       )
     }
+    if (isNumberWithUnitFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <NumberWithUnit.Input
+            {...inputProps}
+            configuration={field.config.configuration}
+            options={field.config.options}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
 
     if (isTextAreaFieldType(field)) {
       return (
@@ -472,6 +495,7 @@ export const GeneratedInputField = React.memo(
             error={inputFieldProps.error}
             label={uploadedFileNameLabel}
             maxFileSize={field.config.configuration.maxFileSize}
+            maxImageSize={field.config.configuration.maxImageSize}
             value={field.value}
             width={field.config.configuration.style?.width}
             onChange={handleFileChange}
@@ -647,6 +671,7 @@ export const GeneratedInputField = React.memo(
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
             error={inputFieldProps.error}
             maxFileSize={field.config.configuration.maxFileSize}
+            maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
