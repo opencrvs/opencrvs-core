@@ -808,6 +808,15 @@ components:
         type:
           type: string
           const: ARCHIVE
+        content:
+          type: object
+          properties:
+            reason:
+              description: Message describing the reason for rejecting or archiving the event.
+              type: string
+              minLength: 1
+          required:
+            - reason
       required:
         - id
         - transactionId
@@ -13743,6 +13752,16 @@ components:
         type:
           type: string
           const: ARCHIVE
+        content:
+          type: object
+          properties:
+            reason:
+              description: Message describing the reason for rejecting or archiving the event.
+              type: string
+              minLength: 1
+          required:
+            - reason
+          additionalProperties: false
       required:
         - id
         - transactionId
