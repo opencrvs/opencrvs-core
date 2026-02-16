@@ -47,13 +47,13 @@ paths:
                           properties:
                             $$event:
                               type: string
-                              enum: &a6
-                                - trackingId
-                                - status
-                                - legalStatuses.REGISTERED.acceptedAt
-                                - legalStatuses.REGISTERED.createdAtLocation
-                                - legalStatuses.REGISTERED.registrationNumber
-                                - updatedAt
+                              enum: &a5
+                                - event.trackingId
+                                - event.status
+                                - event.legalStatuses.REGISTERED.acceptedAt
+                                - event.legalStatuses.REGISTERED.createdAtLocation
+                                - event.legalStatuses.REGISTERED.registrationNumber
+                                - event.updatedAt
                           required:
                             - $$event
                           description: Reference to a field defined in the event metadata, using the field
@@ -702,13 +702,7 @@ paths:
                                         advanced search form.
                                     fieldId:
                                       type: string
-                                      enum: &a7
-                                        - event.trackingId
-                                        - event.status
-                                        - event.legalStatuses.REGISTERED.acceptedAt
-                                        - event.legalStatuses.REGISTERED.createdAtLocation
-                                        - event.legalStatuses.REGISTERED.registrationNumber
-                                        - event.updatedAt
+                                      enum: *a5
                                     fieldType:
                                       type: string
                                       enum:
@@ -721,7 +715,7 @@ paths:
                         required:
                           - title
                           - fields
-                      default: &a8 []
+                      default: &a7 []
                       description: Configuration of fields available in the advanced search feature.
                   required:
                     - id
@@ -773,7 +767,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f942ace2-5161-4c7c-9594-a47c165e89b5
+                transactionId: 97151976-9f4e-4e64-80a6-4a99882a8a01
                 type: birth
       responses:
         "200":
@@ -831,7 +825,7 @@ paths:
                   additionalProperties: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
-                  default: &a5 {}
+                  default: &a6 {}
                 annotation:
                   type: object
                   additionalProperties: {}
@@ -859,7 +853,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 9769d96e-6bc4-4cd7-91a8-1dd9b92a0800
+                transactionId: fe19b2f3-85ee-4354-becd-fc96b679c585
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -919,7 +913,7 @@ paths:
                   additionalProperties: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
-                  default: *a5
+                  default: *a6
                 annotation:
                   type: object
                   additionalProperties: {}
@@ -1001,7 +995,7 @@ paths:
                   additionalProperties: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
-                  default: *a5
+                  default: *a6
                 annotation:
                   type: object
                   additionalProperties: {}
@@ -1086,7 +1080,7 @@ paths:
                   additionalProperties: {}
                   description: Record of field-level changes made by an action. Supports partial
                     updates and nullable values.
-                  default: *a5
+                  default: *a6
                 annotation:
                   type: object
                   additionalProperties: {}
@@ -1174,13 +1168,13 @@ paths:
                 query:
                   allOf:
                     - $ref: "#/components/schemas/QueryType"
-                  default: &a15
+                  default: &a14
                     type: and
                     clauses:
                       - eventType: tennis-club-membership
                         status:
                           type: anyOf
-                          terms: &a16
+                          terms: &a15
                             - CREATED
                             - NOTIFIED
                             - DECLARED
@@ -1302,7 +1296,7 @@ paths:
                             description: Unique identifier of the transaction.
                           createdByUserType:
                             type: string
-                            enum: &a17
+                            enum: &a16
                               - user
                               - system
                             description: Indicates whether the action was created by a human-user or by a
@@ -1338,7 +1332,7 @@ paths:
                               rejected by a third-party integration.
                           type:
                             type: string
-                            enum: &a18
+                            enum: &a17
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -1496,7 +1490,7 @@ components:
               properties:
                 $$event:
                   type: string
-                  enum: *a6
+                  enum: *a5
               required:
                 - $$event
               description: Reference to a field defined in the event metadata, using the field
@@ -2095,7 +2089,7 @@ components:
                             advanced search form.
                         fieldId:
                           type: string
-                          enum: *a7
+                          enum: *a5
                         fieldType:
                           type: string
                           enum:
@@ -2108,7 +2102,7 @@ components:
             required:
               - title
               - fields
-          default: *a8
+          default: *a7
           description: Configuration of fields available in the advanced search feature.
       required:
         - id
@@ -2262,7 +2256,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: &a9 []
+              default: &a8 []
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2285,7 +2279,7 @@ components:
                 required:
                   - validator
                   - message
-              default: &a10 []
+              default: &a9 []
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2430,7 +2424,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: &a11
+                          enum: &a10
                             - id
                             - name
                             - role
@@ -2516,7 +2510,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2539,7 +2533,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2605,7 +2599,7 @@ components:
                   properties:
                     $userField:
                       type: string
-                      enum: *a11
+                      enum: *a10
                     $location:
                       type: string
                   required:
@@ -2694,7 +2688,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2717,7 +2711,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -2857,7 +2851,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -2880,7 +2874,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3046,7 +3040,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3069,7 +3063,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3215,7 +3209,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3238,7 +3232,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3391,7 +3385,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3414,7 +3408,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3549,7 +3543,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3572,7 +3566,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3710,7 +3704,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3733,7 +3727,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3885,7 +3879,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -3908,7 +3902,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -3968,7 +3962,7 @@ components:
                 - SELECT_DATE_RANGE
             defaultValue:
               type: string
-              enum: &a12
+              enum: &a11
                 - last7Days
                 - last30Days
                 - last90Days
@@ -3980,7 +3974,7 @@ components:
                 properties:
                   value:
                     type: string
-                    enum: *a12
+                    enum: *a11
                     description: The value of the option
                   label:
                     description: The label of the option
@@ -4058,7 +4052,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4081,7 +4075,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4150,7 +4144,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: &a13
+                      enum: &a12
                         - reg12
                         - reg14
                         - reg16
@@ -4232,7 +4226,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4255,7 +4249,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4411,7 +4405,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4434,7 +4428,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4507,7 +4501,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a13
+                      enum: *a12
               default: {}
           required:
             - id
@@ -4578,7 +4572,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4601,7 +4595,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4729,7 +4723,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4752,7 +4746,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -4921,7 +4915,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -4944,7 +4938,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5011,7 +5005,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: *a11
+                          enum: *a10
                         $location:
                           type: string
                       required:
@@ -5024,7 +5018,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: *a11
+                          enum: *a10
                         $location:
                           type: string
                       required:
@@ -5037,7 +5031,7 @@ components:
                       properties:
                         $userField:
                           type: string
-                          enum: *a11
+                          enum: *a10
                         $location:
                           type: string
                       required:
@@ -5198,7 +5192,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5221,7 +5215,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5349,7 +5343,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5372,7 +5366,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5500,7 +5494,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5523,7 +5517,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5652,7 +5646,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5675,7 +5669,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5759,7 +5753,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: &a14
+                    enum: &a13
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -5868,7 +5862,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -5891,7 +5885,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6019,7 +6013,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6042,7 +6036,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6191,7 +6185,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6214,7 +6208,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6339,7 +6333,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6362,7 +6356,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6504,7 +6498,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6527,7 +6521,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6655,7 +6649,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6678,7 +6672,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6806,7 +6800,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -6829,7 +6823,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -6904,7 +6898,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a14
+                    enum: *a13
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -6979,7 +6973,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7002,7 +6996,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7138,7 +7132,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7161,7 +7155,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7282,7 +7276,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a14
+                    enum: *a13
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -7357,7 +7351,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7380,7 +7374,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7558,7 +7552,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7581,7 +7575,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7724,7 +7718,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7747,7 +7741,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -7885,7 +7879,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -7908,7 +7902,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8120,7 +8114,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8143,7 +8137,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8285,7 +8279,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8308,7 +8302,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8368,7 +8362,7 @@ components:
                 - VERIFICATION_STATUS
             defaultValue:
               type: string
-              enum: &a20
+              enum: &a19
                 - verified
                 - authenticated
                 - failed
@@ -8455,7 +8449,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8478,7 +8472,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8613,7 +8607,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -8636,7 +8630,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -8766,7 +8760,7 @@ components:
                         type: array
                         items:
                           $ref: "#/components/schemas/FieldConditional"
-                        default: *a9
+                        default: *a8
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
                       secured:
@@ -8789,7 +8783,7 @@ components:
                           required:
                             - validator
                             - message
-                        default: *a10
+                        default: *a9
                         description: Additional validation rules applied to the field.
                       helperText:
                         $ref: "#/components/schemas/TranslationConfig"
@@ -8930,7 +8924,7 @@ components:
                         type: array
                         items:
                           $ref: "#/components/schemas/FieldConditional"
-                        default: *a9
+                        default: *a8
                         description: Conditions determining when the field is shown or enabled. By
                           default, the field is always shown and enabled.
                       secured:
@@ -8953,7 +8947,7 @@ components:
                           required:
                             - validator
                             - message
-                        default: *a10
+                        default: *a9
                         description: Additional validation rules applied to the field.
                       helperText:
                         $ref: "#/components/schemas/TranslationConfig"
@@ -9106,7 +9100,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -9129,7 +9123,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -9266,7 +9260,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -9289,7 +9283,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -9425,7 +9419,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a9
+              default: *a8
               description: Conditions determining when the field is shown or enabled. By
                 default, the field is always shown and enabled.
             secured:
@@ -9448,7 +9442,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a10
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -9531,7 +9525,7 @@ components:
                 query:
                   allOf:
                     - $ref: "#/components/schemas/QueryType"
-                  default: *a15
+                  default: *a14
                 limit:
                   type: number
                   default: 100
@@ -9664,7 +9658,7 @@ components:
             - eventType: tennis-club-membership
               status:
                 type: anyOf
-                terms: *a16
+                terms: *a15
               updatedAt:
                 type: range
                 gte: 2025-05-22
@@ -9733,7 +9727,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a16
+            enum: *a15
       required:
         - type
         - terms
@@ -9746,7 +9740,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a16
+          enum: *a15
       required:
         - type
         - term
@@ -9815,7 +9809,7 @@ components:
             - timePeriod
         term:
           type: string
-          enum: *a12
+          enum: *a11
       required:
         - type
         - term
@@ -9840,7 +9834,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a17
+          enum: *a16
       required:
         - type
         - term
@@ -10557,7 +10551,7 @@ components:
                     description: Unique identifier of the transaction.
                   createdByUserType:
                     type: string
-                    enum: *a17
+                    enum: *a16
                     description: Indicates whether the action was created by a human-user or by a
                       system-user.
                   createdAt:
@@ -10591,7 +10585,7 @@ components:
                       rejected by a third-party integration.
                   type:
                     type: string
-                    enum: *a18
+                    enum: *a17
                 required:
                   - id
                   - transactionId
@@ -10663,7 +10657,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10697,7 +10691,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: &a19
+          enum: &a18
             - Requested
             - Accepted
             - Rejected
@@ -10735,7 +10729,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10769,7 +10763,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10804,7 +10798,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10838,7 +10832,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10883,7 +10877,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -10917,7 +10911,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -10971,7 +10965,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11005,7 +10999,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11040,7 +11034,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11074,7 +11068,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11117,7 +11111,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11151,7 +11145,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11196,7 +11190,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11230,7 +11224,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11265,7 +11259,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11299,7 +11293,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11338,7 +11332,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11372,7 +11366,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11407,7 +11401,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11441,7 +11435,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11480,7 +11474,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11514,7 +11508,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11549,7 +11543,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11583,7 +11577,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11621,7 +11615,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11655,7 +11649,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11703,7 +11697,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11737,7 +11731,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11772,7 +11766,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11806,7 +11800,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11847,7 +11841,7 @@ components:
           description: Unique identifier of the transaction.
         createdByUserType:
           type: string
-          enum: *a17
+          enum: *a16
           description: Indicates whether the action was created by a human-user or by a
             system-user.
         createdAt:
@@ -11881,7 +11875,7 @@ components:
           description: Action-specific metadata used to annotate the event.
         status:
           type: string
-          enum: *a19
+          enum: *a18
           description: Current status of the action. Actions may be validated
             asynchronously by third-party integrations.
         originalActionId:
@@ -11946,7 +11940,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum: *a16
+          enum: *a15
         legalStatuses:
           type: object
           properties:
@@ -12193,7 +12187,7 @@ components:
                     description: Date range with start and end dates in the format YYYY-MM-DD.
                       Inclusive start, exclusive end.
                   - type: string
-                    enum: *a12
+                    enum: *a11
                   - type: boolean
                   - type: number
                   - type: object
@@ -12274,7 +12268,7 @@ components:
                     required:
                       - loading
                   - type: string
-                    enum: *a20
+                    enum: *a19
                   - type: object
                     nullable: true
                     properties:
@@ -12382,7 +12376,7 @@ components:
                           description: Date range with start and end dates in the format YYYY-MM-DD.
                             Inclusive start, exclusive end.
                         - type: string
-                          enum: *a12
+                          enum: *a11
                         - type: boolean
                         - type: number
                         - type: object
@@ -12463,7 +12457,7 @@ components:
                           required:
                             - loading
                         - type: string
-                          enum: *a20
+                          enum: *a19
                         - type: object
                           nullable: true
                           properties:
