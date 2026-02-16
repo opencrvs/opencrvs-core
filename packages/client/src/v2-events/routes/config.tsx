@@ -60,6 +60,8 @@ import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
 function PrefetchQueries() {
+  console.log('Prefetching queries')
+
   const { prefetch } = useWorkqueues()
 
   useEffect(() => {

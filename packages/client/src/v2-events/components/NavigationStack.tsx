@@ -25,6 +25,8 @@ export const NavigationHistoryProvider = ({ children }: PropsWithChildren) => {
   const location = useLocation()
   const [history, setHistory] = useState<Location[]>([])
 
+  console.log({ history })
+
   useEffect(() => {
     setHistory((prevHistory) => [...prevHistory, location])
   }, [location])
@@ -58,6 +60,8 @@ export function NavigationStack(props: PropsWithChildren) {
   const [allowedToNavigate, setAllowedToNavigate] = useState(false)
   // Tracks if we're in the process of backing out of the navigation stack
   const [backing, setBacking] = useState(false)
+
+  console.log({ allowedToNavigate, backing })
 
   useEffect(() => {
     /**
