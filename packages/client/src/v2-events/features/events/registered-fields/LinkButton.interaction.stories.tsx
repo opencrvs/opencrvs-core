@@ -17,6 +17,7 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { FormFieldGeneratorProps } from '../../../components/forms/FormFieldGenerator/FormFieldGenerator'
+import { getCleanRedirectURI } from './LinkButton'
 
 const url = 'https://example.com/authenticate'
 const meta: Meta<FormFieldGeneratorProps> = {
@@ -52,9 +53,10 @@ export const Redirection: Story = {
     const link = await canvas.findByRole('link', {
       name: 'Authenticate by external system'
     })
+    const redirect_uri = encodeURIComponent(getCleanRedirectURI())
     await expect(link).toHaveAttribute(
       'href',
-      `https://example.com/authenticate?redirect_uri=${encodeURIComponent(window.location.href)}`
+      `https://example.com/authenticate?redirect_uri=${redirect_uri}`
     )
   },
   render: (args) => {
