@@ -247,7 +247,7 @@ export function isFieldReference(value: unknown): value is FieldReference {
 }
 
 export function isEventFieldReference(value: unknown): value is FieldReference {
-  return typeof value === 'object' && value !== null && '$event' in value
+  return typeof value === 'object' && value !== null && '$$event' in value
 }
 
 /**
