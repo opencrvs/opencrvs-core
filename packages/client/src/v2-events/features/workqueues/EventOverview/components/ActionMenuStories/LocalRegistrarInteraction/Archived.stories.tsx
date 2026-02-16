@@ -39,9 +39,7 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      // @TODO - decide whether to keep/remove them after conditionals are implemented
       ['Assign']: AssertType.ENABLED,
-      ['Unassign']: AssertType.ENABLED,
       ['Confirm']: AssertType.DISABLED
     }
   },
@@ -58,10 +56,8 @@ const archivedScenariosForLocalRegistrar: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      // @TODO - decide whether to keep/remove them after conditionals are implemented
-      ['Assign']: AssertType.ENABLED,
-      ['Unassign']: AssertType.ENABLED,
-      ['Confirm']: AssertType.DISABLED
+      ['Confirm']: AssertType.DISABLED,
+      ['Unassign']: AssertType.ENABLED
     }
   }
 ]

@@ -15,8 +15,6 @@ exports[`getAvailableActionsForEvent() returns the correct actions for "REGISTER
 exports[`getAvailableActionsForEvent() should return the correct actions for "ARCHIVED" status with no flags 1`] = `
 [
   "READ",
-  "ASSIGN",
-  "UNASSIGN",
   "CUSTOM",
 ]
 `;
