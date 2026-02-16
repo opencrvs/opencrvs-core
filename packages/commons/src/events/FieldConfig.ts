@@ -275,7 +275,7 @@ export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: SerializedNowDateTime.or(DateValue)
+  defaultValue: SerializedNowDateTime.or(DateValue).or(FieldReference).or(CodeToEvaluate)
     .optional()
     .describe('Default date value(yyyy-MM-dd)'),
   configuration: z
@@ -303,7 +303,7 @@ export type AgeField = z.infer<typeof AgeField>
 
 const TimeField = BaseField.extend({
   type: z.literal(FieldType.TIME),
-  defaultValue: SerializedNowDateTime.or(TimeValue)
+  defaultValue: SerializedNowDateTime.or(TimeValue).or(FieldReference).or(CodeToEvaluate)
     .optional()
     .describe('Default time value (HH-mm)'),
   configuration: z

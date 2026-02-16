@@ -33,7 +33,7 @@ import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
 import { ActionConfig, ActionType, EventIndex, EventDocument } from '../client'
 
-nconst compiledValidators = new Map<string, Function>()
+const compiledValidators = new Map<string, Function>()
 const ajv = new Ajv({
   $data: true,
   allowUnionTypes: true,
