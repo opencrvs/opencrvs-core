@@ -552,9 +552,6 @@ export function eventPayloadGenerator(
         declaration: {},
         annotation: {},
         eventId,
-        content: {
-          reason: `${ActionType.ARCHIVE}`
-        },
         ...input
       }),
       reject: (
@@ -843,7 +840,7 @@ export function generateActionDocument<T extends ActionType>({
       }
     }
     case ActionType.ARCHIVE:
-      return { ...actionBase, type: action, content: { reason: 'Archive' } }
+      return { ...actionBase, type: action }
     case ActionType.REJECT:
       return { ...actionBase, type: action, content: { reason: 'Reject' } }
 

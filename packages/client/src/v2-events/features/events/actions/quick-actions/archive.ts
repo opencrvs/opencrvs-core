@@ -23,9 +23,8 @@ export const archive: QuickActionConfig = {
   onConfirm: ({ eventId, actions }) => {
     return actions.archive.mutate({
       eventId,
-      transactionId: uuid(),
-      /** On v1.9, content was hardcoded to { reason: 'Archived from action menu' }. I guess the idea has been to add a reason field, but that has not been implemented. */
-      content: {}
+      transactionId: uuid()
+      /** On v1.9, we sent a content property which was hardcoded to { reason: 'Archived from action menu' }. I guess the idea has been to add a reason field, but that has not been implemented. */
     })
   }
 }
