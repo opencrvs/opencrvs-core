@@ -81,7 +81,7 @@ async function handleAttachmentUpload(
 
   if (!hasScope(token.data, SCOPES.ATTACHMENT_UPLOAD)) {
     res.writeHead(403, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({ error: 'Forbidden: missing attachment.upload scope' }))
+    res.end(JSON.stringify({ error: 'Forbidden' }))
     return
   }
 

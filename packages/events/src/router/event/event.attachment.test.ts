@@ -42,7 +42,7 @@ describe('POST /attachments', () => {
     })
 
     expect(res.status).toBe(401)
-    const body = await res.json()
+    const body = (await res.json()) as { error: string }
     expect(body.error).toBe('Unauthorized')
   })
 
@@ -60,8 +60,8 @@ describe('POST /attachments', () => {
     })
 
     expect(res.status).toBe(403)
-    const body = await res.json()
-    expect(body.error).toContain('Forbidden')
+    const body = (await res.json()) as { error: string }
+    expect(body.error).toBe('Forbidden')
   })
 
   test('successfully uploads a file when token has attachment.upload scope', async () => {
@@ -96,14 +96,18 @@ describe('POST /attachments', () => {
     })
 
     expect(res.status).toBe(200)
-    const body = await res.json()
+    const body = (await res.json()) as { fileUrl: string }
     expect(body).toEqual({ fileUrl: expectedFileUrl })
   })
 
   test('returns 500 when documents service fails', async () => {
     mswServer.use(
       http.post(`${env.DOCUMENTS_URL}/files`, () => {
-        return new HttpResponse(null, { status: 500 })
+        return HttpResponse.json(
+          { error: 'Internal server error' },
+          // @ts-expect-error - MSW does not have a type for this
+          { status: 500 }
+        )
       })
     )
 
@@ -129,7 +133,7 @@ describe('POST /attachments', () => {
     })
 
     expect(res.status).toBe(500)
-    const body = await res.json()
+    const body = (await res.json()) as { error: string }
     expect(body.error).toBe('File upload failed')
   })
 })
