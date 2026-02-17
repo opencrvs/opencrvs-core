@@ -561,11 +561,12 @@ export async function getEventCount({
 }) {
   const esClient = getOrCreateClient()
 
+  const resolvedScopes = acceptedScopes?.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
+  )
+
   const esQueries = queries.map(async (query) =>
     buildElasticQueryFromSearchPayload(query.query, eventConfigs)
-  )
-  const resolvedScopes = acceptedScopes.map((scope) =>
-    resolveRecordActionScopeToIds(scope, user)
   )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
