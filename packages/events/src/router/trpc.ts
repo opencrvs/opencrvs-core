@@ -17,7 +17,7 @@ import { TrpcContext } from '@events/context'
 import { env } from '@events/environment'
 
 export const t = initTRPC
-  .context<Partial<TrpcContext>>()
+  .context<Partial<TrpcContext> & { filename?: string }>()
   .meta<OpenApiMeta>()
   .create({
     transformer: superjson,

@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
+import FormData from 'form-data'
+import { Readable } from 'stream'
 import {
   FullDocumentPath,
   getFilePathsFromEvent,
@@ -84,4 +86,31 @@ export async function cleanupUnreferencedFiles(
   return Promise.all(
     filesToDelete.map(async (file: string) => deleteFile(file, token))
   )
+}
+
+export async function uploadFile(
+  fileStream: unknown,
+  filename: string,
+  token: string
+): Promise<{ fileUrl: string }> {
+  const form = new FormData()
+  form.append('file', Readable.fromWeb(fileStream as import('stream/web').ReadableStream), {
+    filename
+  })
+
+  const res = await fetch(new URL('/files', env.DOCUMENTS_URL).toString(), {
+    method: 'POST',
+    headers: {
+      ...form.getHeaders(),
+      Authorization: token
+    },
+    body: form
+  })
+
+  if (!res.ok) {
+    throw new Error(`File upload failed: ${res.status} ${res.statusText}`)
+  }
+
+  const fileUrl = await res.text()
+  return { fileUrl }
 }

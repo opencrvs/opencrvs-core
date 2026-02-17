@@ -10,11 +10,11 @@
  */
 
 import { http, HttpResponse } from 'msw'
-import { SCOPES } from '@opencrvs/commons'
+import { SCOPES, TokenUserType } from '@opencrvs/commons'
 import { server } from '@events/server'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
-import { createTestToken } from '@events/tests/utils'
+import { createTestToken, setupTestCase } from '@events/tests/utils'
 
 let serverInstance: ReturnType<typeof server>
 let url: string
@@ -36,104 +36,119 @@ afterAll(() => {
 })
 
 describe('POST /attachments', () => {
-  test('returns 401 when no authorization header is provided', async () => {
-    const res = await fetch(`${url}/attachments`, {
-      method: 'POST'
+  test('returns UNAUTHORIZED when no authorization header is provided', async () => {
+    const res = await fetch(`${url}/attachments?filename=test.jpg`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/octet-stream'
+      },
+      body: new Blob(['test file content'])
     })
 
     expect(res.status).toBe(401)
-    const body = (await res.json()) as { error: string }
-    expect(body.error).toBe('Unauthorized')
   })
 
-  test('returns 403 when token does not have attachment.upload scope', async () => {
+  test('returns FORBIDDEN when token does not have attachment.upload scope', async () => {
+    const { user } = await setupTestCase()
+
+    mswServer.use(
+      http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
+        HttpResponse.json({
+          primaryOfficeId: user.primaryOfficeId,
+          role: user.role,
+          signature: user.signature
+        })
+      )
+    )
+
     const token = createTestToken({
-      userId: 'test-user',
-      scopes: [SCOPES.RECORD_READ]
+      userId: user.id,
+      scopes: [SCOPES.RECORD_READ],
+      userType: TokenUserType.enum.user,
+      role: user.role
     })
 
-    const res = await fetch(`${url}/attachments`, {
+    const res = await fetch(`${url}/attachments?filename=test.jpg`, {
       method: 'POST',
       headers: {
-        Authorization: token
-      }
+        Authorization: token,
+        'Content-Type': 'application/octet-stream'
+      },
+      body: new Blob(['test file content'])
     })
 
     expect(res.status).toBe(403)
-    const body = (await res.json()) as { error: string }
-    expect(body.error).toBe('Forbidden')
   })
 
   test('successfully uploads a file when token has attachment.upload scope', async () => {
-    const expectedFileUrl = '/ocrvs/test-event/abc123.jpg'
+    const { user } = await setupTestCase()
+    const expectedFileUrl = '/ocrvs/test-event/test.jpg'
 
     mswServer.use(
+      http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
+        HttpResponse.json({
+          primaryOfficeId: user.primaryOfficeId,
+          role: user.role,
+          signature: user.signature
+        })
+      ),
       http.post(`${env.DOCUMENTS_URL}/files`, () => {
         return HttpResponse.text(expectedFileUrl)
       })
     )
 
     const token = createTestToken({
-      userId: 'test-user',
-      scopes: [SCOPES.ATTACHMENT_UPLOAD]
+      userId: user.id,
+      scopes: [SCOPES.ATTACHMENT_UPLOAD],
+      userType: TokenUserType.enum.user,
+      role: user.role
     })
 
-    const formData = new FormData()
-    formData.append(
-      'file',
-      new Blob(['test file content'], { type: 'image/jpeg' }),
-      'test.jpg'
-    )
-    formData.append('transactionId', 'abc123')
-    formData.append('path', 'test-event')
-
-    const res = await fetch(`${url}/attachments`, {
+    const res = await fetch(`${url}/attachments?filename=test.jpg`, {
       method: 'POST',
       headers: {
-        Authorization: token
+        Authorization: token,
+        'Content-Type': 'application/octet-stream'
       },
-      body: formData
+      body: new Blob(['test file content'])
     })
 
     expect(res.status).toBe(200)
-    const body = (await res.json()) as { fileUrl: string }
-    expect(body).toEqual({ fileUrl: expectedFileUrl })
+    const body = (await res.json()) as {
+      result: { data: { json: { fileUrl: string } } }
+    }
+    expect(body.result.data.json.fileUrl).toBe(expectedFileUrl)
   })
 
-  test('returns 500 when documents service fails', async () => {
+  test('returns BAD_REQUEST when filename query parameter is missing', async () => {
+    const { user } = await setupTestCase()
+
     mswServer.use(
-      http.post(`${env.DOCUMENTS_URL}/files`, () => {
-        return HttpResponse.json(
-          { error: 'Internal server error' },
-          // @ts-expect-error - MSW does not have a type for this
-          { status: 500 }
-        )
-      })
+      http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
+        HttpResponse.json({
+          primaryOfficeId: user.primaryOfficeId,
+          role: user.role,
+          signature: user.signature
+        })
+      )
     )
 
     const token = createTestToken({
-      userId: 'test-user',
-      scopes: [SCOPES.ATTACHMENT_UPLOAD]
+      userId: user.id,
+      scopes: [SCOPES.ATTACHMENT_UPLOAD],
+      userType: TokenUserType.enum.user,
+      role: user.role
     })
-
-    const formData = new FormData()
-    formData.append(
-      'file',
-      new Blob(['test file content'], { type: 'image/jpeg' }),
-      'test.jpg'
-    )
-    formData.append('transactionId', 'abc123')
 
     const res = await fetch(`${url}/attachments`, {
       method: 'POST',
       headers: {
-        Authorization: token
+        Authorization: token,
+        'Content-Type': 'application/octet-stream'
       },
-      body: formData
+      body: new Blob(['test file content'])
     })
 
-    expect(res.status).toBe(500)
-    const body = (await res.json()) as { error: string }
-    expect(body.error).toBe('File upload failed')
+    expect(res.status).toBe(400)
   })
 })

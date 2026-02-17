@@ -76,6 +76,11 @@ export function server() {
       return
     }
 
+    // Rewrite REST-style /attachments to tRPC procedure path
+    if (req.method === 'POST' && req.url.startsWith('/attachments')) {
+      req.url = req.url.replace('/attachments', '/attachments.upload')
+    }
+
     // If it's a tRPC request, handle it with the tRPC server
     if (isTrpcRequest(req)) {
       trpcServer(req, res)
