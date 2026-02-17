@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
+import { IncomingMessage } from 'http'
 import {
   FullDocumentPath,
   getFilePathsFromEvent,
@@ -84,4 +85,25 @@ export async function cleanupUnreferencedFiles(
   return Promise.all(
     filesToDelete.map(async (file: string) => deleteFile(file, token))
   )
+}
+
+export async function uploadFile(
+  req: IncomingMessage,
+  token: string
+): Promise<{ fileUrl: string }> {
+  const res = await fetch(new URL('/files', env.DOCUMENTS_URL).toString(), {
+    method: 'POST',
+    headers: {
+      'content-type': req.headers['content-type'] || 'multipart/form-data',
+      Authorization: token
+    },
+    body: req
+  })
+
+  if (!res.ok) {
+    throw new Error(`File upload failed: ${res.status} ${res.statusText}`)
+  }
+
+  const fileUrl = await res.text()
+  return { fileUrl }
 }
