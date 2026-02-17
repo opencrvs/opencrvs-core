@@ -14,12 +14,15 @@ import _ from 'lodash'
 import {
   ActionUpdate,
   errorMessages,
+  EventState,
+  isFieldVisible,
   LocationType,
   ValidatorContext
 } from '@opencrvs/commons/events'
 import { getOrThrow } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getLeafLocationIds } from '@events/storage/postgres/events/locations'
+import { DeclarationFormConfig } from '../../../../../commons/build/dist/esm'
 
 type ValidationError = {
   message: string
@@ -80,18 +83,36 @@ function flattenEntries<T>(obj: T, path: string = ''): [string, unknown][] {
 /**
  * Compares update vs cleaned payloads and returns an array of offending keys.
  */
-export function getInvalidUpdateKeys<T>({
+export function getInvalidUpdateKeys({
   update,
-  cleaned
+  cleaned,
+  declarationConfig,
+  context
 }: {
-  update: T
-  cleaned: T
+  update: ActionUpdate
+  cleaned: EventState
+  declarationConfig: DeclarationFormConfig
+  context: ValidatorContext
 }): ValidationError[] {
   const updateEntries = flattenEntries(update)
   const cleanedKeys = flattenEntries(cleaned).map(([key]) => key)
 
   return updateEntries
-    .filter(([key]) => !cleanedKeys.includes(key))
+    .filter(([key]) => {
+      const field = declarationConfig.pages
+        .flatMap((page) => page.fields)
+        .find((f) => f.id === key)
+      // null value for hidden field is allowed, as it can be used to clear a value
+      // that was previously set when the field was visible
+      if (
+        field &&
+        !isFieldVisible(field, update, context) &&
+        update[key] === null
+      ) {
+        return false
+      }
+      return !cleanedKeys.includes(key)
+    })
     .map(([key, value]) => ({
       message: errorMessages.hiddenField.defaultMessage,
       id: key,

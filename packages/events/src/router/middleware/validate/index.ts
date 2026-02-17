@@ -152,8 +152,10 @@ function validateDeclarationUpdateAction({
   // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
   // Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
   const invalidKeys = getInvalidUpdateKeys({
-    update: deepDropNulls(declarationUpdate),
-    cleaned: deepDropNulls(cleanedDeclaration)
+    update: declarationUpdate,
+    cleaned: cleanedDeclaration,
+    declarationConfig,
+    context
   })
 
   if (invalidKeys.length > 0) {
