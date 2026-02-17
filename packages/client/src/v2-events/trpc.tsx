@@ -103,86 +103,69 @@ function createIDBPersister(storageIdentifier: string) {
        * Serializing data is a synchronous process and freezes the client, so we want to minimise how often it happens.
        * For large payloads, ensure staleTime is set for queries to avoid frequent updates.
        */
-      try {
-        const [largeQueries, normalQueries] = partition(
-          client.clientState.queries,
-          (query) => query.meta?.useLargeQueryStorage === true
-        )
+      const [largeQueries, normalQueries] = partition(
+        client.clientState.queries,
+        (query) => query.meta?.useLargeQueryStorage === true
+      )
 
-        console.log({ normalQueries, largeQueries })
+      const clientWithoutLargeQueries = {
+        ...client,
+        clientState: {
+          ...client.clientState,
+          queries: normalQueries
+        }
+      }
 
-        const clientWithoutLargeQueries = {
-          ...client,
-          clientState: {
-            ...client.clientState,
-            queries: normalQueries
-          }
+      // 2. Persist the main client without large queries
+      await storage.setItem(fullStorageIdentifier, clientWithoutLargeQueries)
+
+      // 3. Persist large queries only if they have changed since the last persist to avoid unnecessary serialization.
+      const changed = largeQueries.some((query) => {
+        if (query.state.status !== 'success') {
+          return false
         }
 
-        // 2. Persist the main client without large queries
-        await storage.setItem(fullStorageIdentifier, clientWithoutLargeQueries)
-
-        console.log('persisted small queries')
-
-        // 3. Persist large queries only if they have changed since the last persist to avoid unnecessary serialization.
-        const changed = largeQueries.some((query) => {
-          if (query.state.status !== 'success') {
-            return false
-          }
-
-          if (query.state.fetchStatus === 'fetching') {
-            return false
-          }
-
-          const updatedAt = query.state.dataUpdatedAt
-          const dehydratedAt = query.dehydratedAt
-
-          // During the first load updatedAt === dehydratedAt.
-          return dehydratedAt === undefined || updatedAt >= dehydratedAt
-        })
-
-        if (changed) {
-          await storage.setItem(largeQueryStorageIdentifier, largeQueries)
-          console.log('persisted large queries')
+        if (query.state.fetchStatus === 'fetching') {
+          return false
         }
-      } catch (error) {
-        console.log(error)
+
+        const updatedAt = query.state.dataUpdatedAt
+        const dehydratedAt = query.dehydratedAt
+
+        // During the first load updatedAt === dehydratedAt.
+        return dehydratedAt === undefined || updatedAt >= dehydratedAt
+      })
+
+      if (changed) {
+        await storage.setItem(largeQueryStorageIdentifier, largeQueries)
       }
     },
     /** Restore client from storage on page change / refresh. Expected to happen more rarely. */
     restoreClient: async () => {
-      try {
-        const client = await storage.getItem<PersistedClient>(
-          fullStorageIdentifier
-        )
-        console.log(fullStorageIdentifier)
+      const client = await storage.getItem<PersistedClient>(
+        fullStorageIdentifier
+      )
 
-        if (!client) {
-          console.log('No client')
-          return undefined
-        }
+      if (!client) {
+        return undefined
+      }
 
-        const largeQueries = await storage.getItem<
-          PersistedClient['clientState']['queries']
-        >(largeQueryStorageIdentifier)
+      const largeQueries = await storage.getItem<
+        PersistedClient['clientState']['queries']
+      >(largeQueryStorageIdentifier)
 
-        console.log({ largeQueries })
-
-        // 4. Re-attach large queries to the client to provide consistent state.
-        if (largeQueries) {
-          return {
-            ...client,
-            clientState: {
-              ...client.clientState,
-              queries: [...client.clientState.queries, ...largeQueries]
-            }
+      // 4. Re-attach large queries to the client to provide consistent state.
+      if (largeQueries) {
+        return {
+          ...client,
+          clientState: {
+            ...client.clientState,
+            queries: [...client.clientState.queries, ...largeQueries]
           }
         }
-
-        return client
-      } catch (error) {
-        console.log(error)
       }
+
+      return client
     },
     removeClient: async () => {
       await storage.removeItem(fullStorageIdentifier)
@@ -238,12 +221,7 @@ export function TRPCProvider({
           }
         }
       }}
-      onError={() => {
-        console.error('Restore failed')
-        setQueriesRestored(true)
-      }}
       onSuccess={async () => {
-        console.error('Restored successfully')
         setQueriesRestored(true)
         await queryClient.resumePausedMutations()
 

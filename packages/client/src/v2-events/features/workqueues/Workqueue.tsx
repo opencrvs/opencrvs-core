@@ -84,9 +84,6 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
 
 function WorkqueueContent() {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
-  console.log(`Workqueue with slug: ${workqueueSlug}`)
-
   if (!workqueueSlug) {
     throw new Error('Workqueue slug is required')
   }
