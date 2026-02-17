@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import IframeResizer from 'iframe-resizer-react'
 import { useIntl } from 'react-intl'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -23,6 +23,8 @@ import {
   NavigationStack,
   useNavigationHistory
 } from '@client/v2-events/components/NavigationStack'
+import { getToken } from '@client/utils/authUtils'
+import { useDashboardIds } from '@client/hooks/useDashboardIds'
 
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -30,19 +32,43 @@ const StyledIFrame = styled(IframeResizer)`
   border: none;
 `
 interface IdashboardView {
-  title: string
-  url?: string
+  dashboard: {
+    id: string
+    context?: {
+      auth: 'REQUEST_AUTH_TOKEN'
+    }
+    title: {
+      id: string
+      defaultMessage: string
+      description: string
+    }
+    url: string
+  }
   icon?: JSX.Element
 }
 
-function DashboardEmbedView({ title, url, icon }: IdashboardView) {
+function isValidAbsoluteURL(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.origin !== 'null'
+  } catch {
+    return false
+  }
+}
+
+function DashboardEmbedView({ dashboard, icon }: IdashboardView) {
   const intl = useIntl()
+  const title = intl.formatMessage(dashboard.title)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const allowedDashboardIds = useDashboardIds()
   const { eventId, slug, eventType, workqueue, ...rest } = Object.fromEntries(
     searchParams.entries()
   )
   const history = useNavigationHistory()
+  const token = getToken()
 
   const handleCrossBar = () => {
     if (history.length > 1) {
@@ -53,6 +79,49 @@ function DashboardEmbedView({ title, url, icon }: IdashboardView) {
       navigate(ROUTES.V2.path)
     }
   }
+
+  // ---- Send token to wrapper iframe when ready ----
+  useEffect(() => {
+    // Do not send token if dashboard is not allowed by scopes
+    if (!allowedDashboardIds.includes(dashboard.id)) {
+      return
+    }
+
+    if (!token || dashboard.context?.auth !== 'REQUEST_AUTH_TOKEN') {
+      return
+    }
+
+    if (!isValidAbsoluteURL(dashboard.url)) {
+      throw new Error(`Invalid dashboard URL: ${dashboard.url}`)
+    }
+
+    const dashboardOrigin = new URL(dashboard.url).origin
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== dashboardOrigin) {
+        return
+      }
+
+      // this is the real sender window
+      const sourceWindow = event.source as Window | null
+      if (!sourceWindow) {
+        return
+      }
+
+      if (event.data?.type === 'REQUEST_AUTH_TOKEN') {
+        sourceWindow.postMessage({ type: 'AUTH_TOKEN', token }, event.origin)
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+
+    return () => window.removeEventListener('message', handleMessage)
+  }, [
+    allowedDashboardIds,
+    dashboard.context?.auth,
+    dashboard.id,
+    dashboard.url,
+    token
+  ])
 
   return (
     <>
@@ -87,27 +156,32 @@ function DashboardEmbedView({ title, url, icon }: IdashboardView) {
           constantsMessages.skipToMainContent
         )}
       >
-        <StyledIFrame allowFullScreen id={title} src={url} />
+        {
+          <StyledIFrame
+            ref={iframeRef}
+            allowFullScreen
+            id={title}
+            src={dashboard.url}
+          />
+        }
       </Frame>
     </>
   )
 }
 
 export const PerformanceDashboard = () => {
-  const intl = useIntl()
   const params = useParams()
   const id = params.id
-  const config = window.config.DASHBOARDS.find((d) => d.id === id)
-  if (!config) {
+  const dashboard = window.config.DASHBOARDS.find((d) => d.id === id)
+  if (!dashboard) {
     // If no dashboard config found for the given id, render nothing
     return null
   }
   return (
     <NavigationStack>
       <DashboardEmbedView
+        dashboard={dashboard}
         icon={<Icon name="Activity" size="medium" />}
-        title={intl.formatMessage(config.title)}
-        url={config.url}
       />
     </NavigationStack>
   )

@@ -38,6 +38,7 @@ export const User = z.object({
   ),
   primaryOfficeId: UUID,
   administrativeAreaId: UUID.nullish(),
+  email: z.email().optional(),
   device: z.string().optional(),
   fullHonorificName: z.string().optional(),
   type: TokenUserType.extract(['user'])

@@ -32,6 +32,7 @@ type UserAPIResult = {
   name: IUserName[]
   username: string
   email: string
+  emailForNotification: string
   role: string
   fullHonorificName?: string
   practitionerId: string
@@ -111,6 +112,7 @@ export async function getUserOrSystem(
       avatar: user.avatar?.data ? user.avatar.data : undefined,
       primaryOfficeId: user.primaryOfficeId,
       device: user.device ? user.device : undefined,
+      email: user.emailForNotification ? user.emailForNotification : undefined,
       fullHonorificName: user.fullHonorificName
         ? user.fullHonorificName
         : undefined
