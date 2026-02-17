@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { getScopes, getUUID, SCOPES, RecordScopeV2 } from '@opencrvs/commons'
+import { getScopes, getUUID, SCOPES } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -344,7 +344,7 @@ export const eventRouter = router({
           search: input,
           eventConfigs,
           user: ctx.user,
-          acceptedScopes: ctx.acceptedScopes as RecordScopeV2[]
+          acceptedScopes: ctx.acceptedScopes
         })
       }
 

@@ -34,10 +34,11 @@ import {
   hasScope,
   SCOPES,
   hasAnyOfScopes,
-  AnyScope,
   getCurrentEventState,
   ResolvedRecordScopeV2,
-  EventInput
+  EventInput,
+  RecordScopeTypeV2,
+  RecordScopeV2
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext, UserContext } from '@events/context'
@@ -98,7 +99,7 @@ function getAuthorizedEntities(
 
 type CtxWithAuthorizedEntities = TrpcContext & {
   authorizedEntities?: { events?: string[] }
-  acceptedScopes?: AnyScope[]
+  acceptedScopes?: RecordScopeV2[]
 }
 
 function inScope(token: string, scopes: Scope[]) {
@@ -125,7 +126,7 @@ export function requiresAnyOfScopes(
   /**
    * Truly transient property. After complete migration to V2 scopes we should have a single parameter instead of 2-3.
    */
-  v2ScopeTypes?: string[]
+  v2ScopeTypes?: RecordScopeTypeV2[]
 ) {
   const fn: MiddlewareFunction<
     TrpcContext,
@@ -340,7 +341,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   return next()
 }
 
-export const userCanAccessEventWithScopes = (scopes: string[]) => {
+export const userCanAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,

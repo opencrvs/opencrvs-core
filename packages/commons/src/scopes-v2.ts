@@ -35,7 +35,7 @@ export const UserFilter = z
   .describe('Filters based on the user. Limits to self.')
 export type UserFilter = z.infer<typeof UserFilter>
 
-export const RecordAction = z.enum([
+export const RecordScopeTypeV2 = z.enum([
   'record.search',
   'record.create',
   'record.read',
@@ -51,22 +51,24 @@ export const RecordAction = z.enum([
   'record.correct',
   'record.unassign-others'
 ])
-type RecordAction = z.infer<typeof RecordAction>
+export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
 export const ResolvedRecordScopeV2 = z
   .object({
-    type: RecordAction,
-    options: z.object({
-      event: z
-        .array(z.string())
-        .describe('Event type, e.g. birth, death')
-        .optional(),
-      placeOfEvent: UUID.nullish(),
-      declaredIn: UUID.nullish(),
-      declaredBy: z.string().or(z.undefined()).optional(),
-      registeredIn: UUID.nullish(),
-      registeredBy: z.string().or(z.undefined()).optional()
-    })
+    type: RecordScopeTypeV2,
+    options: z
+      .object({
+        event: z
+          .array(z.string())
+          .describe('Event type, e.g. birth, death')
+          .optional(),
+        placeOfEvent: UUID.nullish(),
+        declaredIn: UUID.nullish(),
+        declaredBy: z.string().or(z.undefined()).optional(),
+        registeredIn: UUID.nullish(),
+        registeredBy: z.string().or(z.undefined()).optional()
+      })
+      .optional()
   })
   .describe('Resolved scope with location/user IDs instead of filters.')
 
@@ -74,7 +76,7 @@ export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
 export const RecordScopeV2 = z
   .object({
-    type: RecordAction,
+    type: RecordScopeTypeV2,
     options: z
       .object({
         event: z
@@ -87,6 +89,7 @@ export const RecordScopeV2 = z
         registeredIn: JurisdictionFilter.optional(),
         registeredBy: UserFilter.optional()
       })
+      .optional()
       .describe(
         'Limits access to records using provided filters. Combined as "AND". Use multiple scopes for "OR" behavior.'
       )
@@ -97,20 +100,7 @@ export const RecordScopeV2 = z
 
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
 
-/**
- * Generic scope structure that can represent any scope.
- * Used for encoding/decoding scopes to/from strings.
- * We can then later refine to more specific scope types as needed.
- */
-export const AnyScope = z.object({
-  type: z.string(),
-  options: z
-    .record(z.string(), z.string().or(z.array(z.string()).or(z.undefined())))
-    .optional()
-})
-export type AnyScope = z.infer<typeof AnyScope>
-
-const flattenScope = (scope: AnyScope) => ({
+const flattenScope = (scope: RecordScopeV2) => ({
   type: scope.type,
   ...scope.options
 })
@@ -120,7 +110,7 @@ const unflattenScope = (input: Record<string, unknown>) => {
   return { type, options }
 }
 
-export const encodeScope = (scope: AnyScope): string => {
+export const encodeScope = (scope: RecordScopeV2): string => {
   const flattened = flattenScope(scope)
 
   return qs.stringify(flattened, {
@@ -139,7 +129,7 @@ export const decodeScope = (query: string) => {
   })
 
   const unflattenedScope = unflattenScope(scope)
-  return AnyScope.safeParse(unflattenedScope)?.data
+  return RecordScopeV2.safeParse(unflattenedScope)?.data
 }
 
 type LegacyScopeType = ConfigurableScopeType
@@ -173,6 +163,9 @@ const v1ToV2ConfigScopeTypeMap: Record<LegacyScopeType, string> = {
 
 /**
  * Converts a V1 scope string to a V2 compatible scope string. Used to migrate between 1.9 and 2.0 scopes.
+ * @deprecated - This will be removed after migration to V2 scopes is complete. Do not use for new development.
+ *
+ * NOTE: We are casting intentionally broad with the input and output types to allow for flexibility during migration, without forcing loose types on the rest of the codebase.
  *
  * @param v1Scope e.g. 'record.declared.reject[event=birth|death|tennis-club-membership]',
  * @returns corresponding V2 compatible scope string based on v1 input.
@@ -186,7 +179,7 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
   }
 
   if (literalV1Scope) {
-    return encodeScope(literalV1Scope)
+    return encodeScope(literalV1Scope as RecordScopeV2) // Literal scopes have same structure in V2, just encode to string.
   }
 
   if (configurableV1Scope) {
@@ -198,10 +191,10 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
 
     if (configurableV1Scope.type === 'search') {
       return encodeScope({
-        type,
+        type: type as RecordScopeTypeV2,
         options: {
-          event: configurableV1Scope.options.event[0] || [],
-          access:
+          event: configurableV1Scope.options.event || [],
+          placeOfEvent:
             configurableV1Scope.options.access[0] === 'my-jurisdiction'
               ? 'administrativeArea'
               : 'all'
@@ -210,10 +203,11 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
     }
 
     return encodeScope({
-      type,
-      options: configurableV1Scope.options
+      type: type as RecordScopeTypeV2,
+      options: configurableV1Scope.options as RecordScopeV2['options']
     })
   }
+
   throw new Error(`Unsupported V1 scope type: ${v1Scope}`)
 }
 
@@ -221,9 +215,9 @@ export function getAcceptedScopesByType({
   acceptedScopes,
   scopes
 }: {
-  acceptedScopes: RecordAction[]
+  acceptedScopes: RecordScopeTypeV2[]
   scopes: (LegacyScopeType | string)[]
-}): z.infer<typeof AnyScope>[] {
+}): RecordScopeV2[] {
   return scopes
     .map((scope) => {
       const parsedScope = decodeScope(scope)
@@ -234,5 +228,5 @@ export function getAcceptedScopesByType({
         ? parsedScope
         : null
     })
-    .filter((scope): scope is z.infer<typeof AnyScope> => scope !== null)
+    .filter((scope): scope is RecordScopeV2 => scope !== null)
 }

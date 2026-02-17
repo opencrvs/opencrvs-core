@@ -15,7 +15,7 @@ import {
   encodeScope,
   generateUuid,
   getUUID,
-  RecordScopeType,
+  RecordScopeTypeV2,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
 import {
@@ -65,7 +65,7 @@ test.skip('allows access without required scope when user created the event', as
   const readScopes = ACTION_SCOPE_MAP[ActionType.READ]
   // Previously we failed to notice that more scopes were added to the read action, making some of the tests unhelpful.
   // Make sure at least the create scope is not present for test to make sense.
-  expect(readScopes).not.toContain(RecordScopeType.enum['record.create'])
+  expect(readScopes).not.toContain(RecordScopeTypeV2.enum['record.create'])
 
   const event = await client.event.create(generator.event.create())
   await expect(client.event.get({ eventId: event.id })).resolves.not.toThrow()
