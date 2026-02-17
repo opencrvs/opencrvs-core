@@ -11,6 +11,7 @@
 
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import { useField } from 'formik'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
@@ -93,6 +94,7 @@ function DocumentUploaderWithOption({
   maxFileSize: number
   maxImageSize?: FileUploadWithOptions['configuration']['maxImageSize']
 }) {
+  const [, , helpers] = useField(name)
   const intl = useIntlWithFormData()
   const documentTypeRequiredErrorMessage = intl.formatMessage(
     DocumentTypeRequiredError
@@ -221,7 +223,7 @@ function DocumentUploaderWithOption({
     setSelectedOption(remainingOptions[0].value)
   }
 
-  const errorMessage = error || unselectedOptionError || fileChangeError || ''
+  const errorMessage = unselectedOptionError || fileChangeError || ''
 
   return (
     <UploadWrapper>
@@ -250,6 +252,7 @@ function DocumentUploaderWithOption({
             type={'SELECT'}
             value={selectedOption}
             onChange={(val) => {
+              void helpers.setTouched(true)
               setSelectedOption(val)
               setUnselectedOptionError('')
             }}

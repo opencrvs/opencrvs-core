@@ -28,7 +28,6 @@ import {
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
-  SystemRole,
   UserOrSystem,
   InteractiveFieldType,
   FieldConfig,
@@ -55,23 +54,15 @@ type AllKeys<T> = T extends T ? keyof T : never
  * @returns unique ids of users are referenced in the ActionDocument array.
  * Used for fetching user data in bulk.
  */
-export const getUserIdsFromActions = (
-  actions: ActionDocument[],
-  ignoreRoles?: SystemRole[]
-) => {
+export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   const userIdFields = [
     'createdBy',
     'assignedTo'
   ] satisfies AllKeys<ActionDocument>[]
 
-  const userIds = actions
-    .filter(
-      ({ createdByRole }) =>
-        !ignoreRoles?.some((role) => role === createdByRole)
-    )
-    .flatMap((action) =>
-      userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
-    )
+  const userIds = actions.flatMap((action) =>
+    userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
+  )
 
   return uniq(userIds)
 }
@@ -240,7 +231,8 @@ export const AssignmentStatus = {
   UNASSIGNED: 'UNASSIGNED'
 } as const
 
-type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
+export type AssignmentStatus =
+  (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
 
 export function getAssignmentStatus(
   eventState: EventIndex,
@@ -300,7 +292,7 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Outbox',
     description: 'Title of outbox workqueue'
   },
-  actions: [],
+  action: { type: ActionType.READ },
   slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
 }
@@ -311,7 +303,7 @@ export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  actions: [{ type: ActionType.DECLARE }],
+  action: { type: ActionType.DECLARE },
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }

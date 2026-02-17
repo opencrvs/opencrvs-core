@@ -22,8 +22,9 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
 #### Workqueue configurations
 
-- The `'DEFAULT'` value is no longer supported in workqueue configuration under `actions: [{ type: CtaActionType }]`. Please ensure you specify a valid `CtaActionType` (see [WorkqueueConfig.ts](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/commons/src/events/WorkqueueConfig.ts)).
-- The `conditionals` option has been removed from workqueue configuration under `actions`. This option was previously present but had no effect.
+- `actions: [{ type: CtaActionType }]`. is deprecated in favor of `action: { type: CtaActionType }`
+- The `conditionals` option has been removed from workqueue configuration under `action`. This option was previously present but had no effect.
+- The `'DEFAULT'` value is no longer supported in workqueue `action` configuration. Please ensure you specify a valid `CtaActionType` (see [WorkqueueConfig.ts](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/commons/src/events/WorkqueueConfig.ts)).
 
 ### New features
 
@@ -43,6 +44,30 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - The postgres migration files now get restored to their original state (i.e. without the environment variables being replaced) regardless of the migration passing or not
 - Added experimental ALPHA_HIDDEN form field type, allowing configurable default/derived values and conditional inclusion in form submissions.
 - Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
+
+## 1.9.8
+
+### New features
+
+- Introduced `showParentFieldError` flag in NAME field configuration to consolidate validation error messages at the parent field level (instead of displaying separate errors below firstname, middlename, and surname subfields), improving UX by providing clearer, centralized validation feedback
+
+## 1.9.7
+
+### New features
+
+- In deduplication, the dateRange matcher now supports both `AGE` and `DATE` field.
+- The dateRange matcher supports a new `matchAgainst` option, which can reference either a date field or an age field. When provided, the matcher compares the source field against the specified `matchAgainst` field instead of only matching against itself.
+
+```ts
+field('mother.dob').dateRangeMatches({
+  days: 365,
+  matchAgainst: 'mother.age'
+})
+```
+
+### Bug fixes
+
+- Ensure rejected actions are considered when detecting pending actions. [#11588](https://github.com/opencrvs/opencrvs-core/issues/11588)
 
 ## 1.9.6
 

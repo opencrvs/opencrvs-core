@@ -25,7 +25,6 @@ import {
   tennisClubMembershipEvent,
   getCurrentEventState,
   UUID,
-  SystemRole,
   TestUserRole,
   generateActionDocument,
   ActionDocument,

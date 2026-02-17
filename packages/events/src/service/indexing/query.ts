@@ -314,10 +314,10 @@ export async function buildElasticQueryFromSearchPayload(
 }
 
 /**
- * Adds jurisdiction filters to the query based on user office ID and options.
+ * Adds jurisdiction filters to the query based on the provided scopes.
+ *
  * @param query The original query to modify.
- * @param options The options indicating which event jurisdictions to include.
- * @param userOfficeId The ID of the user's office.
+ * @param scopesV2 The filters indicating which event jurisdictions to include.
  * @returns The modified query with jurisdiction filters.
  */
 export function withJurisdictionFilters({
@@ -346,10 +346,9 @@ export function withJurisdictionFilters({
             })
             break
 
-          case 'eventLocation':
-            // @TODO: Once event location specification is completed, update to include the configurable place of event.
+          case 'placeOfEvent':
             must.push({
-              term: { createdAtLocation: value }
+              term: { placeOfEvent: value }
             })
             break
           case 'declaredIn':

@@ -34,7 +34,7 @@ function toDraftDocument(draft: EventActionDrafts): Draft {
       transactionId: draft.transactionId,
       createdAt: draft.createdAt,
       createdBy: draft.createdBy,
-      createdByRole: draft.createdByRole,
+      createdByRole: draft.createdByRole ?? undefined,
       createdByUserType: draft.createdByUserType as TokenUserType,
       createdAtLocation: draft.createdAtLocation,
       declaration: draft.declaration,

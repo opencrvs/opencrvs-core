@@ -21,7 +21,8 @@ import {
   ActionType,
   isActionConfigType,
   EventDocument,
-  getActionConfig
+  getActionConfig,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -234,7 +235,10 @@ function ActionLocation({ action }: { action: EventHistoryActionDocument }) {
     createdByUserType: action.createdByUserType,
     createdBy: action.createdBy,
     type: action.type,
-    createdByRole: action.createdByRole
+    createdByRole:
+      action.createdByUserType === TokenUserType.enum.user
+        ? (action.createdByRole as string)
+        : undefined
   })
 
   if (type === 'system') {
