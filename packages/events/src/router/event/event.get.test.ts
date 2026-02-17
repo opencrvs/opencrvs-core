@@ -47,8 +47,7 @@ test('prevents access if required scope does not have correct event type configu
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
     `record.declare[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-    'record.read[event=birth]',
-    encodeScope({ type: 'record.read', options: { event: 'birth' } })
+    encodeScope({ type: 'record.read', options: { event: ['birth'] } })
   ])
 
   await expect(
@@ -56,44 +55,12 @@ test('prevents access if required scope does not have correct event type configu
   ).rejects.toMatchSnapshot()
 })
 
-test.skip('allows access without required scope when user created the event', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
-  ])
-
-  const readScopes = ACTION_SCOPE_MAP[ActionType.READ]
-  // Previously we failed to notice that more scopes were added to the read action, making some of the tests unhelpful.
-  // Make sure at least the create scope is not present for test to make sense.
-  expect(readScopes).not.toContain(RecordScopeTypeV2.enum['record.create'])
-
-  const event = await client.event.create(generator.event.create())
-  await expect(client.event.get({ eventId: event.id })).resolves.not.toThrow()
-})
-
-test.skip('prevents access without required scope when user did not create the event', async () => {
-  const { generator, users } = await setupTestCase()
-  const myClient = createTestClient(users[0], [
-    `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
-  ])
-
-  const anotherClient = createTestClient(users[1])
-
-  const event = await anotherClient.event.create(generator.event.create())
-  await expect(myClient.event.get({ eventId: event.id })).rejects.toMatchObject(
-    new TRPCError({
-      code: 'NOT_FOUND',
-      message: `Event not found with ID: ${event.id}`
-    })
-  )
-})
-
 test('allows access with required scope when user did not create the event', async () => {
   const { generator, users } = await setupTestCase()
   const myClient = createTestClient(users[0], [
     encodeScope({
       type: 'record.create',
-      options: { event: TENNIS_CLUB_MEMBERSHIP }
+      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
     })
   ])
 
@@ -102,7 +69,7 @@ test('allows access with required scope when user did not create the event', asy
   const anotherClient = createTestClient(users[1], [
     encodeScope({
       type: 'record.read',
-      options: { event: TENNIS_CLUB_MEMBERSHIP }
+      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
     })
   ])
 
@@ -125,11 +92,11 @@ test('Returns event', async () => {
   const client = createTestClient(user, [
     encodeScope({
       type: 'record.create',
-      options: { event: TENNIS_CLUB_MEMBERSHIP }
+      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
     }),
     encodeScope({
       type: 'record.read',
-      options: { event: TENNIS_CLUB_MEMBERSHIP }
+      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
     })
   ])
 
@@ -153,11 +120,11 @@ test('Returns event with all actions', async () => {
     ...TEST_USER_DEFAULT_SCOPES,
     encodeScope({
       type: 'record.create',
-      options: { event: TENNIS_CLUB_MEMBERSHIP }
+      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
     }),
     encodeScope({
       type: 'record.read',
-      options: { event: TENNIS_CLUB_MEMBERSHIP }
+      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
     })
   ])
 
@@ -306,11 +273,11 @@ describe('Event indexing behavior', () => {
       ...TEST_USER_DEFAULT_SCOPES,
       encodeScope({
         type: 'record.create',
-        options: { event: TENNIS_CLUB_MEMBERSHIP }
+        options: { event: [TENNIS_CLUB_MEMBERSHIP] }
       }),
       encodeScope({
         type: 'record.read',
-        options: { event: TENNIS_CLUB_MEMBERSHIP }
+        options: { event: [TENNIS_CLUB_MEMBERSHIP] }
       })
     ])
   })
@@ -431,11 +398,11 @@ describe('Event indexing behavior', () => {
         ...TEST_USER_DEFAULT_SCOPES,
         encodeScope({
           type: 'record.create',
-          options: { event: TENNIS_CLUB_MEMBERSHIP }
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
         }),
         encodeScope({
           type: 'record.read',
-          options: { event: TENNIS_CLUB_MEMBERSHIP }
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
         })
       ])
       const event = await notifyClient.event.create(generator.event.create())
