@@ -10,12 +10,10 @@
  */
 import { TRPCError } from '@trpc/server'
 import {
-  ACTION_SCOPE_MAP,
   ActionType,
   encodeScope,
   generateUuid,
   getUUID,
-  RecordScopeTypeV2,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
 import {
