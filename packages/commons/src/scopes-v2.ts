@@ -53,15 +53,20 @@ export const RecordScopeTypeV2 = z.enum([
 ])
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
+const scopeByEvent = z
+  // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
+  .preprocess(
+    (val) => (val === undefined ? undefined : [val].flat()),
+    z.array(z.string()).optional()
+  )
+  .describe('Event type, e.g. birth, death')
+
 export const ResolvedRecordScopeV2 = z
   .object({
     type: RecordScopeTypeV2,
     options: z
       .object({
-        event: z
-          .array(z.string())
-          .describe('Event type, e.g. birth, death')
-          .optional(),
+        event: scopeByEvent,
         placeOfEvent: UUID.nullish(),
         declaredIn: UUID.nullish(),
         declaredBy: z.string().or(z.undefined()).optional(),
@@ -79,10 +84,7 @@ export const RecordScopeV2 = z
     type: RecordScopeTypeV2,
     options: z
       .object({
-        event: z
-          .array(z.string())
-          .optional()
-          .describe('Event type, e.g. birth, death'),
+        event: scopeByEvent,
         placeOfEvent: JurisdictionFilter.optional(),
         declaredIn: JurisdictionFilter.optional(),
         declaredBy: UserFilter.optional(),
