@@ -10,12 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import {
-  getScopes,
-  getUUID,
-  SCOPES,
-  RecordScopeV2
-} from '@opencrvs/commons'
+import { getScopes, getUUID, SCOPES, RecordScopeV2 } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -101,10 +96,10 @@ export const eventRouter = router({
         protect: true
       }
     })
-    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.CREATE]))
     .input(EventInput)
+    .use(middleware.userCanCreateEvent)
     .use(middleware.requireLocationForSystemUserEventCreate)
-    .use(middleware.eventTypeAuthorization)
+
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
       const config = await getEventConfigurationById({
@@ -132,7 +127,7 @@ export const eventRouter = router({
     })
     .input(EventIdParam)
     .output(EventDocument)
-    .use(middleware.userCanReadEventV2)
+    .use(middleware.userCanAccessEventWithScopes(['record.read']))
     .query(async ({ ctx }) => {
       const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
