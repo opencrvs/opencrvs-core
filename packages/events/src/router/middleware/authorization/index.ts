@@ -427,11 +427,11 @@ export const userCanCreateEvent: MiddlewareFunction<
   }
 
   const canCreateEvent = acceptedScopes.some((scope) => {
-    if (scope?.options?.event === undefined) {
+    if (scope.options?.event === undefined) {
       return true
     }
 
-    if (scope.options && scope.options.event.includes(input.type)) {
+    if (scope.options.event.includes(input.type)) {
       return true
     }
 
