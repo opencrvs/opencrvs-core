@@ -755,7 +755,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f68e0a99-ec8a-41d8-9b47-6dd91dfae721
+                transactionId: 873aebfb-29b9-40a5-8229-0d2f79f5d97d
                 type: birth
       responses:
         "200":
@@ -841,7 +841,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 3e2d8506-c12e-4db4-9959-b9151110c651
+                transactionId: d82b3d72-e7dd-4505-bf32-e3a948889216
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5025,6 +5025,10 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                showParentFieldError:
+                  type: boolean
+                  default: false
+                  description: If true, shows the parent field error and hides the subfield error
               default:
                 name:
                   firstname:
