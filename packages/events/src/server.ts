@@ -9,20 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createServer, IncomingMessage, ServerResponse } from 'http'
+import { createServer, IncomingMessage } from 'http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import '@opencrvs/commons/monitoring'
-import {
-  logger,
-  hasScope,
-  SCOPES,
-  TokenWithBearer
-} from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import { appRouter } from './router/router'
 import { createContext } from './context'
 import { handleHealthCheckResponse } from './service/health'
-import { uploadFile } from './service/files'
 
 function stringifyRequest(req: IncomingMessage) {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
@@ -60,42 +54,6 @@ function isTrpcRequest(req: IncomingMessage): boolean {
   )
 }
 
-function isAttachmentUpload(req: IncomingMessage): boolean {
-  if (!req.url) return false
-  const url = new URL(req.url, `http://${req.headers.host}`)
-  return req.method === 'POST' && url.pathname === '/attachments'
-}
-
-async function handleAttachmentUpload(
-  req: IncomingMessage,
-  res: ServerResponse
-) {
-  const authorization = req.headers.authorization
-  const token = TokenWithBearer.safeParse(authorization)
-
-  if (!token.success) {
-    res.writeHead(401, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({ error: 'Unauthorized' }))
-    return
-  }
-
-  if (!hasScope(token.data, SCOPES.ATTACHMENT_UPLOAD)) {
-    res.writeHead(403, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({ error: 'Forbidden' }))
-    return
-  }
-
-  try {
-    const result = await uploadFile(req, token.data)
-    res.writeHead(200, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify(result))
-  } catch (error) {
-    logger.error(`Attachment upload failed: ${error}`)
-    res.writeHead(500, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({ error: 'File upload failed' }))
-  }
-}
-
 export function server() {
   const restServer = createOpenApiHttpHandler(trpcConfig)
   const trpcServer = createHTTPHandler(trpcConfig)
@@ -115,11 +73,6 @@ export function server() {
 
     if (req.url === '/health/ready') {
       void handleHealthCheckResponse(res)
-      return
-    }
-
-    if (isAttachmentUpload(req)) {
-      void handleAttachmentUpload(req, res)
       return
     }
 
