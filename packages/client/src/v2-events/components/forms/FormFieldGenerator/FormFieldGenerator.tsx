@@ -36,6 +36,7 @@ import {
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
 import { FormSectionComponent } from './FormSectionComponent'
+import { OpencrvsFormContext } from './opencrvsFormHooks'
 
 export interface FormFieldGeneratorProps {
   /** form id */
@@ -65,7 +66,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     eventConfig,
     fieldsToShowValidationErrors,
     validateAllFields = false,
-    readonlyMode,
+    readonlyMode = false,
     id,
     onAllFieldsValidated,
     isCorrection = false,
@@ -167,29 +168,30 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           }, [touched])
 
           return (
-            <FormSectionComponent
-              className={className}
-              errors={formikProps.errors}
-              eventConfig={eventConfig}
-              fields={fields}
-              fieldsToShowValidationErrors={fieldsToShowValidationErrors}
-              id={id}
-              initialValues={initialValues}
-              isCorrection={isCorrection}
-              parentId={parentId}
-              readonlyMode={readonlyMode}
-              resetForm={formikProps.resetForm}
-              setAllTouchedFields={setAllTouchedFields}
-              setErrors={formikProps.setErrors}
-              setTouched={formikProps.setTouched}
-              setValues={formikProps.setValues}
-              touched={{ ...formikProps.touched, ...touchedFields }}
-              validateAllFields={validateAllFields}
-              validatorContext={validatorContext}
-              values={formikProps.values}
-              onAllFieldsValidated={onAllFieldsValidated}
-              onChange={formikOnChange}
-            />
+            <OpencrvsFormContext.Provider
+              value={{
+                formFields: [
+                  ...(eventConfig ? getDeclarationFields(eventConfig) : []),
+                  ...fields
+                ],
+                pageFields: fields,
+                isCorrection,
+                readonlyMode,
+                validatorContext
+              }}
+            >
+              <FormSectionComponent
+                className={className}
+                fields={fields}
+                fieldsToShowValidationErrors={fieldsToShowValidationErrors}
+                id={id}
+                initialValues={initialValues}
+                validateAllFields={validateAllFields}
+                validatorContext={validatorContext}
+                onAllFieldsValidated={onAllFieldsValidated}
+                onChange={formikOnChange}
+              />
+            </OpencrvsFormContext.Provider>
           )
         }}
       </Formik>

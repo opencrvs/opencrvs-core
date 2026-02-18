@@ -15,7 +15,6 @@ import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { omit } from 'lodash'
 import {
-  EventState,
   FieldConfig,
   FieldValue,
   FileFieldValue,
@@ -58,14 +57,11 @@ import {
   isLinkButtonFieldType,
   isVerificationStatusType,
   isQueryParamReaderFieldType,
-  ValidatorContext,
   isIdReaderFieldType,
   isQrReaderFieldType,
   isLoaderFieldType,
   isAgeFieldType,
-  isNumberWithUnitFieldType,
-  NameField,
-  EventConfig
+  isNumberWithUnitFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -113,52 +109,22 @@ import {
   makeFormikFieldIdsOpenCRVSCompatible,
   parseFieldReferencesInConfiguration
 } from './utils'
+import { useOpencrvsField, useOpencrvsFormContext } from './opencrvsFormHooks'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
-  eventConfig?: EventConfig
-  /** non-native onChange. Updates Formik state by updating the value and its dependencies */
-  onFieldValueChange: (name: string, value: FieldValue | undefined) => void
-  /** Optional callback that is called whenever any field value changes.
-   * This is useful for cases where the parent component needs to know about
-   * changes in the form state.
-   */
-  onBatchFieldValueChange: (
-    values: Array<{ name: string; value: FieldValue | undefined }>
-  ) => void
-  /**
-   * onBlur is used to set the touched state of the field
-   */
-  onBlur: (e: React.FocusEvent) => void
-  value: FieldValue
-  touched: boolean
-  /**
-   * Errors are rendered only when both error and touched are truthy
-   */
-  error: string
-  form: EventState
-  disabled?: boolean
-  readonlyMode?: boolean
-  allKnownFields: FieldConfig[]
-  validatorContext: ValidatorContext
 }
 
 export const GeneratedInputField = React.memo(
-  <T extends FieldConfig>({
-    fieldDefinition,
-    eventConfig,
-    validatorContext,
-    onBlur,
-    onFieldValueChange,
-    onBatchFieldValueChange,
-    error,
-    touched,
-    allKnownFields,
-    value,
-    form,
-    disabled,
-    readonlyMode
-  }: GeneratedInputFieldProps<T>) => {
+  <T extends FieldConfig>({ fieldDefinition }: GeneratedInputFieldProps<T>) => {
+    const [
+      { value, onBlur, onFieldValueChange, onBatchFieldValueChange },
+      { touched, error, disabled },
+      _,
+      form
+    ] = useOpencrvsField<FieldValue>(fieldDefinition)
+    const { formFields, validatorContext, readonlyMode } =
+      useOpencrvsFormContext()
     const intl = useIntl()
     // If label is hidden or default message is empty, we don't need to render label
     const label =
@@ -233,7 +199,6 @@ export const GeneratedInputField = React.memo(
           <Name.Input
             configuration={field.config.configuration}
             disabled={disabled}
-            eventConfig={eventConfig}
             id={fieldDefinition.id}
             validation={validation}
             validatorContext={validatorContext}
@@ -682,7 +647,7 @@ export const GeneratedInputField = React.memo(
       return (
         <Data.Input
           {...field.config}
-          allKnownFields={allKnownFields}
+          allKnownFields={formFields}
           formData={form}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
