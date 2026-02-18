@@ -19,7 +19,7 @@ import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
 import { pipe } from 'fp-ts/lib/function'
 import { verifyToken } from '@config/utils/verifyToken'
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { findScope } from '@opencrvs/commons/authentication'
 
 const SystemRoleType = [
   'FIELD_AGENT',
@@ -63,8 +63,19 @@ async function getCertificatesConfig(
     return []
   }
   const { scope } = decodedOrError.right
+  const printCertifiedCopiesScope = findScope(
+    scope,
+    'record.registered.print-certified-copies'
+  )
+  if (!printCertifiedCopiesScope) {
+    return []
+  }
 
-  if (scope.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+  const templateIds = printCertifiedCopiesScope.options.templateIds ?? []
+
+  console.log({ printCertifiedCopiesScope, templateIds, decodedOrError })
+
+  if (!templateIds.length) {
     const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
     const res = await fetch(url, {
@@ -78,7 +89,29 @@ async function getCertificatesConfig(
     }
     return res.json()
   }
-  return []
+
+  const certificates = []
+
+  for (const templateId of templateIds) {
+    const url = new URL(
+      `/certificates/${templateId}`,
+      env.COUNTRY_CONFIG_URL
+    ).toString()
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${authToken}` }
+    })
+
+    if (!res.ok) {
+      logger.error(
+        `Failed to fetch certificate configuration for template ${templateId}: ${res.statusText} ${url}`
+      )
+      continue
+    }
+    certificates.push(await res.json())
+  }
+
+  return certificates
 }
 
 async function getConfigFromCountry(authToken?: string) {
