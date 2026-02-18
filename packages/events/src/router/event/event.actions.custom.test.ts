@@ -42,6 +42,12 @@ async function initialiseTest(scopes: string[] = [], useSeniorDob = true) {
         event: [TENNIS_CLUB_MEMBERSHIP]
       }
     }),
+    encodeScope({
+      type: 'record.read',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
     `record.declare[event=${TENNIS_CLUB_MEMBERSHIP}]`,
     ...scopes
   ])
