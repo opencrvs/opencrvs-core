@@ -1619,7 +1619,12 @@ test('User with "location" scope only sees events created by system user to thei
   const { user, generator, locations } = await setupTestCase(5541)
 
   const systemClient = createSystemTestClient('test-system', [
-    `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
     `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
   ])
 
