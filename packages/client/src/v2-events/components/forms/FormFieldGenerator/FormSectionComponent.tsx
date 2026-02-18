@@ -123,7 +123,7 @@ function resolveFieldReferenceValue(
   fieldValues: EventState
 ): FieldValue | undefined {
   if (isCodeToEvaluate(reference)) {
-    return resolveValue(reference, makeFormikFieldIdsOpenCRVSCompatible(fieldValues))
+    return resolveValue(reference, fieldValues, currentFieldValue)
   }
   const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible(reference.$$field)
 
