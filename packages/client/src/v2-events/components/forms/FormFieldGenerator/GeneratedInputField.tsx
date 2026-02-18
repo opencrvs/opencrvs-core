@@ -65,7 +65,8 @@ import {
   isAgeFieldType,
   isNumberWithUnitFieldType,
   isCustomFieldType,
-  isHiddenFieldType
+  isHiddenFieldType,
+  isAutocompleteFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -106,6 +107,7 @@ import { Loader } from '@client/v2-events/features/events/registered-fields/Load
 import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
 import { Custom } from '@client/v2-events/features/events/registered-fields/Custom'
 import { Hidden } from '@client/v2-events/features/events/registered-fields/Hidden'
+import { Autocomplete } from '@client/v2-events/features/events/registered-fields/Autocomplete'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -727,6 +729,18 @@ export const GeneratedInputField = React.memo(
           parentValue={form[field.config.configuration.trigger.$$field]}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
+      )
+    }
+    if (isAutocompleteFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Autocomplete.Input
+            {...field.config}
+            key={fieldDefinition.id}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
     if (isSearchFieldType(field)) {

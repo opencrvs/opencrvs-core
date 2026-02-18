@@ -757,6 +757,19 @@ const HttpField = BaseField.extend({
 
 export type HttpField = z.infer<typeof HttpField>
 
+const AutocompleteField = BaseField.extend({
+  type: z.literal(FieldType.AUTOCOMPLETE),
+  configuration: z.object({
+    url: z
+      .string()
+      .describe('URL to fetch autocomplete suggestions from')
+      .optional(),
+    method: z.enum(['GET', 'POST']).default('GET').optional()
+  })
+}).describe('Autocomplete input field')
+
+export type AutocompleteField = z.infer<typeof AutocompleteField>
+
 const SearchField = HttpField.extend({
   type: z.literal(FieldType.SEARCH),
   configuration: SearchQuery.pick({
@@ -934,6 +947,7 @@ export const FieldConfig = z
     ButtonField,
     AlphaPrintButton,
     HttpField,
+    AutocompleteField,
     LinkButtonField,
     VerificationStatus,
     QrReaderField,

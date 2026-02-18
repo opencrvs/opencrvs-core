@@ -54,7 +54,8 @@ import {
   LoaderField,
   AgeField,
   CustomField,
-  HiddenField
+  HiddenField,
+  AutocompleteField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -73,7 +74,8 @@ import {
   ButtonFieldValue,
   VerificationStatusValue,
   AgeValue,
-  FieldUpdateValue
+  FieldUpdateValue,
+  AutocompleteValue
 } from './FieldValue'
 import { FullDocumentPath } from '../documents'
 import {
@@ -205,6 +207,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ALPHA_PRINT_BUTTON:
       schema = TextValue
       break
+    case FieldType.AUTOCOMPLETE:
+      schema = AutocompleteValue
+      break
     case FieldType.HTTP:
     case FieldType.SEARCH:
       schema = HttpFieldUpdateValue
@@ -259,6 +264,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.HTTP:
+    case FieldType.AUTOCOMPLETE:
     case FieldType.SEARCH:
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
@@ -529,6 +535,13 @@ export const isHttpFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: undefined; config: HttpField } => {
   return field.config.type === FieldType.HTTP
+}
+
+export const isAutocompleteFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: undefined; config: AutocompleteField } => {
+  return field.config.type === FieldType.AUTOCOMPLETE
 }
 
 export const isSearchFieldType = (field: {

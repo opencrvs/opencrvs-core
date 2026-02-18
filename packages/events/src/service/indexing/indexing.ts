@@ -116,6 +116,14 @@ function mapFieldTypeToElasticsearch(
         type: 'keyword',
         normalizer: 'lowercase'
       }
+    case FieldType.AUTOCOMPLETE:
+      return {
+        type: 'object',
+        properties: {
+          label: { type: 'keyword' },
+          value: { type: 'keyword' }
+        }
+      }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
     case FieldType.SELECT:

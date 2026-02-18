@@ -247,6 +247,7 @@ function mapFieldTypeToMockValue(
         type: 'image/png'
       } satisfies FileFieldValue
     case FieldType.SEARCH:
+    case FieldType.AUTOCOMPLETE:
     case FieldType.HTTP:
       return {
         error: null,
