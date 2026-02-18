@@ -195,7 +195,7 @@ export function extractPotentialDuplicatesFromActions(
   }, [])
 }
 
-function getEventMetadata(eventIndex: EventIndex): EventMetadata {
+export function getEventMetadata(eventIndex: EventIndex): EventMetadata {
   const metadata = {} as EventMetadata
 
   for (const fieldId of EventFieldId.options) {

@@ -15,6 +15,7 @@ import { ActionType } from './ActionType'
 import { ActionStatus, PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
+import { FieldType } from './FieldType'
 
 /**
  * Event statuses recognized by the system
@@ -281,4 +282,13 @@ export const eventMetadataLabelMap: Record<
     defaultMessage: 'Flags',
     description: 'Flags'
   }
+}
+
+export const EventMetadataFieldType = {
+  'event.trackingId': FieldType.TEXT,
+  'event.status': FieldType.TEXT,
+  'event.legalStatuses.REGISTERED.acceptedAt': FieldType.DATE,
+  'event.legalStatuses.REGISTERED.createdAtLocation': FieldType.DATE,
+  'event.legalStatuses.REGISTERED.registrationNumber': FieldType.DATE,
+  'event.updatedAt': FieldType.DATE
 }
