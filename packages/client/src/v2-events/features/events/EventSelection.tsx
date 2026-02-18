@@ -24,6 +24,7 @@ import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import {
   ACTION_SCOPE_MAP,
+  ActionType,
   canUserCreateEvent,
   getAcceptedScopesByType
 } from '@opencrvs/commons/client'
@@ -87,7 +88,7 @@ function EventSelector() {
   const createEvent = events.createEvent()
 
   const acceptedScopes = getAcceptedScopesByType({
-    acceptedScopes: ACTION_SCOPE_MAP[ActionType.CREATE],
+    acceptedScopes: ACTION_SCOPE_MAP[ActionType.CREATE] ?? [],
     scopes
   })
   const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>

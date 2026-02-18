@@ -38,7 +38,8 @@ import {
   ResolvedRecordScopeV2,
   EventInput,
   RecordScopeTypeV2,
-  RecordScopeV2
+  RecordScopeV2,
+  canUserCreateEvent
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext, UserContext } from '@events/context'
