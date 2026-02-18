@@ -88,7 +88,7 @@ function EventSelector() {
   const createEvent = events.createEvent()
 
   const acceptedScopes = getAcceptedScopesByType({
-    acceptedScopes: ACTION_SCOPE_MAP[ActionType.CREATE] ?? [],
+    acceptedScopes: ACTION_SCOPE_MAP[ActionType.CREATE],
     scopes
   })
   const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
