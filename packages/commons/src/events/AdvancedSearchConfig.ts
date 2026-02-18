@@ -137,7 +137,7 @@ export const EventFieldIdInput = z.enum([
 export const METADATA_FIELD_PREFIX = 'event.'
 
 /**
- * The field IDs that are actually used in the advanced search. The `event`
+ * The field IDs that are actually used in the advanced search, date of event, summary. The `event`
  * function prefixes the `EventFieldIdInput` values with METADATA_FIELD_PREFIX.
  */
 export const EventFieldId = z.enum([

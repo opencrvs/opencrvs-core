@@ -58,6 +58,7 @@ export type ActionFlag = z.infer<typeof ActionFlag>
 export type Flag = z.infer<typeof Flag>
 
 export const ZodDate = z.string().date()
+export const ZodDateTime = z.string().datetime()
 
 export const ActionCreationMetadata = z.object({
   createdAt: z
@@ -92,6 +93,7 @@ export type ActionCreationMetadata = z.infer<typeof ActionCreationMetadata>
 export const RegistrationCreationMetadata = ActionCreationMetadata.extend({
   registrationNumber: z
     .string()
+    .nullish()
     .describe(
       'Registration number of the event. Always present for accepted registrations.'
     )

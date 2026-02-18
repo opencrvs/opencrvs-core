@@ -20,13 +20,14 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus, ZodDate } from '../EventMetadata'
+import { EventStatus, ZodDate, ZodDateTime } from '../EventMetadata'
 import { Draft } from '../Draft'
 import {
   aggregateActionDeclarations,
   deepMerge,
   getAcceptedActions,
-  getCompleteActionAnnotation
+  getCompleteActionAnnotation,
+  getMixedPath
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
@@ -38,6 +39,7 @@ import {
   FullDocumentUrl
 } from '../../documents'
 import { isFieldReference } from '../../conditionals/conditionals'
+import { EventFieldId } from '../AdvancedSearchConfig'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -150,23 +152,30 @@ export function isUndeclaredDraft(status: EventStatus): boolean {
 export const DEFAULT_DATE_OF_EVENT_PROPERTY =
   'createdAt' satisfies keyof EventDocument
 
+function extractDateString(dateTime: string): string {
+  return dateTime.split('T')[0]
+}
+
+type EventMetadata = {
+  [key in EventFieldId]: string | null | undefined
+} & {
+  [key in typeof DEFAULT_DATE_OF_EVENT_PROPERTY]: string
+}
+
 export function resolveDateOfEvent(
-  flattenedEventIndex: FlattenedEventIndex,
+  eventMetadata: EventMetadata,
+  declaration: EventState,
   config: EventConfig
 ) {
   if (!config.dateOfEvent) {
-    return flattenedEventIndex[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+    return extractDateString(eventMetadata[DEFAULT_DATE_OF_EVENT_PROPERTY])
   }
 
-  // @ts-ignore
-  console.log(flattenedEventIndex, config.dateOfEvent.$$event)
   const parsedDate = isFieldReference(config.dateOfEvent)
-    ? // @ts-ignore
-      ZodDate.safeParse(flattenedEventIndex[config.dateOfEvent.$$field])
-    : // @ts-ignore
-      ZodDate.safeParse(flattenedEventIndex[config.dateOfEvent.$$event])
+    ? ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
+    : ZodDateTime.safeParse(eventMetadata[config.dateOfEvent.$$event])
 
-  return parsedDate.success ? parsedDate.data : undefined
+  return parsedDate.success ? extractDateString(parsedDate.data) : undefined
 }
 
 export function extractPotentialDuplicatesFromActions(
@@ -186,21 +195,20 @@ export function extractPotentialDuplicatesFromActions(
   }, [])
 }
 
-export function flattenEventIndex(event: EventIndex) {
-  const { declaration, trackingId, status, ...rest } = event
-  return {
-    ...rest,
-    ...declaration,
-    'event.trackingId': trackingId,
-    'event.status': status,
-    'event.registrationNumber':
-      rest.legalStatuses.REGISTERED?.registrationNumber,
-    'event.registeredAt': rest.legalStatuses.REGISTERED?.createdAtLocation,
-    'event.registeredBy': rest.legalStatuses.REGISTERED?.createdBy
-  }
-}
+function getEventMetadata(eventIndex: EventIndex): EventMetadata {
+  const metadata = {} as EventMetadata
 
-type FlattenedEventIndex = ReturnType<typeof flattenEventIndex>
+  for (const fieldId of EventFieldId.options) {
+    metadata[fieldId] = getMixedPath(
+      eventIndex,
+      fieldId.split('.').slice(1).join('.')
+    )
+  }
+
+  metadata[DEFAULT_DATE_OF_EVENT_PROPERTY] = eventIndex.createdAt
+
+  return metadata
+}
 
 /**
  * NOTE: This function should not run field validations. It should return the state based on the actions, without considering context (users, roles, permissions, etc).
@@ -239,34 +247,34 @@ export function getCurrentEventState(
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
   const declaration = aggregateActionDeclarations(event)
+  const status = getStatusFromActions(sortedActions)
+  const legalStatuses = getLegalStatuses(sortedActions)
 
-  const eventIndexWithoutDateOfEvent: Omit<EventIndex, 'dateOfEvent'> =
-    deepDropNulls({
-      id: event.id,
-      type: event.type,
-      status: getStatusFromActions(sortedActions),
-      legalStatuses: getLegalStatuses(sortedActions),
-      createdAt: creationAction.createdAt,
-      createdBy: creationAction.createdBy,
-      createdByUserType: creationAction.createdByUserType,
-      createdAtLocation: creationAction.createdAtLocation,
-      createdBySignature: creationAction.createdBySignature,
-      updatedAt: acceptedActionMetadata.createdAt,
-      assignedTo: getAssignedUserFromActions(acceptedActions),
-      assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
-      updatedBy: requestActionMetadata.createdBy,
-      updatedAtLocation: requestActionMetadata.createdAtLocation,
-      declaration,
-      trackingId: event.trackingId,
-      updatedByUserRole: requestActionMetadata.createdByRole,
-      potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
-      flags: getFlagsFromActions(sortedActions)
-    })
+  const base = deepDropNulls({
+    id: event.id,
+    type: event.type,
+    status,
+    legalStatuses,
+    createdAt: creationAction.createdAt,
+    createdBy: creationAction.createdBy,
+    createdByUserType: creationAction.createdByUserType,
+    createdAtLocation: creationAction.createdAtLocation,
+    createdBySignature: creationAction.createdBySignature,
+    updatedAt: acceptedActionMetadata.createdAt,
+    assignedTo: getAssignedUserFromActions(acceptedActions),
+    assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
+    updatedBy: requestActionMetadata.createdBy,
+    updatedAtLocation: requestActionMetadata.createdAtLocation,
+    declaration,
+    trackingId: event.trackingId,
+    updatedByUserRole: requestActionMetadata.createdByRole,
+    potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
+    flags: getFlagsFromActions(sortedActions)
+  })
 
-  const flattenedEventIndex = flattenEventIndex(eventIndexWithoutDateOfEvent)
   return {
-    ...eventIndexWithoutDateOfEvent,
-    dateOfEvent: resolveDateOfEvent(flattenedEventIndex, config)
+    ...base,
+    dateOfEvent: resolveDateOfEvent(getEventMetadata(base), declaration, config)
   }
 }
 
@@ -326,13 +334,13 @@ export function applyDeclarationToEventIndex(
   eventConfiguration: EventConfig
 ): EventIndex {
   const updatedDeclaration = deepMerge(eventIndex.declaration, declaration)
-  const flattenedEventIndex = flattenEventIndex({
-    ...eventIndex,
-    declaration: updatedDeclaration
-  })
   return {
     ...eventIndex,
-    dateOfEvent: resolveDateOfEvent(flattenedEventIndex, eventConfiguration),
+    dateOfEvent: resolveDateOfEvent(
+      getEventMetadata(eventIndex),
+      updatedDeclaration,
+      eventConfiguration
+    ),
     declaration: updatedDeclaration
   }
 }
