@@ -11,6 +11,7 @@
 import fetch from 'node-fetch'
 import FormData from 'form-data'
 import { Readable } from 'stream'
+import { File } from 'buffer'
 import {
   FullDocumentPath,
   getFilePathsFromEvent,
@@ -89,14 +90,18 @@ export async function cleanupUnreferencedFiles(
 }
 
 export async function uploadFile(
-  fileStream: unknown,
-  filename: string,
+  input: { file: File; transactionId: string; path?: string },
   token: string
 ): Promise<{ fileUrl: string }> {
   const form = new FormData()
-  form.append('file', Readable.fromWeb(fileStream as import('stream/web').ReadableStream), {
-    filename
+  form.append('file', Readable.from(Buffer.from(await input.file.arrayBuffer())), {
+    filename: input.file.name,
+    contentType: input.file.type
   })
+  form.append('transactionId', input.transactionId)
+  if (input.path) {
+    form.append('path', input.path)
+  }
 
   const res = await fetch(new URL('/files', env.DOCUMENTS_URL).toString(), {
     method: 'POST',

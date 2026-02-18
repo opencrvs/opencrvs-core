@@ -9,9 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createServer, IncomingMessage } from 'http'
+import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
+import { TRPCError } from '@trpc/server'
+import { File } from 'buffer'
+import Busboy from 'busboy'
 import '@opencrvs/commons/monitoring'
 import { logger } from '@opencrvs/commons'
 import { appRouter } from './router/router'
@@ -54,6 +57,77 @@ function isTrpcRequest(req: IncomingMessage): boolean {
   )
 }
 
+function parseMultipartFormData(
+  req: IncomingMessage
+): Promise<Record<string, unknown>> {
+  return new Promise((resolve, reject) => {
+    const fields: Record<string, unknown> = {}
+    const busboy = Busboy({ headers: req.headers })
+
+    busboy.on(
+      'file',
+      (
+        fieldname: string,
+        stream: NodeJS.ReadableStream,
+        info: { filename: string; encoding: string; mimeType: string }
+      ) => {
+        const chunks: Buffer[] = []
+        stream.on('data', (chunk: Buffer) => chunks.push(chunk))
+        stream.on('end', () => {
+          const buffer = Buffer.concat(chunks)
+          fields[fieldname] = new File([buffer], info.filename, {
+            type: info.mimeType
+          })
+        })
+      }
+    )
+
+    busboy.on('field', (fieldname: string, val: string) => {
+      fields[fieldname] = val
+    })
+
+    busboy.on('finish', () => resolve(fields))
+    busboy.on('error', reject)
+
+    req.pipe(busboy)
+  })
+}
+
+async function handleMultipartUpload(req: IncomingMessage, res: ServerResponse) {
+  try {
+    const body = await parseMultipartFormData(req)
+    const ctx = await createContext({ req })
+    const caller = appRouter.createCaller(ctx)
+    const result = await caller.attachments.upload(body as Parameters<typeof caller.attachments.upload>[0])
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify(result))
+  } catch (error) {
+    const trpcError =
+      error instanceof TRPCError
+        ? error
+        : error instanceof Error && 'code' in error
+          ? (error as TRPCError)
+          : null
+
+    if (trpcError) {
+      const statusMap: Record<string, number> = {
+        UNAUTHORIZED: 401,
+        FORBIDDEN: 403,
+        BAD_REQUEST: 400,
+        NOT_FOUND: 404,
+        INTERNAL_SERVER_ERROR: 500
+      }
+      const status = statusMap[trpcError.code] ?? 500
+      res.writeHead(status, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ message: trpcError.message, code: trpcError.code }))
+      return
+    }
+    logger.error(`Upload failed: ${error}`)
+    res.writeHead(500, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ message: 'Internal server error' }))
+  }
+}
+
 export function server() {
   const restServer = createOpenApiHttpHandler(trpcConfig)
   const trpcServer = createHTTPHandler(trpcConfig)
@@ -76,9 +150,14 @@ export function server() {
       return
     }
 
-    // Rewrite REST-style /attachments to tRPC procedure path
-    if (req.method === 'POST' && req.url.startsWith('/attachments')) {
-      req.url = req.url.replace('/attachments', '/attachments.upload')
+    // Handle multipart/form-data uploads for the attachments endpoint
+    if (
+      req.method === 'POST' &&
+      req.url.startsWith('/attachments') &&
+      (req.headers['content-type'] ?? '').startsWith('multipart/form-data')
+    ) {
+      void handleMultipartUpload(req, res)
+      return
     }
 
     // If it's a tRPC request, handle it with the tRPC server

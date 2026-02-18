@@ -164,12 +164,9 @@ async function resolveUserDetails(
 export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
   const token = TokenWithBearer.safeParse(normalizedHeaders.authorization).data
-  const url = new URL(req.url || '', `http://${req.headers.host}`)
-  const filename = url.searchParams.get('filename') ?? undefined
 
   return {
     token,
-    user: token && (await resolveUserDetails(token).catch(() => undefined)),
-    ...(filename && { filename })
+    user: token && (await resolveUserDetails(token).catch(() => undefined))
   }
 }

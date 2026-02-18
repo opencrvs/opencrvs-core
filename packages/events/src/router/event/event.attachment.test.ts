@@ -35,14 +35,23 @@ afterAll(() => {
   serverInstance.close()
 })
 
+function createUploadFormData() {
+  const formData = new FormData()
+  formData.append(
+    'file',
+    new Blob(['test file content'], { type: 'image/jpeg' }),
+    'test.jpg'
+  )
+  formData.append('transactionId', 'abc123')
+  formData.append('path', 'test-event')
+  return formData
+}
+
 describe('POST /attachments', () => {
   test('returns UNAUTHORIZED when no authorization header is provided', async () => {
-    const res = await fetch(`${url}/attachments?filename=test.jpg`, {
+    const res = await fetch(`${url}/attachments`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/octet-stream'
-      },
-      body: new Blob(['test file content'])
+      body: createUploadFormData()
     })
 
     expect(res.status).toBe(401)
@@ -68,13 +77,12 @@ describe('POST /attachments', () => {
       role: user.role
     })
 
-    const res = await fetch(`${url}/attachments?filename=test.jpg`, {
+    const res = await fetch(`${url}/attachments`, {
       method: 'POST',
       headers: {
-        Authorization: token,
-        'Content-Type': 'application/octet-stream'
+        Authorization: token
       },
-      body: new Blob(['test file content'])
+      body: createUploadFormData()
     })
 
     expect(res.status).toBe(403)
@@ -82,7 +90,7 @@ describe('POST /attachments', () => {
 
   test('successfully uploads a file when token has attachment.upload scope', async () => {
     const { user } = await setupTestCase()
-    const expectedFileUrl = '/ocrvs/test-event/test.jpg'
+    const expectedFileUrl = '/ocrvs/test-event/abc123.jpg'
 
     mswServer.use(
       http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
@@ -104,23 +112,20 @@ describe('POST /attachments', () => {
       role: user.role
     })
 
-    const res = await fetch(`${url}/attachments?filename=test.jpg`, {
+    const res = await fetch(`${url}/attachments`, {
       method: 'POST',
       headers: {
-        Authorization: token,
-        'Content-Type': 'application/octet-stream'
+        Authorization: token
       },
-      body: new Blob(['test file content'])
+      body: createUploadFormData()
     })
 
     expect(res.status).toBe(200)
-    const body = (await res.json()) as {
-      result: { data: { json: { fileUrl: string } } }
-    }
-    expect(body.result.data.json.fileUrl).toBe(expectedFileUrl)
+    const body = (await res.json()) as { fileUrl: string }
+    expect(body.fileUrl).toBe(expectedFileUrl)
   })
 
-  test('returns BAD_REQUEST when filename query parameter is missing', async () => {
+  test('returns error when required fields are missing', async () => {
     const { user } = await setupTestCase()
 
     mswServer.use(
@@ -140,13 +145,16 @@ describe('POST /attachments', () => {
       role: user.role
     })
 
+    // Send form data without the file field
+    const formData = new FormData()
+    formData.append('transactionId', 'abc123')
+
     const res = await fetch(`${url}/attachments`, {
       method: 'POST',
       headers: {
-        Authorization: token,
-        'Content-Type': 'application/octet-stream'
+        Authorization: token
       },
-      body: new Blob(['test file content'])
+      body: formData
     })
 
     expect(res.status).toBe(400)
