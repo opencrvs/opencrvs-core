@@ -767,7 +767,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 97151976-9f4e-4e64-80a6-4a99882a8a01
+                transactionId: 9ff44a7c-c72d-4a04-beb2-ffc4a056d315
                 type: birth
       responses:
         "200":
@@ -853,7 +853,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: fe19b2f3-85ee-4354-becd-fc96b679c585
+                transactionId: ec41859a-193a-4bdc-b873-30de23ebdf45
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -12021,6 +12021,7 @@ components:
                   description: Signature of the user who created the action request.
                 registrationNumber:
                   type: string
+                  nullable: true
                   description: Registration number of the event. Always present for accepted
                     registrations.
               required:
@@ -12028,7 +12029,6 @@ components:
                 - createdBy
                 - acceptedAt
                 - createdByRole
-                - registrationNumber
           description: Metadata related to the legal registration of the event, such as
             who registered it and when.
         createdAt:
