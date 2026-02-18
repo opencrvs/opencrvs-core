@@ -426,17 +426,7 @@ export const userCanCreateEvent: MiddlewareFunction<
     })
   }
 
-  const canCreateEvent = acceptedScopes.some((scope) => {
-    if (scope.options?.event === undefined) {
-      return true
-    }
-
-    if (scope.options.event.includes(input.type)) {
-      return true
-    }
-
-    return false
-  })
+  const canCreateEvent = canUserCreateEvent(acceptedScopes, input.type)
 
   if (!canCreateEvent) {
     throw new TRPCError({

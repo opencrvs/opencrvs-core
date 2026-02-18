@@ -232,3 +232,20 @@ export function getAcceptedScopesByType({
     })
     .filter((scope): scope is RecordScopeV2 => scope !== null)
 }
+
+export function canUserCreateEvent(
+  acceptedScopes: RecordScopeV2[],
+  eventType: string
+) {
+  return acceptedScopes.some((scope) => {
+    if (scope.options?.event === undefined) {
+      return true
+    }
+
+    if (scope.options.event.includes(eventType)) {
+      return true
+    }
+
+    return false
+  })
+}

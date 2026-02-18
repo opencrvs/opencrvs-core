@@ -22,7 +22,11 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { ActionType, isActionInScope } from '@opencrvs/commons/client'
+import {
+  ACTION_SCOPE_MAP,
+  canUserCreateEvent,
+  getAcceptedScopesByType
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 
 import { createTemporaryId } from '@client/v2-events/utils'
@@ -82,8 +86,12 @@ function EventSelector() {
   const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
 
+  const acceptedScopes = getAcceptedScopesByType({
+    acceptedScopes: ACTION_SCOPE_MAP[ActionType.CREATE],
+    scopes
+  })
   const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
-    isActionInScope(scopes, ActionType.CREATE, id)
+    canUserCreateEvent(acceptedScopes, id)
   )
 
   function handleContinue() {
@@ -91,7 +99,9 @@ function EventSelector() {
       return setNoEventSelectedError(true)
     }
     const transactionId = createTemporaryId()
-    const eventConfig = eventConfigurations.find(({ id }) => id === eventType)
+    const eventConfig = allowedEventConfigurations.find(
+      ({ id }) => id === eventType
+    )
 
     if (!eventConfig) {
       throw new Error(`Configuration for event '${eventType}' not found`)

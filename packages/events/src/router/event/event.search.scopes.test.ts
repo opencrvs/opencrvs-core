@@ -308,24 +308,24 @@ test('multi-scope combinations', async () => {
         placeOfEvent2
       }) => {
         const scope1 = {
-          type: 'record.search',
+          type: 'record.search' as const,
           options: {
             event: [TENNIS_CLUB_MEMBERSHIP],
             declaredIn: declaredIn1,
             declaredBy: declaredBy1,
             placeOfEvent: placeOfEvent1
           }
-        }
+        } satisfies RecordScopeV2
 
         const scope2 = {
-          type: 'record.search',
+          type: 'record.search' as const,
           options: {
             event: [TENNIS_CLUB_MEMBERSHIP],
             declaredBy: declaredBy2,
             declaredIn: declaredIn2,
             placeOfEvent: placeOfEvent2
           }
-        }
+        } satisfies RecordScopeV2
 
         const scopes = [scope1, scope2]
 
