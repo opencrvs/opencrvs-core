@@ -248,8 +248,16 @@ export const user = Object.assign(userSerializer, {
     $user: { $location: adminLevelId }
   }),
   // @TODO CIHAN: this should alternative take param like user().jurisdiction(user().scope('record.declare').attribute('event_location'))
+  // @TODO CIHAN: should this be in conditionals.ts even though its not really a conditional, rather a value getter?
   jurisdiction: (jurisdiction: JurisdictionFilter) => ({
     $user: { $jurisdiction: jurisdiction }
+  }),
+  // @TODO CIHAN:
+  scope: (scope: Scope) => ({
+    // @TODO CIHAN: specify attribute type
+    attribute: (attribute: 'event_location') => {
+      return 'foo'
+    }
   })
 })
 

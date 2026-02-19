@@ -60,6 +60,9 @@ function AdministrativeAreaInput({
     [options, value]
   )
 
+  // TODO CIHAN: filter options here?
+  console.log('options', options)
+
   return (
     <SearchableSelect
       data-testid={'location__' + id}

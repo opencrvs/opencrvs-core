@@ -158,6 +158,7 @@ function generateAdministrativeAreaFields(
       }
     ]
 
+    // @TODO CIHAN: add allowedLocations to this config?
     const configuration: AdministrativeAreaField['configuration'] = {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE
     }
@@ -166,7 +167,7 @@ function generateAdministrativeAreaFields(
       configuration.partOf = { $declaration: prevItem.id }
     }
 
-    const field: AdministrativeAreaField = {
+    return {
       id,
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
@@ -174,9 +175,7 @@ function generateAdministrativeAreaFields(
       required,
       label,
       configuration
-    }
-
-    return field
+    } satisfies AdministrativeAreaField
   })
 }
 

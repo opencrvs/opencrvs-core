@@ -582,22 +582,20 @@ export const AdministrativeAreas = z.enum([
   'CRVS_OFFICE'
 ])
 
-const AdministrativeAreaConfiguration = z
-  .object({
-    partOf: z
-      .object({
-        $declaration: z.string()
-      })
-      .optional()
-      .describe('Parent location'),
-    type: AdministrativeAreas
-  })
-  .describe('Administrative area options')
-
 const AdministrativeAreaField = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: AdministrativeAreaConfiguration
+  configuration: z
+    .object({
+      partOf: z
+        .object({
+          $declaration: z.string()
+        })
+        .optional()
+        .describe('Parent location'),
+      type: AdministrativeAreas
+    })
+    .describe('Administrative area options')
 }).describe('Administrative area input field e.g. facility, office')
 
 export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
@@ -989,10 +987,6 @@ export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
 >
 
 export type SelectOption = z.infer<typeof SelectOption>
-
-export type AdministrativeAreaConfiguration = z.infer<
-  typeof AdministrativeAreaConfiguration
->
 
 /**
  * Union of file-related fields. Using common type should help with compiler to know where to add new cases.
