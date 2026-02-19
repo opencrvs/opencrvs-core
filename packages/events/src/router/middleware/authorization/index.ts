@@ -406,8 +406,8 @@ export const userCanCreateEvent: MiddlewareFunction<
   OpenApiMeta,
   TrpcContext,
   TrpcContext,
-  EventInput
-> = async ({ next, ctx, input }) => {
+  unknown
+> = async ({ next, ctx, getRawInput }) => {
   const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
   const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
@@ -416,6 +416,15 @@ export const userCanCreateEvent: MiddlewareFunction<
 
   if (acceptedScopes.length === 0) {
     throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+  // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+  const rawInput = await getRawInput()
+  const input = EventInput.safeParse(rawInput)?.data
+
+  if (!input) {
+    throw new TRPCError({ code: 'BAD_REQUEST' })
   }
 
   const eventConfig = eventConfigs.find((c) => c.id === input.type)

@@ -96,8 +96,8 @@ export const eventRouter = router({
         protect: true
       }
     })
-    .input(EventInput)
     .use(middleware.userCanCreateEvent)
+    .input(EventInput)
     .use(middleware.requireLocationForSystemUserEventCreate)
 
     .output(EventDocument)

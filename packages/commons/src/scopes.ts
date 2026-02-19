@@ -465,6 +465,7 @@ export function parseLiteralScope(scope: string) {
 }
 
 /**
+ * @deprecated - Will be removed in v2.0. @see encodeScope @see decodeScope
  * Stringifies a ConfigurableScopes object into a scope string.
  * @param {ConfigurableScopes} scope - The scope object to stringify
  * @returns {string} The stringified scope in format "type[key1=value1|value2,key2=value3|value4]"
