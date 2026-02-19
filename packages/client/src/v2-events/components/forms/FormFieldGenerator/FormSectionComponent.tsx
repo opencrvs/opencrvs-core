@@ -121,7 +121,7 @@ function resolveFieldReferenceValue(
 ): FieldValue | undefined {
   const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible($$field)
 
-  return $$subfield && $$subfield.length > 0
+  return $$subfield.length > 0
     ? get(fieldValues[referenceKeyInFormikFormat], $$subfield)
     : fieldValues[referenceKeyInFormikFormat]
 }
