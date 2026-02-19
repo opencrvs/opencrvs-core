@@ -244,12 +244,10 @@ function AddressInput(props: Props) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const locations = getLocations.useSuspenseQuery()
-
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
   const customAddressFields = props.configuration?.streetAddressForm
-
   const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
 
   const resolveAdministrativeArea = (
@@ -378,7 +376,6 @@ function AddressOutput({
   const validatorContext = useValidatorContext()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
-
   const { config } = useSelector(getOfflineData)
   const customAddressFields = configuration?.configuration
     ?.streetAddressForm as FieldConfigWithoutAddress[]
@@ -389,19 +386,7 @@ function AddressOutput({
   }
 
   const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
-
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
-
-  const adminLevels = getAdminLevelHierarchy(
-    administrativeAreaId,
-    administrativeAreas,
-    adminLevelIds
-  )
-
-  const addressValues = {
-    ...value,
-    ...adminLevels
-  }
 
   const adminStructure = generateAdministrativeAreaFields(
     appConfigAdminLevels,
@@ -425,6 +410,12 @@ function AddressOutput({
     }
   }
 
+  const adminLevels = getAdminLevelHierarchy(
+    administrativeAreaId,
+    administrativeAreas,
+    adminLevelIds
+  )
+  const addressValues = { ...value, ...adminLevels }
   const flattenedAddressValues = flattenAddressObject(addressValues)
 
   const fieldsToShow = [
