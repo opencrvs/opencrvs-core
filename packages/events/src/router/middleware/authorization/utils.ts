@@ -12,7 +12,6 @@
 import {
   getScopes,
   decodeScope,
-  ResolvedRecordScopeV2,
   UserFilter,
   JurisdictionFilter,
   RecordScopeTypeV2,
@@ -29,7 +28,7 @@ import { UserContext } from '../../../context'
  */
 function canAccessEventWithScope(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
-  scope: ResolvedRecordScopeV2,
+  scope: RecordScopeV2,
   user: UserContext
 ): boolean {
   const opts = scope.options
@@ -102,7 +101,7 @@ function canAccessEventWithScope(
  */
 export function canAccessEventWithScopes(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
-  scopes: ResolvedRecordScopeV2[],
+  scopes: RecordScopeV2[],
   user: UserContext
 ) {
   return scopes.some((scope) => canAccessEventWithScope(event, scope, user))

@@ -35,7 +35,6 @@ import {
   SCOPES,
   hasAnyOfScopes,
   getCurrentEventState,
-  ResolvedRecordScopeV2,
   EventInput,
   RecordScopeTypeV2,
   RecordScopeV2,
@@ -380,7 +379,7 @@ export const userCanAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
 
     const hasAccess = canAccessEventWithScopes(
       eventIndexWithLocationHierarchy,
-      acceptedScopes as ResolvedRecordScopeV2[],
+      acceptedScopes,
       humanUser.data
     )
 
