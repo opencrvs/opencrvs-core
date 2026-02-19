@@ -94,7 +94,6 @@ export type ActionCreationMetadata = z.infer<typeof ActionCreationMetadata>
 export const RegistrationCreationMetadata = ActionCreationMetadata.extend({
   registrationNumber: z
     .string()
-    .nullish()
     .describe(
       'Registration number of the event. Always present for accepted registrations.'
     )
