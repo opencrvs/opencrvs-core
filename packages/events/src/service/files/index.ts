@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
-import FormData from 'form-data'
 import { Readable } from 'stream'
 import { File } from 'buffer'
+import fetch from 'node-fetch'
+import FormData from 'form-data'
 import {
   FullDocumentPath,
   getFilePathsFromEvent,
@@ -92,7 +92,7 @@ export async function cleanupUnreferencedFiles(
 export async function uploadFile(
   input: { file: File; transactionId: string; path?: string },
   token: string
-): Promise<{ fileUrl: string }> {
+): Promise<string> {
   const form = new FormData()
   form.append('file', Readable.from(Buffer.from(await input.file.arrayBuffer())), {
     filename: input.file.name,
@@ -116,6 +116,5 @@ export async function uploadFile(
     throw new Error(`File upload failed: ${res.status} ${res.statusText}`)
   }
 
-  const fileUrl = await res.text()
-  return { fileUrl }
+  return res.text()
 }

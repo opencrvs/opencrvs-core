@@ -10,38 +10,36 @@
  */
 
 import * as z from 'zod/v4'
-import { File } from 'buffer'
 import { zfd } from 'zod-form-data'
 import { SCOPES } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { uploadFile } from '@events/service/files'
 
-const FileSchema = z
-  .any()
-  .refine((val) => val instanceof File, 'file is required and must be a File')
-  .meta({ openapi: { type: 'string', format: 'binary' } })
-
-const AttachmentInput = z.object({
-  file: FileSchema,
+const AttachmentInput = zfd.formData({
+  file: zfd.file(),
   transactionId: zfd.text(),
   path: zfd.text(z.string().min(1).optional())
 })
 
 export const attachmentsRouter = router({
   upload: userAndSystemProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/attachments',
-        summary: 'Upload a file attachment',
-        tags: ['Attachments'],
-        protect: true,
-        contentTypes: ['multipart/form-data']
-      }
-    })
+    // This cannot be enabled as for whatever reason zod-form-data and trpc-to-openapi just do not play well together
+    //  TypeError: Cannot use 'in' operator to search for 'Symbol(Symbol.iterator)' in undefined
+    // OpenAPI spec is manually created and can be found here
+    // packages/events/src/openapi.ts
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/attachments',
+    //     summary: 'Upload a file attachment',
+    //     tags: ['Attachments'],
+    //     protect: true,
+    //     contentTypes: ['multipart/form-data']
+    //   }
+    // })
     .input(AttachmentInput)
-    .output(z.object({ fileUrl: z.string() }))
+    .output(z.string())
     .use(requiresAnyOfScopes([SCOPES.ATTACHMENT_UPLOAD]))
     .mutation(async ({ input, ctx }) => {
       return uploadFile(input, ctx.token)
