@@ -29,7 +29,6 @@ const meta: Meta<typeof WorkqueueLayout> = {
 export default meta
 type Story = StoryObj<typeof WorkqueueLayout>
 
-// has 'record.create[event=birth|death|tennis-club-membership]' scope
 const tokenWithCreateScopeForAllEventTypes =
   testDataGenerator().user.token.registrationAgent
 
