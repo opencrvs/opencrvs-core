@@ -1,5 +1,63 @@
 # Changelog
 
+## 1.9.10
+
+### New features
+
+- Added support for `event()` helper to access event metadata in `dateOfEvent` and `summary` configuration in EventConfig. This allows for more dynamic and flexible configurations based on event metadata.
+
+Currenly supported metadata fields include:
+
+- `trackingId`
+- `status`
+- `legalStatuses.REGISTERED.acceptedAt`
+- `legalStatuses.REGISTERED.registrationNumber`
+- `legalStatuses.REGISTERED.createdAtLocation`
+- `updatedAt`
+
+Usage example:
+
+For `dateOfEvent` configuration, you can now reference an event metadata field like this:
+
+```ts
+dateOfEvent: event('legalStatuses.REGISTERED.acceptedAt')
+```
+
+For `summary` configuration, you can use event metadata fields in the value of a custom field like this:
+
+```ts
+summary: {
+  fields: [
+    {
+      id: 'registeredAt',
+      label: {
+        defaultMessage: 'Registration date',
+        description: 'This is the label for the registration date',
+        id: 'event.birth.summary.event.registeredAt.label'
+      },
+      value: '{event.legalStatuses.REGISTERED.acceptedAt}'
+    }
+  ]
+}
+```
+
+Or, you can also use event metadata fields with a newly introduced property `eventFieldId`
+
+```ts
+summary: {
+  fields: [
+    {
+      label: {
+        defaultMessage: 'Registration date from field id',
+        description: 'This is the label for the registration date',
+        id: 'event.birth.summary.event.registeredAtFieldId.label'
+      },
+      eventFieldId: 'event.legalStatuses.REGISTERED.acceptedAt'
+    }
+  ]
+}
+```
+
 ## 1.9.9
 
 ### Bug fixes
