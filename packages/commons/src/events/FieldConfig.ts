@@ -725,6 +725,22 @@ const ButtonField = BaseField.extend({
 
 export type ButtonField = z.infer<typeof ButtonField>
 
+const FieldGroup = BaseField.extend({
+  type: z.literal(FieldType.FIELD_GROUP),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  fields: z.lazy(() => z.array(FieldConfig))
+})
+
+// This needs to be explicit to avoid circular types
+type FieldGroupInput = z.input<typeof BaseField> & {
+  type: typeof FieldType.FIELD_GROUP
+  fields: FieldConfigInput[]
+}
+export type FieldGroup = BaseField & {
+  type: typeof FieldType.FIELD_GROUP
+  fields: FieldConfig[]
+}
+
 // This is an alpha version of the print button and it is not recommended for use and will change in the future
 const AlphaPrintButton = BaseField.extend({
   type: z.literal(FieldType.ALPHA_PRINT_BUTTON),
@@ -884,6 +900,7 @@ export type LoaderField = z.infer<typeof LoaderField>
 
 /** @knipignore */
 export type FieldConfig =
+  | FieldGroup
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof NumberField>
@@ -930,6 +947,7 @@ export type FieldConfig =
  * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
  */
 export type FieldConfigInput =
+  | FieldGroupInput
   | z.input<typeof Address>
   | z.input<typeof TextField>
   | z.input<typeof TimeField>
@@ -982,6 +1000,7 @@ export const FieldConfig: z.ZodType<
   FieldConfigInput
 > = z
   .discriminatedUnion('type', [
+    FieldGroup,
     Address,
     TextField,
     NumberField,

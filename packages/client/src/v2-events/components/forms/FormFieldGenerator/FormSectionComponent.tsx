@@ -12,7 +12,6 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 import { useFormikContext } from 'formik'
 import { isEqual } from 'lodash'
-import styled, { keyframes } from 'styled-components'
 import {
   EventState,
   FieldConfig,
@@ -29,7 +28,7 @@ import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
 } from './utils'
-import { GeneratedInputField } from './GeneratedInputField'
+import { FormItem, GeneratedInputField } from './GeneratedInputField'
 import { useVisibleFields } from './opencrvsFormHooks'
 
 interface AllProps {
@@ -56,19 +55,6 @@ interface AllProps {
   onAllFieldsValidated?: (success: boolean) => void
   validatorContext: ValidatorContext
 }
-
-const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`
-
-const FormItem = styled.div<{
-  ignoreBottomMargin?: boolean
-}>`
-  animation: ${fadeIn} 500ms;
-  margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '22px'};
-`
 
 function focusElementByHash() {
   const hash = window.location.hash.slice(1)
@@ -207,7 +193,10 @@ export function FormSectionComponent({
             key={field.id}
             ignoreBottomMargin={field.type === FieldType.PAGE_HEADER}
           >
-            <GeneratedInputField fieldDefinition={field} />
+            <GeneratedInputField
+              fieldDefinition={field}
+              name={makeFormFieldIdFormikCompatible(field.id)}
+            />
           </FormItem>
         )
       })}

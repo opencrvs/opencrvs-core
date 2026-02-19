@@ -14,6 +14,7 @@
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { omit } from 'lodash'
+import styled, { keyframes } from 'styled-components'
 import {
   FieldConfig,
   FieldValue,
@@ -61,7 +62,9 @@ import {
   isQrReaderFieldType,
   isLoaderFieldType,
   isAgeFieldType,
-  isNumberWithUnitFieldType
+  isNumberWithUnitFieldType,
+  isFieldGroupFieldType,
+  FieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -111,18 +114,38 @@ import {
 } from './utils'
 import { useOpencrvsField, useOpencrvsFormContext } from './opencrvsFormHooks'
 
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`
+
+export const FormItem = styled.div<{
+  ignoreBottomMargin?: boolean
+}>`
+  animation: ${fadeIn} 500ms;
+  margin-bottom: ${({ ignoreBottomMargin }) =>
+    ignoreBottomMargin ? '0px' : '22px'};
+`
+
 interface GeneratedInputFieldProps<T extends FieldConfig> {
+  /**
+   * a formik compatible name where '.' means a nested object
+   */
+  name: string
   fieldDefinition: T
 }
 
 export const GeneratedInputField = React.memo(
-  <T extends FieldConfig>({ fieldDefinition }: GeneratedInputFieldProps<T>) => {
+  <T extends FieldConfig>({
+    fieldDefinition,
+    name
+  }: GeneratedInputFieldProps<T>) => {
     const [
       { value, onBlur, onFieldValueChange, onBatchFieldValueChange },
       { touched, error, disabled },
       _,
       form
-    ] = useOpencrvsField<FieldValue>(fieldDefinition)
+    ] = useOpencrvsField<FieldValue>(name, fieldDefinition)
     const { formFields, validatorContext, readonlyMode } =
       useOpencrvsFormContext()
     const intl = useIntl()
@@ -133,7 +156,7 @@ export const GeneratedInputField = React.memo(
         : intl.formatMessage(fieldDefinition.label)
 
     const inputFieldProps = {
-      id: fieldDefinition.id,
+      id: name,
       // If label is hidden or default message is empty, we don't need to render label
       label,
       required:
@@ -149,8 +172,8 @@ export const GeneratedInputField = React.memo(
     }
 
     const inputProps = {
-      id: fieldDefinition.id,
-      name: fieldDefinition.id,
+      id: name,
+      name,
       onBlur,
       value,
       disabled: disabled || readonlyMode,
@@ -162,15 +185,13 @@ export const GeneratedInputField = React.memo(
     }
 
     const handleFileChange = useCallback(
-      (val: FileFieldValue | null) =>
-        onFieldValueChange(fieldDefinition.id, val),
-      [fieldDefinition.id, onFieldValueChange]
+      (val: FileFieldValue | null) => onFieldValueChange(name, val),
+      [name, onFieldValueChange]
     )
 
     const handleFileWithOptionChange = useCallback(
-      (val: FileFieldWithOptionValue) =>
-        onFieldValueChange(fieldDefinition.id, val),
-      [fieldDefinition.id, onFieldValueChange]
+      (val: FileFieldWithOptionValue) => onFieldValueChange(name, val),
+      [name, onFieldValueChange]
     )
 
     /**
@@ -181,6 +202,26 @@ export const GeneratedInputField = React.memo(
       inputFieldProps,
       config: fieldDefinition,
       value
+    }
+    if (isFieldGroupFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          {field.config.fields.map((subfield) => {
+            const subfieldName = `${name}.${makeFormFieldIdFormikCompatible(subfield.id)}`
+            return (
+              <FormItem
+                key={subfield.id}
+                ignoreBottomMargin={subfield.type === FieldType.PAGE_HEADER}
+              >
+                <GeneratedInputField
+                  fieldDefinition={subfield}
+                  name={subfieldName}
+                />
+              </FormItem>
+            )
+          })}
+        </InputField>
+      )
     }
 
     if (isNameFieldType(field)) {
@@ -203,7 +244,7 @@ export const GeneratedInputField = React.memo(
             validation={validation}
             validatorContext={validatorContext}
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -217,7 +258,7 @@ export const GeneratedInputField = React.memo(
             isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -231,7 +272,7 @@ export const GeneratedInputField = React.memo(
             isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -243,9 +284,7 @@ export const GeneratedInputField = React.memo(
           <DateField.Input
             {...inputProps}
             value={field.value}
-            onChange={(val: string) =>
-              onFieldValueChange(fieldDefinition.id, val)
-            }
+            onChange={(val: string) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -268,7 +307,7 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             asOfDateRef={field.config.configuration.asOfDate.$$field}
             value={field.value?.age}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -281,9 +320,7 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             use12HourFormat={field.config.configuration?.use12HourFormat}
             value={field.value}
-            onChange={(val: string) =>
-              onFieldValueChange(fieldDefinition.id, val)
-            }
+            onChange={(val: string) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -298,7 +335,7 @@ export const GeneratedInputField = React.memo(
             value={parsed.data}
             onBlur={onBlur}
             onChange={(val) => {
-              onFieldValueChange(fieldDefinition.id, val)
+              onFieldValueChange(name, val)
             }}
           />
         </InputField>
@@ -313,7 +350,7 @@ export const GeneratedInputField = React.memo(
             options={field.config.options}
             value={field.value}
             onChange={(val: SelectDateRangeValue) => {
-              onFieldValueChange(fieldDefinition.id, val)
+              onFieldValueChange(name, val)
             }}
           />
         </InputField>
@@ -361,7 +398,7 @@ export const GeneratedInputField = React.memo(
             maxLength={field.config.configuration?.maxLength}
             type={field.config.configuration?.type ?? 'text'}
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -376,7 +413,7 @@ export const GeneratedInputField = React.memo(
             maxLength={field.config.configuration?.maxLength}
             type="email"
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -399,7 +436,7 @@ export const GeneratedInputField = React.memo(
             max={field.config.configuration?.max}
             min={field.config.configuration?.min}
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -412,7 +449,7 @@ export const GeneratedInputField = React.memo(
             configuration={field.config.configuration}
             options={field.config.options}
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -435,9 +472,7 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             maxLength={field.config.configuration?.maxLength}
             value={field.value}
-            onChange={(e) =>
-              onFieldValueChange(fieldDefinition.id, e.target.value)
-            }
+            onChange={(e) => onFieldValueChange(name, e.target.value)}
           />
         </InputField>
       )
@@ -484,7 +519,7 @@ export const GeneratedInputField = React.memo(
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -496,9 +531,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             value={field.value}
-            onChange={(val: string) =>
-              onFieldValueChange(fieldDefinition.id, val)
-            }
+            onChange={(val: string) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -510,7 +543,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -521,7 +554,7 @@ export const GeneratedInputField = React.memo(
           {...field.config}
           disabled={disabled}
           value={field.value}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       )
     }
@@ -532,7 +565,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -546,7 +579,7 @@ export const GeneratedInputField = React.memo(
             disabled={disabled}
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
-            name={fieldDefinition.id}
+            name={name}
             required={inputFieldProps.required}
             value={field.value}
             onChange={(val) => handleFileChange(val)}
@@ -562,13 +595,13 @@ export const GeneratedInputField = React.memo(
         partOfRef && makeFormikFieldIdsOpenCRVSCompatible(form)[partOfRef]
 
       return (
-        <InputField {...inputFieldProps} htmlFor={fieldDefinition.id}>
+        <InputField {...inputFieldProps} htmlFor={name}>
           <AdministrativeArea.Input
             {...field.config}
             disabled={disabled}
             partOf={typeof partOf === 'string' ? partOf : null}
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -587,7 +620,7 @@ export const GeneratedInputField = React.memo(
             }
             value={field.value}
             onBlur={onBlur}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -602,7 +635,7 @@ export const GeneratedInputField = React.memo(
             searchableResource={['offices']}
             value={field.value}
             onBlur={onBlur}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -617,7 +650,7 @@ export const GeneratedInputField = React.memo(
             searchableResource={['facilities']}
             value={field.value}
             onBlur={onBlur}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -649,7 +682,7 @@ export const GeneratedInputField = React.memo(
           {...field.config}
           allKnownFields={formFields}
           formData={form}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       )
     }
@@ -659,10 +692,10 @@ export const GeneratedInputField = React.memo(
         <AlphaPrintButton.Input
           buttonLabel={field.config.configuration.buttonLabel}
           disabled={disabled}
-          id={fieldDefinition.id}
+          id={name}
           template={field.config.configuration.template}
           value={field.value}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       )
     }
@@ -677,9 +710,7 @@ export const GeneratedInputField = React.memo(
             disabled={inputProps.disabled}
             id={field.config.id}
             value={field.value}
-            onChange={(clicks) =>
-              onFieldValueChange(fieldDefinition.id, clicks)
-            }
+            onChange={(clicks) => onFieldValueChange(name, clicks)}
           />
         </InputField>
       )
@@ -688,14 +719,14 @@ export const GeneratedInputField = React.memo(
     if (isHttpFieldType(field)) {
       return (
         <Http.Input
-          key={fieldDefinition.id}
+          key={name}
           configuration={parseFieldReferencesInConfiguration(
             field.config.configuration,
             form
           )}
           form={form}
           parentValue={form[field.config.configuration.trigger.$$field]}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       )
     }
@@ -703,11 +734,11 @@ export const GeneratedInputField = React.memo(
       return (
         <InputField {...inputFieldProps}>
           <Search.Input
-            key={fieldDefinition.id}
+            key={name}
             configuration={field.config.configuration}
             form={form}
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -736,7 +767,7 @@ export const GeneratedInputField = React.memo(
                   name: makeFormFieldIdFormikCompatible(parentField.$$field),
                   value: undefined
                 })),
-                { name: fieldDefinition.id, value: null }
+                { name, value: null }
               ])
             } else if (fieldDefinition.parent) {
               onBatchFieldValueChange([
@@ -746,7 +777,7 @@ export const GeneratedInputField = React.memo(
                   ),
                   value: undefined
                 },
-                { name: fieldDefinition.id, value: null }
+                { name, value: null }
               ])
             }
           }}
@@ -758,7 +789,7 @@ export const GeneratedInputField = React.memo(
       return (
         <QueryParamReader.Input
           configuration={field.config.configuration}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       )
     }
@@ -768,7 +799,7 @@ export const GeneratedInputField = React.memo(
         <IdReader.Input
           id={field.config.id}
           methods={field.config.methods}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       )
     }
@@ -777,7 +808,7 @@ export const GeneratedInputField = React.memo(
       return (
         <QrReader.Input
           configuration={field.config.configuration}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
       )
     }

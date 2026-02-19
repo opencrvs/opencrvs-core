@@ -105,10 +105,11 @@ export function useVisibleFields(fields: FieldConfig[]) {
   )
 }
 
-export function useOpencrvsField<T>(fieldDefinition: FieldConfig) {
-  const [field, meta, helpers] = useField<T>(
-    makeFormikFieldIdOpenCRVSCompatible(fieldDefinition.id)
-  )
+export function useOpencrvsField<T>(
+  name: string,
+  fieldDefinition: FieldConfig
+) {
+  const [field, meta, helpers] = useField<T>(name)
   const { validatorContext, isCorrection, formFields } =
     useOpencrvsFormContext()
   const {
@@ -185,6 +186,7 @@ export function useOpencrvsField<T>(fieldDefinition: FieldConfig) {
 
   const onFieldValueChange = useCallback(
     (formikFieldId: string, value: FieldValue | undefined) => {
+      console.log(formikFieldId)
       const updatedValues = cloneDeep(values)
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
 

@@ -86,6 +86,17 @@ function mapFieldTypeToElasticsearch(
   field: FieldConfig
 ): estypes.MappingProperty {
   switch (field.type) {
+    case FieldType.FIELD_GROUP:
+      return {
+        type: 'object',
+        properties: field.fields.reduce(
+          (acc, subfield) => ({
+            ...acc,
+            [subfield.id]: mapFieldTypeToElasticsearch(subfield)
+          }),
+          {}
+        )
+      }
     case FieldType.NUMBER:
       return { type: 'double' }
     case FieldType.DATE:
