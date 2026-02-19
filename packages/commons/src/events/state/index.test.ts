@@ -737,6 +737,28 @@ describe('getCurrentEventState()', () => {
       }
     })
   })
+
+  test('sets dateOfEvent correctly when configured', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER }
+      ]
+    })
+
+    const state = getCurrentEventState(event, {
+      ...tennisClubMembershipEvent,
+      dateOfEvent: { $$event: 'event.legalStatuses.REGISTERED.acceptedAt' }
+    })
+
+    expect(state.dateOfEvent).toEqual(
+      state.legalStatuses[EventStatus.enum.REGISTERED]?.acceptedAt.split('T')[0]
+    )
+  })
 })
 
 describe('correction requests', () => {
