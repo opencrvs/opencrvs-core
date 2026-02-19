@@ -240,6 +240,7 @@ paths:
                                         - PARAGRAPH
                                         - PAGE_HEADER
                                         - RADIO_GROUP
+                                        - FIELD_GROUP
                                         - FILE
                                         - FILE_WITH_OPTIONS
                                         - BULLET_LIST
@@ -493,6 +494,7 @@ paths:
                                         - PARAGRAPH
                                         - PAGE_HEADER
                                         - RADIO_GROUP
+                                        - FIELD_GROUP
                                         - FILE
                                         - FILE_WITH_OPTIONS
                                         - BULLET_LIST
@@ -755,7 +757,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: d3a6abb3-ee13-4d7b-a6bf-cf5aa253307e
+                transactionId: 7e3539fe-a55a-450a-96ff-05729386cff9
                 type: birth
       responses:
         "200":
@@ -841,7 +843,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: d8ffafc3-5b00-460a-94e8-dd6dfdd50f6e
+                transactionId: de2377b2-a85b-48b8-b639-44efb08d1fb4
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1663,6 +1665,7 @@ components:
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
+                            - FIELD_GROUP
                             - FILE
                             - FILE_WITH_OPTIONS
                             - BULLET_LIST
@@ -1894,6 +1897,7 @@ components:
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
+                            - FIELD_GROUP
                             - FILE
                             - FILE_WITH_OPTIONS
                             - BULLET_LIST
@@ -2254,6 +2258,155 @@ components:
                   - validator
                   - message
               default: &a9 []
+              description: Additional validation rules applied to the field.
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates whether the field can be modified during record
+                correction.
+            value:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                    description: Reference to a field by its ID
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+            analytics:
+              type: boolean
+              default: false
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+            type:
+              type: string
+              enum:
+                - FIELD_GROUP
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+          required:
+            - id
+            - label
+            - type
+            - fields
+          description: Common properties shared across all field types.
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier of the field.
+            label:
+              description: Human-readable label of the field.
+              allOf:
+                - $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                    description: Reference to a field by its ID
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      allOf:
+                        - $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+              default: false
+              description: Indicates whether the field is mandatory.
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a8
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+            secured:
+              type: boolean
+              default: false
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a9
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
