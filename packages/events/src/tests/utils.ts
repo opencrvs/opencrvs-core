@@ -101,7 +101,6 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
   SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
   encodeScope({
