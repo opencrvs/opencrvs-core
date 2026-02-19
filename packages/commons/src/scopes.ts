@@ -10,7 +10,14 @@
  */
 
 import * as z from 'zod/v4'
-import { SearchScopeAccessLevels } from './events'
+
+const SearchScopeAccessLevels = {
+  MY_JURISDICTION: 'my-jurisdiction',
+  ALL: 'all'
+} as const
+
+type SearchScopeAccessLevels =
+  (typeof SearchScopeAccessLevels)[keyof typeof SearchScopeAccessLevels]
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
@@ -465,7 +472,7 @@ export function parseLiteralScope(scope: string) {
 }
 
 /**
- * @deprecated - Will be removed in v2.0. @see encodeScope @see decodeScope
+ * @deprecated - Will be removed in v2.0
  * Stringifies a ConfigurableScopes object into a scope string.
  * @param {ConfigurableScopes} scope - The scope object to stringify
  * @returns {string} The stringified scope in format "type[key1=value1|value2,key2=value3|value4]"

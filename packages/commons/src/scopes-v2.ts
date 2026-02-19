@@ -15,7 +15,7 @@ import {
   ConfigurableScopeType,
   parseConfigurableScope,
   parseLiteralScope
-} from './authentication'
+} from './scopes'
 import { UUID } from './uuid'
 
 /*
