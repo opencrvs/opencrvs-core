@@ -1,0 +1,775 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+/* eslint-disable max-lines */
+
+import React, { useCallback } from 'react'
+import { useIntl } from 'react-intl'
+import { omit } from 'lodash'
+import {
+  FieldConfig,
+  FieldValue,
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  isAddressFieldType,
+  isAdministrativeAreaFieldType,
+  isFacilityFieldType,
+  isBulletListFieldType,
+  isCheckboxFieldType,
+  isCountryFieldType,
+  isDateFieldType,
+  isDateRangeFieldType,
+  isDividerFieldType,
+  isFileFieldType,
+  isFileFieldWithOptionType,
+  isLocationFieldType,
+  isOfficeFieldType,
+  isPageHeaderFieldType,
+  isParagraphFieldType,
+  isRadioGroupFieldType,
+  isSelectFieldType,
+  isSignatureFieldType,
+  isTextAreaFieldType,
+  isTextFieldType,
+  isNumberFieldType,
+  isEmailFieldType,
+  isDataFieldType,
+  isNameFieldType,
+  isPhoneFieldType,
+  isIdFieldType,
+  getValidatorsForField,
+  DateRangeFieldValue,
+  isSelectDateRangeFieldType,
+  SelectDateRangeValue,
+  isTimeFieldType,
+  isButtonFieldType,
+  isPrintButtonFieldType,
+  isHttpFieldType,
+  isSearchFieldType,
+  isLinkButtonFieldType,
+  isVerificationStatusType,
+  isQueryParamReaderFieldType,
+  isIdReaderFieldType,
+  isQrReaderFieldType,
+  isLoaderFieldType,
+  isAgeFieldType,
+  isNumberWithUnitFieldType
+} from '@opencrvs/commons/client'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { InputField } from '@client/components/form/InputField'
+import {
+  BulletList,
+  Checkbox,
+  AgeField,
+  DateField,
+  RadioGroup,
+  LocationSearch,
+  Select,
+  SelectCountry,
+  Text,
+  Number,
+  AdministrativeArea,
+  Divider,
+  PageHeader,
+  Paragraph,
+  SelectDateRangeField,
+  TimeField,
+  Button,
+  AlphaPrintButton,
+  Http,
+  LinkButton,
+  VerificationStatus
+} from '@client/v2-events/features/events/registered-fields'
+import { Address } from '@client/v2-events/features/events/registered-fields/Address'
+import { Data } from '@client/v2-events/features/events/registered-fields/Data'
+import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
+import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
+import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { Search } from '@client/v2-events/features/events/registered-fields/Search'
+import { IdReader } from '@client/v2-events/features/events/registered-fields/IdReader'
+import { QrReader } from '@client/v2-events/features/events/registered-fields/QrReader'
+import { QueryParamReader } from '@client/v2-events/features/events/registered-fields/QueryParamReader'
+import { Loader } from '@client/v2-events/features/events/registered-fields/Loader'
+import { NumberWithUnit } from '@client/v2-events/features/events/registered-fields/NumberWithUnit'
+import {
+  makeFormFieldIdFormikCompatible,
+  makeFormikFieldIdOpenCRVSCompatible
+} from '@client/v2-events/components/forms/utils'
+import { SignatureField } from '../../../inputs/SignatureField'
+import {
+  parseFieldReferencesInConfiguration,
+  makeFormikFieldIdsOpenCRVSCompatible
+} from '../../utils'
+import { useOpencrvsFieldV2 } from '../hooks/useOpencrvsFieldV2'
+import { useFormState } from '../hooks/useFormState'
+import { useCompleteForm } from '../hooks/useCompleteForm'
+
+interface GeneratedInputFieldProps<T extends FieldConfig> {
+  fieldDefinition: T
+}
+
+export const GeneratedInputFieldV2 = React.memo(
+  <T extends FieldConfig>({ fieldDefinition }: GeneratedInputFieldProps<T>) => {
+    const [
+      { value, onBlur, onFieldValueChange, onBatchFieldValueChange },
+      { touched, error, disabled }
+    ] = useOpencrvsFieldV2<FieldValue>(fieldDefinition)
+    const { formFields, validatorContext, readonlyMode } = useFormState()
+    const intl = useIntl()
+    const form = useCompleteForm()
+
+    const label =
+      fieldDefinition.hideLabel || !fieldDefinition.label.defaultMessage
+        ? undefined
+        : intl.formatMessage(fieldDefinition.label)
+
+    const inputFieldProps = {
+      id: fieldDefinition.id,
+      label,
+      required:
+        typeof fieldDefinition.required === 'boolean'
+          ? fieldDefinition.required
+          : !!fieldDefinition.required,
+      disabled: readonlyMode,
+      helperText: fieldDefinition.helperText
+        ? intl.formatMessage(fieldDefinition.helperText)
+        : undefined,
+      error,
+      touched
+    }
+
+    const inputProps = {
+      id: fieldDefinition.id,
+      name: fieldDefinition.id,
+      onBlur,
+      value,
+      disabled: disabled || readonlyMode,
+      error: Boolean(error),
+      touched,
+      placeholder:
+        fieldDefinition.placeholder &&
+        intl.formatMessage(fieldDefinition.placeholder)
+    }
+
+    const handleFileChange = useCallback(
+      (val: FileFieldValue | null) =>
+        onFieldValueChange(fieldDefinition.id, val),
+      [fieldDefinition.id, onFieldValueChange]
+    )
+
+    const handleFileWithOptionChange = useCallback(
+      (val: FileFieldWithOptionValue) =>
+        onFieldValueChange(fieldDefinition.id, val),
+      [fieldDefinition.id, onFieldValueChange]
+    )
+
+    const field = {
+      inputFieldProps,
+      config: fieldDefinition,
+      value
+    }
+
+    if (isNameFieldType(field)) {
+      const validation = getValidatorsForField(
+        makeFormikFieldIdOpenCRVSCompatible(field.config.id),
+        field.config.validation || []
+      )
+
+      return (
+        <Name.Input
+          configuration={field.config.configuration}
+          disabled={disabled}
+          name={fieldDefinition.id}
+          validation={validation}
+          validatorContext={validatorContext}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isPhoneFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Text.Input
+            {...inputProps}
+            isDisabled={inputProps.disabled}
+            type="text"
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isIdFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Text.Input
+            {...inputProps}
+            isDisabled={inputProps.disabled}
+            type="text"
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isDateFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <DateField.Input
+            {...inputProps}
+            value={field.value}
+            onChange={(val: string) =>
+              onFieldValueChange(fieldDefinition.id, val)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isAgeFieldType(field)) {
+      return (
+        <InputField
+          {...field.inputFieldProps}
+          postfix={
+            field.config.configuration.postfix &&
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
+          }
+        >
+          <AgeField.Input
+            {...inputProps}
+            asOfDateRef={field.config.configuration.asOfDate.$$field}
+            value={field.value?.age}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isTimeFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <TimeField.Input
+            {...inputProps}
+            use12HourFormat={field.config.configuration?.use12HourFormat}
+            value={field.value}
+            onChange={(val: string) =>
+              onFieldValueChange(fieldDefinition.id, val)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isDateRangeFieldType(field)) {
+      const parsed = DateRangeFieldValue.safeParse(field.value)
+      return (
+        <InputField {...field.inputFieldProps}>
+          <DateRangeField.Input
+            {...inputProps}
+            value={parsed.data}
+            onBlur={onBlur}
+            onChange={(val) => {
+              onFieldValueChange(fieldDefinition.id, val)
+            }}
+          />
+        </InputField>
+      )
+    }
+
+    if (isSelectDateRangeFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <SelectDateRangeField.Input
+            {...inputProps}
+            options={field.config.options}
+            value={field.value}
+            onChange={(val: SelectDateRangeValue) => {
+              onFieldValueChange(fieldDefinition.id, val)
+            }}
+          />
+        </InputField>
+      )
+    }
+
+    if (isPageHeaderFieldType(field)) {
+      return (
+        <PageHeader.Input>
+          {intl.formatMessage(fieldDefinition.label)}
+        </PageHeader.Input>
+      )
+    }
+
+    if (isParagraphFieldType(field)) {
+      const message = intl.formatMessage(fieldDefinition.label, {
+        [fieldDefinition.id]: field.value
+      })
+
+      return (
+        <Paragraph.Input
+          configuration={field.config.configuration}
+          message={message}
+        />
+      )
+    }
+
+    if (isTextFieldType(field)) {
+      return (
+        <InputField
+          {...field.inputFieldProps}
+          postfix={
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
+          }
+        >
+          <Text.Input
+            {...inputProps}
+            isDisabled={disabled}
+            maxLength={field.config.configuration?.maxLength}
+            type={field.config.configuration?.type ?? 'text'}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isEmailFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Text.Input
+            {...inputProps}
+            isDisabled={disabled}
+            maxLength={field.config.configuration?.maxLength}
+            type="email"
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+    if (isNumberFieldType(field)) {
+      return (
+        <InputField
+          {...field.inputFieldProps}
+          postfix={
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
+          }
+        >
+          <Number.Input
+            {...inputProps}
+            max={field.config.configuration?.max}
+            min={field.config.configuration?.min}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+    if (isNumberWithUnitFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <NumberWithUnit.Input
+            {...inputProps}
+            configuration={field.config.configuration}
+            options={field.config.options}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isTextAreaFieldType(field)) {
+      return (
+        <InputField
+          {...field.inputFieldProps}
+          postfix={
+            field.config.configuration?.postfix &&
+            intl.formatMessage(field.config.configuration.postfix)
+          }
+          prefix={
+            field.config.configuration?.prefix &&
+            intl.formatMessage(field.config.configuration.prefix)
+          }
+        >
+          <TextArea
+            {...inputProps}
+            maxLength={field.config.configuration?.maxLength}
+            value={field.value}
+            onChange={(e) =>
+              onFieldValueChange(fieldDefinition.id, e.target.value)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isFileFieldType(field)) {
+      const uploadedFileNameLabel = field.config.configuration.fileName
+        ? intl.formatMessage(field.config.configuration.fileName)
+        : intl.formatMessage(field.config.label)
+
+      return (
+        <InputField {...field.inputFieldProps}>
+          <File.Input
+            {...inputProps}
+            acceptedFileTypes={field.config.configuration.acceptedFileTypes}
+            disabled={disabled}
+            error={inputFieldProps.error}
+            label={uploadedFileNameLabel}
+            maxFileSize={field.config.configuration.maxFileSize}
+            maxImageSize={field.config.configuration.maxImageSize}
+            value={field.value}
+            width={field.config.configuration.style?.width}
+            onChange={handleFileChange}
+          />
+        </InputField>
+      )
+    }
+    if (isBulletListFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <BulletList.Input {...field.config} />
+        </InputField>
+      )
+    }
+    if (isAddressFieldType(field)) {
+      return (
+        <InputField {...omit(field.inputFieldProps, 'error')}>
+          <Address.Input
+            addressConfig={field.config}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+    if (isSelectFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Select.Input
+            {...field.config}
+            disabled={disabled}
+            value={field.value}
+            onChange={(val: string) =>
+              onFieldValueChange(fieldDefinition.id, val)
+            }
+          />
+        </InputField>
+      )
+    }
+    if (isCountryFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <SelectCountry.Input
+            {...field.config}
+            disabled={disabled}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+    if (isCheckboxFieldType(field)) {
+      return (
+        <Checkbox.Input
+          {...field.config}
+          disabled={disabled}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+    if (isRadioGroupFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <RadioGroup.Input
+            {...field.config}
+            disabled={disabled}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isSignatureFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <SignatureField.Input
+            {...field.config}
+            disabled={disabled}
+            maxFileSize={field.config.configuration.maxFileSize}
+            modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
+            name={fieldDefinition.id}
+            required={inputFieldProps.required}
+            value={field.value}
+            onChange={(val) => handleFileChange(val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isAdministrativeAreaFieldType(field)) {
+      const partOfRef = field.config.configuration.partOf?.$declaration
+
+      const partOf =
+        partOfRef && makeFormikFieldIdsOpenCRVSCompatible(form)[partOfRef]
+
+      return (
+        <InputField {...field.inputFieldProps} htmlFor={fieldDefinition.id}>
+          <AdministrativeArea.Input
+            {...field.config}
+            disabled={disabled}
+            partOf={typeof partOf === 'string' ? partOf : null}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isLocationFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <LocationSearch.Input
+            {...field.config}
+            disabled={disabled}
+            searchableResource={
+              field.config.configuration.searchableResource.length > 0
+                ? field.config.configuration.searchableResource
+                : ['locations']
+            }
+            value={field.value}
+            onBlur={onBlur}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isOfficeFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <LocationSearch.Input
+            {...field.config}
+            disabled={disabled}
+            searchableResource={['offices']}
+            value={field.value}
+            onBlur={onBlur}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isFacilityFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <LocationSearch.Input
+            {...field.config}
+            disabled={disabled}
+            searchableResource={['facilities']}
+            value={field.value}
+            onBlur={onBlur}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+    if (isDividerFieldType(field)) {
+      return <Divider.Input />
+    }
+    if (isFileFieldWithOptionType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <FileWithOption.Input
+            {...inputProps}
+            acceptedFileTypes={field.config.configuration.acceptedFileTypes}
+            error={inputFieldProps.error}
+            maxFileSize={field.config.configuration.maxFileSize}
+            maxImageSize={field.config.configuration.maxImageSize}
+            options={field.config.options}
+            value={field.value}
+            onChange={handleFileWithOptionChange}
+          />
+        </InputField>
+      )
+    }
+
+    if (isDataFieldType(field)) {
+      return (
+        <Data.Input
+          {...field.config}
+          allKnownFields={formFields}
+          formData={form}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isPrintButtonFieldType(field)) {
+      return (
+        <AlphaPrintButton.Input
+          buttonLabel={field.config.configuration.buttonLabel}
+          disabled={disabled}
+          id={fieldDefinition.id}
+          template={field.config.configuration.template}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isButtonFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps} touched={true}>
+          <Button.Input
+            configuration={field.config.configuration}
+            disabled={inputProps.disabled}
+            id={field.config.id}
+            value={field.value}
+            onChange={(clicks) =>
+              onFieldValueChange(fieldDefinition.id, clicks)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isHttpFieldType(field)) {
+      return (
+        <Http.Input
+          key={fieldDefinition.id}
+          configuration={parseFieldReferencesInConfiguration(
+            field.config.configuration,
+            form
+          )}
+          form={form}
+          parentValue={form[field.config.configuration.trigger.$$field]}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+    if (isSearchFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Search.Input
+            key={fieldDefinition.id}
+            configuration={field.config.configuration}
+            form={form}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isLinkButtonFieldType(field)) {
+      return (
+        <LinkButton.Input
+          configuration={field.config.configuration}
+          disabled={inputProps.disabled}
+          id={field.config.id}
+        />
+      )
+    }
+
+    if (isVerificationStatusType(field)) {
+      return (
+        <VerificationStatus.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
+          value={field.value}
+          onReset={() => {
+            if (Array.isArray(fieldDefinition.parent)) {
+              onBatchFieldValueChange([
+                ...fieldDefinition.parent.map((parentField) => ({
+                  name: makeFormFieldIdFormikCompatible(parentField.$$field),
+                  value: undefined
+                })),
+                { name: fieldDefinition.id, value: null }
+              ])
+            } else if (fieldDefinition.parent) {
+              onBatchFieldValueChange([
+                {
+                  name: makeFormFieldIdFormikCompatible(
+                    fieldDefinition.parent.$$field
+                  ),
+                  value: undefined
+                },
+                { name: fieldDefinition.id, value: null }
+              ])
+            }
+          }}
+        />
+      )
+    }
+
+    if (isQueryParamReaderFieldType(field)) {
+      return (
+        <QueryParamReader.Input
+          configuration={field.config.configuration}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isIdReaderFieldType(field)) {
+      return (
+        <IdReader.Input
+          id={field.config.id}
+          methods={field.config.methods}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isQrReaderFieldType(field)) {
+      return (
+        <QrReader.Input
+          configuration={field.config.configuration}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
+      )
+    }
+
+    if (isLoaderFieldType(field)) {
+      return (
+        <Loader.Input
+          configuration={field.config.configuration}
+          id={field.config.id}
+        />
+      )
+    }
+
+    throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
+  }
+)
+
+GeneratedInputFieldV2.displayName = 'GeneratedInputFieldV2'
