@@ -18,6 +18,7 @@ import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 import { EventStatus } from '../events/EventMetadata'
+import { JurisdictionFilter } from 'src/scopes-v2'
 
 /* eslint-disable max-lines */
 
@@ -244,9 +245,11 @@ export const user = Object.assign(userSerializer, {
       required: ['$online']
     }),
   locationLevel: (adminLevelId: string) => ({
-    $user: {
-      $location: adminLevelId
-    }
+    $user: { $location: adminLevelId }
+  }),
+  // @TODO CIHAN: this should alternative take param like user().jurisdiction(user().scope('record.declare').attribute('event_location'))
+  jurisdiction: (jurisdiction: JurisdictionFilter) => ({
+    $user: { $jurisdiction: jurisdiction }
   })
 })
 
