@@ -44,7 +44,7 @@ paths:
                             $$event:
                               type: string
                               enum:
-                                &a5
+                                &a2
                                 - event.trackingId
                                 - event.status
                                 - event.legalStatuses.REGISTERED.acceptedAt
@@ -140,6 +140,38 @@ paths:
                                 required:
                                   - fieldId
                                 description: Field referencing existing event data by field ID.
+                              - type: object
+                                properties:
+                                  emptyValueMessage:
+                                    $ref: "#/components/schemas/TranslationConfig"
+                                    description: Default message displayed when the field value is empty.
+                                  conditionals:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          const: SHOW
+                                        conditional:
+                                          $ref: "#/components/schemas/Conditional"
+                                      required:
+                                        - type
+                                        - conditional
+                                      description: If 'SHOW' conditional is defined, the component is shown to the
+                                        user only if the condition is met
+                                    default: *a1
+                                  eventFieldId:
+                                    type: string
+                                    enum: *a2
+                                  label:
+                                    $ref: "#/components/schemas/TranslationConfig"
+                                    description: Overrides the default label from the referenced field when
+                                      provided.
+                                required:
+                                  - eventFieldId
+                                  - label
+                                description: Event Field referencing existing event meta data by field ID.
                           description: Fields displayed in the event summary view.
                       required:
                         - fields
@@ -194,7 +226,7 @@ paths:
                                         type:
                                           type: string
                                           enum:
-                                            &a2
+                                            &a3
                                             - fuzzy
                                             - exact
                                             - range
@@ -406,7 +438,7 @@ paths:
                                       items:
                                         $ref: "#/components/schemas/FieldConditional"
                                       default:
-                                        &a3 []
+                                        &a4 []
                                       description: "
 
                                         \
@@ -465,7 +497,7 @@ paths:
                                           - validator
                                           - message
                                       default:
-                                        &a4 []
+                                        &a5 []
                                       description: Option for overriding the field validations specifically for
                                         advanced search form.
                                     fieldId:
@@ -484,7 +516,7 @@ paths:
                                       properties:
                                         type:
                                           type: string
-                                          enum: *a2
+                                          enum: *a3
                                           description: Determines the search type of field. How to match value.
                                         searchFields:
                                           type: array
@@ -691,7 +723,7 @@ paths:
                                       type: array
                                       items:
                                         $ref: "#/components/schemas/FieldConditional"
-                                      default: *a3
+                                      default: *a4
                                       description: "
 
                                         \
@@ -749,12 +781,12 @@ paths:
                                         required:
                                           - validator
                                           - message
-                                      default: *a4
+                                      default: *a5
                                       description: Option for overriding the field validations specifically for
                                         advanced search form.
                                     fieldId:
                                       type: string
-                                      enum: *a5
+                                      enum: *a2
                                     fieldType:
                                       type: string
                                       const: event
@@ -859,7 +891,7 @@ components:
               properties:
                 $$event:
                   type: string
-                  enum: *a5
+                  enum: *a2
               required:
                 - $$event
               description: Reference to a field defined in the event metadata, using the field
@@ -946,6 +978,38 @@ components:
                     required:
                       - fieldId
                     description: Field referencing existing event data by field ID.
+                  - type: object
+                    properties:
+                      emptyValueMessage:
+                        $ref: "#/components/schemas/TranslationConfig"
+                        description: Default message displayed when the field value is empty.
+                      conditionals:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              const: SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        default: *a1
+                      eventFieldId:
+                        type: string
+                        enum: *a2
+                      label:
+                        $ref: "#/components/schemas/TranslationConfig"
+                        description: Overrides the default label from the referenced field when
+                          provided.
+                    required:
+                      - eventFieldId
+                      - label
+                    description: Event Field referencing existing event meta data by field ID.
               description: Fields displayed in the event summary view.
           required:
             - fields
@@ -999,7 +1063,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: *a2
+                              enum: *a3
                               description: Determines the search type of field. How to match value.
                             searchFields:
                               type: array
@@ -1176,7 +1240,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: *a3
+                          default: *a4
                           description: "
 
                             \       In advanced
@@ -1225,7 +1289,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: *a4
+                          default: *a5
                           description: Option for overriding the field validations specifically for
                             advanced search form.
                         fieldId:
@@ -1244,7 +1308,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: *a2
+                              enum: *a3
                               description: Determines the search type of field. How to match value.
                             searchFields:
                               type: array
@@ -1421,7 +1485,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: *a3
+                          default: *a4
                           description: "
 
                             \       In advanced
@@ -1470,12 +1534,12 @@ components:
                             required:
                               - validator
                               - message
-                          default: *a4
+                          default: *a5
                           description: Option for overriding the field validations specifically for
                             advanced search form.
                         fieldId:
                           type: string
-                          enum: *a5
+                          enum: *a2
                         fieldType:
                           type: string
                           const: event
