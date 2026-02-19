@@ -133,12 +133,20 @@ export function Summary() {
 
     const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
 
-    const mutationPayload = {
-      eventId,
-      declaration: {
+    const declaration = Object.fromEntries(
+      Object.entries({
         ...formWithOnlyChangedValues,
         ...nullifiedHiddenValues
-      },
+      }).filter(
+        ([key]) =>
+          !getDeclarationFields(eventConfiguration).find((f) => f.id === key)
+            ?.uncorrectable
+      )
+    )
+
+    const mutationPayload = {
+      eventId,
+      declaration,
       transactionId: generateTransactionId(),
       annotation,
       event,

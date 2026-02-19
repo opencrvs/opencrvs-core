@@ -12,7 +12,10 @@
 import { TRPCError } from '@trpc/server'
 import {
   ActionUpdate,
+  DeclarationFormConfig,
   errorMessages,
+  EventState,
+  isFieldVisible,
   LocationType,
   ValidatorContext
 } from '@opencrvs/commons/events'
@@ -55,19 +58,42 @@ export function throwWhenNotEmpty(errors: unknown[]) {
 
 /**
  * Compares update vs cleaned payloads and returns an array of offending keys.
+ *
+ * A key is considered invalid if it appears in the update but not in the cleaned payload —
+ * meaning it belongs to a field that should not be present (e.g. a hidden field).
+ *
+ * Exception: hidden fields with a null value are allowed, since null explicitly signals
+ * that the client is clearing the field's value. This is intentional and necessary to
+ * remove the field from the current event state.
  */
 export function getInvalidUpdateKeys<T>({
   update,
-  cleaned
+  cleaned,
+  formConfig,
+  context
 }: {
   update: T
   cleaned: T
+  formConfig: DeclarationFormConfig
+  context: ValidatorContext
 }): ValidationError[] {
   const updateEntries = flattenEntries(update)
   const cleanedKeys = flattenEntries(cleaned).map(([key]) => key)
 
   return updateEntries
-    .filter(([key]) => !cleanedKeys.includes(key))
+    .filter(([key]) => {
+      const isInvalidKey = !cleanedKeys.includes(key)
+
+      const field = formConfig.pages
+        .flatMap((p) => p.fields)
+        .find((f) => f.id === key)
+
+      const isHiddenWithNullValue =
+        field &&
+        !isFieldVisible(field, update as EventState, context) &&
+        update[key as keyof T] === null
+      return isInvalidKey && !isHiddenWithNullValue
+    })
     .map(([key, value]) => ({
       message: errorMessages.hiddenField.defaultMessage,
       id: key,

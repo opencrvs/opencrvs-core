@@ -153,7 +153,9 @@ function validateDeclarationUpdateAction({
   // Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
   const invalidKeys = getInvalidUpdateKeys({
     update: declarationUpdate,
-    cleaned: cleanedDeclaration
+    cleaned: cleanedDeclaration,
+    formConfig: declarationConfig,
+    context
   })
 
   if (invalidKeys.length > 0) {

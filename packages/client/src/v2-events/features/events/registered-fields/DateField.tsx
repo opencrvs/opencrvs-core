@@ -46,7 +46,7 @@ function resolveNowForDateInput(value: string | SerializedNowDateTime): string {
     return `${year}-${month}-${day}`
   }
 
-  return value.toString()
+  return typeof value === 'string' ? value : ''
 }
 
 function DateInput({

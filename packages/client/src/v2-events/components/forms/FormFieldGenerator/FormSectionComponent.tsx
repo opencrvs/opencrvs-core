@@ -29,7 +29,8 @@ import {
   isFieldEnabled,
   ValidatorContext,
   isFieldVisible,
-  findAllFields
+  findAllFields,
+  mapFieldTypeToEmptyValue
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -375,7 +376,40 @@ export function FormSectionComponent({
     // Formik does not allow controlling the form state 'easily'.
     // We propagate changes to the non-formik state from formik
     if (userChangedForm) {
-      onChange(values)
+      const newValues = cloneDeep(values)
+      let changed = false
+      const prevForm = {
+        ...initialValues,
+        ...makeFormikFieldIdsOpenCRVSCompatible(
+          makeDatesFormatted(fieldsWithDotSeparator, prevValuesRef.current)
+        )
+      }
+      const currentForm = {
+        ...initialValues,
+        ...makeFormikFieldIdsOpenCRVSCompatible(
+          makeDatesFormatted(fieldsWithDotSeparator, values)
+        )
+      }
+
+      for (const field of fieldsWithDotSeparator) {
+        const wasVisible = isFieldVisible(field, prevForm, validatorContext)
+        const isVisible = isFieldVisible(field, currentForm, validatorContext)
+
+        // When a field transitions from visible to hidden, clear its value at the source.
+        // This ensures hidden fields don't silently retain stale data that could cause confusion later.
+        if (wasVisible && !isVisible) {
+          const formikFieldId = makeFormFieldIdFormikCompatible(field.id)
+          set(newValues, formikFieldId, mapFieldTypeToEmptyValue(field))
+          changed = true
+        }
+      }
+
+      if (changed) {
+        void setValues(newValues)
+        onChange(newValues)
+      } else {
+        onChange(values)
+      }
     }
 
     if (sectionChanged) {
@@ -400,7 +434,10 @@ export function FormSectionComponent({
     fieldsWithDotSeparator,
     fieldsToShowValidationErrors,
     validateAllFields,
-    showValidationErrors
+    showValidationErrors,
+    initialValues,
+    validatorContext,
+    setValues
   ])
 
   // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
