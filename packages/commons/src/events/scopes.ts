@@ -21,7 +21,6 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { EventIndex } from './EventIndex'
 
 type AlwaysAllowed = null
 
