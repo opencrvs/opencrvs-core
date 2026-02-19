@@ -41,6 +41,7 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { handleDefaultValue } from '@client/v2-events/hooks/useDefaultValues'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -178,6 +179,8 @@ export function FormSectionComponent({
   useOnlineStatus()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
+
+  const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
 
   const systemVariables = useSystemVariables()
 
@@ -399,8 +402,22 @@ export function FormSectionComponent({
         // This ensures hidden fields don't silently retain stale data that could cause confusion later.
         if (wasVisible && !isVisible) {
           const formikFieldId = makeFormFieldIdFormikCompatible(field.id)
+          const fieldValue = get(newValues, formikFieldId)
+
+          if (fieldValue !== undefined) {
+            cacheHiddenFieldValue(field.id, fieldValue)
+          }
+
           set(newValues, formikFieldId, mapFieldTypeToEmptyValue(field))
           changed = true
+        } else if (!wasVisible && isVisible) {
+          const cachedValue = popHiddenFieldValue(field.id)
+
+          if (cachedValue !== undefined) {
+            const formikFieldId = makeFormFieldIdFormikCompatible(field.id)
+            set(newValues, formikFieldId, cachedValue)
+            changed = true
+          }
         }
       }
 
@@ -437,7 +454,9 @@ export function FormSectionComponent({
     showValidationErrors,
     initialValues,
     validatorContext,
-    setValues
+    setValues,
+    cacheHiddenFieldValue,
+    popHiddenFieldValue
   ])
 
   // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
