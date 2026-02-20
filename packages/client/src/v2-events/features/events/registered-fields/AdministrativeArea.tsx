@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import {
   Location,
   FieldPropsWithoutReferenceValue,
@@ -17,6 +18,7 @@ import {
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 import { LocationSearch } from './LocationSearch'
@@ -25,7 +27,11 @@ function useAdministrativeAreaOptions(parentId?: string | null) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
 
-  return React.useMemo(() => {
+  const userDetails = useSelector(getUserDetails)
+
+  console.log('foo2', userDetails?.primaryOffice.id)
+
+  const options = React.useMemo(() => {
     return [...administrativeAreas.values()]
       .filter((administrativeArea) => {
         if (parentId === undefined) {
@@ -39,6 +45,10 @@ function useAdministrativeAreaOptions(parentId?: string | null) {
         value: location.id
       }))
   }, [administrativeAreas, parentId])
+
+  console.log('options', options)
+
+  return options
 }
 
 function AdministrativeAreaInput({
@@ -59,9 +69,6 @@ function AdministrativeAreaInput({
     () => options.find((o) => o.value === value) ?? null,
     [options, value]
   )
-
-  // TODO CIHAN: filter options here?
-  console.log('options', options)
 
   return (
     <SearchableSelect

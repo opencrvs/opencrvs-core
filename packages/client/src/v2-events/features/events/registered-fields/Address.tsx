@@ -285,6 +285,8 @@ function AddressInput(props: Props) {
     administrativeArea: resolvedAdministrativeArea
   }
 
+  console.log('props.configuration', props.configuration?.allowedLocations)
+
   const adminStructure = generateAdministrativeAreaFields(
     appConfigAdminLevels,
     otherProps.required

@@ -647,6 +647,7 @@ const AllowedLocations = z
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
   defaultValue: NonEmptyTextValue.optional(),
+  // @TODO CIHAN: add this to Office and Location?
   configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for a facility')
 

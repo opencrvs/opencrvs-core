@@ -322,24 +322,24 @@ export function getLocationHierarchy(
   })
 }
 
-export function isOfficeUnderJurisdiction({
-  officeId,
-  otherOfficeId,
+export function isLocationUnderJurisdiction({
+  locationId,
+  otherLocationId,
   locations,
   administrativeAreas
 }: {
-  officeId: string
-  otherOfficeId: string
+  locationId: string
+  otherLocationId: string
   locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
 }) {
-  const office = locations.get(UUID.parse(officeId))
-  const otherOffice = locations.get(UUID.parse(otherOfficeId))
+  const location = locations.get(UUID.parse(locationId))
+  const otherLocation = locations.get(UUID.parse(otherLocationId))
 
-  const officeAdministrativeAreaId = office?.administrativeAreaId
-  const otherOfficeAdministrativeAreaId = otherOffice?.administrativeAreaId
+  const officeAdministrativeAreaId = location?.administrativeAreaId
+  const otherLocationAdministrativeAreaId = otherLocation?.administrativeAreaId
 
-  if (!officeAdministrativeAreaId || !otherOfficeAdministrativeAreaId) {
+  if (!officeAdministrativeAreaId || !otherLocationAdministrativeAreaId) {
     return false
   }
 
@@ -351,7 +351,7 @@ export function isOfficeUnderJurisdiction({
   }
 
   const hierarchy = getAdministrativeAreaHierarchy(
-    otherOfficeAdministrativeAreaId,
+    otherLocationAdministrativeAreaId,
     administrativeAreas
   )
 
