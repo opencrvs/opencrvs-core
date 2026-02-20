@@ -53,7 +53,7 @@ export default async function configHandler(
   }
 }
 
-async function getCertificatesConfig(
+export async function getCertificatesConfig(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -70,47 +70,42 @@ async function getCertificatesConfig(
 
   const templateScope = findScope(scope, 'template')
   const templateIds = templateScope?.options?.id ?? []
+
   const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
-  // If the print certified copies scope is not present or there are templateIds specified in the scope,
+  // If neither print certified copies nor the template scopes are present,
   // no certificate configuration will be fetched
-  if (!printCertifiedCopiesScope || templateIds.length === 0) {
+  if (!printCertifiedCopiesScope && templateIds.length === 0) {
     return []
   }
 
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${authToken}` }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Failed to fetch certificates configuration: ${res.statusText} ${url}`
+    )
+  }
+
+  const certificateConfigs = await res.json()
+
   // If there are no templateIds specified in the scope, all the certificates configuration will be fetched
   if (printCertifiedCopiesScope && templateIds.length === 0) {
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${authToken}` }
-    })
-
-    if (!res.ok) {
-      throw new Error(
-        `Failed to fetch certificates configuration: ${res.statusText} ${url}`
-      )
-    }
-    return res.json()
+    return certificateConfigs
   }
 
   // Even if the print certified copies scope is present but there are templateIds specified in the scope,
   // the certificates configuration for those templateIds will be fetched only.
-  const res = await fetch(url, {
-    body: JSON.stringify({ templateIds }),
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${authToken}`,
-      'Content-Type': 'application/json'
-    }
-  })
-
-  if (!res.ok) {
-    logger.error(
-      `Failed to fetch certificate configuration for templates ${templateIds}: ${res.statusText} ${url}`
+  if (templateIds.length > 0) {
+    return certificateConfigs.filter((config: any) =>
+      templateIds.includes(config.id)
     )
-    return []
   }
-  return res.json()
+
+  return []
 }
 
 async function getConfigFromCountry(authToken?: string) {
