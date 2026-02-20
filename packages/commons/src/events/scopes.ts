@@ -13,6 +13,7 @@ import {
   ConfigurableScopeType,
   findScope,
   getAuthorizedEventsFromScopes,
+  PrintCertifiedCopiesScope,
   RecordScopeType,
   Scope
 } from '../scopes'
@@ -38,7 +39,6 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.DELETE]: ['record.declare'],
   [ActionType.VALIDATE]: ['record.declared.validate', 'record.register'],
   [ActionType.REGISTER]: ['record.register'],
-  // @ts-expect-error - This scope is not yet implemented, but we want to reserve it for the print certificate action
   [ActionType.PRINT_CERTIFICATE]: ['record.registered.print-certified-copies'],
   [ActionType.REQUEST_CORRECTION]: [
     'record.registered.request-correction',
@@ -56,7 +56,10 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
   [ActionType.DUPLICATE_DETECTED]: []
-} satisfies Record<DisplayableAction, RecordScopeType[] | AlwaysAllowed>
+} satisfies Record<
+  DisplayableAction,
+  RecordScopeType[] | PrintCertifiedCopiesScope['type'][] | AlwaysAllowed
+>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
