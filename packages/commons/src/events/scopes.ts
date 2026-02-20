@@ -21,7 +21,7 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { EventIndex } from './EventIndex'
+import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes-v2'
 
 type AlwaysAllowed = null
 
@@ -117,37 +117,20 @@ export function isActionInScope(
     return false
   }
 
-  return configurableEventScopeAllowed(
+  const isAllowedByLegacyScope = configurableEventScopeAllowed(
     scopes,
     allowedConfigurableScopes,
     eventType,
     customActionType
   )
-}
 
-/**
- * A shared utility to check if the user can read a record.
- * This will be removed in 1.10 and implemented by scopes.
- *
- * In order for us to limit the usage of 'record.read' scope, we allow users to view records they have created on system-level.
- *
- * @deprecated - Will be removed in 1.10
- */
-export function canUserReadEvent(
-  event: EventIndex | { createdBy: string; type: string },
-  {
-    userId,
-    scopes
-  }: {
-    userId: string
-    scopes: string[]
-  }
-) {
-  const createdByUser = event.createdBy === userId
+  // NOTE: This is a temporary measure to allow for the transition to V2 scopes.
+  // This will be unified to single check once the V1 scopes are fully deprecated and removed.
+  const isAllowedByV2Scope =
+    getAcceptedScopesByType({
+      acceptedScopes: allowedConfigurableScopes as RecordScopeTypeV2[],
+      scopes
+    }).length > 0
 
-  if (createdByUser) {
-    return true
-  }
-
-  return isActionInScope(scopes, ActionType.READ, event.type)
+  return isAllowedByLegacyScope || isAllowedByV2Scope
 }

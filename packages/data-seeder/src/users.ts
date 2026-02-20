@@ -52,7 +52,7 @@ const RoleSchema = (eventIds: string[]) =>
             return
           }
 
-          if (parsedV2Scopes?.type === 'record.search') {
+          if (parsedV2Scopes?.type) {
             const options = parsedV2Scopes.options
 
             if (options?.event && Array.isArray(options.event)) {
