@@ -2250,7 +2250,7 @@ components:
                             - DATE_RANGE
                             - SELECT_DATE_RANGE
                             - TIME
-                            - IMAGE
+                            - IMAGE_VIEW
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
@@ -2504,7 +2504,7 @@ components:
                             - DATE_RANGE
                             - SELECT_DATE_RANGE
                             - TIME
-                            - IMAGE
+                            - IMAGE_VIEW
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
@@ -4952,13 +4952,13 @@ components:
               type: boolean
             type:
               type: string
-              const: IMAGE
+              const: IMAGE_VIEW
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
-                src:
-                  description: Image source URL or path
-                  type: string
                 alt:
                   description: Alternative text for the image
                   type: string
@@ -4986,8 +4986,6 @@ components:
                     - fill
                     - none
                     - scale-down
-              required:
-                - src
               additionalProperties: false
           required:
             - id
