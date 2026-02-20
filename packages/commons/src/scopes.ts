@@ -278,7 +278,6 @@ const PrintCertifiedCopiesScope = z.object({
     event: z.array(z.string()).describe('Event type, e.g. birth, death'),
     templateIds: z
       .array(z.string())
-      .length(1)
       .optional()
       .describe(
         'Template IDs for certified copies. If not provided, all templates will be used.'
