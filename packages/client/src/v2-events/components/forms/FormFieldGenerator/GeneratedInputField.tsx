@@ -369,7 +369,12 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isImageFieldType(field)) {
-      return <Image.Input configuration={field.config.configuration} />
+      return (
+        <Image.Input
+          configuration={field.config.configuration}
+          value={field.value}
+        />
+      )
     }
 
     if (isParagraphFieldType(field)) {

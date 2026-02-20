@@ -211,7 +211,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
     /** Images are not indexed as they're currently asserted read-only. */
-    case FieldType.IMAGE:
+    case FieldType.IMAGE_VIEW:
     case FieldType.LOADER:
       return {
         type: 'object',

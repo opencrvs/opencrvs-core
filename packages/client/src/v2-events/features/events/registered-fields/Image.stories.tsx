@@ -49,14 +49,14 @@ const svgDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(`
 
 const imageField = {
   id: 'storybook.image',
-  type: FieldType.IMAGE,
+  type: FieldType.IMAGE_VIEW,
   label: {
     id: 'storybook.image.label',
     defaultMessage: 'Reference image',
     description: 'Image field for read-only rendering'
   },
+  defaultValue: svgDataUri,
   configuration: {
-    src: svgDataUri,
     alt: 'Decorative map illustration',
     width: '320px',
     height: '160px',

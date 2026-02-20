@@ -36,11 +36,17 @@ const StyledImage = styled.img<{
 `
 
 function ImageInput({
-  configuration
+  configuration,
+  value
 }: {
   configuration: ImageField['configuration']
+  value: string | null
 }) {
-  const { src, alt, width, height, objectFit, textAlign } = configuration
+  const { alt, width, height, objectFit, textAlign } = configuration
+
+  if (!value) {
+    return null
+  }
 
   return (
     <Container>
@@ -50,7 +56,7 @@ function ImageInput({
           $objectFit={objectFit}
           $width={width}
           alt={alt ?? ''}
-          src={src}
+          src={value}
         />
       </AlignedContainer>
     </Container>

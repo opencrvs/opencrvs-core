@@ -111,7 +111,7 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return PageHeader
     case FieldType.PARAGRAPH:
       return Paragraph
-    case FieldType.IMAGE:
+    case FieldType.IMAGE_VIEW:
       return Image
     case FieldType.NAME:
       return Name

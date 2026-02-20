@@ -26,7 +26,7 @@ export const FieldType = {
   DATE_RANGE: 'DATE_RANGE', // // Internal use, only for search functionality
   SELECT_DATE_RANGE: 'SELECT_DATE_RANGE', // Internal use, only for search functionality
   TIME: 'TIME',
-  IMAGE: 'IMAGE',
+  IMAGE_VIEW: 'IMAGE_VIEW',
   PARAGRAPH: 'PARAGRAPH',
   PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
@@ -96,7 +96,7 @@ export const FieldTypesToHideInReview = [
   FieldType.BULLET_LIST,
   FieldType.DIVIDER,
   FieldType.PAGE_HEADER,
-  FieldType.IMAGE,
+  FieldType.IMAGE_VIEW,
   FieldType.PARAGRAPH,
   FieldType.ID_READER,
   FieldType.LOADER,

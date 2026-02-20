@@ -159,7 +159,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
-    case FieldType.IMAGE:
+    case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
@@ -245,7 +245,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
-    case FieldType.IMAGE:
+    case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
@@ -307,7 +307,7 @@ export const isImageFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: ImageField } => {
-  return field.config.type === FieldType.IMAGE
+  return field.config.type === FieldType.IMAGE_VIEW
 }
 
 export const isDateFieldType = (field: {
@@ -633,7 +633,7 @@ export const isNonInteractiveFieldType = (
   return (
     field.type === FieldType.DIVIDER ||
     field.type === FieldType.PAGE_HEADER ||
-    field.type === FieldType.IMAGE ||
+    field.type === FieldType.IMAGE_VIEW ||
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
