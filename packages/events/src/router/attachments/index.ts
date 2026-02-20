@@ -10,17 +10,10 @@
  */
 
 import * as z from 'zod/v4'
-import { zfd } from 'zod-form-data'
 import { SCOPES } from '@opencrvs/commons'
-import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware'
-import { uploadFile } from '@events/service/files'
-
-const AttachmentInput = zfd.formData({
-  file: zfd.file(),
-  transactionId: zfd.text(),
-  path: zfd.text(z.string().min(1).optional())
-})
+import { router, userAndSystemProcedure } from '@events/router/trpc'
+import { AttachmentInput, uploadFile } from '@events/service/files'
 
 export const attachmentsRouter = router({
   upload: userAndSystemProcedure

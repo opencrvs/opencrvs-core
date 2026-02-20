@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Readable } from 'stream'
-import { File } from 'buffer'
 import fetch from 'node-fetch'
+import { zfd } from 'zod-form-data'
+import * as z from 'zod/v4'
 import FormData from 'form-data'
 import {
   FullDocumentPath,
@@ -89,8 +90,14 @@ export async function cleanupUnreferencedFiles(
   )
 }
 
+export const AttachmentInput = zfd.formData({
+  file: zfd.file(),
+  transactionId: zfd.text(),
+  path: zfd.text(z.string().min(1).optional())
+})
+
 export async function uploadFile(
-  input: { file: File; transactionId: string; path?: string },
+  input: z.infer<typeof AttachmentInput>,
   token: string
 ): Promise<string> {
   const form = new FormData()
