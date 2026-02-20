@@ -10,9 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
-import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
-import { Duplicate } from '@opencrvs/components/lib/icons'
 import { Link } from '@opencrvs/components/lib/Link'
 
 const Flex = styled.div`
@@ -29,25 +26,6 @@ export const NoNameContainer = styled(Link).attrs({
   color: 'negative'
 })``
 
-const Event = styled.div`
-  color: ${({ theme }) => theme.colors.grey500};
-  ${({ theme }) => theme.fonts.reg16}
-`
-
-const NameEventContainer = styled.div`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
-
-const Icon = styled.div`
-  flex-shrink: 0;
-  display: flex;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    align-items: flex-end;
-  }
-  width: 24px;
-`
 interface IIconWith {
   status?: string
   name: React.ReactNode
@@ -57,76 +35,6 @@ interface IIconWith {
   isArchived?: boolean
 }
 
-const IconComp = ({
-  status,
-  isDuplicateIcon,
-  isValidatedOnReview,
-  isArchived
-}: {
-  status: string
-  isDuplicateIcon?: boolean
-  isValidatedOnReview?: boolean
-  isArchived?: boolean
-}) => {
-  return (
-    <Icon>
-      {isDuplicateIcon ? (
-        <Duplicate />
-      ) : (
-        <DeclarationIcon
-          color={STATUSTOCOLOR[status]}
-          isValidatedOnReview={isValidatedOnReview}
-          isArchive={isArchived}
-        />
-      )}
-    </Icon>
-  )
-}
-
-export const IconWithName = ({
-  status,
-  name,
-  isDuplicate,
-  isValidatedOnReview,
-  isArchived
-}: IIconWith) => {
-  return (
-    <Flex id="flex">
-      {status && (
-        <IconComp
-          status={status}
-          isDuplicateIcon={isDuplicate}
-          isValidatedOnReview={isValidatedOnReview}
-          isArchived={isArchived}
-        />
-      )}
-      {name}
-    </Flex>
-  )
-}
-
-export const IconWithNameEvent = ({
-  status,
-  name,
-  event,
-  isDuplicate,
-  isValidatedOnReview,
-  isArchived
-}: IIconWith) => {
-  return (
-    <Flex id="flex">
-      {status && (
-        <IconComp
-          status={status}
-          isDuplicateIcon={isDuplicate}
-          isValidatedOnReview={isValidatedOnReview}
-          isArchived={isArchived}
-        />
-      )}
-      <NameEventContainer id="nameEvent">
-        {name}
-        {event && <Event>{event}</Event>}
-      </NameEventContainer>
-    </Flex>
-  )
+export const IconWithNameEvent = ({}: IIconWith) => {
+  return <Flex id="flex"></Flex>
 }

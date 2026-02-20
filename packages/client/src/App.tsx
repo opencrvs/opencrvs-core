@@ -16,10 +16,7 @@ import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
 import * as routes from '@client/navigation/routes'
-import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
-import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
-import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { SCOPES } from '@opencrvs/commons/client'
@@ -40,11 +37,12 @@ import { useApolloClient } from './utils/apolloClient'
 import { ApolloProvider } from './utils/ApolloProvider'
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+import { config } from './config'
 import { AppStore } from './store'
 import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
+import { TRPCProvider } from './v2-events/trpc'
 import { ReloadModal } from './views/Modals/ReloadModal'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
-import { TRPCProvider } from './v2-events/trpc'
 
 // Injecting global styles for the body tag - used only once
 const GlobalStyle = createGlobalStyle`
@@ -68,6 +66,13 @@ function createRedirect(from: string, to: string) {
     }
   }
 }
+
+// By default we now load V2 events in the '/' route. This is a temporary flag
+// to turn off V2 events in case IET wants to switch back to V1 events.
+// This will be removed after a few releases when V2 events will be finalized.
+const turnOffV2Events =
+  typeof config.FEATURES.V2_EVENTS === 'boolean' &&
+  config.FEATURES.V2_EVENTS === false
 
 export const routesConfig = [
   {
@@ -111,20 +116,8 @@ export const routesConfig = [
         )
       },
       {
-        path: routes.PERFORMANCE_REGISTRATIONS_LIST,
-        element: <RegistrationList />
-      },
-      {
-        path: routes.PERFORMANCE_FIELD_AGENT_LIST,
-        element: <FieldAgentList />
-      },
-      {
         path: routes.EVENT_COMPLETENESS_RATES,
         element: <CompletenessRates />
-      },
-      {
-        path: routes.WORKFLOW_STATUS,
-        element: <WorkflowStatus />
       },
       {
         path: routes.TEAM_SEARCH,

@@ -9,11 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  IFormData,
+  IFormField,
   IFormSection,
   IFormSectionData,
   IFormSectionGroup
 } from '@client/forms'
-import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import {
+  getVisibleSectionGroupsBasedOnConditions,
+  handleInitialValue
+} from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { IStoreState } from '@client/store'
@@ -22,7 +27,6 @@ import {
   clearUserFormData,
   fetchAndStoreUserData
 } from '@client/user/userReducer'
-import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { UserReviewForm } from '@client/views/SysAdmin/Team/user/userCreation/UserReviewForm'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -42,6 +46,9 @@ import {
   withRouter
 } from '@client/components/WithRouterProps'
 import { Scope, SCOPES, UUID } from '@opencrvs/commons/client'
+import { IOfflineData } from '@client/offline/reducer'
+import { UserDetails } from '@client/utils/userUtils'
+import { get, isNull, isUndefined } from 'lodash'
 
 type IUserProps = {
   userId?: string
@@ -218,6 +225,36 @@ function addJurisdictionFilterToLocationSearchInput(
       })
     }))
   }
+}
+function getInitialValue(
+  field: IFormField,
+  form: IFormSectionData,
+  draft: IFormData,
+  config: IOfflineData,
+  user: UserDetails | null
+) {
+  let fieldInitialValue = field.initialValue
+  if (field.initialValueKey) {
+    fieldInitialValue = get(draft, field.initialValueKey, '')
+  }
+
+  return handleInitialValue(fieldInitialValue!, form, config, draft, user)
+}
+
+export function replaceInitialValues(
+  fields: IFormField[],
+  form: IFormSectionData,
+  draft: IFormData,
+  config: IOfflineData,
+  user: UserDetails | null
+) {
+  return fields.map((field) => ({
+    ...field,
+    initialValue:
+      isUndefined(form[field.name]) || isNull(form[field.name])
+        ? getInitialValue(field, form, draft, config, user)
+        : form[field.name]
+  }))
 }
 
 const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {

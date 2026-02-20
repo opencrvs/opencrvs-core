@@ -18,7 +18,6 @@ import {
 import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { getReviewForm } from '@client/forms/register/review-selectors'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
 import { ThemeProvider } from 'styled-components'
@@ -1096,7 +1095,7 @@ export async function getReviewFormFromStore(
 ) {
   store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
-  return getReviewForm(state)![event]
+  throw new Error('Deleted')
 }
 
 export function loginAsFieldAgent(store: AppStore) {
