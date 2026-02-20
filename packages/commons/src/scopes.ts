@@ -272,24 +272,15 @@ const SearchScope = z.object({
   })
 })
 
-const PrintCertifiedCopiesScope = z.object({
-  type: z.literal('record.registered.print-certified-copies'),
+const TemplateScope = z.object({
+  type: z.literal('template'),
   options: z.object({
-    event: z.array(z.string()).describe('Event type, e.g. birth, death'),
-    templateIds: z
-      .array(z.string())
-      .optional()
-      .describe(
-        'Template IDs for certified copies. If not provided, all templates will be used.'
-      )
+    id: z.array(z.string())
   })
 })
 
 export type SearchScope = z.infer<typeof SearchScope>
-
-export type PrintCertifiedCopiesScope = z.infer<
-  typeof PrintCertifiedCopiesScope
->
+export type TemplateScope = z.infer<typeof TemplateScope>
 
 export const RecordScopeType = z.enum([
   'record.create',
@@ -301,6 +292,7 @@ export const RecordScopeType = z.enum([
   'record.declared.archive',
   'record.declared.review-duplicates',
   'record.register',
+  'record.registered.print-certified-copies',
   'record.registered.request-correction',
   'record.registered.correct',
   'record.unassign-others'
@@ -321,10 +313,10 @@ export type RecordScope = z.infer<typeof RecordScope>
 
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
-  PrintCertifiedCopiesScope,
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
+  TemplateScope,
   RecordScope
 ])
 

@@ -67,15 +67,13 @@ async function getCertificatesConfig(
     scope,
     'record.registered.print-certified-copies'
   )
-  if (!printCertifiedCopiesScope) {
-    return []
-  }
 
-  const templateIds = printCertifiedCopiesScope.options.templateIds ?? []
+  const templateScope = findScope(scope, 'template')
+  const templateIds = templateScope?.options?.id ?? []
   const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
   // If there are no templateIds specified in the scope, all the certificates configuration will be fetched
-  if (!templateIds.length) {
+  if (printCertifiedCopiesScope && templateIds.length === 0) {
     const res = await fetch(url, {
       method: 'GET',
       headers: { Authorization: `Bearer ${authToken}` }
@@ -89,7 +87,8 @@ async function getCertificatesConfig(
     return res.json()
   }
 
-  // If there are templateIds specified in the scope, the certificates configuration for those templateIds will be fetched only
+  // Even if the print certified copies scope is present but there are templateIds specified in the scope,
+  // the certificates configuration for those templateIds will be fetched only.
   const res = await fetch(url, {
     body: JSON.stringify({ templateIds }),
     method: 'POST',
