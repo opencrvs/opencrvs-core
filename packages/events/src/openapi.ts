@@ -80,4 +80,5 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
     }
   }
 }
+// eslint-disable-next-line no-console
 console.log(yaml.stringify(openApiDocument))
