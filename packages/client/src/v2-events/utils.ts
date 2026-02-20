@@ -31,7 +31,10 @@ import {
   UserOrSystem,
   InteractiveFieldType,
   FieldConfig,
-  TextField
+  TextField,
+  EventMetadataTimeFields,
+  EventMetadataKeys,
+  EventMetadataKeysArray
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -72,18 +75,135 @@ export const getUserIdsFromActions = (
   return uniq(userIds)
 }
 
+type EventIndexValue =
+  | string
+  | string[]
+  | null
+  | undefined
+  | Record<string, string | string[] | null | undefined>
+
+/**
+ * Recursively flattens nested objects, constructing full paths.
+ *
+ * @param obj - The nested object to flatten
+ * @param prefix - The current path prefix
+ * @returns A flattened object with constructed keys
+ */
+function flattenNestedObject(
+  obj: Record<string, EventIndexValue>,
+  prefix: string
+): Record<string, EventIndexValue> {
+  const result: Record<string, EventIndexValue> = {}
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key]
+      const newKey = `${prefix}.${key}`
+
+      if (value === undefined || value === null) {
+        continue
+      }
+
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        // Continue flattening nested objects
+        Object.assign(result, flattenNestedObject(value, newKey))
+      } else if (Array.isArray(value)) {
+        // Store arrays as-is
+        result[newKey] = value
+      } else {
+        // Store scalar values
+        result[newKey] = value
+      }
+    }
+  }
+
+  return result
+}
+
+/**
+ * Flattens an EventIndex object by extracting only event metadata fields
+ * and constructing full paths with 'event.' prefix for nested properties.
+ *
+ * @param eventIndex - The event index object to flatten
+ * @returns A flattened object with event metadata fields as keys (e.g., 'event.legalStatuses.REGISTERED.acceptedAt')
+ *
+ * @example
+ * const eventIndex = {
+ *   id: '123',
+ *   type: 'BIRTH',
+ *   legalStatuses: {
+ *     REGISTERED: {
+ *       acceptedAt: '2025-02-20T10:00:00Z',
+ *       registrationNumber: 'REG-123'
+ *     }
+ *   },
+ *   declaration: { ... }
+ * }
+ *
+ * const flattened = flattenEventMetadata(eventIndex)
+ * // Result: {
+ * //   'event.id': '123',
+ * //   'event.type': 'BIRTH',
+ * //   'event.legalStatuses.REGISTERED.acceptedAt': '2025-02-20T10:00:00Z',
+ * //   'event.legalStatuses.REGISTERED.registrationNumber': 'REG-123',
+ * //   ...
+ * // }
+ */
+export function flattenEventMetadata(
+  eventIndex: EventIndex
+): Record<string, EventIndexValue> {
+  const result: Record<string, EventIndexValue> = {}
+
+  for (const key of EventMetadataKeysArray) {
+    const value = eventIndex[key]
+
+    if (value === undefined || value === null) {
+      continue
+    }
+
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      // Recursively flatten nested objects
+      const flattened = flattenNestedObject(value, `event.${key}`)
+      Object.assign(result, flattened)
+    } else if (Array.isArray(value)) {
+      // Handle arrays (e.g., flags)
+      result[`event.${key}`] = value
+    } else {
+      // Simple scalar value
+      result[`event.${key}`] = value
+    }
+  }
+
+  return result
+}
+
 export function flattenEventIndex(event: EventIndex) {
   const { declaration, trackingId, status, ...rest } = event
   return {
     ...rest,
     ...declaration,
-    'event.trackingId': trackingId,
-    'event.status': status,
+    ...flattenEventMetadata(event),
     'event.registrationNumber':
       rest.legalStatuses.REGISTERED?.registrationNumber,
     'event.registeredAt': rest.legalStatuses.REGISTERED?.createdAtLocation,
     'event.registeredBy': rest.legalStatuses.REGISTERED?.createdBy
   }
+}
+
+export function transformTimeFieldsIntoTimestamps(
+  eventIndex: Record<string, unknown>
+) {
+  return Object.fromEntries(
+    Object.entries(eventIndex).map(([key, value]) => {
+      if (
+        EventMetadataTimeFields.includes(key as EventMetadataKeys) &&
+        typeof value === 'string'
+      ) {
+        return [key, new Date(value).getTime()]
+      }
+      return [key, value]
+    })
+  )
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>

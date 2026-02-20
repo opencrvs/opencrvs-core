@@ -39,7 +39,6 @@ import {
   FullDocumentUrl
 } from '../../documents'
 import { isFieldReference } from '../../conditionals/conditionals'
-import { EventFieldId } from '../AdvancedSearchConfig'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -156,24 +155,24 @@ function extractDateString(dateTime: string): string {
   return dateTime.split('T')[0]
 }
 
-type EventMetadata = {
-  [key in EventFieldId]: string | null | undefined
-} & {
-  [key in typeof DEFAULT_DATE_OF_EVENT_PROPERTY]: string
-}
-
 export function resolveDateOfEvent(
-  eventMetadata: EventMetadata,
+  eventIndex: EventIndex,
   declaration: EventState,
   config: EventConfig
 ) {
   if (!config.dateOfEvent) {
-    return extractDateString(eventMetadata[DEFAULT_DATE_OF_EVENT_PROPERTY])
+    return extractDateString(eventIndex[DEFAULT_DATE_OF_EVENT_PROPERTY])
   }
 
+  // If dateOfEvent is a field reference, we need to extract the date from the declaration using the field id.
+  // Otherwise, we extract it from the event index using the event reference.
+  // i.e. event('legalStatuses.REGISTERED.acceptedAt') will look for the acceptedAt field in the legalStatuses object
+  // in the event metadata in EventIndex, whereas field('child.dob') will look for the dob field in the declaration.
   const parsedDate = isFieldReference(config.dateOfEvent)
     ? ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
-    : ZodDateTime.safeParse(eventMetadata[config.dateOfEvent.$$event])
+    : ZodDateTime.safeParse(
+        getMixedPath(eventIndex, config.dateOfEvent.$$event)
+      )
 
   return parsedDate.success ? extractDateString(parsedDate.data) : undefined
 }
@@ -193,21 +192,6 @@ export function extractPotentialDuplicatesFromActions(
     }
     return duplicates
   }, [])
-}
-
-export function getEventMetadata(eventIndex: EventIndex): EventMetadata {
-  const metadata = {} as EventMetadata
-
-  for (const fieldId of EventFieldId.options) {
-    metadata[fieldId] = getMixedPath(
-      eventIndex,
-      fieldId.split('.').slice(1).join('.')
-    )
-  }
-
-  metadata[DEFAULT_DATE_OF_EVENT_PROPERTY] = eventIndex.createdAt
-
-  return metadata
 }
 
 /**
@@ -272,10 +256,10 @@ export function getCurrentEventState(
     flags: getFlagsFromActions(sortedActions)
   })
 
-  return {
+  return deepDropNulls({
     ...base,
-    dateOfEvent: resolveDateOfEvent(getEventMetadata(base), declaration, config)
-  }
+    dateOfEvent: resolveDateOfEvent(base, declaration, config)
+  })
 }
 
 /**
@@ -337,7 +321,7 @@ export function applyDeclarationToEventIndex(
   return {
     ...eventIndex,
     dateOfEvent: resolveDateOfEvent(
-      getEventMetadata(eventIndex),
+      eventIndex,
       updatedDeclaration,
       eventConfiguration
     ),

@@ -20,13 +20,13 @@ import {
   ActionFlag,
   InherentFlags,
   TranslationConfig,
-  EventDocument,
-  EventMetadataFieldType
+  EventDocument
 } from '@opencrvs/commons/client'
 import { FieldValue, FieldConfig, FieldType } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { transformTimeFieldsIntoTimestamps } from '@client/v2-events/utils'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
@@ -200,29 +200,6 @@ export function EventSummary({
       }
     }
 
-    if ('eventFieldId' in field) {
-      const value = getMixedPath(eventIndex, field.eventFieldId, '')
-      const config = {
-        type: EventMetadataFieldType[field.eventFieldId]
-      } as FieldConfig
-
-      return {
-        id: field.eventFieldId,
-        label: field.label,
-        emptyValueMessage: field.emptyValueMessage,
-        secured: false,
-        value: (
-          <Output
-            eventConfig={eventConfiguration}
-            field={config}
-            value={
-              config.type === FieldType.DATE ? value?.split('T')[0] : value
-            }
-          />
-        )
-      }
-    }
-
     const accessedFields = intl.variablesUsed(field.value)
 
     return {
@@ -232,7 +209,10 @@ export function EventSummary({
         securedFields.includes(fieldId)
       ),
       emptyValueMessage: field.emptyValueMessage,
-      value: intl.formatMessage(field.value, eventIndex)
+      value: intl.formatMessage(
+        field.value,
+        transformTimeFieldsIntoTimestamps(eventIndex)
+      )
     }
   })
 

@@ -752,7 +752,7 @@ describe('getCurrentEventState()', () => {
 
     const state = getCurrentEventState(event, {
       ...tennisClubMembershipEvent,
-      dateOfEvent: { $$event: 'event.legalStatuses.REGISTERED.acceptedAt' }
+      dateOfEvent: { $$event: 'legalStatuses.REGISTERED.acceptedAt' }
     })
 
     expect(state.dateOfEvent).toEqual(

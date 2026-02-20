@@ -71,22 +71,10 @@ const tennisClubMembershipEventWithConfigurableSummaryFields: EventConfig = {
           id: 'event.birth.summary.event.registeredAt.label'
         },
         value: {
-          defaultMessage: '{event.legalStatuses.REGISTERED.acceptedAt}',
+          defaultMessage:
+            '{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}',
           description: 'This is the registration date value',
           id: 'event.birth.summary.event.registeredAt.value'
-        }
-      },
-      {
-        eventFieldId: 'event.legalStatuses.REGISTERED.acceptedAt',
-        emptyValueMessage: {
-          defaultMessage: 'No registration date',
-          description: 'This is shown when there is no registration date',
-          id: 'event.birth.summary.event.registeredAt.empty'
-        },
-        label: {
-          defaultMessage: 'Registration date from field id',
-          description: 'This is the label for the registration date',
-          id: 'event.birth.summary.event.registeredAtFieldId.label'
         }
       }
     ]
@@ -135,23 +123,8 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
           await canvas.findByText('Registration date')
         await expect(registrationDateField).toBeInTheDocument()
 
-        const registrationDateValue = await canvas.findByText(
-          '2025-01-23T05:35:27.689Z'
-        )
-        await expect(registrationDateValue).toBeInTheDocument()
-      }
-    )
-
-    await step(
-      'Check the registration date defined by eventFieldId is shown in the summary',
-      async () => {
-        const canvas = within(canvasElement)
-        const registrationDateField = await canvas.findByText(
-          'Registration date from field id'
-        )
-        await expect(registrationDateField).toBeInTheDocument()
-
-        const registrationDateValue = await canvas.findByText('23 January 2025')
+        const registrationDateValue =
+          await canvas.findByText('January 23, 2025')
         await expect(registrationDateValue).toBeInTheDocument()
       }
     )

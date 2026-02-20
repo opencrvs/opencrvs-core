@@ -30,7 +30,7 @@ export function createEventFieldConfig(fieldId: EventFieldIdInput) {
     /**
      * Internal reference to the event field.
      */
-    $$event: baseField.fieldId,
+    $$event: fieldId,
     ...createSearchConfig(baseField)
   }
 }

@@ -11,7 +11,6 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { ShowConditional } from './Conditional'
-import { EventFieldId } from './AdvancedSearchConfig'
 
 const BaseField = z.object({
   emptyValueMessage: TranslationConfig.optional().describe(
@@ -27,13 +26,6 @@ const ReferenceField = BaseField.extend({
   )
 }).describe('Field referencing existing event data by field ID.')
 
-const ReferenceEventField = BaseField.extend({
-  eventFieldId: EventFieldId,
-  label: TranslationConfig.describe(
-    'Overrides the default label from the referenced field when provided.'
-  )
-}).describe('Event Field referencing existing event meta data by field ID.')
-
 const Field = BaseField.extend({
   id: z.string().describe('Identifier of the summary field.'),
   value: TranslationConfig.describe(
@@ -45,7 +37,7 @@ const Field = BaseField.extend({
 export const SummaryConfig = z
   .object({
     fields: z
-      .array(z.union([Field, ReferenceField, ReferenceEventField]))
+      .array(z.union([Field, ReferenceField]))
       .describe('Fields displayed in the event summary view.')
   })
   .describe('Configuration of the event summary section.')

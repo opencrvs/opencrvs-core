@@ -20,8 +20,7 @@ import {
   applyDraftToEventIndex,
   deepDropNulls,
   EventStatus,
-  getOrThrow,
-  getEventMetadata
+  getOrThrow
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -89,7 +88,6 @@ function EventOverviewFull({
   const { flags, legalStatuses, potentialDuplicates, ...flattenedEventIndex } =
     {
       ...flattenEventIndex(eventWithDrafts),
-      ...getEventMetadata(eventWithDrafts),
       // drafts should not affect the status of the event
       // so the status and flags are taken from the eventIndex
       'event.status': status,
