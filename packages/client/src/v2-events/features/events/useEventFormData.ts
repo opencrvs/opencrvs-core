@@ -23,7 +23,7 @@ interface EventFormData {
   setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
   hiddenFieldCache: null | EventState
   cacheHiddenFieldValue: (fieldId: string, value: FieldValue) => void
-  popHiddenFieldValue: (fieldId: string) => any
+  popHiddenFieldValue: (fieldId: string) => FieldValue
   clear: () => void
 }
 
@@ -67,7 +67,7 @@ export const useEventFormData = create<EventFormData>()((set, get) => {
         Object.entries(get().getFormValues()).map(([key]) => [key, true])
       ),
 
-    cacheHiddenFieldValue: (fieldId: string, value: any) => {
+    cacheHiddenFieldValue: (fieldId: string, value: FieldValue) => {
       set((state) => ({
         hiddenFieldCache: {
           ...state.hiddenFieldCache,

@@ -11,3 +11,11 @@ exports[`Declare action > validation prevents including hidden fields 1`] = `[TR
 exports[`Declare action > validation prevents including miscellaneous fields 1`] = `[TRPCError: Field with id foo.bar not found in event config]`;
 
 exports[`Declare action > when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-1-2024"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-1-2024"}]]`;
+
+exports[`getInvalidUpdateKeys - hidden field nullification > Edge cases > mixed valid and invalid keys returns only invalid keys in error 1`] = `"[{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.firstname","value":"Jane"},{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.surname","value":"Smith"}]"`;
+
+exports[`getInvalidUpdateKeys - hidden field nullification > Invalid keys scenarios > rejects hidden field from conditional page 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"senior-pass.id","value":"1234567890"}]]`;
+
+exports[`getInvalidUpdateKeys - hidden field nullification > Invalid keys scenarios > rejects hidden field with non-null value 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.firstname","value":"Jane"},{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.surname","value":"Smith"}]]`;
+
+exports[`getInvalidUpdateKeys - hidden field nullification > Invalid keys scenarios > rejects non-existent field 1`] = `[TRPCError: Field with id nonexistent.field not found in event config]`;
