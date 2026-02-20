@@ -25,19 +25,19 @@ exports[`transform v1 scope to v2 1`] = `
     },
     {
       "v1": "search[event=birth,access=all]",
-      "v2": "type=record.search&event=birth&access=all",
+      "v2": "type=record.search&event=birth&placeOfEvent=all",
     },
     {
       "v1": "search[event=death,access=all]",
-      "v2": "type=record.search&event=death&access=all",
+      "v2": "type=record.search&event=death&placeOfEvent=all",
     },
     {
       "v1": "search[event=tennis-club-membership,access=all]",
-      "v2": "type=record.search&event=tennis-club-membership&access=all",
+      "v2": "type=record.search&event=tennis-club-membership&placeOfEvent=all",
     },
     {
       "v1": "search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]",
-      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&access=all",
+      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all",
     },
     {
       "v1": "record.create[event=birth|death|tennis-club-membership]",
@@ -107,19 +107,19 @@ exports[`transform v1 scope to v2 1`] = `
     },
     {
       "v1": "search[event=birth,access=all]",
-      "v2": "type=record.search&event=birth&access=all",
+      "v2": "type=record.search&event=birth&placeOfEvent=all",
     },
     {
       "v1": "search[event=death,access=all]",
-      "v2": "type=record.search&event=death&access=all",
+      "v2": "type=record.search&event=death&placeOfEvent=all",
     },
     {
       "v1": "search[event=tennis-club-membership,access=all]",
-      "v2": "type=record.search&event=tennis-club-membership&access=all",
+      "v2": "type=record.search&event=tennis-club-membership&placeOfEvent=all",
     },
     {
       "v1": "search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]",
-      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&access=all",
+      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all",
     },
     {
       "v1": "user.read:only-my-audit",
@@ -297,19 +297,19 @@ exports[`transform v1 scope to v2 1`] = `
     },
     {
       "v1": "search[event=birth,access=all]",
-      "v2": "type=record.search&event=birth&access=all",
+      "v2": "type=record.search&event=birth&placeOfEvent=all",
     },
     {
       "v1": "search[event=death,access=all]",
-      "v2": "type=record.search&event=death&access=all",
+      "v2": "type=record.search&event=death&placeOfEvent=all",
     },
     {
       "v1": "search[event=tennis-club-membership,access=all]",
-      "v2": "type=record.search&event=tennis-club-membership&access=all",
+      "v2": "type=record.search&event=tennis-club-membership&placeOfEvent=all",
     },
     {
       "v1": "search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]",
-      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&access=all",
+      "v2": "type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all",
     },
     {
       "v1": "record.create[event=birth|death|tennis-club-membership]",
