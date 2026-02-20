@@ -72,13 +72,12 @@ async function getCertificatesConfig(
   }
 
   const templateIds = printCertifiedCopiesScope.options.templateIds ?? []
+  const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
-  console.log({ printCertifiedCopiesScope, templateIds, decodedOrError })
-
+  // If there are no templateIds specified in the scope, all the certificates configuration will be fetched
   if (!templateIds.length) {
-    const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
-
     const res = await fetch(url, {
+      method: 'GET',
       headers: { Authorization: `Bearer ${authToken}` }
     })
 
@@ -90,28 +89,23 @@ async function getCertificatesConfig(
     return res.json()
   }
 
-  const certificates = []
-
-  for (const templateId of templateIds) {
-    const url = new URL(
-      `/certificates/${templateId}`,
-      env.COUNTRY_CONFIG_URL
-    ).toString()
-
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${authToken}` }
-    })
-
-    if (!res.ok) {
-      logger.error(
-        `Failed to fetch certificate configuration for template ${templateId}: ${res.statusText} ${url}`
-      )
-      continue
+  // If there are templateIds specified in the scope, the certificates configuration for those templateIds will be fetched only
+  const res = await fetch(url, {
+    body: JSON.stringify({ templateIds }),
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+      'Content-Type': 'application/json'
     }
-    certificates.push(await res.json())
-  }
+  })
 
-  return certificates
+  if (!res.ok) {
+    logger.error(
+      `Failed to fetch certificate configuration for templates ${templateIds}: ${res.statusText} ${url}`
+    )
+    return []
+  }
+  return res.json()
 }
 
 async function getConfigFromCountry(authToken?: string) {
