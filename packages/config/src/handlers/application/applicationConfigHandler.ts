@@ -72,6 +72,12 @@ async function getCertificatesConfig(
   const templateIds = templateScope?.options?.id ?? []
   const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
+  // If the print certified copies scope is not present or there are templateIds specified in the scope,
+  // no certificate configuration will be fetched
+  if (!printCertifiedCopiesScope || templateIds.length === 0) {
+    return []
+  }
+
   // If there are no templateIds specified in the scope, all the certificates configuration will be fetched
   if (printCertifiedCopiesScope && templateIds.length === 0) {
     const res = await fetch(url, {
