@@ -633,7 +633,6 @@ export const isNonInteractiveFieldType = (
   return (
     field.type === FieldType.DIVIDER ||
     field.type === FieldType.PAGE_HEADER ||
-    field.type === FieldType.IMAGE_VIEW ||
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
