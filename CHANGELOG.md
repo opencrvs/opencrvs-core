@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.9
+
+### Bug fixes
+
+- Fix E-Signet integration breaking when using “Change” links on the review page [#11603](https://github.com/opencrvs/opencrvs-core/issues/11603)
+
 ## 1.9.8
 
 ### New features
