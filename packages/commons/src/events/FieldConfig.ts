@@ -359,6 +359,29 @@ const ParagraphConfiguration = z
 
 export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
 
+const ImageConfiguration = z.object({
+  src: z.string().describe('Image source URL or path'),
+  alt: z.string().optional().describe('Alternative text for the image'),
+  width: z.string().optional().describe('CSS width value for the image'),
+  height: z.string().optional().describe('CSS height value for the image'),
+  textAlign: ParagraphTextAlign.optional().describe(
+    'Text alignment for positioning the image in its container'
+  ),
+  objectFit: z
+    .enum(['contain', 'cover', 'fill', 'none', 'scale-down'])
+    .optional()
+    .describe('How the image should be resized to fit the container')
+})
+
+export type ImageConfiguration = z.infer<typeof ImageConfiguration>
+
+const ImageField = BaseField.extend({
+  type: z.literal(FieldType.IMAGE),
+  configuration: ImageConfiguration
+}).describe('A read-only image component for form pages')
+
+export type ImageField = z.infer<typeof ImageField>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   defaultValue: NonEmptyTextValue.optional(),
@@ -923,6 +946,7 @@ export const FieldConfig = z
     TimeField,
     DateRangeField,
     SelectDateRangeField,
+    ImageField,
     Paragraph,
     RadioGroup,
     BulletList,

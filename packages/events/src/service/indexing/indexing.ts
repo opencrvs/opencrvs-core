@@ -203,23 +203,24 @@ function mapFieldTypeToElasticsearch(
     case FieldType.SEARCH:
     case FieldType.ID_READER:
     case FieldType.QR_READER:
+    /**
+     * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
+     * The field still lands in `_source`.
+     */
     case FieldType.HTTP:
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
+    /** Images are not indexed as they're currently asserted read-only. */
+    case FieldType.IMAGE:
     case FieldType.LOADER:
-      /**
-       * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
-       * The field still lands in `_source`.
-       */
       return {
         type: 'object',
         enabled: false
       }
+    /**
+     * Custom fields are not indexed as their structure is unknown.
+     */
     case FieldType._EXPERIMENTAL_CUSTOM:
-      /**
-       * Custom fields are not indexed as their structure is unknown.
-       */
-
       return {
         type: 'object',
         enabled: false

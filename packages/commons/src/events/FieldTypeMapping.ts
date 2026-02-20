@@ -54,7 +54,8 @@ import {
   LoaderField,
   AgeField,
   CustomField,
-  HiddenField
+  HiddenField,
+  ImageField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -158,6 +159,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.IMAGE:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
@@ -243,6 +245,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.IMAGE:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
@@ -298,6 +301,13 @@ export const isParagraphFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Paragraph } => {
   return field.config.type === FieldType.PARAGRAPH
+}
+
+export const isImageFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: ImageField } => {
+  return field.config.type === FieldType.IMAGE
 }
 
 export const isDateFieldType = (field: {
@@ -605,6 +615,7 @@ export const isHiddenFieldType = (field: {
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
+  | ImageField
   | Paragraph
   | BulletList
   | DataField
@@ -622,6 +633,7 @@ export const isNonInteractiveFieldType = (
   return (
     field.type === FieldType.DIVIDER ||
     field.type === FieldType.PAGE_HEADER ||
+    field.type === FieldType.IMAGE ||
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
