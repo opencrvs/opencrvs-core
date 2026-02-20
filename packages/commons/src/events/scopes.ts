@@ -21,6 +21,7 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
+import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes-v2'
 
 type AlwaysAllowed = null
 
@@ -116,10 +117,20 @@ export function isActionInScope(
     return false
   }
 
-  return configurableEventScopeAllowed(
+  const isAllowedByLegacyScope = configurableEventScopeAllowed(
     scopes,
     allowedConfigurableScopes,
     eventType,
     customActionType
   )
+
+  // NOTE: This is a temporary measure to allow for the transition to V2 scopes.
+  // This will be unified to single check once the V1 scopes are fully deprecated and removed.
+  const isAllowedByV2Scope =
+    getAcceptedScopesByType({
+      acceptedScopes: allowedConfigurableScopes as RecordScopeTypeV2[],
+      scopes
+    }).length > 0
+
+  return isAllowedByLegacyScope || isAllowedByV2Scope
 }
