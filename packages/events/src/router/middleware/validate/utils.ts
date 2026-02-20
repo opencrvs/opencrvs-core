@@ -16,6 +16,7 @@ import {
   errorMessages,
   EventState,
   isFieldVisible,
+  isPageVisible,
   LocationType,
   ValidatorContext
 } from '@opencrvs/commons/events'
@@ -87,11 +88,18 @@ export function getInvalidUpdateKeys<T>({
       const field = formConfig.pages
         .flatMap((p) => p.fields)
         .find((f) => f.id === key)
+      const page = formConfig.pages.find((p) =>
+        p.fields.some((f) => f.id === key)
+      )
+
+      const isFieldHidden =
+        field && !isFieldVisible(field, update as EventState, context)
+      const isPageHidden =
+        page && !isPageVisible(page, update as EventState, context)
 
       const isHiddenWithNullValue =
-        field &&
-        !isFieldVisible(field, update as EventState, context) &&
-        update[key as keyof T] === null
+        (isFieldHidden || isPageHidden) && update[key as keyof T] === null
+
       return isInvalidKey && !isHiddenWithNullValue
     })
     .map(([key, value]) => ({

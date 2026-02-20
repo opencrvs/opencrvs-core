@@ -37,6 +37,7 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { CreatedUser, payloadGenerator } from '@events/tests/generators'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -1196,4 +1197,585 @@ test('deduplication check is performed before register when configured', async (
       { id: existingEvent.id, trackingId: existingEvent.trackingId }
     ]
   } satisfies Partial<EventIndex>)
+})
+
+describe('Register action - hidden field nullification', () => {
+  let user: CreatedUser
+  let generator: ReturnType<typeof payloadGenerator>
+
+  beforeEach(async () => {
+    const testCase = await setupTestCase()
+    user = testCase.user
+    generator = testCase.generator
+  })
+
+  describe('Invalid keys scenarios', () => {
+    test('rejects hidden field with non-null value during registration', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // recommender.name is HIDDEN when recommender.none = true
+          // Sending a VALUE for hidden field should fail
+          'recommender.name': {
+            firstname: 'Jane',
+            surname: 'Smith'
+          },
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      await expect(
+        client.event.actions.register.request(payload)
+      ).rejects.toMatchSnapshot()
+    })
+
+    test('rejects multiple hidden fields with non-null values during registration', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Both fields are HIDDEN when recommender.none = true
+          'recommender.name': {
+            firstname: 'Jane',
+            surname: 'Smith'
+          },
+          'recommender.id': '1234',
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      const error = await client.event.actions.register
+        .request(payload)
+        .catch((err) => err)
+
+      expect(error).toBeInstanceOf(TRPCError)
+      expect(error.code).toBe('BAD_REQUEST')
+      // Should mention both offending fields
+      expect(error.message).toContain('recommender.name')
+      expect(error.message).toContain('recommender.id')
+    })
+
+    test('rejects non-existent field during registration', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Field does not exist in form config
+          'nonexistent.field': 'some value',
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      await expect(
+        client.event.actions.register.request(payload)
+      ).rejects.toMatchSnapshot()
+    })
+
+    test('rejects hidden field from conditional page during registration', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          // DOB after 1950 means senior-pass page is HIDDEN
+          'applicant.dob': '2000-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // senior-pass.id is on a hidden page
+          'senior-pass.id': '1234567890',
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      await expect(
+        client.event.actions.register.request(payload)
+      ).rejects.toMatchSnapshot()
+    })
+  })
+
+  describe('Valid keys scenarios', () => {
+    test('accepts hidden field with null value during registration (intentional clearing)', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Explicitly setting hidden field to null is allowed
+          'recommender.name': null,
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.register.request(payload)
+
+      const requestedAction = response.actions.find(
+        ({ type, status }) =>
+          type === ActionType.REGISTER && status === ActionStatus.Requested
+      )
+
+      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      if (requestedAction?.status === ActionStatus.Requested) {
+        // The null value should be included in the declaration
+        expect(requestedAction.declaration).toHaveProperty(
+          'recommender.name',
+          null
+        )
+      }
+    })
+
+    test('accepts multiple hidden fields with null values during registration', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Multiple hidden fields explicitly set to null
+          'recommender.name': null,
+          'recommender.email': null,
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.register.request(payload)
+
+      const requestedAction = response.actions.find(
+        ({ type, status }) =>
+          type === ActionType.REGISTER && status === ActionStatus.Requested
+      )
+
+      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      if (requestedAction?.status === ActionStatus.Requested) {
+        expect(requestedAction.declaration).toHaveProperty(
+          'recommender.name',
+          null
+        )
+        expect(requestedAction.declaration).toHaveProperty(
+          'recommender.email',
+          null
+        )
+      }
+    })
+
+    test('accepts visible field with any value during registration', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          // When recommender.none = false, recommender.name is VISIBLE
+          'recommender.none': false,
+          'recommender.id': '1234',
+          'recommender.name': {
+            firstname: 'Jane',
+            surname: 'Smith'
+          },
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.register.request(payload)
+
+      const requestedAction = response.actions.find(
+        ({ type, status }) =>
+          type === ActionType.REGISTER && status === ActionStatus.Requested
+      )
+
+      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      if (requestedAction?.status === ActionStatus.Requested) {
+        expect(requestedAction.declaration).toHaveProperty('recommender.name', {
+          firstname: 'Jane',
+          surname: 'Smith'
+        })
+      }
+    })
+
+    test('accepts field from conditional page when page is visible during registration', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          // DOB before 1950 makes senior-pass page VISIBLE
+          'applicant.dob': '1944-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // senior-pass.id is now on a visible page
+          'senior-pass.id': '1234567890',
+          'senior-pass.recommender': true,
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.register.request(payload)
+
+      const requestedAction = response.actions.find(
+        ({ type, status }) =>
+          type === ActionType.REGISTER && status === ActionStatus.Requested
+      )
+
+      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      if (requestedAction?.status === ActionStatus.Requested) {
+        expect(requestedAction.declaration).toHaveProperty(
+          'senior-pass.id',
+          '1234567890'
+        )
+      }
+    })
+
+    test('omits hidden field when not provided during registration (default behavior)', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // recommender.name is hidden and NOT provided (omitted)
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.register.request(payload)
+
+      const requestedAction = response.actions.find(
+        ({ type, status }) =>
+          type === ActionType.REGISTER && status === ActionStatus.Requested
+      )
+
+      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      if (requestedAction?.status === ActionStatus.Requested) {
+        // Hidden field should not be in the declaration at all
+        expect(requestedAction.declaration).not.toHaveProperty(
+          'recommender.name'
+        )
+      }
+    })
+  })
+
+  describe('Edge cases', () => {
+    test('accepts null for hidden field on hidden page during registration', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          // DOB after 1950 means senior-pass page is HIDDEN
+          'applicant.dob': '2000-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Explicitly clearing field on hidden page
+          'senior-pass.id': null,
+          'recommender.name': null,
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.register.request(payload)
+
+      const requestedAction = response.actions.find(
+        ({ type, status }) =>
+          type === ActionType.REGISTER && status === ActionStatus.Requested
+      )
+
+      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      if (requestedAction?.status === ActionStatus.Requested) {
+        expect(requestedAction.declaration).toHaveProperty(
+          'senior-pass.id',
+          null
+        )
+      }
+    })
+
+    test('mixed valid and invalid keys returns only invalid keys in error during registration', async () => {
+      const client = createTestClient(user)
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
+
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          'applicant.dob': '2024-02-01', // ✅ Valid
+          'applicant.dobUnknown': false, // ✅ Valid
+          'applicant.name': {
+            // ✅ Valid
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true, // ✅ Valid
+          'recommender.name': {
+            // ❌ Invalid: hidden field with value
+            firstname: 'Jane',
+            surname: 'Smith'
+          },
+          'applicant.address': {
+            // ✅ Valid
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        }
+      })
+
+      const error = await client.event.actions.register
+        .request(payload)
+        .catch((e) => e)
+
+      expect(error).toBeInstanceOf(TRPCError)
+      expect(error.code).toBe('BAD_REQUEST')
+      // Should only mention invalid keys
+      expect(error.message).toContain('recommender.name')
+      // Should NOT mention valid keys
+      expect(error.message).not.toContain('applicant.dob')
+      expect(error.message).not.toContain('applicant.name')
+    })
+
+    test('nullifying hidden field during registration after it was declared with a value', async () => {
+      const client = createTestClient(user)
+      const event = await client.event.create(generator.event.create())
+
+      // Step 1: Declare with recommender.none = false (recommender.name is visible)
+      await client.event.actions.declare.request(
+        generator.event.actions.declare(event.id, {
+          declaration: {
+            'applicant.dob': '2024-02-01',
+            'applicant.dobUnknown': false,
+            'applicant.name': {
+              firstname: 'John',
+              surname: 'Doe'
+            },
+            'recommender.none': false,
+            'recommender.id': '1234',
+            'recommender.name': {
+              firstname: 'Jane',
+              surname: 'Smith'
+            },
+            'applicant.address': {
+              country: 'FAR',
+              addressType: AddressType.DOMESTIC,
+              administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+              streetLevelDetails: {
+                state: 'State',
+                district2: 'District2'
+              }
+            }
+          },
+          keepAssignment: true
+        })
+      )
+
+      // Step 2: Validate without changes
+      await client.event.actions.validate.request(
+        generator.event.actions.validate(event.id, { keepAssignment: true })
+      )
+
+      // Step 3: Register with recommender.none = true (recommender.name becomes hidden)
+      // Explicitly nullify the previously declared recommender.name
+      const payload = generator.event.actions.register(event.id, {
+        declaration: {
+          'recommender.none': true,
+          'recommender.name': null, // Explicitly clear the hidden field
+          'recommender.id': null // Explicitly clear the hidden field
+        }
+      })
+
+      const response = await client.event.actions.register.request(payload)
+
+      const requestedAction = response.actions.find(
+        ({ type, status }) =>
+          type === ActionType.REGISTER && status === ActionStatus.Requested
+      )
+
+      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      if (requestedAction?.status === ActionStatus.Requested) {
+        expect(requestedAction.declaration).toHaveProperty(
+          'recommender.name',
+          null
+        )
+      }
+
+      // Verify the current event state no longer has recommender.name
+      const currentState = getCurrentEventState(
+        response,
+        tennisClubMembershipEvent
+      )
+      expect(currentState.declaration['recommender.name']).toBeUndefined()
+    })
+  })
 })
