@@ -663,7 +663,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   }
 }
 
-export const RecordAudit = withRouter(
+const RecordAudit = withRouter(
   connect<IStateProps, IDispatchProps, RouteProps, IStoreState>(
     mapStateToProps,
     {

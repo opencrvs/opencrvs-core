@@ -88,7 +88,7 @@ export const changeSortedColumn = (
   }
 }
 
-export const getPreviousOperationDateByOperationType = (
+const getPreviousOperationDateByOperationType = (
   operationHistories: ITaskHistory[],
   operationType: string
 ): Date | null => {

@@ -27,12 +27,12 @@ interface IRange {
   value: number
 }
 
-export interface ICountry {
+interface ICountry {
   value: string
   name: string
 }
 
-export interface IAvailableCountries {
+interface IAvailableCountries {
   language?: string
   countries?: ICountry[]
 }

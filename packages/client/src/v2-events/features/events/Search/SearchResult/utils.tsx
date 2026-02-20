@@ -102,7 +102,7 @@ function getLocalEventStatus({
   return currentStatus
 }
 
-export interface Column {
+interface Column {
   label?: string
   width: number
   key: string

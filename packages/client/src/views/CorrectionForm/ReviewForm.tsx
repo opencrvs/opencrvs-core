@@ -62,6 +62,6 @@ function mapStateToProps(
   }
 }
 
-export const CorrectionReviewForm = withRouter(
+const CorrectionReviewForm = withRouter(
   connect(mapStateToProps)(CorrectionReviewFormComponent)
 )

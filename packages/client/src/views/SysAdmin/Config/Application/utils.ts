@@ -12,7 +12,7 @@
 import { lookup } from 'country-data'
 import { ICurrency } from '@client/utils/referenceApi'
 
-export enum NOTIFICATION_STATUS {
+enum NOTIFICATION_STATUS {
   SUCCESS = 'success',
   IDLE = 'idle',
   IN_PROGRESS = 'inProgress',

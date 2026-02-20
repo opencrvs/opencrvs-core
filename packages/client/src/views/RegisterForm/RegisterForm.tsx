@@ -172,7 +172,7 @@ type Props = {
   config: IOfflineData
 }
 
-export type FullProps = IFormProps &
+type FullProps = IFormProps &
   Props &
   DispatchProps &
   IntlShapeProps &

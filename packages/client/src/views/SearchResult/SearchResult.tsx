@@ -538,7 +538,7 @@ function SearchResultView(props: ISearchResultProps) {
     </Frame>
   )
 }
-export const SearchResult = connect((state: IStoreState) => ({
+const SearchResult = connect((state: IStoreState) => ({
   language: state.i18n.language,
   scope: getScope(state),
   userDetails: getUserDetails(state),

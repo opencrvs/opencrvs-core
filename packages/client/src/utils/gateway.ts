@@ -17,18 +17,18 @@
 import { PlainDate } from '@client/utils/date-formatting'
 
 export type Maybe<T> = T | null
-export type InputMaybe<T> = Maybe<T>
-export type Exact<T extends { [key: string]: unknown }> = {
+type InputMaybe<T> = Maybe<T>
+type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K]
 }
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
   [SubKey in K]?: Maybe<T[SubKey]>
 }
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
   [SubKey in K]: Maybe<T[SubKey]>
 }
 /** All built-in and custom scalars, mapped to their actual values */
-export type Scalars = {
+type Scalars = {
   ID: string
   String: string
   Boolean: boolean
@@ -65,7 +65,7 @@ export type Address = {
   use?: Maybe<Scalars['String']>
 }
 
-export type AddressInput = {
+type AddressInput = {
   city?: InputMaybe<Scalars['String']>
   country?: InputMaybe<Scalars['String']>
   district?: InputMaybe<Scalars['String']>
@@ -80,7 +80,7 @@ export type AddressInput = {
   use?: InputMaybe<AddressUse>
 }
 
-export enum AddressType {
+enum AddressType {
   PrimaryAddress = 'PRIMARY_ADDRESS',
   SecondaryAddress = 'SECONDARY_ADDRESS',
   Both = 'both',
@@ -88,14 +88,14 @@ export enum AddressType {
   Postal = 'postal'
 }
 
-export enum AddressUse {
+enum AddressUse {
   Home = 'home',
   Old = 'old',
   Temp = 'temp',
   Work = 'work'
 }
 
-export type AdvancedSeachParameters = {
+type AdvancedSeachParameters = {
   __typename?: 'AdvancedSeachParameters'
   childDoB?: Maybe<Scalars['String']>
   childDoBEnd?: Maybe<Scalars['String']>
@@ -157,7 +157,7 @@ export type AdvancedSeachParameters = {
   trackingId?: Maybe<Scalars['String']>
 }
 
-export type AdvancedSearchParametersInput = {
+type AdvancedSearchParametersInput = {
   brideDoB?: InputMaybe<Scalars['String']>
   brideDoBEnd?: InputMaybe<Scalars['String']>
   brideDoBStart?: InputMaybe<Scalars['String']>
@@ -257,7 +257,7 @@ export type Attachment = {
   uri?: Maybe<Scalars['String']>
 }
 
-export type AttachmentInput = {
+type AttachmentInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   contentType?: InputMaybe<Scalars['String']>
   createdAt?: InputMaybe<Scalars['Date']>
@@ -271,13 +271,13 @@ export type AttachmentInput = {
   uri?: InputMaybe<Scalars['String']>
 }
 
-export enum AttachmentInputStatus {
+enum AttachmentInputStatus {
   Approved = 'approved',
   Deleted = 'deleted',
   Validated = 'validated'
 }
 
-export type AuditLogItemBase = {
+type AuditLogItemBase = {
   action: Scalars['String']
   ipAddress: Scalars['String']
   isV2?: Maybe<Scalars['Boolean']>
@@ -292,12 +292,12 @@ export type Avatar = {
   type: Scalars['String']
 }
 
-export type AvatarInput = {
+type AvatarInput = {
   data: Scalars['String']
   type: Scalars['String']
 }
 
-export type BirthEventSearchSet = EventSearchSet & {
+type BirthEventSearchSet = EventSearchSet & {
   __typename?: 'BirthEventSearchSet'
   childGender?: Maybe<Scalars['String']>
   childIdentifier?: Maybe<Scalars['String']>
@@ -318,7 +318,7 @@ export type BirthEventSearchSet = EventSearchSet & {
   type?: Maybe<Scalars['String']>
 }
 
-export type BirthRegResultSet = {
+type BirthRegResultSet = {
   __typename?: 'BirthRegResultSet'
   results?: Maybe<Array<Maybe<BirthRegistration>>>
   totalItems?: Maybe<Scalars['Int']>
@@ -347,7 +347,7 @@ export type BirthRegistration = EventRegistration & {
   weightAtBirth?: Maybe<Scalars['Float']>
 }
 
-export type BirthRegistrationInput = {
+type BirthRegistrationInput = {
   _fhirIDMap?: InputMaybe<FhiridMap>
   attendantAtBirth?: InputMaybe<Scalars['String']>
   birthType?: InputMaybe<Scalars['String']>
@@ -367,25 +367,25 @@ export type BirthRegistrationInput = {
   weightAtBirth?: InputMaybe<Scalars['Float']>
 }
 
-export type BookMarkedSearches = {
+type BookMarkedSearches = {
   __typename?: 'BookMarkedSearches'
   searchList?: Maybe<Array<BookmarkedSeachItem>>
 }
 
-export type BookmarkSearchInput = {
+type BookmarkSearchInput = {
   name: Scalars['String']
   parameters: AdvancedSearchParametersInput
   userId: Scalars['String']
 }
 
-export type BookmarkedSeachItem = {
+type BookmarkedSeachItem = {
   __typename?: 'BookmarkedSeachItem'
   name: Scalars['String']
   parameters: AdvancedSeachParameters
   searchId: Scalars['String']
 }
 
-export type Certificate = {
+type Certificate = {
   __typename?: 'Certificate'
   certificateTemplateId?: Maybe<Scalars['String']>
   certifier?: Maybe<User>
@@ -394,20 +394,20 @@ export type Certificate = {
   payments?: Maybe<Array<Maybe<Payment>>>
 }
 
-export type CertificateInput = {
+type CertificateInput = {
   certificateTemplateId?: InputMaybe<Scalars['String']>
   collector?: InputMaybe<RelatedPersonInput>
   hasShowedVerifiedDocument?: InputMaybe<Scalars['Boolean']>
   payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
 }
 
-export type CertificationMetric = {
+type CertificationMetric = {
   __typename?: 'CertificationMetric'
   eventType: Scalars['String']
   total: Scalars['Float']
 }
 
-export type Comment = {
+type Comment = {
   __typename?: 'Comment'
   comment?: Maybe<Scalars['String']>
   createdAt?: Maybe<Scalars['Date']>
@@ -415,26 +415,26 @@ export type Comment = {
   user?: Maybe<User>
 }
 
-export type CommentInput = {
+type CommentInput = {
   comment?: InputMaybe<Scalars['String']>
   createdAt?: InputMaybe<Scalars['Date']>
   user?: InputMaybe<UserInput>
 }
 
-export type ConfirmRegistrationInput = {
+type ConfirmRegistrationInput = {
   comment?: InputMaybe<Scalars['String']>
   identifiers?: InputMaybe<Array<IdentifierInput>>
   registrationNumber: Scalars['String']
 }
 
-export type ContactPoint = {
+type ContactPoint = {
   __typename?: 'ContactPoint'
   system?: Maybe<Scalars['String']>
   use?: Maybe<Scalars['String']>
   value?: Maybe<Scalars['String']>
 }
 
-export type ContactPointInput = {
+type ContactPointInput = {
   system?: InputMaybe<TelecomSystem>
   use?: InputMaybe<TelecomUse>
   value?: InputMaybe<Scalars['String']>
@@ -454,13 +454,13 @@ export type CorrectionInput = {
   values: Array<CorrectionValueInput>
 }
 
-export type CorrectionMetric = {
+type CorrectionMetric = {
   __typename?: 'CorrectionMetric'
   reason: Scalars['String']
   total: Scalars['Float']
 }
 
-export type CorrectionPaymentInput = {
+type CorrectionPaymentInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   amount: Scalars['Float']
   attachmentData?: InputMaybe<Scalars['String']>
@@ -469,7 +469,7 @@ export type CorrectionPaymentInput = {
   type: PaymentType
 }
 
-export type CorrectionRejectionInput = {
+type CorrectionRejectionInput = {
   reason: Scalars['String']
   timeLoggedMS: Scalars['Int']
 }
@@ -481,14 +481,14 @@ export type CorrectionValueInput = {
   section: Scalars['String']
 }
 
-export type CreatedIds = {
+type CreatedIds = {
   __typename?: 'CreatedIds'
   compositionId?: Maybe<Scalars['String']>
   isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
   trackingId?: Maybe<Scalars['String']>
 }
 
-export type DeathEventSearchSet = EventSearchSet & {
+type DeathEventSearchSet = EventSearchSet & {
   __typename?: 'DeathEventSearchSet'
   dateOfDeath?: Maybe<Scalars['PlainDate']>
   deceasedGender?: Maybe<Scalars['String']>
@@ -524,7 +524,7 @@ export type DeathRegistration = EventRegistration & {
   updatedAt?: Maybe<Scalars['Date']>
 }
 
-export type DeathRegistrationInput = {
+type DeathRegistrationInput = {
   _fhirIDMap?: InputMaybe<FhiridMap>
   causeOfDeath?: InputMaybe<Scalars['String']>
   causeOfDeathEstablished?: InputMaybe<Scalars['String']>
@@ -546,25 +546,25 @@ export type DeathRegistrationInput = {
   updatedAt?: InputMaybe<Scalars['Date']>
 }
 
-export type Deceased = {
+type Deceased = {
   __typename?: 'Deceased'
   deathDate?: Maybe<Scalars['PlainDate']>
   deceased?: Maybe<Scalars['Boolean']>
 }
 
-export type DeceasedInput = {
+type DeceasedInput = {
   deathDate?: InputMaybe<Scalars['PlainDate']>
   deceased?: InputMaybe<Scalars['Boolean']>
 }
 
-export type DeclarationsStartedMetrics = {
+type DeclarationsStartedMetrics = {
   __typename?: 'DeclarationsStartedMetrics'
   fieldAgentDeclarations: Scalars['Int']
   hospitalDeclarations: Scalars['Int']
   officeDeclarations: Scalars['Int']
 }
 
-export type Dummy = {
+type Dummy = {
   __typename?: 'Dummy'
   dummy: Scalars['String']
 }
@@ -575,7 +575,7 @@ export type DuplicatesInfo = {
   trackingId?: Maybe<Scalars['String']>
 }
 
-export type Estimation = {
+type Estimation = {
   __typename?: 'Estimation'
   femaleEstimation: Scalars['Float']
   locationId: Scalars['String']
@@ -584,7 +584,7 @@ export type Estimation = {
   totalEstimation: Scalars['Float']
 }
 
-export type EventMetrics = {
+type EventMetrics = {
   __typename?: 'EventMetrics'
   eventLocationType: Scalars['String']
   gender: Scalars['String']
@@ -593,7 +593,7 @@ export type EventMetrics = {
   total: Scalars['Int']
 }
 
-export type EventMetricsByLocation = {
+type EventMetricsByLocation = {
   __typename?: 'EventMetricsByLocation'
   delayed: Scalars['Int']
   healthFacility: Scalars['Int']
@@ -603,7 +603,7 @@ export type EventMetricsByLocation = {
   total: Scalars['Int']
 }
 
-export type EventMetricsByRegistrar = {
+type EventMetricsByRegistrar = {
   __typename?: 'EventMetricsByRegistrar'
   delayed: Scalars['Int']
   late: Scalars['Int']
@@ -611,7 +611,7 @@ export type EventMetricsByRegistrar = {
   total: Scalars['Int']
 }
 
-export type EventMetricsByTime = {
+type EventMetricsByTime = {
   __typename?: 'EventMetricsByTime'
   delayed: Scalars['Int']
   healthFacility: Scalars['Int']
@@ -622,7 +622,7 @@ export type EventMetricsByTime = {
   total: Scalars['Int']
 }
 
-export type EventProgressData = {
+type EventProgressData = {
   __typename?: 'EventProgressData'
   timeInProgress?: Maybe<Scalars['Int']>
   timeInReadyForReview?: Maybe<Scalars['Int']>
@@ -632,13 +632,13 @@ export type EventProgressData = {
   timeInWaitingForBRIS?: Maybe<Scalars['Int']>
 }
 
-export type EventProgressResultSet = {
+type EventProgressResultSet = {
   __typename?: 'EventProgressResultSet'
   results?: Maybe<Array<Maybe<EventProgressSet>>>
   totalItems?: Maybe<Scalars['Int']>
 }
 
-export type EventProgressSet = {
+type EventProgressSet = {
   __typename?: 'EventProgressSet'
   dateOfEvent?: Maybe<Scalars['PlainDate']>
   id: Scalars['ID']
@@ -658,7 +658,7 @@ export type EventRegistration = {
   registration?: Maybe<Registration>
 }
 
-export type EventSearchResultSet = {
+type EventSearchResultSet = {
   __typename?: 'EventSearchResultSet'
   results?: Maybe<Array<Maybe<EventSearchSet>>>
   totalItems?: Maybe<Scalars['Int']>
@@ -677,7 +677,7 @@ export enum EventType {
   Marriage = 'marriage'
 }
 
-export type FhiridMap = {
+type FhiridMap = {
   composition?: InputMaybe<Scalars['String']>
   encounter?: InputMaybe<Scalars['String']>
   eventLocation?: InputMaybe<Scalars['String']>
@@ -685,7 +685,7 @@ export type FhiridMap = {
   questionnaireResponse?: InputMaybe<Scalars['String']>
 }
 
-export enum Gender {
+enum Gender {
   Female = 'female',
   Male = 'male',
   Other = 'other',
@@ -732,7 +732,7 @@ export type HumanName = {
   use?: Maybe<Scalars['String']>
 }
 
-export type HumanNameInput = {
+type HumanNameInput = {
   familyName?: InputMaybe<Scalars['String']>
   firstNames?: InputMaybe<Scalars['String']>
   marriedLastName?: InputMaybe<Scalars['String']>
@@ -740,25 +740,25 @@ export type HumanNameInput = {
   use?: InputMaybe<Scalars['String']>
 }
 
-export type I18nMessage = {
+type I18nMessage = {
   __typename?: 'I18nMessage'
   defaultMessage: Scalars['String']
   description: Scalars['String']
   id: Scalars['String']
 }
 
-export type Identifier = {
+type Identifier = {
   __typename?: 'Identifier'
   system?: Maybe<Scalars['String']>
   value?: Maybe<Scalars['String']>
 }
 
-export type IdentifierInput = {
+type IdentifierInput = {
   type: Scalars['String']
   value: Scalars['String']
 }
 
-export type IdentityInput = {
+type IdentityInput = {
   fieldsModifiedByIdentity?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   id?: InputMaybe<Scalars['ID']>
   otherType?: InputMaybe<Scalars['String']>
@@ -773,25 +773,25 @@ export type IdentityType = {
   type?: Maybe<Scalars['String']>
 }
 
-export type InputOutput = {
+type InputOutput = {
   __typename?: 'InputOutput'
   value: Scalars['FieldValue']
   valueCode: Scalars['String']
   valueId: Scalars['String']
 }
 
-export type IntegratedSystem = {
+type IntegratedSystem = {
   __typename?: 'IntegratedSystem'
   name?: Maybe<Scalars['String']>
   type?: Maybe<Scalars['String']>
   username?: Maybe<Scalars['String']>
 }
 
-export enum IntegratingSystemType {
+enum IntegratingSystemType {
   Other = 'OTHER'
 }
 
-export type LocalRegistrar = {
+type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
   role?: Maybe<Scalars['String']>
@@ -818,7 +818,7 @@ export type Location = {
   type?: Maybe<Scalars['String']>
 }
 
-export type LocationInput = {
+type LocationInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   address?: InputMaybe<AddressInput>
   alias?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
@@ -835,14 +835,14 @@ export type LocationInput = {
   type?: InputMaybe<Scalars['String']>
 }
 
-export type LocationStatisticsResponse = {
+type LocationStatisticsResponse = {
   __typename?: 'LocationStatisticsResponse'
   offices: Scalars['Int']
   population?: Maybe<Scalars['Int']>
   registrars: Scalars['Int']
 }
 
-export type LocationWiseEstimationMetric = {
+type LocationWiseEstimationMetric = {
   __typename?: 'LocationWiseEstimationMetric'
   estimated: Scalars['Float']
   locationId: Scalars['String']
@@ -853,7 +853,7 @@ export type LocationWiseEstimationMetric = {
   withinTarget: Scalars['Float']
 }
 
-export type MarriageEventSearchSet = EventSearchSet & {
+type MarriageEventSearchSet = EventSearchSet & {
   __typename?: 'MarriageEventSearchSet'
   brideIdentifier?: Maybe<Scalars['String']>
   brideName?: Maybe<Array<Maybe<HumanName>>>
@@ -884,7 +884,7 @@ export type MarriageRegistration = EventRegistration & {
   witnessTwo?: Maybe<RelatedPerson>
 }
 
-export type MarriageRegistrationInput = {
+type MarriageRegistrationInput = {
   _fhirIDMap?: InputMaybe<FhiridMap>
   bride?: InputMaybe<PersonInput>
   createdAt?: InputMaybe<Scalars['Date']>
@@ -899,25 +899,25 @@ export type MarriageRegistrationInput = {
   witnessTwo?: InputMaybe<RelatedPersonInput>
 }
 
-export type MedicalPractitioner = {
+type MedicalPractitioner = {
   __typename?: 'MedicalPractitioner'
   lastVisitDate?: Maybe<Scalars['Date']>
   name?: Maybe<Scalars['String']>
   qualification?: Maybe<Scalars['String']>
 }
 
-export type MedicalPractitionerInput = {
+type MedicalPractitionerInput = {
   lastVisitDate?: InputMaybe<Scalars['Date']>
   name?: InputMaybe<Scalars['String']>
   qualification?: InputMaybe<Scalars['String']>
 }
 
-export type MixedTotalMetricsResult =
+type MixedTotalMetricsResult =
   | TotalMetricsByLocation
   | TotalMetricsByRegistrar
   | TotalMetricsByTime
 
-export type MonthWiseEstimationMetric = {
+type MonthWiseEstimationMetric = {
   __typename?: 'MonthWiseEstimationMetric'
   estimated: Scalars['Float']
   month: Scalars['Float']
@@ -928,7 +928,7 @@ export type MonthWiseEstimationMetric = {
   year: Scalars['Float']
 }
 
-export type Mutation = {
+type Mutation = {
   __typename?: 'Mutation'
   activateUser?: Maybe<Scalars['String']>
   approveBirthRegistrationCorrection: Scalars['ID']
@@ -986,283 +986,283 @@ export type Mutation = {
   usernameReminder?: Maybe<Scalars['String']>
 }
 
-export type MutationActivateUserArgs = {
+type MutationActivateUserArgs = {
   password: Scalars['String']
   securityQNAs: Array<InputMaybe<SecurityQuestionAnswer>>
   userId: Scalars['String']
 }
 
-export type MutationApproveBirthRegistrationCorrectionArgs = {
+type MutationApproveBirthRegistrationCorrectionArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationApproveDeathRegistrationCorrectionArgs = {
+type MutationApproveDeathRegistrationCorrectionArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationApproveMarriageRegistrationCorrectionArgs = {
+type MutationApproveMarriageRegistrationCorrectionArgs = {
   details: MarriageRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationAuditUserArgs = {
+type MutationAuditUserArgs = {
   action: Scalars['String']
   comment?: InputMaybe<Scalars['String']>
   reason: Scalars['String']
   userId: Scalars['String']
 }
 
-export type MutationBookmarkAdvancedSearchArgs = {
+type MutationBookmarkAdvancedSearchArgs = {
   bookmarkSearchInput: BookmarkSearchInput
 }
 
-export type MutationChangeAvatarArgs = {
+type MutationChangeAvatarArgs = {
   avatar: AvatarInput
   userId: Scalars['String']
 }
 
-export type MutationChangeEmailArgs = {
+type MutationChangeEmailArgs = {
   email: Scalars['String']
   nonce: Scalars['String']
   userId: Scalars['String']
   verifyCode: Scalars['String']
 }
 
-export type MutationChangePasswordArgs = {
+type MutationChangePasswordArgs = {
   existingPassword: Scalars['String']
   password: Scalars['String']
   userId: Scalars['String']
 }
 
-export type MutationChangePhoneArgs = {
+type MutationChangePhoneArgs = {
   nonce: Scalars['String']
   phoneNumber: Scalars['String']
   userId: Scalars['String']
   verifyCode: Scalars['String']
 }
 
-export type MutationConfirmRegistrationArgs = {
+type MutationConfirmRegistrationArgs = {
   details: ConfirmRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationCreateBirthRegistrationArgs = {
+type MutationCreateBirthRegistrationArgs = {
   details: BirthRegistrationInput
 }
 
-export type MutationCreateBirthRegistrationCorrectionArgs = {
+type MutationCreateBirthRegistrationCorrectionArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationCreateDeathRegistrationArgs = {
+type MutationCreateDeathRegistrationArgs = {
   details: DeathRegistrationInput
 }
 
-export type MutationCreateDeathRegistrationCorrectionArgs = {
+type MutationCreateDeathRegistrationCorrectionArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationCreateMarriageRegistrationArgs = {
+type MutationCreateMarriageRegistrationArgs = {
   details: MarriageRegistrationInput
 }
 
-export type MutationCreateMarriageRegistrationCorrectionArgs = {
+type MutationCreateMarriageRegistrationCorrectionArgs = {
   details: MarriageRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationCreateOrUpdateUserArgs = {
+type MutationCreateOrUpdateUserArgs = {
   user: UserInput
 }
 
-export type MutationDeactivateSystemArgs = {
+type MutationDeactivateSystemArgs = {
   clientId: Scalars['ID']
 }
 
-export type MutationDeleteSystemArgs = {
+type MutationDeleteSystemArgs = {
   clientId: Scalars['ID']
 }
 
-export type MutationMarkBirthAsCertifiedArgs = {
+type MutationMarkBirthAsCertifiedArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationMarkBirthAsIssuedArgs = {
+type MutationMarkBirthAsIssuedArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationMarkBirthAsRegisteredArgs = {
+type MutationMarkBirthAsRegisteredArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationMarkBirthAsValidatedArgs = {
+type MutationMarkBirthAsValidatedArgs = {
   details?: InputMaybe<BirthRegistrationInput>
   id: Scalars['ID']
 }
 
-export type MutationMarkBirthAsVerifiedArgs = {
+type MutationMarkBirthAsVerifiedArgs = {
   details?: InputMaybe<BirthRegistrationInput>
   id: Scalars['ID']
 }
 
-export type MutationMarkDeathAsCertifiedArgs = {
+type MutationMarkDeathAsCertifiedArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationMarkDeathAsIssuedArgs = {
+type MutationMarkDeathAsIssuedArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationMarkDeathAsRegisteredArgs = {
+type MutationMarkDeathAsRegisteredArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationMarkDeathAsValidatedArgs = {
+type MutationMarkDeathAsValidatedArgs = {
   details?: InputMaybe<DeathRegistrationInput>
   id: Scalars['ID']
 }
 
-export type MutationMarkDeathAsVerifiedArgs = {
+type MutationMarkDeathAsVerifiedArgs = {
   details?: InputMaybe<DeathRegistrationInput>
   id: Scalars['ID']
 }
 
-export type MutationMarkEventAsArchivedArgs = {
+type MutationMarkEventAsArchivedArgs = {
   comment?: InputMaybe<Scalars['String']>
   duplicateTrackingId?: InputMaybe<Scalars['String']>
   id: Scalars['String']
   reason?: InputMaybe<Scalars['String']>
 }
 
-export type MutationMarkEventAsDuplicateArgs = {
+type MutationMarkEventAsDuplicateArgs = {
   comment?: InputMaybe<Scalars['String']>
   duplicateTrackingId?: InputMaybe<Scalars['String']>
   id: Scalars['String']
   reason: Scalars['String']
 }
 
-export type MutationMarkEventAsNotDuplicateArgs = {
+type MutationMarkEventAsNotDuplicateArgs = {
   id: Scalars['String']
 }
 
-export type MutationMarkEventAsReinstatedArgs = {
+type MutationMarkEventAsReinstatedArgs = {
   id: Scalars['String']
 }
 
-export type MutationMarkEventAsUnassignedArgs = {
+type MutationMarkEventAsUnassignedArgs = {
   id: Scalars['String']
 }
 
-export type MutationMarkEventAsVoidedArgs = {
+type MutationMarkEventAsVoidedArgs = {
   comment: Scalars['String']
   id: Scalars['String']
   reason: Scalars['String']
 }
 
-export type MutationMarkMarriageAsCertifiedArgs = {
+type MutationMarkMarriageAsCertifiedArgs = {
   details: MarriageRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationMarkMarriageAsIssuedArgs = {
+type MutationMarkMarriageAsIssuedArgs = {
   details: MarriageRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationMarkMarriageAsRegisteredArgs = {
+type MutationMarkMarriageAsRegisteredArgs = {
   details: MarriageRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationMarkMarriageAsValidatedArgs = {
+type MutationMarkMarriageAsValidatedArgs = {
   details?: InputMaybe<MarriageRegistrationInput>
   id: Scalars['ID']
 }
 
-export type MutationReactivateSystemArgs = {
+type MutationReactivateSystemArgs = {
   clientId: Scalars['ID']
 }
 
-export type MutationRefreshSystemSecretArgs = {
+type MutationRefreshSystemSecretArgs = {
   clientId: Scalars['String']
 }
 
-export type MutationRegisterSystemArgs = {
+type MutationRegisterSystemArgs = {
   system?: InputMaybe<SystemInput>
 }
 
-export type MutationRejectRegistrationArgs = {
+type MutationRejectRegistrationArgs = {
   details: RejectRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationRejectRegistrationCorrectionArgs = {
+type MutationRejectRegistrationCorrectionArgs = {
   details: CorrectionRejectionInput
   id: Scalars['ID']
 }
 
-export type MutationRemoveBookmarkedAdvancedSearchArgs = {
+type MutationRemoveBookmarkedAdvancedSearchArgs = {
   removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
 }
 
-export type MutationRequestRegistrationCorrectionArgs = {
+type MutationRequestRegistrationCorrectionArgs = {
   details: CorrectionInput
   id: Scalars['ID']
 }
 
-export type MutationResendInviteArgs = {
+type MutationResendInviteArgs = {
   userId: Scalars['String']
 }
 
-export type MutationResetPasswordInviteArgs = {
+type MutationResetPasswordInviteArgs = {
   userId: Scalars['String']
 }
 
-export type MutationUpdateDeathRegistrationArgs = {
+type MutationUpdateDeathRegistrationArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
 }
 
-export type MutationUpdateFieldArgs = {
+type MutationUpdateFieldArgs = {
   details: UpdateFieldInput
   id: Scalars['ID']
 }
 
-export type MutationUpdatePermissionsArgs = {
+type MutationUpdatePermissionsArgs = {
   setting: UpdatePermissionsInput
 }
 
-export type MutationUpsertRegistrationIdentifierArgs = {
+type MutationUpsertRegistrationIdentifierArgs = {
   id: Scalars['ID']
   identifierType: Scalars['String']
   identifierValue: Scalars['String']
 }
 
-export type MutationUsernameReminderArgs = {
+type MutationUsernameReminderArgs = {
   userId: Scalars['String']
 }
 
-export type NotificationResult = {
+type NotificationResult = {
   __typename?: 'NotificationResult'
   success: Scalars['Boolean']
 }
 
-export enum NotificationType {
+enum NotificationType {
   Email = 'EMAIL',
   Sms = 'SMS'
 }
 
-export type ObservationFhirids = {
+type ObservationFhirids = {
   attendantAtBirth?: InputMaybe<Scalars['String']>
   birthType?: InputMaybe<Scalars['String']>
   causeOfDeath?: InputMaybe<Scalars['String']>
@@ -1279,7 +1279,7 @@ export type ObservationFhirids = {
   weightAtBirth?: InputMaybe<Scalars['String']>
 }
 
-export type OperationHistorySearchSet = {
+type OperationHistorySearchSet = {
   __typename?: 'OperationHistorySearchSet'
   notificationFacilityAlias?: Maybe<Array<Maybe<Scalars['String']>>>
   notificationFacilityName?: Maybe<Scalars['String']>
@@ -1293,7 +1293,7 @@ export type OperationHistorySearchSet = {
   rejectReason?: Maybe<Scalars['String']>
 }
 
-export type Payment = {
+type Payment = {
   __typename?: 'Payment'
   amount: Scalars['Float']
   attachmentURL?: Maybe<Scalars['String']>
@@ -1303,7 +1303,7 @@ export type Payment = {
   type: PaymentType
 }
 
-export type PaymentInput = {
+type PaymentInput = {
   amount?: InputMaybe<Scalars['Float']>
   data?: InputMaybe<Scalars['String']>
   date?: InputMaybe<Scalars['Date']>
@@ -1312,7 +1312,7 @@ export type PaymentInput = {
   type?: InputMaybe<PaymentType>
 }
 
-export type PaymentMetric = {
+type PaymentMetric = {
   __typename?: 'PaymentMetric'
   paymentType: Scalars['String']
   total: Scalars['Float']
@@ -1328,7 +1328,7 @@ export enum PaymentType {
   Manual = 'MANUAL'
 }
 
-export type Person = {
+type Person = {
   __typename?: 'Person'
   _fhirID?: Maybe<Scalars['ID']>
   address?: Maybe<Array<Maybe<Address>>>
@@ -1353,7 +1353,7 @@ export type Person = {
   telecom?: Maybe<Array<Maybe<ContactPoint>>>
 }
 
-export type PersonInput = {
+type PersonInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   address?: InputMaybe<Array<InputMaybe<AddressInput>>>
   age?: InputMaybe<Scalars['Float']>
@@ -1414,65 +1414,65 @@ export type Query = {
   verifyPasswordById?: Maybe<VerifyPasswordResult>
 }
 
-export type QueryFetchBirthRegistrationArgs = {
+type QueryFetchBirthRegistrationArgs = {
   id: Scalars['ID']
 }
 
-export type QueryFetchDeathRegistrationArgs = {
+type QueryFetchDeathRegistrationArgs = {
   id: Scalars['ID']
 }
 
-export type QueryFetchEventRegistrationArgs = {
+type QueryFetchEventRegistrationArgs = {
   id: Scalars['ID']
 }
 
-export type QueryFetchLocationWiseEventMetricsArgs = {
+type QueryFetchLocationWiseEventMetricsArgs = {
   event: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
 }
 
-export type QueryFetchMarriageRegistrationArgs = {
+type QueryFetchMarriageRegistrationArgs = {
   id: Scalars['ID']
 }
 
-export type QueryFetchMonthWiseEventMetricsArgs = {
+type QueryFetchMonthWiseEventMetricsArgs = {
   event: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
 }
 
-export type QueryFetchRecordDetailsForVerificationArgs = {
+type QueryFetchRecordDetailsForVerificationArgs = {
   id: Scalars['String']
 }
 
-export type QueryFetchRegistrationArgs = {
+type QueryFetchRegistrationArgs = {
   id: Scalars['ID']
 }
 
-export type QueryFetchRegistrationCountByStatusArgs = {
+type QueryFetchRegistrationCountByStatusArgs = {
   event?: InputMaybe<Scalars['String']>
   locationId?: InputMaybe<Scalars['String']>
   status: Array<InputMaybe<Scalars['String']>>
 }
 
-export type QueryFetchRegistrationForViewingArgs = {
+type QueryFetchRegistrationForViewingArgs = {
   id: Scalars['ID']
 }
 
-export type QueryFetchSystemArgs = {
+type QueryFetchSystemArgs = {
   clientId: Scalars['ID']
 }
 
-export type QueryGetDeclarationsStartedMetricsArgs = {
+type QueryGetDeclarationsStartedMetricsArgs = {
   locationId: Scalars['String']
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
 }
 
-export type QueryGetEventsWithProgressArgs = {
+type QueryGetEventsWithProgressArgs = {
   compositionType?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   count?: InputMaybe<Scalars['Int']>
   declarationJurisdictionId?: InputMaybe<Scalars['String']>
@@ -1481,7 +1481,7 @@ export type QueryGetEventsWithProgressArgs = {
   sort?: InputMaybe<Scalars['String']>
 }
 
-export type QueryGetLocationStatisticsArgs = {
+type QueryGetLocationStatisticsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   populationYear: Scalars['Int']
 }
@@ -1496,38 +1496,38 @@ export type QueryGetRegistrationsListByFilterArgs = {
   timeStart: Scalars['String']
 }
 
-export type QueryGetTotalCertificationsArgs = {
+type QueryGetTotalCertificationsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
 }
 
-export type QueryGetTotalCorrectionsArgs = {
+type QueryGetTotalCorrectionsArgs = {
   event: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
 }
 
-export type QueryGetTotalMetricsArgs = {
+type QueryGetTotalMetricsArgs = {
   event: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
 }
 
-export type QueryGetTotalPaymentsArgs = {
+type QueryGetTotalPaymentsArgs = {
   event: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
 }
 
-export type QueryGetUserArgs = {
+type QueryGetUserArgs = {
   userId: Scalars['String']
 }
 
-export type QueryGetUserAuditLogArgs = {
+type QueryGetUserAuditLogArgs = {
   count: Scalars['Int']
   practitionerId: Scalars['String']
   skip?: InputMaybe<Scalars['Int']>
@@ -1535,11 +1535,11 @@ export type QueryGetUserAuditLogArgs = {
   timeStart?: InputMaybe<Scalars['String']>
 }
 
-export type QueryGetUserByEmailArgs = {
+type QueryGetUserByEmailArgs = {
   email: Scalars['String']
 }
 
-export type QueryGetUserByMobileArgs = {
+type QueryGetUserByMobileArgs = {
   mobile: Scalars['String']
 }
 
@@ -1547,7 +1547,7 @@ export type QueryIsLeafLevelLocationArgs = {
   locationId: Scalars['String']
 }
 
-export type QueryListBirthRegistrationsArgs = {
+type QueryListBirthRegistrationsArgs = {
   count?: InputMaybe<Scalars['Int']>
   from?: InputMaybe<Scalars['Date']>
   locationIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
@@ -1557,21 +1557,21 @@ export type QueryListBirthRegistrationsArgs = {
   userId?: InputMaybe<Scalars['String']>
 }
 
-export type QueryQueryPersonByIdentifierArgs = {
+type QueryQueryPersonByIdentifierArgs = {
   identifier: Scalars['ID']
 }
 
-export type QueryQueryPersonByNidIdentifierArgs = {
+type QueryQueryPersonByNidIdentifierArgs = {
   country?: InputMaybe<Scalars['String']>
   dob?: InputMaybe<Scalars['String']>
   nid?: InputMaybe<Scalars['String']>
 }
 
-export type QueryQueryRegistrationByIdentifierArgs = {
+type QueryQueryRegistrationByIdentifierArgs = {
   identifier: Scalars['ID']
 }
 
-export type QuerySearchEventsArgs = {
+type QuerySearchEventsArgs = {
   advancedSearchParameters: AdvancedSearchParametersInput
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
@@ -1581,7 +1581,7 @@ export type QuerySearchEventsArgs = {
   userId?: InputMaybe<Scalars['String']>
 }
 
-export type QuerySearchFieldAgentsArgs = {
+type QuerySearchFieldAgentsArgs = {
   count?: InputMaybe<Scalars['Int']>
   event?: InputMaybe<Scalars['String']>
   language?: InputMaybe<Scalars['String']>
@@ -1594,7 +1594,7 @@ export type QuerySearchFieldAgentsArgs = {
   timeStart: Scalars['String']
 }
 
-export type QuerySearchUsersArgs = {
+type QuerySearchUsersArgs = {
   count?: InputMaybe<Scalars['Int']>
   email?: InputMaybe<Scalars['String']>
   locationId?: InputMaybe<Scalars['String']>
@@ -1606,30 +1606,30 @@ export type QuerySearchUsersArgs = {
   username?: InputMaybe<Scalars['String']>
 }
 
-export type QuerySendNotificationToAllUsersArgs = {
+type QuerySendNotificationToAllUsersArgs = {
   body: Scalars['String']
   locale: Scalars['String']
   subject: Scalars['String']
   type?: InputMaybe<NotificationType>
 }
 
-export type QueryVerifyPasswordByIdArgs = {
+type QueryVerifyPasswordByIdArgs = {
   id: Scalars['String']
   password: Scalars['String']
 }
 
-export type QuestionnaireQuestion = {
+type QuestionnaireQuestion = {
   __typename?: 'QuestionnaireQuestion'
   fieldId?: Maybe<Scalars['String']>
   value?: Maybe<Scalars['String']>
 }
 
-export type QuestionnaireQuestionInput = {
+type QuestionnaireQuestionInput = {
   fieldId?: InputMaybe<Scalars['String']>
   value?: InputMaybe<Scalars['String']>
 }
 
-export type RecordDetails = BirthRegistration | DeathRegistration
+type RecordDetails = BirthRegistration | DeathRegistration
 
 export enum RegAction {
   ApprovedCorrection = 'APPROVED_CORRECTION',
@@ -1674,7 +1674,7 @@ export type RegWorkflow = {
   user?: Maybe<User>
 }
 
-export type RegWorkflowInput = {
+type RegWorkflowInput = {
   comments?: InputMaybe<Array<InputMaybe<CommentInput>>>
   location?: InputMaybe<LocationInput>
   reason?: InputMaybe<Scalars['String']>
@@ -1714,13 +1714,13 @@ export type Registration = {
   witnessTwoSignature?: Maybe<Scalars['String']>
 }
 
-export type RegistrationCountResult = {
+type RegistrationCountResult = {
   __typename?: 'RegistrationCountResult'
   results: Array<Maybe<StatusWiseRegistrationCount>>
   total: Scalars['Int']
 }
 
-export type RegistrationInput = {
+type RegistrationInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   attachments?: InputMaybe<Array<AttachmentInput>>
   book?: InputMaybe<Scalars['String']>
@@ -1747,7 +1747,7 @@ export type RegistrationInput = {
   witnessTwoSignature?: InputMaybe<Scalars['String']>
 }
 
-export type RegistrationSearchSet = {
+type RegistrationSearchSet = {
   __typename?: 'RegistrationSearchSet'
   assignment?: Maybe<AssignmentData>
   comment?: Maybe<Scalars['String']>
@@ -1772,18 +1772,18 @@ export enum RegistrationType {
   Marriage = 'MARRIAGE'
 }
 
-export type Reinstated = {
+type Reinstated = {
   __typename?: 'Reinstated'
   registrationStatus?: Maybe<RegStatus>
   taskEntryResourceID: Scalars['ID']
 }
 
-export type RejectRegistrationInput = {
+type RejectRegistrationInput = {
   comment?: InputMaybe<Scalars['String']>
   reason: Scalars['String']
 }
 
-export type RelatedPerson = {
+type RelatedPerson = {
   __typename?: 'RelatedPerson'
   _fhirID?: Maybe<Scalars['ID']>
   _fhirIDPatient?: Maybe<Scalars['ID']>
@@ -1812,7 +1812,7 @@ export type RelatedPerson = {
   telecom?: Maybe<Array<Maybe<ContactPoint>>>
 }
 
-export type RelatedPersonInput = {
+type RelatedPersonInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   _fhirIDPatient?: InputMaybe<Scalars['ID']>
   address?: InputMaybe<Array<InputMaybe<AddressInput>>>
@@ -1840,12 +1840,12 @@ export type RelatedPersonInput = {
   telecom?: InputMaybe<Array<InputMaybe<ContactPointInput>>>
 }
 
-export type RemoveBookmarkedSeachInput = {
+type RemoveBookmarkedSeachInput = {
   searchId: Scalars['String']
   userId: Scalars['String']
 }
 
-export type SearchFieldAgentResponse = {
+type SearchFieldAgentResponse = {
   __typename?: 'SearchFieldAgentResponse'
   avatar?: Maybe<Avatar>
   averageTimeForDeclaredDeclarations?: Maybe<Scalars['Int']>
@@ -1860,35 +1860,35 @@ export type SearchFieldAgentResponse = {
   totalNumberOfRejectedDeclarations?: Maybe<Scalars['Int']>
 }
 
-export type SearchFieldAgentResult = {
+type SearchFieldAgentResult = {
   __typename?: 'SearchFieldAgentResult'
   results?: Maybe<Array<Maybe<SearchFieldAgentResponse>>>
   totalItems?: Maybe<Scalars['Int']>
 }
 
-export type SearchUserResult = {
+type SearchUserResult = {
   __typename?: 'SearchUserResult'
   results?: Maybe<Array<Maybe<User>>>
   totalItems?: Maybe<Scalars['Int']>
 }
 
-export type SecurityQuestionAnswer = {
+type SecurityQuestionAnswer = {
   answer?: InputMaybe<Scalars['String']>
   questionKey?: InputMaybe<Scalars['String']>
 }
 
-export type Signature = {
+type Signature = {
   __typename?: 'Signature'
   data?: Maybe<Scalars['String']>
   type?: Maybe<Scalars['String']>
 }
 
-export type SignatureInput = {
+type SignatureInput = {
   data: Scalars['String']
   type?: InputMaybe<Scalars['String']>
 }
 
-export type SortBy = {
+type SortBy = {
   column: Scalars['String']
   order: Scalars['String']
 }
@@ -1900,12 +1900,12 @@ export enum Status {
   Pending = 'pending'
 }
 
-export type StatusReason = {
+type StatusReason = {
   __typename?: 'StatusReason'
   text?: Maybe<Scalars['String']>
 }
 
-export type StatusWiseRegistrationCount = {
+type StatusWiseRegistrationCount = {
   __typename?: 'StatusWiseRegistrationCount'
   count: Scalars['Int']
   status: Scalars['String']
@@ -1923,20 +1923,20 @@ export type System = {
   type: SystemType
 }
 
-export type SystemInput = {
+type SystemInput = {
   integratingSystemType?: InputMaybe<IntegratingSystemType>
   name: Scalars['String']
   settings?: InputMaybe<SystemSettingsInput>
   type: SystemType
 }
 
-export type SystemSecret = {
+type SystemSecret = {
   __typename?: 'SystemSecret'
   clientSecret: Scalars['ID']
   system: System
 }
 
-export type SystemSettings = {
+type SystemSettings = {
   __typename?: 'SystemSettings'
   dailyQuota?: Maybe<Scalars['Int']>
   openIdProviderBaseUrl?: Maybe<Scalars['String']>
@@ -1945,7 +1945,7 @@ export type SystemSettings = {
   webhook?: Maybe<Array<WebhookPermission>>
 }
 
-export type SystemSettingsInput = {
+type SystemSettingsInput = {
   dailyQuota?: InputMaybe<Scalars['Int']>
   webhook?: InputMaybe<Array<InputMaybe<WebhookInput>>>
 }
@@ -1965,7 +1965,7 @@ export enum SystemType {
   Custom = 'CUSTOM'
 }
 
-export enum TelecomSystem {
+enum TelecomSystem {
   Email = 'email',
   Fax = 'fax',
   Other = 'other',
@@ -1975,7 +1975,7 @@ export enum TelecomSystem {
   Url = 'url'
 }
 
-export enum TelecomUse {
+enum TelecomUse {
   Home = 'home',
   Mobile = 'mobile',
   Old = 'old',
@@ -1983,42 +1983,42 @@ export enum TelecomUse {
   Work = 'work'
 }
 
-export type TotalMetricsByLocation = {
+type TotalMetricsByLocation = {
   __typename?: 'TotalMetricsByLocation'
   results: Array<EventMetricsByLocation>
   total?: Maybe<Scalars['Int']>
 }
 
-export type TotalMetricsByRegistrar = {
+type TotalMetricsByRegistrar = {
   __typename?: 'TotalMetricsByRegistrar'
   results: Array<EventMetricsByRegistrar>
   total?: Maybe<Scalars['Int']>
 }
 
-export type TotalMetricsByTime = {
+type TotalMetricsByTime = {
   __typename?: 'TotalMetricsByTime'
   results: Array<EventMetricsByTime>
   total?: Maybe<Scalars['Int']>
 }
 
-export type TotalMetricsResult = {
+type TotalMetricsResult = {
   __typename?: 'TotalMetricsResult'
   estimated: Estimation
   results: Array<EventMetrics>
 }
 
-export type TotalVsExport = {
+type TotalVsExport = {
   __typename?: 'TotalVSExport'
   results?: Maybe<Array<VsExport>>
 }
 
-export type UpdateFieldInput = {
+type UpdateFieldInput = {
   fieldId: Scalars['String']
   valueBoolean?: InputMaybe<Scalars['Boolean']>
   valueString?: InputMaybe<Scalars['String']>
 }
 
-export type UpdatePermissionsInput = {
+type UpdatePermissionsInput = {
   clientId: Scalars['String']
   webhook: Array<WebhookInput>
 }
@@ -2046,7 +2046,7 @@ export type User = {
   username?: Maybe<Scalars['String']>
 }
 
-export type UserAuditLogItem = AuditLogItemBase & {
+type UserAuditLogItem = AuditLogItemBase & {
   __typename?: 'UserAuditLogItem'
   action: Scalars['String']
   ipAddress: Scalars['String']
@@ -2056,7 +2056,7 @@ export type UserAuditLogItem = AuditLogItemBase & {
   userAgent: Scalars['String']
 }
 
-export type UserAuditLogItemWithComposition = AuditLogItemBase & {
+type UserAuditLogItemWithComposition = AuditLogItemBase & {
   __typename?: 'UserAuditLogItemWithComposition'
   action: Scalars['String']
   data: AdditionalIdWithCompositionId
@@ -2077,13 +2077,13 @@ export type UserAuditLogResultSet = {
   total: Scalars['Int']
 }
 
-export type UserIdentifierInput = {
+type UserIdentifierInput = {
   system?: InputMaybe<Scalars['String']>
   use?: InputMaybe<Scalars['String']>
   value?: InputMaybe<Scalars['String']>
 }
 
-export type UserInput = {
+type UserInput = {
   device?: InputMaybe<Scalars['String']>
   email?: InputMaybe<Scalars['String']>
   fullHonorificName?: InputMaybe<Scalars['String']>
@@ -2116,7 +2116,7 @@ export type VsExport = {
   url: Scalars['String']
 }
 
-export type VerifyPasswordResult = {
+type VerifyPasswordResult = {
   __typename?: 'VerifyPasswordResult'
   id?: Maybe<Scalars['String']>
   mobile?: Maybe<Scalars['String']>
@@ -2125,7 +2125,7 @@ export type VerifyPasswordResult = {
   username?: Maybe<Scalars['String']>
 }
 
-export type WebhookInput = {
+type WebhookInput = {
   event: Scalars['String']
   permissions: Array<InputMaybe<Scalars['String']>>
 }
@@ -2136,71 +2136,71 @@ export type WebhookPermission = {
   permissions: Array<Scalars['String']>
 }
 
-export type CreateBirthRegistrationCorrectionMutationVariables = Exact<{
+type CreateBirthRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: BirthRegistrationInput
 }>
 
-export type CreateBirthRegistrationCorrectionMutation = {
+type CreateBirthRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
   createBirthRegistrationCorrection: string
 }
 
-export type CreateDeathRegistrationCorrectionMutationVariables = Exact<{
+type CreateDeathRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: DeathRegistrationInput
 }>
 
-export type CreateDeathRegistrationCorrectionMutation = {
+type CreateDeathRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
   createDeathRegistrationCorrection: string
 }
 
-export type ApproveBirthRegistrationCorrectionMutationVariables = Exact<{
+type ApproveBirthRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: BirthRegistrationInput
 }>
 
-export type ApproveBirthRegistrationCorrectionMutation = {
+type ApproveBirthRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
   approveBirthRegistrationCorrection: string
 }
 
-export type ApproveDeathRegistrationCorrectionMutationVariables = Exact<{
+type ApproveDeathRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: DeathRegistrationInput
 }>
 
-export type ApproveDeathRegistrationCorrectionMutation = {
+type ApproveDeathRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
   approveDeathRegistrationCorrection: string
 }
 
-export type RequestRegistrationCorrectionMutationVariables = Exact<{
+type RequestRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: CorrectionInput
 }>
 
-export type RequestRegistrationCorrectionMutation = {
+type RequestRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
   requestRegistrationCorrection: string
 }
 
-export type RejectRegistrationCorrectionMutationVariables = Exact<{
+type RejectRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: CorrectionRejectionInput
 }>
 
-export type RejectRegistrationCorrectionMutation = {
+type RejectRegistrationCorrectionMutation = {
   __typename?: 'Mutation'
   rejectRegistrationCorrection: string
 }
 
-export type FetchPersonQueryVariables = Exact<{
+type FetchPersonQueryVariables = Exact<{
   identifier: Scalars['ID']
 }>
 
-export type FetchPersonQuery = {
+type FetchPersonQuery = {
   __typename?: 'Query'
   queryPersonByIdentifier?: {
     __typename?: 'Person'
@@ -2226,13 +2226,13 @@ export type FetchPersonQuery = {
   } | null
 }
 
-export type FetchPersonByNidQueryVariables = Exact<{
+type FetchPersonByNidQueryVariables = Exact<{
   dob: Scalars['String']
   nid: Scalars['String']
   country?: InputMaybe<Scalars['String']>
 }>
 
-export type FetchPersonByNidQuery = {
+type FetchPersonByNidQuery = {
   __typename?: 'Query'
   queryPersonByNidIdentifier?: {
     __typename?: 'Person'
@@ -2246,11 +2246,11 @@ export type FetchPersonByNidQuery = {
   } | null
 }
 
-export type QueryRegistrationByIdentifierQueryVariables = Exact<{
+type QueryRegistrationByIdentifierQueryVariables = Exact<{
   identifier: Scalars['ID']
 }>
 
-export type QueryRegistrationByIdentifierQuery = {
+type QueryRegistrationByIdentifierQuery = {
   __typename?: 'Query'
   queryRegistrationByIdentifier?: {
     __typename?: 'BirthRegistration'
@@ -2270,18 +2270,18 @@ export type QueryRegistrationByIdentifierQuery = {
   } | null
 }
 
-export type CreateOrUpdateUserMutationVariables = Exact<{
+type CreateOrUpdateUserMutationVariables = Exact<{
   user: UserInput
 }>
 
-export type CreateOrUpdateUserMutation = {
+type CreateOrUpdateUserMutation = {
   __typename?: 'Mutation'
   createOrUpdateUser: { __typename?: 'User'; username?: string | null }
 }
 
-export type GetUserRolesQueryVariables = Exact<{ [key: string]: never }>
+type GetUserRolesQueryVariables = Exact<{ [key: string]: never }>
 
-export type GetUserRolesQuery = {
+type GetUserRolesQuery = {
   __typename?: 'Query'
   getUserRoles: Array<{
     __typename?: 'UserRole'
@@ -2296,7 +2296,7 @@ export type GetUserRolesQuery = {
   }>
 }
 
-export type AdvancedSeachParametersFragment = {
+type AdvancedSeachParametersFragment = {
   __typename?: 'AdvancedSeachParameters'
   event?: EventType | null
   name?: string | null
@@ -2356,11 +2356,11 @@ export type AdvancedSeachParametersFragment = {
   compositionType?: Array<string | null> | null
 }
 
-export type BookmarkAdvancedSearchMutationVariables = Exact<{
+type BookmarkAdvancedSearchMutationVariables = Exact<{
   bookmarkSearchInput: BookmarkSearchInput
 }>
 
-export type BookmarkAdvancedSearchMutation = {
+type BookmarkAdvancedSearchMutation = {
   __typename?: 'Mutation'
   bookmarkAdvancedSearch?: {
     __typename?: 'BookMarkedSearches'
@@ -2431,11 +2431,11 @@ export type BookmarkAdvancedSearchMutation = {
   } | null
 }
 
-export type RemoveBookmarkedAdvancedSearchMutationVariables = Exact<{
+type RemoveBookmarkedAdvancedSearchMutationVariables = Exact<{
   removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
 }>
 
-export type RemoveBookmarkedAdvancedSearchMutation = {
+type RemoveBookmarkedAdvancedSearchMutation = {
   __typename?: 'Mutation'
   removeBookmarkedAdvancedSearch?: {
     __typename?: 'BookMarkedSearches'
@@ -2506,7 +2506,7 @@ export type RemoveBookmarkedAdvancedSearchMutation = {
   } | null
 }
 
-export type FetchUserQueryVariables = Exact<{
+type FetchUserQueryVariables = Exact<{
   userId: Scalars['String']
 }>
 
@@ -2629,7 +2629,7 @@ export type FetchUserQuery = {
   } | null
 }
 
-export type SearchEventsQueryVariables = Exact<{
+type SearchEventsQueryVariables = Exact<{
   advancedSearchParameters: AdvancedSearchParametersInput
   sort?: InputMaybe<Scalars['String']>
   count?: InputMaybe<Scalars['Int']>
@@ -2769,34 +2769,34 @@ export type SearchEventsQuery = {
   } | null
 }
 
-export type ResendInviteMutationVariables = Exact<{
+type ResendInviteMutationVariables = Exact<{
   userId: Scalars['String']
 }>
 
-export type ResendInviteMutation = {
+type ResendInviteMutation = {
   __typename?: 'Mutation'
   resendInvite?: string | null
 }
 
-export type UsernameReminderMutationVariables = Exact<{
+type UsernameReminderMutationVariables = Exact<{
   userId: Scalars['String']
 }>
 
-export type UsernameReminderMutation = {
+type UsernameReminderMutation = {
   __typename?: 'Mutation'
   usernameReminder?: string | null
 }
 
-export type ResetPasswordInviteMutationVariables = Exact<{
+type ResetPasswordInviteMutationVariables = Exact<{
   userId: Scalars['String']
 }>
 
-export type ResetPasswordInviteMutation = {
+type ResetPasswordInviteMutation = {
   __typename?: 'Mutation'
   resetPasswordInvite?: string | null
 }
 
-export type SearchUsersQueryVariables = Exact<{
+type SearchUsersQueryVariables = Exact<{
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
   primaryOfficeId?: InputMaybe<Scalars['String']>
@@ -2837,7 +2837,7 @@ export type SearchUsersQuery = {
   } | null
 }
 
-export type GetUserAuditLogQueryVariables = Exact<{
+type GetUserAuditLogQueryVariables = Exact<{
   practitionerId: Scalars['String']
   count: Scalars['Int']
   skip: Scalars['Int']
@@ -2933,24 +2933,24 @@ export type GetUserQuery = {
   } | null
 }
 
-export type AuditUserMutationVariables = Exact<{
+type AuditUserMutationVariables = Exact<{
   userId: Scalars['String']
   action: Scalars['String']
   reason: Scalars['String']
   comment?: InputMaybe<Scalars['String']>
 }>
 
-export type AuditUserMutation = {
+type AuditUserMutation = {
   __typename?: 'Mutation'
   auditUser?: string | null
 }
 
-export type VerifyPasswordByIdQueryVariables = Exact<{
+type VerifyPasswordByIdQueryVariables = Exact<{
   id: Scalars['String']
   password: Scalars['String']
 }>
 
-export type VerifyPasswordByIdQuery = {
+type VerifyPasswordByIdQuery = {
   __typename?: 'Query'
   verifyPasswordById?: {
     __typename?: 'VerifyPasswordResult'
@@ -2959,11 +2959,11 @@ export type VerifyPasswordByIdQuery = {
   } | null
 }
 
-export type CreateBirthRegistrationMutationVariables = Exact<{
+type CreateBirthRegistrationMutationVariables = Exact<{
   details: BirthRegistrationInput
 }>
 
-export type CreateBirthRegistrationMutation = {
+type CreateBirthRegistrationMutation = {
   __typename?: 'Mutation'
   createBirthRegistration: {
     __typename?: 'CreatedIds'
@@ -2973,95 +2973,95 @@ export type CreateBirthRegistrationMutation = {
   }
 }
 
-export type MarkBirthAsValidatedMutationVariables = Exact<{
+type MarkBirthAsValidatedMutationVariables = Exact<{
   id: Scalars['ID']
   details: BirthRegistrationInput
 }>
 
-export type MarkBirthAsValidatedMutation = {
+type MarkBirthAsValidatedMutation = {
   __typename?: 'Mutation'
   markBirthAsValidated?: string | null
 }
 
-export type MarkBirthAsRegisteredMutationVariables = Exact<{
+type MarkBirthAsRegisteredMutationVariables = Exact<{
   id: Scalars['ID']
   details: BirthRegistrationInput
 }>
 
-export type MarkBirthAsRegisteredMutation = {
+type MarkBirthAsRegisteredMutation = {
   __typename?: 'Mutation'
   markBirthAsRegistered: string
 }
 
-export type MarkEventAsVoidedMutationVariables = Exact<{
+type MarkEventAsVoidedMutationVariables = Exact<{
   id: Scalars['String']
   reason: Scalars['String']
   comment: Scalars['String']
 }>
 
-export type MarkEventAsVoidedMutation = {
+type MarkEventAsVoidedMutation = {
   __typename?: 'Mutation'
   markEventAsVoided: string
 }
 
-export type MarkEventAsArchivedMutationVariables = Exact<{
+type MarkEventAsArchivedMutationVariables = Exact<{
   id: Scalars['String']
   reason?: InputMaybe<Scalars['String']>
   comment?: InputMaybe<Scalars['String']>
   duplicateTrackingId?: InputMaybe<Scalars['String']>
 }>
 
-export type MarkEventAsArchivedMutation = {
+type MarkEventAsArchivedMutation = {
   __typename?: 'Mutation'
   markEventAsArchived: string
 }
 
-export type MarkBirthAsCertifiedMutationVariables = Exact<{
+type MarkBirthAsCertifiedMutationVariables = Exact<{
   id: Scalars['ID']
   details: BirthRegistrationInput
 }>
 
-export type MarkBirthAsCertifiedMutation = {
+type MarkBirthAsCertifiedMutation = {
   __typename?: 'Mutation'
   markBirthAsCertified: string
 }
 
-export type MarkBirthAsIssuedMutationVariables = Exact<{
+type MarkBirthAsIssuedMutationVariables = Exact<{
   id: Scalars['ID']
   details: BirthRegistrationInput
 }>
 
-export type MarkBirthAsIssuedMutation = {
+type MarkBirthAsIssuedMutation = {
   __typename?: 'Mutation'
   markBirthAsIssued: string
 }
 
-export type SubmitMutationMutationVariables = Exact<{
+type SubmitMutationMutationVariables = Exact<{
   id: Scalars['String']
 }>
 
-export type SubmitMutationMutation = {
+type SubmitMutationMutation = {
   __typename?: 'Mutation'
   markEventAsUnassigned: string
 }
 
-export type MarkEventAsDuplicateMutationVariables = Exact<{
+type MarkEventAsDuplicateMutationVariables = Exact<{
   id: Scalars['String']
   reason: Scalars['String']
   comment?: InputMaybe<Scalars['String']>
   duplicateTrackingId?: InputMaybe<Scalars['String']>
 }>
 
-export type MarkEventAsDuplicateMutation = {
+type MarkEventAsDuplicateMutation = {
   __typename?: 'Mutation'
   markEventAsDuplicate: string
 }
 
-export type FetchBirthRegistrationForReviewQueryVariables = Exact<{
+type FetchBirthRegistrationForReviewQueryVariables = Exact<{
   id: Scalars['ID']
 }>
 
-export type FetchBirthRegistrationForReviewQuery = {
+type FetchBirthRegistrationForReviewQuery = {
   __typename?: 'Query'
   fetchBirthRegistration?: {
     __typename?: 'BirthRegistration'
@@ -3461,11 +3461,11 @@ export type FetchBirthRegistrationForReviewQuery = {
   } | null
 }
 
-export type FetchBirthRegistrationForCertificateQueryVariables = Exact<{
+type FetchBirthRegistrationForCertificateQueryVariables = Exact<{
   id: Scalars['ID']
 }>
 
-export type FetchBirthRegistrationForCertificateQuery = {
+type FetchBirthRegistrationForCertificateQuery = {
   __typename?: 'Query'
   fetchBirthRegistration?: {
     __typename?: 'BirthRegistration'
@@ -3800,11 +3800,11 @@ export type FetchBirthRegistrationForCertificateQuery = {
   } | null
 }
 
-export type CreateDeathRegistrationMutationVariables = Exact<{
+type CreateDeathRegistrationMutationVariables = Exact<{
   details: DeathRegistrationInput
 }>
 
-export type CreateDeathRegistrationMutation = {
+type CreateDeathRegistrationMutation = {
   __typename?: 'Mutation'
   createDeathRegistration: {
     __typename?: 'CreatedIds'
@@ -3814,51 +3814,51 @@ export type CreateDeathRegistrationMutation = {
   }
 }
 
-export type MarkDeathAsValidatedMutationVariables = Exact<{
+type MarkDeathAsValidatedMutationVariables = Exact<{
   id: Scalars['ID']
   details: DeathRegistrationInput
 }>
 
-export type MarkDeathAsValidatedMutation = {
+type MarkDeathAsValidatedMutation = {
   __typename?: 'Mutation'
   markDeathAsValidated?: string | null
 }
 
-export type MarkDeathAsRegisteredMutationVariables = Exact<{
+type MarkDeathAsRegisteredMutationVariables = Exact<{
   id: Scalars['ID']
   details: DeathRegistrationInput
 }>
 
-export type MarkDeathAsRegisteredMutation = {
+type MarkDeathAsRegisteredMutation = {
   __typename?: 'Mutation'
   markDeathAsRegistered: string
 }
 
-export type MarkDeathAsCertifiedMutationVariables = Exact<{
+type MarkDeathAsCertifiedMutationVariables = Exact<{
   id: Scalars['ID']
   details: DeathRegistrationInput
 }>
 
-export type MarkDeathAsCertifiedMutation = {
+type MarkDeathAsCertifiedMutation = {
   __typename?: 'Mutation'
   markDeathAsCertified: string
 }
 
-export type MarkDeathAsIssuedMutationVariables = Exact<{
+type MarkDeathAsIssuedMutationVariables = Exact<{
   id: Scalars['ID']
   details: DeathRegistrationInput
 }>
 
-export type MarkDeathAsIssuedMutation = {
+type MarkDeathAsIssuedMutation = {
   __typename?: 'Mutation'
   markDeathAsIssued: string
 }
 
-export type FetchDeathRegistrationForReviewQueryVariables = Exact<{
+type FetchDeathRegistrationForReviewQueryVariables = Exact<{
   id: Scalars['ID']
 }>
 
-export type FetchDeathRegistrationForReviewQuery = {
+type FetchDeathRegistrationForReviewQuery = {
   __typename?: 'Query'
   fetchDeathRegistration?: {
     __typename?: 'DeathRegistration'
@@ -4335,11 +4335,11 @@ export type FetchDeathRegistrationForReviewQuery = {
   } | null
 }
 
-export type FetchDeathRegistrationForCertificationQueryVariables = Exact<{
+type FetchDeathRegistrationForCertificationQueryVariables = Exact<{
   id: Scalars['ID']
 }>
 
-export type FetchDeathRegistrationForCertificationQuery = {
+type FetchDeathRegistrationForCertificationQuery = {
   __typename?: 'Query'
   fetchDeathRegistration?: {
     __typename?: 'DeathRegistration'
@@ -4664,11 +4664,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
   } | null
 }
 
-export type CreateMarriageRegistrationMutationVariables = Exact<{
+type CreateMarriageRegistrationMutationVariables = Exact<{
   details: MarriageRegistrationInput
 }>
 
-export type CreateMarriageRegistrationMutation = {
+type CreateMarriageRegistrationMutation = {
   __typename?: 'Mutation'
   createMarriageRegistration: {
     __typename?: 'CreatedIds'
@@ -4677,51 +4677,51 @@ export type CreateMarriageRegistrationMutation = {
   }
 }
 
-export type MarkMarriageAsValidatedMutationVariables = Exact<{
+type MarkMarriageAsValidatedMutationVariables = Exact<{
   id: Scalars['ID']
   details: MarriageRegistrationInput
 }>
 
-export type MarkMarriageAsValidatedMutation = {
+type MarkMarriageAsValidatedMutation = {
   __typename?: 'Mutation'
   markMarriageAsValidated?: string | null
 }
 
-export type MarkMarriageAsRegisteredMutationVariables = Exact<{
+type MarkMarriageAsRegisteredMutationVariables = Exact<{
   id: Scalars['ID']
   details: MarriageRegistrationInput
 }>
 
-export type MarkMarriageAsRegisteredMutation = {
+type MarkMarriageAsRegisteredMutation = {
   __typename?: 'Mutation'
   markMarriageAsRegistered: string
 }
 
-export type MarkMarriageAsCertifiedMutationVariables = Exact<{
+type MarkMarriageAsCertifiedMutationVariables = Exact<{
   id: Scalars['ID']
   details: MarriageRegistrationInput
 }>
 
-export type MarkMarriageAsCertifiedMutation = {
+type MarkMarriageAsCertifiedMutation = {
   __typename?: 'Mutation'
   markMarriageAsCertified: string
 }
 
-export type MarkMarriageAsIssuedMutationVariables = Exact<{
+type MarkMarriageAsIssuedMutationVariables = Exact<{
   id: Scalars['ID']
   details: MarriageRegistrationInput
 }>
 
-export type MarkMarriageAsIssuedMutation = {
+type MarkMarriageAsIssuedMutation = {
   __typename?: 'Mutation'
   markMarriageAsIssued: string
 }
 
-export type FetchMarriageRegistrationForReviewQueryVariables = Exact<{
+type FetchMarriageRegistrationForReviewQueryVariables = Exact<{
   id: Scalars['ID']
 }>
 
-export type FetchMarriageRegistrationForReviewQuery = {
+type FetchMarriageRegistrationForReviewQuery = {
   __typename?: 'Query'
   fetchMarriageRegistration?: {
     __typename?: 'MarriageRegistration'
@@ -5122,11 +5122,11 @@ export type FetchMarriageRegistrationForReviewQuery = {
   } | null
 }
 
-export type FetchMarriageRegistrationForCertificateQueryVariables = Exact<{
+type FetchMarriageRegistrationForCertificateQueryVariables = Exact<{
   id: Scalars['ID']
 }>
 
-export type FetchMarriageRegistrationForCertificateQuery = {
+type FetchMarriageRegistrationForCertificateQuery = {
   __typename?: 'Query'
   fetchMarriageRegistration?: {
     __typename?: 'MarriageRegistration'
@@ -5478,11 +5478,11 @@ export type FetchMarriageRegistrationForCertificateQuery = {
   } | null
 }
 
-export type MarkEventAsNotDuplicateMutationVariables = Exact<{
+type MarkEventAsNotDuplicateMutationVariables = Exact<{
   id: Scalars['String']
 }>
 
-export type MarkEventAsNotDuplicateMutation = {
+type MarkEventAsNotDuplicateMutation = {
   __typename?: 'Mutation'
   markEventAsNotDuplicate: string
 }
@@ -5614,12 +5614,12 @@ type EventSearchFields_MarriageEventSearchSet_Fragment = {
   } | null> | null
 }
 
-export type EventSearchFieldsFragment =
+type EventSearchFieldsFragment =
   | EventSearchFields_BirthEventSearchSet_Fragment
   | EventSearchFields_DeathEventSearchSet_Fragment
   | EventSearchFields_MarriageEventSearchSet_Fragment
 
-export type RegistrationHomeQueryVariables = Exact<{
+type RegistrationHomeQueryVariables = Exact<{
   userId: Scalars['String']
   declarationLocationId: Scalars['String']
   pageSize?: InputMaybe<Scalars['Int']>
@@ -5637,7 +5637,7 @@ export type RegistrationHomeQueryVariables = Exact<{
   issueSkip?: InputMaybe<Scalars['Int']>
 }>
 
-export type RegistrationHomeQuery = {
+type RegistrationHomeQuery = {
   __typename?: 'Query'
   inProgressTab?: {
     __typename?: 'EventSearchResultSet'
@@ -6833,11 +6833,11 @@ export type MarkEventAsReinstatedMutation = {
   } | null
 }
 
-export type FetchDeclarationShortInfoQueryVariables = Exact<{
+type FetchDeclarationShortInfoQueryVariables = Exact<{
   id: Scalars['ID']
 }>
 
-export type FetchDeclarationShortInfoQuery = {
+type FetchDeclarationShortInfoQuery = {
   __typename?: 'Query'
   fetchRegistration?:
     | {
@@ -6968,17 +6968,17 @@ export type FetchDeclarationShortInfoQuery = {
     | null
 }
 
-export type ChangeAvatarMutationVariables = Exact<{
+type ChangeAvatarMutationVariables = Exact<{
   userId: Scalars['String']
   avatar: AvatarInput
 }>
 
-export type ChangeAvatarMutation = {
+type ChangeAvatarMutation = {
   __typename?: 'Mutation'
   changeAvatar?: { __typename?: 'Avatar'; type: string; data: string } | null
 }
 
-export type ChangePasswordMutationVariables = Exact<{
+type ChangePasswordMutationVariables = Exact<{
   userId: Scalars['String']
   existingPassword: Scalars['String']
   password: Scalars['String']
@@ -6996,7 +6996,7 @@ export type ChangePhoneMutationVariables = Exact<{
   verifyCode: Scalars['String']
 }>
 
-export type ChangePhoneMutation = {
+type ChangePhoneMutation = {
   __typename?: 'Mutation'
   changePhone?: string | null
 }
@@ -7008,12 +7008,12 @@ export type ChangeEmailMutationVariables = Exact<{
   verifyCode: Scalars['String']
 }>
 
-export type ChangeEmailMutation = {
+type ChangeEmailMutation = {
   __typename?: 'Mutation'
   changeEmail?: string | null
 }
 
-export type GetUserByMobileQueryVariables = Exact<{
+type GetUserByMobileQueryVariables = Exact<{
   mobile: Scalars['String']
 }>
 
@@ -7030,7 +7030,7 @@ export type GetUserByMobileQuery = {
   } | null
 }
 
-export type GetUserByEmailQueryVariables = Exact<{
+type GetUserByEmailQueryVariables = Exact<{
   email: Scalars['String']
 }>
 
@@ -7047,13 +7047,13 @@ export type GetUserByEmailQuery = {
   } | null
 }
 
-export type EmailAllUsersQueryVariables = Exact<{
+type EmailAllUsersQueryVariables = Exact<{
   subject: Scalars['String']
   body: Scalars['String']
   locale: Scalars['String']
 }>
 
-export type EmailAllUsersQuery = {
+type EmailAllUsersQuery = {
   __typename?: 'Query'
   sendNotificationToAllUsers?: {
     __typename?: 'NotificationResult'
@@ -7204,14 +7204,14 @@ export type DeleteSystemMutation = {
   } | null
 }
 
-export type GetTotalCorrectionsQueryVariables = Exact<{
+type GetTotalCorrectionsQueryVariables = Exact<{
   event: Scalars['String']
   timeStart: Scalars['String']
   timeEnd: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
 }>
 
-export type GetTotalCorrectionsQuery = {
+type GetTotalCorrectionsQuery = {
   __typename?: 'Query'
   getTotalCorrections?: Array<{
     __typename?: 'CorrectionMetric'
@@ -7220,14 +7220,14 @@ export type GetTotalCorrectionsQuery = {
   }> | null
 }
 
-export type GetTotalMetricsQueryVariables = Exact<{
+type GetTotalMetricsQueryVariables = Exact<{
   event: Scalars['String']
   timeStart: Scalars['String']
   timeEnd: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
 }>
 
-export type GetTotalMetricsQuery = {
+type GetTotalMetricsQuery = {
   __typename?: 'Query'
   getTotalMetrics?: {
     __typename?: 'TotalMetricsResult'
@@ -7250,7 +7250,7 @@ export type GetTotalMetricsQuery = {
   } | null
 }
 
-export type GetLocationStatisticsQueryVariables = Exact<{
+type GetLocationStatisticsQueryVariables = Exact<{
   locationId?: InputMaybe<Scalars['String']>
   populationYear: Scalars['Int']
   status: Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
@@ -7258,7 +7258,7 @@ export type GetLocationStatisticsQueryVariables = Exact<{
   officeSelected: Scalars['Boolean']
 }>
 
-export type GetLocationStatisticsQuery = {
+type GetLocationStatisticsQuery = {
   __typename?: 'Query'
   getLocationStatistics?: {
     __typename?: 'LocationStatisticsResponse'
@@ -7277,7 +7277,7 @@ export type GetLocationStatisticsQuery = {
   } | null
 }
 
-export type IsLeafLevelLocationQueryVariables = Exact<{
+type IsLeafLevelLocationQueryVariables = Exact<{
   locationId: Scalars['String']
 }>
 
@@ -7286,14 +7286,14 @@ export type IsLeafLevelLocationQuery = {
   isLeafLevelLocation: boolean
 }
 
-export type FetchMonthWiseEventMetricsQueryVariables = Exact<{
+type FetchMonthWiseEventMetricsQueryVariables = Exact<{
   timeStart: Scalars['String']
   timeEnd: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
   event: Scalars['String']
 }>
 
-export type FetchMonthWiseEventMetricsQuery = {
+type FetchMonthWiseEventMetricsQuery = {
   __typename?: 'Query'
   fetchMonthWiseEventMetrics?: Array<{
     __typename?: 'MonthWiseEstimationMetric'
@@ -7307,14 +7307,14 @@ export type FetchMonthWiseEventMetricsQuery = {
   }> | null
 }
 
-export type FetchLocationWiseEventMetricsQueryVariables = Exact<{
+type FetchLocationWiseEventMetricsQueryVariables = Exact<{
   timeStart: Scalars['String']
   timeEnd: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
   event: Scalars['String']
 }>
 
-export type FetchLocationWiseEventMetricsQuery = {
+type FetchLocationWiseEventMetricsQuery = {
   __typename?: 'Query'
   fetchLocationWiseEventMetrics?: Array<{
     __typename?: 'LocationWiseEstimationMetric'
@@ -7328,7 +7328,7 @@ export type FetchLocationWiseEventMetricsQuery = {
   }> | null
 }
 
-export type GetEventsWithProgressQueryVariables = Exact<{
+type GetEventsWithProgressQueryVariables = Exact<{
   declarationJurisdictionId: Scalars['String']
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
@@ -7402,7 +7402,7 @@ export type GetEventsWithProgressQuery = {
   } | null
 }
 
-export type GetRegistrationsListByFilterQueryVariables = Exact<{
+type GetRegistrationsListByFilterQueryVariables = Exact<{
   event: Scalars['String']
   timeStart: Scalars['String']
   timeEnd: Scalars['String']
@@ -7485,7 +7485,7 @@ export type GetRegistrationsListByFilterQuery = {
     | null
 }
 
-export type SearchFieldAgentsQueryVariables = Exact<{
+type SearchFieldAgentsQueryVariables = Exact<{
   locationId?: InputMaybe<Scalars['String']>
   primaryOfficeId?: InputMaybe<Scalars['String']>
   timeStart: Scalars['String']
@@ -7498,7 +7498,7 @@ export type SearchFieldAgentsQueryVariables = Exact<{
   sort?: InputMaybe<Scalars['String']>
 }>
 
-export type SearchFieldAgentsQuery = {
+type SearchFieldAgentsQuery = {
   __typename?: 'Query'
   searchFieldAgents?: {
     __typename?: 'SearchFieldAgentResult'
@@ -7528,14 +7528,14 @@ export type SearchFieldAgentsQuery = {
   } | null
 }
 
-export type GetTotalPaymentsQueryVariables = Exact<{
+type GetTotalPaymentsQueryVariables = Exact<{
   timeStart: Scalars['String']
   timeEnd: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
   event: Scalars['String']
 }>
 
-export type GetTotalPaymentsQuery = {
+type GetTotalPaymentsQuery = {
   __typename?: 'Query'
   getTotalPayments?: Array<{
     __typename?: 'PaymentMetric'
@@ -7544,13 +7544,13 @@ export type GetTotalPaymentsQuery = {
   }> | null
 }
 
-export type GetTotalCertificationsQueryVariables = Exact<{
+type GetTotalCertificationsQueryVariables = Exact<{
   timeStart: Scalars['String']
   timeEnd: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
 }>
 
-export type GetTotalCertificationsQuery = {
+type GetTotalCertificationsQuery = {
   __typename?: 'Query'
   getTotalCertifications?: Array<{
     __typename?: 'CertificationMetric'
@@ -7559,7 +7559,7 @@ export type GetTotalCertificationsQuery = {
   }> | null
 }
 
-export type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
+type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
 
 export type GetVsExportsQuery = {
   __typename?: 'Query'
@@ -7590,11 +7590,11 @@ export type SubmitActivateUserMutation = {
   activateUser?: string | null
 }
 
-export type FetchRecordDetailsForVerificationQueryVariables = Exact<{
+type FetchRecordDetailsForVerificationQueryVariables = Exact<{
   id: Scalars['String']
 }>
 
-export type FetchRecordDetailsForVerificationQuery = {
+type FetchRecordDetailsForVerificationQuery = {
   __typename?: 'Query'
   fetchRecordDetailsForVerification?:
     | {
@@ -7721,7 +7721,7 @@ export type FetchRecordDetailsForVerificationQuery = {
     | null
 }
 
-export type FetchViewRecordByCompositionQueryVariables = Exact<{
+type FetchViewRecordByCompositionQueryVariables = Exact<{
   id: Scalars['ID']
 }>
 

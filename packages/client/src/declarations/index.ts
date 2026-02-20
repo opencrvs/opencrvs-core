@@ -192,7 +192,7 @@ export interface IPayload {
   [key: string]: IFormFieldValue
 }
 
-export interface IVisitedGroupId {
+interface IVisitedGroupId {
   sectionId: string
   groupId: string
 }
@@ -461,7 +461,7 @@ interface IUnassignDeclarationFailed {
   }
 }
 
-export type Action =
+type Action =
   | IArchiveDeclarationAction
   | IStoreDeclarationAction
   | IModifyDeclarationAction

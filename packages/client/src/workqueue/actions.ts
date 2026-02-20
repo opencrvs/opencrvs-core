@@ -24,7 +24,7 @@ export interface IQueryData {
 }
 
 export const GET_WORKQUEUE_SUCCESS = 'DECLARATION/GET_WORKQUEUE_SUCCESS'
-export const GET_WORKQUEUE_FAILED = 'DECLARATION/GET_WORKQUEUE_FAILED'
+const GET_WORKQUEUE_FAILED = 'DECLARATION/GET_WORKQUEUE_FAILED'
 export const UPDATE_REGISTRAR_WORKQUEUE =
   'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE'
 export const UPDATE_REGISTRAR_WORKQUEUE_SUCCESS =
@@ -45,7 +45,7 @@ interface UpdateRegistrarWorkQueueFailAction {
 
 type IPaginationPayload = Partial<Record<keyof IQueryData, number>>
 
-export interface UpdateWorkqueuePaginationAction {
+interface UpdateWorkqueuePaginationAction {
   type: typeof UPDATE_WORKQUEUE_PAGINATION
   payload: IPaginationPayload
 }
@@ -91,7 +91,7 @@ export const updateRegistrarWorkqueueFailActionCreator =
     type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
   })
 
-export const updateWorkqueuePagination = (
+const updateWorkqueuePagination = (
   payload: IPaginationPayload
 ): UpdateWorkqueuePaginationAction => ({
   type: UPDATE_WORKQUEUE_PAGINATION,

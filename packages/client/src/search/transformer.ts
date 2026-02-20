@@ -26,19 +26,19 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { IntlShape } from 'react-intl'
 
-export const isBirthEvent = (
+const isBirthEvent = (
   req: EventSearchSet
 ): req is GQLBirthEventSearchSet => {
   return req.type === EventType.Birth
 }
 
-export const isDeathEvent = (
+const isDeathEvent = (
   req: EventSearchSet
 ): req is GQLDeathEventSearchSet => {
   return req.type === EventType.Death
 }
 
-export const isMarriageEvent = (
+const isMarriageEvent = (
   reg: EventSearchSet
 ): reg is GQLMarriageEventSearchSet => {
   return reg.type === EventType.Marriage

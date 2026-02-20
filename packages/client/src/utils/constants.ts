@@ -13,7 +13,7 @@ export const CERTIFIED = 'certified'
 export const ISSUED = 'issued'
 export const EMPTY_STRING = ''
 export const REJECTED = 'REJECTED'
-export const IN_PROGRESS = 'IN_PROGRESS'
+const IN_PROGRESS = 'IN_PROGRESS'
 export const DECLARED = 'DECLARED'
 export const VALIDATED = 'VALIDATED'
 export const ARCHIVED = 'ARCHIVED'
@@ -35,7 +35,7 @@ export const NATIONAL_ID = 'NATIONAL_ID'
 export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
 export const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
 
-export const MARRIAGE_SIGNATURE_KEYS = [
+const MARRIAGE_SIGNATURE_KEYS = [
   'groomSignature',
   'brideSignature',
   'witnessOneSignature',
@@ -47,7 +47,7 @@ export const SIGNATURE_KEYS = [
   'informantsSignature'
 ] as const
 
-export const SYNC_WORKQUEUE_TIME = 500
+const SYNC_WORKQUEUE_TIME = 500
 export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 

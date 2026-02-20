@@ -59,11 +59,11 @@ export const SUBSECTION_HEADER = 'SUBSECTION_HEADER'
 export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
 export const BULLET_LIST = 'BULLET_LIST'
 export const PARAGRAPH = 'PARAGRAPH'
-export const DOCUMENTS = 'DOCUMENTS'
+const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
 export const FIELD_WITH_DYNAMIC_DEFINITIONS = 'FIELD_WITH_DYNAMIC_DEFINITIONS'
-export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
+const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const DOCUMENT_UPLOADER_WITH_OPTION = 'DOCUMENT_UPLOADER_WITH_OPTION'
 export const SIMPLE_DOCUMENT_UPLOADER = 'SIMPLE_DOCUMENT_UPLOADER'
 export const WARNING = 'WARNING'
@@ -137,7 +137,7 @@ interface IDispatchOptions {
   payloadKey: string
 }
 
-export interface IDynamicItems {
+interface IDynamicItems {
   dependency: string
   valueMapper: IDynamicValueMapper
   items: { [key: string]: MessageDescriptor[] }
@@ -148,25 +148,25 @@ export interface IDynamicFormFieldValidators {
   dependencies: string[]
 }
 
-export type IDynamicFormFieldLabelMapper = (
+type IDynamicFormFieldLabelMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
-export type IDynamicFormFieldHelperTextMapper = (
+type IDynamicFormFieldHelperTextMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
-export type IDynamicFormFieldToolTipMapper = (
+type IDynamicFormFieldToolTipMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
-export type IDynamicFormFieldUnitMapper = (
+type IDynamicFormFieldUnitMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
 export type IDynamicValueMapper = (key: string) => string
 
-export type IDynamicFieldTypeMapper = (key: string) => string
+type IDynamicFieldTypeMapper = (key: string) => string
 
 export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   switch (key) {
@@ -220,33 +220,33 @@ export interface IDynamicFormFieldDefinitions {
   validator?: IDynamicFormFieldValidators[]
 }
 
-export interface IDynamicFieldLabel {
+interface IDynamicFieldLabel {
   dependency: string
   labelMapper: IDynamicFormFieldLabelMapper
 }
 
-export interface IDynamicFieldHelperText {
+interface IDynamicFieldHelperText {
   dependency: string
   helperTextMapper: IDynamicFormFieldHelperTextMapper
 }
 
-export interface IDynamicFieldTooltip {
+interface IDynamicFieldTooltip {
   dependency: string
   tooltipMapper: IDynamicFormFieldToolTipMapper
 }
 
-export interface IDynamicFieldUnit {
+interface IDynamicFieldUnit {
   dependency: string
   unitMapper: IDynamicFormFieldUnitMapper
 }
 
-export interface IDynamicFieldType {
+interface IDynamicFieldType {
   kind: 'dynamic'
   dependency: string
   typeMapper: IDynamicFieldTypeMapper
 }
 
-export interface IStaticFieldType {
+interface IStaticFieldType {
   kind: 'static'
   staticType: string
 }
@@ -289,7 +289,7 @@ export interface IFileValue {
   fileSize: number
 }
 
-export interface IContactPointPhone {
+interface IContactPointPhone {
   registrationPhone: string
 }
 
@@ -415,7 +415,7 @@ type SerializedRadioGroupWithNestedFields = Omit<
   nestedFields: { [key: string]: SerializedFormField[] }
 }
 
-export type IMapping = {
+type IMapping = {
   mutation?: IMutationDescriptor
   query?: IQueryDescriptor
   template?: ITemplateDescriptor
@@ -529,7 +529,7 @@ export type INestedInputFields = {
   [key: string]: IFormField[]
 }
 
-export enum FLEX_DIRECTION {
+enum FLEX_DIRECTION {
   ROW = 'row',
   ROW_REVERSE = 'row-reverse',
   COLUMN = 'column',
@@ -955,7 +955,7 @@ export type IMutationDescriptor =
 // @todo should be stricter than this
 export type TransformedData = { [key: string]: any }
 
-export type IFormSectionMapping = {
+type IFormSectionMapping = {
   mutation?: IFormSectionMutationMapFunction
   query?: IFormSectionQueryMapFunction
   template?: [string, IFormSectionQueryMapFunction][]
@@ -994,7 +994,7 @@ export enum CorrectionSection {
   Summary = 'summary'
 }
 
-export enum PaymentSection {
+enum PaymentSection {
   Payment = 'payment'
 }
 
@@ -1100,7 +1100,7 @@ interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   options: SelectComponentOption[]
 }
 
-export type Ii18nNestedInputFields = {
+type Ii18nNestedInputFields = {
   [key: string]: Ii18nFormField[]
 }
 

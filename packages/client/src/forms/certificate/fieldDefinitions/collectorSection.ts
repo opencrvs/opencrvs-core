@@ -49,7 +49,7 @@ interface INameField {
 interface INameFields {
   [language: string]: INameField
 }
-export interface IVerifyIDCertificateCollectorField {
+interface IVerifyIDCertificateCollectorField {
   identifierTypeField: string
   identifierOtherTypeField: string
   identifierField: string
@@ -94,7 +94,7 @@ const identityOptions = [
   { value: OTHER, label: formMessages.iDTypeOther }
 ]
 
-export const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
+const verifyIDOnDeclarationCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
   {
     birth: {
       mother: {

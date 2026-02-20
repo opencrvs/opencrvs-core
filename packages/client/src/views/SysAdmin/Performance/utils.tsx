@@ -40,13 +40,13 @@ export const Header = styled.h1`
   ${({ theme }) => theme.fonts.h2};
 `
 
-export function getMonthDateRange(year: number, month: number) {
+function getMonthDateRange(year: number, month: number) {
   return {
     start: startOfMonth(new Date(year, month - 1)),
     end: endOfMonth(new Date(year, month - 1))
   }
 }
-export const ReportHeader = styled.div`
+const ReportHeader = styled.div`
   margin: 32px 0 24px 0;
 `
 
@@ -61,7 +61,7 @@ export const Description = styled.div`
   ${({ theme }) => theme.fonts.reg14};
 `
 
-export const ActionContainer = styled.div`
+const ActionContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -131,7 +131,7 @@ export const ListContainer = styled.div`
   margin-top: 36px;
 `
 
-export const certificationRatesDummyData = [
+const certificationRatesDummyData = [
   {
     label: 'Total',
     value: 4000
@@ -184,7 +184,7 @@ export function getJurisidictionType(location: GQLLocation): string | null {
   return jurisdictionType
 }
 
-export function getPrimaryLocationIdOfOffice(
+function getPrimaryLocationIdOfOffice(
   locations: { [key: string]: ILocation },
   office: ILocation
 ) {

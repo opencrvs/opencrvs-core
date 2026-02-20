@@ -254,7 +254,7 @@ export function getJurisidictionType(
   return relevantLocation.jurisdictionType as string
 }
 
-export type LocationName = string | MessageDescriptor
+type LocationName = string | MessageDescriptor
 
 export function getLocationNameMapOfFacility(
   facilityLocation: ILocation,
@@ -391,7 +391,7 @@ function getAssociatedLocationsAndOffices(
   return [office, ...associatedLocations]
 }
 
-export function generateFullAddress(
+function generateFullAddress(
   address: Address,
   offlineData: IOfflineData
 ): string[] {

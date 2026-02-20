@@ -15,11 +15,11 @@ import { declarationReadyForStatusChange } from './declarations/submissionMiddle
 import { Action, SubmissionAction } from '@client/forms'
 import { isNavigatorOnline } from './utils'
 
-export type ArrayElement<ArrayType extends readonly unknown[]> =
+type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never
 
-export type IRetryStatus = ArrayElement<typeof ALLOWED_STATUS_FOR_RETRY>
-export type IInProgressStatus = ArrayElement<typeof INPROGRESS_STATUS>
+type IRetryStatus = ArrayElement<typeof ALLOWED_STATUS_FOR_RETRY>
+type IInProgressStatus = ArrayElement<typeof INPROGRESS_STATUS>
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
@@ -47,7 +47,7 @@ export const INPROGRESS_STATUS = [
   SUBMISSION_STATUS.REQUESTING_CORRECTION
 ] as const
 
-export function isSubmissionAction(action: Action): action is SubmissionAction {
+function isSubmissionAction(action: Action): action is SubmissionAction {
   return Object.values(SubmissionAction).includes(action as SubmissionAction)
 }
 
