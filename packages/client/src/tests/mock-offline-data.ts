@@ -475,6 +475,14 @@ export const mockOfflineData = {
           defaultMessage: 'District',
           description: 'Label for district in address'
         }
+      },
+      {
+        id: 'village',
+        label: {
+          id: 'field.address.village.label',
+          defaultMessage: 'Village',
+          description: 'Label for village in address'
+        }
       }
     ],
     MARRIAGE: {

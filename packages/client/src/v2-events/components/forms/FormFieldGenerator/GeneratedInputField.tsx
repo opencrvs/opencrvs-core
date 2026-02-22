@@ -13,7 +13,7 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { omit } from 'lodash'
+import { get, omit } from 'lodash'
 import styled, { keyframes } from 'styled-components'
 import { useField, useFormikContext, getIn } from 'formik'
 import {
@@ -603,7 +603,7 @@ export const GeneratedInputField = React.memo(
       const partOfRef = field.config.configuration.partOf?.$declaration
 
       const partOf =
-        partOfRef && makeFormikFieldIdsOpenCRVSCompatible(form)[partOfRef]
+        partOfRef && get(makeFormikFieldIdsOpenCRVSCompatible(form), partOfRef)
 
       return (
         <InputField {...inputFieldProps} htmlFor={name}>

@@ -421,9 +421,6 @@ export function FormSectionComponent({
           !isFieldEnabled(field, visibleFieldValues, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
-        const visibleError = errors[field.id]
-        const error = visibleError ?? ''
-
         return (
           <FormItem
             key={field.id}
@@ -432,7 +429,6 @@ export function FormSectionComponent({
             <GeneratedInputField
               allKnownFields={allFieldsWithDotSeparator}
               disabled={isDisabled}
-              error={isDisabled ? '' : error}
               eventConfig={eventConfig}
               fieldDefinition={field}
               form={completeForm}
