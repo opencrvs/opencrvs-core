@@ -36,12 +36,11 @@ import {
   NumberWithUnitFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
-
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
 import { SerializedNowDateTime } from './serializers/date/serializer'
-import { JurisdictionFilter } from 'src/scopes-v2'
+import { JurisdictionFilter } from '../scopes-v2'
 
 const FieldId = z
   .string()
