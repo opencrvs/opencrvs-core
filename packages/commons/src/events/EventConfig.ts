@@ -12,21 +12,18 @@ import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
-import {
-  AdvancedSearchConfig,
-  EventFieldId,
-  EventFieldIdInput
-} from './AdvancedSearchConfig'
+import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
 import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
 import { isFieldReference } from '../conditionals/conditionals'
+import { EventMetadataTimeFieldIdInput } from './EventMetadata'
 extendZodWithOpenApi(z)
 
 export const EventFieldReference = z
-  .object({ $$event: EventFieldIdInput })
+  .object({ $$event: EventMetadataTimeFieldIdInput })
   .describe(
     'Reference to a field defined in the event metadata, using the field id.'
   )

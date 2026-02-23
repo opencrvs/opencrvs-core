@@ -32,8 +32,7 @@ import {
   InteractiveFieldType,
   FieldConfig,
   TextField,
-  EventMetadataTimeFields,
-  EventMetadataKeys,
+  EventMetadataTimeFieldId,
   EventMetadataKeysArray
 } from '@opencrvs/commons/client'
 
@@ -149,7 +148,7 @@ function flattenNestedObject(
  * //   ...
  * // }
  */
-export function flattenEventMetadata(
+function flattenEventMetadata(
   eventIndex: EventIndex
 ): Record<string, EventIndexValue> {
   const result: Record<string, EventIndexValue> = {}
@@ -196,7 +195,9 @@ export function transformTimeFieldsIntoTimestamps(
   return Object.fromEntries(
     Object.entries(eventIndex).map(([key, value]) => {
       if (
-        EventMetadataTimeFields.includes(key as EventMetadataKeys) &&
+        EventMetadataTimeFieldId.options.includes(
+          key as EventMetadataTimeFieldId
+        ) &&
         typeof value === 'string'
       ) {
         return [key, new Date(value).getTime()]
