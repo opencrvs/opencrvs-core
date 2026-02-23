@@ -67,17 +67,12 @@ export async function getCertificatesConfig(
     scope,
     'record.registered.print-certified-copies'
   )
-
-  const templateScope = findScope(scope, 'template')
-  const templateIds = templateScope?.options?.id ?? []
-
-  const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
-
-  // If neither print certified copies nor the template scopes are present,
-  // no certificate configuration will be fetched
-  if (!printCertifiedCopiesScope && templateIds.length === 0) {
+  if (!printCertifiedCopiesScope) {
     return []
   }
+
+  const templateIds = printCertifiedCopiesScope.options.templateIds ?? []
+  const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
   const res = await fetch(url, {
     method: 'GET',
@@ -93,19 +88,16 @@ export async function getCertificatesConfig(
   const certificateConfigs = await res.json()
 
   // If there are no templateIds specified in the scope, all the certificates configuration will be fetched
-  if (printCertifiedCopiesScope && templateIds.length === 0) {
+  if (!templateIds.length) {
     return certificateConfigs
   }
 
-  // Even if the print certified copies scope is present but there are templateIds specified in the scope,
-  // the certificates configuration for those templateIds will be fetched only.
+  // If there are templateIds specified in the scope, only the certificates configuration matching those templateIds will be fetched
   if (templateIds.length > 0) {
     return certificateConfigs.filter((config: any) =>
       templateIds.includes(config.id)
     )
   }
-
-  return []
 }
 
 async function getConfigFromCountry(authToken?: string) {

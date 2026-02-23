@@ -13,6 +13,7 @@ import {
   ConfigurableScopeType,
   findScope,
   getAuthorizedEventsFromScopes,
+  PrintCertifiedCopiesScope,
   RecordScopeType,
   Scope
 } from '../scopes'
@@ -55,7 +56,10 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
   [ActionType.DUPLICATE_DETECTED]: []
-} satisfies Record<DisplayableAction, RecordScopeType[] | AlwaysAllowed>
+} satisfies Record<
+  DisplayableAction,
+  RecordScopeType[] | PrintCertifiedCopiesScope['type'][] | AlwaysAllowed
+>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
