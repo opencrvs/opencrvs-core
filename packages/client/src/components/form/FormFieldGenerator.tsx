@@ -102,7 +102,7 @@ import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
-import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
+import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { DocumentUploaderWithOption } from './DocumentUploadField/DocumentUploaderWithOption'
 import {
   WrappedComponentProps as IntlShapeProps,

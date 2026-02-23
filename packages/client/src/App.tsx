@@ -16,7 +16,6 @@ import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
 import * as routes from '@client/navigation/routes'
-import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { SCOPES } from '@opencrvs/commons/client'
@@ -42,7 +41,6 @@ import { AppStore } from './store'
 import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
 import { TRPCProvider } from './v2-events/trpc'
 import { ReloadModal } from './views/Modals/ReloadModal'
-import VSExport from './views/SysAdmin/Vsexports/VSExport'
 
 // Injecting global styles for the body tag - used only once
 const GlobalStyle = createGlobalStyle`
@@ -105,20 +103,6 @@ export const routesConfig = [
       createRedirect('/registration-home/print/*', '/'),
       createRedirect('/registration-home/readyForReview/*', '/'),
       createRedirect('/events', '/events/create'),
-      // Search results,
-      // Advanced search,
-      {
-        path: routes.VS_EXPORTS,
-        element: (
-          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]}>
-            <VSExport />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.EVENT_COMPLETENESS_RATES,
-        element: <CompletenessRates />
-      },
       {
         path: routes.TEAM_SEARCH,
         element: (

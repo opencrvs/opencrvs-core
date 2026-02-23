@@ -9,78 +9,61 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ApolloClient,
+  ApolloError,
+  InternalRefetchQueriesInclude
+} from '@apollo/client'
+import {
   Action as DeclarationAction,
-  SubmissionAction,
   DownloadAction,
+  IContactPoint,
   IForm,
   IFormData,
-  IFormFieldValue,
-  IContactPoint,
-  FieldValueMap,
-  IAttachmentValue
+  IFormFieldValue
 } from '@client/forms'
-import { SCOPES } from '@opencrvs/commons/client'
-import {
-  AssignmentData,
-  Attachment,
-  EventType,
-  History,
-  Query,
-  RegStatus
-} from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
-  UserDetailsAvailable,
-  USER_DETAILS_AVAILABLE
+  ShowDownloadDeclarationFailedToast,
+  ShowUnassignedDeclarations
+} from '@client/notification/actions'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import {
+  UserDetailsAvailable
 } from '@client/profile/profileActions'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import {
-  gqlToDraftTransformer,
   draftToGqlTransformer
 } from '@client/transformer'
+import { EMPTY_STRING } from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
+import {
+  AssignmentData,
+  EventType,
+  RegStatus
+} from '@client/utils/gateway'
 import type {
-  GQLEventSearchResultSet,
-  GQLEventSearchSet,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
-  GQLRegistrationSearchSet,
+  GQLEventSearchResultSet,
+  GQLEventSearchSet,
   GQLHumanName,
-  GQLMarriageEventSearchSet
+  GQLMarriageEventSearchSet,
+  GQLRegistrationSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
-import {
-  ApolloClient,
-  ApolloError,
-  ApolloQueryResult,
-  InternalRefetchQueriesInclude
-} from '@apollo/client'
-import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
-import { v4 as uuid } from 'uuid'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import {
-  showDownloadDeclarationFailedToast,
-  ShowDownloadDeclarationFailedToast,
-  ShowUnassignedDeclarations,
-  showUnassignedDeclarations
-} from '@client/notification/actions'
-import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
-import {
-  UpdateRegistrarWorkqueueAction,
-  updateRegistrarWorkqueue,
-  IQueryData,
-  IWorkqueue
-} from '@client/workqueue'
-import { isBase64FileString } from '@client/utils/commonUtils'
-import { EMPTY_STRING, SIGNATURE_KEYS } from '@client/utils/constants'
-import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
-import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
 import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
 import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
+import {
+  IQueryData,
+  IWorkqueue,
+  UpdateRegistrarWorkqueueAction
+} from '@client/workqueue'
+import { LoopReducer } from 'redux-loop'
+import { v4 as uuid } from 'uuid'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -497,14 +480,12 @@ export interface IUserData {
 export interface IDeclarationsState {
   userID: string
   declarations: IDeclaration[]
-  initialDeclarationsLoaded: boolean
   isWritingDraft: boolean
 }
 
 const initialState: IDeclarationsState = {
   userID: '',
   declarations: [],
-  initialDeclarationsLoaded: false,
   isWritingDraft: false
 }
 
@@ -1050,182 +1031,7 @@ export function downloadDeclaration(
   }
 }
 
-function createRequestForDeclaration(
-  declaration: IDeclaration,
-  client: ApolloClient<{}>
-) {
-  const declarationAction = ACTION_LIST[declaration.action as string] || null
-  const result = getQueryMapping(
-    declaration.event,
-    declarationAction as DeclarationAction
-  )
-  const { query } = result || {
-    query: null
-  }
 
-  return {
-    request: client.query,
-    requestArgs: {
-      query,
-      variables: { id: declaration.id }
-    }
-  }
-}
-
-function requestWithStateWrapper(
-  mainRequest: Promise<ApolloQueryResult<Query>>,
-  getState: () => IStoreState,
-  client: ApolloClient<{}>
-) {
-  const store = getState()
-  return new Promise(async (resolve, reject) => {
-    try {
-      const data = await mainRequest
-      const scopes = getScope(getState())
-      if (scopes?.includes(SCOPES.RECORD_REVIEW_DUPLICATES)) {
-        await fetchAllDuplicateDeclarations(data.data)
-      }
-      const duplicateDeclarations = await fetchAllDuplicateDeclarations(
-        data.data
-      )
-
-      const allduplicateDeclarationsAttachments = (duplicateDeclarations ?? [])
-        .map(
-          (declaration) =>
-            declaration.data.fetchRegistrationForViewing?.registration
-        )
-        .flatMap((registration) => registration?.attachments)
-        .map((attachment) => attachment?.data)
-        .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-
-      const allfetchableURLs = [
-        ...new Set([
-          ...getAttachmentUrls(data.data),
-          ...getSignatureUrls(data.data),
-          ...getProfileIconUrls(data.data),
-          ...allduplicateDeclarationsAttachments
-        ])
-      ]
-
-      await Promise.all(
-        allfetchableURLs.map((url) => fetch(url).then((res) => res.blob()))
-      )
-
-      resolve({ data, store, client })
-    } catch (error) {
-      reject(error)
-    }
-  })
-}
-
-function getProfileIconUrls(queryResultData: Query) {
-  const history =
-    queryResultData.fetchBirthRegistration?.history ||
-    queryResultData.fetchDeathRegistration?.history ||
-    queryResultData.fetchMarriageRegistration?.history
-
-  const userAvatars = (history ?? [])
-    .filter((h): h is History => Boolean(h))
-    .map((h) => h.user?.avatar?.data)
-    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-
-  return [...new Set(userAvatars).values()]
-}
-
-function getAttachmentUrls(queryResultData: Query) {
-  const registration =
-    queryResultData.fetchBirthRegistration?.registration ||
-    queryResultData.fetchDeathRegistration?.registration ||
-    queryResultData.fetchMarriageRegistration?.registration
-
-  return (registration?.attachments ?? [])
-    .filter((a): a is Attachment => Boolean(a))
-    .map((a) => a.data)
-    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-}
-
-function getSignatureUrls(queryResultData: Query) {
-  const data =
-    queryResultData.fetchBirthRegistration ||
-    queryResultData.fetchDeathRegistration ||
-    queryResultData.fetchMarriageRegistration
-
-  if (!data) return []
-  const { registration, history } = data
-
-  const registrarSignatures =
-    history
-      ?.map((entry) => entry?.signature?.data)
-      .filter((entry): entry is string => Boolean(entry)) || []
-
-  return [
-    ...registrarSignatures,
-    ...SIGNATURE_KEYS.map((propertyKey) => registration?.[propertyKey]).filter(
-      (maybeUrl): maybeUrl is string => Boolean(maybeUrl)
-    )
-  ]
-}
-
-async function fetchAllDuplicateDeclarations(queryResultData: Query) {
-  const registration =
-    queryResultData.fetchBirthRegistration?.registration ||
-    queryResultData.fetchDeathRegistration?.registration
-
-  const duplicateCompositionIds = registration?.duplicates?.map(
-    (duplicate) => duplicate?.compositionId
-  )
-
-  if (!duplicateCompositionIds || !duplicateCompositionIds?.length) {
-    return
-  }
-
-  const fetchAllDuplicates = duplicateCompositionIds.map((id) =>
-    ViewRecordQueries.fetchDuplicateDeclarations(id as string)
-  )
-
-  return Promise.all(fetchAllDuplicates)
-}
-
-function getDataKey(declaration: IDeclaration) {
-  const result = getQueryMapping(
-    declaration.event,
-    declaration.action as DeclarationAction
-  )
-
-  const { dataKey } = result || { dataKey: null }
-  return dataKey
-}
-
-
-function downloadDeclarationFail(
-  error: ApolloError,
-  declaration: IDeclaration,
-  client: ApolloClient<{}>
-): IDownloadDeclarationFail {
-  return {
-    type: DOWNLOAD_DECLARATION_FAIL,
-    payload: {
-      error,
-      declaration,
-      client
-    }
-  }
-}
-
-function executeUnassignDeclaration(
-  id: string,
-  client: ApolloClient<{}>,
-  refetchQueries?: InternalRefetchQueriesInclude
-): IUnassignDeclaration {
-  return {
-    type: UNASSIGN_DECLARATION,
-    payload: {
-      id,
-      client,
-      refetchQueries
-    }
-  }
-}
 
 export function unassignDeclaration(
   id: string,
@@ -1242,37 +1048,7 @@ export function unassignDeclaration(
   }
 }
 
-function unassignDeclarationSuccess([id, client, refetchQueries]: [
-  string,
-  ApolloClient<{}>,
-  InternalRefetchQueriesInclude
-]): IUnassignDeclarationSuccess {
-  return {
-    type: UNASSIGN_DECLARATION_SUCCESS,
-    payload: {
-      id,
-      client,
-      refetchQueries
-    }
-  }
-}
 
-function unassignDeclarationFailed(
-  error: ApolloError,
-  declarationId: string,
-  client: ApolloClient<{}>,
-  refetchQueries?: InternalRefetchQueriesInclude
-): IUnassignDeclarationFailed {
-  return {
-    type: UNASSIGN_DECLARATION_FAILED,
-    payload: {
-      error,
-      declarationId,
-      client,
-      refetchQueries
-    }
-  }
-}
 export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   state: IDeclarationsState = initialState,
   action: Action
@@ -1304,57 +1080,6 @@ export function filterProcessingDeclarations(
   }
 }
 
-function getMinioUrlsFromDeclaration(declaration: IDeclaration | undefined) {
-  if (!declaration) {
-    return []
-  }
-  const minioUrls: string[] = SIGNATURE_KEYS.map(
-    (propertyKey) => declaration.originalData?.registration?.[propertyKey]
-  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-
-  const documentsData = declaration.originalData?.documents as Record<
-    string,
-    IAttachmentValue[]
-  >
-
-  const userAvatars: string[] = Object.values(
-    declaration.originalData?.history || []
-  )
-    .map((history) => {
-      if (
-        typeof history === 'object' &&
-        history !== null &&
-        'user' in history
-      ) {
-        const user = history.user as { avatar?: { data?: string } }
-        return user?.avatar?.data
-      }
-      return null
-    })
-    .filter((avatarData): avatarData is string => Boolean(avatarData))
-
-  minioUrls.push(...userAvatars)
-
-  if (!documentsData) {
-    return minioUrls
-  }
-  const docSections = Object.values(documentsData)
-
-  for (const docSection of docSections) {
-    for (const doc of docSection) {
-      if (doc.data && !isBase64FileString(doc.data)) {
-        minioUrls.push(doc.data)
-      }
-    }
-  }
-  return minioUrls
-}
-
-function postMinioUrlsToServiceWorker(minioUrls: string[]) {
-  navigator?.serviceWorker?.controller?.postMessage({
-    minioUrls: minioUrls
-  })
-}
 export function getProcessingDeclarationIds(declarations: IDeclaration[]) {
   return declarations
     .filter(

@@ -52,7 +52,6 @@ const StyledPage = styled.div<IPageProps>`
 `
 type IPageProps = RouteComponentProps<{ children?: React.ReactNode }>
 interface IStateToProps {
-  initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
   loadingError: boolean

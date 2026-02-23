@@ -27,13 +27,14 @@ import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
 import { ImageLoader } from './ImageLoader'
 import { getCroppedImage, IImage } from '@client/utils/imageUtils'
-import {
-  withOnlineStatus,
-  IOnlineStatusProps
-} from '@client/views/OfficeHome/LoadingIndicator'
+
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { Square } from '@opencrvs/components/lib/icons'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  IOnlineStatusProps,
+  withOnlineStatus
+} from '@client/components/LoadingIndicator'
 
 const Container = styled.div`
   align-self: center;
