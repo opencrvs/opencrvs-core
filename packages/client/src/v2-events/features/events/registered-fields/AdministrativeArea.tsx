@@ -67,8 +67,7 @@ function useAdministrativeAreaOptions(
 ) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
-  const locationAdministrativeAreaHierarchy =
-    useUserAdministrativeAreaHierarchy()
+  const userAdministrativeAreaHierarchy = useUserAdministrativeAreaHierarchy()
 
   const options = React.useMemo(() => {
     return [...administrativeAreas.values()]
@@ -93,7 +92,7 @@ function useAdministrativeAreaOptions(
   // If jurisdiction is only administrative area, we show all options which are the parent of the users location (either direct or parent of the parent)
   if (jurisdictionFilter === JurisdictionFilter.enum.administrativeArea) {
     return options.filter((o) =>
-      locationAdministrativeAreaHierarchy.some(({ id }) => id === o.value)
+      userAdministrativeAreaHierarchy.some(({ id }) => id === o.value)
     )
   }
 
