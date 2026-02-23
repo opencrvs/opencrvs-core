@@ -300,8 +300,8 @@ function AddressInput(props: Props) {
   /**
    * An address field consists of:
    * 1. A country selection input
-   * 2. Admin structure selection inputs
-   * 3. Address line inputs
+   * 2. Admin structure selection inputs (e.g. Province, District)
+   * 3. Address line inputs (e.g. Town, Residential Area, Street etc.)
    */
   const fields = [
     { ...COUNTRY_FIELD, required: otherProps.required },
