@@ -17,7 +17,6 @@ import {
 } from '@opencrvs/commons/client'
 import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
 import { ThemeProvider } from 'styled-components'
@@ -1078,15 +1077,6 @@ export const getFileFromBase64String = (
   return new File(byteArrays, name, {
     type: contentType
   })
-}
-
-export async function getRegisterFormFromStore(
-  store: Store<IStoreState, AnyAction>,
-  event: EventType
-) {
-  store.dispatch(setOfflineData(userDetails))
-  const state = store.getState()
-  return getRegisterForm(state)[event]
 }
 
 export async function getReviewFormFromStore(
