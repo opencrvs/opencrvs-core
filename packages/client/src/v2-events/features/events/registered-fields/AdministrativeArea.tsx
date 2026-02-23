@@ -33,7 +33,7 @@ function useUserAdministrativeAreaHierarchy() {
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
-  const userLocationId = userDetails?.primaryOffice?.id
+  const userLocationId = userDetails?.primaryOffice.id
 
   if (!userLocationId) {
     return []
@@ -51,7 +51,7 @@ function useUserAdministrativeAreaHierarchy() {
         location.administrativeAreaId,
         administrativeAreas
       ),
-    [location?.administrativeAreaId, administrativeAreas]
+    [location.administrativeAreaId, administrativeAreas]
   )
 
   return hierarchy
