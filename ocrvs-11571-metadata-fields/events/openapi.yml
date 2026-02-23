@@ -49,12 +49,12 @@ paths:
                             $$event:
                               type: string
                               enum: &a7
-                                - trackingId
-                                - status
-                                - legalStatuses.REGISTERED.acceptedAt
-                                - legalStatuses.REGISTERED.createdAtLocation
-                                - legalStatuses.REGISTERED.registrationNumber
+                                - createdAt
                                 - updatedAt
+                                - legalStatuses.DECLARED.createdAt
+                                - legalStatuses.DECLARED.acceptedAt
+                                - legalStatuses.REGISTERED.createdAt
+                                - legalStatuses.REGISTERED.acceptedAt
                           required:
                             - $$event
                           description: Reference to a field defined in the event metadata, using the field
@@ -774,7 +774,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 6e60787d-a600-4727-ad7e-370c9d0769fa
+                transactionId: 989bfe0c-344d-4249-815e-cc4a2ff417cf
                 type: birth
       responses:
         "200":
@@ -860,7 +860,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: a804a271-372a-4407-8f7e-f2f300e7cc99
+                transactionId: 976d5a4c-d006-483b-945a-267608122843
                 declaration: {}
                 annotation: {}
                 type: NOTIFY

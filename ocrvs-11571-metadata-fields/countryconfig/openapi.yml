@@ -47,12 +47,12 @@ paths:
                               type: string
                               enum:
                                 &a6
-                                - trackingId
-                                - status
-                                - legalStatuses.REGISTERED.acceptedAt
-                                - legalStatuses.REGISTERED.createdAtLocation
-                                - legalStatuses.REGISTERED.registrationNumber
+                                - createdAt
                                 - updatedAt
+                                - legalStatuses.DECLARED.createdAt
+                                - legalStatuses.DECLARED.acceptedAt
+                                - legalStatuses.REGISTERED.createdAt
+                                - legalStatuses.REGISTERED.acceptedAt
                           required:
                             - $$event
                           description: Reference to a field defined in the event metadata, using the field
