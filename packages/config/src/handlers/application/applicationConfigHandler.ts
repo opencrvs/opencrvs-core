@@ -53,7 +53,7 @@ export default async function configHandler(
   }
 }
 
-export async function getCertificatesConfig(
+async function getCertificatesConfig(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
