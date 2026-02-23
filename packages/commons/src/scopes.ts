@@ -116,7 +116,10 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding'
+  USER_DATA_SEEDING: 'user.data-seeding',
+
+  // attachment
+  ATTACHMENT_UPLOAD: 'attachment.upload'
 } as const
 
 // Legacy scopes
@@ -222,6 +225,9 @@ const ConfigScope = z.literal(SCOPES.CONFIG_UPDATE_ALL)
 // Data seeding
 const DataSeedingScope = z.literal(SCOPES.USER_DATA_SEEDING)
 
+// Attachment
+const AttachmentScope = z.literal(SCOPES.ATTACHMENT_UPLOAD)
+
 // Combine all
 const LiteralScopes = z.union([
   LegacyScopes,
@@ -240,7 +246,8 @@ const LiteralScopes = z.union([
   UserScopes,
   ConfigScope,
   DataSeedingScope,
-  InternalOperationsScopes
+  InternalOperationsScopes,
+  AttachmentScope
 ])
 
 // Configurable scopes are for example:
