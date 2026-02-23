@@ -14,10 +14,10 @@ import {
   EventFieldIdInput as AdvancedSearchEventFieldIdInput,
   METADATA_FIELD_PREFIX
 } from '../events/AdvancedSearchConfig'
-import { EventMetadataTimeFieldIdInput } from '../client'
+import { EventMetadataDateFieldIdInput } from '../client'
 
 export type NonSearchableEventMetadataTimeFieldIdInput = Exclude<
-  EventMetadataTimeFieldIdInput,
+  EventMetadataDateFieldIdInput,
   AdvancedSearchEventFieldIdInput
 >
 

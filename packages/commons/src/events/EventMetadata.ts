@@ -282,7 +282,7 @@ export const eventMetadataLabelMap: Record<
   }
 }
 
-export const EventMetadataTimeFieldIdInput = z.enum([
+export const EventMetadataDateFieldIdInput = z.enum([
   'createdAt',
   'updatedAt',
   'legalStatuses.DECLARED.createdAt',
@@ -291,11 +291,11 @@ export const EventMetadataTimeFieldIdInput = z.enum([
   'legalStatuses.REGISTERED.acceptedAt'
 ])
 
-export type EventMetadataTimeFieldIdInput = z.infer<
-  typeof EventMetadataTimeFieldIdInput
+export type EventMetadataDateFieldIdInput = z.infer<
+  typeof EventMetadataDateFieldIdInput
 >
 
-export const EventMetadataTimeFieldId = z.enum([
+export const EventMetadataDateFieldId = z.enum([
   'event.createdAt',
   'event.updatedAt',
   'event.legalStatuses.DECLARED.createdAt',
@@ -304,4 +304,4 @@ export const EventMetadataTimeFieldId = z.enum([
   'event.legalStatuses.REGISTERED.acceptedAt'
 ])
 
-export type EventMetadataTimeFieldId = z.infer<typeof EventMetadataTimeFieldId>
+export type EventMetadataDateFieldId = z.infer<typeof EventMetadataDateFieldId>

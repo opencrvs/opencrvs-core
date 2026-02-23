@@ -19,11 +19,11 @@ import { extendZodWithOpenApi } from 'zod-openapi'
 import { FieldType } from './FieldType'
 import { FieldReference } from './FieldConfig'
 import { isFieldReference } from '../conditionals/conditionals'
-import { EventMetadataTimeFieldIdInput } from './EventMetadata'
+import { EventMetadataDateFieldIdInput } from './EventMetadata'
 extendZodWithOpenApi(z)
 
 export const EventFieldReference = z
-  .object({ $$event: EventMetadataTimeFieldIdInput })
+  .object({ $$event: EventMetadataDateFieldIdInput })
   .describe(
     'Reference to a field defined in the event metadata, using the field id.'
   )

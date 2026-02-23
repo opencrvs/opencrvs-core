@@ -189,7 +189,7 @@ export function flattenEventIndex(event: EventIndex) {
   }
 }
 
-export function transformTimeFieldsIntoTimestamps(
+export function convertDateFieldsToUnixTimestamps(
   eventIndex: Record<string, unknown>
 ) {
   return Object.fromEntries(
