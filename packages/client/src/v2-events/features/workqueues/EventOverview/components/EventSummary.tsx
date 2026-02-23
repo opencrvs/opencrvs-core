@@ -211,6 +211,12 @@ export function EventSummary({
       emptyValueMessage: field.emptyValueMessage,
       value: intl.formatMessage(
         field.value,
+        /**
+         * Convert any date fields used in the message to unix timestamps, as the message may be expecting timestamps and not date strings.
+         *
+         * i.e. if the message is something like `{event.updatedAt, date, ::dd MM YYYY}`, then the value of `event.updatedAt`
+         * needs to be a unix timestamp for it to be formatted correctly by `intl.formatMessage`.
+         */
         convertDateFieldsToUnixTimestamps(eventIndex)
       )
     }

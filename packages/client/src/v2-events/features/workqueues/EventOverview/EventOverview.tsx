@@ -94,7 +94,6 @@ function EventOverviewFull({
       'event.assignedTo': assignedTo,
       flags: eventIndex.flags
     }
-
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 

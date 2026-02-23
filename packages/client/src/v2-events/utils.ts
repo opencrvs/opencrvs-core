@@ -32,8 +32,8 @@ import {
   InteractiveFieldType,
   FieldConfig,
   TextField,
-  EventMetadataTimeFieldId,
-  EventMetadataKeysArray
+  flattenEntries,
+  EventMetadataDateFieldId
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -74,105 +74,11 @@ export const getUserIdsFromActions = (
   return uniq(userIds)
 }
 
-type EventIndexValue =
-  | string
-  | string[]
-  | null
-  | undefined
-  | Record<string, string | string[] | null | undefined>
-
-/**
- * Recursively flattens nested objects, constructing full paths.
- *
- * @param obj - The nested object to flatten
- * @param prefix - The current path prefix
- * @returns A flattened object with constructed keys
- */
-function flattenNestedObject(
-  obj: Record<string, EventIndexValue>,
-  prefix: string
-): Record<string, EventIndexValue> {
-  const result: Record<string, EventIndexValue> = {}
-
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      const value = obj[key]
-      const newKey = `${prefix}.${key}`
-
-      if (value === undefined || value === null) {
-        continue
-      }
-
-      if (typeof value === 'object' && !Array.isArray(value)) {
-        // Continue flattening nested objects
-        Object.assign(result, flattenNestedObject(value, newKey))
-      } else if (Array.isArray(value)) {
-        // Store arrays as-is
-        result[newKey] = value
-      } else {
-        // Store scalar values
-        result[newKey] = value
-      }
-    }
+function eventMetadataObjectFromEntries(entries: [string, unknown][]) {
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of entries) {
+    result[`event.${key}`] = value
   }
-
-  return result
-}
-
-/**
- * Flattens an EventIndex object by extracting only event metadata fields
- * and constructing full paths with 'event.' prefix for nested properties.
- *
- * @param eventIndex - The event index object to flatten
- * @returns A flattened object with event metadata fields as keys (e.g., 'event.legalStatuses.REGISTERED.acceptedAt')
- *
- * @example
- * const eventIndex = {
- *   id: '123',
- *   type: 'BIRTH',
- *   legalStatuses: {
- *     REGISTERED: {
- *       acceptedAt: '2025-02-20T10:00:00Z',
- *       registrationNumber: 'REG-123'
- *     }
- *   },
- *   declaration: { ... }
- * }
- *
- * const flattened = flattenEventMetadata(eventIndex)
- * // Result: {
- * //   'event.id': '123',
- * //   'event.type': 'BIRTH',
- * //   'event.legalStatuses.REGISTERED.acceptedAt': '2025-02-20T10:00:00Z',
- * //   'event.legalStatuses.REGISTERED.registrationNumber': 'REG-123',
- * //   ...
- * // }
- */
-function flattenEventMetadata(
-  eventIndex: EventIndex
-): Record<string, EventIndexValue> {
-  const result: Record<string, EventIndexValue> = {}
-
-  for (const key of EventMetadataKeysArray) {
-    const value = eventIndex[key]
-
-    if (value === undefined || value === null) {
-      continue
-    }
-
-    if (typeof value === 'object' && !Array.isArray(value)) {
-      // Recursively flatten nested objects
-      const flattened = flattenNestedObject(value, `event.${key}`)
-      Object.assign(result, flattened)
-    } else if (Array.isArray(value)) {
-      // Handle arrays (e.g., flags)
-      result[`event.${key}`] = value
-    } else {
-      // Simple scalar value
-      result[`event.${key}`] = value
-    }
-  }
-
   return result
 }
 
@@ -181,7 +87,9 @@ export function flattenEventIndex(event: EventIndex) {
   return {
     ...rest,
     ...declaration,
-    ...flattenEventMetadata(event),
+    ...eventMetadataObjectFromEntries(
+      flattenEntries({ trackingId, status, ...rest })
+    ),
     'event.registrationNumber':
       rest.legalStatuses.REGISTERED?.registrationNumber,
     'event.registeredAt': rest.legalStatuses.REGISTERED?.createdAtLocation,
@@ -195,8 +103,8 @@ export function convertDateFieldsToUnixTimestamps(
   return Object.fromEntries(
     Object.entries(eventIndex).map(([key, value]) => {
       if (
-        EventMetadataTimeFieldId.options.includes(
-          key as EventMetadataTimeFieldId
+        EventMetadataDateFieldId.options.includes(
+          key as EventMetadataDateFieldId
         ) &&
         typeof value === 'string'
       ) {
