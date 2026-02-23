@@ -374,13 +374,13 @@ const ImageConfiguration = z.object({
 
 export type ImageConfiguration = z.infer<typeof ImageConfiguration>
 
-const ImageField = BaseField.extend({
+const ImageViewField = BaseField.extend({
   type: z.literal(FieldType.IMAGE_VIEW),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: ImageConfiguration
 }).describe('A read-only image component for form pages')
 
-export type ImageField = z.infer<typeof ImageField>
+export type ImageViewField = z.infer<typeof ImageViewField>
 
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
@@ -946,7 +946,7 @@ export const FieldConfig = z
     TimeField,
     DateRangeField,
     SelectDateRangeField,
-    ImageField,
+    ImageViewField,
     Paragraph,
     RadioGroup,
     BulletList,

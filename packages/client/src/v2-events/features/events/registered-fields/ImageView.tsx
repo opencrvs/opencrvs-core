@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { ImageField } from '@opencrvs/commons/client'
+import { ImageViewField } from '@opencrvs/commons/client'
 
 const Container = styled.div`
   display: flex;
@@ -39,7 +39,7 @@ function ImageViewInput({
   configuration,
   value
 }: {
-  configuration: ImageField['configuration']
+  configuration: ImageViewField['configuration']
   value: string | null
 }) {
   const { alt, width, height, objectFit, textAlign } = configuration

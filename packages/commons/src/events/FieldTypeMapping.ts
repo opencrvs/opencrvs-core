@@ -55,7 +55,7 @@ import {
   AgeField,
   CustomField,
   HiddenField,
-  ImageField
+  ImageViewField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -306,7 +306,7 @@ export const isParagraphFieldType = (field: {
 export const isImageViewFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
-}): field is { value: string; config: ImageField } => {
+}): field is { value: string; config: ImageViewField } => {
   return field.config.type === FieldType.IMAGE_VIEW
 }
 
@@ -615,7 +615,7 @@ export const isHiddenFieldType = (field: {
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
-  | ImageField
+  | ImageViewField
   | Paragraph
   | BulletList
   | DataField
