@@ -503,8 +503,8 @@ export function FormSectionComponent({
     // Formik does not allow controlling the form state 'easily'.
     // We propagate changes to the non-formik state from formik
     if (userChangedForm) {
-      const newValues = cloneDeep(values)
-      let changed = false
+      const newValuesWithChangedVisibility = cloneDeep(values)
+      let fieldVisibilityChanged = false
       const prevForm = {
         ...initialValues,
         ...makeFormikFieldIdsOpenCRVSCompatible(
@@ -520,19 +520,19 @@ export function FormSectionComponent({
 
       for (const field of fieldsWithDotSeparator) {
         if (!field.parent) {
+          // Setting hidden fields values to empty, parent listeners are handled in setValueForListenerField method
           const fieldChanged = handleFieldVisibilityTransition(
             field,
             prevForm,
             currentForm,
-            newValues
+            newValuesWithChangedVisibility
           )
-          changed = changed || fieldChanged
+          fieldVisibilityChanged = fieldVisibilityChanged || fieldChanged
         }
       }
 
-      if (changed) {
-        void setValues(newValues)
-        onChange(newValues)
+      if (fieldVisibilityChanged) {
+        onChange(newValuesWithChangedVisibility)
       } else {
         onChange(values)
       }
