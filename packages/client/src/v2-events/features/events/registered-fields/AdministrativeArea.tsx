@@ -23,44 +23,54 @@ import { AdministrativeAreaField } from '../../../../../../commons/build/dist/es
 import { LocationSearch } from './LocationSearch'
 
 /**
- * Given a location id, return the full administrative area hierarchy for the location.
- * For example, if the location id is Ibombo District Office, this will return the administrative areas objects for:
+ * Return the full administrative area hierarchy for the user's location.
+ * For example, if the user's location is Ibombo District Office, this will return the administrative areas objects for:
  * [Central, Ibombo]
  */
-function useLocationAdministrativeAreaHierarchy(
-  locationId: string | undefined
-) {
+function useUserAdministrativeAreaHierarchy() {
+  const userDetails = useSelector(getUserDetails)
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
+  const userLocationId = userDetails?.primaryOffice?.id
 
-  if (!locationId) {
+  if (!userLocationId) {
     return []
   }
 
-  const location = locations.get(UUID.parse(locationId))
+  const location = locations.get(UUID.parse(userLocationId))
 
   if (!location) {
     return []
   }
 
-  return getAdministrativeAreaHierarchy(
-    location.administrativeAreaId,
-    administrativeAreas
+  const hierarchy = useMemo(
+    () =>
+      getAdministrativeAreaHierarchy(
+        location.administrativeAreaId,
+        administrativeAreas
+      ),
+    [location?.administrativeAreaId, administrativeAreas]
   )
+
+  return hierarchy
 }
 
 /**
- * Given a parent id, return the administrative area options for the parent. This will return both:
- * 1. All administrative areas under the parent
- * 2. Administrative areas under which the users location is located
+ * Given a parent id, return the administrative area options for the parent. The options will be filtered based on the jurisdiction filter.
+ * If parentId is null, we are at the root level of the administrative area hierarchy.
  */
-function useAdministrativeAreaOptions(parentId?: string | null) {
+function useAdministrativeAreaOptions(
+  parentId?: string | null,
+  jurisdictionFilter?: JurisdictionFilter
+) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
-  const userDetails = useSelector(getUserDetails)
-  const allAdministrativeAreaOptions = React.useMemo(() => {
+  const locationAdministrativeAreaHierarchy =
+    useUserAdministrativeAreaHierarchy()
+
+  const options = React.useMemo(() => {
     return [...administrativeAreas.values()]
       .filter((administrativeArea) => {
         if (parentId === undefined) {
@@ -75,17 +85,20 @@ function useAdministrativeAreaOptions(parentId?: string | null) {
       }))
   }, [administrativeAreas, parentId])
 
-  const locationAdministrativeAreaHierarchy =
-    useLocationAdministrativeAreaHierarchy(userDetails?.primaryOffice.id)
-
-  const userAdministrativeAreaOptions = allAdministrativeAreaOptions.filter(
-    (o) => locationAdministrativeAreaHierarchy.some(({ id }) => id === o.value)
-  )
-
-  return {
-    allAdministrativeAreaOptions,
-    userAdministrativeAreaOptions
+  // If jurisdiction is only user's current location, we never show any administrative area options.
+  if (jurisdictionFilter === JurisdictionFilter.enum.location) {
+    return []
   }
+
+  // If jurisdiction is only administrative area, we show all options which are the parent of the users location (either direct or parent of the parent)
+  if (jurisdictionFilter === JurisdictionFilter.enum.administrativeArea) {
+    return options.filter((o) =>
+      locationAdministrativeAreaHierarchy.some(({ id }) => id === o.value)
+    )
+  }
+
+  // By default or if jurisdiction is all, we show all options
+  return options
 }
 
 function AdministrativeAreaInput({
@@ -103,14 +116,10 @@ function AdministrativeAreaInput({
   configuration: AdministrativeAreaField['configuration']
   id: string
 }) {
-  const { allAdministrativeAreaOptions, userAdministrativeAreaOptions } =
-    useAdministrativeAreaOptions(partOf)
-
-  const options =
-    configuration.allowedLocations ===
-    JurisdictionFilter.enum.administrativeArea
-      ? userAdministrativeAreaOptions
-      : allAdministrativeAreaOptions
+  const options = useAdministrativeAreaOptions(
+    partOf,
+    configuration.allowedLocations
+  )
 
   const selectedLocation = useMemo(
     () => options.find((o) => o.value === value) ?? null,
