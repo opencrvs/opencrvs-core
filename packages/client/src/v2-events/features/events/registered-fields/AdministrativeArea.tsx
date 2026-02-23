@@ -10,11 +10,7 @@
  */
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import {
-  Location,
-  FieldPropsWithoutReferenceValue,
-  UUID
-} from '@opencrvs/commons/client'
+import { Location, UUID } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -95,20 +91,20 @@ function AdministrativeAreaInput({
   partOf,
   id,
   disabled,
-  allowedLocations,
-  ...props
-}: FieldPropsWithoutReferenceValue<'ADMINISTRATIVE_AREA'> & {
+  configuration
+}: {
   onChange: (val: string | null) => void
   partOf: string | null
   value?: string | null
   disabled?: boolean
-  allowedLocations?: AdministrativeAreaField['configuration']['allowedLocations']
+  configuration: AdministrativeAreaField['configuration']
+  id: string
 }) {
   const { allOptions, userAdministrativeAreaOptions } =
     useAdministrativeAreaOptions(partOf)
 
   // TODO CIHAN: need to resolve this prop
-  const options = props.configuration?.allowedLocations
+  const options = configuration.allowedLocations
     ? userAdministrativeAreaOptions
     : allOptions
 
