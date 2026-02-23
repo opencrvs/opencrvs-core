@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.10
+
+### Bug fixes
+
+- Extended the `record.registered.print-certified-copies[event=tennis-club-membership]` scope to support an optional `templates` parameter (e.g. `templates=v2.tennis-club-membership-certificate-alpha`). When `templates` is specified, users are restricted to printing only the listed certificate templates. If `templates` is omitted, all certificate templates for the event remain available, preserving existing behavior [[#11753](https://github.com/opencrvs/opencrvs-core/issues/11753)]
+
 ## 1.9.9
 
 ### Bug fixes
