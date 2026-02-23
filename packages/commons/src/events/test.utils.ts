@@ -295,13 +295,15 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
+    // Hidden fields with null value, is however allowed indicating removal of a field from the currentEventState.
     return omitHiddenPaginatedFields(
       declarationConfig,
       {
         ...declaration,
         ...overrides
       },
-      {} // Intentionally empty. Allow generating fields with custom conditionals.
+      {}, // Intentionally empty. Allow generating fields with custom conditionals.
+      true
     )
   }
 

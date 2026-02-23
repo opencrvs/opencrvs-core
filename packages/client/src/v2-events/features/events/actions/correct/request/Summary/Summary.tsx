@@ -135,10 +135,16 @@ export function Summary() {
 
     const mutationPayload = {
       eventId,
-      declaration: {
-        ...formWithOnlyChangedValues,
-        ...nullifiedHiddenValues
-      },
+      declaration: Object.fromEntries(
+        Object.entries({
+          ...formWithOnlyChangedValues,
+          ...nullifiedHiddenValues
+        }).filter(
+          ([key]) =>
+            !getDeclarationFields(eventConfiguration).find((f) => f.id === key)
+              ?.uncorrectable
+        )
+      ),
       transactionId: generateTransactionId(),
       annotation,
       event,
