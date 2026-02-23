@@ -243,7 +243,7 @@ export const ChildOnboardingEvent = defineConfig({
   title: generateTranslationConfig(
     '{child.name.firstname} {child.name.surname}'
   ),
-  label: generateTranslationConfig('Birth'),
+  label: generateTranslationConfig('Child onboarding'),
   summary: {
     fields: []
   },

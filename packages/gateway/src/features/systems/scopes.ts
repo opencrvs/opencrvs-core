@@ -10,11 +10,12 @@
  */
 
 import {
-  ConfigurableScopeType,
+  encodeScope,
   EventConfig,
   IAuthHeader,
   joinUrl,
   logger,
+  RecordScopeTypeV2,
   Scope,
   SCOPES,
   stringifyScope
@@ -47,7 +48,7 @@ const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, Scope[]> = {
  */
 const CONFIGURABLE_SCOPES_BY_TYPE: Record<
   SystemIntegrationType,
-  ConfigurableScopeType[]
+  RecordScopeTypeV2[]
 > = {
   HEALTH: ['record.create', 'record.notify'],
   RECORD_SEARCH: []
@@ -121,15 +122,21 @@ export function getSystemScopesFromType(
   }
 
   const literalScopes = DEFAULT_SCOPES_BY_TYPE[type]
-  const configurableScopes = CONFIGURABLE_SCOPES_BY_TYPE[type].map(
-    (scope: ConfigurableScopeType) =>
-      stringifyScope({
-        type: scope as 'record.create' | 'record.notify',
-        options: { event: eventIds }
-      })
+  const v2Scopes = CONFIGURABLE_SCOPES_BY_TYPE[type].map(
+    (scope: RecordScopeTypeV2) =>
+      // Transient check. We migrate scopes 1 by 1. This feature was implemented using the old one.
+      scope === 'record.create'
+        ? encodeScope({
+            type: scope,
+            options: { event: eventIds }
+          })
+        : stringifyScope({
+            type: scope as 'record.notify',
+            options: { event: eventIds }
+          })
   )
 
-  return [...literalScopes, ...configurableScopes]
+  return [...literalScopes, ...v2Scopes]
 }
 
 /**
