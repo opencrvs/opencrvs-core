@@ -9,13 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  AddressType,
   ConditionalType,
+  EventState,
   field,
   FieldType,
   TestUserRole,
   TokenUserType,
   user
 } from '@opencrvs/commons'
+import { TENNIS_CLUB_DECLARATION_FORM } from '@opencrvs/commons/fixtures'
+import { getInvalidUpdateKeys } from './utils'
 import { getFieldErrors } from './index'
 
 export const testContext = {
@@ -352,5 +356,89 @@ describe('getFieldErrors()', () => {
     )
 
     expect(errors).toMatchSnapshot()
+  })
+})
+
+describe('getInvalidUpdateKeys', () => {
+  const cleaned: EventState = {
+    'applicant.dob': '2024-02-01',
+    'applicant.dobUnknown': false,
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'recommender.none': false,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  }
+  test('getInvalidUpdateKeys should return invalid keys', () => {
+    const update: EventState = {
+      // recommender.name is HIDDEN when recommender.none = true
+      // Sending a VALUE for hidden field should fail
+      'recommender.id': '1234',
+      'recommender.name': {
+        firstname: 'Jane',
+        surname: 'Smith'
+      }
+    }
+
+    const invalidKeys = getInvalidUpdateKeys({
+      update,
+      cleaned,
+      formConfig: TENNIS_CLUB_DECLARATION_FORM,
+      context: testContext
+    })
+
+    expect(invalidKeys).toEqual([
+      {
+        message: 'Hidden or disabled field should not receive a value',
+        id: 'recommender.id',
+        value: '1234'
+      },
+      {
+        message: 'Hidden or disabled field should not receive a value',
+        id: 'recommender.name.firstname',
+        value: 'Jane'
+      },
+      {
+        message: 'Hidden or disabled field should not receive a value',
+        id: 'recommender.name.surname',
+        value: 'Smith'
+      }
+    ])
+  })
+
+  test('getInvalidUpdateKeys with hidden null value should return empty array', () => {
+    const updateWithNull: EventState = {
+      // recommender.name is HIDDEN when recommender.none = true
+      // Sending a VALUE for hidden field should fail
+      'recommender.none': true,
+      'recommender.id': null,
+      'recommender.name': null
+    }
+
+    const invalidKeys2 = getInvalidUpdateKeys({
+      update: updateWithNull,
+      cleaned: {
+        ...cleaned,
+        'recommender.none': false,
+        'recommender.id': '1234',
+        'recommender.name': {
+          firstname: 'A',
+          surname: 'B'
+        }
+      },
+      formConfig: TENNIS_CLUB_DECLARATION_FORM,
+      context: testContext
+    })
+
+    expect(invalidKeys2).toEqual([])
   })
 })
