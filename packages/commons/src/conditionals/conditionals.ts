@@ -18,7 +18,7 @@ import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 import { EventStatus } from '../events/EventMetadata'
-import { JurisdictionFilter } from 'src/scopes-v2'
+import { JurisdictionFilter } from '../scopes-v2'
 
 /* eslint-disable max-lines */
 
@@ -247,11 +247,16 @@ export const user = Object.assign(userSerializer, {
   locationLevel: (adminLevelId: string) => ({
     $user: { $location: adminLevelId }
   }),
-  // @TODO CIHAN: this should alternative take param like user().jurisdiction(user().scope('record.declare').attribute('event_location'))
+  // @TODO CIHAN: this should alternatively take param like user().jurisdiction(user().scope('record.declare').attribute('event_location'))
   // @TODO CIHAN: should this be in conditionals.ts even though its not really a conditional, rather a value getter?
-  jurisdiction: (jurisdiction: JurisdictionFilter) => ({
-    $user: { $jurisdiction: jurisdiction }
-  }),
+  jurisdiction: (jurisdiction: JurisdictionFilter) => () => {
+    if (typeof jurisdiction === 'string') {
+      return jurisdiction
+    }
+
+    // @TODO CIHAN: resolve scope fn?
+    return JurisdictionFilter.enum.all
+  },
   // @TODO CIHAN:
   scope: (scope: Scope) => ({
     // @TODO CIHAN: specify attribute type

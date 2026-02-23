@@ -41,6 +41,7 @@ import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
 import { SerializedNowDateTime } from './serializers/date/serializer'
+import { JurisdictionFilter } from 'src/scopes-v2'
 
 const FieldId = z
   .string()
@@ -578,7 +579,9 @@ export type Country = z.infer<typeof Country>
 
 // @TODO CIHAN: type
 const AllowedLocations = z
-  .any()
+  .function({
+    output: JurisdictionFilter.describe('The allowed locations')
+  })
   .optional()
   .describe(
     'Limits which location options are selectable depending on user jurisdiction and location.'

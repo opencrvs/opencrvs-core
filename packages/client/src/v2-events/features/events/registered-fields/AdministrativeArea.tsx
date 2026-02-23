@@ -10,7 +10,7 @@
  */
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import { Location, UUID } from '@opencrvs/commons/client'
+import { JurisdictionFilter, Location, UUID } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -103,10 +103,13 @@ function AdministrativeAreaInput({
   const { allOptions, userAdministrativeAreaOptions } =
     useAdministrativeAreaOptions(partOf)
 
-  // TODO CIHAN: need to resolve this prop
-  const options = configuration.allowedLocations
-    ? userAdministrativeAreaOptions
-    : allOptions
+  // @TODO CIHAN: move this resolving to separate function?
+  const options =
+    configuration.allowedLocations &&
+    configuration.allowedLocations() ===
+      JurisdictionFilter.enum.administrativeArea
+      ? userAdministrativeAreaOptions
+      : allOptions
 
   const selectedLocation = useMemo(
     () => options.find((o) => o.value === value) ?? null,
