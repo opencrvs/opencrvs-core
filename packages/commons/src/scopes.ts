@@ -276,7 +276,7 @@ const PrintCertifiedCopiesScope = z.object({
   type: z.literal('record.registered.print-certified-copies'),
   options: z.object({
     event: z.array(z.string()).describe('Event type, e.g. birth, death'),
-    templateIds: z
+    templates: z
       .array(z.string())
       .optional()
       .describe(

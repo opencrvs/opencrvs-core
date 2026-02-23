@@ -71,7 +71,7 @@ async function getCertificatesConfig(
     return []
   }
 
-  const templateIds = printCertifiedCopiesScope.options.templateIds ?? []
+  const templateIds = printCertifiedCopiesScope.options.templates ?? []
   const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
   const res = await fetch(url, {
