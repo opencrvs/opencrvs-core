@@ -58,7 +58,7 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.DUPLICATE_DETECTED]: []
 } satisfies Record<
   DisplayableAction,
-  RecordScopeType[] | PrintCertifiedCopiesScope['type'][] | AlwaysAllowed
+  (RecordScopeType | PrintCertifiedCopiesScope['type'])[] | AlwaysAllowed
 >
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
