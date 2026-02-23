@@ -19,17 +19,47 @@ import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { getAdministrativeAreaHierarchy } from '@client/v2-events/utils'
 import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
+import { useLocations } from '../../../hooks/useLocations'
 import { LocationSearch } from './LocationSearch'
+
+/**
+ * Given a location id, return the full administrative area hierarchy for the location.
+ * For example, if the location id is Ibombo District Office, this will return the administrative areas objects for:
+ * [Central, Ibombo]
+ */
+function useLocationAdministrativeAreaHierarchy(
+  locationId: string | undefined
+) {
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
+
+  if (!locationId) {
+    return []
+  }
+
+  const location = locations.get(UUID.parse(locationId))
+
+  if (!location) {
+    return []
+  }
+
+  return getAdministrativeAreaHierarchy(
+    location.administrativeAreaId,
+    administrativeAreas
+  )
+}
 
 function useAdministrativeAreaOptions(parentId?: string | null) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
-
   const userDetails = useSelector(getUserDetails)
-
-  console.log('foo2', userDetails?.primaryOffice.id)
+  const locationAdministrativeAreaHierarchy =
+    useLocationAdministrativeAreaHierarchy(userDetails?.primaryOffice.id)
 
   const options = React.useMemo(() => {
     return [...administrativeAreas.values()]
@@ -46,9 +76,12 @@ function useAdministrativeAreaOptions(parentId?: string | null) {
       }))
   }, [administrativeAreas, parentId])
 
-  console.log('options', options)
+  // @TODO CIHAN: add comment here
+  const userAdministrativeAreaOptions = options.filter((o) =>
+    locationAdministrativeAreaHierarchy.some(({ id }) => id === o.value)
+  )
 
-  return options
+  return { allOptions: options, userAdministrativeAreaOptions }
 }
 
 function AdministrativeAreaInput({
@@ -63,17 +96,26 @@ function AdministrativeAreaInput({
   value?: string | null
   disabled?: boolean
 }) {
-  const options = useAdministrativeAreaOptions(partOf)
+  const { allOptions, userAdministrativeAreaOptions } =
+    useAdministrativeAreaOptions(partOf)
+
+  // TODO CIHAN: use userAdministrativeAreaOptions instead of allOptions if 'administrativeArea' jurisdiction type is set
+  console.log('userAdministrativeAreaOptions', userAdministrativeAreaOptions)
+
+  const options = 'TODO CIHAN' ? userAdministrativeAreaOptions : allOptions
 
   const selectedLocation = useMemo(
     () => options.find((o) => o.value === value) ?? null,
     [options, value]
   )
 
+  /** If there is only one option and its selected, lets disable the input. */
+  const hasOnlyOneOption = options.length === 1 && Boolean(selectedLocation)
+
   return (
     <SearchableSelect
       data-testid={'location__' + id}
-      disabled={disabled}
+      disabled={disabled || hasOnlyOneOption}
       id={id}
       options={options}
       value={selectedLocation}

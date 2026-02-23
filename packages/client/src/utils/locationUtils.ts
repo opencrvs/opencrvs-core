@@ -322,6 +322,15 @@ export function getLocationHierarchy(
   })
 }
 
+/**
+ * Determines if the given other location is under the jurisdiction (administrative area) of the specified location.
+ *
+ * @param {string} params.locationId - The UUID of the reference location (the one representing the office's jurisdiction).
+ * @param {string} params.otherLocationId - The UUID of the location to check against the jurisdiction.
+ * @param {Map<UUID, Location>} params.locations - A map of all locations, keyed by UUID.
+ * @param {Map<UUID, AdministrativeArea>} params.administrativeAreas - A map of administrative areas, keyed by UUID.
+ * @returns {boolean} True if the other location falls under the parent administrative area of the given location, otherwise false.
+ */
 export function isLocationUnderJurisdiction({
   locationId,
   otherLocationId,
@@ -335,7 +344,6 @@ export function isLocationUnderJurisdiction({
 }) {
   const location = locations.get(UUID.parse(locationId))
   const otherLocation = locations.get(UUID.parse(otherLocationId))
-
   const officeAdministrativeAreaId = location?.administrativeAreaId
   const otherLocationAdministrativeAreaId = otherLocation?.administrativeAreaId
 
