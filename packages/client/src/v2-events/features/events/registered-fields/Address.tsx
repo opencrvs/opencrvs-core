@@ -137,7 +137,8 @@ function isDomesticAddress() {
 
 function generateAdministrativeAreaFields(
   inputArray: AdminStructureItem[],
-  required: RequireConfig
+  required: RequireConfig,
+  allowedLocations?: AdministrativeAreaField['configuration']['allowedLocations']
 ): AdministrativeAreaField[] {
   return inputArray.map((item, index) => {
     const { id, label } = item
@@ -158,9 +159,9 @@ function generateAdministrativeAreaFields(
       }
     ]
 
-    // @TODO CIHAN: add allowedLocations to this config?
     const configuration: AdministrativeAreaField['configuration'] = {
-      type: AdministrativeAreas.enum.ADMIN_STRUCTURE
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
+      allowedLocations
     }
 
     if (!isFirst && prevItem?.id) {
@@ -285,11 +286,10 @@ function AddressInput(props: Props) {
     administrativeArea: resolvedAdministrativeArea
   }
 
-  console.log('props.configuration', props.configuration?.allowedLocations)
-
   const adminStructure = generateAdministrativeAreaFields(
     appConfigAdminLevels,
-    otherProps.required
+    otherProps.required,
+    props.configuration?.allowedLocations
   )
 
   const addressFields =
@@ -391,7 +391,8 @@ function AddressOutput({
 
   const adminStructure = generateAdministrativeAreaFields(
     appConfigAdminLevels,
-    configuration?.required
+    configuration?.required,
+    undefined
   )
 
   const addressFields =

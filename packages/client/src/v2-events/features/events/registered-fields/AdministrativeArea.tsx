@@ -23,6 +23,7 @@ import { getAdministrativeAreaHierarchy } from '@client/v2-events/utils'
 import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 import { useLocations } from '../../../hooks/useLocations'
+import { AdministrativeAreaField } from '../../../../../../commons/build/dist/esm/events/FieldConfig'
 import { LocationSearch } from './LocationSearch'
 
 /**
@@ -54,6 +55,11 @@ function useLocationAdministrativeAreaHierarchy(
   )
 }
 
+/**
+ * Given a parent id, return the administrative area options for the parent. This will return both:
+ * 1. All administrative areas under the parent
+ * 2. Administrative areas under which the users location is located
+ */
 function useAdministrativeAreaOptions(parentId?: string | null) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
@@ -76,7 +82,6 @@ function useAdministrativeAreaOptions(parentId?: string | null) {
       }))
   }, [administrativeAreas, parentId])
 
-  // @TODO CIHAN: add comment here
   const userAdministrativeAreaOptions = options.filter((o) =>
     locationAdministrativeAreaHierarchy.some(({ id }) => id === o.value)
   )
@@ -89,20 +94,23 @@ function AdministrativeAreaInput({
   value,
   partOf,
   id,
-  disabled
+  disabled,
+  allowedLocations,
+  ...props
 }: FieldPropsWithoutReferenceValue<'ADMINISTRATIVE_AREA'> & {
   onChange: (val: string | null) => void
   partOf: string | null
   value?: string | null
   disabled?: boolean
+  allowedLocations?: AdministrativeAreaField['configuration']['allowedLocations']
 }) {
   const { allOptions, userAdministrativeAreaOptions } =
     useAdministrativeAreaOptions(partOf)
 
-  // TODO CIHAN: use userAdministrativeAreaOptions instead of allOptions if 'administrativeArea' jurisdiction type is set
-  console.log('userAdministrativeAreaOptions', userAdministrativeAreaOptions)
-
-  const options = 'TODO CIHAN' ? userAdministrativeAreaOptions : allOptions
+  // TODO CIHAN: need to resolve this prop
+  const options = props.configuration?.allowedLocations
+    ? userAdministrativeAreaOptions
+    : allOptions
 
   const selectedLocation = useMemo(
     () => options.find((o) => o.value === value) ?? null,

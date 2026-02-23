@@ -576,6 +576,14 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
+// @TODO CIHAN: type
+const AllowedLocations = z
+  .any()
+  .optional()
+  .describe(
+    'Limits which location options are selectable depending on user jurisdiction and location.'
+  )
+
 export const AdministrativeAreas = z.enum([
   'ADMIN_STRUCTURE',
   'HEALTH_FACILITY',
@@ -593,7 +601,8 @@ const AdministrativeAreaField = BaseField.extend({
         })
         .optional()
         .describe('Parent location'),
-      type: AdministrativeAreas
+      type: AdministrativeAreas,
+      allowedLocations: AllowedLocations
     })
     .describe('Administrative area options')
 }).describe('Administrative area input field e.g. facility, office')
@@ -604,7 +613,8 @@ const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
-    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices']))
+    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices'])),
+    configuration: z.object({ allowedLocations: AllowedLocations }).optional()
   })
 }).describe('Input field for a location')
 
@@ -636,18 +646,9 @@ const FileUploadWithOptions = BaseField.extend({
 
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
-// @TODO CIHAN:
-const AllowedLocations = z
-  .any()
-  .optional()
-  .describe(
-    'Limits which location options are selectable depending on user jurisdiction and location.'
-  )
-
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
   defaultValue: NonEmptyTextValue.optional(),
-  // @TODO CIHAN: add this to Office and Location?
   configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for a facility')
 
@@ -655,7 +656,8 @@ export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
