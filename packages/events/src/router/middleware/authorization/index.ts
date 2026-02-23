@@ -182,6 +182,8 @@ export function requiresAnyOfScopes(
 /**
  * Middleware function that checks if the event type is authorized for the user.
  *
+ * @deprecated in 2.0. @see userCanAccessEventWithScopes checks event access based on scope options, including event types.
+ *
  * The function accepts either an eventId or event type directly in the input.
  * If an eventId is provided, it fetches the event to determine its type.
  *
@@ -348,13 +350,22 @@ export const userCanAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     TrpcContext,
     TrpcContext & { eventId: UUID; eventType: string },
     EventIdParam
-  > = async ({ next, ctx, input }) => {
+  > = async ({ next, ctx, getRawInput }) => {
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
     if (acceptedScopes.length === 0) {
       throw new TRPCError({ code: 'FORBIDDEN' })
+    }
+
+    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+    const rawInput = await getRawInput()
+    const input = EventIdParam.safeParse(rawInput)?.data
+
+    if (!input) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
     }
 
     const event = await getEventById(input.eventId)

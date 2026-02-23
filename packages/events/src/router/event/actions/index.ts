@@ -12,6 +12,7 @@ import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
+import { noop } from 'lodash'
 import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
@@ -335,10 +336,15 @@ export function getDefaultActionProcedures(
     )
   }
 
-  const requireScopesForRequestMiddleware = requiresAnyOfScopes(
-    [],
-    ACTION_SCOPE_MAP[actionType]
+  const actionsMigratedToV2Scopes = [ActionType.NOTIFY] as const
+
+  const requireScopesForRequestMiddleware = actionsMigratedToV2Scopes.some(
+    (act) => act === actionType
   )
+    ? middleware.userCanAccessEventWithScopes(
+        ACTION_SCOPE_MAP[actionType] as any
+      )
+    : requiresAnyOfScopes([], ACTION_SCOPE_MAP[actionType])
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
@@ -347,6 +353,7 @@ export function getDefaultActionProcedures(
       .meta(meta)
       .use(requireScopesForRequestMiddleware)
       .input(actionConfig.inputSchema.strict())
+      // @ts-expect-error - fn is not needed in v2. types are optional anyways, so will not force v2 code to comply with this.
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
