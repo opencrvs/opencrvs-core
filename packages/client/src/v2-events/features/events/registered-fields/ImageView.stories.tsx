@@ -19,7 +19,7 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
-  title: 'Inputs/Image',
+  title: 'Inputs/ImageView',
   args: { onChange: fn() },
   decorators: [
     (Story, context) => (

@@ -35,7 +35,7 @@ const StyledImage = styled.img<{
   object-fit: ${({ $objectFit }) => $objectFit ?? 'contain'};
 `
 
-function ImageInput({
+function ImageViewInput({
   configuration,
   value
 }: {
@@ -63,7 +63,7 @@ function ImageInput({
   )
 }
 
-export const Image = {
-  Input: ImageInput,
+export const ImageView = {
+  Input: ImageViewInput,
   Output: null
 }

@@ -39,7 +39,7 @@ import { AlphaPrintButton } from './AlphaPrintButton'
 import { LinkButton } from './LinkButton'
 import { VerificationStatus } from './VerificationStatus'
 import { QueryParamReader } from './QueryParamReader'
-import { Image } from './Image'
+import { ImageView } from './ImageView'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -65,7 +65,7 @@ export * from './TimeField'
 export * from './AlphaPrintButton'
 export * from './LinkButton'
 export * from './VerificationStatus'
-export * from './Image'
+export * from './ImageView'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -112,7 +112,7 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
     case FieldType.PARAGRAPH:
       return Paragraph
     case FieldType.IMAGE_VIEW:
-      return Image
+      return ImageView
     case FieldType.NAME:
       return Name
     case FieldType.SELECT_DATE_RANGE:

@@ -73,7 +73,7 @@ import {
   getRegisteredFieldByFieldConfig,
   VerificationStatus,
   AgeField,
-  Image
+  ImageView
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -141,7 +141,7 @@ export function ValueOutput({
   }
 
   if (isImageFieldType(field)) {
-    return Image.Output
+    return ImageView.Output
   }
 
   if (isParagraphFieldType(field)) {

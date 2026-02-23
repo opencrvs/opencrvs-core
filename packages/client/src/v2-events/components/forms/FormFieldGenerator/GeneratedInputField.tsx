@@ -93,7 +93,7 @@ import {
   Http,
   LinkButton,
   VerificationStatus,
-  Image
+  ImageView
 } from '@client/v2-events/features/events/registered-fields'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
@@ -370,7 +370,7 @@ export const GeneratedInputField = React.memo(
 
     if (isImageFieldType(field)) {
       return (
-        <Image.Input
+        <ImageView.Input
           configuration={field.config.configuration}
           value={field.value}
         />
