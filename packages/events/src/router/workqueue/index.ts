@@ -12,7 +12,6 @@
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import {
-  RecordScopeV2,
   WorkqueueConfig,
   WorkqueueCountInput,
   WorkqueueCountOutput
@@ -51,7 +50,7 @@ export const workqueueRouter = router({
         queries: input,
         user: ctx.user,
         eventConfigs: await getInMemoryEventConfigurations(ctx.token),
-        acceptedScopes: ctx.acceptedScopes as RecordScopeV2[]
+        acceptedScopes: ctx.acceptedScopes
       })
     })
 })

@@ -14,6 +14,7 @@ import * as z from 'zod/v4'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
 import { UUID } from './uuid'
+import { encodeScope } from './scopes-v2'
 export * from './scopes'
 
 export const DEFAULT_ROLES_DEFINITION = [
@@ -25,8 +26,18 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.fieldAgent'
     },
     scopes: [
-      `record.create[event=birth|death|tennis-club-membership]`,
-      'record.declare[event=birth|death|tennis-club-membership]',
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -45,8 +56,18 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.registrationAgent'
     },
     scopes: [
-      `record.create[event=birth|death|tennis-club-membership]`,
-      'record.declare[event=birth|death|tennis-club-membership]',
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -73,8 +94,18 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localRegistrar'
     },
     scopes: [
-      `record.create[event=birth|death|tennis-club-membership]`,
-      'record.declare[event=birth|death|tennis-club-membership]',
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
