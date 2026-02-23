@@ -103,11 +103,9 @@ function AdministrativeAreaInput({
   const { allOptions, userAdministrativeAreaOptions } =
     useAdministrativeAreaOptions(partOf)
 
-  // @TODO CIHAN: move this resolving to separate function?
   const options =
-    configuration.allowedLocations &&
-    configuration.allowedLocations() ===
-      JurisdictionFilter.enum.administrativeArea
+    configuration.allowedLocations ===
+    JurisdictionFilter.enum.administrativeArea
       ? userAdministrativeAreaOptions
       : allOptions
 

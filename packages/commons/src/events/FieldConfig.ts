@@ -577,14 +577,9 @@ const Country = BaseField.extend({
 export type Country = z.infer<typeof Country>
 
 // @TODO CIHAN: type
-const AllowedLocations = z
-  .function({
-    output: JurisdictionFilter.describe('The allowed locations')
-  })
-  .optional()
-  .describe(
-    'Limits which location options are selectable depending on user jurisdiction and location.'
-  )
+const AllowedLocations = JurisdictionFilter.optional().describe(
+  'Limits which location options are selectable depending on user jurisdiction and location.'
+)
 
 export const AdministrativeAreas = z.enum([
   'ADMIN_STRUCTURE',
