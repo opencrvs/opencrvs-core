@@ -2136,6 +2136,11 @@ components:
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
+                  type: string
+                  enum:
+                    - administrativeArea
+                    - location
+                    - all
               additionalProperties: false
             defaultValue:
               type: object
@@ -5982,6 +5987,11 @@ components:
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
+                  type: string
+                  enum:
+                    - administrativeArea
+                    - location
+                    - all
               required:
                 - type
               additionalProperties: false
@@ -6301,6 +6311,11 @@ components:
                     allowedLocations:
                       description: Limits which location options are selectable depending on user
                         jurisdiction and location.
+                      type: string
+                      enum:
+                        - administrativeArea
+                        - location
+                        - all
                   additionalProperties: false
               required:
                 - searchableResource
@@ -6463,6 +6478,11 @@ components:
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
+                  type: string
+                  enum:
+                    - administrativeArea
+                    - location
+                    - all
               additionalProperties: false
           required:
             - id
@@ -6621,6 +6641,11 @@ components:
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
+                  type: string
+                  enum:
+                    - administrativeArea
+                    - location
+                    - all
               additionalProperties: false
           required:
             - id
