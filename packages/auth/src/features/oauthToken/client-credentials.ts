@@ -48,9 +48,32 @@ export async function clientCredentialsHandler(
   const isNotificationAPIUser = result.scope.includes(SCOPES.NOTIFICATION_API)
   const isImportExportClient = result.scope.includes(SCOPES.RECORD_IMPORT)
 
+  /**
+   * Intermediary step to convert any legacy scopes to the new format.
+   * For example, 'record.create' becomes 'type=record.create' to align with the new scope format.
+   *
+   * Since mongo is in the middle of deprecation, we won't write new migrations to update existing scopes in the database, but instead convert them on the fly here.
+   */
+  const v2Scopes = result.scope.map((s) => {
+    // Intentionally verbose for clarity.
+    if (s === 'record.search') {
+      return 'type=record.search'
+    }
+
+    if (s === 'record.read') {
+      return 'type=record.read'
+    }
+
+    if (s === 'record.create') {
+      return 'type=record.create'
+    }
+
+    return s
+  })
+
   const token = await createToken(
     result.systemId,
-    result.scope,
+    v2Scopes,
     isNotificationAPIUser
       ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
       : WEB_USER_JWT_AUDIENCES,

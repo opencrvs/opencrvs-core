@@ -101,17 +101,20 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  SCOPES.RECORD_READ, // @TODO: this can be removed after unnecessary .list endpoint is removed
   SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
-  'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
   encodeScope({
     type: 'record.read',
     options: {
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
     }
   }),
-  'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.create',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
   'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
