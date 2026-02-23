@@ -576,7 +576,6 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
-// @TODO CIHAN: type
 const AllowedLocations = JurisdictionFilter.optional().describe(
   'Limits which location options are selectable depending on user jurisdiction and location.'
 )

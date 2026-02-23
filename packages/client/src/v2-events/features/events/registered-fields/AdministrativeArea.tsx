@@ -60,10 +60,7 @@ function useAdministrativeAreaOptions(parentId?: string | null) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
   const userDetails = useSelector(getUserDetails)
-  const locationAdministrativeAreaHierarchy =
-    useLocationAdministrativeAreaHierarchy(userDetails?.primaryOffice.id)
-
-  const options = React.useMemo(() => {
+  const allAdministrativeAreaOptions = React.useMemo(() => {
     return [...administrativeAreas.values()]
       .filter((administrativeArea) => {
         if (parentId === undefined) {
@@ -78,11 +75,17 @@ function useAdministrativeAreaOptions(parentId?: string | null) {
       }))
   }, [administrativeAreas, parentId])
 
-  const userAdministrativeAreaOptions = options.filter((o) =>
-    locationAdministrativeAreaHierarchy.some(({ id }) => id === o.value)
+  const locationAdministrativeAreaHierarchy =
+    useLocationAdministrativeAreaHierarchy(userDetails?.primaryOffice.id)
+
+  const userAdministrativeAreaOptions = allAdministrativeAreaOptions.filter(
+    (o) => locationAdministrativeAreaHierarchy.some(({ id }) => id === o.value)
   )
 
-  return { allOptions: options, userAdministrativeAreaOptions }
+  return {
+    allAdministrativeAreaOptions,
+    userAdministrativeAreaOptions
+  }
 }
 
 function AdministrativeAreaInput({
@@ -100,14 +103,14 @@ function AdministrativeAreaInput({
   configuration: AdministrativeAreaField['configuration']
   id: string
 }) {
-  const { allOptions, userAdministrativeAreaOptions } =
+  const { allAdministrativeAreaOptions, userAdministrativeAreaOptions } =
     useAdministrativeAreaOptions(partOf)
 
   const options =
     configuration.allowedLocations ===
     JurisdictionFilter.enum.administrativeArea
       ? userAdministrativeAreaOptions
-      : allOptions
+      : allAdministrativeAreaOptions
 
   const selectedLocation = useMemo(
     () => options.find((o) => o.value === value) ?? null,
