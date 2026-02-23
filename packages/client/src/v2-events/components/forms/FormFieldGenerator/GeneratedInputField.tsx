@@ -67,7 +67,7 @@ import {
   isCustomFieldType,
   isHiddenFieldType,
   EventConfig,
-  isImageFieldType
+  isImageViewFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -368,7 +368,7 @@ export const GeneratedInputField = React.memo(
       )
     }
 
-    if (isImageFieldType(field)) {
+    if (isImageViewFieldType(field)) {
       return (
         <ImageView.Input
           configuration={field.config.configuration}
@@ -684,7 +684,6 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />

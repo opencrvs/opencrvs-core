@@ -51,7 +51,7 @@ import {
   isAgeFieldType,
   FieldUpdateValue,
   isCustomFieldType,
-  isImageFieldType
+  isImageViewFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -140,7 +140,7 @@ export function ValueOutput({
     return PageHeader.Output
   }
 
-  if (isImageFieldType(field)) {
+  if (isImageViewFieldType(field)) {
     return ImageView.Output
   }
 

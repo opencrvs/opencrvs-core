@@ -303,7 +303,7 @@ export const isParagraphFieldType = (field: {
   return field.config.type === FieldType.PARAGRAPH
 }
 
-export const isImageFieldType = (field: {
+export const isImageViewFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: ImageField } => {
