@@ -8,6 +8,10 @@ exports[`Register action - hidden field nullification > Invalid keys scenarios >
 
 exports[`Register action - hidden field nullification > Invalid keys scenarios > rejects non-existent field during registration 1`] = `[TRPCError: Field with id nonexistent.field not found in event config]`;
 
+exports[`Registration by different user with declaration changes > registration agent declares with hidden page field, registrar attempts to set different value for still-hidden field - should fail 1`] = `[TRPCError: You are not assigned to this event]`;
+
+exports[`Registration by different user with declaration changes > registration agent declares, registrar attempts to set hidden field with value - should fail 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.id","value":"1234"},{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.firstname","value":"Different"},{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.surname","value":"Person"}]]`;
+
 exports[`Request and confirmation flow > Asynchronous confirmation flow > Accepting > should not be able to accept action if action is already rejected 1`] = `[TRPCError: Action has already been rejected.]`;
 
 exports[`Request and confirmation flow > Asynchronous confirmation flow > Accepting > should not be able to accept the action if action is not first requested 1`] = `[TRPCError: Action not found.]`;

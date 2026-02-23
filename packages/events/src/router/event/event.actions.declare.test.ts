@@ -39,6 +39,7 @@ import { encodeEventIndex } from '@events/service/indexing/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 
+/* eslint-disable max-lines */
 describe('Declare action', () => {
   let user: CreatedUser
   let generator: ReturnType<typeof payloadGenerator>
@@ -842,7 +843,6 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
       })
 
       const response = await client.event.actions.declare.request(payload)
-      console.log(JSON.stringify(response, null, 2))
 
       const savedAction = response.actions.find(
         ({ type, status }) =>

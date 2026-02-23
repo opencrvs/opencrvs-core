@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -38,6 +37,8 @@ import {
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 import { CreatedUser, payloadGenerator } from '@events/tests/generators'
+
+/* eslint-disable max-lines */
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -1777,5 +1778,606 @@ describe('Register action - hidden field nullification', () => {
       )
       expect(currentState.declaration['recommender.name']).toBeUndefined()
     })
+  })
+})
+
+describe('Registration by different user with declaration changes', () => {
+  let user: CreatedUser
+  let generator: ReturnType<typeof payloadGenerator>
+
+  beforeEach(async () => {
+    const testCase = await setupTestCase()
+    user = testCase.user
+    generator = testCase.generator
+  })
+
+  test('registration agent declares with senior-pass page visible, registrar nullifies hidden page field when page becomes hidden', async () => {
+    // Registration agent with limited scopes
+    const { user: agent } = await setupTestCase()
+    const registrationAgentClient = createTestClient(agent, [
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.declared.validate[event=birth|death|tennis-club-membership]'
+    ])
+
+    // Regular client with full permissions
+    const registrarClient = createTestClient(user)
+
+    // Step 1: Registration agent creates event
+    const event = await registrationAgentClient.event.create(
+      generator.event.create()
+    )
+
+    const payload = {
+      keepAssignment: true,
+      declaration: {
+        'applicant.dob': '1944-02-01', // Makes senior-pass page visible
+        'applicant.dobUnknown': false,
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Doe'
+        },
+        'recommender.none': true,
+        'senior-pass.id': '1234567890', // Field on visible page
+        'senior-pass.recommender': true,
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {
+            state: 'State',
+            district2: 'District2'
+          }
+        }
+      }
+    }
+    // Step 2: Registration agent declares with senior-pass page VISIBLE (dob < 1950)
+    await registrationAgentClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id, payload)
+    )
+
+    // Step 3: Registration agent validates
+    await registrationAgentClient.event.actions.validate.request(
+      generator.event.actions.validate(event.id)
+    )
+
+    // Step 4: Assign the event to registrar for registration
+    const assignmentInput = generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+    await registrarClient.event.actions.assignment.assign(assignmentInput)
+
+    // Step 5: Registrar changes dob to make senior-pass page HIDDEN and nullifies the field
+    const registerPayload = generator.event.actions.register(event.id, {
+      declaration: {
+        ...payload.declaration,
+        'applicant.dob': '2000-02-01', // Makes senior-pass page hidden
+        'senior-pass.id': null, // Explicitly nullify hidden page field
+        'senior-pass.recommender': null
+      }
+    })
+
+    const response =
+      await registrarClient.event.actions.register.request(registerPayload)
+
+    const requestedAction = response.actions.find(
+      ({ type, status }) =>
+        type === ActionType.REGISTER && status === ActionStatus.Requested
+    )
+
+    expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+    if (requestedAction?.status === ActionStatus.Requested) {
+      expect(requestedAction.declaration).toHaveProperty('senior-pass.id', null)
+      expect(requestedAction.declaration).toHaveProperty(
+        'senior-pass.recommender',
+        null
+      )
+    }
+
+    // Verify current event state no longer has senior-pass fields
+    const currentState = getCurrentEventState(
+      response,
+      tennisClubMembershipEvent
+    )
+    expect(currentState.declaration['senior-pass.id']).toBeUndefined()
+    expect(currentState.declaration['senior-pass.recommender']).toBeUndefined()
+    expect(currentState.declaration['applicant.dob']).toBe('2000-02-01')
+  })
+
+  test('registration agent declares with recommender details, registrar nullifies hidden field when recommender.none changes', async () => {
+    const { user: agent } = await setupTestCase()
+    const registrationAgentClient = createTestClient(agent, [
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.declared.validate[event=birth|death|tennis-club-membership]'
+    ])
+
+    const registrarClient = createTestClient(user)
+
+    // Step 1: Registration agent creates event
+    const event = await registrationAgentClient.event.create(
+      generator.event.create()
+    )
+
+    const payload = {
+      keepAssignment: true,
+      declaration: {
+        'applicant.dob': '2024-02-01',
+        'applicant.dobUnknown': false,
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Doe'
+        },
+        'recommender.none': false, // Makes recommender.name visible
+        'recommender.name': {
+          firstname: 'Jane',
+          surname: 'Smith'
+        },
+        'recommender.id': '1234',
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {
+            state: 'State',
+            district2: 'District2'
+          }
+        }
+      }
+    }
+    // Step 2: Registration agent declares with recommender.none = false (recommender.name is visible)
+    await registrationAgentClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id, payload)
+    )
+
+    // Step 3: Registration agent validates
+    await registrationAgentClient.event.actions.validate.request(
+      generator.event.actions.validate(event.id)
+    )
+
+    // Step 4: Assign the event to registrar for registration
+    const assignmentInput = generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+    await registrarClient.event.actions.assignment.assign(assignmentInput)
+
+    // Step 5: Registrar changes recommender.none to true and nullifies hidden fields
+    const registerPayload = generator.event.actions.register(event.id, {
+      declaration: {
+        ...payload.declaration,
+        'recommender.none': true, // Makes recommender.name hidden
+        'recommender.name': null, // Explicitly nullify
+        'recommender.id': null // Explicitly nullify
+      }
+    })
+
+    const response =
+      await registrarClient.event.actions.register.request(registerPayload)
+
+    const requestedAction = response.actions.find(
+      ({ type, status }) =>
+        type === ActionType.REGISTER && status === ActionStatus.Requested
+    )
+
+    expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+    if (requestedAction?.status === ActionStatus.Requested) {
+      expect(requestedAction.declaration).toHaveProperty(
+        'recommender.name',
+        null
+      )
+      expect(requestedAction.declaration).toHaveProperty(
+        'recommender.none',
+        true
+      )
+    }
+
+    // Verify current event state no longer has recommender fields
+    const currentState = getCurrentEventState(
+      response,
+      tennisClubMembershipEvent
+    )
+    expect(currentState.declaration['recommender.name']).toBeUndefined()
+
+    expect(currentState.declaration['recommender.none']).toBe(true)
+  })
+
+  test('registration agent declares, registrar attempts to set hidden field with value - should fail', async () => {
+    const { user: agent } = await setupTestCase()
+    const registrationAgentClient = createTestClient(agent, [
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.declared.validate[event=birth|death|tennis-club-membership]'
+    ])
+
+    const registrarClient = createTestClient(user)
+
+    // Step 1: Registration agent creates event
+    const event = await registrationAgentClient.event.create(
+      generator.event.create()
+    )
+
+    const payload = {
+      keepAssignment: true,
+      declaration: {
+        'applicant.dob': '2024-02-01',
+        'applicant.dobUnknown': false,
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Doe'
+        },
+        'recommender.none': false,
+        'recommender.id': '1234',
+        'recommender.name': {
+          firstname: 'Jane',
+          surname: 'Smith'
+        },
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {
+            state: 'State',
+            district2: 'District2'
+          }
+        }
+      }
+    }
+    // Step 2: Registration agent declares with recommender.none = false
+    await registrationAgentClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id, payload)
+    )
+
+    // Step 3: Registration agent validates
+    await registrationAgentClient.event.actions.validate.request(
+      generator.event.actions.validate(event.id)
+    )
+
+    // Step 4: Assign the event to registrar for registration
+    const assignmentInput = generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+    await registrarClient.event.actions.assignment.assign(assignmentInput)
+
+    // Step 5: Registrar changes recommender.none to true BUT tries to send a value for hidden field
+    const registerPayload = generator.event.actions.register(event.id, {
+      declaration: {
+        ...payload.declaration,
+        'recommender.none': true, // Makes recommender.name hidden
+        'recommender.name': {
+          // ❌ Trying to set value for hidden field
+          firstname: 'Different',
+          surname: 'Person'
+        }
+      }
+    })
+
+    await expect(
+      registrarClient.event.actions.register.request(registerPayload)
+    ).rejects.toMatchSnapshot()
+  })
+
+  test('registration agent declares, registrar attempts to add invalid field - should fail', async () => {
+    const { user: agent } = await setupTestCase()
+    const registrationAgentClient = createTestClient(agent, [
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.declared.validate[event=birth|death|tennis-club-membership]'
+    ])
+
+    const registrarClient = createTestClient(user)
+
+    // Step 1: Registration agent creates event
+    const event = await registrationAgentClient.event.create(
+      generator.event.create()
+    )
+
+    // Step 2: Registration agent declares
+    const payload = {
+      keepAssignment: true,
+      declaration: {
+        'applicant.dob': '2024-02-01',
+        'applicant.dobUnknown': false,
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Doe'
+        },
+        'recommender.none': true,
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {
+            state: 'State',
+            district2: 'District2'
+          }
+        }
+      }
+    }
+    await registrationAgentClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id, payload)
+    )
+
+    // Step 3: Registration agent validates
+    await registrationAgentClient.event.actions.validate.request(
+      generator.event.actions.validate(event.id)
+    )
+
+    // Step 4: Assign the event to registrar for registration
+    const assignmentInput = generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+    await registrarClient.event.actions.assignment.assign(assignmentInput)
+
+    // Step 5: Registrar tries to add non-existent field during registration
+    const registerPayload = generator.event.actions.register(event.id, {
+      declaration: {
+        ...payload.declaration,
+        'invalid.field': 'some value',
+        'another.invalid.age': { age: 20, asOfDateRef: 'applicant.dob' }
+      }
+    })
+
+    const error = await registrarClient.event.actions.register
+      .request(registerPayload)
+      .catch((e) => e)
+
+    expect(error).toBeInstanceOf(TRPCError)
+    expect(error.code).toBe('INTERNAL_SERVER_ERROR')
+    expect(error.message).toContain(
+      'Field with id invalid.field not found in event config'
+    )
+  })
+
+  test('registration agent declares with hidden page field, registrar attempts to set different value for still-hidden field - should fail', async () => {
+    const { user: agent } = await setupTestCase()
+    const registrationAgentClient = createTestClient(agent, [
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.declared.validate[event=birth|death|tennis-club-membership]'
+    ])
+
+    const registrarClient = createTestClient(user)
+
+    // Step 1: Registration agent creates event
+    const event = await registrationAgentClient.event.create(
+      generator.event.create()
+    )
+
+    // Step 2: Registration agent declares with senior-pass page HIDDEN (dob > 1950)
+    const payload = {
+      keepAssignment: true,
+      declaration: {
+        'applicant.dob': '2000-02-01', // senior-pass page is hidden
+        'applicant.dobUnknown': false,
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Doe'
+        },
+        'recommender.none': true,
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {
+            state: 'State',
+            district2: 'District2'
+          }
+        }
+      }
+    }
+    await registrationAgentClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id, payload)
+    )
+
+    // Step 3: Registration agent validates
+    await registrationAgentClient.event.actions.validate.request(
+      generator.event.actions.validate(event.id)
+    )
+
+    // Step 4: Registrar tries to add field from hidden page during registration
+    const registerPayload = generator.event.actions.register(event.id, {
+      declaration: {
+        ...payload.declaration,
+        'senior-pass.id': '9876543210' // ❌ Page is still hidden
+      }
+    })
+
+    await expect(
+      registrarClient.event.actions.register.request(registerPayload)
+    ).rejects.toMatchSnapshot()
+  })
+
+  test('registration agent declares minimal data, registrar completes with valid visible fields', async () => {
+    const { user: agent } = await setupTestCase()
+    const registrationAgentClient = createTestClient(agent, [
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.declared.validate[event=birth|death|tennis-club-membership]'
+    ])
+
+    const registrarClient = createTestClient(user)
+
+    // Step 1: Registration agent creates event
+    const event = await registrationAgentClient.event.create(
+      generator.event.create()
+    )
+
+    // Step 2: Registration agent declares with minimal data
+    const payload = {
+      keepAssignment: true,
+      declaration: {
+        'applicant.dob': '2024-02-01',
+        'applicant.dobUnknown': false,
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Doe'
+        },
+        'recommender.none': true,
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {
+            state: 'State',
+            district2: 'District2'
+          }
+        }
+      }
+    }
+    await registrationAgentClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id, payload)
+    )
+
+    // Step 3: Registration agent validates
+    await registrationAgentClient.event.actions.validate.request(
+      generator.event.actions.validate(event.id)
+    )
+
+    // Step 4: Assign the event to registrar for registration
+    const assignmentInput = generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+    await registrarClient.event.actions.assignment.assign(assignmentInput)
+
+    // Step 5: Registrar adds additional valid visible fields during registration
+    const registerPayload = generator.event.actions.register(event.id, {
+      declaration: {
+        ...payload.declaration,
+        'applicant.email': 'applicant@example.com' // Valid visible field
+      }
+    })
+
+    const response =
+      await registrarClient.event.actions.register.request(registerPayload)
+
+    const requestedAction = response.actions.find(
+      ({ type, status }) =>
+        type === ActionType.REGISTER && status === ActionStatus.Requested
+    )
+
+    expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+    if (requestedAction?.status === ActionStatus.Requested) {
+      expect(requestedAction.declaration).toHaveProperty(
+        'applicant.email',
+        'applicant@example.com'
+      )
+    }
+
+    // Verify current event state has the new field
+    const currentState = getCurrentEventState(
+      response,
+      tennisClubMembershipEvent
+    )
+    expect(currentState.declaration['applicant.email']).toBe(
+      'applicant@example.com'
+    )
+  })
+
+  test('registration agent declares with visible conditional field, registrar changes condition and nullifies multiple hidden fields', async () => {
+    const { user: agent } = await setupTestCase()
+    const registrationAgentClient = createTestClient(agent, [
+      'record.create[event=birth|death|tennis-club-membership]',
+      'record.declare[event=birth|death|tennis-club-membership]',
+      'record.declared.validate[event=birth|death|tennis-club-membership]'
+    ])
+
+    const registrarClient = createTestClient(user)
+
+    // Step 1: Registration agent creates event
+    const event = await registrationAgentClient.event.create(
+      generator.event.create()
+    )
+
+    // Step 2: Registration agent declares with both conditional contexts visible
+    const payload = {
+      keepAssignment: true,
+      declaration: {
+        'applicant.dob': '1944-02-01', // Makes senior-pass page visible
+        'applicant.dobUnknown': false,
+        'applicant.name': {
+          firstname: 'John',
+          surname: 'Doe'
+        },
+        'recommender.none': false, // Makes recommender fields visible
+        'recommender.name': {
+          firstname: 'Jane',
+          surname: 'Smith'
+        },
+        'recommender.id': 'jane@example.com',
+        'senior-pass.id': '1234567890',
+        'senior-pass.recommender': true,
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {
+            state: 'State',
+            district2: 'District2'
+          }
+        }
+      }
+    }
+    await registrationAgentClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id, payload)
+    )
+
+    // Step 3: Registration agent validates
+    await registrationAgentClient.event.actions.validate.request(
+      generator.event.actions.validate(event.id)
+    )
+
+    // Step 4: Assign the event to registrar for registration
+    const assignmentInput = generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+    await registrarClient.event.actions.assignment.assign(assignmentInput)
+
+    // Step 5: Registrar changes both conditions and nullifies all hidden fields
+    const registerPayload = generator.event.actions.register(event.id, {
+      declaration: {
+        ...payload.declaration,
+        'applicant.dob': '2000-02-01', // Hides senior-pass page
+        'recommender.none': true, // Hides recommender fields
+        'recommender.name': null,
+        'recommender.id': null,
+        'senior-pass.id': null,
+        'senior-pass.recommender': null
+      }
+    })
+
+    const response =
+      await registrarClient.event.actions.register.request(registerPayload)
+
+    const requestedAction = response.actions.find(
+      ({ type, status }) =>
+        type === ActionType.REGISTER && status === ActionStatus.Requested
+    )
+
+    expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+    if (requestedAction?.status === ActionStatus.Requested) {
+      // All hidden fields should be null in the action
+      expect(requestedAction.declaration).toHaveProperty(
+        'recommender.name',
+        null
+      )
+      expect(requestedAction.declaration).toHaveProperty('recommender.id', null)
+      expect(requestedAction.declaration).toHaveProperty('senior-pass.id', null)
+      expect(requestedAction.declaration).toHaveProperty(
+        'senior-pass.recommender',
+        null
+      )
+    }
+
+    // Verify current event state has none of the hidden fields
+    const currentState = getCurrentEventState(
+      response,
+      tennisClubMembershipEvent
+    )
+    expect(currentState.declaration['recommender.name']).toBeUndefined()
+    expect(currentState.declaration['recommender.email']).toBeUndefined()
+    expect(currentState.declaration['senior-pass.id']).toBeUndefined()
+    expect(currentState.declaration['senior-pass.recommender']).toBeUndefined()
+    expect(currentState.declaration['applicant.dob']).toBe('2000-02-01')
+    expect(currentState.declaration['recommender.none']).toBe(true)
   })
 })
