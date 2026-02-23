@@ -7350,6 +7350,14 @@ components:
                         - location
                         - all
                   additionalProperties: false
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: string
+                  enum:
+                    - administrativeArea
+                    - location
+                    - all
               required:
                 - searchableResource
               additionalProperties: false
