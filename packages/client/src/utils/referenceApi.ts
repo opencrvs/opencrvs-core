@@ -108,7 +108,7 @@ export interface ICertificateData extends ICertificateConfigData {
   svg: string
 }
 
-export interface ICurrency {
+interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
 }

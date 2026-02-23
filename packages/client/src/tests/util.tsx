@@ -68,7 +68,7 @@ import { mockOfflineData, validImageB64String } from './mock-offline-data'
 
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
-export const inValidImageB64String =
+const inValidImageB64String =
   'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
 export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
@@ -102,7 +102,7 @@ export const REGISTRAR_DEFAULT_SCOPES = [
   SCOPES.SEARCH_MARRIAGE
 ] satisfies Scope[]
 
-export const ACTION_STATUS_MAP = {
+const ACTION_STATUS_MAP = {
   [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
   [SubmissionAction.APPROVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_APPROVE,
   [SubmissionAction.REGISTER_DECLARATION]: SUBMISSION_STATUS.READY_TO_REGISTER,
@@ -158,7 +158,7 @@ export function getInitialState(): IStoreState {
   return mockStore.getState()
 }
 
-export function waitForReady(app: ReactWrapper) {
+function waitForReady(app: ReactWrapper) {
   return waitForElement(app, '#readyDeclaration')
 }
 
@@ -397,7 +397,7 @@ export const mockUserResponse = {
   }
 }
 
-export const mockLocalSysAdminUserResponse = {
+const mockLocalSysAdminUserResponse = {
   data: {
     getUser: {
       userMgntUserID: '123',
@@ -493,7 +493,7 @@ function appendStringToKeys(
   return newObj
 }
 
-export const mockDeclarationData = {
+const mockDeclarationData = {
   template: {},
   child: {
     firstNames: 'গায়ত্রী',
@@ -585,7 +585,7 @@ export const mockDeclarationData = {
   documents: {}
 }
 
-export const mockDeathDeclarationData = {
+const mockDeathDeclarationData = {
   template: {},
   deceased: {
     iDType: 'NATIONAL_ID',
@@ -687,7 +687,7 @@ export const mockDeathDeclarationData = {
   }
 }
 
-export const mockMarriageDeclarationData = {
+const mockMarriageDeclarationData = {
   registration: {
     trackingId: 'M2LA47X',
     registrationNumber: '2023M2LA47X',
@@ -777,7 +777,7 @@ export const mockMarriageDeclarationData = {
   }
 }
 
-export const mockBirthRegistrationSectionData = {
+const mockBirthRegistrationSectionData = {
   informantsSignature: 'data:image/png;base64,abcd',
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
@@ -809,7 +809,7 @@ export const mockBirthRegistrationSectionData = {
   ]
 }
 
-export const mockDeathRegistrationSectionData = {
+const mockDeathRegistrationSectionData = {
   trackingId: 'DDSS0SE',
   registrationNumber: '201908122365DDSS0SE1',
   type: 'death',
@@ -1079,7 +1079,7 @@ export const getFileFromBase64String = (
   })
 }
 
-export async function getReviewFormFromStore(
+async function getReviewFormFromStore(
   store: Store<IStoreState, AnyAction>,
   event: EventType
 ) {
@@ -1140,7 +1140,7 @@ export function loginAsFieldAgent(store: AppStore) {
   )
 }
 
-export function createRouterProps<
+function createRouterProps<
   T,
   Params extends { [K in keyof Params]?: string | undefined }
 >(

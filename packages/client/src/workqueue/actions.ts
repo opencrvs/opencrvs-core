@@ -23,15 +23,15 @@ export interface IQueryData {
   externalValidationTab: GQLEventSearchResultSet
 }
 
-export const GET_WORKQUEUE_SUCCESS = 'DECLARATION/GET_WORKQUEUE_SUCCESS'
+const GET_WORKQUEUE_SUCCESS = 'DECLARATION/GET_WORKQUEUE_SUCCESS'
 const GET_WORKQUEUE_FAILED = 'DECLARATION/GET_WORKQUEUE_FAILED'
 export const UPDATE_REGISTRAR_WORKQUEUE =
   'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE'
-export const UPDATE_REGISTRAR_WORKQUEUE_SUCCESS =
+const UPDATE_REGISTRAR_WORKQUEUE_SUCCESS =
   'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE_SUCCESS'
 const UPDATE_REGISTRAR_WORKQUEUE_FAIL =
   'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE_FAIL'
-export const UPDATE_WORKQUEUE_PAGINATION =
+const UPDATE_WORKQUEUE_PAGINATION =
   'DECLARATION/UPDATE_WORKQUEUE_PAGINATION'
 
 interface UpdateRegistrarWorkQueueSuccessAction {
@@ -58,35 +58,35 @@ export interface UpdateRegistrarWorkqueueAction {
   }
 }
 
-export interface IGetWorkqueueOfCurrentUserSuccessAction {
+interface IGetWorkqueueOfCurrentUserSuccessAction {
   type: typeof GET_WORKQUEUE_SUCCESS
   payload: string
 }
 
-export interface IGetWorkqueueOfCurrentUserFailedAction {
+interface IGetWorkqueueOfCurrentUserFailedAction {
   type: typeof GET_WORKQUEUE_FAILED
 }
 
-export const getCurrentUserWorkqueueFailed =
+const getCurrentUserWorkqueueFailed =
   (): IGetWorkqueueOfCurrentUserFailedAction => ({
     type: GET_WORKQUEUE_FAILED
   })
 
-export const getCurrentUserWorkqueuSuccess = (
+const getCurrentUserWorkqueuSuccess = (
   response: string
 ): IGetWorkqueueOfCurrentUserSuccessAction => ({
   type: GET_WORKQUEUE_SUCCESS,
   payload: response
 })
 
-export const updateRegistrarWorkqueueSuccessActionCreator = (
+const updateRegistrarWorkqueueSuccessActionCreator = (
   response: string
 ): UpdateRegistrarWorkQueueSuccessAction => ({
   type: UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
   payload: response
 })
 
-export const updateRegistrarWorkqueueFailActionCreator =
+const updateRegistrarWorkqueueFailActionCreator =
   (): UpdateRegistrarWorkQueueFailAction => ({
     type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
   })

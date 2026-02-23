@@ -241,7 +241,7 @@ function getInitialValue(
   return handleInitialValue(fieldInitialValue!, form, config, draft, user)
 }
 
-export function replaceInitialValues(
+function replaceInitialValues(
   fields: IFormField[],
   form: IFormSectionData,
   draft: IFormData,

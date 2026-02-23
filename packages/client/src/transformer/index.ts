@@ -230,7 +230,7 @@ function hasFieldChanged(
 }
 
 
-export function getChangedValues(
+function getChangedValues(
   formDefinition: IForm,
   declaration: IDeclaration,
   offlineCountryConfig: IOfflineData,
@@ -426,7 +426,7 @@ export const draftToGqlTransformer = (
   return transformedData
 }
 
-export const appendGqlMetadataFromDraft = (
+const appendGqlMetadataFromDraft = (
   draft: IDeclaration,
   gqlDetails: TransformedData
 ) => {
@@ -560,7 +560,7 @@ export const gqlToDraftTransformer = (
   return transformedData
 }
 
-export function getPotentialDuplicateIds(
+function getPotentialDuplicateIds(
   eventRegistration: EventRegistration | EventSearchSet | null
 ) {
   const duplicates = eventRegistration?.registration?.duplicates

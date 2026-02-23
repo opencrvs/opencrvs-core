@@ -125,7 +125,7 @@ export enum SUBMISSION_STATUS {
   REJECT_CORRECTION = 'REJECT_CORRECTION'
 }
 
-export enum DOWNLOAD_STATUS {
+enum DOWNLOAD_STATUS {
   READY_TO_DOWNLOAD = 'READY_TO_DOWNLOAD',
   DOWNLOADING = 'DOWNLOADING',
   DOWNLOADED = 'DOWNLOADED',
@@ -179,7 +179,7 @@ interface IVisitedGroupId {
   groupId: string
 }
 
-export interface ITaskHistory {
+interface ITaskHistory {
   operationType?: string
   operatedOn?: string
 }
@@ -282,7 +282,7 @@ type PaymentType = 'MANUAL'
 
 type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 
-export type Payment = {
+type Payment = {
   paymentId?: string
   type: PaymentType
   amount: number
@@ -522,7 +522,7 @@ function makeDeclarationReadyToDownload(
   }
 }
 
-export function createReviewDeclaration(
+function createReviewDeclaration(
   declarationId: string,
   formData: IFormData,
   event: EventType,
@@ -558,13 +558,13 @@ export function storeDeclaration(
   return { type: STORE_DECLARATION, payload: { declaration } }
 }
 
-export function modifyDeclaration(
+function modifyDeclaration(
   declaration: IPrintableDeclaration | Partial<IDeclaration>
 ): IModifyDeclarationAction {
   return { type: MODIFY_DECLARATION, payload: { declaration } }
 }
 
-export function clearCorrectionAndPrintChanges(
+function clearCorrectionAndPrintChanges(
   declarationId: string
 ): IClearCorrectionAndPrintChanges {
   return {
@@ -601,7 +601,7 @@ export function archiveDeclaration(
   }
 }
 
-export const RemoveUnassignedDeclarationsActionCreator = (payload: {
+const RemoveUnassignedDeclarationsActionCreator = (payload: {
   currentlyDownloadedDeclarations: IDeclaration[]
   unassignedDeclarations: IDeclaration[]
 }): IRemoveUnassignedDeclarationAction => ({
@@ -609,7 +609,7 @@ export const RemoveUnassignedDeclarationsActionCreator = (payload: {
   payload: payload
 })
 
-export function deleteDeclaration(
+function deleteDeclaration(
   declarationId: string,
   client: ApolloClient<{}>
 ): IDeleteDeclarationAction {
@@ -657,7 +657,7 @@ export async function getCurrentUserID(): Promise<string> {
   return (JSON.parse(userDetails) as UserDetails).userMgntUserID || ''
 }
 
-export async function getUserData(userId: string) {
+async function getUserData(userId: string) {
   const userData = await storage.getItem('USER_DATA')
   const allUserData: IUserData[] = !userData
     ? []
@@ -667,7 +667,7 @@ export async function getUserData(userId: string) {
   return { allUserData, currentUserData }
 }
 
-export function mergeDeclaredDeclarations(
+function mergeDeclaredDeclarations(
   declarations: IDeclaration[],
   declaredDeclarations: GQLEventSearchSet[]
 ) {
@@ -774,7 +774,7 @@ async function deleteDeclarationByUser(
   return declarationId
 }
 
-export function downloadDeclaration(
+function downloadDeclaration(
   event: EventType,
   compositionId: string,
   action: DeclarationAction,
@@ -796,7 +796,7 @@ export function downloadDeclaration(
 
 
 
-export function unassignDeclaration(
+function unassignDeclaration(
   id: string,
   client: ApolloClient<{}>,
   refetchQueries?: InternalRefetchQueriesInclude
@@ -819,7 +819,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   return state
 }
 
-export function filterProcessingDeclarations(
+function filterProcessingDeclarations(
   data: GQLEventSearchResultSet,
   processingDeclarationIds: string[]
 ): GQLEventSearchResultSet {
@@ -843,7 +843,7 @@ export function filterProcessingDeclarations(
   }
 }
 
-export function getProcessingDeclarationIds(declarations: IDeclaration[]) {
+function getProcessingDeclarationIds(declarations: IDeclaration[]) {
   return declarations
     .filter(
       (declaration) =>

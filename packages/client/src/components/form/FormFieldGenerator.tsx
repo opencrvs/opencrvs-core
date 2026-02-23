@@ -795,7 +795,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-export const mapFieldsToValues = (
+const mapFieldsToValues = (
   fields: IFormField[],
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
 ) =>
@@ -869,7 +869,7 @@ interface IQueryData {
   [key: string]: any
 }
 
-export interface ITouchedNestedFields {
+interface ITouchedNestedFields {
   value: boolean
   nestedFields: {
     [fieldName: string]: boolean

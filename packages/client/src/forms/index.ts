@@ -125,7 +125,7 @@ export interface ICheckboxOption {
   label: MessageDescriptor
 }
 
-export interface IDynamicOptions {
+interface IDynamicOptions {
   dependency?: string
   jurisdictionType?: string
   resource?: string
@@ -273,7 +273,7 @@ export type IFormFieldValue =
   | IDateRangePickerValue
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
-export interface FieldValueMap {
+interface FieldValueMap {
   [key: string]: IFormFieldValue
 }
 
@@ -447,7 +447,7 @@ export interface IAttachment {
   description?: string
 }
 
-export enum REVIEW_OVERRIDE_POSITION {
+enum REVIEW_OVERRIDE_POSITION {
   BEFORE = 'before',
   AFTER = 'after'
 }
@@ -525,7 +525,7 @@ export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
   dynamicDefinitions: IDynamicFormFieldDefinitions
 }
 
-export type INestedInputFields = {
+type INestedInputFields = {
   [key: string]: IFormField[]
 }
 
@@ -583,11 +583,11 @@ interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
   step?: number
 }
-export interface ICheckboxGroupFormField extends IFormFieldBase {
+interface ICheckboxGroupFormField extends IFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: ICheckboxOption[]
 }
-export interface ICheckboxFormField extends IFormFieldBase {
+interface ICheckboxFormField extends IFormFieldBase {
   type: typeof CHECKBOX
   checkedValue?: 'true' | 'false' | boolean
   uncheckedValue?: 'true' | 'false' | boolean
@@ -830,7 +830,7 @@ export type IFormField =
   | IIDVerificationBannerFormField
   | ILoaderFormField
 
-export interface IPreviewGroup {
+interface IPreviewGroup {
   id: string
   label: MessageDescriptor
   fieldToRedirect?: string
@@ -982,7 +982,7 @@ export enum UserSection {
   Preview = 'preview'
 }
 
-export enum CertificateSection {
+enum CertificateSection {
   Collector = 'collector'
 }
 
@@ -998,7 +998,7 @@ enum PaymentSection {
   Payment = 'payment'
 }
 
-export enum ReviewSection {
+enum ReviewSection {
   Review = 'review'
 }
 
@@ -1390,7 +1390,7 @@ type Payment = {
   date: number
 }
 
-export interface ICertificate {
+interface ICertificate {
   collector?: IFormSectionData
   hasShowedVerifiedDocument?: boolean
   payments?: Payment[]

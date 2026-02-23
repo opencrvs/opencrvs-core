@@ -82,7 +82,7 @@ function Workqueues({
   ))
 }
 
-export const SidebarComponent = ({
+const SidebarComponent = ({
   menuCollapse,
   navigationWidth,
   isMobileView = false

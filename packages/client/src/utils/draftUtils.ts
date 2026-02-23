@@ -275,7 +275,7 @@ export function isDeclarationInReadyToReviewStatus(
   )
 }
 
-export function getRegisteringOfficeId(
+function getRegisteringOfficeId(
   declaration?: IPrintableDeclaration
 ): string | null {
   const registeringHistory = (

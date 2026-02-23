@@ -8,15 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ITaskHistory } from '@client/declarations'
+
 import { EMPTY_STRING } from '@client/utils/constants'
 import { getLocalisedName } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import {
   EventSearchSet,
   EventType,
-  HumanName,
-  SearchEventsQuery
+  HumanName
 } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
@@ -45,7 +44,8 @@ const isMarriageEvent = (
 }
 
 export const transformData = (
-  data: SearchEventsQuery['searchEvents'],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any,
   intl: IntlShape
 ) => {
   const { locale } = intl
@@ -54,7 +54,8 @@ export const transformData = (
   }
 
   return data.results
-    .filter((req): req is EventSearchSet => req !== null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .filter((req: any): req is EventSearchSet => req !== null)
     .map((reg: EventSearchSet) => {
       let birthReg
       let deathReg
@@ -146,7 +147,8 @@ export const transformData = (
           assignedReg.registration &&
           (assignedReg.registration.modifiedAt ||
             assignedReg.registration.createdAt),
-        operationHistories: assignedReg.operationHistories as ITaskHistory[]
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        operationHistories: assignedReg.operationHistories as any[]
       }
     })
 }

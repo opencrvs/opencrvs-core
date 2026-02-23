@@ -31,8 +31,6 @@ import {
 } from '@client/navigation/routes'
 import { EventType } from '@client/utils/gateway'
 
-import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
-
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import { stringify } from 'qs'
@@ -213,36 +211,6 @@ export const generateIssueCertificatePaymentUrl = ({
     registrationId: registrationId.toString(),
     eventType: event
   })
-
-export const generateCompletenessRatesUrl = ({
-  eventType,
-  locationId,
-  timeStart,
-  timeEnd,
-  time = CompletenessRateTime.WithinTarget
-}: {
-  eventType: EventType
-  locationId?: string
-  timeStart: Date
-  timeEnd: Date
-  time?: CompletenessRateTime
-}) =>
-  formatUrl(EVENT_COMPLETENESS_RATES, { eventType }) +
-  '?' +
-  stringify(
-    locationId
-      ? {
-          locationId,
-          timeStart: timeStart.toISOString(),
-          timeEnd: timeEnd.toISOString(),
-          time
-        }
-      : {
-          timeStart: timeStart.toISOString(),
-          timeEnd: timeEnd.toISOString(),
-          time
-        }
-  )
 
 export const generateRegistrationsListUrlConfig = ({
   timeStart,

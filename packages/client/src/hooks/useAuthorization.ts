@@ -28,7 +28,7 @@ import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
-export const RECORD_ALLOWED_SCOPES = {
+const RECORD_ALLOWED_SCOPES = {
   UPDATE: [
     SCOPES.RECORD_REGISTER,
     SCOPES.RECORD_SUBMIT_FOR_UPDATES,

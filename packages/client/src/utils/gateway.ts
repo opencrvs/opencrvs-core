@@ -241,7 +241,7 @@ export type AssignmentData = {
   practitionerId?: Maybe<Scalars['String']>
 }
 
-export type Attachment = {
+type Attachment = {
   __typename?: 'Attachment'
   _fhirID?: Maybe<Scalars['ID']>
   contentType?: Maybe<Scalars['String']>
@@ -440,7 +440,7 @@ type ContactPointInput = {
   value?: InputMaybe<Scalars['String']>
 }
 
-export type CorrectionInput = {
+type CorrectionInput = {
   attachments: Array<AttachmentInput>
   hasShowedVerifiedDocument: Scalars['Boolean']
   location: LocationInput
@@ -1318,13 +1318,13 @@ type PaymentMetric = {
   total: Scalars['Float']
 }
 
-export enum PaymentOutcomeType {
+enum PaymentOutcomeType {
   Completed = 'COMPLETED',
   Error = 'ERROR',
   Partial = 'PARTIAL'
 }
 
-export enum PaymentType {
+enum PaymentType {
   Manual = 'MANUAL'
 }
 
@@ -1375,7 +1375,7 @@ type PersonInput = {
   telecom?: InputMaybe<Array<InputMaybe<ContactPointInput>>>
 }
 
-export type Query = {
+type Query = {
   __typename?: 'Query'
   fetchBirthRegistration?: Maybe<BirthRegistration>
   fetchDeathRegistration?: Maybe<DeathRegistration>
@@ -1486,7 +1486,7 @@ type QueryGetLocationStatisticsArgs = {
   populationYear: Scalars['Int']
 }
 
-export type QueryGetRegistrationsListByFilterArgs = {
+type QueryGetRegistrationsListByFilterArgs = {
   event: Scalars['String']
   filterBy: Scalars['String']
   locationId?: InputMaybe<Scalars['String']>
@@ -1543,7 +1543,7 @@ type QueryGetUserByMobileArgs = {
   mobile: Scalars['String']
 }
 
-export type QueryIsLeafLevelLocationArgs = {
+type QueryIsLeafLevelLocationArgs = {
   locationId: Scalars['String']
 }
 
@@ -1684,7 +1684,7 @@ type RegWorkflowInput = {
   user?: InputMaybe<UserInput>
 }
 
-export type Registration = {
+type Registration = {
   __typename?: 'Registration'
   _fhirID?: Maybe<Scalars['ID']>
   assignment?: Maybe<AssignmentData>
@@ -1766,7 +1766,7 @@ type RegistrationSearchSet = {
   trackingId?: Maybe<Scalars['String']>
 }
 
-export enum RegistrationType {
+enum RegistrationType {
   Birth = 'BIRTH',
   Death = 'DEATH',
   Marriage = 'MARRIAGE'
@@ -2106,7 +2106,7 @@ export type UserRole = {
   scopes: Array<Scalars['String']>
 }
 
-export type VsExport = {
+type VsExport = {
   __typename?: 'VSExport'
   createdOn: Scalars['Date']
   endDate: Scalars['Date']
@@ -2637,7 +2637,7 @@ type SearchEventsQueryVariables = Exact<{
   sortColumn?: InputMaybe<Scalars['String']>
 }>
 
-export type SearchEventsQuery = {
+type SearchEventsQuery = {
   __typename?: 'Query'
   searchEvents?: {
     __typename?: 'EventSearchResultSet'
@@ -6820,11 +6820,11 @@ type RegistrationHomeQuery = {
   } | null
 }
 
-export type MarkEventAsReinstatedMutationVariables = Exact<{
+type MarkEventAsReinstatedMutationVariables = Exact<{
   id: Scalars['String']
 }>
 
-export type MarkEventAsReinstatedMutation = {
+type MarkEventAsReinstatedMutation = {
   __typename?: 'Mutation'
   markEventAsReinstated?: {
     __typename?: 'Reinstated'
@@ -7281,7 +7281,7 @@ type IsLeafLevelLocationQueryVariables = Exact<{
   locationId: Scalars['String']
 }>
 
-export type IsLeafLevelLocationQuery = {
+type IsLeafLevelLocationQuery = {
   __typename?: 'Query'
   isLeafLevelLocation: boolean
 }
@@ -7340,7 +7340,7 @@ type GetEventsWithProgressQueryVariables = Exact<{
   >
 }>
 
-export type GetEventsWithProgressQuery = {
+type GetEventsWithProgressQuery = {
   __typename?: 'Query'
   getEventsWithProgress?: {
     __typename?: 'EventProgressResultSet'
@@ -7412,7 +7412,7 @@ type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
-export type GetRegistrationsListByFilterQuery = {
+type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
     | {
@@ -7561,7 +7561,7 @@ type GetTotalCertificationsQuery = {
 
 type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
 
-export type GetVsExportsQuery = {
+type GetVsExportsQuery = {
   __typename?: 'Query'
   getVSExports?: {
     __typename?: 'TotalVSExport'
@@ -7725,7 +7725,7 @@ type FetchViewRecordByCompositionQueryVariables = Exact<{
   id: Scalars['ID']
 }>
 
-export type FetchViewRecordByCompositionQuery = {
+type FetchViewRecordByCompositionQuery = {
   __typename?: 'Query'
   fetchRegistrationForViewing?:
     | {

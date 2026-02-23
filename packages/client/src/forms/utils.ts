@@ -93,7 +93,7 @@ import { memoize } from 'lodash'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { Conditional } from './conditionals'
 
-export const VIEW_TYPE = {
+const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
   PREVIEW: 'preview',
@@ -335,7 +335,7 @@ export const getFieldValidation = (
   return validator
 }
 
-export function getNextSectionIds(
+function getNextSectionIds(
   sections: IFormSection[],
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
