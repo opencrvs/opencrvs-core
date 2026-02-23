@@ -5979,6 +5979,9 @@ components:
                     - ADMIN_STRUCTURE
                     - HEALTH_FACILITY
                     - CRVS_OFFICE
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
               required:
                 - type
               additionalProperties: false
@@ -6292,6 +6295,13 @@ components:
                       - locations
                       - facilities
                       - offices
+                configuration:
+                  type: object
+                  properties:
+                    allowedLocations:
+                      description: Limits which location options are selectable depending on user
+                        jurisdiction and location.
+                  additionalProperties: false
               required:
                 - searchableResource
               additionalProperties: false
@@ -6605,6 +6615,13 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            configuration:
+              type: object
+              properties:
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+              additionalProperties: false
           required:
             - id
             - label
