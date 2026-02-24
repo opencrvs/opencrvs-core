@@ -17,6 +17,7 @@ import {
   IFormFieldMutationMapFunction,
   IFormFieldQueryMapFunction,
   IFormSection,
+  IFormSectionData,
   TransformedData
 } from '@client/forms'
 import { sectionTransformer } from '@client/forms/register/mappings/query'
@@ -39,8 +40,7 @@ import {
   EventSearchSet
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
-import { get, isEmpty } from 'lodash'
+import { get, isEmpty, isEqual } from 'lodash'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -174,7 +174,63 @@ function isMetaTypeField(field: IFormField): boolean {
     isFieldHttp(field) || isFieldLinkButton(field) || isFieldIDReader(field)
   )
 }
-export function getChangedValues(
+
+function hasNestedDataChanged(
+  nestedFieldData: IFormData,
+  previousNestedFieldData: IFormData
+) {
+  if (nestedFieldData.value === previousNestedFieldData.value) {
+    for (const key of Object.keys(nestedFieldData.nestedFields)) {
+      if (
+        !previousNestedFieldData.nestedFields[key] &&
+        nestedFieldData.nestedFields[key] === ''
+      ) {
+        continue
+      }
+      if (
+        nestedFieldData.nestedFields[key] !==
+        previousNestedFieldData.nestedFields[key]
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+  return true
+}
+
+function hasFieldChanged(
+  field: IFormField,
+  sectionData: IFormSectionData,
+  originalSectionData?: IFormSectionData
+) {
+  if (!originalSectionData) {
+    const isCustomSection = sectionData && sectionData[field.name]
+    if (isCustomSection) return true
+    return false
+  }
+  if (sectionData[field.name] && (sectionData[field.name] as IFormData).value) {
+    return hasNestedDataChanged(
+      sectionData[field.name] as IFormData,
+      originalSectionData[field.name] as IFormData
+    )
+  }
+  /*
+   * data section might have some values as empty string
+   * whereas original data section have them as undefined
+   */
+  if (!originalSectionData[field.name] && sectionData[field.name] === '') {
+    return false
+  }
+
+  if (Array.isArray(sectionData[field.name])) {
+    return !isEqual(sectionData[field.name], originalSectionData[field.name])
+  }
+  return sectionData[field.name] !== originalSectionData[field.name]
+}
+
+
+function getChangedValues(
   formDefinition: IForm,
   declaration: IDeclaration,
   offlineCountryConfig: IOfflineData,
@@ -370,7 +426,7 @@ export const draftToGqlTransformer = (
   return transformedData
 }
 
-export const appendGqlMetadataFromDraft = (
+const appendGqlMetadataFromDraft = (
   draft: IDeclaration,
   gqlDetails: TransformedData
 ) => {
@@ -504,7 +560,7 @@ export const gqlToDraftTransformer = (
   return transformedData
 }
 
-export function getPotentialDuplicateIds(
+function getPotentialDuplicateIds(
   eventRegistration: EventRegistration | EventSearchSet | null
 ) {
   const duplicates = eventRegistration?.registration?.duplicates

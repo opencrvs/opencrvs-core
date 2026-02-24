@@ -22,7 +22,7 @@ export const getAuthenticated = (
   store: IStoreState
 ): ProfileState['authenticated'] => getKey(store, 'authenticated')
 
-export const getTokenPayload = (
+const getTokenPayload = (
   store: IStoreState
 ): ProfileState['tokenPayload'] => getKey(store, 'tokenPayload')
 

@@ -18,7 +18,7 @@ import {
   Ii18nInformativeRadioGroupFormField
 } from '@client/forms'
 
-import { ParentDetails } from '@client/views/PrintCertificate/ParentDetails'
+import { ParentDetails } from './ParentDetails'
 import styled from 'styled-components'
 
 const RadioGroupWrapper = styled.div`

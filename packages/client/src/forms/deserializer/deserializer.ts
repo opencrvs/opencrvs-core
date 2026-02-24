@@ -218,7 +218,7 @@ function fieldMutationDescriptorToMutationFunction(
   return transformer
 }
 
-export function fieldValidationDescriptorToValidationFunction(
+function fieldValidationDescriptorToValidationFunction(
   descriptor: IValidatorDescriptor,
   validators: Record<string, Validator>
 ): Validation {

@@ -63,19 +63,19 @@ type LocationsFailedAction = {
 }
 
 export const FORMS_LOADED = 'OFFLINE/FORMS_LOADED'
-export type FormsLoadedAction = {
+type FormsLoadedAction = {
   type: typeof FORMS_LOADED
   payload: LoadFormsResponse
 }
 
 export const CUSTOM_VALIDATORS_LOADED = 'OFFLINE/CUSTOM_VALIDATORS_LOADED'
-export type CustomValidatorsLoadedLoadedAction = {
+type CustomValidatorsLoadedLoadedAction = {
   type: typeof CUSTOM_VALIDATORS_LOADED
   payload: LoadFormsResponse
 }
 
 export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
-export type FormsFailedAction = {
+type FormsFailedAction = {
   type: typeof FORMS_FAILED
   payload: Error
 }
@@ -116,7 +116,7 @@ type CertificatesLoadedAction = {
   payload: ICertificateData[]
 }
 
-export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
+const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
 type CertificatesLoadFailedAction = {
   type: typeof CERTIFICATES_LOAD_FAILED
   payload: Error

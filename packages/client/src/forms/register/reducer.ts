@@ -11,8 +11,7 @@
 import { LoopReducer, Loop, Cmd, loop } from 'redux-loop'
 import { IForm } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
-import { deserializeForm } from '@client/forms/deserializer/deserializer'
-import { initValidators, validators } from '@client/forms/validators'
+import { initValidators } from '@client/forms/validators'
 
 export type IRegisterFormState =
   | {
@@ -61,40 +60,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
     case offlineActions.CUSTOM_VALIDATORS_LOADED:
       const { forms } = action.payload
 
-      const birth = deserializeForm(forms.birth, validators)
-      const death = deserializeForm(forms.death, validators)
-      const marriage = deserializeForm(forms.marriage, validators)
-
-      return {
-        ...state,
-        state: 'READY',
-        registerForm: {
-          birth: {
-            ...birth,
-            sections: [
-              ...birth.sections.filter(({ viewType }) =>
-                ['form', 'hidden', 'preview'].includes(viewType)
-              )
-            ]
-          },
-          death: {
-            ...death,
-            sections: [
-              ...death.sections.filter(({ viewType }) =>
-                ['form', 'hidden', 'preview'].includes(viewType)
-              )
-            ]
-          },
-          marriage: {
-            ...marriage,
-            sections: [
-              ...marriage.sections.filter(({ viewType }) =>
-                ['form', 'hidden', 'preview'].includes(viewType)
-              )
-            ]
-          }
-        }
-      }
+      return state
     default:
       return state
   }

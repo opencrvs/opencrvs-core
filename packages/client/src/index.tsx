@@ -15,7 +15,6 @@ import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-import { SubmissionController } from '@client/SubmissionController'
 import * as Sentry from '@sentry/react'
 import { BrowserTracing } from '@sentry/tracing'
 import { createBrowserRouter } from 'react-router-dom'
@@ -79,5 +78,3 @@ void navigator.serviceWorker.ready.then(() => {
   console.debug('Service worker is ready')
   root.render(<App router={router} store={store} />)
 })
-
-new SubmissionController(store).start()
