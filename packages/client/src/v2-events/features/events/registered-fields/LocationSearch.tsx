@@ -8,10 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import {
   FieldPropsWithoutReferenceValue,
   Location,
@@ -27,6 +26,7 @@ import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 interface SearchLocation {
@@ -45,18 +45,6 @@ const resourceTypeMap: Record<'locations' | 'facilities' | 'offices', string> =
     facilities: 'HEALTH_FACILITY',
     offices: 'CRVS_OFFICE'
   }
-
-function resourceToSearchOption(r: Location | AdministrativeArea): {
-  id: string
-  searchableText: string
-  displayLabel: string
-} {
-  return {
-    id: r.id,
-    searchableText: r.name.toLowerCase(),
-    displayLabel: r.name
-  }
-}
 
 /**
  * Return the available location options. The options will be filtered based on the jurisdiction filter.
@@ -105,14 +93,12 @@ function useAvailableLocations(
   }, [searchableResource, locations, administrativeAreas])
 }
 
-/**
- * @deprecated -- Replace internals using SearchableSelect v2.0 onwards.
- */
 function LocationSearchInput({
   onChange,
   value,
   searchableResource,
   onBlur,
+  id,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -120,39 +106,31 @@ function LocationSearchInput({
   value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
+  id: string
 }) {
   const availableLocations = useAvailableLocations(
     searchableResource,
     props.configuration?.allowedLocations
   )
-  const options = availableLocations.map((l) => resourceToSearchOption(l))
-  const hasSingleOption = options.length === 1
-  const selectedOption = hasSingleOption
-    ? options[0]
-    : options.find((option) => option.id === value)
+
+  const options = useMemo(
+    () => availableLocations.map((l) => ({ value: l.id, label: l.name })),
+    [availableLocations]
+  )
+
+  const selectedOption =
+    options.find((option) => option.value === value) ?? null
 
   return (
-    <LocationSearchComponent
-      buttonLabel="Health facility"
-      disabled={props.disabled || hasSingleOption}
-      locationList={options}
-      searchHandler={(location: SearchLocation) => {
-        if (location.id === '0') {
-          onChange(undefined)
-          return
-        }
-
-        onChange(location.id)
+    <SearchableSelect
+      data-testid={'location__' + id}
+      disabled={props.disabled}
+      id={id}
+      options={options}
+      value={selectedOption}
+      onChange={(opt) => {
+        onChange(opt?.value ?? undefined)
       }}
-      selectedLocation={selectedOption}
-      onBlur={(...args) => {
-        /*
-         * This is here purely for legacy reasons.
-         * As without passing this in, onChange will not trigger.
-         */
-        onBlur?.(...args)
-      }}
-      {...props}
     />
   )
 }
