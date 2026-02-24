@@ -12,13 +12,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { ImageViewField } from '@opencrvs/commons/client'
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`
-
-const AlignedContainer = styled.div<{
+const Container = styled.div<{
   $textAlign?: React.CSSProperties['textAlign']
 }>`
   text-align: ${({ $textAlign }) => $textAlign ?? 'left'};
@@ -49,16 +43,14 @@ function ImageViewInput({
   }
 
   return (
-    <Container>
-      <AlignedContainer $textAlign={textAlign}>
-        <StyledImage
-          $height={height}
-          $objectFit={objectFit}
-          $width={width}
-          alt={alt ?? ''}
-          src={value}
-        />
-      </AlignedContainer>
+    <Container $textAlign={textAlign}>
+      <StyledImage
+        $height={height}
+        $objectFit={objectFit}
+        $width={width}
+        alt={alt ?? ''}
+        src={value}
+      />
     </Container>
   )
 }
