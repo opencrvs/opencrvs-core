@@ -381,19 +381,51 @@ export type FormState<T> =
 
 export function buildFormState<T>(
   fields: FieldConfig[],
-  mapper: (field: FieldConfig) => T
+  mapper: (field: FieldConfig) => T | undefined
 ): IndexMap<FormState<T>> {
   return fields.reduce(
     (acc, field) => {
       if (field.type === FieldType.FIELD_GROUP) {
         acc[field.id] = buildFormState(field.fields, mapper)
-      } else {
-        acc[field.id] = mapper(field)
+        return acc
+      }
+      const mappedValue = mapper(field)
+      if (mappedValue) {
+        acc[field.id] = mappedValue
       }
       return acc
     },
     {} as IndexMap<FormState<T>>
   )
+}
+
+export function mapFormState<T, R>(
+  state: IndexMap<FormState<T>>,
+  fn: (err: T) => R
+): IndexMap<FormState<R>> {
+  return Object.entries(state).reduce(
+    (mappedState: IndexMap<FormState<R>>, [key, value]) => {
+      if (!value) {
+        return mappedState
+      }
+      if (Array.isArray(value)) {
+        mappedState[key] = fn(value)
+        return mappedState
+      }
+      mappedState[key] = mapFormState(value, fn)
+      return mappedState
+    },
+    {}
+  )
+}
+
+export function flattenFormState<T>(state: FormState<T[]>): T[] {
+  if (Array.isArray(state)) {
+    return state
+  }
+  return Object.values(state)
+    .filter((s): s is FormState<T[]> => s !== undefined)
+    .flatMap(flattenFormState)
 }
 
 export function isWriteAction(actionType: ActionType): boolean {

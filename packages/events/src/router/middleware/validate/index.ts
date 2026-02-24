@@ -44,7 +44,7 @@ import {
   runFieldValidations,
   runStructuralValidations,
   ValidatorContext,
-  flattenFieldError
+  flattenFormState
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -96,7 +96,7 @@ export function getFieldErrors(
 
   // For visible fields, run the field validations as configured
   const visibleFieldErrors = visibleFields.flatMap((field) => {
-    const fieldErrors = flattenFieldError(
+    const fieldErrors = flattenFormState(
       runFieldValidations({
         field,
         value: data[field.id],

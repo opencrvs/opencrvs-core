@@ -32,7 +32,12 @@ import {
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
-import { ageToDate, IndexMap } from '../events/utils'
+import {
+  ageToDate,
+  buildFormState,
+  flattenFormState,
+  FormState
+} from '../events/utils'
 import { ActionType } from '../events/ActionType'
 import { EventDocument } from '../events/EventDocument'
 
@@ -560,42 +565,6 @@ export function runStructuralValidations({
   return fieldValidationResult
 }
 
-type FieldError<T> =
-  | T
-  | {
-      [id: string]: FieldError<T> | undefined
-    }
-export type FieldErrors<T> = IndexMap<FieldError<T>>
-
-export function flattenFieldError<T>(errors: FieldError<T[]>): T[] {
-  if (Array.isArray(errors)) {
-    return errors
-  }
-  return Object.values(errors)
-    .filter((e): e is FieldError<T[]> => e !== undefined)
-    .flatMap(flattenFieldError)
-}
-
-export function mapFieldErrors<T, R>(
-  errors: FieldErrors<T>,
-  fn: (err: T) => R
-): FieldErrors<R> {
-  return Object.entries(errors).reduce(
-    (mappedErrors: FieldErrors<R>, [key, value]) => {
-      if (!value) {
-        return mappedErrors
-      }
-      if (Array.isArray(value)) {
-        mappedErrors[key] = fn(value)
-        return mappedErrors
-      }
-      mappedErrors[key] = mapFieldErrors(value, fn)
-      return mappedErrors
-    },
-    {}
-  )
-}
-
 export function runFieldValidations({
   field: config,
   form,
@@ -606,7 +575,7 @@ export function runFieldValidations({
   value: FieldUpdateValue
   form: ActionUpdate
   context: ValidatorContext
-}): FieldError<Array<{ message: TranslationConfig }>> {
+}): FormState<Array<{ message: TranslationConfig }>> {
   const field = { config, value }
   if (!isFieldVisible(field.config, form, context)) {
     return []
@@ -627,21 +596,18 @@ export function runFieldValidations({
   }
 
   if (isFieldGroupFieldType(field)) {
-    const subFieldErrors: FieldError<Array<{ message: TranslationConfig }>> =
-      field.config.fields.reduce((acc, subField) => {
-        return {
-          ...acc,
-          [subField.id]: runFieldValidations({
-            field: subField,
-            value: field.value[subField.id],
-            form,
-            context
-          })
-        }
-      }, {})
+    const subfieldErrors: FormState<Array<{ message: TranslationConfig }>> =
+      buildFormState(field.config.fields, (subfield) =>
+        runFieldValidations({
+          field: subfield,
+          value: field.value[subfield.id],
+          form,
+          context
+        })
+      )
 
-    if (flattenFieldError(subFieldErrors).length !== 0) {
-      return subFieldErrors
+    if (flattenFormState(subfieldErrors).length !== 0) {
+      return subfieldErrors
     }
 
     // run group validations only when subfields do not contain any errors

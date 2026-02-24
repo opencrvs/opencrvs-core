@@ -14,13 +14,13 @@ import { Formik } from 'formik'
 import { noop, pick } from 'lodash'
 import { useIntl } from 'react-intl'
 import {
+  buildFormState,
   EventConfig,
   EventState,
   FieldConfig,
   FormState,
   IndexMap,
-  mapFieldErrors,
-  mapFieldTypeToEmptyValue,
+  mapFormState,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
@@ -71,11 +71,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
   }) => {
     const intl = useIntl()
     const emptyPageValues = useMemo(
-      () =>
-        fields.reduce((acc, field) => {
-          acc[field.id] = mapFieldTypeToEmptyValue(field)
-          return acc
-        }, {} as EventState),
+      () => buildFormState(fields, () => ''),
       [fields]
     )
     const getDefaultValues = useDefaultValue()
@@ -148,13 +144,12 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
           makeFormFieldIdsFormikCompatible(
-            mapFieldErrors(
+            mapFormState(
               getValidationErrorsForForm(
                 fields,
                 makeFormikFieldIdsOpenCRVSCompatible(values),
                 validatorContext
               ),
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               (errs) => errs[0]?.message && intl.formatMessage(errs[0].message)
             )
           )

@@ -19,7 +19,8 @@ import {
   Location,
   FieldType,
   FieldValue,
-  EventState
+  EventState,
+  buildFormState
 } from '@opencrvs/commons/client'
 import {
   getAdminLevelHierarchy,
@@ -69,19 +70,12 @@ export function mapFieldToDefaultValue(
   context: Context
 ): FieldValue | undefined {
   if (field.type === FieldType.FIELD_GROUP) {
-    const nestedValue: Record<string, FieldValue> = field.fields
-      .filter(
-        (subfield): subfield is InteractiveFieldType =>
-          !isNonInteractiveFieldType(subfield)
-      )
-      .reduce(
-        (acc, subfield) => ({
-          ...acc,
-          [subfield.id]: mapFieldToDefaultValue(subfield, context)
-        }),
-        {}
-      )
-    return nestedValue
+    return buildFormState(field.fields, (subfield) => {
+      if (isNonInteractiveFieldType(subfield)) {
+        return
+      }
+      return mapFieldToDefaultValue(subfield, context)
+    })
   }
   if (!field.defaultValue) {
     return
@@ -186,24 +180,7 @@ export function useDefaultValue() {
   ): FieldValue | EventState {
     if (Array.isArray(fieldOrFields)) {
       const fields = fieldOrFields
-      return fields
-        .filter(
-          (field): field is InteractiveFieldType =>
-            !isNonInteractiveFieldType(field)
-        )
-        .reduce((acc, field) => {
-          const resolvedDefaultValue = mapFieldToDefaultValue(field, {
-            ...systemVariables,
-            locations,
-            adminLevelIds
-          })
-          if (!resolvedDefaultValue) {
-            return acc
-          }
-          acc[field.id] = resolvedDefaultValue
-
-          return acc
-        }, {} as EventState)
+      return buildFormState(fields, (field) => getDefaultValue(field))
     }
     const field = fieldOrFields
     if (isNonInteractiveFieldType(field)) {
