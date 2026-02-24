@@ -238,7 +238,7 @@ export const showCreateUserDuplicateEmailErrorToast = (
   payload: { data, email }
 })
 
-export const showDownloadDeclarationFailedToast =
+const showDownloadDeclarationFailedToast =
   (): ShowDownloadDeclarationFailedToast => ({
     type: SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
   })
@@ -281,7 +281,7 @@ type ShowDuplicateRecordsToast = {
   payload: { trackingId: string; compositionId: string }
 }
 
-export const showDuplicateRecordsToast = ({
+const showDuplicateRecordsToast = ({
   trackingId,
   compositionId
 }: AdditionalIdWithCompositionId): ShowDuplicateRecordsToast => ({
@@ -312,14 +312,14 @@ export const hidePINUpdateSuccessToast = (): HidePINUpdateSuccessAction => ({
   type: HIDE_PIN_UPDATE_SUCCESS
 })
 
-export const showUnassigned = (
+const showUnassigned = (
   data: ShowUnassignedPayload
 ): ShowUnassigned => ({
   type: SHOW_UNASSIGNED,
   payload: data
 })
 
-export const showUnassignedDeclarations = (
+const showUnassignedDeclarations = (
   unassignedDeclarationTrackingIds: string[]
 ): ShowUnassignedDeclarations => ({
   type: SHOW_UNASSIGNED_DECLARATIONS,

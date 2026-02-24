@@ -53,7 +53,7 @@ const SignatureDescription = styled.p`
   color: ${({ theme }) => theme.colors.grey500};
 `
 
-export type SignatureUploaderProps = Omit<
+type SignatureUploaderProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   'onChange' | 'value'
 > & {

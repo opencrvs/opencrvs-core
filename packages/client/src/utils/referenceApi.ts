@@ -42,13 +42,13 @@ export const SearchCriteria = {
   EMAIL: 'EMAIL'
 } as const
 
-export type SearchCriteriaType = keyof typeof SearchCriteria
+type SearchCriteriaType = keyof typeof SearchCriteria
 
 export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
 }
 
-export type FontFamilyTypes = {
+type FontFamilyTypes = {
   normal: string
   bold: string
   italics: string
@@ -81,7 +81,7 @@ interface ILoginBackground {
   backgroundImage?: string
   imageFit?: string
 }
-export interface ICertificateConfigData {
+interface ICertificateConfigData {
   id: string
   event: EventType
   // This is a temporary field to indicate that the certificate is a v2 template.
@@ -108,7 +108,7 @@ export interface ICertificateData extends ICertificateConfigData {
   svg: string
 }
 
-export interface ICurrency {
+interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
 }
@@ -259,7 +259,7 @@ async function importValidators(): Promise<LoadValidatorsResponse> {
 }
 
 export type LoadConditionalsResponse = Record<string, Conditional>
-export async function importConditionals(): Promise<LoadConditionalsResponse> {
+async function importConditionals(): Promise<LoadConditionalsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const { conditionals } = await import(
     /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/conditionals.js`

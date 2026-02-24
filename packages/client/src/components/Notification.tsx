@@ -35,9 +35,9 @@ import {
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import * as routes from '@client/navigation/routes'
-import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { RouteComponentProps, withRouter } from './WithRouterProps'
 import { formatUrl } from '@client/navigation'
+import { useOnlineStatus } from '@client/utils'
 
 type NotificationProps = ReturnType<typeof mapStateToProps> & {
   children?: React.ReactNode
@@ -315,6 +315,15 @@ const mapStateToProps = (store: IStoreState) => {
       store.notification.userCreateDuplicateEmailFailedToast,
     userReconnectedToast: store.notification.userReconnectedToast,
     emailAllUsers: store.notification.emailAllUsers
+  }
+}
+
+function withOnlineStatus<ComponentProps>(
+  Component: React.ComponentType<ComponentProps>
+) {
+  return (props: Omit<ComponentProps, 'isOnline'>) => {
+    const isOnline = useOnlineStatus()
+    return <Component isOnline={isOnline} {...(props as ComponentProps)} />
   }
 }
 

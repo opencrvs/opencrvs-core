@@ -29,12 +29,9 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { orderBy } from 'lodash'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
+
 import subMonths from 'date-fns/subMonths'
-import {
-  IOnlineStatusProps,
-  withOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
+
 import {
   GetUserAuditLogQuery,
   UserAuditLogResultItem,
@@ -52,8 +49,18 @@ import { formatUrl } from '@client/navigation'
 import { config } from '@client/config'
 import { ROUTES } from '@client/v2-events/routes'
 import { UUID } from '@opencrvs/commons/client'
+import { useOnlineStatus } from '@client/utils'
 
 const DEFAULT_LIST_SIZE = 10
+function withOnlineStatus<T>(
+  WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
+) {
+  return function WithOnlineStatus(props: T) {
+    const isOnline = useOnlineStatus()
+
+    return <WrappedComponent isOnline={isOnline} {...props} />
+  }
+}
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -96,9 +103,14 @@ enum SORTED_COLUMN {
   DATE = 'auditTimeValue',
   DEVICE = 'deviceIpAddress'
 }
-
+type IOnlineStatusProps = {
+  isOnline: boolean
+}
 const ADMIN_ACTIONS = ['DEACTIVATE', 'REACTIVATE', 'EDIT_USER', 'CREATE_USER']
-
+enum SORT_ORDER {
+  ASCENDING = 'asc',
+  DESCENDING = 'desc'
+}
 type State = {
   timeStart: Date
   timeEnd: Date

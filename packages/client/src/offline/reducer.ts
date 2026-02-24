@@ -271,8 +271,6 @@ function delay(cmd: RunCmd<any>, time: number) {
 function getDataLoadingCommands() {
   return Cmd.list<actions.Action>([
     CONFIG_CMD,
-    CONDITIONALS_CMD,
-    VALIDATORS_CMD,
     HANDLEBARS_CMD,
     ...(import.meta.env.MODE === 'test' || import.meta.env.STORYBOOK
       ? [FORMS_CMD]
