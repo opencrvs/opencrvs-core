@@ -2,6 +2,36 @@
 
 ## 1.9.10
 
+### New features
+
+- Added support for `event()` helper to access event metadata in `dateOfEvent` and `summary` configuration in EventConfig. This allows for more dynamic and flexible configurations based on event metadata.
+
+Usage example:
+
+For `dateOfEvent` configuration, you can now reference an event metadata field like this:
+
+```ts
+dateOfEvent: event('legalStatuses.REGISTERED.acceptedAt')
+```
+
+For `summary` configuration, you can use event metadata fields in the value of a custom field like this:
+
+```ts
+summary: {
+  fields: [
+    {
+      id: 'registeredAt',
+      label: {
+        defaultMessage: 'Registration date',
+        description: 'This is the label for the registration date',
+        id: 'event.birth.summary.event.registeredAt.label'
+      },
+      value: '{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}'
+    }
+  ]
+}
+```
+
 ### Bug fixes
 
 - Extended the `record.registered.print-certified-copies[event=tennis-club-membership]` scope to support an optional `templates` parameter (e.g. `templates=v2.tennis-club-membership-certificate-alpha`). When `templates` is specified, users are restricted to printing only the listed certificate templates. If `templates` is omitted, all certificate templates for the event remain available, preserving existing behavior [[#11753](https://github.com/opencrvs/opencrvs-core/issues/11753)]

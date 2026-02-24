@@ -17,6 +17,7 @@ import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
+import { FieldReference } from '../events/FieldConfig'
 
 /* eslint-disable max-lines */
 
@@ -142,8 +143,6 @@ export function never(): JSONSchema {
   return not(alwaysTrue())
 }
 
-type FieldReference = { $$field: string; $$subfield: string[] }
-
 function jsonFieldPath(field: FieldReference) {
   return [field.$$field, ...field.$$subfield].join('/')
 }
@@ -245,6 +244,10 @@ export const user = Object.assign(userSerializer, {
 
 export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
+}
+
+export function isEventFieldReference(value: unknown): value is FieldReference {
+  return typeof value === 'object' && value !== null && '$$event' in value
 }
 
 /**

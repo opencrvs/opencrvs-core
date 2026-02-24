@@ -11,6 +11,7 @@
 
 import { NameFieldValue } from './events/CompositeFieldValue'
 import * as z from 'zod'
+import * as _ from 'lodash'
 
 export function getOrThrow<T>(x: T, message: string) {
   if (x === undefined || x === null) {
@@ -67,4 +68,30 @@ export function omitKeyDeep(obj: any, keyToRemove: string): any {
     }
   }
   return newObj
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return _.isPlainObject(value)
+}
+
+/**
+ * Flattens an object into a list of [key, value] pairs using dot/bracket notation.
+ */
+export function flattenEntries<T>(
+  obj: T,
+  path: string = ''
+): [string, unknown][] {
+  if (Array.isArray(obj)) {
+    return obj.flatMap((value, index) =>
+      flattenEntries(value, `${path}[${index}]`)
+    )
+  }
+
+  if (isObject(obj)) {
+    return Object.entries(obj).flatMap(([key, value]) =>
+      flattenEntries(value, path ? `${path}.${key}` : key)
+    )
+  }
+
+  return obj === undefined ? [] : [[path, obj]]
 }
