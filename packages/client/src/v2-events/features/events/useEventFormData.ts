@@ -11,16 +11,17 @@
 
 import { useEffect, useRef } from 'react'
 import { create } from 'zustand'
-import { FormikTouched } from 'formik'
-import { EventState } from '@opencrvs/commons/client'
+import { EventState, FormState, IndexMap } from '@opencrvs/commons/client'
+
+type FormTouched = IndexMap<FormState<boolean>>
 
 interface EventFormData {
   formValues: null | EventState
   setFormValues: (data: EventState) => void
   getFormValues: (initialValues?: EventState) => EventState
-  getTouchedFields: () => Record<string, boolean>
-  touchedFields: FormikTouched<EventState>
-  setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
+  formTouched: FormTouched
+  setFormTouched: (formTouched: FormTouched) => void
+  getFormTouched: (initialTouched?: FormTouched) => FormTouched
   clear: () => void
 }
 
@@ -46,7 +47,7 @@ function removeUndefinedKeys(data: EventState) {
 export const useEventFormData = create<EventFormData>()((set, get) => {
   return {
     formValues: {},
-    touchedFields: {},
+    formTouched: {},
 
     getFormValues: (initialValues?: EventState) =>
       get().formValues || initialValues || {},
@@ -56,15 +57,14 @@ export const useEventFormData = create<EventFormData>()((set, get) => {
       return set(() => ({ formValues }))
     },
 
-    setAllTouchedFields: (fields) => set(() => ({ touchedFields: fields })),
+    getFormTouched: (initialTouched) => {
+      return { ...initialTouched, ...get().formTouched }
+    },
 
-    getTouchedFields: () =>
-      Object.fromEntries(
-        Object.entries(get().getFormValues()).map(([key]) => [key, true])
-      ),
+    setFormTouched: (formTouched) => set(() => ({ formTouched })),
 
     clear: () => {
-      set(() => ({ formValues: {}, touchedFields: {} }))
+      set(() => ({ formValues: {}, formTouched: {} }))
     }
   }
 })

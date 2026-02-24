@@ -44,7 +44,7 @@ export interface FormFieldGeneratorProps {
   /** Full form values, the page values are plucked out of it */
   formValues: EventState
   /** Full form touched values, the page values are plucked out of it */
-  touchedValues: IndexMap<FormState<boolean>>
+  formTouched: IndexMap<FormState<boolean>>
   onFormChange: (values: EventState) => void
   onTouchedChange: (touched: IndexMap<FormState<boolean>>) => void
   onAllFieldsValidated?: (success: boolean) => void
@@ -66,7 +66,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     id,
     onAllFieldsValidated,
     isCorrection = false,
-    touchedValues,
+    formTouched,
     validatorContext
   }) => {
     const intl = useIntl()
@@ -134,7 +134,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     })
     const formikCompatibleInitialTouched = makeFormFieldIdsFormikCompatible(
       pick(
-        touchedValues,
+        formTouched,
         fields.map((field) => field.id)
       )
     )
@@ -184,7 +184,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               values={formikProps.values}
               onAllFieldsValidated={onAllFieldsValidated}
               onFormChange={(cb) => onFormChange(cb(formValues))}
-              onTouchedChange={(cb) => onTouchedChange(cb(touchedValues))}
+              onTouchedChange={(cb) => onTouchedChange(cb(formTouched))}
             />
           )
         }}

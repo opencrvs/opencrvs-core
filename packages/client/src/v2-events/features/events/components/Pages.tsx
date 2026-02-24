@@ -17,20 +17,19 @@ import {
   isPageVisible,
   PageTypes,
   PageConfig,
-  ValidatorContext
+  ValidatorContext,
+  buildFormState
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
-import { AvailableActionTypes } from './Action/utils'
 
 interface PagesProps {
-  form: EventState
-  setFormData: (dec: EventState) => void
+  formData: EventState
+  setFormData: (form: EventState) => void
   pageId: string
   showReviewButton?: boolean
   formPages: PageConfig[]
@@ -42,20 +41,12 @@ interface PagesProps {
   isCorrection?: boolean
 }
 
-type DeclarationProps =
-  | {
-      actionType: AvailableActionTypes
-      declaration?: undefined
-    }
-  | {
-      declaration: EventState
-    }
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
  */
 export function Pages({
-  form,
+  formData,
   showReviewButton,
   formPages,
   onPageChange,
@@ -64,22 +55,20 @@ export function Pages({
   continueButtonText,
   setFormData,
   eventConfig,
-  declaration,
   // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
   isCorrection = false,
   validatorContext
-}: PagesProps & DeclarationProps) {
+}: PagesProps) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) =>
-    isPageVisible(page, form, validatorContext)
+    isPageVisible(page, formData, validatorContext)
   )
 
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
   const [validateAllFields, setValidateAllFields] = useState(false)
 
-  const { setAllTouchedFields, touchedFields: initialTouchedFields } =
-    useEventFormData()
+  const { formTouched, setFormTouched } = useEventFormData()
 
   useEffect(() => {
     // If page changes, scroll to the top of the page using the anchor element ID
@@ -113,15 +102,14 @@ export function Pages({
     // I decided to leave it this way for now, since it works, but we should overhaul the default values logic at some point.
     //
     // Why doesn't this use deepMerge() instead of spread? If there are any defined or 'undefined' values in the 'form' at this point, they should completely replace the default values.
-    setFormData({ ...getDefaultValue(page.fields), ...form, ...values })
+    setFormData({ ...getDefaultValue(page.fields), ...formData, ...values })
 
     // Before switching to the next page, we need to mark all fields in the current page as touched
     // so that when we get back to the page, we show validation errors for all fields in the page.
-    setAllTouchedFields(
-      page.fields.reduce((touched, { id: fieldId }) => {
-        return { ...touched, [makeFormFieldIdFormikCompatible(fieldId)]: true }
-      }, initialTouchedFields)
-    )
+    setFormTouched({
+      ...formTouched,
+      ...buildFormState(page.fields, () => true)
+    })
 
     // If we are in requireCompletionToContinue mode, we need to validate all fields before moving to the next page.
     // In this case, the actual switching of the page is done on the 'onAllFieldsValidated' callback.
@@ -157,12 +145,9 @@ export function Pages({
     <FormFieldGenerator
       eventConfig={eventConfig}
       fields={page.fields}
+      formTouched={formTouched}
+      formValues={formData}
       id="pagesSection"
-      // In some Action page forms, the form data itself is not the complete declaration.
-      // We still merge the optional `declaration` prop into the initial form values so that
-      // read-only declaration data is available for Data components or calculations.
-      // Example: Print Certificate action.
-      initialValues={{ ...declaration, ...form }}
       isCorrection={isCorrection}
       validateAllFields={validateAllFields}
       validatorContext={validatorContext}
@@ -172,7 +157,8 @@ export function Pages({
           switchToNextPage()
         }
       }}
-      onChange={(values) => setFormData(values)}
+      onFormChange={setFormData}
+      onTouchedChange={setFormTouched}
     />
   )
 

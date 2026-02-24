@@ -104,7 +104,7 @@ const meta: Meta<typeof FormFieldGenerator> = {
         district: '62a0ccb4-880d-4f30-8882-f256007dfff9'
       }
     },
-    touchedValues: {}
+    formTouched: {}
   },
   parameters: {
     layout: 'centered'
@@ -119,14 +119,14 @@ const meta: Meta<typeof FormFieldGenerator> = {
   ],
   render: function Component(args) {
     const [form, setForm] = React.useState(args.formValues)
-    const [touched, setTouched] = React.useState(args.touchedValues)
+    const [touched, setTouched] = React.useState(args.formTouched)
     return (
       <StyledFormFieldGenerator
         {...args}
         fields={addressFields}
         formValues={form}
         id="address-form"
-        touchedValues={touched}
+        formTouched={touched}
         onFormChange={setForm}
         onTouchedChange={setTouched}
       />
@@ -153,7 +153,7 @@ export const AddressFieldWithOptionalLocationLevel: Story = {
         district: ''
       }
     },
-    touchedValues: {
+    formTouched: {
       address: {
         country: true,
         province: true,

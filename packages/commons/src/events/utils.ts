@@ -54,6 +54,7 @@ import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
 import { DateValue, SelectDateRangeValue } from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
+import { FieldType } from './FieldType'
 
 export function ageToDate(age: number, asOfDate: DateValue) {
   const date = new Date(asOfDate)
@@ -377,6 +378,23 @@ export type FormState<T> =
   | {
       [id: string]: FormState<T> | undefined
     }
+
+export function buildFormState<T>(
+  fields: FieldConfig[],
+  mapper: (field: FieldConfig) => T
+): IndexMap<FormState<T>> {
+  return fields.reduce(
+    (acc, field) => {
+      if (field.type === FieldType.FIELD_GROUP) {
+        acc[field.id] = buildFormState(field.fields, mapper)
+      } else {
+        acc[field.id] = mapper(field)
+      }
+      return acc
+    },
+    {} as IndexMap<FormState<T>>
+  )
+}
 
 export function isWriteAction(actionType: ActionType): boolean {
   return writeActions.safeParse(actionType).success
