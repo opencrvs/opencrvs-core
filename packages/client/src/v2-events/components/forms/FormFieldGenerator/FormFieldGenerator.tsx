@@ -36,7 +36,6 @@ export interface FormFieldGeneratorProps {
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
   validateAllFields?: boolean
-  onChange: (values: EventState) => void
   readonlyMode?: boolean
   className?: string
   /** Which fields are generated */
@@ -48,7 +47,6 @@ export interface FormFieldGeneratorProps {
   touchedValues: IndexMap<FormState<boolean>>
   onFormChange: (values: EventState) => void
   onTouchedChange: (touched: IndexMap<FormState<boolean>>) => void
-  initialValues?: EventState
   onAllFieldsValidated?: (success: boolean) => void
   isCorrection?: boolean
   validatorContext: ValidatorContext
@@ -56,12 +54,10 @@ export interface FormFieldGeneratorProps {
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
   ({
-    onChange,
     onFormChange,
     onTouchedChange,
     fields,
     formValues,
-    initialValues,
     className,
     eventConfig,
     fieldsToShowValidationErrors,
@@ -128,9 +124,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     //   setAllTouchedFields(deepMerge(touchedFields, touched))
     // }
 
-    const formikOnChange = (values: EventState) =>
-      onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
-
     const formikCompatibleInitialValues = makeFormFieldIdsFormikCompatible({
       ...emptyPageValues,
       ...defaultPageValues,
@@ -177,8 +170,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               eventConfig={eventConfig}
               fields={fields}
               fieldsToShowValidationErrors={fieldsToShowValidationErrors}
+              fullForm={{ ...formValues, ...formikProps.values }}
               id={id}
-              initialValues={initialValues}
               isCorrection={isCorrection}
               readonlyMode={readonlyMode}
               resetForm={formikProps.resetForm}
@@ -190,7 +183,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               validatorContext={validatorContext}
               values={formikProps.values}
               onAllFieldsValidated={onAllFieldsValidated}
-              onChange={formikOnChange}
               onFormChange={(cb) => onFormChange(cb(formValues))}
               onTouchedChange={(cb) => onTouchedChange(cb(touchedValues))}
             />

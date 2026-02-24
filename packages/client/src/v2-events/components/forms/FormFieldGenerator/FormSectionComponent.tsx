@@ -31,30 +31,22 @@ import {
   findAllFields
 } from '@opencrvs/commons/client'
 import {
-  makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
-import {
-  makeFormFieldIdsFormikCompatible,
-  makeFormikFieldIdsOpenCRVSCompatible
-} from './utils'
+import { makeFormFieldIdsFormikCompatible } from './utils'
 import { FormItem, GeneratedInputField } from './GeneratedInputField'
 
 type AllProps = {
   id: string
-  initialValues?: EventState
   eventConfig?: EventConfig
   fields: FieldConfig[]
+  fullForm: EventState
   className?: string
   readonlyMode?: boolean
   errors: IndexMap<string>
-  /**
-   * Update the form values in the non-formik state.
-   */
-  onChange: (values: EventState) => void
   /**
    * Update the form values in the non-formik state.
    */
@@ -141,18 +133,17 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
 export function FormSectionComponent({
   values,
   fields: fieldsWithDotSeparator,
+  fullForm,
   touched,
   onFormChange,
   onTouchedChange,
   className,
-  initialValues = {},
   readonlyMode,
   id,
   errors: errorsWithDotSeparator,
   eventConfig,
   setValues,
   setTouched,
-  onChange,
   resetForm,
   validateAllFields,
   fieldsToShowValidationErrors,
@@ -179,9 +170,6 @@ export function FormSectionComponent({
   )
 
   const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)
-  const form = makeFormikFieldIdsOpenCRVSCompatible(
-    makeDatesFormatted(fieldsWithDotSeparator, values)
-  )
 
   const showValidationErrors = useCallback(
     (formFields: FieldConfig[]) => {
@@ -368,7 +356,6 @@ export function FormSectionComponent({
   }, [
     values,
     id,
-    onChange,
     resetForm,
     fieldsWithDotSeparator,
     fieldsToShowValidationErrors,
@@ -376,13 +363,10 @@ export function FormSectionComponent({
     showValidationErrors
   ])
 
-  // @TODO: Using deepMerge here will cause e2e tests to fail without noticeable difference in the output.
-  const completeForm = { ...initialValues, ...form }
-
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
     const fieldErrors = errors[field.id]
     const hasErrors = fieldErrors && fieldErrors.length > 0
-    return isFieldVisible(field, completeForm, validatorContext) && hasErrors
+    return isFieldVisible(field, fullForm, validatorContext) && hasErrors
   })
 
   useEffect(() => {
@@ -406,7 +390,7 @@ export function FormSectionComponent({
   const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
   const visibleFieldValues = omitHiddenFields(
     allFields,
-    completeForm,
+    fullForm,
     validatorContext
   )
 
@@ -431,7 +415,7 @@ export function FormSectionComponent({
               disabled={isDisabled}
               eventConfig={eventConfig}
               fieldDefinition={field}
-              form={completeForm}
+              form={fullForm}
               name={field.id}
               readonlyMode={readonlyMode}
               validatorContext={validatorContext}
