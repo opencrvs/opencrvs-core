@@ -72,6 +72,7 @@ export function Draft() {
       actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={eventConfigs}
+      paginationVisibleOffline={true}
       queryData={currentPageDrafts}
       title={intl.formatMessage(WORKQUEUE_DRAFT.name)}
       totalResults={eventsWithDrafts.length}

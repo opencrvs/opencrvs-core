@@ -47,6 +47,7 @@ export function Outbox() {
       allowRetry={true}
       columns={outboxColumns}
       eventConfigs={eventConfigs}
+      paginationVisibleOffline={true}
       queryData={outbox}
       title={intl.formatMessage(WORKQUEUE_OUTBOX.name)}
       totalResults={outbox.length}
