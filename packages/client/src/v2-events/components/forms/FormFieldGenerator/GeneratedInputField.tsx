@@ -11,7 +11,7 @@
 
 /* eslint-disable max-lines */
 
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useIntl } from 'react-intl'
 import { omit } from 'lodash'
 import styled, { keyframes } from 'styled-components'
@@ -20,8 +20,6 @@ import {
   EventState,
   FieldConfig,
   FieldValue,
-  FileFieldValue,
-  FileFieldWithOptionValue,
   isAddressFieldType,
   isAdministrativeAreaFieldType,
   isFacilityFieldType,
@@ -51,7 +49,6 @@ import {
   getValidatorsForField,
   DateRangeFieldValue,
   isSelectDateRangeFieldType,
-  SelectDateRangeValue,
   isTimeFieldType,
   isButtonFieldType,
   isPrintButtonFieldType,
@@ -146,11 +143,6 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   onBatchFieldValueChange: (
     values: Array<{ name: string; value: FieldValue | undefined }>
   ) => void
-  touched: boolean
-  /**
-   * Errors are rendered only when both error and touched are truthy
-   */
-  error: string
   form: EventState
   disabled?: boolean
   readonlyMode?: boolean
@@ -167,15 +159,15 @@ export const GeneratedInputField = React.memo(
       validatorContext,
       onFieldValueChange,
       onBatchFieldValueChange,
-      error,
-      touched,
       allKnownFields,
       form,
       disabled,
       readonlyMode
     } = props
     const intl = useIntl()
-    const [{ value, onBlur }] = useField<FieldValue>(name)
+    const [{ value, onBlur }, { error: formikError, touched }] =
+      useField<FieldValue>(name)
+    const error = disabled ? '' : formikError
     // If label is hidden or default message is empty, we don't need to render label
     const label =
       fieldDefinition.hideLabel || !fieldDefinition.label.defaultMessage
@@ -199,27 +191,18 @@ export const GeneratedInputField = React.memo(
     }
 
     const inputProps = {
+      disabled: disabled || readonlyMode,
+      error: Boolean(error),
       id: name,
       name,
       onBlur,
-      value,
-      disabled: disabled || readonlyMode,
-      error: Boolean(error),
-      touched,
+      onChange: onFieldValueChange.bind(null, name),
       placeholder:
         fieldDefinition.placeholder &&
-        intl.formatMessage(fieldDefinition.placeholder)
+        intl.formatMessage(fieldDefinition.placeholder),
+      touched,
+      value
     }
-
-    const handleFileChange = useCallback(
-      (val: FileFieldValue | null) => onFieldValueChange(name, val),
-      [name, onFieldValueChange]
-    )
-
-    const handleFileWithOptionChange = useCallback(
-      (val: FileFieldWithOptionValue) => onFieldValueChange(name, val),
-      [name, onFieldValueChange]
-    )
 
     /**
      * Combines the field definition with the current value and input field props
@@ -287,7 +270,6 @@ export const GeneratedInputField = React.memo(
             isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -301,7 +283,6 @@ export const GeneratedInputField = React.memo(
             isDisabled={inputProps.disabled}
             type="text"
             value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -310,11 +291,7 @@ export const GeneratedInputField = React.memo(
     if (isDateFieldType(field)) {
       return (
         <InputField {...field.inputFieldProps}>
-          <DateField.Input
-            {...inputProps}
-            value={field.value}
-            onChange={(val: string) => onFieldValueChange(name, val)}
-          />
+          <DateField.Input {...inputProps} value={field.value} />
         </InputField>
       )
     }
@@ -336,7 +313,6 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             asOfDateRef={field.config.configuration.asOfDate.$$field}
             value={field.value?.age}
-            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -349,7 +325,6 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             use12HourFormat={field.config.configuration?.use12HourFormat}
             value={field.value}
-            onChange={(val: string) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -359,14 +334,7 @@ export const GeneratedInputField = React.memo(
       const parsed = DateRangeFieldValue.safeParse(field.value)
       return (
         <InputField {...field.inputFieldProps}>
-          <DateRangeField.Input
-            {...inputProps}
-            value={parsed.data}
-            onBlur={onBlur}
-            onChange={(val) => {
-              onFieldValueChange(name, val)
-            }}
-          />
+          <DateRangeField.Input {...inputProps} value={parsed.data} />
         </InputField>
       )
     }
@@ -378,9 +346,6 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             options={field.config.options}
             value={field.value}
-            onChange={(val: SelectDateRangeValue) => {
-              onFieldValueChange(name, val)
-            }}
           />
         </InputField>
       )
@@ -427,7 +392,6 @@ export const GeneratedInputField = React.memo(
             maxLength={field.config.configuration?.maxLength}
             type={field.config.configuration?.type ?? 'text'}
             value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -438,11 +402,10 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <Text.Input
             {...inputProps}
-            isDisabled={disabled}
+            isDisabled={inputProps.disabled}
             maxLength={field.config.configuration?.maxLength}
             type="email"
             value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -465,7 +428,6 @@ export const GeneratedInputField = React.memo(
             max={field.config.configuration?.max}
             min={field.config.configuration?.min}
             value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -478,7 +440,6 @@ export const GeneratedInputField = React.memo(
             configuration={field.config.configuration}
             options={field.config.options}
             value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -524,7 +485,6 @@ export const GeneratedInputField = React.memo(
             maxImageSize={field.config.configuration.maxImageSize}
             value={field.value}
             width={field.config.configuration.style?.width}
-            onChange={handleFileChange}
           />
         </InputField>
       )
@@ -557,10 +517,10 @@ export const GeneratedInputField = React.memo(
       return (
         <InputField {...inputFieldProps}>
           <Select.Input
-            {...field.config}
-            disabled={disabled}
+            {...inputProps}
+            noOptionsMessage={field.config.noOptionsMessage}
+            options={field.config.options}
             value={field.value}
-            onChange={(val: string) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -568,12 +528,7 @@ export const GeneratedInputField = React.memo(
     if (isCountryFieldType(field)) {
       return (
         <InputField {...inputFieldProps}>
-          <SelectCountry.Input
-            {...field.config}
-            disabled={disabled}
-            value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
+          <SelectCountry.Input {...inputProps} value={field.value} />
         </InputField>
       )
     }
@@ -611,7 +566,7 @@ export const GeneratedInputField = React.memo(
             name={name}
             required={inputFieldProps.required}
             value={field.value}
-            onChange={(val) => handleFileChange(val)}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -626,11 +581,9 @@ export const GeneratedInputField = React.memo(
       return (
         <InputField {...inputFieldProps} htmlFor={name}>
           <AdministrativeArea.Input
-            {...field.config}
-            disabled={disabled}
+            {...inputProps}
             partOf={typeof partOf === 'string' ? partOf : null}
             value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
@@ -699,7 +652,7 @@ export const GeneratedInputField = React.memo(
             options={field.config.options}
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
-            onChange={handleFileWithOptionChange}
+            onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
       )
