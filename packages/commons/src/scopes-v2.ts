@@ -70,7 +70,11 @@ const scopeByEvent = z
 const scopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
-    placeOfEvent: JurisdictionFilter.optional()
+    placeOfEvent: JurisdictionFilter.optional(),
+    declaredIn: z.undefined().optional(),
+    declaredBy: z.undefined().optional(),
+    registeredIn: z.undefined().optional(),
+    registeredBy: z.undefined().optional()
   })
   .describe('Options applicable to all record scopes.')
 
@@ -281,6 +285,7 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
       })
     }
 
+    // @ts-expect-error - foo
     return encodeScope({
       type: type as RecordScopeTypeV2,
       options: configurableV1Scope.options as RecordScopeV2['options']

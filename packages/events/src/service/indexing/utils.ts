@@ -239,7 +239,10 @@ type ToArrayFields<T, K extends PropertyKey> = T extends unknown
  * Event index type where all location fields are arrays representing full location hierarchy.
  */
 export type EventIndexWithAdministrativeHierarchy = Omit<
-  ToArrayFields<EventIndex, 'createdAtLocation' | 'updatedAtLocation'>,
+  ToArrayFields<
+    EventIndex,
+    'createdAtLocation' | 'updatedAtLocation' | 'placeOfEvent'
+  >,
   'legalStatuses'
 > & {
   legalStatuses: {
@@ -505,8 +508,8 @@ export function resolveRecordActionScopeToIds(
   scope: RecordScopeV2,
   user: TrpcUserContext
 ): ResolvedRecordScopeV2 {
-  const { type, options } = scope
-  return {
+  const { options, type } = scope
+  const resolved = ResolvedRecordScopeV2.parse({
     type,
     options: {
       event: options?.event,
@@ -518,5 +521,7 @@ export function resolveRecordActionScopeToIds(
       registeredBy:
         options?.registeredBy === UserFilter.enum.user ? user.id : undefined
     }
-  }
+  })
+
+  return resolved
 }

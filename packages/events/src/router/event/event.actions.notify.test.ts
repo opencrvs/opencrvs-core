@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import {
   ActionStatus,
@@ -28,6 +28,7 @@ import {
   setupTestCase
 } from '@events/tests/utils'
 import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { EventNotFoundError } from '@events/service/events/events'
 
 describe('event.actions.notify', () => {
   describe('authorization', () => {
@@ -81,7 +82,8 @@ describe('event.actions.notify', () => {
         notifyClient.event.actions.notify.request(
           generator.event.actions.notify(event.id)
         )
-      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+        // User has record.notify scope, but not for the correct event type, so should get not found to prevent information leakage about the existence of the event
+      ).rejects.toMatchObject(new EventNotFoundError(event.id))
     })
 
     test('allows access with API scope with correct event type', async () => {
@@ -93,7 +95,10 @@ describe('event.actions.notify', () => {
             event: [TENNIS_CLUB_MEMBERSHIP]
           }
         }),
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+        encodeScope({
+          type: 'record.notify',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
       ])
 
       await expect(
@@ -502,7 +507,20 @@ describe('event.actions.notify', () => {
 
   test('Can not create a record with partial address when addressType is missing', async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      }),
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [TENNIS_CLUB_MEMBERSHIP]
+        }
+      })
+    ])
     const event = await client.event.create(generator.event.create())
 
     await expect(

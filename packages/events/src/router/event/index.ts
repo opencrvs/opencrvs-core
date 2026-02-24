@@ -127,7 +127,7 @@ export const eventRouter = router({
     })
     .input(EventIdParam)
     .output(EventDocument)
-    .use(middleware.userCanAccessEventWithScopes(['record.read']))
+    .use(middleware.canAccessEventWithScopes(['record.read']))
     .query(async ({ ctx }) => {
       const { eventId, eventType } = ctx
       const configuration = await getEventConfigurationById({
