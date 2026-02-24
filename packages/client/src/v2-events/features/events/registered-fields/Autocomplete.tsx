@@ -334,6 +334,6 @@ function AutocompleteInput(props: AutocompleteProps) {
 export const Autocomplete = {
   Input: AutocompleteInput,
   Output: ({ value }: { value: AutocompleteUpdateValue }) => {
-    return value ? `${value?.value}: ${value?.label}` : null
+    return value ? `${value.value}: ${value.label}` : null
   }
 }
