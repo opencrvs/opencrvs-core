@@ -15,7 +15,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { omit } from 'lodash'
 import styled, { keyframes } from 'styled-components'
-import { useField } from 'formik'
+import { useField, useFormikContext, getIn } from 'formik'
 import {
   EventState,
   FieldConfig,
@@ -65,7 +65,10 @@ import {
   isNumberWithUnitFieldType,
   isFieldGroupFieldType,
   FieldType,
-  EventConfig
+  EventConfig,
+  isFieldVisible,
+  IndexMap,
+  FormState
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -144,6 +147,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
     values: Array<{ name: string; value: FieldValue | undefined }>
   ) => void
   form: EventState
+  onBlur?: (formikFieldId: string, newTouched: FormState<boolean>) => void
   disabled?: boolean
   readonlyMode?: boolean
   allKnownFields: FieldConfig[]
@@ -159,15 +163,16 @@ export const GeneratedInputField = React.memo(
       validatorContext,
       onFieldValueChange,
       onBatchFieldValueChange,
+      onBlur,
       allKnownFields,
       form,
       disabled,
       readonlyMode
     } = props
     const intl = useIntl()
-    const [{ value, onBlur }, { error: formikError, touched }] =
-      useField<FieldValue>(name)
-    const error = disabled ? '' : formikError
+    const [input, meta] = useField<FieldValue>(name)
+    const { touched: allTouched } = useFormikContext<EventState>()
+    const error = disabled ? '' : meta.error
     // If label is hidden or default message is empty, we don't need to render label
     const label =
       fieldDefinition.hideLabel || !fieldDefinition.label.defaultMessage
@@ -187,7 +192,12 @@ export const GeneratedInputField = React.memo(
         ? intl.formatMessage(fieldDefinition.helperText)
         : undefined,
       error,
-      touched
+      touched: meta.touched
+    }
+
+    function handleBlur<E>(e: React.FocusEvent<E>) {
+      onBlur?.(name, true)
+      input.onBlur(e)
     }
 
     const inputProps = {
@@ -195,13 +205,12 @@ export const GeneratedInputField = React.memo(
       error: Boolean(error),
       id: name,
       name,
-      onBlur,
+      onBlur: handleBlur,
       onChange: onFieldValueChange.bind(null, name),
       placeholder:
         fieldDefinition.placeholder &&
         intl.formatMessage(fieldDefinition.placeholder),
-      touched,
-      value
+      touched: meta.touched
     }
 
     /**
@@ -211,22 +220,40 @@ export const GeneratedInputField = React.memo(
     const field = {
       inputFieldProps,
       config: fieldDefinition,
-      value
+      value: input.value
     }
     if (isFieldGroupFieldType(field)) {
+      const parentTouched =
+        (getIn(allTouched, name) as unknown as
+          | IndexMap<FormState<boolean>>
+          | undefined) ?? {}
+      const parentInputFieldProps = {
+        ...field.inputFieldProps,
+        error: typeof error === 'string' ? error : ''
+      }
       return (
-        <InputField {...field.inputFieldProps}>
+        <InputField {...parentInputFieldProps}>
           {field.config.fields.map((subfield) => {
-            const subfieldName = `${name}.${makeFormFieldIdFormikCompatible(subfield.id)}`
+            if (!isFieldVisible(subfield, form, validatorContext)) {
+              return null
+            }
+            const subfieldName = makeFormFieldIdFormikCompatible(subfield.id)
+            const subfieldFullName = `${name}.${subfieldName}`
             return (
               <FormItem
-                key={subfield.id}
+                key={subfieldFullName}
                 ignoreBottomMargin={subfield.type === FieldType.PAGE_HEADER}
               >
                 <GeneratedInputField
                   {...props}
                   fieldDefinition={subfield}
-                  name={subfieldName}
+                  name={subfieldFullName}
+                  onBlur={(_, nestedTouched) =>
+                    onBlur?.(name, {
+                      ...parentTouched,
+                      [subfieldName]: nestedTouched
+                    })
+                  }
                 />
               </FormItem>
             )
@@ -601,7 +628,7 @@ export const GeneratedInputField = React.memo(
                 : ['locations']
             }
             value={field.value}
-            onBlur={onBlur}
+            onBlur={handleBlur}
             onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
@@ -616,7 +643,7 @@ export const GeneratedInputField = React.memo(
             disabled={disabled}
             searchableResource={['offices']}
             value={field.value}
-            onBlur={onBlur}
+            onBlur={handleBlur}
             onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
@@ -631,7 +658,7 @@ export const GeneratedInputField = React.memo(
             disabled={disabled}
             searchableResource={['facilities']}
             value={field.value}
-            onBlur={onBlur}
+            onBlur={handleBlur}
             onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>

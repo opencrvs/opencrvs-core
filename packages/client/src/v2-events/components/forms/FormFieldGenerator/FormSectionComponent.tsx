@@ -10,8 +10,8 @@
  */
 
 import React, { useCallback, useEffect, useRef } from 'react'
-import { FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, omit, get, compact } from 'lodash'
+import { FormikProps } from 'formik'
+import { cloneDeep, set, omit, get, compact } from 'lodash'
 import {
   EventState,
   EventConfig,
@@ -19,8 +19,8 @@ import {
   FieldType,
   FieldValue,
   AddressType,
+  FormState,
   IndexMap,
-  joinValues,
   isNonInteractiveFieldType,
   InteractiveFieldType,
   FieldReference,
@@ -31,14 +31,12 @@ import {
   findAllFields
 } from '@opencrvs/commons/client'
 import {
-  FIELD_SEPARATOR,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
-import { handleDefaultValue } from '@client/v2-events/hooks/useDefaultValues'
-import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -58,9 +56,14 @@ type AllProps = {
    */
   onChange: (values: EventState) => void
   /**
-   * Update the touched values in the non-formik state.
+   * Update the form values in the non-formik state.
    */
-  setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
+  onFormChange: (cb: (prevForm: EventState) => EventState) => void
+  onTouchedChange: (
+    cb: (
+      prevTouched: IndexMap<FormState<boolean>>
+    ) => IndexMap<FormState<boolean>>
+  ) => void
   fieldsToShowValidationErrors?: FieldConfig[]
   /**
    * When set to true, all fields will be marked as touched and any validation errors will be shown to user
@@ -75,7 +78,6 @@ type AllProps = {
    * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
    */
   isCorrection?: boolean
-  parentId?: string
   validatorContext: ValidatorContext
 } & UsedFormikProps
 
@@ -140,7 +142,8 @@ export function FormSectionComponent({
   values,
   fields: fieldsWithDotSeparator,
   touched,
-  setAllTouchedFields,
+  onFormChange,
+  onTouchedChange,
   className,
   initialValues = {},
   readonlyMode,
@@ -151,20 +154,17 @@ export function FormSectionComponent({
   setTouched,
   onChange,
   resetForm,
-  setErrors,
   validateAllFields,
   fieldsToShowValidationErrors,
   onAllFieldsValidated,
   isCorrection = false,
-  parentId,
   validatorContext
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
   useOnlineStatus()
-  const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
 
-  const systemVariables = useSystemVariables()
+  const getDefaultValue = useDefaultValue()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,
@@ -205,8 +205,7 @@ export function FormSectionComponent({
   const setValueForListenerField = useCallback(
     (
       listenerField: InteractiveFieldType,
-      fieldValues: Record<string, FieldValue>,
-      fieldErrors: AllProps['errors']
+      fieldValues: Record<string, FieldValue>
     ) => {
       // this can be any field. Even though we call this only when parent triggers the change.
       const listenerFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
@@ -233,27 +232,21 @@ export function FormSectionComponent({
 
       if (firstNonFalsyValue) {
         set(fieldValues, listenerFieldFormikId, firstNonFalsyValue)
-        set(fieldErrors, listenerFieldFormikId, '')
         return
       }
 
-      const defaultValue = handleDefaultValue({
-        field: listenerField,
-        systemVariables
-      })
+      const defaultValue = getDefaultValue(listenerField)
 
       set(fieldValues, listenerFieldFormikId, defaultValue)
-      set(fieldErrors, listenerFieldFormikId, '')
 
       return
     },
-    [allFieldsWithDotSeparator, systemVariables]
+    [allFieldsWithDotSeparator, getDefaultValue]
   )
 
   const onFieldValueChange = useCallback(
     (formikFieldId: string, value: FieldValue | undefined) => {
       const updatedValues = cloneDeep(values)
-      const updatedErrors = cloneDeep(errorsWithDotSeparator)
 
       const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
       const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
@@ -265,7 +258,7 @@ export function FormSectionComponent({
       set(updatedValues, formikFieldId, value)
 
       for (const listenerField of interactiveListenerFields) {
-        setValueForListenerField(listenerField, updatedValues, updatedErrors)
+        setValueForListenerField(listenerField, updatedValues)
       }
 
       // @TODO: we should not reference field id 'country' directly.
@@ -286,20 +279,22 @@ export function FormSectionComponent({
 
       const updatedTouched = omit(touched, formikListenerFieldIds)
 
-      void setErrors(updatedErrors)
       void setValues(updatedValues)
       void setTouched(updatedTouched)
-      void setAllTouchedFields(updatedTouched)
+      onFormChange((prevForm) => ({ ...prevForm, ...updatedValues }))
+      onTouchedChange((prevTouched) => ({
+        ...prevTouched,
+        ...updatedTouched
+      }))
     },
     [
       values,
       setValues,
-      listenerFieldsByParentId,
-      setTouched,
       touched,
-      errorsWithDotSeparator,
-      setErrors,
-      setAllTouchedFields,
+      setTouched,
+      onFormChange,
+      onTouchedChange,
+      listenerFieldsByParentId,
       setValueForListenerField
     ]
   )
@@ -307,7 +302,6 @@ export function FormSectionComponent({
   const onBatchFieldValueChange = useCallback(
     (newValues: Array<{ name: string; value: FieldValue | undefined }>) => {
       const updatedValues = cloneDeep(values)
-      const updatedErrors = cloneDeep(errorsWithDotSeparator)
       const updatedTouched = cloneDeep(touched)
 
       for (const { name: formikFieldId, value } of newValues) {
@@ -320,32 +314,33 @@ export function FormSectionComponent({
         )
 
         for (const listenerField of interactiveListenerFields) {
-          setValueForListenerField(listenerField, updatedValues, updatedErrors)
+          setValueForListenerField(listenerField, updatedValues)
           updatedTouched[makeFormFieldIdFormikCompatible(listenerField.id)] =
             undefined
         }
       }
 
-      void setErrors(updatedErrors)
       void setValues(updatedValues)
       void setTouched(updatedTouched)
-      void setAllTouchedFields(updatedTouched)
+      onFormChange((prevForm) => ({ ...prevForm, ...updatedValues }))
+      onTouchedChange((prevTouched) => ({
+        ...prevTouched,
+        ...updatedTouched
+      }))
     },
     [
       values,
       setValues,
-      listenerFieldsByParentId,
-      setTouched,
       touched,
-      errorsWithDotSeparator,
-      setErrors,
-      setAllTouchedFields,
+      setTouched,
+      onFormChange,
+      onTouchedChange,
+      listenerFieldsByParentId,
       setValueForListenerField
     ]
   )
 
   useEffect(() => {
-    void setTouched({})
     if (validateAllFields) {
       showValidationErrors(fieldsWithDotSeparator)
     }
@@ -355,14 +350,7 @@ export function FormSectionComponent({
   }, [])
 
   useEffect(() => {
-    const userChangedForm = !isEqual(values, prevValuesRef.current)
     const sectionChanged = prevIdRef.current !== id
-
-    // Formik does not allow controlling the form state 'easily'.
-    // We propagate changes to the non-formik state from formik
-    if (userChangedForm) {
-      onChange(values)
-    }
 
     if (sectionChanged) {
       resetForm()
@@ -376,7 +364,6 @@ export function FormSectionComponent({
       }
     }
 
-    prevValuesRef.current = values
     prevIdRef.current = id
   }, [
     values,
@@ -451,20 +438,15 @@ export function FormSectionComponent({
               form={completeForm}
               name={field.id}
               readonlyMode={readonlyMode}
-              touched={
-                /**
-                 * We check the full path so that,
-                 * touching `child____name____firstname`
-                 * does not make `mother____name____firstname` dirty
-                 */
-                (parentId
-                  ? touched[
-                      joinValues([parentId, FIELD_SEPARATOR, field.id], '')
-                    ] || touched[parentId]
-                  : touched[field.id]) ?? false
-              }
               validatorContext={validatorContext}
               onBatchFieldValueChange={onBatchFieldValueChange}
+              onBlur={(formikFieldId, newTouched) => {
+                onTouchedChange((prevTouched) => ({
+                  ...prevTouched,
+                  [makeFormikFieldIdOpenCRVSCompatible(formikFieldId)]:
+                    newTouched
+                }))
+              }}
               onFieldValueChange={onFieldValueChange}
             />
           </FormItem>

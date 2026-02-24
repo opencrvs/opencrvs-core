@@ -22,7 +22,7 @@ import {
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useDefaultValues } from '@client/v2-events/hooks/useDefaultValues'
+import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
@@ -100,7 +100,7 @@ export function Pages({
     return nextPage ? onPageChange(nextPage.id) : onSubmit()
   }
 
-  const defaultValues = useDefaultValues(page.fields)
+  const getDefaultValue = useDefaultValue()
 
   // values is used on the verification page wizard to set the verification page result
   function onNextPage(values?: EventState) {
@@ -113,7 +113,7 @@ export function Pages({
     // I decided to leave it this way for now, since it works, but we should overhaul the default values logic at some point.
     //
     // Why doesn't this use deepMerge() instead of spread? If there are any defined or 'undefined' values in the 'form' at this point, they should completely replace the default values.
-    setFormData({ ...defaultValues, ...form, ...values })
+    setFormData({ ...getDefaultValue(page.fields), ...form, ...values })
 
     // Before switching to the next page, we need to mark all fields in the current page as touched
     // so that when we get back to the page, we show validation errors for all fields in the page.

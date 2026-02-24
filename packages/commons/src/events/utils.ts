@@ -372,6 +372,12 @@ export type IndexMap<T> = {
   [id: string]: T | undefined
 }
 
+export type FormState<T> =
+  | T
+  | {
+      [id: string]: FormState<T> | undefined
+    }
+
 export function isWriteAction(actionType: ActionType): boolean {
   return writeActions.safeParse(actionType).success
 }

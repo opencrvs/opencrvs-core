@@ -9,30 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
-
-import { Formik, FormikTouched } from 'formik'
-import { isEqual, noop } from 'lodash'
+import React, { useMemo } from 'react'
+import { Formik } from 'formik'
+import { noop, pick } from 'lodash'
 import { useIntl } from 'react-intl'
 import {
-  deepMerge,
   EventConfig,
   EventState,
   FieldConfig,
-  FieldType,
-  FieldValue,
-  getDeclarationFields,
-  joinValues,
+  FormState,
+  IndexMap,
   mapFieldErrors,
+  mapFieldTypeToEmptyValue,
   ValidatorContext
 } from '@opencrvs/commons/client'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import {
-  FIELD_SEPARATOR,
-  makeFormikFieldIdOpenCRVSCompatible
-} from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
-import { useDefaultValues } from '@client/v2-events/hooks/useDefaultValues'
+import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -50,18 +42,25 @@ export interface FormFieldGeneratorProps {
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
-  /** Default field values. Might equal to declaration, when a declaration form is rendered. */
+  /** Full form values, the page values are plucked out of it */
+  formValues: EventState
+  /** Full form touched values, the page values are plucked out of it */
+  touchedValues: IndexMap<FormState<boolean>>
+  onFormChange: (values: EventState) => void
+  onTouchedChange: (touched: IndexMap<FormState<boolean>>) => void
   initialValues?: EventState
   onAllFieldsValidated?: (success: boolean) => void
   isCorrection?: boolean
-  parentId?: string // `child____name` part of `child____name____firstname`
   validatorContext: ValidatorContext
 }
 
 export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
   ({
     onChange,
+    onFormChange,
+    onTouchedChange,
     fields,
+    formValues,
     initialValues,
     className,
     eventConfig,
@@ -71,68 +70,88 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     id,
     onAllFieldsValidated,
     isCorrection = false,
-    parentId,
+    touchedValues,
     validatorContext
   }) => {
-    const { setAllTouchedFields, touchedFields } = useEventFormData()
     const intl = useIntl()
-    const defaultValues = useDefaultValues(fields)
+    const emptyPageValues = useMemo(
+      () =>
+        fields.reduce((acc, field) => {
+          acc[field.id] = mapFieldTypeToEmptyValue(field)
+          return acc
+        }, {} as EventState),
+      [fields]
+    )
+    const getDefaultValues = useDefaultValue()
+    const defaultPageValues = getDefaultValues(fields)
 
-    const updateTouchFields = (
-      touched: FormikTouched<Record<string, boolean | undefined>>
-    ) => {
-      const newlyTouched =
-        Object.keys(touched).length > 0 &&
-        !isEqual(touched, touchedFields) &&
-        Object.keys(touched).filter((key) => !(key in touchedFields))
-
-      if (newlyTouched && newlyTouched.length > 0) {
-        const newlyTouchedFields = parentId
-          ? newlyTouched.reduce((prev, fieldId) => {
-              let markParentDirty = false
-              if (eventConfig) {
-                const fieldConfig = getDeclarationFields(eventConfig).find(
-                  (x) => x.id === makeFormikFieldIdOpenCRVSCompatible(parentId)
-                )
-                /**
-                 * For NAME fields with hideSubFieldError enabled, we need to mark its parent as dirty to ensure proper validation error
-                 * message is shown at Name field level, since subfield validation error message is hidden
-                 */
-                markParentDirty =
-                  fieldConfig?.type === FieldType.NAME &&
-                  !!fieldConfig.configuration?.showParentFieldError
-              }
-
-              return {
-                ...prev,
-                /**
-                 * If we are touching  `firstname` from `child____name`,
-                 * we mark `child____name____firstname` as dirty
-                 */
-                [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true,
-                ...(markParentDirty && {
-                  [parentId]: true
-                })
-              }
-            }, {})
-          : touched
-      }
-      setAllTouchedFields(deepMerge(touchedFields, touched))
-    }
+    //@todo: move the logic inside NAME field
+    // const updateTouchFields = (
+    //   touched: FormikTouched<Record<string, boolean | undefined>>
+    // ) => {
+    //   const newlyTouched =
+    //     Object.keys(touched).length > 0 &&
+    //     !isEqual(touched, touchedFields) &&
+    //     Object.keys(touched).filter((key) => !(key in touchedFields))
+    //
+    //   if (newlyTouched && newlyTouched.length > 0) {
+    //     const newlyTouchedFields = parentId
+    //       ? newlyTouched.reduce((prev, fieldId) => {
+    //           let markParentDirty = false
+    //           if (eventConfig) {
+    //             const fieldConfig = getDeclarationFields(eventConfig).find(
+    //               (x) => x.id === makeFormikFieldIdOpenCRVSCompatible(parentId)
+    //             )
+    //             /**
+    //              * For NAME fields with hideSubFieldError enabled, we need to mark its parent as dirty to ensure proper validation error
+    //              * message is shown at Name field level, since subfield validation error message is hidden
+    //              */
+    //             markParentDirty =
+    //               fieldConfig?.type === FieldType.NAME &&
+    //               !!fieldConfig.configuration?.showParentFieldError
+    //           }
+    //
+    //           return {
+    //             ...prev,
+    //             /**
+    //              * If we are touching  `firstname` from `child____name`,
+    //              * we mark `child____name____firstname` as dirty
+    //              */
+    //             [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true,
+    //             ...(markParentDirty && {
+    //               [parentId]: true
+    //             })
+    //           }
+    //         }, {})
+    //       : touched
+    //   }
+    //   setAllTouchedFields(deepMerge(touchedFields, touched))
+    // }
 
     const formikOnChange = (values: EventState) =>
       onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
-    const formikCompatibleInitialValues =
-      makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...defaultValues,
-        ...initialValues
-      })
+    const formikCompatibleInitialValues = makeFormFieldIdsFormikCompatible({
+      ...emptyPageValues,
+      ...defaultPageValues,
+      ...pick(
+        formValues,
+        fields.map((field) => field.id)
+      )
+    })
+    const formikCompatibleInitialTouched = makeFormFieldIdsFormikCompatible(
+      pick(
+        touchedValues,
+        fields.map((field) => field.id)
+      )
+    )
 
     return (
       <Formik<EventState>
         enableReinitialize={true}
-        initialTouched={touchedFields}
+        initialTouched={
+          formikCompatibleInitialTouched as Record<string, boolean>
+        }
         initialValues={formikCompatibleInitialValues}
         validate={(values) =>
           makeFormFieldIdsFormikCompatible(
@@ -142,6 +161,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
                 makeFormikFieldIdsOpenCRVSCompatible(values),
                 validatorContext
               ),
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               (errs) => errs[0]?.message && intl.formatMessage(errs[0].message)
             )
           )
@@ -150,18 +170,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
         onSubmit={noop}
       >
         {(formikProps) => {
-          const { touched } = formikProps
-
-          useEffect(() => {
-            /**
-             * Because 'enableReinitialize' prop is set to 'true' above, whenever initialValue changes,
-             * formik lose track of touched fields. This is a workaround to save all the fields that
-             * have been touched for once during the form manipulation. So that we can show validation
-             * errors for all fields that have been touched.
-             */
-            updateTouchFields(touched)
-          }, [touched])
-
           return (
             <FormSectionComponent
               className={className}
@@ -172,19 +180,19 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               id={id}
               initialValues={initialValues}
               isCorrection={isCorrection}
-              parentId={parentId}
               readonlyMode={readonlyMode}
               resetForm={formikProps.resetForm}
-              setAllTouchedFields={setAllTouchedFields}
               setErrors={formikProps.setErrors}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
-              touched={{ ...formikProps.touched, ...touchedFields }}
+              touched={formikProps.touched}
               validateAllFields={validateAllFields}
               validatorContext={validatorContext}
               values={formikProps.values}
               onAllFieldsValidated={onAllFieldsValidated}
               onChange={formikOnChange}
+              onFormChange={(cb) => onFormChange(cb(formValues))}
+              onTouchedChange={(cb) => onTouchedChange(cb(touchedValues))}
             />
           )
         }}

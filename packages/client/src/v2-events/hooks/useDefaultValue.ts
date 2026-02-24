@@ -170,7 +170,7 @@ export function mapFieldToDefaultValue(
   }
 }
 
-export function useDefaultValues(fields: FieldConfig[]) {
+export function useDefaultValue() {
   const systemVariables = useSystemVariables()
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
@@ -179,10 +179,14 @@ export function useDefaultValues(fields: FieldConfig[]) {
     () => config.ADMIN_STRUCTURE.map((level) => level.id),
     [config.ADMIN_STRUCTURE]
   )
-
-  return useMemo(
-    () =>
-      fields
+  function getDefaultValue(field: FieldConfig): FieldValue
+  function getDefaultValue(fields: FieldConfig[]): EventState
+  function getDefaultValue(
+    fieldOrFields: FieldConfig | FieldConfig[]
+  ): FieldValue | EventState {
+    if (Array.isArray(fieldOrFields)) {
+      const fields = fieldOrFields
+      return fields
         .filter(
           (field): field is InteractiveFieldType =>
             !isNonInteractiveFieldType(field)
@@ -199,7 +203,17 @@ export function useDefaultValues(fields: FieldConfig[]) {
           acc[field.id] = resolvedDefaultValue
 
           return acc
-        }, {} as EventState),
-    [fields, systemVariables, locations, adminLevelIds]
-  )
+        }, {} as EventState)
+    }
+    const field = fieldOrFields
+    if (isNonInteractiveFieldType(field)) {
+      return
+    }
+    return mapFieldToDefaultValue(field, {
+      ...systemVariables,
+      locations,
+      adminLevelIds
+    })
+  }
+  return getDefaultValue
 }
