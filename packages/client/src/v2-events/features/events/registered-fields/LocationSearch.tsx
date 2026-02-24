@@ -27,6 +27,7 @@ import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
+import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 /**
@@ -63,10 +64,7 @@ function useAvailableLocations(
     return location ? [location] : []
   }
 
-  // @TODO CIHAN:
-  const locationsInUserAdministrativeArea = 'foo'
-
-  return React.useMemo(() => {
+  const options = useMemo(() => {
     const searchableResources: (Location | AdministrativeArea)[] = []
 
     if (searchableResource.includes('locations')) {
@@ -88,6 +86,27 @@ function useAvailableLocations(
 
     return searchableResources
   }, [searchableResource, locations, administrativeAreas])
+
+  // If jurisdiction filter is administrative area, we filter the options to only include locations that are under the user's admin area jurisdiction.
+  if (
+    jurisdictionFilter === JurisdictionFilter.enum.administrativeArea &&
+    userLocationId
+  ) {
+    return useMemo(
+      () =>
+        options.filter((o) =>
+          isLocationUnderJurisdiction({
+            locationId: userLocationId,
+            otherLocationId: o.id,
+            locations,
+            administrativeAreas
+          })
+        ),
+      [options, userLocationId, locations, administrativeAreas]
+    )
+  }
+
+  return options
 }
 
 function LocationSearchInput({
