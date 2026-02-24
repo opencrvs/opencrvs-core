@@ -94,7 +94,7 @@ async function getCertificatesConfig(
 
   // If there are templateIds specified in the scope, only the certificates configuration matching those templateIds will be fetched
   if (templateIds.length > 0) {
-    return certificateConfigs.filter((config: any) =>
+    return certificateConfigs.filter((config: { id: string }) =>
       templateIds.includes(config.id)
     )
   }

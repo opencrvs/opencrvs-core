@@ -137,9 +137,9 @@ export const AlphaPrintButton = {
       ? intl.formatMessage(buttonLabel)
       : intl.formatMessage(addedButtonLabel)
 
-    return certificateConfig ? (
+    return (
       <Button
-        disabled={disabled}
+        disabled={disabled || !certificateConfig}
         id={id}
         size="medium"
         type="secondary"
@@ -148,7 +148,7 @@ export const AlphaPrintButton = {
         <Icon name="Printer" />
         {label}
       </Button>
-    ) : null
+    )
   },
   Output: ({ value }: { value?: string }) => <>{value?.toString() || ''}</>
 }
