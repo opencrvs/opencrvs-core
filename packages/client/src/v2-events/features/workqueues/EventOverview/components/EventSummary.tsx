@@ -209,7 +209,7 @@ export function EventSummary({
         securedFields.includes(fieldId)
       ),
       emptyValueMessage: field.emptyValueMessage,
-      value: intl.formatMessage(
+      value: intl.safeFormatMessage(
         field.value,
         /**
          * Convert any date fields used in the message to unix timestamps, as the message may be expecting timestamps and not date strings.

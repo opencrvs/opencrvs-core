@@ -85,7 +85,6 @@ function eventMetadataObjectFromEntries(entries: [string, unknown][]) {
 export function flattenEventIndex(event: EventIndex) {
   const { declaration, trackingId, status, ...rest } = event
   return {
-    ...rest,
     ...declaration,
     ...eventMetadataObjectFromEntries(
       flattenEntries({ trackingId, status, ...rest })
