@@ -62,7 +62,7 @@ async function reindexSearch(token: TokenWithBearer) {
   })
 }
 
-export async function reindex(token: TokenWithBearer) {
+async function runReindex(token: TokenWithBearer) {
   const configurations = await getEventConfigurations(token)
   for (const configuration of configurations) {
     logger.info(`Ensuring index exists for: ${configuration.id}`)
@@ -119,4 +119,11 @@ export async function reindex(token: TokenWithBearer) {
   })
 
   return Promise.all([searchIndexingPromise, countryConfigIndexingPromise])
+}
+
+export function reindex(token: TokenWithBearer) {
+  logger.info('Reindex started in background')
+  runReindex(token).catch((err) => {
+    logger.error('Reindex failed', err)
+  })
 }
