@@ -5,6 +5,7 @@ exports[`Returns both normal users and system users 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "name": [
@@ -24,6 +25,7 @@ exports[`Returns both normal users and system users 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "name": [
@@ -43,6 +45,7 @@ exports[`Returns both normal users and system users 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "name": [
@@ -62,6 +65,7 @@ exports[`Returns both normal users and system users 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "name": [
@@ -81,6 +85,7 @@ exports[`Returns both normal users and system users 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
     "name": [
@@ -111,6 +116,7 @@ exports[`Returns multiple users with honorifics 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": "4th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "name": [
@@ -130,6 +136,7 @@ exports[`Returns multiple users with honorifics 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": "5th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "name": [
@@ -149,6 +156,7 @@ exports[`Returns multiple users with honorifics 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": "6th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "name": [
@@ -168,6 +176,7 @@ exports[`Returns multiple users with honorifics 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": "7th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "name": [
@@ -187,6 +196,7 @@ exports[`Returns multiple users with honorifics 1`] = `
   {
     "avatar": undefined,
     "device": undefined,
+    "email": undefined,
     "fullHonorificName": "8th Class Registration Officer, John Doe",
     "id": "[sanitized]",
     "name": [
