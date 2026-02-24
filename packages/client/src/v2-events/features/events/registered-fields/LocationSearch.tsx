@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import {
@@ -28,12 +28,6 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
-
-interface SearchLocation {
-  id: string
-  searchableText: string
-  displayLabel: string
-}
 
 /**
  * @deprecated
@@ -68,6 +62,9 @@ function useAvailableLocations(
     const location = locations.get(UUID.parse(userLocationId))
     return location ? [location] : []
   }
+
+  // @TODO CIHAN:
+  const locationsInUserAdministrativeArea = 'foo'
 
   return React.useMemo(() => {
     const searchableResources: (Location | AdministrativeArea)[] = []

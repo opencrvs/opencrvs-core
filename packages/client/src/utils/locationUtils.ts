@@ -16,7 +16,6 @@ import {
   CRVSOffice,
   AdminStructure
 } from '@client/offline/reducer'
-import { Address } from '@client/utils/gateway'
 import { ISearchLocation as SearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
@@ -103,24 +102,6 @@ export function generateLocationName(
       intl.formatMessage(locationMessages[location.jurisdictionType]) || ''
     }`.trimEnd())
   return name
-}
-
-function generateFullLocation(
-  districtId: string,
-  stateId: string,
-  countryCode: string,
-  resources: IOfflineData,
-  intl: IntlShape
-) {
-  const district = districtId && resources.locations[districtId]
-  const state = stateId && resources.locations[stateId]
-  const country =
-    countryCode && intl.formatMessage(countryMessages[countryCode])
-  let location = ''
-  if (district) location = district.name + ', '
-  if (state) location = location + state.name + ', '
-  location = location + country
-  return location
 }
 
 export function generateSearchableLocations(
@@ -397,45 +378,4 @@ function getAssociatedLocationsAndOffices(
   })
 
   return [office, ...associatedLocations]
-}
-
-function generateFullAddress(
-  address: Address,
-  offlineData: IOfflineData
-): string[] {
-  const district =
-    address.district && offlineData.locations[address.district].name
-
-  const state = address.state && offlineData.locations[address.state].name
-
-  const eventLocationLevel3 =
-    address?.line?.[10] && offlineData.locations[address.line[10]]?.name
-
-  const eventLocationLevel4 =
-    address?.line?.[11] && offlineData.locations[address.line[11]]?.name
-
-  const eventLocationLevel5 =
-    address?.line?.[12] && offlineData.locations[address.line[12]]?.name
-
-  const eventLocationLevel6 =
-    address?.line?.[13] && offlineData.locations[address.line[13]]?.name
-
-  return [
-    eventLocationLevel6,
-    eventLocationLevel5,
-    eventLocationLevel4,
-    eventLocationLevel3,
-    district,
-    state
-  ].filter((maybeLocation): maybeLocation is string => Boolean(maybeLocation))
-}
-
-function isAdministrativeArea(
-  a: Location | AdministrativeArea
-): a is AdministrativeArea {
-  // Until LocationSearch is refactored, using parser as a type guard is too expensive.
-  return (
-    (a as AdministrativeArea).parentId !== undefined ||
-    (a as Location).locationType !== undefined
-  )
 }

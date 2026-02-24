@@ -51,8 +51,8 @@ export function getUsersFullName(name: UserOrSystem['name'], language: string) {
 type AllKeys<T> = T extends T ? keyof T : never
 
 /**
- * @returns unique ids of users are referenced in the ActionDocument array.
  * Used for fetching user data in bulk.
+ * @returns unique ids of users which are referenced in the ActionDocument array.
  */
 export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   const userIdFields = [
