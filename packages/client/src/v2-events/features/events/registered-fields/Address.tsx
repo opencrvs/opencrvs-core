@@ -28,11 +28,9 @@ import {
   isFieldDisplayedOnReview,
   AddressField,
   AdministrativeArea,
-  DefaultAddressFieldValue,
   LocationType,
   ValidatorContext,
-  RequireConfig,
-  DomesticAddressFieldValue
+  RequireConfig
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -40,7 +38,6 @@ import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStrin
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -240,7 +237,6 @@ function AddressInput(props: Props) {
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
-  const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
   const adminStructure = generateAdminStructureFields(
@@ -255,45 +251,18 @@ function AddressInput(props: Props) {
 
   const administrativeArea = getAdministrativeArea(value)
 
-  const resolveAdministrativeArea = (
-    adminArea:
-      | DomesticAddressFieldValue['administrativeArea']
-      | DefaultAddressFieldValue['administrativeArea']
-  ) => {
-    if (!adminArea) {
-      return undefined
-    }
-    if (typeof adminArea === 'string') {
-      return adminArea
-    }
-    if (adminArea.$location) {
-      const locationId = userDetails?.primaryOffice.id
-
-      const hierarchy = getAdminLevelHierarchy(
-        locationId,
-        locations,
-        adminLevelIds
-      )
-
-      return hierarchy[adminArea.$location]
-    }
-  }
-
-  const resolvedAdministrativeArea =
-    resolveAdministrativeArea(administrativeArea)
-
   if (
     value &&
     value.addressType === AddressType.DOMESTIC &&
-    resolvedAdministrativeArea
+    administrativeArea
   ) {
-    value.administrativeArea = resolvedAdministrativeArea
+    value.administrativeArea = administrativeArea
   }
 
   const resolvedValue = {
     ...value,
     ...value?.streetLevelDetails,
-    administrativeArea: resolvedAdministrativeArea
+    administrativeArea
   }
 
   const addressFields =
@@ -302,7 +271,7 @@ function AddressInput(props: Props) {
       : []
 
   const derivedAdminLevels = getAdminLevelHierarchy(
-    resolvedAdministrativeArea,
+    administrativeArea,
     adminStructureLocations,
     adminLevelIds
   )
