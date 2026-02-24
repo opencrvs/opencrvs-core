@@ -21,6 +21,9 @@ import { withValidatorContext } from '../../../../../.storybook/decorators'
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/ImageView',
   args: { onChange: fn() },
+  parameters: {
+    layout: 'centered'
+  },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -65,9 +68,6 @@ const imageField = {
 }
 
 export const LeftAligned: StoryObj<typeof FormFieldGenerator> = {
-  parameters: {
-    layout: 'centered'
-  },
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
@@ -88,9 +88,6 @@ export const LeftAligned: StoryObj<typeof FormFieldGenerator> = {
 }
 
 export const CenterAligned: StoryObj<typeof FormFieldGenerator> = {
-  parameters: {
-    layout: 'centered'
-  },
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
@@ -111,9 +108,6 @@ export const CenterAligned: StoryObj<typeof FormFieldGenerator> = {
 }
 
 export const RightAligned: StoryObj<typeof FormFieldGenerator> = {
-  parameters: {
-    layout: 'centered'
-  },
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
