@@ -271,7 +271,8 @@ function AutocompleteInput(props: AutocompleteProps) {
 
   const fetchOptions = useCallback(
     async (inputValue: string): Promise<AutocompleteValue[]> => {
-      if (!inputValue) {
+      // We can skip the API call if the input is empty or just whitespace
+      if (!inputValue.trim()) {
         return []
       }
 
