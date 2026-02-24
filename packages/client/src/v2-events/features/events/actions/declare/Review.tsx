@@ -52,7 +52,6 @@ export function Review() {
 
   const reviewConfig = actionConfiguration.review
   const form = useEventFormData((state) => state.getFormValues())
-  console.log('form declare :>> ', form)
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
