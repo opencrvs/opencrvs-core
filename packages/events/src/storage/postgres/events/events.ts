@@ -144,9 +144,12 @@ async function* processBatch(batch: Events[]) {
  * Useful for cases where you want every event to be processed in bulk,
  * for example, reindexing to ElasticSearch.
  */
-export async function* streamEventDocuments() {
+export async function* streamEventDocuments(eventType?: string) {
   const db = getClient()
-  const eventsStream = db.selectFrom('events').selectAll().stream()
+  const query = eventType
+    ? db.selectFrom('events').selectAll().where('eventType', '=', eventType)
+    : db.selectFrom('events').selectAll()
+  const eventsStream = query.stream()
   let batch: Events[] = []
 
   for await (const row of eventsStream) {

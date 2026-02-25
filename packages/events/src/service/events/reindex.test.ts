@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse, HttpResponseInit } from 'msw'
 import {
   ActionStatus,
   ActionType,
@@ -24,6 +24,7 @@ import {
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createSystemTestClient, setupTestCase } from '@events/tests/utils'
 import {
+  getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
@@ -40,6 +41,11 @@ const postHandler = http.post(
 
     return HttpResponse.json({})
   }
+)
+
+const failingPostHandler = http.post(
+  `${env.COUNTRY_CONFIG_URL}/reindex`,
+  () => new HttpResponse(null, { status: 500 } as HttpResponseInit)
 )
 
 let event: EventDocument
@@ -157,13 +163,14 @@ test('reindexing indexes all events into Elasticsearch', async () => {
   const esClient = getOrCreateClient()
 
   // Reindex doesn't refresh the index automatically, as it would block the event stream unnecessarily
-  // So we need to manually refresh the index to see the changes
+  // So we need to manually refresh the index to see the changes.
+  // After a blue/green reindex the concrete index name changes, so we refresh via the alias.
   await esClient.indices.refresh({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+    index: getEventAliasName()
   })
 
   const body = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    index: getEventAliasName(),
     body: {
       query: {
         match_all: {}
@@ -185,12 +192,13 @@ test('reindexing twice', async () => {
 
   const esClient = getOrCreateClient()
 
+  // After a blue/green reindex the concrete index name changes, so we refresh via the alias.
   await esClient.indices.refresh({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+    index: getEventAliasName()
   })
 
   const body = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    index: getEventAliasName(),
     body: {
       query: {
         match_all: {}
@@ -205,4 +213,127 @@ test('reindexing twice', async () => {
   expect((body.hits.hits[0]._source as EventIndex).trackingId).toEqual(
     event.trackingId
   )
+})
+
+test('blue/green: original concrete index is replaced by a timestamped index after reindex', async () => {
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
+  const esClient = getOrCreateClient()
+
+  // The concrete index ({prefix}_{eventType}) should exist before reindex
+  // from the server startup ensureIndexExists call
+  const liveIndexName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  // After a blue/green reindex the original concrete index is deleted.
+  // The alias now points to a new timestamped index.
+  const liveIndexExistsAfterReindex = await esClient.indices.exists({
+    index: liveIndexName
+  })
+
+  expect(liveIndexExistsAfterReindex).toBe(false)
+
+  // The alias must still resolve to exactly one index
+  const aliasInfo = await esClient.indices.getAlias({
+    name: getEventAliasName()
+  })
+
+  const indexesBehindAlias = Object.keys(aliasInfo)
+  expect(indexesBehindAlias).toHaveLength(1)
+  // The surviving index name should contain the original name as a prefix
+  expect(indexesBehindAlias[0]).toMatch(new RegExp(`^${liveIndexName}_\\d+$`))
+})
+
+test('blue/green: data is searchable via alias immediately after alias swap', async () => {
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
+  const esClient = getOrCreateClient()
+
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  await esClient.indices.refresh({ index: getEventAliasName() })
+
+  const body = await esClient.search({
+    index: getEventAliasName(),
+    body: { query: { match_all: {} } }
+  })
+
+  // One declared event indexed; draft excluded
+  expect(body.hits.hits).toHaveLength(1)
+  expect((body.hits.hits[0]._source as EventIndex).trackingId).toEqual(
+    event.trackingId
+  )
+})
+
+test('blue/green: on country config failure, temp index is cleaned up and no orphaned indexes remain', async () => {
+  // Establish a live index first with a successful reindex
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  const esClient = getOrCreateClient()
+
+  // Capture index names after the first successful reindex
+  const aliasInfoBefore = await esClient.indices.getAlias({
+    name: getEventAliasName()
+  })
+  const liveIndexBefore = Object.keys(aliasInfoBefore)[0]
+
+  // Now simulate a failure on the next reindex
+  mswServer.use(failingPostHandler)
+
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  // Give the background task a chance to complete
+  await new Promise((resolve) => setTimeout(resolve, 200))
+
+  // The alias must still point to the same index as before (live index untouched)
+  const aliasInfoAfter = await esClient.indices.getAlias({
+    name: getEventAliasName()
+  })
+  const liveIndexAfter = Object.keys(aliasInfoAfter)[0]
+  expect(liveIndexAfter).toEqual(liveIndexBefore)
+
+  // There must be no orphaned temporary indexes (the failed temp index cleaned up)
+  const allIndexes = await esClient.cat.indices({ format: 'json' })
+  const tempIndexes = (allIndexes as { index: string }[]).filter(
+    ({ index }) => /_\d+$/.test(index) && index !== liveIndexAfter
+  )
+  expect(tempIndexes).toHaveLength(0)
+})
+
+test('reindex with eventType filter only rebuilds the specified event type index', async () => {
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
+  const esClient = getOrCreateClient()
+
+  // First full reindex to establish the live index
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  const aliasInfoAfterFull = await esClient.indices.getAlias({
+    name: getEventAliasName()
+  })
+  const liveIndexAfterFull = Object.keys(aliasInfoAfterFull)[0]
+
+  // Reindex only the tennis-club-membership event type
+  await expect(
+    client.event.reindex({ eventType: TENNIS_CLUB_MEMBERSHIP })
+  ).resolves.not.toThrow()
+
+  await esClient.indices.refresh({ index: getEventAliasName() })
+
+  // The alias should have been swapped to a new temp index
+  const aliasInfoAfterPartial = await esClient.indices.getAlias({
+    name: getEventAliasName()
+  })
+  const liveIndexAfterPartial = Object.keys(aliasInfoAfterPartial)[0]
+
+  expect(liveIndexAfterPartial).not.toEqual(liveIndexAfterFull)
+  expect(liveIndexAfterPartial).toMatch(
+    new RegExp(`^${getEventIndexName(TENNIS_CLUB_MEMBERSHIP)}_\\d+$`)
+  )
+
+  // Data is still present after the partial reindex
+  const body = await esClient.search({
+    index: getEventAliasName(),
+    body: { query: { match_all: {} } }
+  })
+  expect(body.hits.hits).toHaveLength(1)
 })

@@ -19,13 +19,25 @@ import {
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
-import { ensureIndexExists, indexEventsInBulk } from '../indexing/indexing'
+import {
+  cleanupTemporaryIndex,
+  finaliseReindexIndex,
+  indexEventsInBulk,
+  prepareReindexIndex
+} from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
 
 import { getInMemoryEventConfigurations } from '../config/config'
 
-async function reindexSearch(token: TokenWithBearer) {
-  const configurations = await getInMemoryEventConfigurations(token)
+async function reindexSearch(
+  token: TokenWithBearer,
+  indexNameOverrides: Map<string, string>,
+  eventType?: string
+) {
+  const allConfigurations = await getInMemoryEventConfigurations(token)
+  const configurations = eventType
+    ? allConfigurations.filter((c) => c.id === eventType)
+    : allConfigurations
   let buffer: EventDocument[] = []
 
   async function flush() {
@@ -33,8 +45,7 @@ async function reindexSearch(token: TokenWithBearer) {
       return
     }
     logger.info(`Reindexing ${buffer.length} events`)
-    // Index the buffered events in bulk
-    await indexEventsInBulk(buffer, configurations)
+    await indexEventsInBulk(buffer, configurations, indexNameOverrides)
     buffer = []
   }
 
@@ -62,14 +73,34 @@ async function reindexSearch(token: TokenWithBearer) {
   })
 }
 
-async function runReindex(token: TokenWithBearer) {
-  const configurations = await getEventConfigurations(token)
+async function runReindex(token: TokenWithBearer, eventType?: string) {
+  const allConfigurations = await getEventConfigurations(token)
+  const configurations = eventType
+    ? allConfigurations.filter((c) => c.id === eventType)
+    : allConfigurations
+
+  // Build temp indexes for each event type (blue/green pattern).
+  // The live indexes remain intact and searchable throughout.
+  const timestamp = Date.now()
+  const indexMap = new Map<string, { tempIndexName: string }>()
+
   for (const configuration of configurations) {
-    logger.info(`Ensuring index exists for: ${configuration.id}`)
-    await ensureIndexExists(configuration, { overwrite: true })
+    const result = await prepareReindexIndex(configuration, timestamp)
+    indexMap.set(configuration.id, result)
+    logger.info(
+      `Prepared temporary index ${result.tempIndexName} for event type ${configuration.id}`
+    )
   }
 
-  const objStream = Readable.from(streamEventDocuments())
+  // Map of eventType → temporary index name for bulk writes
+  const indexNameOverrides = new Map(
+    [...indexMap.entries()].map(([type, { tempIndexName }]) => [
+      type,
+      tempIndexName
+    ])
+  )
+
+  const objStream = Readable.from(streamEventDocuments(eventType))
 
   // Stream to reindex endpoint in country config. PassThrough forks the stream.
   const eventDocumentStreamForCountryConfig = new PassThrough({
@@ -77,11 +108,15 @@ async function runReindex(token: TokenWithBearer) {
   })
   objStream.pipe(eventDocumentStreamForCountryConfig)
 
-  // Stream to ES indexing
+  // Stream to ES indexing (targets temporary indexes)
   const eventDocumentStreamForSearch = new PassThrough({ objectMode: true })
   objStream.pipe(eventDocumentStreamForSearch)
 
-  const searchIndexingStream = await reindexSearch(token)
+  const searchIndexingStream = await reindexSearch(
+    token,
+    indexNameOverrides,
+    eventType
+  )
   const searchIndexingPromise = new Promise((resolve, reject) => {
     eventDocumentStreamForSearch
       .pipe(searchIndexingStream)
@@ -118,12 +153,37 @@ async function runReindex(token: TokenWithBearer) {
     }
   })
 
-  return Promise.all([searchIndexingPromise, countryConfigIndexingPromise])
+  try {
+    await Promise.all([searchIndexingPromise, countryConfigIndexingPromise])
+  } catch (err) {
+    // Reindexing failed — clean up temp indexes, leave live indexes untouched
+    logger.error('Reindex failed, cleaning up temporary indexes', err)
+    for (const { tempIndexName } of indexMap.values()) {
+      await cleanupTemporaryIndex(tempIndexName).catch((cleanupErr) => {
+        logger.error(
+          `Failed to clean up temporary index ${tempIndexName}`,
+          cleanupErr
+        )
+      })
+    }
+    throw err
+  }
+
+  // Success — atomically swap aliases from live → temp for each event type.
+  // Pass the eventType so finaliseReindexIndex can look up the current live
+  // index from the alias (which may itself be a previous temp index).
+  for (const [eventType, { tempIndexName }] of indexMap.entries()) {
+    await finaliseReindexIndex(eventType, tempIndexName)
+  }
 }
 
-export function reindex(token: TokenWithBearer) {
-  logger.info('Reindex started in background')
-  runReindex(token).catch((err) => {
+export function reindex(token: TokenWithBearer, eventType?: string) {
+  logger.info(
+    eventType
+      ? `Reindex started in background for event type: ${eventType}`
+      : 'Reindex started in background for all event types'
+  )
+  runReindex(token, eventType).catch((err) => {
     logger.error('Reindex failed', err)
   })
 }

@@ -34,6 +34,7 @@ import { logger } from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
+  getTemporaryIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import {
@@ -236,8 +237,9 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
 
 export async function createIndex(
   indexName: string,
-  formFields: FieldConfig[]
-) {
+  formFields: FieldConfig[],
+  { addAlias = true }: { addAlias?: boolean } = {}
+): Promise<void> {
   const client = getOrCreateClient()
 
   await client.indices.create({
@@ -311,7 +313,9 @@ export async function createIndex(
     }
   })
 
-  return ensureAlias(indexName)
+  if (addAlias) {
+    await ensureAlias(indexName)
+  }
 }
 
 export async function ensureIndexExists(
@@ -329,13 +333,99 @@ export async function ensureIndexExists(
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
     logger.info(`Index ${indexName} already exists.`)
-    if (overwrite) {
-      logger.info(`. - Overwriting index ${indexName}`)
-      await esClient.indices.delete({ index: indexName })
-      await createIndex(indexName, getDeclarationFields(eventConfiguration))
-    }
   }
   return ensureAlias(indexName)
+}
+
+/**
+ * Creates a temporary index for blue/green reindexing.
+ * Returns the temporary index name. Bulk writes should target this index.
+ * The alias is NOT added at this point — it is only added in `finaliseReindexIndex`
+ * once all data has been successfully indexed, so the temp index never appears
+ * in alias-based queries before the swap.
+ * Call `finaliseReindexIndex` on success or `cleanupTemporaryIndex` on failure.
+ */
+export async function prepareReindexIndex(
+  eventConfiguration: EventConfig,
+  timestamp: number
+): Promise<{ tempIndexName: string }> {
+  const tempIndexName = getTemporaryIndexName(eventConfiguration.id, timestamp)
+  const formFields = getDeclarationFields(eventConfiguration)
+
+  logger.info(`Preparing temporary reindex index ${tempIndexName}`)
+  // addAlias: false — the temp index must NOT join the alias until the swap
+  await createIndex(tempIndexName, formFields, { addAlias: false })
+
+  return { tempIndexName }
+}
+
+/**
+ * Atomically swaps the alias from whichever index currently holds it to the
+ * newly built temp index, then deletes the old index. Zero-downtime promotion.
+ *
+ * We look up the current alias holder at finalise-time rather than relying on
+ * the static computed name, because after the first blue/green reindex the live
+ * index is a timestamped temp name, not the original `{prefix}_{eventType}`.
+ */
+export async function finaliseReindexIndex(
+  eventType: string,
+  tempIndexName: string
+) {
+  const esClient = getOrCreateClient()
+  const aliasName = getEventAliasName()
+
+  // Find which concrete index currently holds the alias for this event type
+  let currentLiveIndex: string | undefined
+  try {
+    const aliasInfo = await esClient.indices.getAlias({ name: aliasName })
+    // The alias is shared across all event types — find the index that serves
+    // the specific event type (its name starts with the event type index prefix)
+    const eventIndexPrefix = getEventIndexName(eventType)
+    currentLiveIndex = Object.keys(aliasInfo).find((idx) =>
+      idx.startsWith(eventIndexPrefix)
+    )
+  } catch {
+    // Alias doesn't exist yet — this is the first reindex
+  }
+
+  if (currentLiveIndex) {
+    logger.info(
+      `Swapping alias ${aliasName} from ${currentLiveIndex} to ${tempIndexName}`
+    )
+    await esClient.indices.updateAliases({
+      body: {
+        actions: [
+          { remove: { index: currentLiveIndex, alias: aliasName } },
+          { add: { index: tempIndexName, alias: aliasName } }
+        ]
+      }
+    })
+    logger.info(
+      `Alias ${aliasName} swapped. Deleting old index ${currentLiveIndex}`
+    )
+    await esClient.indices.delete({ index: currentLiveIndex })
+  } else {
+    // No existing index for this event type — just point the alias at the new one
+    logger.info(
+      `No existing index for ${eventType}, adding alias ${aliasName} → ${tempIndexName}`
+    )
+    await esClient.indices.putAlias({ index: tempIndexName, name: aliasName })
+  }
+
+  logger.info(`Reindex finalised: ${tempIndexName} is now live`)
+}
+
+/**
+ * Deletes the temporary index if reindexing failed. The live index is untouched.
+ */
+export async function cleanupTemporaryIndex(tempIndexName: string) {
+  const esClient = getOrCreateClient()
+  logger.info(`Cleaning up temporary index ${tempIndexName}`)
+  const exists = await esClient.indices.exists({ index: tempIndexName })
+  if (exists) {
+    await esClient.indices.delete({ index: tempIndexName })
+    logger.info(`Temporary index ${tempIndexName} deleted`)
+  }
 }
 
 type _Combine<
@@ -349,12 +439,23 @@ export type BulkResponse = estypes.BulkResponse
 
 export async function indexEventsInBulk(
   batch: EventDocument[],
-  configs: EventConfig[]
+  configs: EventConfig[],
+  /**
+   * Optional map of eventType → index name. When provided (e.g. during a
+   * blue/green reindex), writes go to the temporary index instead of the live one.
+   */
+  indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()
 
   const body = batch.flatMap((doc) => [
-    { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+    {
+      index: {
+        _index:
+          indexNameOverrides?.get(doc.type) ?? getEventIndexName(doc.type),
+        _id: doc.id
+      }
+    },
     eventToEventIndex(doc, getEventConfigById(configs, doc.type))
   ])
 
