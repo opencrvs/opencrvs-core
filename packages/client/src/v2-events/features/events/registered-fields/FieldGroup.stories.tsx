@@ -129,7 +129,6 @@ const meta: Meta<typeof FormFieldGenerator> = {
   render: function Component(args) {
     const [form, setForm] = React.useState(args.formValues)
     const [touched, setTouched] = React.useState(args.formTouched)
-
     return (
       <StyledFormFieldGenerator
         {...args}
@@ -156,7 +155,7 @@ export const WithOptionalLocationLevel: Story = {
   name: 'Address field with error shown',
   args: {
     formValues: {
-      address: {
+      ['storybook.address']: {
         country: 'BGD',
         //The address value clashes with "ADDRESS" field value
         //@ts-ignore
@@ -165,7 +164,7 @@ export const WithOptionalLocationLevel: Story = {
       }
     },
     formTouched: {
-      address: {
+      ['storybook.address']: {
         country: true,
         province: true,
         district: true
