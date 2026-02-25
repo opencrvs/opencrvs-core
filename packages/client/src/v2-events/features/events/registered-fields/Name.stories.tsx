@@ -49,12 +49,6 @@ const meta: Meta<FormFieldGeneratorProps> = {
     validatorContext: { control: false }
   },
   args: {
-    formValues: {
-      'storybook.name': {
-        firstname: '',
-        surname: ''
-      }
-    },
     fields: [nameField]
   },
   render: (args) => {
@@ -90,6 +84,7 @@ export const Basic: Story = {
 }
 
 export const WithRequiredErrorsShown: Story = {
+  name: 'Required errors visible',
   args: {
     formTouched: {
       'storybook.name': {
@@ -122,6 +117,14 @@ export const WithAllOptions: Story = {
   name: 'With custom label and field ordering',
   parameters: {
     layout: 'centered'
+  },
+  args: {
+    formValues: {
+      'storybook.name': {
+        firstname: '',
+        surname: ''
+      }
+    }
   },
   render: function Component(args) {
     const [form, setForm] = React.useState(args.formValues)
