@@ -166,6 +166,28 @@ const SearchInputWrapper = styled.div`
   width: 100%;
   gap: 8px;
 `
+
+const SearchWrapper = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+`
+
+const StyledIcon = styled(Icon)`
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  color: ${({ theme }) => theme.colors.primary};
+  transform: translateX(50%) translateY(-50%);
+  pointer-events: none;
+`
+
+const StyledInput = styled(TextInput)`
+  padding-left: 24px;
+  width: 100%;
+`
+
 function Postfix({
   configuration,
   isLoading = false,
@@ -380,24 +402,32 @@ function SearchInput({
           )}
         </Stack>
         <SearchInputWrapper>
-          <TextInput
-            data-testid="search-input"
-            id="search"
-            isDisabled={!isEditable}
-            postfix={
-              <Postfix
-                clearData={async () => clearData()}
-                configuration={configuration}
-                hasData={!!((httpState?.data?.total ?? 0) > 0)}
-                isLoading={httpState?.loading}
-              />
-            }
-            value={inputState}
-            onChange={(e) => {
-              setHttpState(null)
-              setInputState(e.target.value)
-            }}
-          />
+          <SearchWrapper>
+            <StyledIcon
+              color="currentColor"
+              name="MagnifyingGlass"
+              size="large"
+            />
+            <StyledInput
+              data-testid="search-input"
+              id="search"
+              isDisabled={!isEditable}
+              postfix={
+                <Postfix
+                  clearData={async () => clearData()}
+                  configuration={configuration}
+                  hasData={!!((httpState?.data?.total ?? 0) > 0)}
+                  isLoading={httpState?.loading}
+                />
+              }
+              value={inputState}
+              onChange={(e) => {
+                setHttpState(null)
+                setInputState(e.target.value)
+              }}
+            />
+          </SearchWrapper>
+
           <Http.Input
             configuration={{
               url: '/api/events/events/search',
