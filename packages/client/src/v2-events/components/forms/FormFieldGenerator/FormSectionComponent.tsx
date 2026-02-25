@@ -11,7 +11,7 @@
 
 import React, { useCallback, useEffect, useRef } from 'react'
 import { FormikProps } from 'formik'
-import { cloneDeep, set, omit, get, compact } from 'lodash'
+import { cloneDeep, set, get, compact } from 'lodash'
 import {
   EventState,
   EventConfig,
@@ -28,7 +28,8 @@ import {
   isFieldEnabled,
   ValidatorContext,
   isFieldVisible,
-  findAllFields
+  findAllFields,
+  flattenFieldReference
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
@@ -95,34 +96,42 @@ function focusElementByHash() {
   window.scrollTo(0, document.documentElement.scrollTop - 100)
 }
 
-function resolveFieldReferenceValue(
-  { $$field, $$subfield }: FieldReference,
-  fieldValues: EventState
-): FieldValue | undefined {
-  const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible($$field)
-
-  return $$subfield && $$subfield.length > 0
-    ? get(fieldValues[referenceKeyInFormikFormat], $$subfield)
-    : fieldValues[referenceKeyInFormikFormat]
-}
-
 /**
  * Create a reference map of visible parent fields and their their children for quick access.
  * This is used to reset the values of child fields when a parent field changes.
  *
- * @returns `Record<parentFieldId, FieldConfig[]>` mapping parent field IDs to their child fields
+ * @returns `Record<parentFieldId, Array<[string[], FieldConfig]>` mapping parent
+ * field IDs to their child fields. The parentFieldId is the full path of the field
+ * where nested fields are concatenated together
  */
 function getParentsOfListenerFields(fields: FieldConfig[]) {
   // Create a reference map of visible parent fields and their their children for quick access.
   // This is used to reset the values of child fields when a parent field changes.
-  const fieldsByParentId: IndexMap<FieldConfig[]> = {}
+  const fieldsByParentId: IndexMap<Array<[string[], FieldConfig]>> = {}
 
   for (const field of fields) {
+    if (field.type === FieldType.FIELD_GROUP) {
+      const subfieldsByParentId = getParentsOfListenerFields(field.fields)
+      Object.entries(subfieldsByParentId).forEach(
+        ([parent, subfieldWithPath]) => {
+          if (!subfieldWithPath) {
+            return
+          }
+          fieldsByParentId[parent] = (fieldsByParentId[parent] ?? []).concat(
+            subfieldWithPath.map(([path, subfields]) => [
+              [field.id, ...path],
+              subfields
+            ])
+          )
+        }
+      )
+      continue
+    }
     const parents = ([] as FieldReference[]).concat(field.parent ?? [])
 
     for (const parent of parents) {
-      const listenersParentId = parent.$$field
-      ;(fieldsByParentId[listenersParentId] ||= []).push(field)
+      const listenersParentId = flattenFieldReference(parent).join('.')
+      ;(fieldsByParentId[listenersParentId] ||= []).push([[field.id], field])
     }
   }
 
@@ -192,44 +201,41 @@ export function FormSectionComponent({
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
   const setValueForListenerField = useCallback(
     (
-      listenerField: InteractiveFieldType,
+      [path, listenerField]: [string[], InteractiveFieldType],
       fieldValues: Record<string, FieldValue>
     ) => {
       // this can be any field. Even though we call this only when parent triggers the change.
-      const listenerFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
-        listenerField.id
-      )
-
-      const listenerFieldConfig = allFieldsWithDotSeparator.find(
-        (f) => f.id === listenerFieldOcrvsId
+      const formikCompatibleListenerFieldPath = path.map(
+        makeFormFieldIdFormikCompatible
       )
 
       const referencesToOtherFields = ([] as FieldReference[]).concat(
-        listenerFieldConfig?.value ?? []
-      )
-
-      const listenerFieldFormikId = makeFormFieldIdFormikCompatible(
-        listenerField.id
+        listenerField.value ?? []
       )
 
       const firstNonFalsyValue = compact(
         referencesToOtherFields.map((reference) =>
-          resolveFieldReferenceValue(reference, fieldValues)
+          get(
+            fieldValues,
+            flattenFieldReference(reference).map(
+              makeFormFieldIdFormikCompatible
+            )
+          )
         )
       )[0]
 
       if (firstNonFalsyValue) {
-        set(fieldValues, listenerFieldFormikId, firstNonFalsyValue)
+        set(fieldValues, formikCompatibleListenerFieldPath, firstNonFalsyValue)
         return
       }
 
       const defaultValue = getDefaultValue(listenerField)
 
-      set(fieldValues, listenerFieldFormikId, defaultValue)
+      set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
 
       return
     },
-    [allFieldsWithDotSeparator, getDefaultValue]
+    [getDefaultValue]
   )
 
   const onFieldValueChange = useCallback(
@@ -239,7 +245,8 @@ export function FormSectionComponent({
       const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
       const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
       const interactiveListenerFields = listenerFields.filter(
-        (c): c is InteractiveFieldType => !isNonInteractiveFieldType(c)
+        (fieldWithPath): fieldWithPath is [string[], InteractiveFieldType] =>
+          !isNonInteractiveFieldType(fieldWithPath[1])
       )
 
       // update the value of the field that was changed
@@ -261,27 +268,31 @@ export function FormSectionComponent({
         )
       }
 
-      const formikListenerFieldIds = listenerFields.map((child) =>
-        makeFormFieldIdFormikCompatible(child.id)
-      )
-
-      const updatedTouched = omit(touched, formikListenerFieldIds)
+      // @todo figure out if this is needed
+      // const formikListenerFieldIds = listenerFields.map((child) =>
+      //   makeFormFieldIdFormikCompatible(child.id)
+      // )
+      //
+      // const updatedTouched = omit(touched, formikListenerFieldIds)
 
       void setValues(updatedValues)
-      void setTouched(updatedTouched)
-      onFormChange((prevForm) => ({ ...prevForm, ...updatedValues }))
-      onTouchedChange((prevTouched) => ({
-        ...prevTouched,
-        ...updatedTouched
+      // void setTouched(updatedTouched)
+      onFormChange((prevForm) => ({
+        ...prevForm,
+        ...makeFormFieldIdsFormikCompatible(updatedValues)
       }))
+      // onTouchedChange((prevTouched) => ({
+      //   ...prevTouched,
+      //   ...makeFormFieldIdsFormikCompatible(updatedTouched)
+      // }))
     },
     [
       values,
       setValues,
-      touched,
-      setTouched,
+      // touched,
+      // setTouched,
       onFormChange,
-      onTouchedChange,
+      // onTouchedChange,
       listenerFieldsByParentId,
       setValueForListenerField
     ]
@@ -290,7 +301,7 @@ export function FormSectionComponent({
   const onBatchFieldValueChange = useCallback(
     (newValues: Array<{ name: string; value: FieldValue | undefined }>) => {
       const updatedValues = cloneDeep(values)
-      const updatedTouched = cloneDeep(touched)
+      // const updatedTouched = cloneDeep(touched)
 
       for (const { name: formikFieldId, value } of newValues) {
         set(updatedValues, formikFieldId, value)
@@ -298,31 +309,32 @@ export function FormSectionComponent({
         const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
         const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
         const interactiveListenerFields = listenerFields.filter(
-          (c): c is InteractiveFieldType => !isNonInteractiveFieldType(c)
+          (fieldWithPath): fieldWithPath is [string[], InteractiveFieldType] =>
+            !isNonInteractiveFieldType(fieldWithPath[1])
         )
 
         for (const listenerField of interactiveListenerFields) {
           setValueForListenerField(listenerField, updatedValues)
-          updatedTouched[makeFormFieldIdFormikCompatible(listenerField.id)] =
-            undefined
+          // updatedTouched[makeFormFieldIdFormikCompatible(listenerField.id)] =
+          //   undefined
         }
       }
 
       void setValues(updatedValues)
-      void setTouched(updatedTouched)
+      // void setTouched(updatedTouched)
       onFormChange((prevForm) => ({ ...prevForm, ...updatedValues }))
-      onTouchedChange((prevTouched) => ({
-        ...prevTouched,
-        ...updatedTouched
-      }))
+      // onTouchedChange((prevTouched) => ({
+      //   ...prevTouched,
+      //   ...updatedTouched
+      // }))
     },
     [
       values,
       setValues,
-      touched,
-      setTouched,
+      // touched,
+      // setTouched,
       onFormChange,
-      onTouchedChange,
+      // onTouchedChange,
       listenerFieldsByParentId,
       setValueForListenerField
     ]
