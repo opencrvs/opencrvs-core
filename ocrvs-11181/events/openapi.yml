@@ -774,7 +774,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 14af9118-13b6-459e-8d21-f5148de104d5
+                transactionId: 8471dce1-18c2-4044-9972-68e22d139771
                 type: birth
       responses:
         "200":
@@ -860,7 +860,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 2b17ef60-a5ef-4d4c-bdda-a6ffb69ec6ac
+                transactionId: 1f62db57-4e93-4160-97d4-642ea2e199a0
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9764,10 +9764,6 @@ components:
                 - limit
                 - offset
                 - validation
-            description:
-              type: string
-              description: Description to display above the search field, e.g. instructions on
-                how to use the search
           required:
             - id
             - label

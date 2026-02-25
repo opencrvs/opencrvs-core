@@ -9024,10 +9024,6 @@ components:
                 - limit
                 - offset
                 - validation
-            description:
-              type: string
-              description: Description to display above the search field, e.g. instructions on
-                how to use the search
           required:
             - id
             - label
