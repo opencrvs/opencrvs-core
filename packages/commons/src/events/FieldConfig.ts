@@ -768,6 +768,12 @@ export type HttpField = z.infer<typeof HttpField>
 
 const SearchField = HttpField.extend({
   type: z.literal(FieldType.SEARCH),
+  description: z
+    .string()
+    .optional()
+    .describe(
+      'Description to display above the search field, e.g. instructions on how to use the search'
+    ),
   configuration: SearchQuery.pick({
     query: true,
     limit: true,
