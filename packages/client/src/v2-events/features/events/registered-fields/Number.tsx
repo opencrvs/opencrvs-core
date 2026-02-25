@@ -76,7 +76,7 @@ export const Number = {
     return (
       <>
         {prefix && intl.formatMessage(prefix)}
-        {value.toString() || ''}
+        {value ? value.toString() : ''}
         {postfix && intl.formatMessage(postfix)}
       </>
     )

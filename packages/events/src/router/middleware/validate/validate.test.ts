@@ -391,9 +391,7 @@ describe('getInvalidUpdateKeys', () => {
 
     const invalidKeys = getInvalidUpdateKeys({
       update,
-      cleaned,
-      formConfig: TENNIS_CLUB_DECLARATION_FORM,
-      context: testContext
+      cleaned
     })
 
     expect(invalidKeys).toEqual([
@@ -419,9 +417,7 @@ describe('getInvalidUpdateKeys', () => {
     const updateWithNull: EventState = {
       // recommender.name is HIDDEN when recommender.none = true
       // Sending a VALUE for hidden field should fail
-      'recommender.none': true,
-      'recommender.id': null,
-      'recommender.name': null
+      'recommender.none': true
     }
 
     const invalidKeys2 = getInvalidUpdateKeys({
@@ -434,9 +430,7 @@ describe('getInvalidUpdateKeys', () => {
           firstname: 'A',
           surname: 'B'
         }
-      },
-      formConfig: TENNIS_CLUB_DECLARATION_FORM,
-      context: testContext
+      }
     })
 
     expect(invalidKeys2).toEqual([])

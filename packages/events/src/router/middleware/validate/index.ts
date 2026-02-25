@@ -131,31 +131,33 @@ function validateDeclarationUpdateAction({
    * We need to validate the update against the cleaned declaration, which is a merged version of the previous declaration and the update.
    */
 
+  const declarationConfig = getDeclaration(eventConfig)
   // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
   const previousDeclaration = getCurrentEventState(
     event,
     eventConfig
   ).declaration
-  // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
-  const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
-  const declarationConfig = getDeclaration(eventConfig)
+  // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
+  const completeDeclaration = deepDropNulls(
+    deepMerge(previousDeclaration, declarationUpdate)
+  )
 
   // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
   // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
-    completeDeclaration,
+    deepDropNulls({
+      ...completeDeclaration,
+      ...declarationUpdate
+    }),
     context
   )
 
-  // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
-  // Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
+  // 3. When completeDeclaration update has fields that are not in the cleaned declaration, payload is invalid.
   const invalidKeys = getInvalidUpdateKeys({
-    update: declarationUpdate,
-    cleaned: cleanedDeclaration,
-    formConfig: declarationConfig,
-    context
+    update: completeDeclaration,
+    cleaned: cleanedDeclaration
   })
 
   if (invalidKeys.length > 0) {

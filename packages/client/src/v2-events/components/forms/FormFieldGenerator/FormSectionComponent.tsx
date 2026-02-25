@@ -11,7 +11,7 @@
 
 import React, { useCallback, useEffect, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, omit, get, compact } from 'lodash'
+import { cloneDeep, isEqual, set, omit, get, compact, isNil } from 'lodash'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -25,12 +25,12 @@ import {
   isNonInteractiveFieldType,
   InteractiveFieldType,
   FieldReference,
-  omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
   isFieldVisible,
   findAllFields,
-  mapFieldTypeToEmptyValue
+  omitHiddenPaginatedFields,
+  DeclarationFormConfig
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -48,7 +48,6 @@ import {
 } from './utils'
 import { GeneratedInputField } from './GeneratedInputField'
 
-/* eslint-disable max-lines */
 type AllProps = {
   id: string
   initialValues?: EventState
@@ -232,39 +231,60 @@ export function FormSectionComponent({
    */
   const handleFieldVisibilityTransition = useCallback(
     (
-      field: FieldConfig,
+      formConfig: DeclarationFormConfig,
       prevForm: EventState,
       currentForm: EventState,
       fieldValues: Record<string, FieldValue>
     ): boolean => {
-      const wasVisible = isFieldVisible(field, prevForm, validatorContext)
-      const isVisible = isFieldVisible(field, currentForm, validatorContext)
+      let visibilityChanged = false
+      const prevCleandedForm = omitHiddenPaginatedFields(
+        formConfig,
+        prevForm,
+        validatorContext
+      )
+
+      const currentCleandedForm = omitHiddenPaginatedFields(
+        formConfig,
+        currentForm,
+        validatorContext
+      )
+
+      const newHiddenKeys = Object.keys(prevCleandedForm).filter(
+        (key) => !(key in currentCleandedForm)
+      )
+
+      const newVisibleKeys = Object.keys(currentCleandedForm).filter(
+        (key) => !(key in prevCleandedForm)
+      )
 
       // When a field transitions from visible to hidden, cache its value and clear it
-      if (wasVisible && !isVisible) {
-        const formikFieldId = makeFormFieldIdFormikCompatible(field.id)
-        const fieldValue = get(fieldValues, formikFieldId)
+      if (newHiddenKeys.length > 0) {
+        newHiddenKeys.forEach((key) => {
+          const formikFieldId = makeFormFieldIdFormikCompatible(key)
+          const fieldValue = get(prevCleandedForm, key)
 
-        if (fieldValue !== undefined) {
-          cacheHiddenFieldValue(field.id, fieldValue)
-        }
-
-        set(fieldValues, formikFieldId, mapFieldTypeToEmptyValue(field))
-        return true
+          if (!isNil(fieldValue)) {
+            cacheHiddenFieldValue(key, fieldValue)
+            set(fieldValues, formikFieldId, null)
+            visibilityChanged = true
+          }
+        })
       }
 
       // When a field transitions from hidden to visible, restore its cached value
-      if (!wasVisible && isVisible) {
-        const cachedValue = popHiddenFieldValue(field.id)
+      if (newVisibleKeys.length > 0) {
+        newVisibleKeys.forEach((key) => {
+          const cachedValue = popHiddenFieldValue(key)
 
-        if (cachedValue !== undefined) {
-          const formikFieldId = makeFormFieldIdFormikCompatible(field.id)
-          set(fieldValues, formikFieldId, cachedValue)
-          return true
-        }
+          if (cachedValue !== undefined) {
+            const formikFieldId = makeFormFieldIdFormikCompatible(key)
+            set(fieldValues, formikFieldId, cachedValue)
+            visibilityChanged = true
+          }
+        })
       }
 
-      return false
+      return visibilityChanged
     },
     [validatorContext, cacheHiddenFieldValue, popHiddenFieldValue]
   )
@@ -274,9 +294,7 @@ export function FormSectionComponent({
     (
       listenerField: InteractiveFieldType,
       fieldValues: Record<string, FieldValue>,
-      fieldErrors: AllProps['errors'],
-      prevForm: EventState,
-      currentForm: EventState
+      fieldErrors: AllProps['errors']
     ) => {
       // this can be any field. Even though we call this only when parent triggers the change.
       const listenerFieldOcrvsId = makeFormikFieldIdOpenCRVSCompatible(
@@ -287,31 +305,8 @@ export function FormSectionComponent({
         (f) => f.id === listenerFieldOcrvsId
       )
 
-      if (!listenerFieldConfig) {
-        return
-      }
-
-      // Check if this field is transitioning visibility states
-      // If so, handle caching/restoration and return early
-      const visibilityChanged = handleFieldVisibilityTransition(
-        listenerFieldConfig,
-        prevForm,
-        currentForm,
-        fieldValues
-      )
-
-      if (visibilityChanged) {
-        const listenerFieldFormikId = makeFormFieldIdFormikCompatible(
-          listenerField.id
-        )
-        set(fieldErrors, listenerFieldFormikId, '')
-        return
-      }
-
-      // If no visibility change, proceed with the original logic
-      // (setting value from references or default value)
       const referencesToOtherFields = ([] as FieldReference[]).concat(
-        listenerFieldConfig.value ?? []
+        listenerFieldConfig?.value ?? []
       )
 
       const listenerFieldFormikId = makeFormFieldIdFormikCompatible(
@@ -340,11 +335,7 @@ export function FormSectionComponent({
 
       return
     },
-    [
-      allFieldsWithDotSeparator,
-      systemVariables,
-      handleFieldVisibilityTransition
-    ]
+    [allFieldsWithDotSeparator, systemVariables]
   )
 
   const onFieldValueChange = useCallback(
@@ -361,28 +352,8 @@ export function FormSectionComponent({
       // update the value of the field that was changed
       set(updatedValues, formikFieldId, value)
 
-      // Prepare form states for visibility comparison
-      const prevForm = {
-        ...initialValues,
-        ...makeFormikFieldIdsOpenCRVSCompatible(
-          makeDatesFormatted(fieldsWithDotSeparator, values)
-        )
-      }
-      const currentForm = {
-        ...initialValues,
-        ...makeFormikFieldIdsOpenCRVSCompatible(
-          makeDatesFormatted(fieldsWithDotSeparator, updatedValues)
-        )
-      }
-
       for (const listenerField of interactiveListenerFields) {
-        setValueForListenerField(
-          listenerField,
-          updatedValues,
-          updatedErrors,
-          prevForm,
-          currentForm
-        )
+        setValueForListenerField(listenerField, updatedValues, updatedErrors)
       }
 
       // @TODO: we should not reference field id 'country' directly.
@@ -417,9 +388,7 @@ export function FormSectionComponent({
       errorsWithDotSeparator,
       setErrors,
       setAllTouchedFields,
-      setValueForListenerField,
-      initialValues,
-      fieldsWithDotSeparator
+      setValueForListenerField
     ]
   )
 
@@ -446,21 +415,8 @@ export function FormSectionComponent({
           (c): c is InteractiveFieldType => !isNonInteractiveFieldType(c)
         )
 
-        const currentForm = {
-          ...initialValues,
-          ...makeFormikFieldIdsOpenCRVSCompatible(
-            makeDatesFormatted(fieldsWithDotSeparator, updatedValues)
-          )
-        }
-
         for (const listenerField of interactiveListenerFields) {
-          setValueForListenerField(
-            listenerField,
-            updatedValues,
-            updatedErrors,
-            prevForm,
-            currentForm
-          )
+          setValueForListenerField(listenerField, updatedValues, updatedErrors)
           updatedTouched[makeFormFieldIdFormikCompatible(listenerField.id)] =
             undefined
         }
@@ -518,17 +474,14 @@ export function FormSectionComponent({
         )
       }
 
-      for (const field of fieldsWithDotSeparator) {
-        if (!field.parent) {
-          // Setting hidden fields values to empty, parent listeners are handled in setValueForListenerField method
-          const fieldChanged = handleFieldVisibilityTransition(
-            field,
-            prevForm,
-            currentForm,
-            newValuesWithChangedVisibility
-          )
-          fieldVisibilityChanged = fieldVisibilityChanged || fieldChanged
-        }
+      if (eventConfig) {
+        const fieldChanged = handleFieldVisibilityTransition(
+          eventConfig.declaration,
+          prevForm,
+          currentForm,
+          newValuesWithChangedVisibility
+        )
+        fieldVisibilityChanged = fieldVisibilityChanged || fieldChanged
       }
 
       if (fieldVisibilityChanged) {
@@ -555,6 +508,7 @@ export function FormSectionComponent({
   }, [
     values,
     id,
+    eventConfig,
     onChange,
     resetForm,
     fieldsWithDotSeparator,
@@ -584,22 +538,6 @@ export function FormSectionComponent({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validateAllFields])
-
-  /*
-   * For the conditional check data, we want to only include values from visible fields so values of hidden fields don't affect them.
-   *
-   * You might wonder why values of hidden fields aren't filtered out completely earlier.
-   * That's intentional — we persist their values so if the fields become visible again, the previous values are restored instead of resetting.
-   */
-  const declarationFields = eventConfig?.declaration.pages.flatMap(
-    (p) => p.fields
-  )
-  // const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
-  // const visibleFieldValues = omitHiddenFields(
-  //   allFields,
-  //   completeForm,
-  //   validatorContext
-  // )
 
   return (
     <section className={className}>

@@ -12,11 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import {
   ActionUpdate,
-  DeclarationFormConfig,
   errorMessages,
-  EventState,
-  isFieldVisible,
-  isPageVisible,
   LocationType,
   ValidatorContext
 } from '@opencrvs/commons/events'
@@ -69,39 +65,16 @@ export function throwWhenNotEmpty(errors: unknown[]) {
  */
 export function getInvalidUpdateKeys<T>({
   update,
-  cleaned,
-  formConfig,
-  context
+  cleaned
 }: {
   update: T
   cleaned: T
-  formConfig: DeclarationFormConfig
-  context: ValidatorContext
 }): ValidationError[] {
   const updateEntries = flattenEntries(update)
   const cleanedKeys = flattenEntries(cleaned).map(([key]) => key)
 
   return updateEntries
-    .filter(([key]) => {
-      const isInvalidKey = !cleanedKeys.includes(key)
-
-      const field = formConfig.pages
-        .flatMap((p) => p.fields)
-        .find((f) => f.id === key)
-      const page = formConfig.pages.find((p) =>
-        p.fields.some((f) => f.id === key)
-      )
-
-      const isFieldHidden =
-        field && !isFieldVisible(field, update as EventState, context)
-      const isPageHidden =
-        page && !isPageVisible(page, update as EventState, context)
-
-      const isHiddenWithNullValue =
-        (isFieldHidden || isPageHidden) && update[key as keyof T] === null
-
-      return isInvalidKey && !isHiddenWithNullValue
-    })
+    .filter(([key]) => !cleanedKeys.includes(key))
     .map(([key, value]) => ({
       message: errorMessages.hiddenField.defaultMessage,
       id: key,

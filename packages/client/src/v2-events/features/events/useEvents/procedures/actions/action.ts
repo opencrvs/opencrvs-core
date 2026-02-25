@@ -100,7 +100,8 @@ function getCleanedDeclarationDiff({
     return omitHiddenPaginatedFields(
       eventConfiguration.declaration,
       declarationDiff,
-      validatorContext
+      validatorContext,
+      true
     )
   }
 
