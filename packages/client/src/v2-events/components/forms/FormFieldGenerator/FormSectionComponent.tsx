@@ -37,7 +37,10 @@ import {
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
-import { makeFormFieldIdsFormikCompatible } from './utils'
+import {
+  makeFormFieldIdsFormikCompatible,
+  makeFormikFieldIdsOpenCRVSCompatible
+} from './utils'
 import { FormItem, GeneratedInputField } from './GeneratedInputField'
 
 type AllProps = {
@@ -279,11 +282,11 @@ export function FormSectionComponent({
       // void setTouched(updatedTouched)
       onFormChange((prevForm) => ({
         ...prevForm,
-        ...makeFormFieldIdsFormikCompatible(updatedValues)
+        ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
       }))
       // onTouchedChange((prevTouched) => ({
       //   ...prevTouched,
-      //   ...makeFormFieldIdsFormikCompatible(updatedTouched)
+      //   ...makeFormikFieldIdsOpenCRVSCompatible(updatedTouched)
       // }))
     },
     [
@@ -322,10 +325,13 @@ export function FormSectionComponent({
 
       void setValues(updatedValues)
       // void setTouched(updatedTouched)
-      onFormChange((prevForm) => ({ ...prevForm, ...updatedValues }))
+      onFormChange((prevForm) => ({
+        ...prevForm,
+        ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
+      }))
       // onTouchedChange((prevTouched) => ({
       //   ...prevTouched,
-      //   ...updatedTouched
+      //   ...makeFormikFieldIdsOpenCRVSCompatible(updatedTouched)
       // }))
     },
     [
