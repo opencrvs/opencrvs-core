@@ -73,13 +73,6 @@ export function omitUncorrectableFields(
 
 /**
  * Compares update vs cleaned payloads and returns an array of offending keys.
- *
- * A key is considered invalid if it appears in the update but not in the cleaned payload —
- * meaning it belongs to a field that should not be present (e.g. a hidden field).
- *
- * Exception: hidden fields with a null value are allowed, since null explicitly signals
- * that the client is clearing the field's value. This is intentional and necessary to
- * remove the field from the current event state.
  */
 export function getInvalidUpdateKeys<T>({
   update,
