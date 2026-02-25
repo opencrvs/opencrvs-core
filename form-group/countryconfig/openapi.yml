@@ -5449,11 +5449,18 @@ components:
                 partOf:
                   type: object
                   properties:
-                    $declaration:
+                    $$field:
                       type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
-                    - $declaration
-                  description: Parent location
+                    - $$field
+                  description: Reference to a field by its ID
                 type:
                   type: string
                   enum:

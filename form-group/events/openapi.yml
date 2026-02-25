@@ -757,7 +757,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 6bec8f65-5963-4918-9c31-132dd8581606
+                transactionId: f9e8c2af-3c00-4055-82da-50e209d206eb
                 type: birth
       responses:
         "200":
@@ -843,7 +843,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: cee58c6a-13a9-4417-abfd-f5058a27af54
+                transactionId: 7674e911-f55f-401e-9d13-1949b50ff0a4
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -6142,11 +6142,18 @@ components:
                 partOf:
                   type: object
                   properties:
-                    $declaration:
+                    $$field:
                       type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
-                    - $declaration
-                  description: Parent location
+                    - $$field
+                  description: Reference to a field by its ID
                 type:
                   type: string
                   enum:
