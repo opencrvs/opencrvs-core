@@ -142,6 +142,14 @@ function validateDeclarationUpdateAction({
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
+  // For REQUEST_CORRECTION, `previousDeclaration` may contain uncorrectable fields that are conditionally hidden.
+  // When merged into `completeDeclaration`, these hidden uncorrectable fields would incorrectly trigger
+  // "Hidden or disabled field should not receive a value" error during invalid key check.
+  // We cannot resolve this by sending them as null in `declarationUpdate` either,
+  // because `validateCorrectableFields` below rejects any uncorrectable field in a REQUEST_CORRECTION.
+  // Stripping uncorrectable fields from `completeDeclaration` (which is previousDeclaration + declarationUpdate) entirely is the only clean solution —
+  // and it's safe because `validateCorrectableFields` already catches the case where
+  // the client wrongly includes uncorrectable fields in `declarationUpdate`.
   const completeDeclaration = deepDropNulls(
     actionType === ActionType.REQUEST_CORRECTION
       ? omitUncorrectableFields(eventConfig, mergedDeclaration)

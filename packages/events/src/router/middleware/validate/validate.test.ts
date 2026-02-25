@@ -9,16 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  AddressType,
   ConditionalType,
-  EventState,
   field,
   FieldType,
   TestUserRole,
   TokenUserType,
   user
 } from '@opencrvs/commons'
-import { getInvalidUpdateKeys } from './utils'
 import { getFieldErrors } from './index'
 
 export const testContext = {

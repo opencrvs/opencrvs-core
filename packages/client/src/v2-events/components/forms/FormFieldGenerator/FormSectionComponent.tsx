@@ -460,7 +460,6 @@ export function FormSectionComponent({
     // We propagate changes to the non-formik state from formik
     if (userChangedForm) {
       const newValuesWithChangedVisibility = cloneDeep(values)
-      let fieldVisibilityChanged = false
       const prevForm = {
         ...initialValues,
         ...makeFormikFieldIdsOpenCRVSCompatible(
@@ -475,17 +474,16 @@ export function FormSectionComponent({
       }
 
       if (eventConfig) {
-        const fieldChanged = handleFieldVisibilityTransition(
+        const fieldVisibilityChanged = handleFieldVisibilityTransition(
           eventConfig.declaration,
           prevForm,
           currentForm,
           newValuesWithChangedVisibility
         )
-        fieldVisibilityChanged = fieldVisibilityChanged || fieldChanged
-      }
 
-      if (fieldVisibilityChanged) {
-        onChange(newValuesWithChangedVisibility)
+        onChange(
+          fieldVisibilityChanged ? newValuesWithChangedVisibility : values
+        )
       } else {
         onChange(values)
       }
