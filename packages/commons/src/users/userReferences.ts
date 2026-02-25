@@ -24,14 +24,27 @@ export const JurisdictionReference = z.object({
 })
 export type JurisdictionReference = z.infer<typeof JurisdictionReference>
 
+/*
+ * Type guard to check if the jurisdiction is a plain jurisdiction filter.
+ *
+ * @param jurisdiction - The jurisdiction to check.
+ * @returns True if the jurisdiction is a plain jurisdiction filter, false otherwise.
+ */
 function isJurisdictionFilter(
   jurisdiction: JurisdictionFilter | ScopeAttributeReference
 ): jurisdiction is JurisdictionFilter {
-  return JurisdictionFilter.safeParse(jurisdiction).success
+  if (typeof jurisdiction !== 'string') {
+    return false
+  }
+
+  // Do this instead of using safeParse for performance reasons.
+  const allowedJurisdictionFilters = Object.values(JurisdictionFilter.enum)
+  return allowedJurisdictionFilters.includes(jurisdiction)
 }
 
 function resolveScopeAttribute(
-  scopeAttributeReference: ScopeAttributeReference
+  scopeAttributeReference: ScopeAttributeReference,
+  scopes: string[]
 ): JurisdictionFilter {
   const scopeName = scopeAttributeReference['$scope']
   const scopeAttribute = scopeAttributeReference['$attribute']
@@ -51,7 +64,8 @@ function resolveScopeAttribute(
  * @returns The jurisdiction filter.
  */
 export function resolveJurisdictionReference(
-  jurisdictionReference: JurisdictionReference | undefined
+  jurisdictionReference: JurisdictionReference | undefined,
+  scopes?: string[]
 ): JurisdictionFilter {
   if (!jurisdictionReference) {
     return JurisdictionFilter.enum.all
@@ -65,8 +79,8 @@ export function resolveJurisdictionReference(
   }
 
   // If the jurisdiction is a scope attribute reference, resolve it
-  if (jurisdiction['$scope']) {
-    return resolveScopeAttribute(jurisdiction)
+  if (jurisdiction['$scope'] && scopes) {
+    return resolveScopeAttribute(jurisdiction, scopes)
   }
 
   throw 'Failed to resolve jurisdiction filter'

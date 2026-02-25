@@ -126,7 +126,9 @@ function LocationSearchInput({
   id: string
 }) {
   const jurisdictionFilter = resolveJurisdictionReference(
-    props.configuration?.allowedLocations
+    props.configuration?.allowedLocations,
+    // TODO CIHAN: pass in scopes as param
+    []
   )
 
   const locations = useAvailableLocations(
