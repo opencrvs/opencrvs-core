@@ -17,12 +17,15 @@ import {
   SearchField,
   validateValue,
   HttpFieldValue,
-  EventIndex
+  EventIndex,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import {
+  Box,
   Button,
   Dialog,
   IColor,
+  Icon,
   Link,
   Loader,
   Stack,
@@ -152,6 +155,12 @@ function ClearModal({
   )
 }
 
+const StyledContainer = styled(Box)`
+  background: ${({ theme }) => theme.colors.background};
+  border: none;
+  flex: 1;
+`
+
 const SearchInputWrapper = styled.div`
   display: flex;
   width: 100%;
@@ -224,10 +233,14 @@ function SearchInput({
   onChange,
   form,
   configuration,
+  label,
+  helperText,
   value
 }: Omit<Props, 'configuration'> & {
   configuration: SearchField['configuration']
   value: HttpFieldValue | null | undefined
+  label?: string
+  helperText?: TranslationConfig
 }) {
   const intl = useIntl()
 
@@ -342,70 +355,94 @@ function SearchInput({
     !httpState || !!httpState.error || !((httpState.data?.total ?? 0) > 0)
 
   return (
-    <Stack alignItems="flex-start" direction="column" gap={8}>
-      <SearchInputWrapper>
-        <TextInput
-          data-testid="search-input"
-          id="search"
-          isDisabled={!isEditable}
-          postfix={
-            <Postfix
-              clearData={async () => clearData()}
-              configuration={configuration}
-              hasData={!!((httpState?.data?.total ?? 0) > 0)}
-              isLoading={httpState?.loading}
-            />
-          }
-          value={inputState}
-          onChange={(e) => {
-            setHttpState(null)
-            setInputState(e.target.value)
-          }}
-        />
-        <Http.Input
-          configuration={{
-            url: '/api/events/events/search',
-            timeout: 5000,
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: {
-              query: replaceTerm(inputState, configuration.query),
-              limit: configuration.limit,
-              offset: configuration.offset
+    <StyledContainer>
+      <Stack alignItems="-moz-initial" direction="column" gap={8}>
+        <Stack alignItems="-moz-initial" direction="column" gap={8}>
+          {label && (
+            <Text
+              color="grey600"
+              element="span"
+              style={{ fontWeight: 500 }}
+              variant="h4"
+            >
+              {label}
+            </Text>
+          )}
+          {helperText && (
+            <Text
+              color="grey500"
+              element="span"
+              style={{ fontWeight: 400 }}
+              variant="h4"
+            >
+              {intl.formatMessage(helperText)}
+            </Text>
+          )}
+        </Stack>
+        <SearchInputWrapper>
+          <TextInput
+            data-testid="search-input"
+            id="search"
+            isDisabled={!isEditable}
+            postfix={
+              <Postfix
+                clearData={async () => clearData()}
+                configuration={configuration}
+                hasData={!!((httpState?.data?.total ?? 0) > 0)}
+                isLoading={httpState?.loading}
+              />
             }
-          }}
-          form={form}
-          parentValue={buttonPressed}
-          onChange={onHTTPChange}
-        />
-        {isEditable && (
-          <Button
-            disabled={!valid || !isOnline}
-            size="large"
-            type="secondary"
-            onClick={() => setButtonPressed(buttonPressed + 1)}
+            value={inputState}
+            onChange={(e) => {
+              setHttpState(null)
+              setInputState(e.target.value)
+            }}
+          />
+          <Http.Input
+            configuration={{
+              url: '/api/events/events/search',
+              timeout: 5000,
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: {
+                query: replaceTerm(inputState, configuration.query),
+                limit: configuration.limit,
+                offset: configuration.offset
+              }
+            }}
+            form={form}
+            parentValue={buttonPressed}
+            onChange={onHTTPChange}
+          />
+          {isEditable && (
+            <Button
+              disabled={!valid || !isOnline}
+              size="large"
+              type="secondary"
+              onClick={() => setButtonPressed(buttonPressed + 1)}
+            >
+              {intl.formatMessage(
+                configuration.indicators?.confirmButton ||
+                  defaultIndicators.confirmButton
+              )}
+            </Button>
+          )}
+        </SearchInputWrapper>
+        {message && (
+          <Text
+            color={color}
+            data-testid="search-input-error"
+            element="span"
+            variant="bold16"
           >
-            {intl.formatMessage(
-              configuration.indicators?.confirmButton ||
-                defaultIndicators.confirmButton
-            )}
-          </Button>
+            {message}
+          </Text>
         )}
-      </SearchInputWrapper>
-      {message && (
-        <Text
-          color={color}
-          data-testid="search-input-error"
-          element="span"
-          variant="bold16"
-        >
-          {message}
-        </Text>
-      )}
-      {modal}
-    </Stack>
+        {modal}
+      </Stack>
+    </StyledContainer>
   )
 }
 
