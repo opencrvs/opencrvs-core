@@ -55,7 +55,8 @@ import {
   getValidatorContext,
   getInvalidUpdateKeys,
   getVerificationPageErrors,
-  throwWhenNotEmpty
+  throwWhenNotEmpty,
+  omitUncorrectableFields
 } from './utils'
 
 export function getFieldErrors(
@@ -139,8 +140,12 @@ function validateDeclarationUpdateAction({
   ).declaration
 
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
+  const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)
+
   const completeDeclaration = deepDropNulls(
-    deepMerge(previousDeclaration, declarationUpdate)
+    actionType === ActionType.REQUEST_CORRECTION
+      ? omitUncorrectableFields(eventConfig, mergedDeclaration)
+      : mergedDeclaration
   )
 
   // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed

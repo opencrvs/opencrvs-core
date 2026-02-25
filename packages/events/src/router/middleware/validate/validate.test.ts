@@ -18,7 +18,6 @@ import {
   TokenUserType,
   user
 } from '@opencrvs/commons'
-import { TENNIS_CLUB_DECLARATION_FORM } from '@opencrvs/commons/fixtures'
 import { getInvalidUpdateKeys } from './utils'
 import { getFieldErrors } from './index'
 
