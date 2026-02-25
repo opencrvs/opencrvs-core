@@ -624,6 +624,7 @@ export type NonInteractiveFieldType =
   | LinkButtonField
   | QueryParamReaderField
   | LoaderField
+  | AutocompleteField
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 

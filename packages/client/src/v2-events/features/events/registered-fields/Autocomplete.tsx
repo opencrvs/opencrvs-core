@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
+import { List, RowComponentProps } from 'react-window'
 import {
   SingleValue,
   GroupBase,
@@ -26,7 +27,6 @@ import {
   FieldPropsWithoutReferenceValue,
   FieldType
 } from '@opencrvs/commons/client'
-import { List, RowComponentProps } from 'react-window'
 import { Icon } from '@opencrvs/components'
 import { Option } from '../../../utils'
 
@@ -74,7 +74,7 @@ function RowComponent<T extends string | number>({
       style={style}
       onClick={option.value ? () => selectOption(option) : undefined}
     >
-      {option.value}: {option.label}
+      {`${option.value}: ${option.label}`}
     </DropDownItem>
   )
 }
@@ -250,6 +250,7 @@ type AutocompleteProps = FieldPropsWithoutReferenceValue<
   touched?: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function debouncePromise<Args extends any[], R>(
   fn: (...args: Args) => Promise<R>,
   delay: number
@@ -268,33 +269,34 @@ function debouncePromise<Args extends any[], R>(
 function AutocompleteInput(props: AutocompleteProps) {
   const { id, onChange, value, configuration, error, touched } = props
 
-  const fetchOptions = async (
-    inputValue: string
-  ): Promise<AutocompleteValue[]> => {
-    if (!inputValue) {
-      return []
-    }
+  const fetchOptions = useCallback(
+    async (inputValue: string): Promise<AutocompleteValue[]> => {
+      // We can skip the API call if the input is empty or just whitespace
+      if (!inputValue.trim()) {
+        return []
+      }
 
-    const res = await fetch(
-      `${configuration.url}${encodeURIComponent(inputValue)}`
-    )
+      const res = await fetch(
+        `${configuration.url}${encodeURIComponent(inputValue)}`
+      )
 
-    if (!res.ok) {
-      return []
-    }
+      if (!res.ok) {
+        return []
+      }
 
-    const [, displays] = await res.json()
+      const [, displays] = await res.json()
 
-    return displays.map(([code, label]: [string, string]) => ({
-      value: code,
-      label
-    }))
-  }
+      return displays.map(([code, label]: [string, string]) => ({
+        value: code,
+        label
+      }))
+    },
+    [configuration.url]
+  )
 
   const debouncedFetchOptions = useMemo(
     () => debouncePromise(fetchOptions, 400),
-
-    []
+    [fetchOptions]
   )
 
   const loadOptions = async (inputValue: string) => {
@@ -304,8 +306,6 @@ function AutocompleteInput(props: AutocompleteProps) {
   const handleChange = (newValue: SingleValue<AutocompleteValue>) => {
     onChange(newValue)
   }
-
-  console.log('value :>> ', value)
 
   return (
     <StyledAsyncSelect
@@ -334,6 +334,6 @@ function AutocompleteInput(props: AutocompleteProps) {
 export const Autocomplete = {
   Input: AutocompleteInput,
   Output: ({ value }: { value: AutocompleteUpdateValue }) => {
-    return value ? `${value?.value}: ${value?.label}` : null
+    return value ? `${value.value}: ${value.label}` : null
   }
 }
