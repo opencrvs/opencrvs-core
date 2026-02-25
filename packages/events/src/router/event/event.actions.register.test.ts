@@ -104,7 +104,8 @@ test('Validation error message contains all the offending fields', async () => {
     declaration: {
       'applicant.dob': '02-02',
       'recommender.none': true,
-      'applicant.dobUnknown': false
+      'applicant.dobUnknown': false,
+      'applicant.age': null
     }
   })
 
@@ -1217,11 +1218,10 @@ describe('Register action - hidden field nullification', () => {
         ActionType.DECLARE,
         ActionType.VALIDATE
       ])
-
       const payload = generator.event.actions.register(event.id, {
         declaration: {
-          'applicant.dob': '2024-02-01',
-          'applicant.dobUnknown': false,
+          'applicant.dobUnknown': true,
+          'applicant.age': 19,
           'applicant.name': {
             firstname: 'John',
             surname: 'Doe'
@@ -1259,8 +1259,8 @@ describe('Register action - hidden field nullification', () => {
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
-          'applicant.dob': '2024-02-01',
-          'applicant.dobUnknown': false,
+          'applicant.dobUnknown': true,
+          'applicant.age': 19,
           'applicant.name': {
             firstname: 'John',
             surname: 'Doe'
@@ -1274,8 +1274,7 @@ describe('Register action - hidden field nullification', () => {
           'recommender.id': '1234',
           'applicant.address': {
             country: 'FAR',
-            addressType: AddressType.DOMESTIC,
-            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            addressType: AddressType.INTERNATIONAL,
             streetLevelDetails: {
               state: 'State',
               district2: 'District2'
@@ -1304,8 +1303,8 @@ describe('Register action - hidden field nullification', () => {
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
-          'applicant.dob': '2024-02-01',
-          'applicant.dobUnknown': false,
+          'applicant.dobUnknown': true,
+          'applicant.age': 19,
           'applicant.name': {
             firstname: 'John',
             surname: 'Doe'
@@ -1377,8 +1376,8 @@ describe('Register action - hidden field nullification', () => {
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
-          'applicant.dob': '2024-02-01',
-          'applicant.dobUnknown': false,
+          'applicant.age': 19,
+          'applicant.dobUnknown': true,
           'applicant.name': {
             firstname: 'John',
             surname: 'Doe'
@@ -1424,8 +1423,8 @@ describe('Register action - hidden field nullification', () => {
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
-          'applicant.dob': '2024-02-01',
-          'applicant.dobUnknown': false,
+          'applicant.age': 19,
+          'applicant.dobUnknown': true,
           'applicant.name': {
             firstname: 'John',
             surname: 'Doe'
@@ -1475,8 +1474,8 @@ describe('Register action - hidden field nullification', () => {
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
-          'applicant.dob': '2024-02-01',
-          'applicant.dobUnknown': false,
+          'applicant.age': 19,
+          'applicant.dobUnknown': true,
           'applicant.name': {
             firstname: 'John',
             surname: 'Doe'
@@ -1528,6 +1527,7 @@ describe('Register action - hidden field nullification', () => {
           // DOB before 1950 makes senior-pass page VISIBLE
           'applicant.dob': '1944-02-01',
           'applicant.dobUnknown': false,
+          'applicant.age': null,
           'applicant.name': {
             firstname: 'John',
             surname: 'Doe'
@@ -1573,8 +1573,8 @@ describe('Register action - hidden field nullification', () => {
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
-          'applicant.dob': '2024-02-01',
-          'applicant.dobUnknown': false,
+          'applicant.age': 19,
+          'applicant.dobUnknown': true,
           'applicant.name': {
             firstname: 'John',
             surname: 'Doe'
@@ -1623,6 +1623,7 @@ describe('Register action - hidden field nullification', () => {
           // DOB after 1950 means senior-pass page is HIDDEN
           'applicant.dob': '2000-02-01',
           'applicant.dobUnknown': false,
+          'applicant.age': null,
           'applicant.name': {
             firstname: 'John',
             surname: 'Doe'
@@ -1668,8 +1669,8 @@ describe('Register action - hidden field nullification', () => {
 
       const payload = generator.event.actions.register(event.id, {
         declaration: {
-          'applicant.dob': '2024-02-01', // ✅ Valid
-          'applicant.dobUnknown': false, // ✅ Valid
+          'applicant.age': 19, // ✅ Valid
+          'applicant.dobUnknown': false, // ✅ trued
           'applicant.name': {
             // ✅ Valid
             firstname: 'John',
@@ -1711,52 +1712,56 @@ describe('Register action - hidden field nullification', () => {
       const client = createTestClient(user)
       const event = await client.event.create(generator.event.create())
 
-      // Step 1: Declare with recommender.none = false (recommender.name is visible)
-      await client.event.actions.declare.request(
-        generator.event.actions.declare(event.id, {
-          declaration: {
-            'applicant.dob': '2024-02-01',
-            'applicant.dobUnknown': false,
-            'applicant.name': {
-              firstname: 'John',
-              surname: 'Doe'
-            },
-            'recommender.none': false,
-            'recommender.id': '1234',
-            'recommender.name': {
-              firstname: 'Jane',
-              surname: 'Smith'
-            },
-            'applicant.address': {
-              country: 'FAR',
-              addressType: AddressType.DOMESTIC,
-              administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
-              streetLevelDetails: {
-                state: 'State',
-                district2: 'District2'
-              }
-            }
+      const payload = generator.event.actions.declare(event.id, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
           },
-          keepAssignment: true
-        })
-      )
+          'recommender.none': false,
+          'recommender.id': '1234',
+          'recommender.name': {
+            firstname: 'Jane',
+            surname: 'Smith'
+          },
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'State',
+              district2: 'District2'
+            }
+          }
+        },
+        keepAssignment: true
+      })
+
+      // Step 1: Declare with recommender.none = false (recommender.name is visible)
+      await client.event.actions.declare.request(payload)
 
       // Step 2: Validate without changes
-      await client.event.actions.validate.request(
-        generator.event.actions.validate(event.id, { keepAssignment: true })
-      )
+      const validate = generator.event.actions.validate(event.id, {
+        declaration: payload.declaration,
+        keepAssignment: true
+      })
+      await client.event.actions.validate.request(validate)
 
       // Step 3: Register with recommender.none = true (recommender.name becomes hidden)
       // Explicitly nullify the previously declared recommender.name
-      const payload = generator.event.actions.register(event.id, {
+      const registerPayload = generator.event.actions.register(event.id, {
         declaration: {
+          ...declaration,
           'recommender.none': true,
           'recommender.name': null, // Explicitly clear the hidden field
           'recommender.id': null // Explicitly clear the hidden field
         }
       })
 
-      const response = await client.event.actions.register.request(payload)
+      const response =
+        await client.event.actions.register.request(registerPayload)
 
       const requestedAction = response.actions.find(
         ({ type, status }) =>
@@ -1813,6 +1818,7 @@ describe('Registration by different user with declaration changes', () => {
       declaration: {
         'applicant.dob': '1944-02-01', // Makes senior-pass page visible
         'applicant.dobUnknown': false,
+        'applicant.age': null,
         'applicant.name': {
           firstname: 'John',
           surname: 'Doe'
@@ -1838,7 +1844,9 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 3: Registration agent validates
     await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id)
+      generator.event.actions.validate(event.id, {
+        declaration: payload.declaration
+      })
     )
 
     // Step 4: Assign the event to registrar for registration
@@ -1902,8 +1910,8 @@ describe('Registration by different user with declaration changes', () => {
     const payload = {
       keepAssignment: true,
       declaration: {
-        'applicant.dob': '2024-02-01',
-        'applicant.dobUnknown': false,
+        'applicant.age': 19,
+        'applicant.dobUnknown': true,
         'applicant.name': {
           firstname: 'John',
           surname: 'Doe'
@@ -1932,7 +1940,9 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 3: Registration agent validates
     await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id)
+      generator.event.actions.validate(event.id, {
+        declaration: payload.declaration
+      })
     )
 
     // Step 4: Assign the event to registrar for registration
@@ -1999,8 +2009,8 @@ describe('Registration by different user with declaration changes', () => {
     const payload = {
       keepAssignment: true,
       declaration: {
-        'applicant.dob': '2024-02-01',
-        'applicant.dobUnknown': false,
+        'applicant.age': 19,
+        'applicant.dobUnknown': true,
         'applicant.name': {
           firstname: 'John',
           surname: 'Doe'
@@ -2029,7 +2039,9 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 3: Registration agent validates
     await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id)
+      generator.event.actions.validate(event.id, {
+        declaration: payload.declaration
+      })
     )
 
     // Step 4: Assign the event to registrar for registration
@@ -2075,8 +2087,8 @@ describe('Registration by different user with declaration changes', () => {
     const payload = {
       keepAssignment: true,
       declaration: {
-        'applicant.dob': '2024-02-01',
-        'applicant.dobUnknown': false,
+        'applicant.age': 19,
+        'applicant.dobUnknown': true,
         'applicant.name': {
           firstname: 'John',
           surname: 'Doe'
@@ -2099,7 +2111,9 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 3: Registration agent validates
     await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id)
+      generator.event.actions.validate(event.id, {
+        declaration: payload.declaration
+      })
     )
 
     // Step 4: Assign the event to registrar for registration
@@ -2171,7 +2185,9 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 3: Registration agent validates
     await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id)
+      generator.event.actions.validate(event.id, {
+        declaration: payload.declaration
+      })
     )
 
     // Step 4: Registrar tries to add field from hidden page during registration
@@ -2206,8 +2222,8 @@ describe('Registration by different user with declaration changes', () => {
     const payload = {
       keepAssignment: true,
       declaration: {
-        'applicant.dob': '2024-02-01',
-        'applicant.dobUnknown': false,
+        'applicant.age': 19,
+        'applicant.dobUnknown': true,
         'applicant.name': {
           firstname: 'John',
           surname: 'Doe'
@@ -2230,7 +2246,9 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 3: Registration agent validates
     await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id)
+      generator.event.actions.validate(event.id, {
+        declaration: payload.declaration
+      })
     )
 
     // Step 4: Assign the event to registrar for registration
@@ -2323,7 +2341,9 @@ describe('Registration by different user with declaration changes', () => {
 
     // Step 3: Registration agent validates
     await registrationAgentClient.event.actions.validate.request(
-      generator.event.actions.validate(event.id)
+      generator.event.actions.validate(event.id, {
+        declaration: payload.declaration
+      })
     )
 
     // Step 4: Assign the event to registrar for registration

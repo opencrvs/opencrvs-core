@@ -147,10 +147,7 @@ function validateDeclarationUpdateAction({
   // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
-    deepDropNulls({
-      ...completeDeclaration,
-      ...declarationUpdate
-    }),
+    completeDeclaration,
     context
   )
 

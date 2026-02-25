@@ -195,7 +195,7 @@ describe('Overwriting parent field', () => {
       'mother.dob': '1990-03-22',
       'mother.idType': 'NID',
       'mother.nid': 'ID123456789',
-      'informant.relation': 'FATHER',
+      'informant.relation': 'BROTHER',
       'informant.name': { firstname: 'Rok', surname: 'Doe' },
       'informant.dob': '1988-06-12',
       'informant.dobUnknown': false
@@ -233,7 +233,10 @@ describe('Overwriting parent field', () => {
     event = await client.event.actions.correction.request.request(
       generator.event.actions.correction.request(event.id, {
         declaration: {
-          'informant.relation': 'MOTHER'
+          'informant.relation': 'MOTHER',
+          'informant.name': null,
+          'informant.dob': null,
+          'informant.dobUnknown': null
         },
         keepAssignment: true
       })
