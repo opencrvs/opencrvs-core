@@ -421,6 +421,8 @@ export function FormSectionComponent({
               validatorContext={validatorContext}
               onBatchFieldValueChange={onBatchFieldValueChange}
               onBlur={(formikFieldId, newTouched) => {
+                // @ts-ignore Formik types don't work well with nested values
+                void setTouched({ ...touched, [formikFieldId]: newTouched })
                 onTouchedChange((prevTouched) => ({
                   ...prevTouched,
                   [makeFormikFieldIdOpenCRVSCompatible(formikFieldId)]:

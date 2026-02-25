@@ -147,7 +147,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
     values: Array<{ name: string; value: FieldValue | undefined }>
   ) => void
   form: EventState
-  onBlur?: (formikFieldId: string, newTouched: FormState<boolean>) => void
+  onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
   disabled?: boolean
   readonlyMode?: boolean
   allKnownFields: FieldConfig[]
@@ -195,9 +195,8 @@ export const GeneratedInputField = React.memo(
       touched: meta.touched
     }
 
-    function handleBlur<E>(e: React.FocusEvent<E>) {
-      onBlur?.(name, true)
-      input.onBlur(e)
+    function handleBlur<E>(_: React.FocusEvent<E>) {
+      onBlur(name, true)
     }
 
     const inputProps = {
@@ -224,9 +223,8 @@ export const GeneratedInputField = React.memo(
     }
     if (isFieldGroupFieldType(field)) {
       const parentTouched =
-        (getIn(allTouched, name) as unknown as
-          | IndexMap<FormState<boolean>>
-          | undefined) ?? {}
+        (getIn(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
+        {}
       const parentInputFieldProps = {
         ...field.inputFieldProps,
         error: typeof error === 'string' ? error : ''
@@ -249,7 +247,7 @@ export const GeneratedInputField = React.memo(
                   fieldDefinition={subfield}
                   name={subfieldFullName}
                   onBlur={(_, nestedTouched) =>
-                    onBlur?.(name, {
+                    onBlur(name, {
                       ...parentTouched,
                       [subfieldName]: nestedTouched
                     })
@@ -267,6 +265,9 @@ export const GeneratedInputField = React.memo(
         makeFormikFieldIdOpenCRVSCompatible(field.config.id),
         field.config.validation || []
       )
+      const parentTouched =
+        (getIn(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
+        {}
 
       return (
         // We are showing errors to underlying text input, so we need to ignore them here
@@ -280,9 +281,12 @@ export const GeneratedInputField = React.memo(
             disabled={disabled}
             eventConfig={eventConfig}
             id={fieldDefinition.id}
+            name={name}
+            touched={parentTouched}
             validation={validation}
             validatorContext={validatorContext}
             value={field.value}
+            onBlur={onBlur}
             onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>
