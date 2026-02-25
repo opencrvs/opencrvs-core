@@ -40,7 +40,7 @@ import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
 import { SerializedNowDateTime } from './serializers/date/serializer'
-import { JurisdictionFilter } from '../scopes-v2'
+import { JurisdictionReference } from '../users/userReferences'
 
 const FieldId = z
   .string()
@@ -576,7 +576,7 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
-const AllowedLocations = JurisdictionFilter.optional().describe(
+const AllowedLocations = JurisdictionReference.optional().describe(
   'Limits which location options are selectable depending on user jurisdiction and location.'
 )
 

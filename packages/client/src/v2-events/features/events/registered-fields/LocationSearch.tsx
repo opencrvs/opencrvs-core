@@ -17,7 +17,8 @@ import {
   UUID,
   joinValues,
   AdministrativeArea,
-  JurisdictionFilter
+  JurisdictionFilter,
+  resolveJurisdictionReference
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -124,14 +125,18 @@ function LocationSearchInput({
   disabled?: boolean
   id: string
 }) {
-  const availableLocations = useAvailableLocations(
-    searchableResource,
+  const jurisdictionFilter = resolveJurisdictionReference(
     props.configuration?.allowedLocations
   )
 
+  const locations = useAvailableLocations(
+    searchableResource,
+    jurisdictionFilter
+  )
+
   const options = useMemo(
-    () => availableLocations.map((l) => ({ value: l.id, label: l.name })),
-    [availableLocations]
+    () => locations.map((l) => ({ value: l.id, label: l.name })),
+    [locations]
   )
 
   const selectedOption =

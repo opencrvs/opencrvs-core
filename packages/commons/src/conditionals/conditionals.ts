@@ -18,7 +18,7 @@ import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 import { EventStatus } from '../events/EventMetadata'
-import { JurisdictionFilter } from '../scopes-v2'
+import { userReferenceFunctions } from '../users/userReferences'
 
 /* eslint-disable max-lines */
 
@@ -196,6 +196,7 @@ export const now = Object.assign(todayDateTimeValueSerializer, {})
  * Generate conditional rules for user.
  */
 export const user = Object.assign(userSerializer, {
+  ...userReferenceFunctions,
   hasScope: (scope: Scope) =>
     defineConditional({
       type: 'object',
@@ -246,18 +247,6 @@ export const user = Object.assign(userSerializer, {
     }),
   locationLevel: (adminLevelId: string) => ({
     $user: { $location: adminLevelId }
-  }),
-  // @TODO CIHAN: this should alternatively take param like user().jurisdiction(user().scope('record.declare').attribute('event_location'))
-  // @TODO CIHAN: should this be in conditionals.ts even though its not really a conditional, rather a value getter?
-  jurisdiction: (jurisdiction: JurisdictionFilter) => {
-    return jurisdiction
-  },
-  // @TODO CIHAN:
-  scope: (scope: Scope) => ({
-    // @TODO CIHAN: specify attribute type
-    attribute: (attribute: 'placeOfEvent') => {
-      return 'foo'
-    }
   })
 })
 
