@@ -50,7 +50,8 @@ import {
   EventConfig,
   isAgeFieldType,
   FieldUpdateValue,
-  isCustomFieldType
+  isCustomFieldType,
+  isImageViewFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -71,7 +72,8 @@ import {
   TimeField,
   getRegisteredFieldByFieldConfig,
   VerificationStatus,
-  AgeField
+  AgeField,
+  ImageView
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -136,6 +138,10 @@ export function ValueOutput({
 
   if (isPageHeaderFieldType(field)) {
     return PageHeader.Output
+  }
+
+  if (isImageViewFieldType(field)) {
+    return ImageView.Output
   }
 
   if (isParagraphFieldType(field)) {
