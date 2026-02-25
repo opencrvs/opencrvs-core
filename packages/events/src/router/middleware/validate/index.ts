@@ -103,7 +103,7 @@ export function getFieldErrors(
         form: data,
         context
       })
-    )
+    ).flatMap(([, errors]) => errors)
 
     return fieldErrors.map((error) => ({
       message: error.message.defaultMessage,

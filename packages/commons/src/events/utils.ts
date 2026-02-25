@@ -419,13 +419,19 @@ export function mapFormState<T, R>(
   )
 }
 
-export function flattenFormState<T>(state: FormState<T[]>): T[] {
+export function flattenFormState<T>(
+  state: FormState<T[]>,
+  path: string[] = []
+): Array<[string[], T[]]> {
   if (Array.isArray(state)) {
-    return state
+    if (state.length === 0) {
+      return []
+    }
+    return [[path, state]]
   }
-  return Object.values(state)
-    .filter((s): s is FormState<T[]> => s !== undefined)
-    .flatMap(flattenFormState)
+  return Object.entries(state)
+    .filter((e): e is [string, FormState<T[]>] => e[1] !== undefined)
+    .flatMap((e) => flattenFormState(e[1], [...path, e[0]]))
 }
 
 export function isWriteAction(actionType: ActionType): boolean {

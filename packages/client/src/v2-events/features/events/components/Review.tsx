@@ -334,7 +334,7 @@ function FormReview({
                   form,
                   context: validatorContext
                 })
-              )
+              ).flatMap(([, errs]) => errs)
 
               const errorDisplay =
                 errors.length > 0 ? (
