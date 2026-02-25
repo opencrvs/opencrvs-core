@@ -461,14 +461,21 @@ function SearchInput({
           )}
         </SearchInputWrapper>
         {message && (
-          <Text
-            color={color}
-            data-testid="search-input-error"
-            element="span"
-            variant="bold16"
-          >
-            {message}
-          </Text>
+          <Stack alignItems="normal" direction="row" gap={4}>
+            <Icon
+              color={color}
+              name={color === 'red' ? 'XCircle' : 'CheckCircle'}
+              weight={'bold'}
+            />
+            <Text
+              color={color}
+              data-testid="search-input-error"
+              element="span"
+              variant="bold16"
+            >
+              {message}
+            </Text>
+          </Stack>
         )}
         {modal}
       </Stack>
