@@ -27,7 +27,7 @@ import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const addressFields = [
   {
-    id: 'address',
+    id: 'storybook.address',
     type: FieldType.FIELD_GROUP,
     label: generateTranslationConfig('Address'),
     fields: [
@@ -42,13 +42,16 @@ const addressFields = [
         type: FieldType.ADMINISTRATIVE_AREA,
         required: true,
         label: generateTranslationConfig('Province'),
+        parent: field('storybook.address').get('country'),
         configuration: {
           type: 'ADMIN_STRUCTURE'
         },
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: field('address').get('country').isEqualTo('BGD')
+            conditional: field('storybook.address')
+              .get('country')
+              .isEqualTo('BGD')
           }
         ]
       },
@@ -57,14 +60,17 @@ const addressFields = [
         type: FieldType.ADMINISTRATIVE_AREA,
         required: true,
         label: generateTranslationConfig('District'),
+        parent: field('storybook.address').get('province'),
         configuration: {
           type: 'ADMIN_STRUCTURE',
-          partOf: { $declaration: 'address.province' }
+          partOf: field('storybook.address').get('province')
         },
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: not(field('address').get('province').isFalsy())
+            conditional: not(
+              field('storybook.address').get('province').isFalsy()
+            )
           }
         ]
       },
@@ -73,14 +79,17 @@ const addressFields = [
         type: FieldType.ADMINISTRATIVE_AREA,
         required: false,
         label: generateTranslationConfig('Village'),
+        parent: field('storybook.address').get('district'),
         configuration: {
           type: 'ADMIN_STRUCTURE',
-          partOf: { $declaration: 'address.district' }
+          partOf: field('storybook.address').get('district')
         },
         conditionals: [
           {
             type: ConditionalType.SHOW,
-            conditional: not(field('address').get('district').isFalsy())
+            conditional: not(
+              field('storybook.address').get('district').isFalsy()
+            )
           }
         ]
       }
@@ -93,10 +102,10 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 `
 
 const meta: Meta<typeof FormFieldGenerator> = {
-  title: 'FormFieldGenerator/FieldGroup',
+  title: 'Inputs/FieldGroup',
   args: {
     formValues: {
-      address: {
+      'storybook.address': {
         country: 'BGD',
         //The address value clashes with "ADDRESS" field value
         //@ts-ignore
@@ -120,13 +129,14 @@ const meta: Meta<typeof FormFieldGenerator> = {
   render: function Component(args) {
     const [form, setForm] = React.useState(args.formValues)
     const [touched, setTouched] = React.useState(args.formTouched)
+
     return (
       <StyledFormFieldGenerator
         {...args}
         fields={addressFields}
+        formTouched={touched}
         formValues={form}
         id="address-form"
-        formTouched={touched}
         onFormChange={setForm}
         onTouchedChange={setTouched}
       />
@@ -135,13 +145,14 @@ const meta: Meta<typeof FormFieldGenerator> = {
 }
 
 export default meta
+
 type Story = StoryObj<typeof FormFieldGenerator>
 
 export const Basic: Story = {
   name: 'Address field with optional location level'
 }
 
-export const AddressFieldWithOptionalLocationLevel: Story = {
+export const WithOptionalLocationLevel: Story = {
   name: 'Address field with error shown',
   args: {
     formValues: {

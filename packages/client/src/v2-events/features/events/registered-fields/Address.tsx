@@ -16,7 +16,7 @@ import {
   AddressFieldValue,
   and,
   ConditionalType,
-  field as createFieldCondition,
+  field as fieldHelper,
   FieldConfig,
   FieldPropsWithoutReferenceValue,
   FieldType,
@@ -125,8 +125,8 @@ const ALL_ADDRESS_FIELDS = [
 
 function isDomesticAddress() {
   return and(
-    not(createFieldCondition('country').isUndefined()),
-    createFieldCondition('addressType').isEqualTo(AddressType.DOMESTIC)
+    not(fieldHelper('country').isUndefined()),
+    fieldHelper('addressType').isEqualTo(AddressType.DOMESTIC)
   )
 }
 
@@ -146,10 +146,7 @@ function generateAdminStructureFields(
         type: ConditionalType.SHOW,
         conditional: isFirst
           ? isDomesticAddress()
-          : and(
-              isDomesticAddress(),
-              not(createFieldCondition(parentId).isUndefined())
-            )
+          : and(isDomesticAddress(), not(fieldHelper(parentId).isUndefined()))
       }
     ]
 
@@ -158,14 +155,14 @@ function generateAdminStructureFields(
     }
 
     if (!isFirst && prevItem?.id) {
-      configuration.partOf = { $declaration: prevItem.id }
+      configuration.partOf = fieldHelper(prevItem.id)
     }
 
     const field: AdministrativeArea = {
       id,
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
-      parent: createFieldCondition(parentId),
+      parent: fieldHelper(parentId),
       required,
       label,
       configuration

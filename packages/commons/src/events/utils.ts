@@ -31,7 +31,7 @@ import {
   writeActions
 } from './ActionType'
 import { EventConfig } from './EventConfig'
-import { FieldConfig } from './FieldConfig'
+import { FieldConfig, FieldReference } from './FieldConfig'
 import {
   Action,
   ActionDocument,
@@ -432,6 +432,10 @@ export function flattenFormState<T>(
   return Object.entries(state)
     .filter((e): e is [string, FormState<T[]>] => e[1] !== undefined)
     .flatMap((e) => flattenFormState(e[1], [...path, e[0]]))
+}
+
+export function flattenFieldReference(ref: FieldReference) {
+  return [ref.$$field, ...(ref.$$subfield ?? [])]
 }
 
 export function isWriteAction(actionType: ActionType): boolean {

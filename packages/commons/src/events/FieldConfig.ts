@@ -580,12 +580,7 @@ export const AdministrativeAreas = z.enum([
 
 const AdministrativeAreaConfiguration = z
   .object({
-    partOf: z
-      .object({
-        $declaration: z.string()
-      })
-      .optional()
-      .describe('Parent location'),
+    partOf: FieldReference.optional(),
     type: AdministrativeAreas
   })
   .describe('Administrative area options')

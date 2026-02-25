@@ -15,7 +15,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { get, omit } from 'lodash'
 import styled, { keyframes } from 'styled-components'
-import { useField, useFormikContext, getIn } from 'formik'
+import { useField, useFormikContext } from 'formik'
 import {
   EventState,
   FieldConfig,
@@ -68,7 +68,8 @@ import {
   EventConfig,
   isFieldVisible,
   IndexMap,
-  FormState
+  FormState,
+  flattenFieldReference
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -112,10 +113,7 @@ import {
   makeFormikFieldIdOpenCRVSCompatible
 } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
-import {
-  makeFormikFieldIdsOpenCRVSCompatible,
-  parseFieldReferencesInConfiguration
-} from './utils'
+import { parseFieldReferencesInConfiguration } from './utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -223,7 +221,7 @@ export const GeneratedInputField = React.memo(
     }
     if (isFieldGroupFieldType(field)) {
       const parentTouched =
-        (getIn(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
+        (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
         {}
       const parentInputFieldProps = {
         ...field.inputFieldProps,
@@ -266,7 +264,7 @@ export const GeneratedInputField = React.memo(
         field.config.validation || []
       )
       const parentTouched =
-        (getIn(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
+        (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
         {}
 
       return (
@@ -604,10 +602,9 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isAdministrativeAreaFieldType(field)) {
-      const partOfRef = field.config.configuration.partOf?.$declaration
+      const partOfRef = field.config.configuration.partOf
 
-      const partOf =
-        partOfRef && get(makeFormikFieldIdsOpenCRVSCompatible(form), partOfRef)
+      const partOf = partOfRef && get(form, flattenFieldReference(partOfRef))
 
       return (
         <InputField {...inputFieldProps} htmlFor={name}>
