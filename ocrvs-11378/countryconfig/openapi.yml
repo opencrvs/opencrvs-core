@@ -3169,11 +3169,30 @@ components:
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
-                  type: string
-                  enum:
-                    - administrativeArea
-                    - location
-                    - all
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                            $attribute:
+                              type: string
+                          required:
+                            - $scope
+                            - $attribute
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               additionalProperties: false
             defaultValue:
               type: object
@@ -7020,11 +7039,30 @@ components:
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
-                  type: string
-                  enum:
-                    - administrativeArea
-                    - location
-                    - all
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                            $attribute:
+                              type: string
+                          required:
+                            - $scope
+                            - $attribute
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               required:
                 - type
               additionalProperties: false
@@ -7344,20 +7382,58 @@ components:
                     allowedLocations:
                       description: Limits which location options are selectable depending on user
                         jurisdiction and location.
-                      type: string
-                      enum:
-                        - administrativeArea
-                        - location
-                        - all
+                      type: object
+                      properties:
+                        $jurisdiction:
+                          anyOf:
+                            - description: Filters based on user jurisdiction relative to their office
+                                location in hierarchy.
+                              type: string
+                              enum:
+                                - administrativeArea
+                                - location
+                                - all
+                            - type: object
+                              properties:
+                                $scope:
+                                  type: string
+                                $attribute:
+                                  type: string
+                              required:
+                                - $scope
+                                - $attribute
+                              additionalProperties: false
+                      required:
+                        - $jurisdiction
+                      additionalProperties: false
                   additionalProperties: false
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
-                  type: string
-                  enum:
-                    - administrativeArea
-                    - location
-                    - all
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                            $attribute:
+                              type: string
+                          required:
+                            - $scope
+                            - $attribute
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               required:
                 - searchableResource
               additionalProperties: false
@@ -7519,11 +7595,30 @@ components:
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
-                  type: string
-                  enum:
-                    - administrativeArea
-                    - location
-                    - all
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                            $attribute:
+                              type: string
+                          required:
+                            - $scope
+                            - $attribute
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               additionalProperties: false
           required:
             - id
@@ -7682,11 +7777,30 @@ components:
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
-                  type: string
-                  enum:
-                    - administrativeArea
-                    - location
-                    - all
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                            $attribute:
+                              type: string
+                          required:
+                            - $scope
+                            - $attribute
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               additionalProperties: false
           required:
             - id
