@@ -378,8 +378,8 @@ function SearchInput({
 
   return (
     <StyledContainer>
-      <Stack alignItems="-moz-initial" direction="column" gap={8}>
-        <Stack alignItems="-moz-initial" direction="column" gap={8}>
+      <Stack alignItems="initial" direction="column" gap={8}>
+        <Stack alignItems="initial" direction="column" gap={8}>
           {label && (
             <Text
               color="grey600"
