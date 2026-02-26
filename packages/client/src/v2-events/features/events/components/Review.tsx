@@ -530,6 +530,7 @@ function ReviewComponent({
               <ReviewContainter>
                 <FormFieldGenerator
                   fields={reviewFields}
+                  formContext={form}
                   formTouched={touched}
                   formValues={annotation}
                   id={'review'}

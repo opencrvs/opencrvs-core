@@ -46,6 +46,7 @@ type AllProps = {
   id: string
   eventConfig?: EventConfig
   fields: FieldConfig[]
+  formContext?: EventState
   fullForm: EventState
   className?: string
   readonlyMode?: boolean
@@ -144,6 +145,7 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
 export function FormSectionComponent({
   values,
   fields: fieldsWithDotSeparator,
+  formContext,
   fullForm,
   touched,
   onFormChange,
@@ -167,6 +169,10 @@ export function FormSectionComponent({
   const prevIdRef = useRef(id)
 
   const getDefaultValue = useDefaultValue()
+
+  if (formContext) {
+    fullForm = { ...formContext, ...fullForm }
+  }
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
     ...field,

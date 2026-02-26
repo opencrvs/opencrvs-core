@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Formik } from 'formik'
 import { noop, pick } from 'lodash'
 import { useIntl } from 'react-intl'
 import {
-  buildFormState,
   EventConfig,
   EventState,
   FieldConfig,
@@ -38,6 +37,11 @@ export interface FormFieldGeneratorProps {
   validateAllFields?: boolean
   readonlyMode?: boolean
   className?: string
+  /**
+   * Read only context values that are made available in the
+   * form validations/conditionals
+   */
+  formContext?: EventState
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -57,6 +61,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     onFormChange,
     onTouchedChange,
     fields,
+    formContext,
     formValues,
     className,
     eventConfig,
@@ -70,10 +75,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     validatorContext
   }) => {
     const intl = useIntl()
-    const emptyPageValues = useMemo(
-      () => buildFormState(fields, () => ''),
-      [fields]
-    )
     const getDefaultValues = useDefaultValue()
     const defaultPageValues = getDefaultValues(fields)
 
@@ -121,7 +122,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     // }
 
     const formikCompatibleInitialValues = makeFormFieldIdsFormikCompatible({
-      ...emptyPageValues,
       ...defaultPageValues,
       ...pick(
         formValues,
@@ -166,7 +166,11 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               eventConfig={eventConfig}
               fields={fields}
               fieldsToShowValidationErrors={fieldsToShowValidationErrors}
-              fullForm={{ ...formValues, ...formikProps.values }}
+              formContext={formContext}
+              fullForm={{
+                ...formValues,
+                ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
+              }}
               id={id}
               isCorrection={isCorrection}
               readonlyMode={readonlyMode}

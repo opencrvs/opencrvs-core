@@ -26,6 +26,7 @@ import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
+import { AvailableActionTypes } from './Action/utils'
 
 interface PagesProps {
   formData: EventState
@@ -41,6 +42,14 @@ interface PagesProps {
   isCorrection?: boolean
 }
 
+type DeclarationProps =
+  | {
+      actionType: AvailableActionTypes
+      declaration?: undefined
+    }
+  | {
+      declaration: EventState
+    }
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
@@ -55,10 +64,11 @@ export function Pages({
   continueButtonText,
   setFormData,
   eventConfig,
+  declaration,
   // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
   isCorrection = false,
   validatorContext
-}: PagesProps) {
+}: PagesProps & DeclarationProps) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) =>
     isPageVisible(page, formData, validatorContext)
@@ -145,6 +155,7 @@ export function Pages({
     <FormFieldGenerator
       eventConfig={eventConfig}
       fields={page.fields}
+      formContext={declaration}
       formTouched={formTouched}
       formValues={formData}
       id="pagesSection"
