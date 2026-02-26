@@ -82,7 +82,7 @@ export function Pages() {
       <PagesComponent
         actionType={ActionType.VALIDATE}
         eventConfig={configuration}
-        form={form}
+        formData={form}
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
