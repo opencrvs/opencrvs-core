@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, userEvent, within } from '@storybook/test'
+import { expect, userEvent, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { IntlProvider } from 'react-intl'
@@ -44,7 +44,6 @@ function IntlDecorator(messages: Record<string, string>) {
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/TimeField',
-  args: { onChange: fn() },
   decorators: [withValidatorContext]
 }
 
@@ -125,11 +124,8 @@ export const TimeInput24HourWithInitialValue: StoryObj<
             }
           ]}
           id="my-form-24h"
-          initialValues={formData}
-          onChange={(data) => {
-            args.onChange(data)
-            setFormData(data)
-          }}
+          formValues={formData}
+          onFormChange={(data) => setFormData(data)}
         />
         <OutputDisplay data-testid="time-output">
           {'Output (always 24-hour): '}
@@ -181,11 +177,8 @@ export const TimeInput12HourDisplay: StoryObj<typeof FormFieldGenerator> = {
             }
           ]}
           id="my-form-12h"
-          initialValues={formData}
-          onChange={(data) => {
-            args.onChange(data)
-            setFormData(data)
-          }}
+          formValues={formData}
+          onFormChange={(data) => setFormData(data)}
         />
         <OutputDisplay data-testid="time-output-24h">
           {'Output (always 24-hour): '}
@@ -253,11 +246,8 @@ export const TimeInput12HourDisplayWith24HourInitialValue: StoryObj<
             }
           ]}
           id="my-form-conversion"
-          initialValues={formData}
-          onChange={(data) => {
-            args.onChange(data)
-            setFormData(data)
-          }}
+          formValues={formData}
+          onFormChange={(data) => setFormData(data)}
         />
         <OutputDisplay data-testid="time-output-conversion">
           {'Output (always 24-hour): '}
@@ -328,11 +318,8 @@ export const TimeFieldEdgeCases: StoryObj<typeof FormFieldGenerator> = {
             }
           ]}
           id="my-form-edge"
-          initialValues={formData}
-          onChange={(data) => {
-            args.onChange(data)
-            setFormData(data)
-          }}
+          formValues={formData}
+          onFormChange={(data) => setFormData(data)}
         />
         <OutputDisplay data-testid="time-output-edge">
           {'Output: '}
@@ -404,11 +391,8 @@ export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        initialValues={formData}
-        onChange={(data) => {
-          args.onChange(data)
-          setFormData(data)
-        }}
+        formValues={formData}
+        onFormChange={(data) => setFormData(data)}
       />
     )
   }

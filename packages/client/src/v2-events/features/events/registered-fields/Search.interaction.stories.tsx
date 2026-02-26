@@ -13,7 +13,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import {
   expect,
   fireEvent,
-  fn,
   userEvent,
   waitFor,
   within
@@ -25,13 +24,8 @@ import { defineConditional, field, FieldType } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
-interface Args {
-  onChange: (val: unknown) => void
-}
-
-const meta: Meta<Args> = {
+const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Search',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -211,9 +205,6 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
           fields={searchFields}
           id="my-form"
           validatorContext={{}}
-          onChange={(data) => {
-            args.onChange(data)
-          }}
         />
       )
     }
@@ -359,9 +350,6 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
           fields={searchFields}
           id="my-form"
           validatorContext={{}}
-          onChange={(data) => {
-            args.onChange(data)
-          }}
         />
       )
     }
@@ -404,9 +392,6 @@ export const TimeOut: StoryObj<typeof FormFieldGenerator> = {
         fields={searchFields}
         id="my-form"
         validatorContext={{}}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
@@ -451,9 +436,6 @@ export const HttpError: StoryObj<typeof FormFieldGenerator> = {
         fields={searchFields}
         id="my-form"
         validatorContext={{}}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }

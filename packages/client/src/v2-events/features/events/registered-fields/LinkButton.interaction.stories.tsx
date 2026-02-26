@@ -10,7 +10,7 @@
  */
 import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { fn, expect, within } from '@storybook/test'
+import { expect, within } from '@storybook/test'
 import styled from 'styled-components'
 import { ConditionalType, user } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
@@ -22,9 +22,6 @@ import { getCleanRedirectURI } from './LinkButton'
 const url = 'https://example.com/authenticate'
 const meta: Meta<FormFieldGeneratorProps> = {
   title: 'Inputs/LinkButton',
-  args: {
-    onChange: fn()
-  },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -106,7 +103,6 @@ export const Redirection: Story = {
             }
           ]}
           id="event.tennisClubMembership"
-          onChange={args.onChange}
         />
       </Container>
     )

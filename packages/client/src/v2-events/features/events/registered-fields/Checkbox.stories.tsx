@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, within } from '@storybook/test'
+import { expect, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
@@ -25,7 +25,6 @@ import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Checkbox',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -64,9 +63,6 @@ export const CheckboxInput: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }

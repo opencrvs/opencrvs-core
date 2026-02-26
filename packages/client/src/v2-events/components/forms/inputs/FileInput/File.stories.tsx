@@ -10,13 +10,11 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { noop } from '@client/v2-events'
 import { getTestValidatorContext } from '../../../../../../.storybook/decorators'
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
@@ -25,7 +23,6 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 
 const meta: Meta<typeof StyledFormFieldGenerator> = {
   title: 'Inputs/File',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -105,9 +102,6 @@ export const FileInputWithOption: StoryObj<typeof FormFieldGenerator> = {
             ]}
             id="my-form"
             validatorContext={getTestValidatorContext()}
-            onChange={(data) => {
-              meta.args?.onChange(data) ?? noop()
-            }}
           />
         )
       },
@@ -147,9 +141,6 @@ export const FileInputWithoutOption: StoryObj<typeof StyledFormFieldGenerator> =
               ]}
               id="my-form"
               validatorContext={getTestValidatorContext()}
-              onChange={(data) => {
-                meta.args?.onChange(data) ?? noop()
-              }}
             />
           )
         },

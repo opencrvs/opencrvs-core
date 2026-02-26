@@ -12,7 +12,6 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import { fn } from '@storybook/test'
 import {
   and,
   field,
@@ -31,7 +30,6 @@ import { NumberWithUnit } from './NumberWithUnit'
 const meta: Meta<FormFieldGeneratorProps> = {
   title: 'Inputs/NumberWithUnit',
   component: FormFieldGenerator,
-  args: { onChange: fn() },
   argTypes: {},
   decorators: [
     (Story, context) => (
@@ -133,7 +131,6 @@ export const SymptomDuration: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
     return (
       <StyledFormFieldGenerator
         {...args}
@@ -179,10 +176,6 @@ export const SymptomDuration: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-          setFormData(data)
-        }}
       />
     )
   }
@@ -194,7 +187,6 @@ export const Fees: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
     return (
       <StyledFormFieldGenerator
         {...args}
@@ -224,10 +216,6 @@ export const Fees: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-          setFormData(data)
-        }}
       />
     )
   }

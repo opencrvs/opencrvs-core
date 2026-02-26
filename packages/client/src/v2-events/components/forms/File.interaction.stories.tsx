@@ -10,14 +10,13 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, expect, within } from '@storybook/test'
+import { expect, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { userEvent } from '@storybook/testing-library'
 import { FieldType, MimeType, TestUserRole } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { noop } from '@client/v2-events'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
 import { FormFieldGeneratorProps } from './FormFieldGenerator/FormFieldGenerator'
 
@@ -26,7 +25,6 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 `
 const meta: Meta<typeof StyledFormFieldGenerator> = {
   title: 'Inputs/File/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -110,9 +108,6 @@ export const FileInputWithOptionTest: StoryObj<
             validatorContext={getTestValidatorContext(
               TestUserRole.Enum.LOCAL_REGISTRAR
             )}
-            onChange={(data) => {
-              meta.args?.onChange(data) ?? noop()
-            }}
           />
         )
       },
@@ -213,9 +208,6 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
             validatorContext={getTestValidatorContext(
               TestUserRole.Enum.LOCAL_REGISTRAR
             )}
-            onChange={(data) => {
-              meta.args?.onChange(data) ?? noop()
-            }}
           />
         )
       },
@@ -336,9 +328,6 @@ export const FileInputButtonMaxImage: StoryObj<FormFieldGeneratorProps> = {
             validatorContext={getTestValidatorContext(
               TestUserRole.Enum.LOCAL_REGISTRAR
             )}
-            onChange={(data) => {
-              meta.args?.onChange(data) ?? noop()
-            }}
           />
         )
       },

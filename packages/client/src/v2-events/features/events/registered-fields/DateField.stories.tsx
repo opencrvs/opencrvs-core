@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
@@ -21,7 +21,6 @@ import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/DateField',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -111,11 +110,8 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        initialValues={formData}
-        onChange={(data) => {
-          args.onChange(data)
-          setFormData(data)
-        }}
+        formValues={formData}
+        onFormChange={(data) => setFormData(data)}
       />
     )
   }

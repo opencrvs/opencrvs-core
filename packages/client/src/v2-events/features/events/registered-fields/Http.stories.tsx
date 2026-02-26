@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
@@ -33,13 +33,8 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Review } from '../components/Review'
 
-interface Args {
-  onChange: (val: unknown) => void
-}
-
-const meta: Meta<Args> = {
+const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Http',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -216,9 +211,6 @@ export const FetchBrn: StoryObj<typeof FormFieldGenerator> = {
         {...args}
         fields={fetchBrnFields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
@@ -294,9 +286,6 @@ export const HttpPopulatesWithNonDeclarationFields: StoryObj<
         eventConfig={digitalIdentityEvent}
         fields={PRINT_DIGITAL_ID_CERTIFICATE_FORM.pages[0].fields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }

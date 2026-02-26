@@ -11,7 +11,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn } from '@storybook/test'
+import { expect } from '@storybook/test'
 import { userEvent, waitFor, within } from '@storybook/testing-library'
 import React from 'react'
 import * as selectEvent from 'react-select-event'
@@ -37,7 +37,6 @@ import { Address } from './Address'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Address/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -366,9 +365,6 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
@@ -460,9 +456,6 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
@@ -608,9 +601,6 @@ export const AddressFieldInteractionDomesticToInternational: StoryObj<
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
@@ -669,8 +659,8 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
             }
           ]}
           id="my-form"
-          initialValues={formData}
-          onChange={(data) => {
+          formValues={formData}
+          onFormChange={(data) => {
             setFormData((prev) => ({ ...prev, ...data }))
             const address = AddressFieldValue.safeParse(
               data['storybook.address']

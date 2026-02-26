@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fireEvent, fn } from '@storybook/test'
+import { expect, fireEvent } from '@storybook/test'
 import { userEvent, waitFor, within } from '@storybook/testing-library'
 import React, { Suspense } from 'react'
 import styled from 'styled-components'
@@ -21,7 +21,6 @@ import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Age/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -80,9 +79,6 @@ export const AgeFieldInteractionLeadingZero: StoryObj<
         {...args}
         fields={fields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -111,9 +107,6 @@ export const AgeFieldInteractionDecimal: StoryObj<typeof FormFieldGenerator> = {
         {...args}
         fields={fields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -144,9 +137,6 @@ export const AgeFieldInteractionExponential: StoryObj<
         {...args}
         fields={fields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -173,9 +163,6 @@ export const AgeFieldInteractionSmaller: StoryObj<typeof FormFieldGenerator> = {
         {...args}
         fields={fields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -207,9 +194,6 @@ export const AgeFieldInteractionGreater: StoryObj<typeof FormFieldGenerator> = {
         {...args}
         fields={fields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -241,9 +225,6 @@ export const AgeFieldInteractionEmpty: StoryObj<typeof FormFieldGenerator> = {
         {...args}
         fields={fields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -270,9 +251,6 @@ export const AgeFieldInteractionDigits: StoryObj<typeof FormFieldGenerator> = {
         {...args}
         fields={fields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
