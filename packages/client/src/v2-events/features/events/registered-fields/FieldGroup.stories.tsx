@@ -58,7 +58,7 @@ const addressFields = [
       {
         id: 'district',
         type: FieldType.ADMINISTRATIVE_AREA,
-        required: true,
+        required: false,
         label: generateTranslationConfig('District'),
         parent: field('storybook.address').get('province'),
         configuration: {
@@ -70,25 +70,6 @@ const addressFields = [
             type: ConditionalType.SHOW,
             conditional: not(
               field('storybook.address').get('province').isFalsy()
-            )
-          }
-        ]
-      },
-      {
-        id: 'village',
-        type: FieldType.ADMINISTRATIVE_AREA,
-        required: false,
-        label: generateTranslationConfig('Village'),
-        parent: field('storybook.address').get('district'),
-        configuration: {
-          type: 'ADMIN_STRUCTURE',
-          partOf: field('storybook.address').get('district')
-        },
-        conditionals: [
-          {
-            type: ConditionalType.SHOW,
-            conditional: not(
-              field('storybook.address').get('district').isFalsy()
             )
           }
         ]
@@ -155,19 +136,16 @@ export const WithOptionalLocationLevel: Story = {
   name: 'Address field with error shown',
   args: {
     formValues: {
+      //The address value clashes with "ADDRESS" field value
+      //@ts-ignore
       ['storybook.address']: {
-        country: 'BGD',
-        //The address value clashes with "ADDRESS" field value
-        //@ts-ignore
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: ''
+        country: 'BGD'
       }
     },
     formTouched: {
       ['storybook.address']: {
         country: true,
-        province: true,
-        district: true
+        province: true
       }
     }
   }

@@ -122,48 +122,6 @@ export const V2_DEFAULT_MOCK_LOCATIONS = [
     validUntil: null
   },
   {
-    id: '11111111-1111-1111-1111-111111111111' as UUID,
-    name: 'Isango Village 1',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
-    validUntil: null
-  },
-  {
-    id: '22222222-2222-2222-2222-222222222222' as UUID,
-    name: 'Isango Village 2',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
-    validUntil: null
-  },
-  {
-    id: '33333333-3333-3333-3333-333333333333' as UUID,
-    name: 'Isamba Village 1',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
-    validUntil: null
-  },
-  {
-    id: '44444444-4444-4444-4444-444444444444' as UUID,
-    name: 'Itambo Village 1',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
-    validUntil: null
-  },
-  {
-    id: '55555555-5555-5555-5555-555555555555' as UUID,
-    name: 'Ibombo Village 1',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '66666666-6666-6666-6666-666666666666' as UUID,
-    name: 'Ibombo Village 2',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
     id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
     name: 'Chamakubi Health Post',
     locationType: LocationType.enum.HEALTH_FACILITY,
