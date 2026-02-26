@@ -150,6 +150,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
                 makeFormikFieldIdsOpenCRVSCompatible(values),
                 validatorContext
               ),
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
               (errs) => errs[0]?.message && intl.formatMessage(errs[0].message)
             )
           )

@@ -10,7 +10,6 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -18,6 +17,7 @@ import {
   FieldType,
   tennisClubMembershipEvent,
   AddressFieldValue,
+  AddressField,
   AddressType,
   getDeclaration,
   UUID
@@ -29,9 +29,42 @@ import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStrin
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
+const addressField = {
+  id: 'storybook.address',
+  type: FieldType.ADDRESS,
+  label: {
+    id: 'storybook.address.label',
+    defaultMessage: 'Address',
+    description: 'The title for the address input'
+  }
+} satisfies AddressField
+
+const StyledFormFieldGenerator = styled(FormFieldGenerator)`
+  width: 400px;
+`
+
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Address',
-  args: { onChange: fn() },
+  parameters: {
+    layout: 'centered'
+  },
+  args: {
+    fields: [addressField]
+  },
+  render: function Component(args) {
+    const [form, setForm] = React.useState(args.formValues)
+    const [touched, setTouched] = React.useState(args.formTouched)
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        formTouched={touched}
+        formValues={form}
+        id="address-form"
+        onFormChange={setForm}
+        onTouchedChange={setTouched}
+      />
+    )
+  },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -44,129 +77,82 @@ const meta: Meta<typeof FormFieldGenerator> = {
 
 export default meta
 
+type Story = StoryObj<typeof FormFieldGenerator>
+
 const leafAdminStructureLocationId =
   '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
 
-const StyledFormFieldGenerator = styled(FormFieldGenerator)`
-  width: 400px;
-`
-
-export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
-  name: 'Empty address input',
-  parameters: {
-    layout: 'centered'
-  },
-  render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={[
-          {
-            id: 'storybook.address',
-            type: FieldType.ADDRESS,
-            label: {
-              id: 'storybook.address.label',
-              defaultMessage: 'Address',
-              description: 'The title for the address input'
-            }
-          }
-        ]}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
-  }
+export const EmptyAddressField: Story = {
+  name: 'Empty address input'
 }
 
-export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const AddressFieldWithUserPrimaryOfficeAddress: Story = {
   name: 'Defaults to user primary office address',
-  parameters: {
-    layout: 'centered'
-  },
-  render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={[
-          {
-            id: 'storybook.address',
-            type: 'ADDRESS',
-            label: {
-              id: 'storybook.address.label',
-              defaultMessage: 'Address',
-              description: 'The title for the address input'
+  args: {
+    fields: [
+      {
+        ...addressField,
+        defaultValue: {
+          country: 'BGD',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: leafAdminStructureLocationId
+        },
+        configuration: {
+          streetAddressForm: [
+            {
+              id: 'town',
+              required: false,
+              label: {
+                id: 'field.address.town.label',
+                defaultMessage: 'Town',
+                description: 'This is the label for the field'
+              },
+              type: FieldType.TEXT
             },
-            defaultValue: {
-              country: 'FAR',
-              addressType: AddressType.DOMESTIC,
-              administrativeArea: leafAdminStructureLocationId
+            {
+              id: 'residentialArea',
+              required: false,
+              label: {
+                id: 'field.address.residentialArea.label',
+                defaultMessage: 'Residential Area',
+                description: 'This is the label for the field'
+              },
+              type: FieldType.TEXT
             },
-            configuration: {
-              streetAddressForm: [
-                {
-                  id: 'town',
-                  required: false,
-                  label: {
-                    id: 'field.address.town.label',
-                    defaultMessage: 'Town',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'residentialArea',
-                  required: false,
-                  label: {
-                    id: 'field.address.residentialArea.label',
-                    defaultMessage: 'Residential Area',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'street',
-                  required: false,
-                  label: {
-                    id: 'field.address.street.label',
-                    defaultMessage: 'Street',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'number',
-                  required: false,
-                  label: {
-                    id: 'field.address.number.label',
-                    defaultMessage: 'Number',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                },
-                {
-                  id: 'zipCode',
-                  required: false,
-                  label: {
-                    id: 'field.address.postcodeOrZip.label',
-                    defaultMessage: 'Postcode / Zip',
-                    description: 'This is the label for the field'
-                  },
-                  type: FieldType.TEXT
-                }
-              ]
+            {
+              id: 'street',
+              required: false,
+              label: {
+                id: 'field.address.street.label',
+                defaultMessage: 'Street',
+                description: 'This is the label for the field'
+              },
+              type: FieldType.TEXT
+            },
+            {
+              id: 'number',
+              required: false,
+              label: {
+                id: 'field.address.number.label',
+                defaultMessage: 'Number',
+                description: 'This is the label for the field'
+              },
+              type: FieldType.TEXT
+            },
+            {
+              id: 'zipCode',
+              required: false,
+              label: {
+                id: 'field.address.postcodeOrZip.label',
+                defaultMessage: 'Postcode / Zip',
+                description: 'This is the label for the field'
+              },
+              type: FieldType.TEXT
             }
-          }
-        ]}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+          ]
+        }
+      }
+    ]
   }
 }
 
@@ -174,11 +160,8 @@ const eventConfig: EventConfig = tennisClubMembershipEvent
 
 const declarationForm = getDeclaration(eventConfig)
 
-export const AddressReviewInvalid: StoryObj<typeof FormFieldGenerator> = {
+export const AddressReviewInvalid: StoryObj<typeof Review.Body> = {
   name: 'Review output (Invalid)',
-  parameters: {
-    layout: 'centered'
-  },
   render: function Component(args) {
     return (
       <Review.Body
@@ -200,11 +183,8 @@ export const AddressReviewInvalid: StoryObj<typeof FormFieldGenerator> = {
     )
   }
 }
-export const AddressReviewEmpty: StoryObj<typeof FormFieldGenerator> = {
+export const AddressReviewEmpty: StoryObj<typeof Review.Body> = {
   name: 'Review output (Empty)',
-  parameters: {
-    layout: 'centered'
-  },
   render: function Component(args) {
     return (
       <Review.Body
@@ -220,11 +200,8 @@ export const AddressReviewEmpty: StoryObj<typeof FormFieldGenerator> = {
     )
   }
 }
-export const AddressReviewChanged: StoryObj<typeof FormFieldGenerator> = {
+export const AddressReviewChanged: StoryObj<typeof Review.Body> = {
   name: 'Review with changed address',
-  parameters: {
-    layout: 'centered'
-  },
   render: function Component(args) {
     return (
       <Review.Body
@@ -268,9 +245,6 @@ export const AddressReviewChanged: StoryObj<typeof FormFieldGenerator> = {
 }
 export const AddressInCopy: StoryObj<typeof Review> = {
   name: 'Address to string',
-  parameters: {
-    layout: 'centered'
-  },
   render: function Component() {
     const allFields = declarationForm.pages.map((page) => page.fields).flat()
     const stringifier = useFormDataStringifier()

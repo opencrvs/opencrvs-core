@@ -30,7 +30,9 @@ import {
   AdministrativeArea,
   LocationType,
   ValidatorContext,
-  RequireConfig
+  RequireConfig,
+  IndexMap,
+  FormState
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -49,7 +51,10 @@ type FieldConfigWithoutAddress = Exclude<
 >
 
 type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
+  name: string
+  onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
   onChange: (newValue: Partial<AddressFieldValue>) => void
+  touched: IndexMap<FormState<boolean>> | undefined
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
   disabled?: boolean
@@ -187,7 +192,7 @@ function extractAddressLines(
     Object.entries(obj).filter(
       ([key, value]) => !keysToIgnore.includes(key) && value
     )
-  )
+  ) as Record<string, string>
 }
 
 function getLeafAdministrativeLevel(
@@ -201,7 +206,7 @@ function getLeafAdministrativeLevel(
   for (let i = keys.length - 1; i >= 0; i--) {
     const key = keys[i] as keyof AddressFieldValue
     if (val[key]) {
-      return val[key]
+      return val[key] as string
     }
   }
   return undefined
@@ -224,16 +229,24 @@ function getAdministrativeArea(value?: AddressFieldValue) {
  */
 function AddressInput(props: Props) {
   const {
+    onBlur,
     onChange,
-    defaultValue,
     disabled,
-    value,
+    name,
+    value = {
+      addressType: AddressType.DOMESTIC,
+      country: '',
+      administrativeArea: ''
+    },
     validatorContext,
+    touched = {},
     ...otherProps
   } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const [adminStructureLocations] = getLocations.useSuspenseQuery({
+    locationType: LocationType.enum.ADMIN_STRUCTURE
+  })
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
   const adminStructure = generateAdminStructureFields(
@@ -242,36 +255,18 @@ function AddressInput(props: Props) {
   )
   const customAddressFields = props.configuration?.streetAddressForm
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
   const administrativeArea = getAdministrativeArea(value)
-
-  if (
-    value &&
-    value.addressType === AddressType.DOMESTIC &&
-    administrativeArea
-  ) {
-    value.administrativeArea = administrativeArea
-  }
-
-  const resolvedValue = {
-    ...value,
-    ...value?.streetLevelDetails,
-    administrativeArea
-  }
-
-  const addressFields =
-    Array.isArray(customAddressFields) && customAddressFields.length > 0
-      ? customAddressFields
-      : []
 
   const derivedAdminLevels = getAdminLevelHierarchy(
     administrativeArea,
     adminStructureLocations,
     adminLevelIds
   )
+
+  const addressFields =
+    Array.isArray(customAddressFields) && customAddressFields.length > 0
+      ? customAddressFields
+      : []
 
   const fields = [
     { ...COUNTRY_FIELD, required: otherProps.required },
@@ -293,37 +288,49 @@ function AddressInput(props: Props) {
     }
   })
 
-  const handleChange = (values: EventState) => {
-    const addressLines = extractAddressLines(values, adminLevelIds)
+  /*
+   *  nested value is of the following format:
+   *  {
+   *    country: string
+   *    [adminLevelId]: string
+   *    [streetAddressFields]: string
+   *  }
+   */
+  const handleChange = (nestedValue: EventState) => {
+    const addressLines = extractAddressLines(nestedValue, adminLevelIds)
     const leafAdminLevelValue = getLeafAdministrativeLevel(
-      values,
+      nestedValue,
       adminLevelIds
     )
-    const { country, addressType } = values
-
-    const addressValue = {
-      country,
-      addressType,
-      administrativeArea:
-        addressType === AddressType.DOMESTIC ? leafAdminLevelValue : undefined,
-      streetLevelDetails: addressLines
+    const country = nestedValue.country as string
+    const defaultCountry = window.config.COUNTRY || 'FAR'
+    if (country === defaultCountry) {
+      onChange({
+        country,
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: leafAdminLevelValue,
+        streetLevelDetails: addressLines
+      })
+    } else {
+      onChange({
+        country,
+        addressType: AddressType.INTERNATIONAL,
+        streetLevelDetails: addressLines
+      })
     }
-
-    const cleanedAddressValue = Object.fromEntries(
-      Object.entries(addressValue).filter(([_, v]) => v != null)
-    )
-
-    onChange(cleanedAddressValue as AddressFieldValue)
   }
 
   return (
     <FormFieldGenerator
       {...otherProps}
       fields={fields}
-      initialValues={{ ...resolvedValue, ...derivedAdminLevels }}
-      parentId={props.id}
+      formTouched={touched}
+      formValues={{ ...value, ...derivedAdminLevels }}
       validatorContext={validatorContext}
-      onChange={handleChange}
+      onFormChange={handleChange}
+      onTouchedChange={(newTouched) =>
+        onBlur(name, { ...touched, ...newTouched })
+      }
     />
   )
 }

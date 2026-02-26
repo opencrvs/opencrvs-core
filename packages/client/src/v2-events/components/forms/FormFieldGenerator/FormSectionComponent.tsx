@@ -18,7 +18,6 @@ import {
   FieldConfig,
   FieldType,
   FieldValue,
-  AddressType,
   FormState,
   IndexMap,
   isNonInteractiveFieldType,
@@ -257,18 +256,6 @@ export function FormSectionComponent({
 
       for (const listenerField of interactiveListenerFields) {
         setValueForListenerField(listenerField, updatedValues)
-      }
-
-      // @TODO: we should not reference field id 'country' directly.
-      if (formikFieldId === 'country') {
-        const defaultCountry = window.config.COUNTRY || 'FAR'
-        set(
-          updatedValues,
-          'addressType',
-          value === defaultCountry
-            ? AddressType.DOMESTIC
-            : AddressType.INTERNATIONAL
-        )
       }
 
       // @todo figure out if this is needed

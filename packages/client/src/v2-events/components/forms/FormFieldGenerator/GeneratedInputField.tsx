@@ -220,7 +220,7 @@ export const GeneratedInputField = React.memo(
       value: input.value
     }
     if (isFieldGroupFieldType(field)) {
-      const parentTouched =
+      const groupTouched =
         (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
         {}
       const parentInputFieldProps = {
@@ -246,7 +246,7 @@ export const GeneratedInputField = React.memo(
                   name={subfieldFullName}
                   onBlur={(_, nestedTouched) =>
                     onBlur(name, {
-                      ...parentTouched,
+                      ...groupTouched,
                       [subfieldName]: nestedTouched
                     })
                   }
@@ -263,7 +263,7 @@ export const GeneratedInputField = React.memo(
         makeFormikFieldIdOpenCRVSCompatible(field.config.id),
         field.config.validation || []
       )
-      const parentTouched =
+      const groupTouched =
         (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
         {}
 
@@ -280,7 +280,7 @@ export const GeneratedInputField = React.memo(
             eventConfig={eventConfig}
             id={fieldDefinition.id}
             name={name}
-            touched={parentTouched}
+            touched={groupTouched}
             validation={validation}
             validatorContext={validatorContext}
             value={field.value}
@@ -526,6 +526,9 @@ export const GeneratedInputField = React.memo(
       )
     }
     if (isAddressFieldType(field)) {
+      const groupTouched =
+        (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
+        {}
       return (
         // We are showing errors to underlying inputs, so we need to ignore them here
         <InputField {...omit(field.inputFieldProps, 'error')}>
@@ -533,8 +536,11 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             configuration={field.config.configuration}
             disabled={disabled}
+            name={name}
+            touched={groupTouched}
             validatorContext={validatorContext}
             value={field.value}
+            onBlur={onBlur}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
             onChange={(val) => onFieldValueChange(name, val)}
