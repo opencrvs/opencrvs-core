@@ -79,7 +79,8 @@ export const ResolvedRecordScopeV2 = z
 
 export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
-export const RecordScopeOptions = z
+/** Note! Moving on these should be called attributes and not options. */
+export const RecordScopeAttributes = z
   .object({
     event: scopeByEvent,
     placeOfEvent: JurisdictionFilter.optional(),
@@ -92,12 +93,12 @@ export const RecordScopeOptions = z
     'Limits access to records using provided filters. Combined as "AND". Use multiple scopes for "OR" behavior.'
   )
 
-export type RecordScopeOptions = z.infer<typeof RecordScopeOptions>
+export type RecordScopeAttributes = z.infer<typeof RecordScopeAttributes>
 
 export const RecordScopeV2 = z
   .object({
     type: RecordScopeTypeV2,
-    options: RecordScopeOptions.optional()
+    options: RecordScopeAttributes.optional()
   })
   .describe(
     "Scopes used to check user's permission to perform actions on a record."

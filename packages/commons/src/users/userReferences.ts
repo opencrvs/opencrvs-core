@@ -12,20 +12,23 @@ import {
   JurisdictionFilter,
   RecordScopeTypeV2,
   findScopeV2,
-  RecordScopeOptions
+  RecordScopeAttributes
 } from '../scopes-v2'
 import { RawScopes, Scope } from '../authentication'
 import z from 'zod/v4'
 
-const ScopeOptionReference = z.object({
+const RecordScopeAttributeKey = RecordScopeAttributes.keyof()
+type RecordScopeAttributeKey = z.infer<typeof RecordScopeAttributeKey>
+
+const ScopeAttributeReference = z.object({
   $scope: RecordScopeTypeV2,
-  $option: RecordScopeOptions.keyof()
+  $attribute: RecordScopeAttributeKey
 })
 
-type ScopeOptionReference = z.infer<typeof ScopeOptionReference>
+type ScopeAttributeReference = z.infer<typeof ScopeAttributeReference>
 
 export const JurisdictionReference = z.object({
-  $jurisdiction: JurisdictionFilter.or(ScopeOptionReference)
+  $jurisdiction: JurisdictionFilter.or(ScopeAttributeReference)
 })
 export type JurisdictionReference = z.infer<typeof JurisdictionReference>
 
@@ -51,10 +54,10 @@ function isJurisdictionFilter(
 
 // TODO CIHAN: can we make this into a generic function for resolving any scope option?
 function parseScopeOption(
-  scopeOptionReference: ScopeOptionReference,
+  scopeAttributeReference: ScopeAttributeReference,
   scopes: RawScopes[]
 ): JurisdictionFilter {
-  const { $scope, $option } = scopeOptionReference
+  const { $scope, $attribute } = scopeAttributeReference
   const scope = findScopeV2(scopes, $scope)
 
   // If no scope is found, return the most limited jurisdiction filter
@@ -62,14 +65,14 @@ function parseScopeOption(
     return JurisdictionFilter.enum.location
   }
 
-  const optionValue = scope.options?.[$option]
+  const attributeValue = scope.options?.[$attribute]
 
-  // If scope is found but no option is set, return the most permissive jurisdiction filter
-  if (!optionValue || !isJurisdictionFilter(optionValue)) {
+  // If scope is found but no attribute is set, return the most permissive jurisdiction filter
+  if (!attributeValue || !isJurisdictionFilter(attributeValue)) {
     return JurisdictionFilter.enum.all
   }
 
-  return optionValue
+  return attributeValue
 }
 
 /**
@@ -105,26 +108,31 @@ export function resolveJurisdictionReference(
 export const userReferenceFunctions = {
   scope: (scope: Scope) => ({
     /**
-     * user.scope().option() is used to create a scope option reference.
+     * user.scope().attribute() is used to create a scope attribute reference.
      *
-     * E.g.: user.scope('record.create').option('placeOfEvent')
+     * E.g.: user.scope('record.create').attribute('placeOfEvent')
      *
      * @param option - The option to create a reference for.
      * @returns A scope option reference.
      */
-    option: (option: string) => ({ $scope: scope, $option: option })
+    attribute: (attribute: RecordScopeAttributeKey) => ({
+      $scope: scope,
+      $attribute: attribute
+    })
   }),
   /**
    * user.jurisdicton() accepts two different kinds of parameters, either:
    *
    * 1. a plain jurisdiction filter: user.jurisdiction('administrativeArea')
-   * 2. a scope attribute reference: user.jurisdiction(user.scope('record.create').option('placeOfEvent'))
+   * 2. a scope attribute reference: user.jurisdiction(user.scope('record.create').attribute('placeOfEvent'))
    *
    * These will be resolved during runtime.
    *
    * @param jurisdiction - The jurisdiction to resolve.
    */
-  jurisdiction: (jurisdiction: JurisdictionFilter | ScopeOptionReference) => ({
+  jurisdiction: (
+    jurisdiction: JurisdictionFilter | ScopeAttributeReference
+  ) => ({
     $jurisdiction: jurisdiction
   })
 }
