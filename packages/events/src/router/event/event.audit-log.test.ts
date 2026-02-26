@@ -332,7 +332,6 @@ describe('audit log', () => {
       formData.append('transactionId', 'abc123')
       formData.append('path', 'test-event')
 
-      // @ts-expect-error FormData is not the exact type expected but works for test
       await client.attachments.upload(formData)
 
       const db = getClient()

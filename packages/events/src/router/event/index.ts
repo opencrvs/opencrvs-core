@@ -121,7 +121,11 @@ export const eventRouter = router({
           clientId: ctx.user.id,
           clientType: ctx.user.type,
           operation: 'event.create',
-          requestData: input as Record<string, unknown>,
+          requestData: {
+            transactionId: input.transactionId,
+            type: input.type,
+            createdAtLocation: input.createdAtLocation ?? null
+          },
           responseSummary: {
             eventId: result.id,
             eventType: result.type,
@@ -386,7 +390,11 @@ export const eventRouter = router({
           clientId: ctx.user.id,
           clientType: ctx.user.type,
           operation: 'event.search',
-          requestData: input as Record<string, unknown>,
+          requestData: {
+            query: input.query ?? null,
+            limit: input.limit ?? null,
+            offset: input.offset ?? null
+          },
           responseSummary: {
             total: result.total,
             eventIds: result.results.map((r) => r.id)

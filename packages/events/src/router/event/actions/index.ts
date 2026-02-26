@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { logger, TokenUserType, UUID } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -394,6 +394,8 @@ export function getDefaultActionProcedures(
 
         const auditOperation = AUDIT_LOGGED_ACTION_OPERATIONS[actionType]
         if (user.type === TokenUserType.enum.system && auditOperation) {
+          // Exclude `declaration` and `annotation` fields from the audit log:
+          // they can contain large PII-heavy payloads not suited for an audit trail.
           const { declaration, annotation, ...requestData } = input
           await writeAuditLog({
             clientId: user.id,
