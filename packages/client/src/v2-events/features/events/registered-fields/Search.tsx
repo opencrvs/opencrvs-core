@@ -17,12 +17,15 @@ import {
   SearchField,
   validateValue,
   HttpFieldValue,
-  EventIndex
+  EventIndex,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import {
+  Box,
   Button,
   Dialog,
   IColor,
+  Icon,
   Link,
   Loader,
   Stack,
@@ -152,11 +155,39 @@ function ClearModal({
   )
 }
 
+const StyledContainer = styled(Box)`
+  background: ${({ theme }) => theme.colors.background};
+  border: none;
+  flex: 1;
+`
+
 const SearchInputWrapper = styled.div`
   display: flex;
   width: 100%;
   gap: 8px;
 `
+
+const SearchWrapper = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+`
+
+const StyledIcon = styled(Icon)`
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  color: ${({ theme }) => theme.colors.primary};
+  transform: translateX(50%) translateY(-50%);
+  pointer-events: none;
+`
+
+const StyledInput = styled(TextInput)`
+  padding-left: 24px;
+  width: 100%;
+`
+
 function Postfix({
   configuration,
   isLoading = false,
@@ -224,10 +255,14 @@ function SearchInput({
   onChange,
   form,
   configuration,
+  label,
+  helperText,
   value
 }: Omit<Props, 'configuration'> & {
   configuration: SearchField['configuration']
   value: HttpFieldValue | null | undefined
+  label?: string
+  helperText?: TranslationConfig
 }) {
   const intl = useIntl()
 
@@ -342,70 +377,109 @@ function SearchInput({
     !httpState || !!httpState.error || !((httpState.data?.total ?? 0) > 0)
 
   return (
-    <Stack alignItems="flex-start" direction="column" gap={8}>
-      <SearchInputWrapper>
-        <TextInput
-          data-testid="search-input"
-          id="search"
-          isDisabled={!isEditable}
-          postfix={
-            <Postfix
-              clearData={async () => clearData()}
-              configuration={configuration}
-              hasData={!!((httpState?.data?.total ?? 0) > 0)}
-              isLoading={httpState?.loading}
+    <StyledContainer>
+      <Stack alignItems="initial" direction="column" gap={8}>
+        <Stack alignItems="initial" direction="column" gap={8}>
+          {label && (
+            <Text
+              color="grey600"
+              element="span"
+              style={{ fontWeight: 500 }}
+              variant="h4"
+            >
+              {label}
+            </Text>
+          )}
+          {helperText && (
+            <Text
+              color="grey500"
+              element="span"
+              style={{ fontWeight: 400 }}
+              variant="h4"
+            >
+              {intl.formatMessage(helperText)}
+            </Text>
+          )}
+        </Stack>
+        <SearchInputWrapper>
+          <SearchWrapper>
+            <StyledIcon
+              color="currentColor"
+              name="MagnifyingGlass"
+              size="large"
             />
-          }
-          value={inputState}
-          onChange={(e) => {
-            setHttpState(null)
-            setInputState(e.target.value)
-          }}
-        />
-        <Http.Input
-          configuration={{
-            url: '/api/events/events/search',
-            timeout: 5000,
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: {
-              query: replaceTerm(inputState, configuration.query),
-              limit: configuration.limit,
-              offset: configuration.offset
-            }
-          }}
-          form={form}
-          parentValue={buttonPressed}
-          onChange={onHTTPChange}
-        />
-        {isEditable && (
-          <Button
-            disabled={!valid || !isOnline}
-            size="large"
-            type="secondary"
-            onClick={() => setButtonPressed(buttonPressed + 1)}
-          >
-            {intl.formatMessage(
-              configuration.indicators?.confirmButton ||
-                defaultIndicators.confirmButton
-            )}
-          </Button>
+            <StyledInput
+              data-testid="search-input"
+              id="search"
+              isDisabled={!isEditable}
+              postfix={
+                <Postfix
+                  clearData={async () => clearData()}
+                  configuration={configuration}
+                  hasData={!!((httpState?.data?.total ?? 0) > 0)}
+                  isLoading={httpState?.loading}
+                />
+              }
+              value={inputState}
+              onChange={(e) => {
+                setHttpState(null)
+                setInputState(e.target.value)
+              }}
+            />
+          </SearchWrapper>
+
+          <Http.Input
+            configuration={{
+              url: '/api/events/events/search',
+              timeout: 5000,
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: {
+                query: replaceTerm(inputState, configuration.query),
+                limit: configuration.limit,
+                offset: configuration.offset
+              }
+            }}
+            form={form}
+            parentValue={buttonPressed}
+            onChange={onHTTPChange}
+          />
+          {isEditable && (
+            <Button
+              disabled={!valid || !isOnline}
+              size="large"
+              type="secondary"
+              onClick={() => setButtonPressed(buttonPressed + 1)}
+            >
+              {intl.formatMessage(
+                configuration.indicators?.confirmButton ||
+                  defaultIndicators.confirmButton
+              )}
+            </Button>
+          )}
+        </SearchInputWrapper>
+        {message && (
+          <Stack alignItems="normal" direction="row" gap={4}>
+            <Icon
+              color={color}
+              name={color === 'red' ? 'XCircle' : 'CheckCircle'}
+              weight={'bold'}
+            />
+            <Text
+              color={color}
+              data-testid="search-input-error"
+              element="span"
+              variant="bold16"
+            >
+              {message}
+            </Text>
+          </Stack>
         )}
-      </SearchInputWrapper>
-      {message && (
-        <Text
-          color={color}
-          data-testid="search-input-error"
-          element="span"
-          variant="bold16"
-        >
-          {message}
-        </Text>
-      )}
-      {modal}
-    </Stack>
+        {modal}
+      </Stack>
+    </StyledContainer>
   )
 }
 
