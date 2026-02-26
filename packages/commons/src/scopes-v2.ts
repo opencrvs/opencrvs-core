@@ -79,22 +79,25 @@ export const ResolvedRecordScopeV2 = z
 
 export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
+export const RecordScopeOptions = z
+  .object({
+    event: scopeByEvent,
+    placeOfEvent: JurisdictionFilter.optional(),
+    declaredIn: JurisdictionFilter.optional(),
+    declaredBy: UserFilter.optional(),
+    registeredIn: JurisdictionFilter.optional(),
+    registeredBy: UserFilter.optional()
+  })
+  .describe(
+    'Limits access to records using provided filters. Combined as "AND". Use multiple scopes for "OR" behavior.'
+  )
+
+export type RecordScopeOptions = z.infer<typeof RecordScopeOptions>
+
 export const RecordScopeV2 = z
   .object({
     type: RecordScopeTypeV2,
-    options: z
-      .object({
-        event: scopeByEvent,
-        placeOfEvent: JurisdictionFilter.optional(),
-        declaredIn: JurisdictionFilter.optional(),
-        declaredBy: UserFilter.optional(),
-        registeredIn: JurisdictionFilter.optional(),
-        registeredBy: UserFilter.optional()
-      })
-      .optional()
-      .describe(
-        'Limits access to records using provided filters. Combined as "AND". Use multiple scopes for "OR" behavior.'
-      )
+    options: RecordScopeOptions.optional()
   })
   .describe(
     "Scopes used to check user's permission to perform actions on a record."
@@ -132,6 +135,11 @@ export const decodeScope = (query: string) => {
 
   const unflattenedScope = unflattenScope(scope)
   return RecordScopeV2.safeParse(unflattenedScope)?.data
+}
+
+export function findScopeV2(scopes: string[], scopeType: RecordScopeTypeV2) {
+  const parsedScopes = scopes.map(decodeScope)
+  return parsedScopes.find((scope) => scope?.type === scopeType)
 }
 
 type LegacyScopeType = ConfigurableScopeType

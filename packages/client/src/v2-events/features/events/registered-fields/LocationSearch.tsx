@@ -26,7 +26,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
@@ -125,10 +125,10 @@ function LocationSearchInput({
   disabled?: boolean
   id: string
 }) {
+  const scopes = useSelector(getScope)
   const jurisdictionFilter = resolveJurisdictionReference(
     props.configuration?.allowedLocations,
-    // TODO CIHAN: pass in scopes as param
-    []
+    scopes
   )
 
   const locations = useAvailableLocations(

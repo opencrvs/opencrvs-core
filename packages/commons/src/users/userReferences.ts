@@ -8,19 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { JurisdictionFilter } from '../scopes-v2'
-import { Scope } from '../authentication'
+import {
+  JurisdictionFilter,
+  RecordScopeTypeV2,
+  findScopeV2,
+  RecordScopeOptions
+} from '../scopes-v2'
+import { RawScopes, Scope } from '../authentication'
 import z from 'zod/v4'
 
-// TODO CIHAN: can we specify the scope and attribute here?
-const ScopeAttributeReference = z.object({
-  $scope: z.string(),
-  $attribute: z.string()
+const ScopeOptionReference = z.object({
+  $scope: RecordScopeTypeV2,
+  $option: RecordScopeOptions.keyof()
 })
-type ScopeAttributeReference = z.infer<typeof ScopeAttributeReference>
+
+type ScopeOptionReference = z.infer<typeof ScopeOptionReference>
 
 export const JurisdictionReference = z.object({
-  $jurisdiction: JurisdictionFilter.or(ScopeAttributeReference)
+  $jurisdiction: JurisdictionFilter.or(ScopeOptionReference)
 })
 export type JurisdictionReference = z.infer<typeof JurisdictionReference>
 
@@ -31,7 +36,7 @@ export type JurisdictionReference = z.infer<typeof JurisdictionReference>
  * @returns True if the jurisdiction is a plain jurisdiction filter, false otherwise.
  */
 function isJurisdictionFilter(
-  jurisdiction: JurisdictionFilter | ScopeAttributeReference
+  jurisdiction: JurisdictionFilter | ScopeOptionReference
 ): jurisdiction is JurisdictionFilter {
   if (typeof jurisdiction !== 'string') {
     return false
@@ -42,16 +47,29 @@ function isJurisdictionFilter(
   return allowedJurisdictionFilters.includes(jurisdiction)
 }
 
-function resolveScopeAttribute(
-  scopeAttributeReference: ScopeAttributeReference,
-  scopes: string[]
+// TODO CIHAN: can we make this into a generic function for resolving any scope option?
+function parseScopeOption(
+  scopeOptionReference: ScopeOptionReference,
+  scopes: RawScopes[]
 ): JurisdictionFilter {
-  const scopeName = scopeAttributeReference['$scope']
-  const scopeAttribute = scopeAttributeReference['$attribute']
+  const scopeName = scopeOptionReference['$scope']
+  const scopeOption = scopeOptionReference['$option']
 
   // TODO CIHAN:
   console.log('scopeName', scopeName)
-  console.log('scopeAttribute', scopeAttribute)
+  console.log('scopeOption', scopeOption)
+
+  const scope = findScopeV2(scopes, scopeName)
+
+  console.log('scope', scope)
+
+  if (!scope) {
+    return JurisdictionFilter.enum.location
+  }
+
+  const optionValue = scope.options?.[scopeOption]
+
+  console.log('optionValue', optionValue)
 
   // By default the scope attribute is 'all'
   return JurisdictionFilter.enum.all
@@ -65,7 +83,7 @@ function resolveScopeAttribute(
  */
 export function resolveJurisdictionReference(
   jurisdictionReference: JurisdictionReference | undefined,
-  scopes?: string[]
+  scopes?: RawScopes[] | null
 ): JurisdictionFilter {
   if (!jurisdictionReference) {
     return JurisdictionFilter.enum.all
@@ -80,7 +98,7 @@ export function resolveJurisdictionReference(
 
   // If the jurisdiction is a scope attribute reference, resolve it
   if (jurisdiction['$scope'] && scopes) {
-    return resolveScopeAttribute(jurisdiction, scopes)
+    return parseScopeOption(jurisdiction, scopes)
   }
 
   throw 'Failed to resolve jurisdiction filter'
@@ -88,10 +106,10 @@ export function resolveJurisdictionReference(
 
 /** Functions for resolving values from user details */
 export const userReferenceFunctions = {
-  jurisdiction: (
-    jurisdiction: JurisdictionFilter | ScopeAttributeReference
-  ) => ({ $jurisdiction: jurisdiction }),
+  jurisdiction: (jurisdiction: JurisdictionFilter | ScopeOptionReference) => ({
+    $jurisdiction: jurisdiction
+  }),
   scope: (scope: Scope) => ({
-    attribute: (attribute: string) => ({ $scope: scope, $attribute: attribute })
+    option: (option: string) => ({ $scope: scope, $option: option })
   })
 }

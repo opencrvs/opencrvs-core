@@ -10,11 +10,16 @@
  */
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import { JurisdictionFilter, Location, UUID } from '@opencrvs/commons/client'
+import {
+  JurisdictionFilter,
+  Location,
+  resolveJurisdictionReference,
+  UUID
+} from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getAdministrativeAreaHierarchy } from '@client/v2-events/utils'
 import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
@@ -61,7 +66,7 @@ function useUserAdministrativeAreaHierarchy() {
  * Given a parent id, return the administrative area options for the parent. The options will be filtered based on the jurisdiction filter.
  * If parentId is null, we are at the root level of the administrative area hierarchy.
  */
-function useAdministrativeAreaOptions(
+function useAvailableAdministrativeAreas(
   parentId?: string | null,
   jurisdictionFilter?: JurisdictionFilter
 ) {
@@ -70,18 +75,13 @@ function useAdministrativeAreaOptions(
   const userAdministrativeAreaHierarchy = useUserAdministrativeAreaHierarchy()
 
   const options = React.useMemo(() => {
-    return [...administrativeAreas.values()]
-      .filter((administrativeArea) => {
-        if (parentId === undefined) {
-          return true
-        }
+    return [...administrativeAreas.values()].filter((administrativeArea) => {
+      if (parentId === undefined) {
+        return true
+      }
 
-        return administrativeArea.parentId === parentId
-      })
-      .map((location) => ({
-        label: location.name,
-        value: location.id
-      }))
+      return administrativeArea.parentId === parentId
+    })
   }, [administrativeAreas, parentId])
 
   // If jurisdiction is only user's current location, we never show any administrative area options.
@@ -92,7 +92,7 @@ function useAdministrativeAreaOptions(
   // If jurisdiction is only administrative area, we show all options which are the parent of the users location (either direct or parent of the parent)
   if (jurisdictionFilter === JurisdictionFilter.enum.administrativeArea) {
     return options.filter((o) =>
-      userAdministrativeAreaHierarchy.some(({ id }) => id === o.value)
+      userAdministrativeAreaHierarchy.some(({ id }) => id === o.id)
     )
   }
 
@@ -115,9 +115,20 @@ function AdministrativeAreaInput({
   configuration: AdministrativeAreaField['configuration']
   id: string
 }) {
-  const options = useAdministrativeAreaOptions(
+  const scopes = useSelector(getScope)
+  const jurisdictionFilter = resolveJurisdictionReference(
+    configuration.allowedLocations,
+    scopes
+  )
+
+  const administrativeAreas = useAvailableAdministrativeAreas(
     partOf,
-    configuration.allowedLocations
+    jurisdictionFilter
+  )
+
+  const options = useMemo(
+    () => administrativeAreas.map((o) => ({ label: o.name, value: o.id })),
+    [administrativeAreas]
   )
 
   const selectedLocation = useMemo(
