@@ -248,6 +248,47 @@ test('blue/green: original concrete index is replaced by a timestamped index aft
   expect(indexesBehindAlias[0]).toMatch(new RegExp(`^${liveIndexName}_\\d+$`))
 })
 
+test('blue/green: first-reindex name conflict is resolved — write alias created even when bare concrete index existed', async () => {
+  // This test exercises the case where `ensureIndexExists` created a bare
+  // concrete index (e.g. "events_tennis-club-membership") before any reindex
+  // had occurred. finaliseReindexIndex must detect the name conflict and fall
+  // back to the two-step promotion so the write alias is still created.
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
+  const esClient = getOrCreateClient()
+
+  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+
+  // Confirm we start with a bare concrete index (not yet an alias)
+  const isConcreteBefore = await esClient.indices.exists({
+    index: writeAliasName
+  })
+  const isAliasBefore = await esClient.indices.existsAlias({
+    name: writeAliasName
+  })
+  expect(isConcreteBefore).toBe(true)
+  expect(isAliasBefore).toBe(false)
+
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  // After reindex the write alias must exist and point to a timestamped index
+  const isAliasAfter = await esClient.indices.existsAlias({
+    name: writeAliasName
+  })
+  expect(isAliasAfter).toBe(true)
+
+  const writeAliasInfo = await esClient.indices.getAlias({
+    name: writeAliasName
+  })
+  const indexBehindWriteAlias = Object.keys(writeAliasInfo)[0]
+  expect(indexBehindWriteAlias).toMatch(new RegExp(`^${writeAliasName}_\\d+$`))
+
+  // The original bare concrete index must be gone
+  const isConcreteAfter = await esClient.indices.exists({
+    index: writeAliasName
+  })
+  expect(isConcreteAfter).toBe(false)
+})
+
 test('blue/green: data is searchable via alias immediately after alias swap', async () => {
   const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
   const esClient = getOrCreateClient()

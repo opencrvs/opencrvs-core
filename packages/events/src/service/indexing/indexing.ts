@@ -412,28 +412,63 @@ export async function finaliseReindexIndex(
   }
 
   if (currentLiveIndex) {
-    logger.info(
-      `Swapping aliases [${globalAliasName}, ${writeAliasName}] from ${currentLiveIndex} to ${tempIndexName}`
-    )
-    // Single atomic call: swap global read alias AND create per-type write alias
-    // simultaneously. This eliminates the window where the write alias is absent
-    // between index deletion and alias creation.
-    await esClient.indices.updateAliases({
-      body: {
-        actions: [
-          { remove: { index: currentLiveIndex, alias: globalAliasName } },
-          { add: { index: tempIndexName, alias: globalAliasName } },
-          { add: { index: tempIndexName, alias: writeAliasName } }
-        ]
-      }
-    })
-    // Only delete the old index after all aliases are already consistent.
-    // ES removes aliases pointing to a deleted index automatically, but the
-    // previous write alias already points to `tempIndexName` at this point.
-    logger.info(
-      `Aliases swapped atomically. Deleting old index ${currentLiveIndex}`
-    )
-    await esClient.indices.delete({ index: currentLiveIndex })
+    // First-ever reindex of a deployed instance: the live index is a bare
+    // concrete index whose name (e.g. "events_birth") is the same as the write
+    // alias we want to create. ES does not allow an alias to share a name with
+    // an existing concrete index, so we must delete the concrete index first and
+    // then create the alias in two separate steps.
+    const writeAliasConflictsWithConcreteIndex =
+      currentLiveIndex === writeAliasName
+
+    if (writeAliasConflictsWithConcreteIndex) {
+      logger.warn(
+        `First-time blue/green reindex detected: live index "${currentLiveIndex}" has the same name ` +
+          `as the write alias "${writeAliasName}". Falling back to two-step alias promotion ` +
+          `(brief write-alias gap window is unavoidable in this case).`
+      )
+      // Step 1: Atomically swap global read alias to the new index.
+      await esClient.indices.updateAliases({
+        body: {
+          actions: [
+            { remove: { index: currentLiveIndex, alias: globalAliasName } },
+            { add: { index: tempIndexName, alias: globalAliasName } }
+          ]
+        }
+      })
+      // Step 2: Delete old concrete index — this frees the name "events_birth".
+      logger.info(
+        `Global alias swapped. Deleting old concrete index ${currentLiveIndex}`
+      )
+      await esClient.indices.delete({ index: currentLiveIndex })
+      // Step 3: Now safe to create the write alias under the freed name.
+      logger.info(
+        `Creating per-type write alias ${writeAliasName} → ${tempIndexName}`
+      )
+      await esClient.indices.putAlias({
+        index: tempIndexName,
+        name: writeAliasName
+      })
+    } else {
+      logger.info(
+        `Swapping aliases [${globalAliasName}, ${writeAliasName}] from ${currentLiveIndex} to ${tempIndexName}`
+      )
+      // Normal path (second+ reindex): single atomic call swaps global read alias
+      // AND creates per-type write alias simultaneously — no gap window.
+      await esClient.indices.updateAliases({
+        body: {
+          actions: [
+            { remove: { index: currentLiveIndex, alias: globalAliasName } },
+            { add: { index: tempIndexName, alias: globalAliasName } },
+            { add: { index: tempIndexName, alias: writeAliasName } }
+          ]
+        }
+      })
+      // Delete old index only after aliases are consistent.
+      logger.info(
+        `Aliases swapped atomically. Deleting old index ${currentLiveIndex}`
+      )
+      await esClient.indices.delete({ index: currentLiveIndex })
+    }
   } else {
     // No existing index for this event type — create both aliases in one call.
     logger.info(
