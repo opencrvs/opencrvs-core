@@ -195,6 +195,7 @@ async function buildClause(
       case 'assignedTo':
       case 'createdBy':
       case 'updatedBy':
+      case 'updatedByUserRole':
       case 'createdByUserType':
       case 'legalStatuses.REGISTERED.registrationNumber': {
         const value = clause[key]
