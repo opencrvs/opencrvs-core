@@ -407,6 +407,81 @@ export const DraftPagination: Story = {
   }
 }
 
+/**
+ * Shows draft in offline mode and that pagination works in offline mode as well.
+ */
+export const DraftPaginationOffline: Story = {
+  parameters: {
+    chromatic: { disableSnapshot: true },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'draft' })
+    },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('draft')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 1 }
+            }, {})
+          })
+        ],
+        events: [tRPCMsw.event.search.query(() => ({ results: [], total: 0 }))],
+        event: [
+          tRPCMsw.event.draft.list.query(() => drafts),
+          tRPCMsw.event.get.query((input) => {
+            const event = events.find((e) => e.event.id === input)?.event
+
+            if (!event) {
+              throw new Error(`Event not found with id: ${input}`)
+            }
+
+            return event
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return { results: [], total: 0 }
+          })
+        ],
+        drafts: [tRPCMsw.event.draft.list.query(() => drafts)],
+        offline: { drafts }
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    Object.defineProperty(window.navigator, 'onLine', {
+      configurable: true,
+      get: () => false
+    })
+
+    // Dispatch offline event so useEffect listener reacts
+    window.dispatchEvent(new Event('offline'))
+
+    const canvas = within(canvasElement)
+
+    // Expect 10 elements with text 'Tennis club membership application'
+    const firstPageRows = await canvas.findAllByText(
+      'Tennis club membership application'
+    )
+    await expect(firstPageRows).toHaveLength(10)
+
+    // Check that offline labels are shown
+    await canvas.findAllByText('No connection')
+
+    // Wait for page to load before interacting
+    await canvas.findByRole('button', { name: 'Next page' }, { timeout: 5000 })
+    await userEvent.click(canvas.getByRole('button', { name: 'Next page' }))
+
+    // Expect 5 elements with text 'Tennis club membership application'
+    const secondPageRows = await canvas.findAllByText(
+      'Tennis club membership application'
+    )
+    await expect(secondPageRows).toHaveLength(5)
+  }
+}
+
 const downloadEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
