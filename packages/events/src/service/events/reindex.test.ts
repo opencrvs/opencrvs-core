@@ -341,3 +341,74 @@ test('reindex with eventType filter only rebuilds the specified event type index
   })
   expect(body.hits.hits).toHaveLength(1)
 })
+
+test('blue/green: per-type write alias is created after reindex', async () => {
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
+  const esClient = getOrCreateClient()
+
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  // After reindex, events_birth should exist as an alias (not a concrete index)
+  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const aliasExists = await esClient.indices.existsAlias({
+    name: writeAliasName
+  })
+  expect(aliasExists).toBe(true)
+
+  // The alias must point to the current timestamped index
+  const writeAliasInfo = await esClient.indices.getAlias({
+    name: writeAliasName
+  })
+  const indexesBehindWriteAlias = Object.keys(writeAliasInfo)
+  expect(indexesBehindWriteAlias).toHaveLength(1)
+  expect(indexesBehindWriteAlias[0]).toMatch(
+    new RegExp(`^${writeAliasName}_\\d+$`)
+  )
+})
+
+test('blue/green: events indexed after reindex go to the correct (timestamped) index via write alias', async () => {
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
+  const esClient = getOrCreateClient()
+
+  // Perform a reindex so the live index becomes a timestamped index
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  // Determine the current live (timestamped) physical index
+  const globalAlias = getEventAliasName()
+  const aliasInfo = await esClient.indices.getAlias({ name: globalAlias })
+  const liveIndex = Object.keys(aliasInfo)[0]
+
+  // The write alias (e.g. "events_tennis-club-membership") must resolve to the
+  // same live timestamped index, not to a stale bare concrete index
+  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const writeAliasInfo = await esClient.indices.getAlias({
+    name: writeAliasName
+  })
+  const indexBehindWriteAlias = Object.keys(writeAliasInfo)[0]
+
+  expect(indexBehindWriteAlias).toEqual(liveIndex)
+})
+
+test('blue/green: per-type write alias is re-pointed on every subsequent reindex', async () => {
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
+  const esClient = getOrCreateClient()
+
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
+  const aliasAfterFirst = await esClient.indices.getAlias({
+    name: writeAliasName
+  })
+  const indexAfterFirst = Object.keys(aliasAfterFirst)[0]
+
+  // Second reindex — the write alias must point to the new index
+  await expect(client.event.reindex()).resolves.not.toThrow()
+
+  const aliasAfterSecond = await esClient.indices.getAlias({
+    name: writeAliasName
+  })
+  const indexAfterSecond = Object.keys(aliasAfterSecond)[0]
+
+  expect(indexAfterSecond).not.toEqual(indexAfterFirst)
+  expect(indexAfterSecond).toMatch(new RegExp(`^${writeAliasName}_\\d+$`))
+})

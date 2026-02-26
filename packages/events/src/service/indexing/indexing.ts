@@ -318,23 +318,35 @@ export async function createIndex(
   }
 }
 
-export async function ensureIndexExists(
-  eventConfiguration: EventConfig,
-  { overwrite }: { overwrite?: boolean } = { overwrite: false }
-) {
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
 
-  if (!hasEventsIndex) {
+  // After a blue/green reindex, `indexName` (e.g. "events_birth") is a write
+  // alias rather than a concrete index. finaliseReindexIndex already set up
+  // both the global read alias and the per-type write alias, so nothing to do.
+  const isAlreadyWriteAlias = await esClient.indices.existsAlias({
+    name: indexName
+  })
+  if (isAlreadyWriteAlias) {
+    logger.info(
+      `Write alias ${indexName} already exists — index setup already complete`
+    )
+    return
+  }
+
+  const hasConcreteIndex = await esClient.indices.exists({ index: indexName })
+
+  if (!hasConcreteIndex) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    logger.info(`Index ${indexName} already exists.`)
+    // Existing deployment: bare concrete index. Add the global read alias so
+    // searches work. The per-type write alias will be created on the next
+    // reindex (triggered automatically on deploy).
+    logger.info(`Index ${indexName} already exists as a concrete index.`)
+    await ensureAlias(indexName)
   }
-  return ensureAlias(indexName)
 }
 
 /**
@@ -360,8 +372,15 @@ export async function prepareReindexIndex(
 }
 
 /**
- * Atomically swaps the alias from whichever index currently holds it to the
- * newly built temp index, then deletes the old index. Zero-downtime promotion.
+ * Atomically swaps the global read alias and the per-type write alias from
+ * whichever index currently holds them to the newly built temp index, then
+ * deletes the old index. Zero-downtime promotion.
+ *
+ * Two aliases are maintained:
+ *  - Global read alias  (`events`)         — used by all search/query operations
+ *  - Per-type write alias (`events_birth`) — used by indexEvent / indexEventsInBulk
+ *    so that writes always resolve to the correct physical index regardless of
+ *    whether a reindex has occurred.
  *
  * We look up the current alias holder at finalise-time rather than relying on
  * the static computed name, because after the first blue/green reindex the live
@@ -372,14 +391,18 @@ export async function finaliseReindexIndex(
   tempIndexName: string
 ) {
   const esClient = getOrCreateClient()
-  const aliasName = getEventAliasName()
+  const globalAliasName = getEventAliasName()
+  // The write alias name is the same as the stable event-type index name
+  // (e.g. "events_birth"). After the first reindex this name is an alias, not a
+  // concrete index, so writes always land on the correct physical index.
+  const writeAliasName = getEventIndexName(eventType)
 
-  // Find which concrete index currently holds the alias for this event type
+  // Find which concrete index currently holds the global alias for this event type
   let currentLiveIndex: string | undefined
   try {
-    const aliasInfo = await esClient.indices.getAlias({ name: aliasName })
-    // The alias is shared across all event types — find the index that serves
-    // the specific event type (its name starts with the event type index prefix)
+    const aliasInfo = await esClient.indices.getAlias({ name: globalAliasName })
+    // The global alias spans all event types — find the index that serves this
+    // specific event type (its name starts with the event type index prefix)
     const eventIndexPrefix = getEventIndexName(eventType)
     currentLiveIndex = Object.keys(aliasInfo).find((idx) =>
       idx.startsWith(eventIndexPrefix)
@@ -390,26 +413,40 @@ export async function finaliseReindexIndex(
 
   if (currentLiveIndex) {
     logger.info(
-      `Swapping alias ${aliasName} from ${currentLiveIndex} to ${tempIndexName}`
+      `Swapping aliases [${globalAliasName}, ${writeAliasName}] from ${currentLiveIndex} to ${tempIndexName}`
+    )
+    // Single atomic call: swap global read alias AND create per-type write alias
+    // simultaneously. This eliminates the window where the write alias is absent
+    // between index deletion and alias creation.
+    await esClient.indices.updateAliases({
+      body: {
+        actions: [
+          { remove: { index: currentLiveIndex, alias: globalAliasName } },
+          { add: { index: tempIndexName, alias: globalAliasName } },
+          { add: { index: tempIndexName, alias: writeAliasName } }
+        ]
+      }
+    })
+    // Only delete the old index after all aliases are already consistent.
+    // ES removes aliases pointing to a deleted index automatically, but the
+    // previous write alias already points to `tempIndexName` at this point.
+    logger.info(
+      `Aliases swapped atomically. Deleting old index ${currentLiveIndex}`
+    )
+    await esClient.indices.delete({ index: currentLiveIndex })
+  } else {
+    // No existing index for this event type — create both aliases in one call.
+    logger.info(
+      `No existing index for ${eventType}, creating aliases ${globalAliasName} and ${writeAliasName} → ${tempIndexName}`
     )
     await esClient.indices.updateAliases({
       body: {
         actions: [
-          { remove: { index: currentLiveIndex, alias: aliasName } },
-          { add: { index: tempIndexName, alias: aliasName } }
+          { add: { index: tempIndexName, alias: globalAliasName } },
+          { add: { index: tempIndexName, alias: writeAliasName } }
         ]
       }
     })
-    logger.info(
-      `Alias ${aliasName} swapped. Deleting old index ${currentLiveIndex}`
-    )
-    await esClient.indices.delete({ index: currentLiveIndex })
-  } else {
-    // No existing index for this event type — just point the alias at the new one
-    logger.info(
-      `No existing index for ${eventType}, adding alias ${aliasName} → ${tempIndexName}`
-    )
-    await esClient.indices.putAlias({ index: tempIndexName, name: aliasName })
   }
 
   logger.info(`Reindex finalised: ${tempIndexName} is now live`)
@@ -459,7 +496,23 @@ export async function indexEventsInBulk(
     eventToEventIndex(doc, getEventConfigById(configs, doc.type))
   ])
 
-  return esClient.bulk({ refresh: false, body })
+  const response = await esClient.bulk({ refresh: false, body })
+
+  if (response.errors) {
+    const failures = response.items
+      .filter((item) => item.index?.error)
+      .map((item) => ({
+        id: item.index?._id,
+        index: item.index?._index,
+        error: item.index?.error
+      }))
+    logger.error(
+      `Bulk indexing had ${failures.length} failure(s) out of ${batch.length} documents`,
+      { failures }
+    )
+  }
+
+  return response
 }
 
 export async function indexEvent(event: EventDocument, config: EventConfig) {
