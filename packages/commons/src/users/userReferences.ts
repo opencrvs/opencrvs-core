@@ -52,7 +52,7 @@ function isJurisdictionFilter(
   return allowedJurisdictionFilters.includes(jurisdiction)
 }
 
-// TODO CIHAN: can we make this into a generic function for resolving any scope option?
+// TODO CIHAN: can we make this into a generic function for resolving any scope attribute?
 function getScopeAttributeValue(
   scopeAttributeReference: ScopeAttributeReference,
   scopes: RawScopes[]
@@ -112,7 +112,7 @@ export const userReferenceFunctions = {
      *
      * E.g.: user.scope('record.create').attribute('placeOfEvent')
      *
-     * @param option - The option to create a reference for.
+     * @param attribute - The attribute to create a reference for.
      * @returns A scope option reference.
      */
     attribute: (attribute: RecordScopeAttributeKey) => ({
