@@ -143,9 +143,9 @@ function validateDeclarationUpdateAction({
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
-  // check for any invalid key that doesn't exist in declaration config
+  // 2. Check for any invalid key that doesn't exist in declaration config
   // getDeclarationFieldById will throw if any field is not in the declaration config
-  Object.entries(mergedDeclaration).forEach(([key]) => {
+  Object.keys(mergedDeclaration).forEach((key) => {
     getDeclarationFieldById(eventConfig, key)
   })
 
@@ -163,7 +163,7 @@ function validateDeclarationUpdateAction({
       : mergedDeclaration
   )
 
-  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
+  // 3. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
   // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
@@ -171,7 +171,7 @@ function validateDeclarationUpdateAction({
     context
   )
 
-  // 3. When completeDeclaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // 4. When completeDeclaration update has fields that are not in the cleaned declaration, payload is invalid.
   const invalidKeys = getInvalidUpdateKeys({
     update: completeDeclaration,
     cleaned: cleanedDeclaration
@@ -181,7 +181,7 @@ function validateDeclarationUpdateAction({
     return invalidKeys
   }
 
-  // 4. Validate declaration update against conditional rules, taking into account conditional pages.
+  // 5. Validate declaration update against conditional rules, taking into account conditional pages.
   const allVisiblePageFields = declarationConfig.pages
     .filter((page) => isPageVisible(page, cleanedDeclaration, context))
     .flatMap((page) => page.fields)
@@ -195,7 +195,7 @@ function validateDeclarationUpdateAction({
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
-  // 5. Validate against action review fields, if applicable
+  // 6. Validate against action review fields, if applicable
   const reviewFields = declarationActionParse.success
     ? getActionReviewFields(eventConfig, declarationActionParse.data)
     : []

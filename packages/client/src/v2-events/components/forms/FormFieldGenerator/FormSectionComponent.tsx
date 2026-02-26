@@ -480,7 +480,10 @@ export function FormSectionComponent({
           currentForm,
           newValuesWithChangedVisibility
         )
-
+        // When conditionally a field's visibility changes
+        // if its hidden, we set the field value to null and cache the previous value
+        // if it becomes visible again, we restore the cached value
+        // We do it for all fields in the declaration form pages
         onChange(
           fieldVisibilityChanged ? newValuesWithChangedVisibility : values
         )

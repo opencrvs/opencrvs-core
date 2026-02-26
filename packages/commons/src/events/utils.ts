@@ -198,6 +198,8 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
 ): Partial<T> {
   const base = cloneDeep(formValues)
 
+  // The omitting is done recursively until the object does not change.
+  // This is because the previously removed fields might affect the visibility of other fields.
   function fn(prevVisibilityContext: Partial<T>): Partial<T> {
     const cleaned = omitBy<Partial<T>>(base, (value, fieldId) => {
       const fieldConfig = fields.filter((f) => f.id === fieldId)

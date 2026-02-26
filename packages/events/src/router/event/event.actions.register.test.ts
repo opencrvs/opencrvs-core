@@ -1516,7 +1516,7 @@ describe('Register action - hidden field nullification', () => {
           'recommender.none': true,
           // Multiple hidden fields explicitly set to null
           'recommender.name': null,
-          'recommender.email': null,
+          'recommender.id': null,
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
@@ -1538,7 +1538,7 @@ describe('Register action - hidden field nullification', () => {
           null
         )
         expect(requestedAction.declaration).toHaveProperty(
-          'recommender.email',
+          'recommender.id',
           null
         )
       }
@@ -1591,12 +1591,9 @@ describe('Register action - hidden field nullification', () => {
 
     test('accepts field from conditional page when page is visible during registration', async () => {
       const client = createTestClient(user)
-      const event = await createEvent(client, generator, [
-        ActionType.DECLARE,
-        ActionType.VALIDATE
-      ])
+      const event = await createEvent(client, generator, [])
 
-      const payload = generator.event.actions.register(event.id, {
+      const payload = generator.event.actions.declare(event.id, {
         declaration: {
           // DOB before 1950 makes senior-pass page VISIBLE
           'applicant.dob': '1944-02-01',
@@ -1619,18 +1616,41 @@ describe('Register action - hidden field nullification', () => {
               district2: 'District2'
             }
           }
-        }
+        },
+        keepAssignment: true
+      })
+      // Step 1: Declare with recommender.none = false (recommender.name is visible)
+      await client.event.actions.declare.request(payload)
+
+      // Step 2: Validate without changes
+      const validate = generator.event.actions.validate(event.id, {
+        declaration: payload.declaration,
+        keepAssignment: true
       })
 
-      const response = await client.event.actions.register.request(payload)
+      await client.event.actions.validate.request(validate)
 
-      const requestedAction = getRequestedRegisterAction(response)
-      if (requestedAction?.status === ActionStatus.Requested) {
-        expect(requestedAction.declaration).toHaveProperty(
-          'senior-pass.id',
-          '1234567890'
-        )
-      }
+      // Step 3: Register with the same values - senior-pass.id and senior-pass.recommender as null
+      const registerPayload = generator.event.actions.register(event.id, {
+        declaration: {
+          ...declaration,
+          // DOB after 1950 makes senior-pass page HIDDEN
+          'applicant.dob': '2000-02-01',
+          'senior-pass.id': null, // Explicitly clear the hidden field
+          'senior-pass.recommender': null // Explicitly clear the hidden field
+        }
+      })
+      const registerResponse =
+        await client.event.actions.register.request(registerPayload)
+
+      const currentEventState = getCurrentEventState(
+        registerResponse,
+        tennisClubMembershipEvent
+      )
+      expect(currentEventState.declaration).not.toHaveProperty('senior-pass.id')
+      expect(currentEventState.declaration).not.toHaveProperty(
+        'senior-pass.recommender'
+      )
     })
 
     test('omits hidden field when not provided during registration (default behavior)', async () => {
@@ -2470,7 +2490,7 @@ describe('Registration by different user with declaration changes', () => {
       tennisClubMembershipEvent
     )
     expect(currentState.declaration['recommender.name']).toBeUndefined()
-    expect(currentState.declaration['recommender.email']).toBeUndefined()
+    expect(currentState.declaration['recommender.id']).toBeUndefined()
     expect(currentState.declaration['senior-pass.id']).toBeUndefined()
     expect(currentState.declaration['senior-pass.recommender']).toBeUndefined()
     expect(currentState.declaration['applicant.dob']).toBe('2000-02-01')
