@@ -178,7 +178,11 @@ test('reindexing indexes all events into Elasticsearch', async () => {
     }
   })
 
-  expect(spy.mock.calls[0]).toHaveLength(1)
+  // spy is called once per batch; with 1 declared event, exactly one batch call is made
+  expect(spy).toHaveBeenCalledTimes(1)
+  // The body passed to country config is now an EventDocument[] array, not a stream
+  expect(Array.isArray(spy.mock.calls[0][0])).toBe(true)
+  expect(spy.mock.calls[0][0]).toHaveLength(1)
   // Does not reindex draftDocument - thus only one record is indexed
   expect(body.hits.hits).toHaveLength(1)
 })
