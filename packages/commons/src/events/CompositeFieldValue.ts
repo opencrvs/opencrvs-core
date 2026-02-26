@@ -139,7 +139,8 @@ export const HttpFieldUpdateValue = z
 
 export const QueryParamReaderFieldValue = z
   .object({
-    data: z.record(z.string(), z.string())
+    data: z.record(z.string(), z.string()),
+    updatedAt: z.iso.datetime()
   })
   .nullish()
 

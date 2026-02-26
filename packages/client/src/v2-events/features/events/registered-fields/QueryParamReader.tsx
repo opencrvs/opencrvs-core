@@ -61,7 +61,8 @@ function QueryParamReaderInput({
         onChangeRef.current({
           data: {
             ...fieldValue
-          }
+          },
+          updatedAt: new Date().toISOString()
         })
         setSearchParams(removeParams(params, pickParams), { replace: true })
       }
