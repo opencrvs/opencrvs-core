@@ -36,14 +36,16 @@ export type JurisdictionReference = z.infer<typeof JurisdictionReference>
  * @returns True if the jurisdiction is a plain jurisdiction filter, false otherwise.
  */
 function isJurisdictionFilter(
-  jurisdiction: JurisdictionFilter | ScopeOptionReference
+  jurisdiction: unknown
 ): jurisdiction is JurisdictionFilter {
   if (typeof jurisdiction !== 'string') {
     return false
   }
 
   // Do this instead of using safeParse for performance reasons.
-  const allowedJurisdictionFilters = Object.values(JurisdictionFilter.enum)
+  const allowedJurisdictionFilters: string[] = Object.values(
+    JurisdictionFilter.enum
+  )
   return allowedJurisdictionFilters.includes(jurisdiction)
 }
 
@@ -52,27 +54,21 @@ function parseScopeOption(
   scopeOptionReference: ScopeOptionReference,
   scopes: RawScopes[]
 ): JurisdictionFilter {
-  const scopeName = scopeOptionReference['$scope']
-  const scopeOption = scopeOptionReference['$option']
-
-  // TODO CIHAN:
-  console.log('scopeName', scopeName)
-  console.log('scopeOption', scopeOption)
-
-  const scope = findScopeV2(scopes, scopeName)
-
-  console.log('scope', scope)
+  const { $scope, $option } = scopeOptionReference
+  const scope = findScopeV2(scopes, $scope)
 
   if (!scope) {
     return JurisdictionFilter.enum.location
   }
 
-  const optionValue = scope.options?.[scopeOption]
-
-  console.log('optionValue', optionValue)
+  const optionValue = scope.options?.[$option]
 
   // By default the scope attribute is 'all'
-  return JurisdictionFilter.enum.all
+  if (!optionValue || !isJurisdictionFilter(optionValue)) {
+    return JurisdictionFilter.enum.all
+  }
+
+  return optionValue
 }
 
 /**
