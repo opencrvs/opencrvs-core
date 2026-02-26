@@ -4,6 +4,17 @@
 
 ### New features
 
+- Added support for `updatedByUserRole` in core workqueue configuration.
+  Workqueues can now be filtered by a specific role or `user('role')`. [#11848](https://github.com/opencrvs/opencrvs-core/issues/11848)
+
+**Usage example**
+
+```ts
+query: {
+  updatedByUserRole: { type: 'exact', term: user('role') }
+}
+```
+
 - Added support for `event()` helper to access event metadata in `dateOfEvent` and `summary` configuration in EventConfig. This allows for more dynamic and flexible configurations based on event metadata.
 
 Usage example:
@@ -34,7 +45,7 @@ summary: {
 
 ### Bug fixes
 
-- Extended the `record.registered.print-certified-copies[event=tennis-club-membership]` scope to support an optional `templates` parameter (e.g. `templates=v2.tennis-club-membership-certificate-alpha`). When `templates` is specified, users are restricted to printing only the listed certificate templates. If `templates` is omitted, all certificate templates for the event remain available, preserving existing behavior [[#11753](https://github.com/opencrvs/opencrvs-core/issues/11753)]
+- Extended the `record.registered.print-certified-copies[event=tennis-club-membership]` scope to support an optional `templates` parameter (e.g. `templates=v2.tennis-club-membership-certificate-alpha`). When `templates` is specified, users are restricted to printing only the listed certificate templates. If `templates` is omitted, all certificate templates for the event remain available, preserving existing behavior [#11753](https://github.com/opencrvs/opencrvs-core/issues/11753)
 
 ## 1.9.9
 
