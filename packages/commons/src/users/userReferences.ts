@@ -57,13 +57,14 @@ function parseScopeOption(
   const { $scope, $option } = scopeOptionReference
   const scope = findScopeV2(scopes, $scope)
 
+  // If no scope is found, return the most limited jurisdiction filter
   if (!scope) {
     return JurisdictionFilter.enum.location
   }
 
   const optionValue = scope.options?.[$option]
 
-  // By default the scope attribute is 'all'
+  // If scope is found but no option is set, return the most permissive jurisdiction filter
   if (!optionValue || !isJurisdictionFilter(optionValue)) {
     return JurisdictionFilter.enum.all
   }
