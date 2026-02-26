@@ -46,11 +46,11 @@ export interface FormFieldGeneratorProps {
   fields: FieldConfig[]
   eventConfig?: EventConfig
   /** Full form values, the page values are plucked out of it */
-  formValues: EventState
+  formValues?: EventState
   /** Full form touched values, the page values are plucked out of it */
-  formTouched: IndexMap<FormState<boolean>>
-  onFormChange: (values: EventState) => void
-  onTouchedChange: (touched: IndexMap<FormState<boolean>>) => void
+  formTouched?: IndexMap<FormState<boolean>>
+  onFormChange?: (values: EventState) => void
+  onTouchedChange?: (touched: IndexMap<FormState<boolean>>) => void
   onAllFieldsValidated?: (success: boolean) => void
   isCorrection?: boolean
   validatorContext: ValidatorContext
@@ -183,8 +183,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               validatorContext={validatorContext}
               values={formikProps.values}
               onAllFieldsValidated={onAllFieldsValidated}
-              onFormChange={(cb) => onFormChange(cb(formValues))}
-              onTouchedChange={(cb) => onTouchedChange(cb(formTouched))}
+              onFormChange={(cb) => onFormChange?.(cb(formValues ?? {}))}
+              onTouchedChange={(cb) => onTouchedChange?.(cb(formTouched ?? {}))}
             />
           )
         }}
