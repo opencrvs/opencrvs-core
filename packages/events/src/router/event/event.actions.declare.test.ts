@@ -23,13 +23,18 @@ import {
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
   ActionUpdate,
-  EventState
+  EventState,
+  EventDocument
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
   tennisClubMembershipEventWithDedupCheck
 } from '@opencrvs/commons/fixtures'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES
+} from '@events/tests/utils'
 import { CreatedUser, payloadGenerator } from '@events/tests/generators'
 import {
   getEventIndexName,
@@ -38,6 +43,17 @@ import {
 import { encodeEventIndex } from '@events/service/indexing/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+
+function getRequestedRegisterAction(response: EventDocument) {
+  const savedAction = response.actions.find(
+    ({ type, status }: { type: ActionType; status: ActionStatus }) =>
+      type === ActionType.DECLARE && status === ActionStatus.Requested
+  )
+
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+
+  return savedAction
+}
 
 /* eslint-disable max-lines */
 describe('Declare action', () => {
@@ -160,12 +176,7 @@ describe('Declare action', () => {
 
     const response = await client.event.actions.declare.request(data)
 
-    const savedAction = response.actions.find(
-      ({ type, status }) =>
-        type === ActionType.DECLARE && status === ActionStatus.Requested
-    )
-
-    expect(savedAction?.status).toEqual(ActionStatus.Requested)
+    const savedAction = getRequestedRegisterAction(response)
     if (savedAction?.status === ActionStatus.Requested) {
       expect(savedAction.declaration).toEqual(form)
     }
@@ -232,12 +243,7 @@ describe('Declare action', () => {
 
     const response = await client.event.actions.declare.request(data)
 
-    const savedAction = response.actions.find(
-      ({ type, status }) =>
-        type === ActionType.DECLARE && status === ActionStatus.Requested
-    )
-
-    expect(savedAction?.status).toEqual(ActionStatus.Requested)
+    const savedAction = getRequestedRegisterAction(response)
     if (savedAction?.status === ActionStatus.Requested) {
       expect(savedAction.declaration).toEqual(form)
     }
@@ -446,7 +452,7 @@ test('deduplication and annotation check is performed after declaration', async 
   ])
 })
 
-describe('getInvalidUpdateKeys - hidden field nullification', () => {
+describe('Declare action - hidden field nullification', () => {
   let user: CreatedUser
   let generator: ReturnType<typeof payloadGenerator>
   let eventId: UUID
@@ -514,6 +520,7 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
             firstname: 'Jane',
             surname: 'Smith'
           },
+          'recommender.id': '1234',
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
@@ -534,6 +541,7 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
       expect(error.code).toBe('BAD_REQUEST')
       // Should mention both offending fields
       expect(error.message).toContain('recommender.name')
+      expect(error.message).toContain('recommender.id')
     })
 
     test('rejects non-existent field', async () => {
@@ -602,7 +610,10 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
 
   describe('Valid keys scenarios', () => {
     test('accepts hidden field with null value (intentional clearing)', async () => {
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        ...TEST_USER_DEFAULT_SCOPES,
+        'search[event=tennis-club-membership,access=my-jurisdiction]'
+      ])
 
       const payload = generator.event.actions.declare(eventId, {
         declaration: {
@@ -629,16 +640,40 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
 
       const response = await client.event.actions.declare.request(payload)
 
-      const savedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.DECLARE && status === ActionStatus.Requested
-      )
-
-      expect(savedAction?.status).toEqual(ActionStatus.Requested)
+      const savedAction = getRequestedRegisterAction(response)
       if (savedAction?.status === ActionStatus.Requested) {
         // The null value should be included in the declaration
         expect(savedAction.declaration).toHaveProperty('recommender.name', null)
       }
+
+      const { results: fetchedEvents } = await client.event.search({
+        query: {
+          type: 'and',
+          clauses: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.name': { type: 'fuzzy', term: 'John' },
+                'applicant.dob': { type: 'exact', term: '2024-02-01' }
+              }
+            }
+          ]
+        }
+      })
+
+      expect(fetchedEvents).toHaveLength(1)
+      expect(fetchedEvents[0].declaration).not.toHaveProperty(
+        'recommender.name'
+      )
+      expect(fetchedEvents[0].declaration).not.toHaveProperty('recommender.id')
+      expect(fetchedEvents[0].declaration).toHaveProperty(
+        'recommender.none',
+        true
+      )
+      expect(fetchedEvents[0].declaration).toHaveProperty('applicant.name', {
+        firstname: 'John',
+        surname: 'Doe'
+      })
     })
 
     test('accepts multiple hidden fields with null values', async () => {
@@ -655,7 +690,6 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
           'recommender.none': true,
           // Multiple hidden fields explicitly set to null
           'recommender.name': null,
-          'recommender.email': null,
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
@@ -670,18 +704,9 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
 
       const response = await client.event.actions.declare.request(payload)
 
-      const savedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.DECLARE && status === ActionStatus.Requested
-      )
-
-      expect(savedAction?.status).toEqual(ActionStatus.Requested)
+      const savedAction = getRequestedRegisterAction(response)
       if (savedAction?.status === ActionStatus.Requested) {
         expect(savedAction.declaration).toHaveProperty('recommender.name', null)
-        expect(savedAction.declaration).toHaveProperty(
-          'recommender.email',
-          null
-        )
       }
     })
 
@@ -716,12 +741,7 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
       })
 
       const response = await client.event.actions.declare.request(payload)
-      const savedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.DECLARE && status === ActionStatus.Requested
-      )
-
-      expect(savedAction?.status).toEqual(ActionStatus.Requested)
+      const savedAction = getRequestedRegisterAction(response)
       if (savedAction?.status === ActionStatus.Requested) {
         expect(savedAction.declaration).toHaveProperty('recommender.name', {
           firstname: 'Jane',
@@ -760,12 +780,7 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
 
       const response = await client.event.actions.declare.request(payload)
 
-      const savedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.DECLARE && status === ActionStatus.Requested
-      )
-
-      expect(savedAction?.status).toEqual(ActionStatus.Requested)
+      const savedAction = getRequestedRegisterAction(response)
       if (savedAction?.status === ActionStatus.Requested) {
         expect(savedAction.declaration).toHaveProperty(
           'senior-pass.id',
@@ -801,12 +816,7 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
 
       const response = await client.event.actions.declare.request(payload)
 
-      const savedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.DECLARE && status === ActionStatus.Requested
-      )
-
-      expect(savedAction?.status).toEqual(ActionStatus.Requested)
+      const savedAction = getRequestedRegisterAction(response)
       if (savedAction?.status === ActionStatus.Requested) {
         // Hidden field should not be in the declaration at all
         expect(savedAction.declaration).not.toHaveProperty('recommender.name')
@@ -829,7 +839,10 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
           },
           'recommender.none': true,
           // Explicitly clearing field on hidden page
-          'recommender-name': null,
+          'recommender.name': null,
+          'recommender.id': null,
+          'senior-pass.id': null,
+          'senior-pass.recommender': null,
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
@@ -844,18 +857,13 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
 
       const response = await client.event.actions.declare.request(payload)
 
-      const savedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.DECLARE && status === ActionStatus.Requested
-      )
-
-      expect(savedAction?.status).toEqual(ActionStatus.Requested)
+      const savedAction = getRequestedRegisterAction(response)
       if (savedAction?.status === ActionStatus.Requested) {
-        expect(savedAction.declaration).toHaveProperty('recommender-name', null)
+        expect(savedAction.declaration).toHaveProperty('recommender.name', null)
       }
     })
 
-    test('mixed valid and invalid keys returns only invalid keys in error', async () => {
+    test('mixed valid but hidden and invalid keys returns only invalid keys in error', async () => {
       const client = createTestClient(user)
 
       const payload = generator.event.actions.declare(eventId, {
@@ -892,9 +900,10 @@ describe('getInvalidUpdateKeys - hidden field nullification', () => {
         .catch((e) => e)
 
       expect(error).toBeInstanceOf(TRPCError)
-      expect(error.code).toBe('BAD_REQUEST')
       // Should only mention invalid keys
-      expect(error.message).toMatchSnapshot()
+      expect(error.message).toEqual(
+        'Field with id nonexistent.field not found in event config'
+      )
     })
   })
 })

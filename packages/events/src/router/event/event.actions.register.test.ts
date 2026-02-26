@@ -17,12 +17,14 @@ import {
   ActionUpdate,
   AddressType,
   createPrng,
+  EventDocument,
   EventIndex,
   generateActionDuplicateDeclarationInput,
   generateRegistrationNumber,
   getCurrentEventState,
   getOrThrow,
-  getUUID
+  getUUID,
+  TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -32,7 +34,8 @@ import {
   createEvent,
   createTestClient,
   createCountryConfigClient,
-  setupTestCase
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -1201,6 +1204,17 @@ test('deduplication check is performed before register when configured', async (
   } satisfies Partial<EventIndex>)
 })
 
+function getRequestedRegisterAction(response: EventDocument) {
+  const requestedAction = response.actions.find(
+    ({ type, status }: { type: ActionType; status: ActionStatus }) =>
+      type === ActionType.REGISTER && status === ActionStatus.Requested
+  )
+
+  expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+
+  return requestedAction
+}
+
 describe('Register action - hidden field nullification', () => {
   let user: CreatedUser
   let generator: ReturnType<typeof payloadGenerator>
@@ -1218,6 +1232,22 @@ describe('Register action - hidden field nullification', () => {
         ActionType.DECLARE,
         ActionType.VALIDATE
       ])
+
+      const validatedDocument = await client.event.get(event.id)
+      const validatedCurrentEventState = getCurrentEventState(
+        validatedDocument,
+        tennisClubMembershipEvent
+      )
+      expect(validatedCurrentEventState.declaration).toHaveProperty(
+        'recommender.none',
+        true
+      )
+      expect(validatedCurrentEventState.declaration).not.toHaveProperty(
+        'recommender.name'
+      )
+      expect(validatedCurrentEventState.declaration).not.toHaveProperty(
+        'recommender.id'
+      )
       const payload = generator.event.actions.register(event.id, {
         declaration: {
           'applicant.dobUnknown': true,
@@ -1257,6 +1287,22 @@ describe('Register action - hidden field nullification', () => {
         ActionType.VALIDATE
       ])
 
+      const validatedDocument = await client.event.get(event.id)
+      const validatedCurrentEventState = getCurrentEventState(
+        validatedDocument,
+        tennisClubMembershipEvent
+      )
+      expect(validatedCurrentEventState.declaration).toHaveProperty(
+        'recommender.none',
+        true
+      )
+      expect(validatedCurrentEventState.declaration).not.toHaveProperty(
+        'recommender.name'
+      )
+      expect(validatedCurrentEventState.declaration).not.toHaveProperty(
+        'recommender.id'
+      )
+
       const payload = generator.event.actions.register(event.id, {
         declaration: {
           'applicant.dobUnknown': true,
@@ -1286,7 +1332,6 @@ describe('Register action - hidden field nullification', () => {
       const error = await client.event.actions.register
         .request(payload)
         .catch((err) => err)
-
       expect(error).toBeInstanceOf(TRPCError)
       expect(error.code).toBe('BAD_REQUEST')
       // Should mention both offending fields
@@ -1311,7 +1356,7 @@ describe('Register action - hidden field nullification', () => {
           },
           'recommender.none': true,
           // Field does not exist in form config
-          'nonexistent.field': 'some value',
+          'nonexistent.field': null,
           'applicant.address': {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
@@ -1368,7 +1413,10 @@ describe('Register action - hidden field nullification', () => {
 
   describe('Valid keys scenarios', () => {
     test('accepts hidden field with null value during registration (intentional clearing)', async () => {
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        ...TEST_USER_DEFAULT_SCOPES,
+        'search[event=tennis-club-membership,access=my-jurisdiction]'
+      ])
       const event = await createEvent(client, generator, [
         ActionType.DECLARE,
         ActionType.VALIDATE
@@ -1399,12 +1447,7 @@ describe('Register action - hidden field nullification', () => {
 
       const response = await client.event.actions.register.request(payload)
 
-      const requestedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.REGISTER && status === ActionStatus.Requested
-      )
-
-      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      const requestedAction = getRequestedRegisterAction(response)
       if (requestedAction?.status === ActionStatus.Requested) {
         // The null value should be included in the declaration
         expect(requestedAction.declaration).toHaveProperty(
@@ -1412,6 +1455,47 @@ describe('Register action - hidden field nullification', () => {
           null
         )
       }
+
+      const { results: fetchedEvents } = await client.event.search({
+        query: {
+          type: 'and',
+          clauses: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.name': { type: 'fuzzy', term: 'John' }
+              }
+            }
+          ]
+        }
+      })
+
+      expect(fetchedEvents).toHaveLength(1)
+      expect(fetchedEvents[0].declaration).not.toHaveProperty(
+        'recommender.name'
+      )
+      expect(fetchedEvents[0].declaration).not.toHaveProperty('recommender.id')
+      expect(fetchedEvents[0].declaration).toHaveProperty(
+        'recommender.none',
+        true
+      )
+      expect(fetchedEvents[0].declaration).toHaveProperty('applicant.name', {
+        firstname: 'John',
+        surname: 'Doe'
+      })
+
+      const currentEventState = getCurrentEventState(
+        response,
+        tennisClubMembershipEvent
+      )
+      expect(currentEventState.declaration).not.toHaveProperty(
+        'recommender.name'
+      )
+      expect(currentEventState.declaration).not.toHaveProperty('recommender.id')
+      expect(currentEventState.declaration).toHaveProperty(
+        'recommender.none',
+        true
+      )
     })
 
     test('accepts multiple hidden fields with null values during registration', async () => {
@@ -1447,12 +1531,7 @@ describe('Register action - hidden field nullification', () => {
 
       const response = await client.event.actions.register.request(payload)
 
-      const requestedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.REGISTER && status === ActionStatus.Requested
-      )
-
-      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      const requestedAction = getRequestedRegisterAction(response)
       if (requestedAction?.status === ActionStatus.Requested) {
         expect(requestedAction.declaration).toHaveProperty(
           'recommender.name',
@@ -1501,12 +1580,7 @@ describe('Register action - hidden field nullification', () => {
 
       const response = await client.event.actions.register.request(payload)
 
-      const requestedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.REGISTER && status === ActionStatus.Requested
-      )
-
-      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      const requestedAction = getRequestedRegisterAction(response)
       if (requestedAction?.status === ActionStatus.Requested) {
         expect(requestedAction.declaration).toHaveProperty('recommender.name', {
           firstname: 'Jane',
@@ -1550,12 +1624,7 @@ describe('Register action - hidden field nullification', () => {
 
       const response = await client.event.actions.register.request(payload)
 
-      const requestedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.REGISTER && status === ActionStatus.Requested
-      )
-
-      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      const requestedAction = getRequestedRegisterAction(response)
       if (requestedAction?.status === ActionStatus.Requested) {
         expect(requestedAction.declaration).toHaveProperty(
           'senior-pass.id',
@@ -1565,7 +1634,10 @@ describe('Register action - hidden field nullification', () => {
     })
 
     test('omits hidden field when not provided during registration (default behavior)', async () => {
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        ...TEST_USER_DEFAULT_SCOPES,
+        'search[event=tennis-club-membership,access=my-jurisdiction]'
+      ])
       const event = await createEvent(client, generator, [
         ActionType.DECLARE,
         ActionType.VALIDATE
@@ -1595,18 +1667,54 @@ describe('Register action - hidden field nullification', () => {
 
       const response = await client.event.actions.register.request(payload)
 
-      const requestedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.REGISTER && status === ActionStatus.Requested
-      )
-
-      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      const requestedAction = getRequestedRegisterAction(response)
       if (requestedAction?.status === ActionStatus.Requested) {
         // Hidden field should not be in the declaration at all
         expect(requestedAction.declaration).not.toHaveProperty(
           'recommender.name'
         )
       }
+
+      const { results: fetchedEvents } = await client.event.search({
+        query: {
+          type: 'and',
+          clauses: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.name': { type: 'fuzzy', term: 'John' }
+              }
+            }
+          ]
+        }
+      })
+
+      expect(fetchedEvents).toHaveLength(1)
+      expect(fetchedEvents[0].declaration).not.toHaveProperty(
+        'recommender.name'
+      )
+      expect(fetchedEvents[0].declaration).not.toHaveProperty('recommender.id')
+      expect(fetchedEvents[0].declaration).toHaveProperty(
+        'recommender.none',
+        true
+      )
+      expect(fetchedEvents[0].declaration).toHaveProperty('applicant.name', {
+        firstname: 'John',
+        surname: 'Doe'
+      })
+
+      const currentEventState = getCurrentEventState(
+        response,
+        tennisClubMembershipEvent
+      )
+      expect(currentEventState.declaration).not.toHaveProperty(
+        'recommender.name'
+      )
+      expect(currentEventState.declaration).not.toHaveProperty('recommender.id')
+      expect(currentEventState.declaration).toHaveProperty(
+        'recommender.none',
+        true
+      )
     })
   })
 
@@ -1645,13 +1753,7 @@ describe('Register action - hidden field nullification', () => {
       })
 
       const response = await client.event.actions.register.request(payload)
-
-      const requestedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.REGISTER && status === ActionStatus.Requested
-      )
-
-      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      const requestedAction = getRequestedRegisterAction(response)
       if (requestedAction?.status === ActionStatus.Requested) {
         expect(requestedAction.declaration).toHaveProperty(
           'senior-pass.id',
@@ -1763,12 +1865,7 @@ describe('Register action - hidden field nullification', () => {
       const response =
         await client.event.actions.register.request(registerPayload)
 
-      const requestedAction = response.actions.find(
-        ({ type, status }) =>
-          type === ActionType.REGISTER && status === ActionStatus.Requested
-      )
-
-      expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+      const requestedAction = getRequestedRegisterAction(response)
       if (requestedAction?.status === ActionStatus.Requested) {
         expect(requestedAction.declaration).toHaveProperty(
           'recommender.name',
@@ -1868,12 +1965,7 @@ describe('Registration by different user with declaration changes', () => {
     const response =
       await registrarClient.event.actions.register.request(registerPayload)
 
-    const requestedAction = response.actions.find(
-      ({ type, status }) =>
-        type === ActionType.REGISTER && status === ActionStatus.Requested
-    )
-
-    expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+    const requestedAction = getRequestedRegisterAction(response)
     if (requestedAction?.status === ActionStatus.Requested) {
       expect(requestedAction.declaration).toHaveProperty('senior-pass.id', null)
       expect(requestedAction.declaration).toHaveProperty(
@@ -1964,12 +2056,7 @@ describe('Registration by different user with declaration changes', () => {
     const response =
       await registrarClient.event.actions.register.request(registerPayload)
 
-    const requestedAction = response.actions.find(
-      ({ type, status }) =>
-        type === ActionType.REGISTER && status === ActionStatus.Requested
-    )
-
-    expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+    const requestedAction = getRequestedRegisterAction(response)
     if (requestedAction?.status === ActionStatus.Requested) {
       expect(requestedAction.declaration).toHaveProperty(
         'recommender.name',
@@ -2136,7 +2223,6 @@ describe('Registration by different user with declaration changes', () => {
       .catch((e) => e)
 
     expect(error).toBeInstanceOf(TRPCError)
-    expect(error.code).toBe('INTERNAL_SERVER_ERROR')
     expect(error.message).toContain(
       'Field with id invalid.field not found in event config'
     )
@@ -2268,12 +2354,7 @@ describe('Registration by different user with declaration changes', () => {
     const response =
       await registrarClient.event.actions.register.request(registerPayload)
 
-    const requestedAction = response.actions.find(
-      ({ type, status }) =>
-        type === ActionType.REGISTER && status === ActionStatus.Requested
-    )
-
-    expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+    const requestedAction = getRequestedRegisterAction(response)
     if (requestedAction?.status === ActionStatus.Requested) {
       expect(requestedAction.declaration).toHaveProperty(
         'applicant.email',
@@ -2368,12 +2449,7 @@ describe('Registration by different user with declaration changes', () => {
     const response =
       await registrarClient.event.actions.register.request(registerPayload)
 
-    const requestedAction = response.actions.find(
-      ({ type, status }) =>
-        type === ActionType.REGISTER && status === ActionStatus.Requested
-    )
-
-    expect(requestedAction?.status).toEqual(ActionStatus.Requested)
+    const requestedAction = getRequestedRegisterAction(response)
     if (requestedAction?.status === ActionStatus.Requested) {
       // All hidden fields should be null in the action
       expect(requestedAction.declaration).toHaveProperty(

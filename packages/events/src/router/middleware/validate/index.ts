@@ -43,7 +43,8 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  ValidatorContext
+  ValidatorContext,
+  getDeclarationFieldById
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -141,6 +142,12 @@ function validateDeclarationUpdateAction({
 
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)
+
+  // check for any invalid key that doesn't exist in declaration config
+  // getDeclarationFieldById will throw if any field is not in the declaration config
+  Object.entries(mergedDeclaration).forEach(([key]) => {
+    getDeclarationFieldById(eventConfig, key)
+  })
 
   // For REQUEST_CORRECTION, `previousDeclaration` may contain uncorrectable fields that are conditionally hidden.
   // When merged into `completeDeclaration`, these hidden uncorrectable fields would incorrectly trigger
