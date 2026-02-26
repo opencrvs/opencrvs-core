@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { getScopes, getUUID, SCOPES } from '@opencrvs/commons'
+import { getScopes, getUUID, SCOPES, TokenUserType } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -63,6 +63,7 @@ import { getDuplicateEvents } from '../../service/deduplication/deduplication'
 import { declareActionProcedures } from './actions/declare'
 import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 export const eventRouter = router({
   config: router({
@@ -107,13 +108,29 @@ export const eventRouter = router({
         eventType: input.type
       })
 
-      return createEvent({
+      const result = await createEvent({
         transactionId: input.transactionId,
         eventInput: input,
         user: ctx.user,
         createdAtLocation: input.createdAtLocation,
         config
       })
+
+      if (ctx.user.type === TokenUserType.enum.system) {
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'event.create',
+          requestData: input as Record<string, unknown>,
+          responseSummary: {
+            eventId: result.id,
+            eventType: result.type,
+            trackingId: result.trackingId
+          }
+        })
+      }
+
+      return result
     }),
   get: userAndSystemProcedure
     .meta({
@@ -150,6 +167,20 @@ export const eventRouter = router({
           configuration
         }
       )
+
+      if (ctx.user.type === TokenUserType.enum.system) {
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'event.get',
+          requestData: { eventId },
+          responseSummary: {
+            eventId: updatedEvent.id,
+            eventType: updatedEvent.type,
+            trackingId: updatedEvent.trackingId
+          }
+        })
+      }
 
       return updatedEvent
     }),
@@ -325,8 +356,10 @@ export const eventRouter = router({
 
       const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
 
+      let result
+
       if (isRecordSearchSystemClient) {
-        return findRecordsByQuery({
+        result = await findRecordsByQuery({
           search: input,
           eventConfigs,
           user: ctx.user,
@@ -337,18 +370,31 @@ export const eventRouter = router({
             }
           ]
         })
-      }
-
-      if (ctx.acceptedScopes) {
-        return findRecordsByQuery({
+      } else if (ctx.acceptedScopes) {
+        result = await findRecordsByQuery({
           search: input,
           eventConfigs,
           user: ctx.user,
           acceptedScopes: ctx.acceptedScopes
         })
+      } else {
+        throw new Error('No search scope provided')
       }
 
-      throw new Error('No search scope provided')
+      if (ctx.user.type === TokenUserType.enum.system) {
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'event.search',
+          requestData: input as Record<string, unknown>,
+          responseSummary: {
+            total: result.total,
+            eventIds: result.results.map((r) => r.id)
+          }
+        })
+      }
+
+      return result
     }),
   bulkImport: userAndSystemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))

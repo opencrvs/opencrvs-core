@@ -374,7 +374,16 @@ export const userCanAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
       await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
 
     if (!humanUser.success) {
-      throw new TRPCError({ code: 'FORBIDDEN' })
+      // System users bypass location-based access checks.
+      // They are granted access to any event if they have the required scope.
+      return next({
+        ctx: {
+          ...ctx,
+          acceptedScopes,
+          eventId: input.eventId,
+          eventType: event.type
+        }
+      })
     }
 
     const hasAccess = canAccessEventWithScopes(
