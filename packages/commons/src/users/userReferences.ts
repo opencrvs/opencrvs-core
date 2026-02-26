@@ -104,12 +104,30 @@ export function resolveJurisdictionReference(
   throw 'Failed to resolve jurisdiction filter'
 }
 
-/** Functions for resolving values from user details */
+/** Functions for referencing values from the logged in user's details */
 export const userReferenceFunctions = {
+  scope: (scope: Scope) => ({
+    /**
+     * user.scope().option() is used to create a scope option reference.
+     *
+     * E.g.: user.scope('record.create').option('placeOfEvent')
+     *
+     * @param option - The option to create a reference for.
+     * @returns A scope option reference.
+     */
+    option: (option: string) => ({ $scope: scope, $option: option })
+  }),
+  /**
+   * user.jurisdicton() accepts two different kinds of parameters, either:
+   *
+   * 1. a plain jurisdiction filter: user.jurisdiction('administrativeArea')
+   * 2. a scope attribute reference: user.jurisdiction(user.scope('record.create').option('placeOfEvent'))
+   *
+   * These will be resolved during runtime.
+   *
+   * @param jurisdiction - The jurisdiction to resolve.
+   */
   jurisdiction: (jurisdiction: JurisdictionFilter | ScopeOptionReference) => ({
     $jurisdiction: jurisdiction
-  }),
-  scope: (scope: Scope) => ({
-    option: (option: string) => ({ $scope: scope, $option: option })
   })
 }
