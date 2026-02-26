@@ -60,9 +60,7 @@ function QueryParamReaderInput({
       if (Object.keys(fieldValue).length) {
         onChangeRef.current({
           data: {
-            ...fieldValue,
-            // to ensure formik sees it as a new value even if the params are the same
-            [Symbol('updated')]: true
+            ...fieldValue
           }
         })
         setSearchParams(removeParams(params, pickParams), { replace: true })
