@@ -49,21 +49,8 @@ const meta: Meta<FormFieldGeneratorProps> = {
     validatorContext: { control: false }
   },
   args: {
+    id: 'name-form',
     fields: [nameField]
-  },
-  render: (args) => {
-    const [form, setForm] = React.useState(args.formValues)
-    const [touched, setTouched] = React.useState(args.formTouched)
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        formTouched={touched}
-        formValues={form}
-        id="name-form"
-        onFormChange={setForm}
-        onTouchedChange={setTouched}
-      />
-    )
   },
   decorators: [
     (Story, context) => (
@@ -115,9 +102,6 @@ export const OptionalMiddleName: Story = {
 
 export const WithAllOptions: Story = {
   name: 'With custom label and field ordering',
-  parameters: {
-    layout: 'centered'
-  },
   args: {
     formValues: {
       'storybook.name': {
@@ -166,7 +150,7 @@ export const WithAllOptions: Story = {
     return (
       <div>
         <strong>{'Current Value:'}</strong>
-        <ValueOutput config={field} value={form['storybook.name'] ?? {}} />
+        <ValueOutput config={field} value={form?.['storybook.name']} />
         <br />
         <br />
         <strong>{'Form:'}</strong>

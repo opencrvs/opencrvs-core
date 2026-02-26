@@ -16,7 +16,6 @@ import {
   EventConfig,
   FieldType,
   tennisClubMembershipEvent,
-  AddressFieldValue,
   AddressField,
   AddressType,
   getDeclaration,
@@ -48,22 +47,10 @@ const meta: Meta<typeof FormFieldGenerator> = {
   parameters: {
     layout: 'centered'
   },
+  component: StyledFormFieldGenerator,
   args: {
+    id: 'address-form',
     fields: [addressField]
-  },
-  render: function Component(args) {
-    const [form, setForm] = React.useState(args.formValues)
-    const [touched, setTouched] = React.useState(args.formTouched)
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        formTouched={touched}
-        formValues={form}
-        id="address-form"
-        onFormChange={setForm}
-        onTouchedChange={setTouched}
-      />
-    )
   },
   decorators: [
     (Story, context) => (
@@ -77,16 +64,16 @@ const meta: Meta<typeof FormFieldGenerator> = {
 
 export default meta
 
-type Story = StoryObj<typeof FormFieldGenerator>
+type FormStory = StoryObj<typeof FormFieldGenerator>
 
 const leafAdminStructureLocationId =
   '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
 
-export const EmptyAddressField: Story = {
+export const EmptyAddressField: FormStory = {
   name: 'Empty address input'
 }
 
-export const AddressFieldWithUserPrimaryOfficeAddress: Story = {
+export const AddressFieldWithUserPrimaryOfficeAddress: FormStory = {
   name: 'Defaults to user primary office address',
   args: {
     fields: [
@@ -160,7 +147,9 @@ const eventConfig: EventConfig = tennisClubMembershipEvent
 
 const declarationForm = getDeclaration(eventConfig)
 
-export const AddressReviewInvalid: StoryObj<typeof Review.Body> = {
+type ReviewStory = StoryObj<typeof Review.Body>
+
+export const AddressReviewInvalid: ReviewStory = {
   name: 'Review output (Invalid)',
   render: function Component(args) {
     return (
@@ -171,7 +160,7 @@ export const AddressReviewInvalid: StoryObj<typeof Review.Body> = {
             country: 'FAR',
             addressType: AddressType.DOMESTIC,
             administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054d' as UUID // random uuid
-          } as AddressFieldValue
+          }
         }}
         formConfig={declarationForm}
         title="My address form with address output"
@@ -183,7 +172,7 @@ export const AddressReviewInvalid: StoryObj<typeof Review.Body> = {
     )
   }
 }
-export const AddressReviewEmpty: StoryObj<typeof Review.Body> = {
+export const AddressReviewEmpty: ReviewStory = {
   name: 'Review output (Empty)',
   render: function Component(args) {
     return (
@@ -200,7 +189,7 @@ export const AddressReviewEmpty: StoryObj<typeof Review.Body> = {
     )
   }
 }
-export const AddressReviewChanged: StoryObj<typeof Review.Body> = {
+export const AddressReviewChanged: ReviewStory = {
   name: 'Review with changed address',
   render: function Component(args) {
     return (
@@ -243,7 +232,7 @@ export const AddressReviewChanged: StoryObj<typeof Review.Body> = {
     )
   }
 }
-export const AddressInCopy: StoryObj<typeof Review> = {
+export const AddressInCopy: ReviewStory = {
   name: 'Address to string',
   render: function Component() {
     const allFields = declarationForm.pages.map((page) => page.fields).flat()

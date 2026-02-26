@@ -85,6 +85,8 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/FieldGroup',
   args: {
+    id: 'address-form',
+    fields: addressFields,
     formValues: {
       'storybook.address': {
         country: 'BGD',
@@ -93,8 +95,7 @@ const meta: Meta<typeof FormFieldGenerator> = {
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         district: '62a0ccb4-880d-4f30-8882-f256007dfff9'
       }
-    },
-    formTouched: {}
+    }
   },
   parameters: {
     layout: 'centered'
@@ -107,21 +108,7 @@ const meta: Meta<typeof FormFieldGenerator> = {
     ),
     withValidatorContext
   ],
-  render: function Component(args) {
-    const [form, setForm] = React.useState(args.formValues)
-    const [touched, setTouched] = React.useState(args.formTouched)
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={addressFields}
-        formTouched={touched}
-        formValues={form}
-        id="address-form"
-        onFormChange={setForm}
-        onTouchedChange={setTouched}
-      />
-    )
-  }
+  component: StyledFormFieldGenerator
 }
 
 export default meta
