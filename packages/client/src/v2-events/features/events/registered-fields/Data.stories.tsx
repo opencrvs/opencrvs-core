@@ -12,7 +12,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import { noop } from 'lodash'
 import {
   FieldType,
   tennisClubMembershipEvent,
@@ -94,8 +93,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        id="my-form"
-        initialValues={{
+        formValues={{
           'applicant.name': {
             firstname: 'Tanya',
             surname: 'McQuaid'
@@ -103,7 +101,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
           'applicant.id': '2370934578',
           'applicant.dob': '1975-01-02'
         }}
-        onChange={noop}
+        id="my-form"
       />
     )
   }
@@ -155,22 +153,19 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
             }
           }
         ]}
-        id="my-form"
-        initialValues={{
+        formValues={{
           'recommender.none': true,
-          // @ts-ignore
           'recommender.name': {
             firstname: 'John',
             surname: ''
           },
-          // @ts-ignore
           'applicant.name': {
             firstname: 'Rasheed',
             surname: ''
           },
           'applicant.isRecommendedByFieldAgent': true
         }}
-        onChange={noop}
+        id="my-form"
       />
     )
   }
@@ -183,7 +178,7 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
     layout: 'centered',
     userRole: TestUserRole.Enum.FIELD_AGENT
   },
-  render: (args, context) => {
+  render: (args) => {
     return (
       <StyledFormFieldGenerator
         {...args}
@@ -219,8 +214,7 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
             }
           }
         ]}
-        id="my-form"
-        initialValues={{
+        formValues={{
           'recommender.name': {
             firstname: 'John',
             surname: ''
@@ -232,7 +226,7 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
           'recommender.none': false,
           'applicant.isRecommendedByFieldAgent': true
         }}
-        onChange={noop}
+        id="my-form"
       />
     )
   }

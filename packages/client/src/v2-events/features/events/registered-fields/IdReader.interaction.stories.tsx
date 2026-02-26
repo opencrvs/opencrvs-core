@@ -10,7 +10,7 @@
  */
 
 import { Decorator, Meta, StoryObj } from '@storybook/react'
-import { fn, expect, waitFor } from '@storybook/test'
+import { expect, waitFor } from '@storybook/test'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
@@ -68,7 +68,6 @@ function mockCamera(src: string): Decorator {
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/IdReader/Interaction',
-  args: { onChange: fn() },
   decorators: [
     mockCamera('/assets/qr-sample.webm'),
     (Story, context) => (
@@ -350,16 +349,7 @@ export const AuthenticationFlow: StoryObj<typeof FormFieldGenerator> = {
       return () => document.removeEventListener('click', handler)
     }, [navigate])
 
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   }
 }
 
@@ -403,15 +393,6 @@ export const QrReaderFlow: StoryObj<typeof FormFieldGenerator> = {
     })
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   }
 }

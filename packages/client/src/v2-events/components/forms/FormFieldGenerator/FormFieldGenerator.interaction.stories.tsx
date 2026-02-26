@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fireEvent, fn, userEvent, within } from '@storybook/test'
+import { expect, fireEvent, userEvent, within } from '@storybook/test'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
@@ -31,7 +31,6 @@ import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -113,11 +112,8 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         {...args}
         fields={fields}
+        formValues={declaration}
         id="my-form"
-        initialValues={declaration}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -221,11 +217,8 @@ export const UpdateParentFieldValues: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         {...args}
         fields={tennisFamilyMembership}
+        formValues={tennisFamilyMembershipDeclaration}
         id="my-form"
-        initialValues={tennisFamilyMembershipDeclaration}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -317,7 +310,7 @@ export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    const initialValues = {
+    const formValues = {
       'tennis.style': 'defensive',
       'tennis.style.firstname': 'Roger'
     }
@@ -326,11 +319,8 @@ export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         {...args}
         fields={tennisStyleFields}
+        formValues={formValues}
         id="my-form"
-        initialValues={initialValues}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -400,7 +390,7 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    const initialValues = {
+    const formValues = {
       'tennis.style': 'defensive'
     }
 
@@ -408,11 +398,8 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         {...args}
         fields={tennisStyleFields}
+        formValues={formValues}
         id="my-form"
-        initialValues={initialValues}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -474,12 +461,8 @@ export const CustomRequiredValidationMessage: StoryObj<
             } satisfies FieldConfig
           })}
           id="my-form"
-          initialValues={{}}
           validateAllFields={validateAllFields}
           onAllFieldsValidated={() => false}
-          onChange={(data) => {
-            args.onChange(data)
-          }}
         />
       </FormWizard>
     )

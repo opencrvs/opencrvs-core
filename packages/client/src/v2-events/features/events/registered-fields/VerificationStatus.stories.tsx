@@ -10,24 +10,22 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within } from '@storybook/test'
-import React, { useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { noop } from 'lodash'
-import { FieldType, TestUserRole } from '@opencrvs/commons/client'
+import { FieldType } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { getTestValidatorContext } from '../../../../../.storybook/decorators'
+import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/VerificationStatus',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
         <Story />
       </TRPCProvider>
-    )
+    ),
+    withValidatorContext
   ]
 }
 
@@ -41,9 +39,10 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
   parameters: {
     layout: 'centered'
   },
-  render: function Component() {
+  render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={[
           {
             id: 'storybook.pending',
@@ -131,17 +130,13 @@ export const Status: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        id="my-form"
-        initialValues={{
+        formValues={{
           'storybook.pending': 'pending',
           'storybook.verified': 'verified',
           'storybook.authenticated': 'authenticated',
           'storybook.failed': 'failed'
         }}
-        validatorContext={getTestValidatorContext(
-          TestUserRole.Enum.LOCAL_REGISTRAR
-        )}
-        onChange={noop}
+        id="my-form"
       />
     )
   }

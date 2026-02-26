@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, within, expect } from '@storybook/test'
+import { within, expect } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -25,7 +25,6 @@ import {
   TestUserRole,
   user,
   not,
-  EventDocument,
   FieldConditional,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -33,7 +32,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 
-import { noop } from '@client/v2-events'
 import { tennisClubMembershipEventDocument } from '../fixtures'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
@@ -48,7 +46,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/AlphaPrintButton/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -103,7 +100,6 @@ function createAlphaPrintButtonStoryParameters(
             ]}
             id="my-form"
             validatorContext={validatorContext}
-            onChange={() => noop()}
           />
         )
       },
