@@ -2196,11 +2196,33 @@ components:
                           properties:
                             $scope:
                               type: string
-                            $attribute:
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
                               type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
                           required:
                             - $scope
-                            - $attribute
+                            - $option
                           additionalProperties: false
                   required:
                     - $jurisdiction
@@ -6066,11 +6088,33 @@ components:
                           properties:
                             $scope:
                               type: string
-                            $attribute:
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
                               type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
                           required:
                             - $scope
-                            - $attribute
+                            - $option
                           additionalProperties: false
                   required:
                     - $jurisdiction
@@ -6409,11 +6453,33 @@ components:
                               properties:
                                 $scope:
                                   type: string
-                                $attribute:
+                                  enum:
+                                    - record.search
+                                    - record.create
+                                    - record.read
+                                    - record.declare
+                                    - record.notify
+                                    - record.validate
+                                    - record.reject
+                                    - record.archive
+                                    - record.review-duplicates
+                                    - record.register
+                                    - record.print-certified-copies
+                                    - record.request-correction
+                                    - record.correct
+                                    - record.unassign-others
+                                $option:
                                   type: string
+                                  enum:
+                                    - event
+                                    - placeOfEvent
+                                    - declaredIn
+                                    - declaredBy
+                                    - registeredIn
+                                    - registeredBy
                               required:
                                 - $scope
-                                - $attribute
+                                - $option
                               additionalProperties: false
                       required:
                         - $jurisdiction
@@ -6437,11 +6503,33 @@ components:
                           properties:
                             $scope:
                               type: string
-                            $attribute:
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
                               type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
                           required:
                             - $scope
-                            - $attribute
+                            - $option
                           additionalProperties: false
                   required:
                     - $jurisdiction
@@ -6622,11 +6710,33 @@ components:
                           properties:
                             $scope:
                               type: string
-                            $attribute:
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
                               type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
                           required:
                             - $scope
-                            - $attribute
+                            - $option
                           additionalProperties: false
                   required:
                     - $jurisdiction
@@ -6804,11 +6914,33 @@ components:
                           properties:
                             $scope:
                               type: string
-                            $attribute:
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
                               type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
                           required:
                             - $scope
-                            - $attribute
+                            - $option
                           additionalProperties: false
                   required:
                     - $jurisdiction
