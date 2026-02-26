@@ -50,7 +50,7 @@ export default defineConfig(({ mode }) => {
       strategies: 'injectManifest',
       injectManifest: {
         globDirectory: 'build/',
-        globPatterns: ['**/*.{json,ico,ttf,html,js}'],
+        globPatterns: ['**/*.{json,ico,ttf,html,js,map}'],
         globIgnores: ['**/config.js'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         swDest: 'build/src-sw.js'

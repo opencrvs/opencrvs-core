@@ -435,7 +435,7 @@ export function flattenFormState<T>(
 }
 
 export function flattenFieldReference(ref: FieldReference) {
-  return [ref.$$field, ...(ref.$$subfield ?? [])]
+  return [ref.$$field, ...ref.$$subfield]
 }
 
 export function isWriteAction(actionType: ActionType): boolean {

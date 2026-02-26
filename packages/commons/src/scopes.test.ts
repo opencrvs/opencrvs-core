@@ -182,4 +182,40 @@ describe('parseConfigurableScope()', () => {
     const mergedScopes = findScope([scope1, scope2, scope3], 'search')
     expect(mergedScopes).toEqual(undefined)
   })
+
+  it('should return scope for a valid scope with print-certified-copies', () => {
+    const scope1 =
+      'record.registered.print-certified-copies[event=tennis-club-membership,templates=v2.tennis-club-membership-certificate-alpha]' // valid scope with templateIds option
+    expect(parseConfigurableScope(scope1)).toEqual({
+      type: 'record.registered.print-certified-copies',
+      options: {
+        event: ['tennis-club-membership'],
+        templates: ['v2.tennis-club-membership-certificate-alpha']
+      }
+    })
+
+    const scope2 =
+      'record.registered.print-certified-copies[event=tennis-club-membership]' // valid because templates is optional
+
+    expect(parseConfigurableScope(scope2)).toEqual({
+      type: 'record.registered.print-certified-copies',
+      options: { event: ['tennis-club-membership'] }
+    })
+
+    const scope3 =
+      'record.registered.print-certified-copies[event=tennis-club-membership,templates=]' // invalid because templates is empty
+
+    expect(parseConfigurableScope(scope3)).toEqual(undefined)
+
+    const scope4 =
+      'record.registered.print-certified-copies[event=tennis-club-membership,templates=v2.tennis-club-membership-certificate-alpha|v2.birth]' // valid scope with multiple templateIds option
+
+    expect(parseConfigurableScope(scope4)).toEqual({
+      type: 'record.registered.print-certified-copies',
+      options: {
+        event: ['tennis-club-membership'],
+        templates: ['v2.tennis-club-membership-certificate-alpha', 'v2.birth']
+      }
+    })
+  })
 })

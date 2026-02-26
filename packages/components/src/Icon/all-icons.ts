@@ -26,6 +26,7 @@ export {
   ChartLine,
   ChatCircle,
   Check,
+  CheckCircle,
   CheckSquare,
   Circle,
   CircleWavyCheck,
@@ -91,6 +92,7 @@ export {
   Users,
   WarningCircle,
   Webcam,
-  X
+  X,
+  XCircle
 } from 'phosphor-react'
 export * from './custom-icons'
