@@ -28,10 +28,7 @@ export default interface AuditLogTable {
     Record<string, any> | null
   >
 
-  /**
-   * Per-endpoint curated summary of the response (e.g. search terms used and
-   * count + IDs of results returned). Not the raw response payload.
-   */
+  /** Per-endpoint curated summary of the response (e.g. search terms used and count + IDs of results returned). Not the raw response payload. */
   responseSummary: ColumnType<
     Record<string, any> | null,
     Record<string, any> | null,
