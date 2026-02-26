@@ -53,7 +53,7 @@ function isJurisdictionFilter(
 }
 
 // TODO CIHAN: can we make this into a generic function for resolving any scope option?
-function parseScopeOption(
+function getScopeAttributeValue(
   scopeAttributeReference: ScopeAttributeReference,
   scopes: RawScopes[]
 ): JurisdictionFilter {
@@ -98,7 +98,7 @@ export function resolveJurisdictionReference(
 
   // If the jurisdiction is a scope attribute reference, resolve it
   if (jurisdiction['$scope'] && scopes) {
-    return parseScopeOption(jurisdiction, scopes)
+    return getScopeAttributeValue(jurisdiction, scopes)
   }
 
   throw 'Failed to resolve jurisdiction filter'
