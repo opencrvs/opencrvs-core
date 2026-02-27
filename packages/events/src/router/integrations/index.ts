@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { SCOPES, TokenUserType } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { registerSystem } from '@events/service/integrations/api'
