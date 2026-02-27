@@ -10,13 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import {
-  expect,
-  fireEvent,
-  userEvent,
-  waitFor,
-  within
-} from '@storybook/test'
+import { expect, fireEvent, userEvent, waitFor, within } from '@storybook/test'
 import { http, HttpResponse } from 'msw'
 import React from 'react'
 import styled from 'styled-components'
@@ -202,6 +196,7 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
     render: function Component(args) {
       return (
         <StyledFormFieldGenerator
+          {...args}
           fields={searchFields}
           id="my-form"
           validatorContext={{}}
@@ -347,6 +342,7 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
     render: function Component(args) {
       return (
         <StyledFormFieldGenerator
+          {...args}
           fields={searchFields}
           id="my-form"
           validatorContext={{}}
@@ -389,6 +385,7 @@ export const TimeOut: StoryObj<typeof FormFieldGenerator> = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={searchFields}
         id="my-form"
         validatorContext={{}}
@@ -433,6 +430,7 @@ export const HttpError: StoryObj<typeof FormFieldGenerator> = {
   render: function Component(args) {
     return (
       <StyledFormFieldGenerator
+        {...args}
         fields={searchFields}
         id="my-form"
         validatorContext={{}}

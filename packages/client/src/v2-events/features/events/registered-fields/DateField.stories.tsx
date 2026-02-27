@@ -70,26 +70,20 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
       await userEvent.clear(monthInput)
       await userEvent.clear(yearInput)
 
-      await userEvent.type(
-        await canvas.findByTestId('storybook____date-dd'),
-        '1'
-      )
+      await userEvent.type(dayInput, '1')
 
       await userEvent.click(await canvas.findByText('Date input'))
 
       await canvas.findByText('Invalid date field')
 
-      await userEvent.type(
-        await canvas.findByTestId('storybook____date-dd'),
-        '{backspace}'
-      )
+      await userEvent.type(dayInput, '{backspace}')
+
+      await userEvent.click(await canvas.findByText('Date input'))
 
       await canvas.findByText('Required')
     })
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
-
     return (
       <StyledFormFieldGenerator
         {...args}
@@ -110,8 +104,6 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        formValues={formData}
-        onFormChange={(data) => setFormData(data)}
       />
     )
   }

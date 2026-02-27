@@ -628,7 +628,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
     const intl = useIntl()
     const [formData, setFormData] = React.useState<Record<string, FieldValue>>({
       'storybook.address': {
-        country: 'FAR',
+        country: 'BGD',
         administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
         addressType: 'DOMESTIC'
       }
@@ -741,7 +741,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
       await userEvent.type(residentialArea, 'Mirpur')
 
       await expect(canvas.queryByTestId('country')).toHaveTextContent(
-        'Farajaland'
+        'Bangladesh'
       )
       await expect(canvas.queryByTestId('addressType')).toHaveTextContent(
         'DOMESTIC'

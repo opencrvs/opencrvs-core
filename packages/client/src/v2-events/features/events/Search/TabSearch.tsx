@@ -27,7 +27,8 @@ import {
   isDateRangeFieldType,
   isNameFieldType,
   isFieldVisible,
-  ValidatorContext
+  ValidatorContext,
+  flattenFormState
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues } from '@client/v2-events/utils'
@@ -92,10 +93,10 @@ function SearchSectionForm({
     >
       <FormFieldGenerator
         fields={section.fields}
+        formValues={fieldValues}
         id={section.title.id}
-        initialValues={fieldValues}
         validatorContext={validatorContext}
-        onChange={(updatedValues) => {
+        onFormChange={(updatedValues) => {
           Object.entries(updatedValues).forEach(([fieldId, value]) =>
             handleFieldChange(fieldId, value)
           )
@@ -175,7 +176,9 @@ export function TabSearch({
 
   const errors = Object.values(
     getAdvancedSearchFieldErrors(sections, formValues, validatorContext)
-  ).flatMap((fieldErrors) => fieldErrors)
+  ).flatMap((fieldErrors) =>
+    flattenFormState(fieldErrors ?? []).flatMap(([, errs]) => errs)
+  )
 
   const nonEmptyValues = filterEmptyValues(formValues)
 
