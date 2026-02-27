@@ -394,6 +394,7 @@ function AddressInput(props: Props) {
     <FormFieldGenerator
       {...otherProps}
       fields={fields}
+      formContext={{ addressType: value.addressType }}
       formTouched={nestedTouched}
       formValues={nestedValue}
       validatorContext={validatorContext}
