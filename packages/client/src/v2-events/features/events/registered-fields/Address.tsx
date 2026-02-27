@@ -218,6 +218,103 @@ function getAdministrativeArea(value?: AddressFieldValue) {
     : undefined
 }
 
+function transformParentValueToNested(
+  value: AddressFieldValue,
+  adminLevelIds: string[],
+  adminStructureLocations: Location[]
+): EventState {
+  const administrativeArea = getAdministrativeArea(value)
+  const derivedAdminLevels = getAdminLevelHierarchy(
+    administrativeArea,
+    adminStructureLocations,
+    adminLevelIds
+  )
+  return { ...value, ...derivedAdminLevels }
+}
+
+function transformNestedValueToParent(
+  nestedValue: EventState,
+  adminLevelIds: string[]
+): AddressFieldValue {
+  const addressLines = extractAddressLines(nestedValue, adminLevelIds)
+  const leafAdminLevelValue = getLeafAdministrativeLevel(
+    nestedValue,
+    adminLevelIds
+  )
+  const country = nestedValue.country as string
+  const defaultCountry = window.config.COUNTRY || 'FAR'
+  if (country === defaultCountry) {
+    return {
+      country,
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: leafAdminLevelValue ?? '',
+      streetLevelDetails: addressLines
+    }
+  }
+  return {
+    country,
+    addressType: AddressType.INTERNATIONAL,
+    streetLevelDetails: addressLines
+  }
+}
+
+function transformParentTouchedToNested(
+  parentTouched: IndexMap<FormState<boolean>>,
+  adminLevelIds: string[],
+  streetAddressFieldIds: string[]
+): IndexMap<FormState<boolean>> {
+  const result: IndexMap<FormState<boolean>> = {}
+
+  if (parentTouched.administrativeArea) {
+    adminLevelIds.forEach((id) => {
+      result[id] = true
+    })
+  }
+  if (parentTouched.country) {
+    result.country = parentTouched.country
+  }
+
+  const streetLevelDetailsTouched = parentTouched.streetLevelDetails
+  if (
+    streetLevelDetailsTouched &&
+    typeof streetLevelDetailsTouched === 'object'
+  ) {
+    streetAddressFieldIds.forEach((id) => {
+      if (streetLevelDetailsTouched[id]) {
+        result[id] = streetLevelDetailsTouched[id]
+      }
+    })
+  }
+
+  return result
+}
+
+function transformTouchedToParentFormat(
+  nestedTouched: IndexMap<FormState<boolean>>,
+  adminLevelIds: string[],
+  streetAddressFieldIds: string[]
+): IndexMap<FormState<boolean>> {
+  const result: IndexMap<FormState<boolean>> = {}
+
+  const adminLevelTouched = adminLevelIds.some((id) => nestedTouched[id])
+  if (adminLevelTouched) {
+    result.administrativeArea = true
+  }
+  if (nestedTouched.country) {
+    result.country = nestedTouched.country
+  }
+
+  const streetDetailsTouched: Record<string, FormState<boolean>> = {}
+  streetAddressFieldIds.forEach((id) => {
+    if (nestedTouched[id]) {
+      streetDetailsTouched[id] = nestedTouched[id]
+    }
+  })
+  result.streetLevelDetails = streetDetailsTouched
+
+  return result
+}
+
 /**
  * AddressInput is a form component for capturing address details based on administrative structure.
  *
@@ -255,18 +352,23 @@ function AddressInput(props: Props) {
   )
   const customAddressFields = props.configuration?.streetAddressForm
 
-  const administrativeArea = getAdministrativeArea(value)
-
-  const derivedAdminLevels = getAdminLevelHierarchy(
-    administrativeArea,
-    adminStructureLocations,
-    adminLevelIds
-  )
-
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
       ? customAddressFields
       : []
+
+  const streetAddressFieldIds = addressFields.map((f) => f.id)
+
+  const nestedValue = transformParentValueToNested(
+    value,
+    adminLevelIds,
+    adminStructureLocations
+  )
+  const nestedTouched = transformParentTouchedToNested(
+    touched,
+    adminLevelIds,
+    streetAddressFieldIds
+  )
 
   const fields = [
     { ...COUNTRY_FIELD, required: otherProps.required },
@@ -288,48 +390,25 @@ function AddressInput(props: Props) {
     }
   })
 
-  /*
-   *  nested value is of the following format:
-   *  {
-   *    country: string
-   *    [adminLevelId]: string
-   *    [streetAddressFields]: string
-   *  }
-   */
-  const handleChange = (nestedValue: EventState) => {
-    const addressLines = extractAddressLines(nestedValue, adminLevelIds)
-    const leafAdminLevelValue = getLeafAdministrativeLevel(
-      nestedValue,
-      adminLevelIds
-    )
-    const country = nestedValue.country as string
-    const defaultCountry = window.config.COUNTRY || 'FAR'
-    if (country === defaultCountry) {
-      onChange({
-        country,
-        addressType: AddressType.DOMESTIC,
-        administrativeArea: leafAdminLevelValue,
-        streetLevelDetails: addressLines
-      })
-    } else {
-      onChange({
-        country,
-        addressType: AddressType.INTERNATIONAL,
-        streetLevelDetails: addressLines
-      })
-    }
-  }
-
   return (
     <FormFieldGenerator
       {...otherProps}
       fields={fields}
-      formTouched={touched}
-      formValues={{ ...value, ...derivedAdminLevels }}
+      formTouched={nestedTouched}
+      formValues={nestedValue}
       validatorContext={validatorContext}
-      onFormChange={handleChange}
+      onFormChange={(nestedVal) =>
+        onChange(transformNestedValueToParent(nestedVal, adminLevelIds))
+      }
       onTouchedChange={(newTouched) =>
-        onBlur(name, { ...touched, ...newTouched })
+        onBlur(
+          name,
+          transformTouchedToParentFormat(
+            newTouched,
+            adminLevelIds,
+            streetAddressFieldIds
+          )
+        )
       }
     />
   )
