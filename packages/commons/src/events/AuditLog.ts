@@ -81,6 +81,21 @@ export type EventCorrectionRejectAuditLog = {
   responseSummary: EventResponseSummary
 }
 
+/**
+ * All event action audit log variants share the same requestData and responseSummary shapes.
+ * Defined as a single type with a union operation field so call sites can pass a
+ * union-typed operation string without needing a type cast.
+ */
+export type EventActionAuditLog = {
+  operation:
+    | EventNotifyAuditLog['operation']
+    | EventCorrectionRequestAuditLog['operation']
+    | EventCorrectionApproveAuditLog['operation']
+    | EventCorrectionRejectAuditLog['operation']
+  requestData: ActionAuditLogRequestData
+  responseSummary: EventResponseSummary
+}
+
 export type IntegrationCreateAuditLog = {
   operation: 'integrations.create'
   requestData: {
@@ -106,15 +121,14 @@ export type AttachmentUploadAuditLog = {
 /**
  * Union of all audit log entry variants.
  * Each variant narrows the `operation`, `requestData`, and `responseSummary` fields together.
+ * Event action operations are grouped into a single `EventActionAuditLog` type since they
+ * share identical requestData and responseSummary shapes.
  */
 export type AuditLogOperation =
   | EventCreateAuditLog
   | EventGetAuditLog
   | EventSearchAuditLog
-  | EventNotifyAuditLog
-  | EventCorrectionRequestAuditLog
-  | EventCorrectionApproveAuditLog
-  | EventCorrectionRejectAuditLog
+  | EventActionAuditLog
   | IntegrationCreateAuditLog
   | AttachmentUploadAuditLog
 
@@ -126,13 +140,3 @@ export type AuditLogParams = AuditLogOperation & {
   clientId: string
   clientType: TokenUserType
 }
-
-/**
- * Union of all audit log entry variants for event action operations.
- * These all share the same requestData and responseSummary shapes.
- */
-export type EventActionAuditLog =
-  | EventNotifyAuditLog
-  | EventCorrectionRequestAuditLog
-  | EventCorrectionApproveAuditLog
-  | EventCorrectionRejectAuditLog

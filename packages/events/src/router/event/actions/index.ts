@@ -35,8 +35,6 @@ import {
   EditActionInput
 } from '@opencrvs/commons/events'
 import {
-  AuditLogOperation,
-  AuditLogParams,
   EventActionAuditLog
 } from '@opencrvs/commons/events'
 import {
@@ -175,7 +173,7 @@ const ACTION_PROCEDURE_CONFIG = {
  * Only includes action types that should be audit-logged.
  */
 const AUDIT_LOG_OPERATION_MAP: Partial<
-  Record<keyof typeof ACTION_PROCEDURE_CONFIG, AuditLogOperation['operation']>
+  Record<keyof typeof ACTION_PROCEDURE_CONFIG, EventActionAuditLog['operation']>
 > = {
   [ActionType.NOTIFY]: 'event.actions.notify.request',
   [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request.request',
@@ -411,7 +409,7 @@ export function getDefaultActionProcedures(
               eventType: result.type,
               trackingId: result.trackingId
             }
-          } as Extract<AuditLogParams, EventActionAuditLog & { clientId: string; clientType: string }>)
+          })
         }
 
         return result
