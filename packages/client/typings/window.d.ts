@@ -12,13 +12,11 @@
 interface Window {
   config: {
     APPLICATION_NAME: string
-    API_GATEWAY_URL: string
     BIRTH: {
       REGISTRATION_TARGET: number
       LATE_REGISTRATION_TARGET: number
       PRINT_IN_ADVANCE: boolean
     }
-    CONFIG_API_URL: string
     COUNTRY: string
     COUNTRY_LOGO: {
       fileName: string
@@ -44,13 +42,11 @@ interface Window {
       DATE_OF_BIRTH_UNKNOWN: boolean
       V2_EVENTS: boolean
     }
-    LANGUAGES: string
+    LANGUAGES: string[]
     LOGIN_URL: string
-    AUTH_URL: string
     MINIO_URL: string
     MINIO_BASE_URL: string // URL without path/bucket information, used for file uploads, v2
     MINIO_BUCKET: string
-    COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'

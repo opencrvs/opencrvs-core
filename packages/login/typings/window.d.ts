@@ -10,11 +10,8 @@
  */
 interface Window {
   config: {
-    AUTH_API_URL: string
-    CONFIG_API_URL: string
-    COUNTRY_CONFIG_URL: string
     COUNTRY: string
-    LANGUAGES: string
+    LANGUAGES: string[]
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     CLIENT_APP_URL: string

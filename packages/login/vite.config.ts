@@ -90,6 +90,21 @@ export default defineConfig(({ mode }): any => {
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/api\/countryconfig/, '')
         },
+        '/api/auth/': {
+          target: 'http://localhost:4040',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/api\/auth/, '')
+        },
+        '/api/config/': {
+          target: 'http://localhost:2021',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/api\/config/, '')
+        },
+        '/api/': {
+          target: 'http://localhost:7070',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/api/, '')
+        },
         '/health/ready': {
           target: 'http://localhost:3040',
           changeOrigin: true,
