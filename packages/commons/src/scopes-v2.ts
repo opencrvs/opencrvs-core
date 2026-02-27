@@ -94,6 +94,8 @@ export const RecordScopeAttributes = z
   )
 
 export type RecordScopeAttributes = z.infer<typeof RecordScopeAttributes>
+export const RecordScopeAttributeKey = RecordScopeAttributes.keyof()
+export type RecordScopeAttributeKey = z.infer<typeof RecordScopeAttributeKey>
 
 export const RecordScopeV2 = z
   .object({
@@ -141,6 +143,30 @@ export const decodeScope = (query: string) => {
 export function findScopeV2(scopes: string[], scopeType: RecordScopeTypeV2) {
   const parsedScopes = scopes.map(decodeScope)
   return parsedScopes.find((scope) => scope?.type === scopeType)
+}
+
+const DEFAULT_SCOPE_ATTRIBUTES: RecordScopeAttributes = {
+  placeOfEvent: JurisdictionFilter.enum.all
+}
+
+/**
+ * Function to get the value of a scope attribute.
+ *
+ * @param scope - The scope to get the value of the attribute from.
+ * @param attribute - The attribute to get the value of.
+ * @returns The value of the scope attribute. Will return the default value if the attribute is not set.
+ */
+export function getScopeAttributeValue<T extends RecordScopeAttributeKey>(
+  scope: RecordScopeV2,
+  attribute: T
+): RecordScopeAttributes[T] | undefined {
+  const value = scope.options?.[attribute]
+  const defaultValue =
+    attribute in DEFAULT_SCOPE_ATTRIBUTES
+      ? DEFAULT_SCOPE_ATTRIBUTES[attribute]
+      : undefined
+
+  return value ?? defaultValue
 }
 
 type LegacyScopeType = ConfigurableScopeType

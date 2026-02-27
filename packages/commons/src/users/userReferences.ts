@@ -12,13 +12,11 @@ import {
   JurisdictionFilter,
   RecordScopeTypeV2,
   findScopeV2,
-  RecordScopeAttributes
+  RecordScopeAttributeKey,
+  getScopeAttributeValue
 } from '../scopes-v2'
 import { RawScopes, Scope } from '../authentication'
 import z from 'zod/v4'
-
-const RecordScopeAttributeKey = RecordScopeAttributes.keyof()
-type RecordScopeAttributeKey = z.infer<typeof RecordScopeAttributeKey>
 
 const ScopeAttributeReference = z.object({
   $scope: RecordScopeTypeV2,
@@ -52,24 +50,23 @@ function isJurisdictionFilter(
   return allowedJurisdictionFilters.includes(jurisdiction)
 }
 
-// TODO CIHAN: can we make this into a generic function for resolving any scope attribute?
-function getScopeAttributeValue(
+function resolveJurisdictionScopeAttributeReference(
   scopeAttributeReference: ScopeAttributeReference,
   scopes: RawScopes[]
 ): JurisdictionFilter {
   const { $scope, $attribute } = scopeAttributeReference
   const scope = findScopeV2(scopes, $scope)
 
-  // If no scope is found, return the most limited jurisdiction filter
+  // If no scope is found, return the least permissive jurisdiction filter
   if (!scope) {
     return JurisdictionFilter.enum.location
   }
 
-  const attributeValue = scope.options?.[$attribute]
+  const attributeValue = getScopeAttributeValue(scope, $attribute)
 
-  // If scope is found but no attribute is set, return the most permissive jurisdiction filter
-  if (!attributeValue || !isJurisdictionFilter(attributeValue)) {
-    return JurisdictionFilter.enum.all
+  // If attribute is set but not a jurisdiction filter, return the least permissive jurisdiction filter
+  if (!isJurisdictionFilter(attributeValue)) {
+    return JurisdictionFilter.enum.location
   }
 
   return attributeValue
@@ -98,7 +95,7 @@ export function resolveJurisdictionReference(
 
   // If the jurisdiction is a scope attribute reference, resolve it
   if (jurisdiction['$scope'] && scopes) {
-    return getScopeAttributeValue(jurisdiction, scopes)
+    return resolveJurisdictionScopeAttributeReference(jurisdiction, scopes)
   }
 
   throw 'Failed to resolve jurisdiction filter'
