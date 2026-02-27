@@ -16,7 +16,9 @@ import {
   JurisdictionFilter,
   RecordScopeTypeV2,
   RecordScopeV2,
-  UUID
+  UUID,
+  scopeHasDeclaredOptions,
+  scopeHasFullOptions
 } from '@opencrvs/commons'
 import { EventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { SystemContext, UserContext } from '../../../context'
@@ -89,60 +91,68 @@ export function canAccessEventWithScope(
     return false
   }
 
-  if (opts?.declaredBy === UserFilter.enum.user) {
-    if (event.legalStatuses?.DECLARED?.createdBy !== user.id) {
+  if (scopeHasDeclaredOptions(scope)) {
+    const { options } = scope
+
+    if (options?.declaredBy === UserFilter.enum.user) {
+      if (event.legalStatuses?.DECLARED?.createdBy !== user.id) {
+        return false
+      }
+    }
+
+    if (
+      options?.declaredIn === JurisdictionFilter.enum.location &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.DECLARED?.createdAtLocation,
+        JurisdictionFilter.enum.location,
+        user
+      )
+    ) {
+      return false
+    }
+
+    if (
+      options?.declaredIn === JurisdictionFilter.enum.administrativeArea &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.DECLARED?.createdAtLocation,
+        JurisdictionFilter.enum.administrativeArea,
+        user
+      )
+    ) {
       return false
     }
   }
 
-  if (
-    opts?.declaredIn === JurisdictionFilter.enum.location &&
-    !matchesJurisdictionFilter(
-      event.legalStatuses?.DECLARED?.createdAtLocation,
-      JurisdictionFilter.enum.location,
-      user
-    )
-  ) {
-    return false
-  }
+  if (scopeHasFullOptions(scope)) {
+    const { options } = scope
 
-  if (
-    opts?.declaredIn === JurisdictionFilter.enum.administrativeArea &&
-    !matchesJurisdictionFilter(
-      event.legalStatuses?.DECLARED?.createdAtLocation,
-      JurisdictionFilter.enum.administrativeArea,
-      user
-    )
-  ) {
-    return false
-  }
+    if (options?.registeredBy === UserFilter.enum.user) {
+      if (event.legalStatuses?.REGISTERED?.createdBy !== user.id) {
+        return false
+      }
+    }
 
-  if (opts?.registeredBy === UserFilter.enum.user) {
-    if (event.legalStatuses?.REGISTERED?.createdBy !== user.id) {
+    if (
+      options?.registeredIn === JurisdictionFilter.enum.location &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.REGISTERED?.createdAtLocation,
+        JurisdictionFilter.enum.location,
+        user
+      )
+    ) {
       return false
     }
-  }
 
-  if (
-    opts?.registeredIn === JurisdictionFilter.enum.location &&
-    !matchesJurisdictionFilter(
-      event.legalStatuses?.REGISTERED?.createdAtLocation,
-      JurisdictionFilter.enum.location,
-      user
-    )
-  ) {
-    return false
-  }
-
-  if (
-    opts?.registeredIn === JurisdictionFilter.enum.administrativeArea &&
-    !matchesJurisdictionFilter(
-      event.legalStatuses?.REGISTERED?.createdAtLocation,
-      JurisdictionFilter.enum.administrativeArea,
-      user
-    )
-  ) {
-    return false
+    if (
+      options?.registeredIn === JurisdictionFilter.enum.administrativeArea &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.REGISTERED?.createdAtLocation,
+        JurisdictionFilter.enum.administrativeArea,
+        user
+      )
+    ) {
+      return false
+    }
   }
 
   return true

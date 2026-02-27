@@ -195,12 +195,12 @@ describe('parseConfigurableScope()', () => {
 describe('2.0 scopes', () => {
   it('Strips out scope options unavailable for the "placeEvent" scope types', () => {
     const placeEventScopes = scopesWithPlaceEventOptions.options.map((type) =>
-      // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
       encodeScope({
         type,
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
+          // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
           declaredBy: 'user' as const,
           declaredIn: 'administrativeArea' as const,
           registeredBy: 'user' as const,
@@ -227,7 +227,6 @@ describe('2.0 scopes', () => {
 
   it('Strips out scope options unavailable for the "declared" scope types', () => {
     const declaredEventOptions = scopesWithDeclaredOptions.options.map((type) =>
-      // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
       encodeScope({
         type,
         options: {
@@ -235,6 +234,7 @@ describe('2.0 scopes', () => {
           placeOfEvent: 'location' as const,
           declaredBy: 'user' as const,
           declaredIn: 'administrativeArea' as const,
+          // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
           registeredBy: 'user' as const,
           registeredIn: 'administrativeArea' as const
         }

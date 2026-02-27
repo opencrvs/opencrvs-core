@@ -70,11 +70,7 @@ const scopeByEvent = z
 const scopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
-    placeOfEvent: JurisdictionFilter.optional(),
-    declaredIn: z.undefined().optional(),
-    declaredBy: z.undefined().optional(),
-    registeredIn: z.undefined().optional(),
-    registeredBy: z.undefined().optional()
+    placeOfEvent: JurisdictionFilter.optional()
   })
   .describe('Options applicable to all record scopes.')
 
@@ -163,6 +159,24 @@ export const RecordScopeV2 = z
     "Scopes used to check user's permission to perform actions on a record."
   )
 
+export function scopeHasDeclaredOptions(
+  scope: RecordScopeV2
+): scope is Extract<
+  RecordScopeV2,
+  { type: z.infer<typeof scopesWithDeclaredOptions> }
+> {
+  return scopesWithDeclaredOptions.options.some((opt) => opt === scope.type)
+}
+
+export function scopeHasFullOptions(
+  scope: RecordScopeV2
+): scope is Extract<
+  RecordScopeV2,
+  { type: z.infer<typeof scopesWithFullOptions> }
+> {
+  return scopesWithFullOptions.options.some((opt) => opt === scope.type)
+}
+
 export const ResolvedRecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
@@ -212,6 +226,7 @@ export const decodeScope = (query: string) => {
   })
 
   const unflattenedScope = unflattenScope(scope)
+
   return RecordScopeV2.safeParse(unflattenedScope)?.data
 }
 
@@ -285,7 +300,6 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
       })
     }
 
-    // @ts-expect-error - foo
     return encodeScope({
       type: type as RecordScopeTypeV2,
       options: configurableV1Scope.options as RecordScopeV2['options']

@@ -508,7 +508,11 @@ export function resolveRecordActionScopeToIds(
   scope: RecordScopeV2,
   user: TrpcUserContext
 ): ResolvedRecordScopeV2 {
-  const { options, type } = scope
+  const { type } = scope
+
+  // We parse on the next step, and by default fields that do not match, are stripped out.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const options = scope.options as any
   const resolved = ResolvedRecordScopeV2.parse({
     type,
     options: {
