@@ -61,13 +61,9 @@ async function notifyCountryConfigBatch(
 
 async function reindexSearch(
   token: TokenWithBearer,
-  indexNameOverrides: Map<string, string>,
-  eventType?: string
+  indexNameOverrides: Map<string, string>
 ) {
-  const allConfigurations = await getInMemoryEventConfigurations(token)
-  const configurations = eventType
-    ? allConfigurations.filter((c) => c.id === eventType)
-    : allConfigurations
+  const configurations = await getInMemoryEventConfigurations(token)
   let buffer: EventDocument[] = []
 
   async function flush() {
@@ -109,11 +105,8 @@ async function reindexSearch(
   })
 }
 
-async function runReindex(token: TokenWithBearer, eventType?: string) {
-  const allConfigurations = await getEventConfigurations(token)
-  const configurations = eventType
-    ? allConfigurations.filter((c) => c.id === eventType)
-    : allConfigurations
+async function runReindex(token: TokenWithBearer) {
+  const configurations = await getEventConfigurations(token)
 
   // Build temp indexes for each event type (blue/green pattern).
   // The live indexes remain intact and searchable throughout.
@@ -136,12 +129,8 @@ async function runReindex(token: TokenWithBearer, eventType?: string) {
     ])
   )
 
-  const objStream = Readable.from(streamEventDocuments(eventType))
-  const searchIndexingStream = await reindexSearch(
-    token,
-    indexNameOverrides,
-    eventType
-  )
+  const objStream = Readable.from(streamEventDocuments())
+  const searchIndexingStream = await reindexSearch(token, indexNameOverrides)
 
   try {
     await new Promise<void>((resolve, reject) => {
@@ -165,20 +154,14 @@ async function runReindex(token: TokenWithBearer, eventType?: string) {
   }
 
   // Success — atomically swap aliases from live → temp for each event type.
-  // Pass the eventType so finaliseReindexIndex can look up the current live
-  // index from the alias (which may itself be a previous temp index).
-  for (const [eventType, { tempIndexName }] of indexMap.entries()) {
-    await finaliseReindexIndex(eventType, tempIndexName)
+  for (const [type, { tempIndexName }] of indexMap.entries()) {
+    await finaliseReindexIndex(type, tempIndexName)
   }
 }
 
-export function reindex(token: TokenWithBearer, eventType?: string) {
-  logger.info(
-    eventType
-      ? `Reindex started in background for event type: ${eventType}`
-      : 'Reindex started in background for all event types'
-  )
-  runReindex(token, eventType).catch((err) => {
+export function reindex(token: TokenWithBearer) {
+  logger.info('Reindex started in background for all event types')
+  runReindex(token).catch((err) => {
     logger.error('Reindex failed', err)
   })
 }

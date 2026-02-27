@@ -347,7 +347,7 @@ export const eventRouter = router({
     .output(z.any())
     .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
   reindex: systemProcedure
-    .input(z.object({ eventType: z.string().optional() }).optional())
+    .input(z.void())
     .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
     .output(z.void())
     .meta({
@@ -359,7 +359,7 @@ export const eventRouter = router({
         tags: ['events']
       }
     })
-    .mutation(({ input, ctx }) => {
-      reindex(ctx.token, input?.eventType)
+    .mutation(({ ctx }) => {
+      reindex(ctx.token)
     })
 })

@@ -345,44 +345,6 @@ test('blue/green: on country config failure, temp index is cleaned up and no orp
   expect(tempIndexes).toHaveLength(0)
 })
 
-test('reindex with eventType filter only rebuilds the specified event type index', async () => {
-  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
-  const esClient = getOrCreateClient()
-
-  // First full reindex to establish the live index
-  await expect(client.event.reindex()).resolves.not.toThrow()
-
-  const aliasInfoAfterFull = await esClient.indices.getAlias({
-    name: getEventAliasName()
-  })
-  const liveIndexAfterFull = Object.keys(aliasInfoAfterFull)[0]
-
-  // Reindex only the tennis-club-membership event type
-  await expect(
-    client.event.reindex({ eventType: TENNIS_CLUB_MEMBERSHIP })
-  ).resolves.not.toThrow()
-
-  await esClient.indices.refresh({ index: getEventAliasName() })
-
-  // The alias should have been swapped to a new temp index
-  const aliasInfoAfterPartial = await esClient.indices.getAlias({
-    name: getEventAliasName()
-  })
-  const liveIndexAfterPartial = Object.keys(aliasInfoAfterPartial)[0]
-
-  expect(liveIndexAfterPartial).not.toEqual(liveIndexAfterFull)
-  expect(liveIndexAfterPartial).toMatch(
-    new RegExp(`^${getEventIndexName(TENNIS_CLUB_MEMBERSHIP)}_\\d+$`)
-  )
-
-  // Data is still present after the partial reindex
-  const body = await esClient.search({
-    index: getEventAliasName(),
-    body: { query: { match_all: {} } }
-  })
-  expect(body.hits.hits).toHaveLength(1)
-})
-
 test('blue/green: per-type write alias is created after reindex', async () => {
   const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
   const esClient = getOrCreateClient()
