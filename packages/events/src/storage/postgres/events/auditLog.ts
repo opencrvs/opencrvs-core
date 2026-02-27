@@ -9,32 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { logger } from '@opencrvs/commons'
+import { AuditLogParams } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
-import UserType from './schema/app/UserType'
 
-export interface AuditLogParams {
-  clientId: string
-  clientType: UserType
-  operation: string
-  requestData: Record<string, unknown> | null
-  responseSummary: Record<string, unknown> | null
-}
+export type { AuditLogParams }
 
 /**
- * Writes an audit log entry for a system client operation.
+ * Writes an audit log entry for a client operation.
  *
  * All parameters must be supplied explicitly by the caller —
  * do not pass tokens or context objects directly.
  */
-export async function writeAuditLog(params: AuditLogParams): Promise<void> {
-  try {
-    const db = getClient()
-    await db.insertInto('auditLog').values(params).execute()
-  } catch (error) {
-    logger.error(
-      { error, operation: params.operation, clientId: params.clientId },
-      'Failed to write audit log entry'
-    )
-  }
+export async function writeAuditLog(
+  params: AuditLogParams
+): Promise<void> {
+  const db = getClient()
+  return db
+    .insertInto('auditLog')
+    .values({
+      clientId: params.clientId,
+      clientType: params.clientType,
+      operation: params.operation,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      requestData: params.requestData as Record<string, any>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      responseSummary: params.responseSummary as Record<string, any>
+    })
+    .execute()
+    .then(() => undefined)
 }

@@ -35,6 +35,11 @@ import {
   EditActionInput
 } from '@opencrvs/commons/events'
 import {
+  AuditLogOperation,
+  AuditLogParams,
+  EventActionAuditLog
+} from '@opencrvs/commons/events'
+import {
   TokenUserType,
   TokenWithBearer
 } from '@opencrvs/commons/authentication'
@@ -164,6 +169,19 @@ const ACTION_PROCEDURE_CONFIG = {
     }
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
+
+/**
+ * Maps action types to their corresponding audit log operation names (tRPC paths).
+ * Only includes action types that should be audit-logged.
+ */
+const AUDIT_LOG_OPERATION_MAP: Partial<
+  Record<keyof typeof ACTION_PROCEDURE_CONFIG, AuditLogOperation['operation']>
+> = {
+  [ActionType.NOTIFY]: 'event.actions.notify.request',
+  [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request.request',
+  [ActionType.APPROVE_CORRECTION]: 'event.actions.correction.approve.request',
+  [ActionType.REJECT_CORRECTION]: 'event.actions.correction.reject.request'
+}
 
 type ActionProcedure = {
   request: MutationProcedure<{
@@ -381,17 +399,20 @@ export function getDefaultActionProcedures(
           actionConfig.actionConfirmationResponseSchema
         )
 
-        await writeAuditLog({
-          clientId: user.id,
-          clientType: user.type,
-          operation: ctx.operation,
-          requestData: { eventId, actionType, transactionId: input.transactionId },
-          responseSummary: {
-            eventId: result.id,
-            eventType: result.type,
-            trackingId: result.trackingId
-          }
-        })
+        const auditOperation = AUDIT_LOG_OPERATION_MAP[actionType]
+        if (auditOperation) {
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: auditOperation,
+            requestData: { eventId, actionType, transactionId: input.transactionId },
+            responseSummary: {
+              eventId: result.id,
+              eventType: result.type,
+              trackingId: result.trackingId
+            }
+          } as Extract<AuditLogParams, EventActionAuditLog & { clientId: string; clientType: string }>)
+        }
 
         return result
       }),

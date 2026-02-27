@@ -388,7 +388,7 @@ export const eventRouter = router({
       await writeAuditLog({
         clientId: ctx.user.id,
         clientType: ctx.user.type,
-        operation: ctx.operation,
+        operation: 'event.search',
         requestData: {
           query: input.query ?? null,
           limit: input.limit ?? null,
