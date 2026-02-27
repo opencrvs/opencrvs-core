@@ -18,7 +18,8 @@ import {
   PageTypes,
   PageConfig,
   ValidatorContext,
-  buildFormState
+  buildFormState,
+  FieldType
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -118,7 +119,30 @@ export function Pages({
     // so that when we get back to the page, we show validation errors for all fields in the page.
     setFormTouched({
       ...formTouched,
-      ...buildFormState(page.fields, () => true)
+      ...buildFormState(page.fields, (field) => {
+        if (field.type === FieldType.NAME) {
+          return {
+            firstname: true,
+            middlename: true,
+            surname: true
+          }
+        } else if (field.type === FieldType.ADDRESS) {
+          return {
+            country: true,
+            administrativeArea: true,
+            streetLevelDetails: (
+              field.configuration?.streetAddressForm ?? []
+            ).reduce(
+              (acc, streetField) => {
+                acc[streetField.id] = true
+                return acc
+              },
+              {} as Record<string, boolean>
+            )
+          }
+        }
+        return true
+      })
     })
 
     // If we are in requireCompletionToContinue mode, we need to validate all fields before moving to the next page.
