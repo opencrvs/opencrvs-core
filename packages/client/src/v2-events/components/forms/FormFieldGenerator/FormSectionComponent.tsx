@@ -11,7 +11,7 @@
 
 import React, { useCallback, useEffect, useRef } from 'react'
 import { FormikProps } from 'formik'
-import { cloneDeep, set, get, compact } from 'lodash'
+import { cloneDeep, set, get, compact, omit, unset } from 'lodash'
 import {
   EventState,
   EventConfig,
@@ -246,9 +246,52 @@ export function FormSectionComponent({
     [getDefaultValue]
   )
 
-  const onFieldValueChange = useCallback(
-    (formikFieldId: string, value: FieldValue | undefined) => {
-      const updatedValues = cloneDeep(values)
+  const onFieldValueChange = (
+    formikFieldId: string,
+    value: FieldValue | undefined
+  ) => {
+    const updatedValues = cloneDeep(values)
+
+    const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
+    const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
+    const interactiveListenerFields = listenerFields.filter(
+      (fieldWithPath): fieldWithPath is [string[], InteractiveFieldType] =>
+        !isNonInteractiveFieldType(fieldWithPath[1])
+    )
+
+    // update the value of the field that was changed
+    set(updatedValues, formikFieldId, value)
+
+    for (const listenerField of interactiveListenerFields) {
+      setValueForListenerField(listenerField, updatedValues)
+    }
+
+    const formikListenerFieldPaths = listenerFields.map(([p]) =>
+      p.map(makeFormFieldIdFormikCompatible).join('.')
+    )
+
+    const updatedTouched = omit(touched, formikListenerFieldPaths)
+
+    void setValues(updatedValues)
+    void setTouched(updatedTouched)
+    onFormChange((prevForm) => ({
+      ...prevForm,
+      ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
+    }))
+    onTouchedChange((prevTouched) => ({
+      ...prevTouched,
+      ...makeFormikFieldIdsOpenCRVSCompatible(updatedTouched)
+    }))
+  }
+
+  const onBatchFieldValueChange = (
+    newValues: Array<{ name: string; value: FieldValue | undefined }>
+  ) => {
+    const updatedValues = cloneDeep(values)
+    const updatedTouched = cloneDeep(touched)
+
+    for (const { name: formikFieldId, value } of newValues) {
+      set(updatedValues, formikFieldId, value)
 
       const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
       const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
@@ -257,87 +300,26 @@ export function FormSectionComponent({
           !isNonInteractiveFieldType(fieldWithPath[1])
       )
 
-      // update the value of the field that was changed
-      set(updatedValues, formikFieldId, value)
-
       for (const listenerField of interactiveListenerFields) {
         setValueForListenerField(listenerField, updatedValues)
-      }
-
-      // @todo figure out if this is needed
-      // const formikListenerFieldIds = listenerFields.map((child) =>
-      //   makeFormFieldIdFormikCompatible(child.id)
-      // )
-      //
-      // const updatedTouched = omit(touched, formikListenerFieldIds)
-
-      void setValues(updatedValues)
-      // void setTouched(updatedTouched)
-      onFormChange((prevForm) => ({
-        ...prevForm,
-        ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
-      }))
-      // onTouchedChange((prevTouched) => ({
-      //   ...prevTouched,
-      //   ...makeFormikFieldIdsOpenCRVSCompatible(updatedTouched)
-      // }))
-    },
-    [
-      values,
-      setValues,
-      // touched,
-      // setTouched,
-      onFormChange,
-      // onTouchedChange,
-      listenerFieldsByParentId,
-      setValueForListenerField
-    ]
-  )
-
-  const onBatchFieldValueChange = useCallback(
-    (newValues: Array<{ name: string; value: FieldValue | undefined }>) => {
-      const updatedValues = cloneDeep(values)
-      // const updatedTouched = cloneDeep(touched)
-
-      for (const { name: formikFieldId, value } of newValues) {
-        set(updatedValues, formikFieldId, value)
-
-        const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
-        const listenerFields = listenerFieldsByParentId[ocrvsFieldId] ?? []
-        const interactiveListenerFields = listenerFields.filter(
-          (fieldWithPath): fieldWithPath is [string[], InteractiveFieldType] =>
-            !isNonInteractiveFieldType(fieldWithPath[1])
+        unset(
+          updatedTouched,
+          listenerField[0].map(makeFormFieldIdFormikCompatible)
         )
-
-        for (const listenerField of interactiveListenerFields) {
-          setValueForListenerField(listenerField, updatedValues)
-          // updatedTouched[makeFormFieldIdFormikCompatible(listenerField.id)] =
-          //   undefined
-        }
       }
+    }
 
-      void setValues(updatedValues)
-      // void setTouched(updatedTouched)
-      onFormChange((prevForm) => ({
-        ...prevForm,
-        ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
-      }))
-      // onTouchedChange((prevTouched) => ({
-      //   ...prevTouched,
-      //   ...makeFormikFieldIdsOpenCRVSCompatible(updatedTouched)
-      // }))
-    },
-    [
-      values,
-      setValues,
-      // touched,
-      // setTouched,
-      onFormChange,
-      // onTouchedChange,
-      listenerFieldsByParentId,
-      setValueForListenerField
-    ]
-  )
+    void setValues(updatedValues)
+    void setTouched(updatedTouched)
+    onFormChange((prevForm) => ({
+      ...prevForm,
+      ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
+    }))
+    onTouchedChange((prevTouched) => ({
+      ...prevTouched,
+      ...makeFormikFieldIdsOpenCRVSCompatible(updatedTouched)
+    }))
+  }
 
   useEffect(() => {
     if (validateAllFields) {
