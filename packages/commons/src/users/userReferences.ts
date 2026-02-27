@@ -50,6 +50,13 @@ function isJurisdictionFilter(
   return allowedJurisdictionFilters.includes(jurisdiction)
 }
 
+/**
+ * Resolves a scope attribute reference to a jurisdiction filter.
+ *
+ * @param scopeAttributeReference - The scope attribute reference to resolve. This will contain scope and attribute names.
+ * @param scopes - The scopes to resolve the scope attribute reference from.
+ * @returns The jurisdiction filter.
+ */
 function resolveJurisdictionScopeAttributeReference(
   scopeAttributeReference: ScopeAttributeReference,
   scopes: RawScopes[]

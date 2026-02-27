@@ -161,6 +161,7 @@ export function getScopeAttributeValue<T extends RecordScopeAttributeKey>(
   attribute: T
 ): RecordScopeAttributes[T] | undefined {
   const value = scope.options?.[attribute]
+
   const defaultValue =
     attribute in DEFAULT_SCOPE_ATTRIBUTES
       ? DEFAULT_SCOPE_ATTRIBUTES[attribute]
