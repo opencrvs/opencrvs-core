@@ -362,6 +362,7 @@ export function getDefaultActionProcedures(
       .meta(meta)
       .use(canAccessEventMiddleware)
       .input(actionConfig.inputSchema.strict())
+      // @ts-expect-error - deprecated by the end of 2.0
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
