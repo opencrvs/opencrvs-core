@@ -150,7 +150,7 @@ const DEFAULT_SCOPE_ATTRIBUTES: RecordScopeAttributes = {
 }
 
 /**
- * Function to get the value of a scope attribute.
+ * Function to get the value of a scope attribute (aka. scope option)
  *
  * @param scope - The scope to get the value of the attribute from.
  * @param attribute - The attribute to get the value of.
