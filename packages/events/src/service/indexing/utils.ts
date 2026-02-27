@@ -509,14 +509,14 @@ export function resolveRecordActionScopeToIds(
   return {
     type,
     options: {
-      event: options.event,
-      placeOfEvent: getLocationIdsFromScopeOptions(options.placeOfEvent, user),
-      declaredIn: getLocationIdsFromScopeOptions(options.declaredIn, user),
+      event: options?.event,
+      placeOfEvent: getLocationIdsFromScopeOptions(options?.placeOfEvent, user),
+      declaredIn: getLocationIdsFromScopeOptions(options?.declaredIn, user),
       declaredBy:
-        options.declaredBy === UserFilter.enum.user ? user.id : undefined,
-      registeredIn: getLocationIdsFromScopeOptions(options.registeredIn, user),
+        options?.declaredBy === UserFilter.enum.user ? user.id : undefined,
+      registeredIn: getLocationIdsFromScopeOptions(options?.registeredIn, user),
       registeredBy:
-        options.registeredBy === UserFilter.enum.user ? user.id : undefined
+        options?.registeredBy === UserFilter.enum.user ? user.id : undefined
     }
   }
 }

@@ -20,7 +20,7 @@ export const USER_DETAILS = 'USER_DETAILS'
 
 export type UserDetails = NonNullable<FetchUserQuery['getUser']>
 
-export function getUserLocation(userDetails: UserDetails) {
+function getUserLocation(userDetails: UserDetails) {
   if (!userDetails.primaryOffice) {
     throw Error('The user has no primary office')
   }

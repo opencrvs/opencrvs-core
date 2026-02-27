@@ -76,6 +76,17 @@ export function server() {
       return
     }
 
+    // Handle multipart/form-data uploads for the attachments endpoint
+    if (
+      req.method === 'POST' &&
+      req.url.startsWith('/attachments') &&
+      (req.headers['content-type'] ?? '').startsWith('multipart/form-data')
+    ) {
+      req.url = '/attachments.upload'
+      void trpcServer(req, res)
+      return
+    }
+
     // If it's a tRPC request, handle it with the tRPC server
     if (isTrpcRequest(req)) {
       trpcServer(req, res)

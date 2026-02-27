@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { FieldType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
 import { getAllUniqueFields } from '@opencrvs/commons/events'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('user can fetch event config without scopes', async () => {
   const { user } = await setupTestCase()

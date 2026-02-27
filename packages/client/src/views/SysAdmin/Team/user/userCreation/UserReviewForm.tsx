@@ -64,7 +64,6 @@ import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Link } from '@opencrvs/components'
 import { UserRole } from '@client/utils/gateway'
-import { usePermissions } from '@client/hooks/useAuthorization'
 import { draftToGqlTransformer } from '@client/transformer'
 import {
   RouteComponentProps,

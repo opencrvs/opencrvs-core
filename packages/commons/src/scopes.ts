@@ -10,7 +10,14 @@
  */
 
 import * as z from 'zod/v4'
-import { SearchScopeAccessLevels } from './events'
+
+const SearchScopeAccessLevels = {
+  MY_JURISDICTION: 'my-jurisdiction',
+  ALL: 'all'
+} as const
+
+type SearchScopeAccessLevels =
+  (typeof SearchScopeAccessLevels)[keyof typeof SearchScopeAccessLevels]
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
@@ -109,7 +116,10 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding'
+  USER_DATA_SEEDING: 'user.data-seeding',
+
+  // attachment
+  ATTACHMENT_UPLOAD: 'attachment.upload'
 } as const
 
 // Legacy scopes
@@ -215,6 +225,9 @@ const ConfigScope = z.literal(SCOPES.CONFIG_UPDATE_ALL)
 // Data seeding
 const DataSeedingScope = z.literal(SCOPES.USER_DATA_SEEDING)
 
+// Attachment
+const AttachmentScope = z.literal(SCOPES.ATTACHMENT_UPLOAD)
+
 // Combine all
 const LiteralScopes = z.union([
   LegacyScopes,
@@ -233,7 +246,8 @@ const LiteralScopes = z.union([
   UserScopes,
   ConfigScope,
   DataSeedingScope,
-  InternalOperationsScopes
+  InternalOperationsScopes,
+  AttachmentScope
 ])
 
 // Configurable scopes are for example:
@@ -465,6 +479,7 @@ export function parseLiteralScope(scope: string) {
 }
 
 /**
+ * @deprecated - Will be removed in v2.0
  * Stringifies a ConfigurableScopes object into a scope string.
  * @param {ConfigurableScopes} scope - The scope object to stringify
  * @returns {string} The stringified scope in format "type[key1=value1|value2,key2=value3|value4]"

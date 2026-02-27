@@ -12,7 +12,7 @@ import { messages } from '@client/i18n/messages/views/performance'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { getOfflineData } from '@client/offline/selectors'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { Header } from '@client/views/SysAdmin/Performance/utils'
+
 import {
   ISearchLocation,
   LocationSearch
@@ -45,6 +45,10 @@ const NoConnectivity = styled(NoWifi)`
 const Text = styled.div`
   ${({ theme }) => theme.fonts.reg16};
   text-align: center;
+`
+const Header = styled.h1`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.h2};
 `
 
 export function TeamSearch() {

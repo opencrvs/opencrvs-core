@@ -105,7 +105,7 @@ export function generateLocationName(
   return name
 }
 
-export function generateFullLocation(
+function generateFullLocation(
   districtId: string,
   stateId: string,
   countryCode: string,
@@ -254,7 +254,7 @@ export function getJurisidictionType(
   return relevantLocation.jurisdictionType as string
 }
 
-export type LocationName = string | MessageDescriptor
+type LocationName = string | MessageDescriptor
 
 export function getLocationNameMapOfFacility(
   facilityLocation: ILocation,
@@ -281,7 +281,7 @@ export function getLocationNameMapOfFacility(
   return map
 }
 
-export function getLocalizedLocationName(intl: IntlShape, location: ILocation) {
+function getLocalizedLocationName(intl: IntlShape, location: ILocation) {
   if (intl.locale === getDefaultLanguage()) {
     return location.name
   } else {
@@ -391,7 +391,7 @@ function getAssociatedLocationsAndOffices(
   return [office, ...associatedLocations]
 }
 
-export function generateFullAddress(
+function generateFullAddress(
   address: Address,
   offlineData: IOfflineData
 ): string[] {
@@ -422,7 +422,7 @@ export function generateFullAddress(
   ].filter((maybeLocation): maybeLocation is string => Boolean(maybeLocation))
 }
 
-export function isAdministrativeArea(
+function isAdministrativeArea(
   a: Location | AdministrativeArea
 ): a is AdministrativeArea {
   // Until LocationSearch is refactored, using parser as a type guard is too expensive.
