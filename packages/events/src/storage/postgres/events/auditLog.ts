@@ -28,10 +28,8 @@ export async function writeAuditLog(
       clientId: params.clientId,
       clientType: params.clientType,
       operation: params.operation,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      requestData: params.requestData as Record<string, any>,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      responseSummary: params.responseSummary as Record<string, any>
+      requestData: params.requestData,
+      responseSummary: params.responseSummary
     })
     .execute()
 }
