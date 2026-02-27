@@ -165,7 +165,8 @@ export function scopeHasDeclaredOptions(
   RecordScopeV2,
   { type: z.infer<typeof scopesWithDeclaredOptions> }
 > {
-  return scopesWithDeclaredOptions.options.some((opt) => opt === scope.type)
+  // If the scope has less, it is found here. Otherwise in other categories.
+  return !scopesWithPlaceEventOptions.options.some((opt) => opt === scope.type)
 }
 
 export function scopeHasFullOptions(
