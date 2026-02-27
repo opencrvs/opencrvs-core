@@ -20,7 +20,6 @@ import type {
   GQLEventSearchSet,
   GQLMarriageEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
-import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { getLocalisedName } from './data-formatting'
@@ -213,6 +212,19 @@ const transformMarriageSearchQueryDataToDraft = (
   }
 }
 
+function getEvent(eventType: string | undefined) {
+  switch (eventType && eventType.toLowerCase()) {
+    case 'birth':
+    default:
+      return EventType.Birth
+    case 'death':
+      return EventType.Death
+    case 'marriage':
+      return EventType.Marriage
+  }
+}
+
+
 export const transformSearchQueryDataToDraft = (
   data: GQLEventSearchSet
 ): IDeclaration => {
@@ -263,7 +275,7 @@ export function isDeclarationInReadyToReviewStatus(
   )
 }
 
-export function getRegisteringOfficeId(
+function getRegisteringOfficeId(
   declaration?: IPrintableDeclaration
 ): string | null {
   const registeringHistory = (

@@ -43,7 +43,10 @@ function matchesJurisdictionFilter(
     return locationIds.some((id) => id === user.primaryOfficeId)
   }
   if (filter === JurisdictionFilter.enum.administrativeArea) {
-    return locationIds.some((id) => id === user.administrativeAreaId)
+    return (
+      user.administrativeAreaId === null ||
+      locationIds.some((id) => id === user.administrativeAreaId)
+    )
   }
 
   return true
@@ -137,17 +140,6 @@ export function canAccessEventWithScope(
       !matchesJurisdictionFilter(
         event.legalStatuses?.REGISTERED?.createdAtLocation,
         JurisdictionFilter.enum.location,
-        user
-      )
-    ) {
-      return false
-    }
-
-    if (
-      options?.registeredIn === JurisdictionFilter.enum.administrativeArea &&
-      !matchesJurisdictionFilter(
-        event.legalStatuses?.REGISTERED?.createdAtLocation,
-        JurisdictionFilter.enum.administrativeArea,
         user
       )
     ) {

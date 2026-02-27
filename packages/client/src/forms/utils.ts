@@ -93,7 +93,7 @@ import { memoize } from 'lodash'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { Conditional } from './conditionals'
 
-export const VIEW_TYPE = {
+const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
   PREVIEW: 'preview',
@@ -335,7 +335,7 @@ export const getFieldValidation = (
   return validator
 }
 
-export function getNextSectionIds(
+function getNextSectionIds(
   sections: IFormSection[],
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
@@ -548,7 +548,7 @@ export const getFieldOptionsByValueMapper = (
   return items
 }
 
-export const diffDoB = (doB: string) => {
+const diffDoB = (doB: string) => {
   if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB))
     return 'withinTargetdays'
   const todaysDate = new Date()
@@ -570,7 +570,7 @@ export const diffDoB = (doB: string) => {
   return valueWithinRange ? valueWithinRange.value : ''
 }
 
-export function isCityLocation(
+function isCityLocation(
   locations: { [key: string]: ILocation },
   locationId: string
 ): boolean {
@@ -586,7 +586,7 @@ export function isCityLocation(
   }
 }
 
-export function isDefaultCountry(countryCode: string): boolean {
+function isDefaultCountry(countryCode: string): boolean {
   return countryCode === window.config.COUNTRY.toUpperCase()
 }
 

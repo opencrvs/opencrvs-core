@@ -54,7 +54,7 @@ export const getCountryLogoFile = createSelector(
   (data) => data.config.COUNTRY_LOGO.file
 )
 
-export const getAdminStructureLocations = createSelector(
+const getAdminStructureLocations = createSelector(
   getOfflineData,
   (data) => data.locations
 )
@@ -73,14 +73,14 @@ export const selectCountryBackground = (store: IStoreState) => {
   }
 }
 
-export const selectCountryLogo = (store: IStoreState) => {
+const selectCountryLogo = (store: IStoreState) => {
   return (
     getKey(store, 'offlineData').config?.COUNTRY_LOGO?.file ||
     getKey(store, 'offlineData').anonymousConfig?.COUNTRY_LOGO?.file
   )
 }
 
-export function selectApplicationName(store: IStoreState) {
+function selectApplicationName(store: IStoreState) {
   return (
     getKey(store, 'offlineData').config?.APPLICATION_NAME ||
     getKey(store, 'offlineData').anonymousConfig?.APPLICATION_NAME
