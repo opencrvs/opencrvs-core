@@ -429,7 +429,7 @@ export const userCanCreateEvent: MiddlewareFunction<
   // Since determining access requires knowing the event type, we need to parse the input before we can check access.
   // default .input(...) throws 400, which is something that we want to return only if the user should have access.
   const rawInput = await getRawInput()
-  const input = EventInput.safeParse(rawInput)?.data
+  const input = EventInput.safeParse(rawInput).data
 
   if (!input) {
     throw new TRPCError({ code: 'BAD_REQUEST' })

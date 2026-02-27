@@ -390,9 +390,9 @@ export const eventRouter = router({
         clientType: ctx.user.type,
         operation: 'event.search',
         requestData: {
-          query: input.query ?? null,
-          limit: input.limit ?? null,
-          offset: input.offset ?? null
+          query: input.query,
+          limit: input.limit,
+          offset: input.offset
         },
         responseSummary: {
           total: result.total,

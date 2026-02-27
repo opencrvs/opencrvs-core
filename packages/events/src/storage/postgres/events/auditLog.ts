@@ -12,8 +12,6 @@
 import { AuditLogParams } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 
-export type { AuditLogParams }
-
 /**
  * Writes an audit log entry for a client operation.
  *
@@ -22,7 +20,7 @@ export type { AuditLogParams }
  */
 export async function writeAuditLog(
   params: AuditLogParams
-): Promise<void> {
+) {
   const db = getClient()
   return db
     .insertInto('auditLog')
@@ -36,5 +34,4 @@ export async function writeAuditLog(
       responseSummary: params.responseSummary as Record<string, any>
     })
     .execute()
-    .then(() => undefined)
 }
