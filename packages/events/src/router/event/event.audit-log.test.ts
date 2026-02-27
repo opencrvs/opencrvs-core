@@ -54,24 +54,6 @@ describe('audit log', () => {
         trackingId: event.trackingId
       })
     })
-
-    test('does not write an audit log entry when a human user creates an event', async () => {
-      const { user, generator } = await setupTestCase()
-      const client = createTestClient(user, [
-        encodeScope({ type: 'record.create' })
-      ])
-
-      await client.event.create(generator.event.create())
-
-      const db = getClient()
-      const logs = await db
-        .selectFrom('auditLog')
-        .selectAll()
-        .where('clientId', '=', user.id)
-        .execute()
-
-      expect(logs).toHaveLength(0)
-    })
   })
 
   describe('event.get', () => {
@@ -112,26 +94,6 @@ describe('audit log', () => {
         trackingId: event.trackingId
       })
     })
-
-    test('does not write an audit log entry when a human user fetches an event', async () => {
-      const { user, generator } = await setupTestCase()
-      const client = createTestClient(user, [
-        encodeScope({ type: 'record.create' }),
-        encodeScope({ type: 'record.read' })
-      ])
-
-      const event = await client.event.create(generator.event.create())
-      await client.event.get({ eventId: event.id })
-
-      const db = getClient()
-      const logs = await db
-        .selectFrom('auditLog')
-        .selectAll()
-        .where('clientId', '=', user.id)
-        .execute()
-
-      expect(logs).toHaveLength(0)
-    })
   })
 
   describe('event.actions.notify', () => {
@@ -163,11 +125,11 @@ describe('audit log', () => {
         .selectFrom('auditLog')
         .selectAll()
         .where('clientId', '=', systemId)
-        .where('operation', '=', 'event.actions.notify')
+        .where('operation', '=', 'event.actions.notify.request')
         .execute()
 
       expect(logs).toHaveLength(1)
-      expect(logs[0].operation).toBe('event.actions.notify')
+      expect(logs[0].operation).toBe('event.actions.notify.request')
       expect(logs[0].clientType).toBe('system')
       expect(logs[0].responseSummary).toMatchObject({
         eventId: result.id,
@@ -207,18 +169,19 @@ describe('audit log', () => {
       })
     })
 
-    test('does not write an audit log entry when a human user searches for events', async () => {
+    test('writes an audit log entry when a human user searches for events', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [
         encodeScope({ type: 'record.search' })
       ])
-
-      await client.event.search({
+      const searchInput = {
         query: {
           type: 'and',
           clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
         }
-      })
+      }
+
+      const result = await client.event.search(searchInput)
 
       const db = getClient()
       const logs = await db
@@ -227,7 +190,13 @@ describe('audit log', () => {
         .where('clientId', '=', user.id)
         .execute()
 
-      expect(logs).toHaveLength(0)
+      expect(logs).toHaveLength(1)
+      expect(logs[0].operation).toBe('event.search')
+      expect(logs[0].clientType).toBe('user')
+      expect(logs[0].responseSummary).toMatchObject({
+        total: result.total,
+        eventIds: result.results.map((r) => r.id)
+      })
     })
   })
 

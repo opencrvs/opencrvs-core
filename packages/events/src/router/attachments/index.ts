@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { SCOPES, TokenUserType } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { AttachmentInput, uploadFile } from '@events/service/files'
@@ -38,18 +38,16 @@ export const attachmentsRouter = router({
     .mutation(async ({ input, ctx }) => {
       const fileUrl = await uploadFile(input, ctx.token)
 
-      if (ctx.user.type === TokenUserType.enum.system) {
-        await writeAuditLog({
-          clientId: ctx.user.id,
-          clientType: ctx.user.type,
-          operation: 'attachments.upload',
-          requestData: {
-            transactionId: input.transactionId,
-            path: input.path ?? null
-          },
-          responseSummary: { fileUrl }
-        })
-      }
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'attachments.upload',
+        requestData: {
+          transactionId: input.transactionId,
+          path: input.path ?? null
+        },
+        responseSummary: { fileUrl }
+      })
 
       return fileUrl
     })

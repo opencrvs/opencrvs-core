@@ -50,15 +50,15 @@ export const integrationsRouter = router({
         ctx.token
       )
 
-      if (ctx.user.type === TokenUserType.enum.system) {
-        await writeAuditLog({
-          clientId: ctx.user.id,
-          clientType: ctx.user.type,
-          operation: 'integrations.create',
-          requestData: { name: input.name, scopes: input.scopes },
-          responseSummary: { clientId: result.clientId }
-        })
-      }
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.create',
+        requestData: { name: input.name, scopes: input.scopes },
+        responseSummary: { clientId: result.clientId }
+      })
+
 
       return result
     })

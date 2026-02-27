@@ -57,7 +57,8 @@ const authedProcedure = t.procedure.use(async (opts) => {
     ctx: {
       ...opts.ctx,
       token,
-      user
+      user,
+      operation: opts.path
     }
   })
 })

@@ -56,11 +56,11 @@ import {
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getActionConfirmationToken } from '@events/service/auth'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
 } from './actionConfirmationRequest'
-import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 /**
  * Configuration for an action procedure
@@ -313,17 +313,6 @@ export type AsyncActionConfirmationResponseSchema = z.infer<
 >
 
 /**
- * Mapping from action types that should be audit-logged to their operation names.
- * Only actions accessible by system clients that are in scope for audit logging.
- */
-const AUDIT_LOGGED_ACTION_OPERATIONS: Partial<Record<ActionType, string>> = {
-  [ActionType.NOTIFY]: 'event.actions.notify',
-  [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request',
-  [ActionType.APPROVE_CORRECTION]: 'event.actions.correction.approve',
-  [ActionType.REJECT_CORRECTION]: 'event.actions.correction.reject'
-}
-
-/**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
  *
@@ -392,23 +381,17 @@ export function getDefaultActionProcedures(
           actionConfig.actionConfirmationResponseSchema
         )
 
-        const auditOperation = AUDIT_LOGGED_ACTION_OPERATIONS[actionType]
-        if (user.type === TokenUserType.enum.system && auditOperation) {
-          // Exclude `declaration` and `annotation` fields from the audit log:
-          // they can contain large PII-heavy payloads not suited for an audit trail.
-          const { declaration, annotation, ...requestData } = input
-          await writeAuditLog({
-            clientId: user.id,
-            clientType: user.type,
-            operation: auditOperation,
-            requestData: requestData as Record<string, unknown>,
-            responseSummary: {
-              eventId: result.id,
-              eventType: result.type,
-              trackingId: result.trackingId
-            }
-          })
-        }
+        await writeAuditLog({
+          clientId: user.id,
+          clientType: user.type,
+          operation: ctx.operation,
+          requestData: { eventId, actionType, transactionId: input.transactionId },
+          responseSummary: {
+            eventId: result.id,
+            eventType: result.type,
+            trackingId: result.trackingId
+          }
+        })
 
         return result
       }),
