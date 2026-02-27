@@ -313,7 +313,9 @@ describe('audit log', () => {
       expect(logs).toHaveLength(1)
       expect(logs[0].operation).toBe('attachments.upload')
       expect(logs[0].clientType).toBe('system')
-      expect(logs[0].responseSummary).toMatchObject({ fileUrl: expectedFileUrl })
+      expect(logs[0].responseSummary).toMatchObject({
+        fileUrl: expectedFileUrl
+      })
     })
   })
 
@@ -331,8 +333,16 @@ describe('audit log', () => {
             clientId: targetClientId,
             clientType: 'system',
             operation: 'event.create',
-            requestData: { transactionId: 'tx1', type: 'birth', createdAtLocation: null },
-            responseSummary: { eventId: 'evt1', eventType: 'birth', trackingId: 'TR1' },
+            requestData: {
+              transactionId: 'tx1',
+              type: 'birth',
+              createdAtLocation: null
+            },
+            responseSummary: {
+              eventId: 'evt1',
+              eventType: 'birth',
+              trackingId: 'TR1'
+            },
             createdAt: '2024-01-01T10:00:00Z'
           },
           {
@@ -340,7 +350,11 @@ describe('audit log', () => {
             clientType: 'system',
             operation: 'event.get',
             requestData: { eventId: 'evt1' },
-            responseSummary: { eventId: 'evt1', eventType: 'birth', trackingId: 'TR1' },
+            responseSummary: {
+              eventId: 'evt1',
+              eventType: 'birth',
+              trackingId: 'TR1'
+            },
             createdAt: '2024-01-02T10:00:00Z'
           }
         ])
@@ -418,3 +432,4 @@ describe('audit log', () => {
       ).rejects.toThrow()
     })
   })
+})
