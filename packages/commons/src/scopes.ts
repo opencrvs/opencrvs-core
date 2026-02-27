@@ -119,7 +119,10 @@ export const SCOPES = {
   USER_DATA_SEEDING: 'user.data-seeding',
 
   // attachment
-  ATTACHMENT_UPLOAD: 'attachment.upload'
+  ATTACHMENT_UPLOAD: 'attachment.upload',
+
+  // audit
+  AUDIT_READ: 'audit.read'
 } as const
 
 // Legacy scopes
@@ -228,6 +231,9 @@ const DataSeedingScope = z.literal(SCOPES.USER_DATA_SEEDING)
 // Attachment
 const AttachmentScope = z.literal(SCOPES.ATTACHMENT_UPLOAD)
 
+// Audit read
+const AuditReadScope = z.literal(SCOPES.AUDIT_READ)
+
 // Combine all
 const LiteralScopes = z.union([
   LegacyScopes,
@@ -247,7 +253,8 @@ const LiteralScopes = z.union([
   ConfigScope,
   DataSeedingScope,
   InternalOperationsScopes,
-  AttachmentScope
+  AttachmentScope,
+  AuditReadScope
 ])
 
 // Configurable scopes are for example:

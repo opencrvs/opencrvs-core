@@ -10,11 +10,14 @@
  */
 
 import * as z from 'zod/v4'
-import { SCOPES } from '@opencrvs/commons'
+import { SCOPES, UUID } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { registerSystem } from '@events/service/integrations/api'
-import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import {
+  writeAuditLog,
+  readAuditLog
+} from '@events/storage/postgres/events/auditLog'
 
 const CreateIntegrationInput = z.object({
   name: z.string().min(1, 'Integration name is required'),
@@ -25,6 +28,29 @@ const CreateIntegrationOutput = z.object({
   clientId: z.string(),
   shaSecret: z.string(),
   clientSecret: z.string()
+})
+
+const AuditLogEntry = z.object({
+  id: UUID,
+  clientId: z.string(),
+  clientType: z.string(),
+  operation: z.string(),
+  requestData: z.record(z.string(), z.unknown()).nullable(),
+  responseSummary: z.record(z.string(), z.unknown()).nullable(),
+  createdAt: z.string()
+})
+
+const AuditInput = z.object({
+  clientId: UUID,
+  from: z.string().datetime().optional(),
+  to: z.string().datetime().optional(),
+  skip: z.number().int().nonnegative().optional().default(0),
+  count: z.number().int().positive().max(100).optional().default(10)
+})
+
+const AuditOutput = z.object({
+  total: z.number(),
+  results: z.array(AuditLogEntry)
 })
 
 export const integrationsRouter = router({
@@ -61,5 +87,26 @@ export const integrationsRouter = router({
 
 
       return result
+    }),
+  audit: userAndSystemProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/integrations/{clientId}/audit',
+        summary: 'Retrieve audit log for a specific integration client',
+        tags: ['Integrations']
+      }
+    })
+    .input(AuditInput)
+    .output(AuditOutput)
+    .use(requiresAnyOfScopes([SCOPES.AUDIT_READ]))
+    .query(async ({ input }) => {
+      return readAuditLog({
+        clientId: input.clientId,
+        from: input.from,
+        to: input.to,
+        skip: input.skip,
+        count: input.count
+      })
     })
 })
