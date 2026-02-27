@@ -143,14 +143,19 @@ function HttpInput({ parentValue, configuration, form, onChange }: Props) {
   })
 
   React.useEffect(() => {
-    // 1) skip on first mount
+    // 1) if this field has no explicit trigger, run once on mount
     if (firstRunRef.current) {
       firstRunRef.current = false
       prevParentRef.current = parentValue
+
+      if (parentValue === undefined) {
+        mutation.mutate()
+      }
+
       return
     }
 
-    // 2) trigger on following mounts if the value tracked changes
+    // 2) trigger when parent value changes for explicitly triggered fields
     if (
       !isEqual(parentValue, prevParentRef.current) &&
       parentValue !== undefined
