@@ -10,7 +10,12 @@
  */
 
 import { http, HttpResponse } from 'msw'
-import { encodeScope, SCOPES, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
+import {
+  getUUID,
+  encodeScope,
+  SCOPES,
+  TENNIS_CLUB_MEMBERSHIP
+} from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -322,7 +327,7 @@ describe('audit log', () => {
   describe('integrations.audit', () => {
     test('returns paginated audit log entries for a specific client', async () => {
       const adminId = 'admin-user'
-      const targetClientId = '00000000-0000-0000-0000-000000000001'
+      const targetClientId = getUUID()
       const adminClient = createSystemTestClient(adminId, [SCOPES.AUDIT_READ])
 
       const db = getClient()
@@ -374,7 +379,7 @@ describe('audit log', () => {
 
     test('filters audit log entries by date range', async () => {
       const adminId = 'admin-user'
-      const targetClientId = '00000000-0000-0000-0000-000000000002'
+      const targetClientId = getUUID()
       const adminClient = createSystemTestClient(adminId, [SCOPES.AUDIT_READ])
 
       const db = getClient()
@@ -420,7 +425,7 @@ describe('audit log', () => {
 
     test('rejects access without audit.read scope', async () => {
       const unauthorizedId = 'unauthorized-user'
-      const targetClientId = '00000000-0000-0000-0000-000000000003'
+      const targetClientId = getUUID()
       const unauthorizedClient = createSystemTestClient(unauthorizedId, [
         SCOPES.INTEGRATION_CREATE
       ])
