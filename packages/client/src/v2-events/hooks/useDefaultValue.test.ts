@@ -13,12 +13,68 @@ import {
   field,
   FieldType,
   InteractiveFieldType,
+  Location,
   now,
   SystemVariables,
   user
 } from '@opencrvs/commons/client'
-import { replacePlaceholders } from './utils'
-import { handleDefaultValue } from './hooks/useDefaultValues'
+import { mapFieldToDefaultValue } from './useDefaultValue'
+
+const PROVINCE_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+const DISTRICT_ID = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
+const OFFICE_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc'
+
+const mockLocations: Location[] = [
+  {
+    id: OFFICE_ID,
+    parentId: DISTRICT_ID,
+    name: 'Test Office',
+    validUntil: null,
+    locationType: 'CRVS_OFFICE'
+  },
+  {
+    id: DISTRICT_ID,
+    parentId: PROVINCE_ID,
+    name: 'Test District',
+    validUntil: null,
+    locationType: 'ADMIN_STRUCTURE'
+  },
+  {
+    id: PROVINCE_ID,
+    parentId: null,
+    name: 'Test Province',
+    validUntil: null,
+    locationType: 'ADMIN_STRUCTURE'
+  }
+]
+
+// Mirrors window.config.ADMIN_STRUCTURE in setupTests.ts: ['province', 'district']
+const mockAdminLevelIds = ['province', 'district']
+
+const mockContext: SystemVariables & {
+  locations: Location[]
+  adminLevelIds: string[]
+} = {
+  user: {
+    id: 'user-id',
+    firstname: 'John',
+    middlename: 'Michael',
+    surname: 'Doe',
+    primaryOfficeId: OFFICE_ID,
+    name: 'John Michael Doe',
+    role: 'REGISTRAR'
+  },
+  $window: {
+    location: {
+      href: '',
+      pathname: '/',
+      hostname: 'localhost',
+      originPathname: '/'
+    }
+  },
+  locations: mockLocations,
+  adminLevelIds: mockAdminLevelIds
+}
 
 const TextField = {
   id: 'recommender.id',
@@ -89,6 +145,11 @@ const AddressField = {
     id: 'event.tennis-club-membership.action.declare.form.section.who.field.address.label'
   },
   validation: [],
+  defaultValue: {
+    country: 'FAR',
+    addressType: AddressType.DOMESTIC,
+    administrativeArea: user('primaryOfficeId').locationLevel('district')
+  },
   configuration: {
     streetAddressForm: [
       {
@@ -239,228 +300,52 @@ const AddressField = {
   }
 } satisfies InteractiveFieldType
 
-const testCases = [
-  {
-    currentValue: undefined,
-    defaultValue: undefined,
-    systemVariables: {
-      user: {
-        name: '',
-        role: '',
-        id: '',
-        district: '',
-        province: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: undefined,
-    field: AddressField satisfies InteractiveFieldType
-  },
-  {
-    currentValue: undefined,
-    defaultValue: 'Hello',
-    systemVariables: {
-      user: {
-        district: '',
-        province: '',
-        name: '',
-        role: '',
-        id: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: 'Hello',
-    field: TextField
-  },
-  {
-    currentValue: 'Hello world',
-    defaultValue: '$user.district',
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        role: '',
-        district: '',
-        province: '',
-        id: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: 'Hello world',
-    field: TextField
-  },
-  {
-    currentValue: undefined,
-    defaultValue: {
-      country: 'FAR',
-      addressType: AddressType.DOMESTIC
-    },
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        role: 'Field Agent',
-        district: '',
-        province: '',
-        id: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: {
-      country: 'FAR',
-      addressType: AddressType.DOMESTIC
-    },
-    field: AddressField
-  }
-] as const
+describe('mapFieldToDefaultValue', () => {
+  it('resolves user field token for TEXT field', () => {
+    const result = mapFieldToDefaultValue(TextField, mockContext)
+    expect(result).toBe('John Michael Doe')
+  })
 
-describe('replacePlaceholders', () => {
-  testCases.forEach(({ expected, ...props }) => {
-    it(`When currentValue is ${JSON.stringify(
-      props.currentValue
-    )} and defaultValue is ${JSON.stringify(
-      props.defaultValue
-    )} returns ${JSON.stringify(expected)}`, () => {
-      const result = replacePlaceholders(props)
-      expect(result).toEqual(expected)
+  it('resolves now() token for TIME field', () => {
+    const result = mapFieldToDefaultValue(TimeField, mockContext)
+    expect(result).toMatch(/^\d{2}:\d{2}$/)
+  })
+
+  it('resolves now() token for DATE field', () => {
+    const result = mapFieldToDefaultValue(DateField, mockContext)
+    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+  })
+
+  it('resolves user field tokens for NAME field', () => {
+    const result = mapFieldToDefaultValue(NameField, mockContext)
+    expect(result).toEqual({
+      firstname: 'John',
+      middlename: 'Michael',
+      surname: 'Doe'
     })
   })
-})
 
-const testCasesForDefaultValue = [
-  {
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        role: '',
-        id: '',
-        province: '',
-        district: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: 'Jon Doe',
-    field: TextField
-  },
-  {
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        firstname: 'Jon',
-        surname: 'Doe',
-        role: '',
-        id: '',
-        province: '',
-        district: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: {
-      firstname: 'Jon',
-      middlename: '',
-      surname: 'Doe'
-    },
-    field: NameField
-  },
-  {
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        firstname: 'Jon',
-        surname: 'Doe',
-        role: '',
-        id: '',
-        province: '',
-        district: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: {
-      $$now: true
-    },
-    field: TimeField
-  },
-  {
-    systemVariables: {
-      user: {
-        name: 'Jon Doe',
-        firstname: 'Jon',
-        surname: 'Doe',
-        role: '',
-        id: '',
-        province: '',
-        district: ''
-      },
-      $window: {
-        location: {
-          href: 'http://example.com',
-          pathname: '/path',
-          originPathname: '/path',
-          hostname: 'example.com'
-        }
-      }
-    } satisfies SystemVariables,
-    expected: {
-      $$now: true
-    },
-    field: DateField
-  }
-]
+  it('resolves administrativeArea via locationLevel district for ADDRESS field', () => {
+    const result = mapFieldToDefaultValue(AddressField, mockContext)
+    expect(result).toMatchObject({ administrativeArea: DISTRICT_ID })
+  })
 
-describe('handleDefaultValue', () => {
-  testCasesForDefaultValue.forEach(({ expected, ...props }) => {
-    it(`When field type is ${JSON.stringify(
-      props.field.type
-    )} returns ${JSON.stringify(expected)}`, () => {
-      const result = handleDefaultValue(props)
-      expect(result).toEqual(expected)
-    })
+  it('resolves administrativeArea via locationLevel province for ADDRESS field', () => {
+    const addressFieldProvince = {
+      ...AddressField,
+      defaultValue: {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: user('primaryOfficeId').locationLevel('province')
+      }
+    } satisfies InteractiveFieldType
+
+    const result = mapFieldToDefaultValue(addressFieldProvince, mockContext)
+    expect(result).toMatchObject({ administrativeArea: PROVINCE_ID })
+  })
+
+  it('passes through other address fields unchanged', () => {
+    const result = mapFieldToDefaultValue(AddressField, mockContext)
+    expect(result).toMatchObject({ country: 'FAR', addressType: 'DOMESTIC' })
   })
 })
