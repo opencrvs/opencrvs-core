@@ -16,13 +16,14 @@ import {
   Location,
   now,
   SystemVariables,
-  user
+  user,
+  UUID
 } from '@opencrvs/commons/client'
 import { mapFieldToDefaultValue } from './useDefaultValue'
 
-const PROVINCE_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
-const DISTRICT_ID = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
-const OFFICE_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc'
+const PROVINCE_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' as UUID
+const DISTRICT_ID = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' as UUID
+const OFFICE_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc' as UUID
 
 const mockLocations: Location[] = [
   {
