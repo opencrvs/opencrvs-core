@@ -135,6 +135,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
       )
     )
 
+    const fullForm = { ...formContext, ...formValues }
+
     return (
       <Formik<EventState>
         enableReinitialize={true}
@@ -148,7 +150,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               getValidationErrorsForForm(
                 fields,
                 {
-                  ...formContext,
+                  ...fullForm,
                   ...makeFormikFieldIdsOpenCRVSCompatible(values)
                 },
                 validatorContext
@@ -169,9 +171,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               eventConfig={eventConfig}
               fields={fields}
               fieldsToShowValidationErrors={fieldsToShowValidationErrors}
-              formContext={formContext}
               fullForm={{
-                ...formValues,
+                ...fullForm,
                 ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)
               }}
               id={id}
