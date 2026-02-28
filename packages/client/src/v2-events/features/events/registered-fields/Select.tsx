@@ -27,6 +27,9 @@ function SelectInput({
   noOptionsMessage,
   options,
   value,
+  // forwarding name to the underlying Select component results in
+  // an extra input[type=hidden] element being rendered
+  name,
   ...props
 }: SelectInputProps) {
   const intl = useIntlWithFormData()
