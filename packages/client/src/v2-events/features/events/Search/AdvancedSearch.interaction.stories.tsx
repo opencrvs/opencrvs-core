@@ -122,7 +122,7 @@ export const AdvancedSearchStory: Story = {
       await expect(searchButton).toBeDisabled()
 
       const statusWrapper = await canvas.findByTestId('select__event____status')
-      const statusInput = within(statusWrapper).getByRole('combobox')
+      const statusInput = within(statusWrapper).getByRole('textbox')
       await userEvent.click(statusInput)
       const statusOption = await canvas.findAllByText('Any status')
       await userEvent.click(statusOption[0])
