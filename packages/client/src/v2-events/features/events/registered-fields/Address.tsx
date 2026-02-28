@@ -149,9 +149,10 @@ function generateAdminStructureFields(
     const conditionals = [
       {
         type: ConditionalType.SHOW,
-        conditional: isFirst
-          ? isDomesticAddress()
-          : and(isDomesticAddress(), not(fieldHelper(parentId).isUndefined()))
+        conditional: and(
+          isDomesticAddress(),
+          not(fieldHelper(parentId).isFalsy())
+        )
       }
     ]
 
