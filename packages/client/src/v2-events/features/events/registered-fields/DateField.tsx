@@ -25,6 +25,7 @@ import {
 } from '@opencrvs/components/lib/DateField'
 import { useResolveDefaultValue } from '../useResolveDefaultValue'
 import { StringifierContext } from './RegisteredField'
+import { parseISO } from 'date-fns'
 
 const messages = defineMessages({
   dateFormat: {
@@ -116,7 +117,7 @@ function DateOutput({ value }: { value?: string }) {
 
   if (parsed.success) {
     return format(
-      new Date(parsed.data),
+      parseISO(parsed.data),
       intl.formatMessage(messages.dateFormat)
     )
   }
