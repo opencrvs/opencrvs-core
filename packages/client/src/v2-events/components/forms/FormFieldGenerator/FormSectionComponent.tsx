@@ -28,8 +28,7 @@ import {
   ValidatorContext,
   isFieldVisible,
   findAllFields,
-  flattenFieldReference,
-  flattenFormState
+  flattenFieldReference
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
@@ -47,7 +46,6 @@ type AllProps = {
   fullForm: EventState
   className?: string
   readonlyMode?: boolean
-  errors: IndexMap<string>
   /**
    * Update the form values in the non-formik state.
    */
@@ -57,15 +55,6 @@ type AllProps = {
       prevTouched: IndexMap<FormState<boolean>>
     ) => IndexMap<FormState<boolean>>
   ) => void
-  /**
-   * When set to true, all fields will be marked as touched and any validation errors will be shown to user
-   */
-  validateAllFields: boolean
-  /**
-   * Used in conjunction with 'validateAllFields'. When validateAllFields is switched from false to true,
-   * this callback is called with success true if all fields are valid, or false if there are any validation errors.
-   */
-  onAllFieldsValidated?: (success: boolean) => void
   /**
    * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
    */
@@ -148,13 +137,10 @@ export function FormSectionComponent({
   className,
   readonlyMode,
   id,
-  errors,
   eventConfig,
   setValues,
   setTouched,
   resetForm,
-  validateAllFields,
-  onAllFieldsValidated,
   isCorrection = false,
   validatorContext
 }: AllProps) {
@@ -298,18 +284,6 @@ export function FormSectionComponent({
     }
     prevIdRef.current = id
   }, [id, resetForm])
-
-  useEffect(() => {
-    if (validateAllFields) {
-      const flatennedErrors = flattenFormState(
-        errors as IndexMap<FormState<string>>
-      ).flatMap(([, errs]) => errs)
-
-      onAllFieldsValidated?.(flatennedErrors.length === 0)
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [validateAllFields])
 
   /*
    * For the conditional check data, we want to only include values from visible fields so values of hidden fields don’t affect them.

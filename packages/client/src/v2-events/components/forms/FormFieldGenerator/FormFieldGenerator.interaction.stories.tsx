@@ -11,7 +11,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fireEvent, userEvent, within } from '@storybook/test'
-import React, { useState } from 'react'
+import React, { useRef } from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
 import {
@@ -24,7 +24,10 @@ import {
   generateTranslationConfig
 } from '@opencrvs/commons/client'
 
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorHandle
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormWizard } from '@client/v2-events/features/events/components/FormWizard'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
@@ -439,16 +442,17 @@ export const CustomRequiredValidationMessage: StoryObj<
     layout: 'centered'
   },
   render: function Component(args) {
-    const [validateAllFields, setValidateAllFields] = useState(false)
+    const formRef = useRef<FormFieldGeneratorHandle>(null)
     return (
       <FormWizard
         currentPage={0}
         pageTitle="Tennis form"
-        onNextPage={() => setValidateAllFields(true)}
+        onNextPage={() => formRef.current?.submit()}
         onSubmit={noop}
       >
         <StyledFormFieldGenerator
           {...args}
+          ref={formRef}
           fields={tennisStyleFields.map((f) => {
             const { parent, ...rest } = f
             return {
@@ -461,8 +465,6 @@ export const CustomRequiredValidationMessage: StoryObj<
             } satisfies FieldConfig
           })}
           id="my-form"
-          validateAllFields={validateAllFields}
-          onAllFieldsValidated={() => false}
         />
       </FormWizard>
     )

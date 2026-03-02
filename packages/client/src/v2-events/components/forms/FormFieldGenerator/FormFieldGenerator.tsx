@@ -9,14 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
-import { Formik } from 'formik'
+import React, { forwardRef, useImperativeHandle, useRef } from 'react'
+import { Formik, FormikProps, FormikTouched } from 'formik'
 import { noop, pick } from 'lodash'
 import { useIntl } from 'react-intl'
 import {
+  buildFormState,
   EventConfig,
   EventState,
   FieldConfig,
+  FieldType,
+  flattenFormState,
   FormState,
   IndexMap,
   mapFormState,
@@ -30,10 +33,13 @@ import {
 } from './utils'
 import { FormSectionComponent } from './FormSectionComponent'
 
+export interface FormFieldGeneratorHandle {
+  submit: (extraValues?: EventState) => string[]
+}
+
 export interface FormFieldGeneratorProps {
   /** form id */
   id: string
-  validateAllFields?: boolean
   readonlyMode?: boolean
   className?: string
   /**
@@ -50,28 +56,83 @@ export interface FormFieldGeneratorProps {
   formTouched?: IndexMap<FormState<boolean>>
   onFormChange?: (values: EventState) => void
   onTouchedChange?: (touched: IndexMap<FormState<boolean>>) => void
-  onAllFieldsValidated?: (success: boolean) => void
+  /** Called when the form is submitted and all fields are valid */
+  onValidSubmit?: () => void
   isCorrection?: boolean
   validatorContext: ValidatorContext
 }
 
-export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
-  ({
-    onFormChange,
-    onTouchedChange,
-    fields,
-    formContext,
-    formValues,
-    className,
-    eventConfig,
-    validateAllFields = false,
-    readonlyMode,
-    id,
-    onAllFieldsValidated,
-    isCorrection = false,
-    formTouched,
-    validatorContext
-  }) => {
+const FormFieldGeneratorInner = forwardRef<
+  FormFieldGeneratorHandle,
+  FormFieldGeneratorProps
+>(
+  (
+    {
+      onFormChange,
+      onTouchedChange,
+      fields,
+      formContext,
+      formValues,
+      className,
+      eventConfig,
+      readonlyMode,
+      id,
+      onValidSubmit,
+      isCorrection = false,
+      formTouched,
+      validatorContext
+    },
+    ref
+  ) => {
+    const formikRef = useRef<FormikProps<EventState>>(null)
+
+    const fullForm = { ...formContext, ...formValues }
+
+    useImperativeHandle(ref, () => ({
+      submit: (extraValues?: EventState) => {
+        const allTouched = buildFormState(fields, (field) => {
+          if (field.type === FieldType.NAME) {
+            return {
+              firstname: true,
+              middlename: true,
+              surname: true
+            }
+          } else if (field.type === FieldType.ADDRESS) {
+            return {
+              country: true,
+              administrativeArea: true,
+              streetLevelDetails: (
+                field.configuration?.streetAddressForm ?? []
+              ).reduce(
+                (acc, streetField) => {
+                  acc[streetField.id] = true
+                  return acc
+                },
+                {} as Record<string, boolean>
+              )
+            }
+          }
+          return true
+        }) as FormikTouched<EventState>
+
+        void formikRef.current?.setTouched(
+          makeFormFieldIdsFormikCompatible(allTouched)
+        )
+        onTouchedChange?.({ ...formTouched, ...allTouched })
+        onFormChange?.({
+          ...formValues,
+          ...formikRef.current?.values,
+          ...extraValues
+        })
+        const currentErrors = flattenFormState(formikRef.current?.errors)
+          .map(([, errs]) => errs)
+          .filter((err) => err !== undefined)
+        if (currentErrors.length === 0) {
+          onValidSubmit?.()
+        }
+        return currentErrors
+      }
+    }))
     const intl = useIntl()
     const getDefaultValues = useDefaultValue()
     const defaultPageValues = getDefaultValues(fields)
@@ -133,8 +194,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
       )
     )
 
-    const fullForm = { ...formContext, ...formValues }
-
     return (
       <Formik<EventState>
         enableReinitialize={true}
@@ -142,6 +201,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           formikCompatibleInitialTouched as Record<string, boolean>
         }
         initialValues={formikCompatibleInitialValues}
+        innerRef={formikRef}
         validate={(values) =>
           makeFormFieldIdsFormikCompatible(
             mapFormState(
@@ -165,7 +225,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
           return (
             <FormSectionComponent
               className={className}
-              errors={formikProps.errors}
               eventConfig={eventConfig}
               fields={fields}
               fullForm={{
@@ -180,10 +239,8 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               touched={formikProps.touched}
-              validateAllFields={validateAllFields}
               validatorContext={validatorContext}
               values={formikProps.values}
-              onAllFieldsValidated={onAllFieldsValidated}
               onFormChange={(cb) => onFormChange?.(cb(formValues ?? {}))}
               onTouchedChange={(cb) => onTouchedChange?.(cb(formTouched ?? {}))}
             />
@@ -193,3 +250,5 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     )
   }
 )
+
+export const FormFieldGenerator = React.memo(FormFieldGeneratorInner)

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useIntl } from 'react-intl'
 import {
   EventState,
@@ -17,13 +17,13 @@ import {
   isPageVisible,
   PageTypes,
   PageConfig,
-  ValidatorContext,
-  buildFormState,
-  FieldType
+  ValidatorContext
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorHandle
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
@@ -77,7 +77,7 @@ export function Pages({
 
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
-  const [validateAllFields, setValidateAllFields] = useState(false)
+  const formRef = useRef<FormFieldGeneratorHandle>(null)
 
   const { formTouched, setFormTouched } = useEventFormData()
 
@@ -87,10 +87,6 @@ export function Pages({
   }, [pageId])
 
   function switchToNextPage() {
-    // When switching to next page, reset the validateAllFields state to false.
-    // Otherwise we would be seeing validation errors right away on the next page.
-    setValidateAllFields(false)
-
     const nextPageIdx = pageIdx + 1
     const nextPage =
       nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
@@ -100,59 +96,12 @@ export function Pages({
     return nextPage ? onPageChange(nextPage.id) : onSubmit()
   }
 
-  const getDefaultValue = useDefaultValue()
-
   // values is used on the verification page wizard to set the verification page result
   function onNextPage(values?: EventState) {
-    // Ensure that defaultValues end up in the zustand state
-    // This solution is not ideal, as the current way default values work is:
-    //   1. They are updated in to the formik state as 'initialValues' in <FormFieldGenerator/>
-    //   2. They are updated in to the zustand state on next page switch here
-    //
-    // I tried to improve this by updating the default values directly into the zustand state on form initialisation, but it caused other issues.
-    // I decided to leave it this way for now, since it works, but we should overhaul the default values logic at some point.
-    //
-    // Why doesn't this use deepMerge() instead of spread? If there are any defined or 'undefined' values in the 'form' at this point, they should completely replace the default values.
-    setFormData({ ...getDefaultValue(page.fields), ...formData, ...values })
-
-    // Before switching to the next page, we need to mark all fields in the current page as touched
-    // so that when we get back to the page, we show validation errors for all fields in the page.
-    setFormTouched({
-      ...formTouched,
-      ...buildFormState(page.fields, (field) => {
-        if (field.type === FieldType.NAME) {
-          return {
-            firstname: true,
-            middlename: true,
-            surname: true
-          }
-        } else if (field.type === FieldType.ADDRESS) {
-          return {
-            country: true,
-            administrativeArea: true,
-            streetLevelDetails: (
-              field.configuration?.streetAddressForm ?? []
-            ).reduce(
-              (acc, streetField) => {
-                acc[streetField.id] = true
-                return acc
-              },
-              {} as Record<string, boolean>
-            )
-          }
-        }
-        return true
-      })
-    })
-
-    // If we are in requireCompletionToContinue mode, we need to validate all fields before moving to the next page.
-    // In this case, the actual switching of the page is done on the 'onAllFieldsValidated' callback.
-    if (page.requireCompletionToContinue) {
-      setValidateAllFields(true)
-      return
+    const errors = formRef.current?.submit(values) ?? []
+    if (!page.requireCompletionToContinue && errors.length > 0) {
+      switchToNextPage()
     }
-
-    switchToNextPage()
   }
 
   function onPreviousPage() {
@@ -161,7 +110,6 @@ export function Pages({
       previousPageIdx >= 0 ? visiblePages[previousPageIdx] : undefined
 
     if (previousPage) {
-      setValidateAllFields(false)
       return onPageChange(previousPage.id)
     }
   }
@@ -177,6 +125,7 @@ export function Pages({
 
   const fields = (
     <FormFieldGenerator
+      ref={formRef}
       eventConfig={eventConfig}
       fields={page.fields}
       formContext={declaration}
@@ -184,16 +133,10 @@ export function Pages({
       formValues={formData}
       id="pagesSection"
       isCorrection={isCorrection}
-      validateAllFields={validateAllFields}
       validatorContext={validatorContext}
-      onAllFieldsValidated={(success) => {
-        setValidateAllFields(false)
-        if (success) {
-          switchToNextPage()
-        }
-      }}
       onFormChange={setFormData}
       onTouchedChange={setFormTouched}
+      onValidSubmit={switchToNextPage}
     />
   )
 
