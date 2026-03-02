@@ -30,7 +30,7 @@ describe('audit log', () => {
   describe('event.create', () => {
     test('writes an audit log entry when a system client creates an event', async () => {
       const { generator, locations } = await setupTestCase()
-      const systemId = 'test-system'
+      const systemId = getUUID()
       const client = createSystemTestClient(systemId, [
         encodeScope({
           type: 'record.create',
@@ -64,7 +64,7 @@ describe('audit log', () => {
   describe('event.get', () => {
     test('writes an audit log entry when a system client fetches an event', async () => {
       const { generator, locations } = await setupTestCase()
-      const systemId = 'test-system'
+      const systemId = getUUID()
 
       const systemClient = createSystemTestClient(systemId, [
         encodeScope({
@@ -104,7 +104,7 @@ describe('audit log', () => {
   describe('event.actions.notify', () => {
     test('writes an audit log entry when a system client notifies an event', async () => {
       const { generator } = await setupTestCase()
-      const systemId = 'test-system'
+      const systemId = getUUID()
       const locations = await getLocations()
 
       const client = createSystemTestClient(systemId, [
@@ -146,7 +146,7 @@ describe('audit log', () => {
 
   describe('event.search', () => {
     test('writes an audit log entry when a system client searches for events', async () => {
-      const systemId = 'test-system'
+      const systemId = getUUID()
       const client = createSystemTestClient(systemId, [SCOPES.RECORDSEARCH])
 
       const searchInput = {
@@ -207,7 +207,7 @@ describe('audit log', () => {
 
   describe('integrations.create', () => {
     test('writes an audit log entry when a system client creates an integration', async () => {
-      const systemId = 'test-system'
+      const systemId = getUUID()
       const client = createSystemTestClient(systemId, [
         SCOPES.INTEGRATION_CREATE
       ])
@@ -248,7 +248,7 @@ describe('audit log', () => {
     })
 
     test('does not include credentials in audit log response summary', async () => {
-      const systemId = 'test-system'
+      const systemId = getUUID()
       const client = createSystemTestClient(systemId, [
         SCOPES.INTEGRATION_CREATE
       ])
@@ -284,7 +284,7 @@ describe('audit log', () => {
 
   describe('attachments.upload', () => {
     test('writes an audit log entry when a system client uploads an attachment', async () => {
-      const systemId = 'test-system'
+      const systemId = getUUID()
       const expectedFileUrl = '/ocrvs/test-event/abc123.jpg'
 
       mswServer.use(
@@ -326,7 +326,7 @@ describe('audit log', () => {
 
   describe('integrations.audit', () => {
     test('returns paginated audit log entries for a specific client', async () => {
-      const adminId = 'admin-user'
+      const adminId = getUUID()
       const targetClientId = getUUID()
       const adminClient = createSystemTestClient(adminId, [SCOPES.AUDIT_READ])
 
@@ -378,7 +378,7 @@ describe('audit log', () => {
     })
 
     test('filters audit log entries by date range', async () => {
-      const adminId = 'admin-user'
+      const adminId = getUUID()
       const targetClientId = getUUID()
       const adminClient = createSystemTestClient(adminId, [SCOPES.AUDIT_READ])
 
@@ -424,7 +424,7 @@ describe('audit log', () => {
     })
 
     test('rejects access without audit.read scope', async () => {
-      const unauthorizedId = 'unauthorized-user'
+      const unauthorizedId = getUUID()
       const targetClientId = getUUID()
       const unauthorizedClient = createSystemTestClient(unauthorizedId, [
         SCOPES.INTEGRATION_CREATE
