@@ -102,7 +102,7 @@ async function fetchHttpFieldValue(
 
 export interface Props {
   parentValue?: FieldValue
-  configuration: Omit<HttpField['configuration'], 'trigger'>
+  configuration: HttpField['configuration']
   form: Record<string, FieldValue>
   onChange: (val: HttpFieldValue) => void
 }
@@ -148,7 +148,7 @@ function HttpInput({ parentValue, configuration, form, onChange }: Props) {
       firstRunRef.current = false
       prevParentRef.current = parentValue
 
-      if (parentValue === undefined) {
+      if (configuration.trigger === undefined) {
         mutation.mutate()
       }
 
@@ -163,7 +163,7 @@ function HttpInput({ parentValue, configuration, form, onChange }: Props) {
       prevParentRef.current = parentValue
       mutation.mutate()
     }
-  }, [parentValue, mutation])
+  }, [parentValue, mutation, configuration.trigger])
 
   return null
 }
