@@ -33,7 +33,6 @@ import { FormSectionComponent } from './FormSectionComponent'
 export interface FormFieldGeneratorProps {
   /** form id */
   id: string
-  fieldsToShowValidationErrors?: FieldConfig[]
   validateAllFields?: boolean
   readonlyMode?: boolean
   className?: string
@@ -65,7 +64,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     formValues,
     className,
     eventConfig,
-    fieldsToShowValidationErrors,
     validateAllFields = false,
     readonlyMode,
     id,
@@ -170,7 +168,6 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               errors={formikProps.errors}
               eventConfig={eventConfig}
               fields={fields}
-              fieldsToShowValidationErrors={fieldsToShowValidationErrors}
               fullForm={{
                 ...fullForm,
                 ...makeFormikFieldIdsOpenCRVSCompatible(formikProps.values)

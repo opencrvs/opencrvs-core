@@ -28,7 +28,8 @@ import {
   ValidatorContext,
   isFieldVisible,
   findAllFields,
-  flattenFieldReference
+  flattenFieldReference,
+  flattenFormState
 } from '@opencrvs/commons/client'
 import {
   makeFormFieldIdFormikCompatible,
@@ -36,10 +37,7 @@ import {
 } from '@client/v2-events/components/forms/utils'
 import { useOnlineStatus } from '@client/utils'
 import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
-import {
-  makeFormFieldIdsFormikCompatible,
-  makeFormikFieldIdsOpenCRVSCompatible
-} from './utils'
+import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
 import { FormItem, GeneratedInputField } from './GeneratedInputField'
 
 type AllProps = {
@@ -59,7 +57,6 @@ type AllProps = {
       prevTouched: IndexMap<FormState<boolean>>
     ) => IndexMap<FormState<boolean>>
   ) => void
-  fieldsToShowValidationErrors?: FieldConfig[]
   /**
    * When set to true, all fields will be marked as touched and any validation errors will be shown to user
    */
@@ -151,13 +148,12 @@ export function FormSectionComponent({
   className,
   readonlyMode,
   id,
-  errors: errorsWithDotSeparator,
+  errors,
   eventConfig,
   setValues,
   setTouched,
   resetForm,
   validateAllFields,
-  fieldsToShowValidationErrors,
   onAllFieldsValidated,
   isCorrection = false,
   validatorContext
@@ -178,26 +174,6 @@ export function FormSectionComponent({
     : fieldsWithDotSeparator
   const listenerFieldsByParentId = getParentsOfListenerFields(
     allFieldsWithDotSeparator
-  )
-
-  const errors = makeFormFieldIdsFormikCompatible(errorsWithDotSeparator)
-
-  const showValidationErrors = useCallback(
-    (formFields: FieldConfig[]) => {
-      const formattedFieldIds = formFields.map(({ id: fieldId }) =>
-        makeFormFieldIdFormikCompatible(fieldId)
-      )
-
-      const touchedForm = formattedFieldIds.reduce<Record<string, boolean>>(
-        (acc, fieldId) => {
-          acc[fieldId] = true
-          return acc
-        },
-        {}
-      )
-      void setTouched(touchedForm)
-    },
-    [setTouched]
   )
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
@@ -316,12 +292,7 @@ export function FormSectionComponent({
   }
 
   useEffect(() => {
-    if (validateAllFields) {
-      showValidationErrors(fieldsWithDotSeparator)
-    }
-
     focusElementByHash()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -329,37 +300,17 @@ export function FormSectionComponent({
 
     if (sectionChanged) {
       resetForm()
-
-      const fieldsToValidate = validateAllFields
-        ? fieldsWithDotSeparator
-        : (fieldsToShowValidationErrors ?? [])
-
-      if (fieldsToValidate.length) {
-        showValidationErrors(fieldsToValidate)
-      }
     }
-
     prevIdRef.current = id
-  }, [
-    values,
-    id,
-    resetForm,
-    fieldsWithDotSeparator,
-    fieldsToShowValidationErrors,
-    validateAllFields,
-    showValidationErrors
-  ])
-
-  const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
-    const fieldErrors = errors[field.id]
-    const hasErrors = fieldErrors && fieldErrors.length > 0
-    return isFieldVisible(field, fullForm, validatorContext) && hasErrors
-  })
+  }, [id, resetForm])
 
   useEffect(() => {
     if (validateAllFields) {
-      showValidationErrors(fieldsWithDotSeparator)
-      onAllFieldsValidated?.(!hasAnyValidationErrors)
+      const flatennedErrors = flattenFormState(
+        errors as IndexMap<FormState<string>>
+      ).flatMap(([, errs]) => errs)
+
+      onAllFieldsValidated?.(flatennedErrors.length === 0)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
