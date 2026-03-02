@@ -660,6 +660,107 @@ paths:
         "401": *a1
         "403": *a2
         "500": *a3
+  /integrations/{clientId}/audit:
+    get:
+      operationId: integrations-audit
+      summary: Retrieve audit log for a specific integration client
+      tags:
+        - Integrations
+      security:
+        - Authorization: []
+      parameters:
+        - in: path
+          name: clientId
+          schema:
+            type: string
+            format: uuid
+            pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          required: true
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        - in: query
+          name: to
+          schema:
+            type: string
+            format: date-time
+            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+        - in: query
+          name: skip
+          schema:
+            default: 0
+            type: integer
+            minimum: 0
+            maximum: 9007199254740991
+        - in: query
+          name: count
+          schema:
+            default: 10
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 100
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                        clientId:
+                          type: string
+                        clientType:
+                          type: string
+                        operation:
+                          type: string
+                        requestData:
+                          anyOf:
+                            - type: object
+                              propertyNames:
+                                type: string
+                              additionalProperties: {}
+                            - type: "null"
+                        responseSummary:
+                          anyOf:
+                            - type: object
+                              propertyNames:
+                                type: string
+                              additionalProperties: {}
+                            - type: "null"
+                        createdAt:
+                          type: string
+                      required:
+                        - id
+                        - clientId
+                        - clientType
+                        - operation
+                        - requestData
+                        - responseSummary
+                        - createdAt
+                      additionalProperties: false
+                required:
+                  - total
+                  - results
+                additionalProperties: false
+        "400": *a4
+        "401": *a1
+        "403": *a2
+        "404": *a5
+        "500": *a3
   /attachments:
     post:
       summary: Upload a file attachment
