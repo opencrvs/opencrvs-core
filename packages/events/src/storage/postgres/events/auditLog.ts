@@ -33,3 +33,50 @@ export async function writeAuditLog(
     })
     .execute()
 }
+
+/**
+ * Reads audit log entries for a specific client, with optional date range filters and pagination.
+ */
+export async function readAuditLog({
+  clientId,
+  from,
+  to,
+  skip = 0,
+  count = 10
+}: {
+  clientId: string
+  from?: string
+  to?: string
+  skip?: number
+  count?: number
+}) {
+  const db = getClient()
+
+  let baseQuery = db
+    .selectFrom('auditLog')
+    .where('clientId', '=', clientId)
+
+  if (from) {
+    baseQuery = baseQuery.where('createdAt', '>=', from)
+  }
+  if (to) {
+    baseQuery = baseQuery.where('createdAt', '<=', to)
+  }
+
+  const [results, totalResult] = await Promise.all([
+    baseQuery
+      .selectAll()
+      .orderBy('createdAt', 'desc')
+      .limit(count)
+      .offset(skip)
+      .execute(),
+    baseQuery
+      .select(({ fn }) => [fn.count<string>('id').as('count')])
+      .executeTakeFirst()
+  ])
+
+  return {
+    results,
+    total: totalResult?.count ? Number(totalResult.count) : 0
+  }
+}
