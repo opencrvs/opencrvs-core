@@ -34,9 +34,7 @@ import {
   CustomActionInput,
   EditActionInput
 } from '@opencrvs/commons/events'
-import {
-  EventActionAuditLog
-} from '@opencrvs/commons/events'
+import { EventActionAuditLog } from '@opencrvs/commons/events'
 import {
   TokenUserType,
   TokenWithBearer
@@ -331,7 +329,12 @@ export type AsyncActionConfirmationResponseSchema = z.infer<
 /**
  * To prevent accidental access granting, we want to make sure that system users can only access events with scopes that explicitly allow system user access, even if the scope options would match the system user's context.
  */
-const SYSTEM_USER_ALLOWED_ACTIONS = [ActionType.NOTIFY] as const
+const SYSTEM_USER_ALLOWED_ACTIONS = [
+  ActionType.NOTIFY,
+  ActionType.REJECT_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REQUEST_CORRECTION
+] as const
 
 /**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
@@ -419,7 +422,11 @@ export function getDefaultActionProcedures(
             clientId: user.id,
             clientType: user.type,
             operation: auditOperation,
-            requestData: { eventId, actionType, transactionId: input.transactionId },
+            requestData: {
+              eventId,
+              actionType,
+              transactionId: input.transactionId
+            },
             responseSummary: {
               eventId: result.id,
               eventType: result.type,
