@@ -29,11 +29,12 @@ jobs:
           ref: 'develop'
 
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
+          version: 'v0.69.2'
 
   security-scan-development:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
@@ -43,11 +44,12 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
+          version: 'v0.69.2'
 
   security-scan-manual:
     if: github.event_name == 'workflow_dispatch'
@@ -57,11 +59,12 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
+          version: 'v0.69.2'
 
   security-scan-pull-request:
     if: github.event_name == 'pull_request'
@@ -79,7 +82,7 @@ jobs:
           path: 'branch'
 
       - name: Gather Trivy output from base branch
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           scan-type: 'fs'
           scan-ref: 'base'
@@ -87,9 +90,10 @@ jobs:
           format: 'sarif'
           output: './trivy-results-base.sarif'
           exit-code: '0'
+          version: 'v0.69.2'
 
       - name: Gather Trivy output from PR branch
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           scan-type: 'fs'
           scan-ref: 'branch'
@@ -97,6 +101,7 @@ jobs:
           format: 'sarif'
           output: './trivy-results-branch.sarif'
           exit-code: '0'
+          version: 'v0.69.2'
 
       - name: Remove lines that are always expected to be different
         run: |
