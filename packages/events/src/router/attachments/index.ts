@@ -14,6 +14,7 @@ import { SCOPES } from '@opencrvs/commons'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { AttachmentInput, uploadFile } from '@events/service/files'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 export const attachmentsRouter = router({
   upload: userAndSystemProcedure
@@ -35,6 +36,19 @@ export const attachmentsRouter = router({
     .output(z.string())
     .use(requiresAnyOfScopes([SCOPES.ATTACHMENT_UPLOAD]))
     .mutation(async ({ input, ctx }) => {
-      return uploadFile(input, ctx.token)
+      const fileUrl = await uploadFile(input, ctx.token)
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'attachments.upload',
+        requestData: {
+          transactionId: input.transactionId,
+          path: input.path ?? null
+        },
+        responseSummary: { fileUrl }
+      })
+
+      return fileUrl
     })
 })

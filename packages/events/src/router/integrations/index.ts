@@ -14,6 +14,7 @@ import { SCOPES } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { registerSystem } from '@events/service/integrations/api'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 const CreateIntegrationInput = z.object({
   name: z.string().min(1, 'Integration name is required'),
@@ -48,6 +49,16 @@ export const integrationsRouter = router({
         },
         ctx.token
       )
+
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.create',
+        requestData: { name: input.name, scopes: input.scopes },
+        responseSummary: { clientId: result.clientId }
+      })
+
 
       return result
     })
