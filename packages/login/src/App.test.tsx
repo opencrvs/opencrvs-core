@@ -18,7 +18,6 @@ describe('Login app step one', () => {
     window.config = {
       COUNTRY: 'far',
       LANGUAGES: ['en', 'fr'],
-      CLIENT_APP_URL: 'http://localhost:3000/',
       USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
       PHONE_NUMBER_PATTERN: /^0(7|9)[0-9]{1}[0-9]{7}$/,
       SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',

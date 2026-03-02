@@ -43,7 +43,6 @@ interface Window {
       V2_EVENTS: boolean
     }
     LANGUAGES: string[]
-    LOGIN_URL: string
     MINIO_URL: string
     MINIO_BASE_URL: string // URL without path/bucket information, used for file uploads, v2
     MINIO_BUCKET: string

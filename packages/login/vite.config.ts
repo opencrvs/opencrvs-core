@@ -23,6 +23,21 @@ dns.setDefaultResultOrder('ipv4first')
 export default defineConfig(({ mode }): any => {
   const env = loadEnv(mode, 'env')
 
+  const registerRedirectPlugin = () => ({
+    name: 'register-redirect',
+    configureServer(server: import('vite').ViteDevServer) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.startsWith('/register')) {
+          const suffix = req.url.replace(/^\/register/, '') || '/'
+          res.writeHead(302, { Location: `http://localhost:3000${suffix}` })
+          res.end()
+          return
+        }
+        next()
+      })
+    }
+  })
+
   const htmlPlugin = () => {
     return {
       name: 'html-transform',
@@ -69,7 +84,13 @@ export default defineConfig(({ mode }): any => {
         transformMixedEsModules: true
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths(), vitePWAPlugin()],
+    plugins: [
+      htmlPlugin(),
+      react(),
+      tsconfigPaths(),
+      vitePWAPlugin(),
+      registerRedirectPlugin()
+    ],
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',

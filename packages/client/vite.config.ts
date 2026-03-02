@@ -23,6 +23,21 @@ dns.setDefaultResultOrder('ipv4first')
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, 'env')
 
+  const loginRedirectPlugin = () => ({
+    name: 'login-redirect',
+    configureServer(server: import('vite').ViteDevServer) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.startsWith('/login')) {
+          const suffix = req.url.replace(/^\/login/, '') || '/'
+          res.writeHead(302, { Location: `http://localhost:3020${suffix}` })
+          res.end()
+          return
+        }
+        next()
+      })
+    }
+  })
+
   const noTreeshakingForEvalPlugin = () => {
     return {
       name: 'no-treeshaking-for-eval',
@@ -97,6 +112,7 @@ export default defineConfig(({ mode }) => {
       }
     },
     plugins: [
+      loginRedirectPlugin(),
       htmlPlugin(),
       react({
         babel: {

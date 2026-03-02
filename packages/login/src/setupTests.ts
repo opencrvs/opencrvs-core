@@ -13,7 +13,6 @@ import { vi } from 'vitest'
 const config = {
   COUNTRY: 'FAR',
   LANGUAGES: ['en', 'fr'],
-  CLIENT_APP_URL: 'http://localhost:3000/',
   USER_NOTIFICATION_DELIVERY_METHOD: 'sms'
 }
 
