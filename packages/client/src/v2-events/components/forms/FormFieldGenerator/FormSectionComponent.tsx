@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { FormikProps } from 'formik'
 import { cloneDeep, set, get, compact, omit, unset } from 'lodash'
 import {
@@ -177,44 +177,39 @@ export function FormSectionComponent({
   )
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
-  const setValueForListenerField = useCallback(
-    (
-      [path, listenerField]: [string[], InteractiveFieldType],
-      fieldValues: Record<string, FieldValue>
-    ) => {
-      // this can be any field. Even though we call this only when parent triggers the change.
-      const formikCompatibleListenerFieldPath = path.map(
-        makeFormFieldIdFormikCompatible
-      )
+  const setValueForListenerField = (
+    [path, listenerField]: [string[], InteractiveFieldType],
+    fieldValues: Record<string, FieldValue>
+  ) => {
+    // this can be any field. Even though we call this only when parent triggers the change.
+    const formikCompatibleListenerFieldPath = path.map(
+      makeFormFieldIdFormikCompatible
+    )
 
-      const referencesToOtherFields = ([] as FieldReference[]).concat(
-        listenerField.value ?? []
-      )
+    const referencesToOtherFields = ([] as FieldReference[]).concat(
+      listenerField.value ?? []
+    )
 
-      const firstNonFalsyValue = compact(
-        referencesToOtherFields.map((reference) =>
-          get(
-            fieldValues,
-            flattenFieldReference(reference).map(
-              makeFormFieldIdFormikCompatible
-            )
-          )
+    const firstNonFalsyValue = compact(
+      referencesToOtherFields.map((reference) =>
+        get(
+          fieldValues,
+          flattenFieldReference(reference).map(makeFormFieldIdFormikCompatible)
         )
-      )[0]
+      )
+    )[0]
 
-      if (firstNonFalsyValue) {
-        set(fieldValues, formikCompatibleListenerFieldPath, firstNonFalsyValue)
-        return
-      }
-
-      const defaultValue = getDefaultValue(listenerField)
-
-      set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
-
+    if (firstNonFalsyValue) {
+      set(fieldValues, formikCompatibleListenerFieldPath, firstNonFalsyValue)
       return
-    },
-    [getDefaultValue]
-  )
+    }
+
+    const defaultValue = getDefaultValue(listenerField)
+
+    set(fieldValues, formikCompatibleListenerFieldPath, defaultValue)
+
+    return
+  }
 
   const onFieldValueChange = (
     formikFieldId: string,
