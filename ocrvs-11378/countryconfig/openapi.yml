@@ -9397,7 +9397,9 @@ components:
               type: object
               properties:
                 trigger:
-                  description: Reference to a field by its ID
+                  description: Reference to the field that triggers the HTTP request when its
+                    value changes. If not provided, the HTTP request is
+                    triggered once on component mount.
                   type: object
                   properties:
                     $$field:
@@ -9462,7 +9464,6 @@ components:
                   default: 15000
                   type: number
               required:
-                - trigger
                 - url
                 - method
                 - timeout

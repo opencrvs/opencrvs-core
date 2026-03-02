@@ -8409,7 +8409,9 @@ components:
               type: object
               properties:
                 trigger:
-                  description: Reference to a field by its ID
+                  description: Reference to the field that triggers the HTTP request when its
+                    value changes. If not provided, the HTTP request is
+                    triggered once on component mount.
                   type: object
                   properties:
                     $$field:
@@ -8474,7 +8476,6 @@ components:
                   default: 15000
                   type: number
               required:
-                - trigger
                 - url
                 - method
                 - timeout
@@ -14707,8 +14708,13 @@ components:
                               type: string
                             additionalProperties:
                               type: string
+                          updatedAt:
+                            type: string
+                            format: date-time
+                            pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
                         required:
                           - data
+                          - updatedAt
                         additionalProperties: false
                       - type: "null"
                   - type: object
@@ -14946,8 +14952,13 @@ components:
                                         type: string
                                       additionalProperties:
                                         type: string
+                                    updatedAt:
+                                      type: string
+                                      format: date-time
+                                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
                                   required:
                                     - data
+                                    - updatedAt
                                   additionalProperties: false
                                 - type: "null"
                             - type: object
