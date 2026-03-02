@@ -15,6 +15,8 @@ import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { DeclarationFormConfig } from './FormConfig'
 import { FieldReference } from './FieldConfig'
+import { isFieldReference } from '../conditionals/conditionals'
+import { EventMetadataDateFieldIdInput } from './EventMetadata'
 import { FlagConfig } from './Flag'
 import {
   validateActionOrder,
@@ -23,6 +25,12 @@ import {
   validateDateOfEvent,
   validateAdvancedSearchConfig
 } from './eventConfigValidation'
+
+export const EventFieldReference = z
+  .object({ $$event: EventMetadataDateFieldIdInput })
+  .describe(
+    'Reference to a field defined in the event metadata, using the field id.'
+  )
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -36,9 +44,11 @@ export const EventConfig = z
       .describe(
         'Machine-readable identifier of the event (e.g. "birth", "death").'
       ),
-    dateOfEvent: FieldReference.optional().describe(
-      'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
-    ),
+    dateOfEvent: FieldReference.or(EventFieldReference)
+      .optional()
+      .describe(
+        'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
+      ),
     placeOfEvent: FieldReference.optional().describe(
       'Reference to the field capturing the place of the event (e.g. place of birth). Defaults to the meta.createdAtLocation if unspecified.'
     ),

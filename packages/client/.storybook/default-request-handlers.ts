@@ -59,6 +59,19 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 export const handlers = {
+  ping: [
+    http.get('/api/ping', () => {
+      return HttpResponse.json({
+        auth: true,
+        search: true,
+        'user-mgnt': true,
+        metrics: true,
+        notification: true,
+        countryconfig: true,
+        workflow: true
+      })
+    })
+  ],
   drafts: [
     tRPCMsw.event.draft.list.query(() => {
       return []

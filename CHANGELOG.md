@@ -45,6 +45,47 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Added experimental ALPHA_HIDDEN form field type, allowing configurable default/derived values and conditional inclusion in form submissions.
 - Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
 
+## 1.9.10
+
+### New features
+
+- Added support for `event()` helper to access event metadata in `dateOfEvent` and `summary` configuration in EventConfig. This allows for more dynamic and flexible configurations based on event metadata.
+
+Usage example:
+
+For `dateOfEvent` configuration, you can now reference an event metadata field like this:
+
+```ts
+dateOfEvent: event('legalStatuses.REGISTERED.acceptedAt')
+```
+
+For `summary` configuration, you can use event metadata fields in the value of a custom field like this:
+
+```ts
+summary: {
+  fields: [
+    {
+      id: 'registeredAt',
+      label: {
+        defaultMessage: 'Registration date',
+        description: 'This is the label for the registration date',
+        id: 'event.birth.summary.event.registeredAt.label'
+      },
+      value: '{event.legalStatuses.REGISTERED.acceptedAt, date, ::dd MMMM yyyy}'
+    }
+  ]
+}
+```
+
+### Bug fixes
+
+- Fix bug that requires users to log in when offline instead of unlocking with a PIN. [#11243](https://github.com/opencrvs/opencrvs-core/issues/11243)
+
+### Improvements
+
+- Improve BRN lookup experience by making the search field clearer and more intuitive, properly handling base/success/error states, and providing clearer, context-specific error messaging for users. [#11181](https://github.com/opencrvs/opencrvs-core/issues/11181)
+- Extended the `record.registered.print-certified-copies[event=tennis-club-membership]` scope to support an optional `templates` parameter (e.g. `templates=v2.tennis-club-membership-certificate-alpha`). When `templates` is specified, users are restricted to printing only the listed certificate templates. If `templates` is omitted, all certificate templates for the event remain available, preserving existing behavior [#11753](https://github.com/opencrvs/opencrvs-core/issues/11753)
+
 ## 1.9.9
 
 ### Bug fixes

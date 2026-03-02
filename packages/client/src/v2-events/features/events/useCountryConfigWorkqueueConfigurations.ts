@@ -21,8 +21,7 @@ import { getScope } from '@client/profile/profileSelectors'
 export function useCountryConfigWorkqueueConfigurations() {
   const trpc = useTRPC()
   const config = useSuspenseQuery({
-    ...trpc.workqueue.config.list.queryOptions(),
-    networkMode: 'offlineFirst'
+    ...trpc.workqueue.config.list.queryOptions()
   }).data
 
   const scopes = useSelector(getScope)

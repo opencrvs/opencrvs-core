@@ -29,6 +29,7 @@ export const EventStatus = z.enum([
 export type EventStatus = z.infer<typeof EventStatus>
 
 export const ZodDate = z.iso.date()
+export const ZodDateTime = z.string().datetime()
 
 export const ActionCreationMetadata = z.object({
   createdAt: z.iso
@@ -258,3 +259,27 @@ export const eventMetadataLabelMap: Record<
     description: 'Flags'
   }
 }
+
+export const EventMetadataDateFieldIdInput = z.enum([
+  'createdAt',
+  'updatedAt',
+  'legalStatuses.DECLARED.createdAt',
+  'legalStatuses.DECLARED.acceptedAt',
+  'legalStatuses.REGISTERED.createdAt',
+  'legalStatuses.REGISTERED.acceptedAt'
+])
+
+export type EventMetadataDateFieldIdInput = z.infer<
+  typeof EventMetadataDateFieldIdInput
+>
+
+export const EventMetadataDateFieldId = z.enum([
+  'event.createdAt',
+  'event.updatedAt',
+  'event.legalStatuses.DECLARED.createdAt',
+  'event.legalStatuses.DECLARED.acceptedAt',
+  'event.legalStatuses.REGISTERED.createdAt',
+  'event.legalStatuses.REGISTERED.acceptedAt'
+])
+
+export type EventMetadataDateFieldId = z.infer<typeof EventMetadataDateFieldId>

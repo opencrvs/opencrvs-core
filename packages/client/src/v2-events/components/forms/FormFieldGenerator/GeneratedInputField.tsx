@@ -749,12 +749,20 @@ export const GeneratedInputField = React.memo(
       )
     }
     if (isSearchFieldType(field)) {
+      const {
+        label: inputLabel,
+        helperText,
+        ...restInputFieldProps
+      } = inputFieldProps
+
       return (
-        <InputField {...inputFieldProps}>
+        <InputField {...restInputFieldProps}>
           <Search.Input
             key={fieldDefinition.id}
             configuration={field.config.configuration}
             form={form}
+            helperText={fieldDefinition.helperText}
+            label={inputLabel}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
