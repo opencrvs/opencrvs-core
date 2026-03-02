@@ -109,7 +109,7 @@ export function resolveJurisdictionReference(
 
 /** Functions for referencing values from the logged in user's details */
 export const userReferenceFunctions = {
-  scope: (scope: Scope) => ({
+  scope: (scope: RecordScopeTypeV2) => ({
     /**
      * user.scope().attribute() is used to create a scope attribute reference.
      *
