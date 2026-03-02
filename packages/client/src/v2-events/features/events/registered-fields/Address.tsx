@@ -168,7 +168,7 @@ function generateAdminStructureFields(
       id,
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
-      parent: fieldHelper(parentId),
+      parent: !isFirst ? fieldHelper(parentId) : undefined,
       required,
       label,
       configuration
