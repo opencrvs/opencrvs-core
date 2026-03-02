@@ -101,16 +101,18 @@ async function fetchHttpFieldValue(
 }
 
 export interface Props {
-  parentValue?: FieldValue
   configuration: HttpField['configuration']
   form: Record<string, FieldValue>
   onChange: (val: HttpFieldValue) => void
 }
 
-function HttpInput({ parentValue, configuration, form, onChange }: Props) {
+function HttpInput({ configuration, form, onChange }: Props) {
   const systemVariables = useSystemVariables()
   const firstRunRef = useRef(true)
   const prevParentRef = useRef<FieldValue | undefined>(undefined)
+  const parentValue = configuration.trigger
+    ? form[configuration.trigger.$$field]
+    : undefined
 
   const mutation = useMutation<unknown, HttpError>({
     mutationFn: async () =>
