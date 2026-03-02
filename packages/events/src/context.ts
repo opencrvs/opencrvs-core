@@ -10,12 +10,12 @@
  */
 
 import { IncomingMessage } from 'http'
+import { readFileSync } from 'fs'
 import * as z from 'zod/v4'
 import '@opencrvs/commons/monitoring'
 import { TRPCError } from '@trpc/server'
+import * as jwt from 'jsonwebtoken'
 import {
-  getUserId,
-  getUserTypeFromToken,
   logger,
   REINDEX_USER_ID,
   TokenUserType,
@@ -25,6 +25,7 @@ import {
 } from '@opencrvs/commons'
 import { getUser } from './service/users/api'
 import { getLocationById } from './service/locations/locations'
+import { env } from './environment'
 
 export const UserContext = User.pick({
   id: true,
@@ -66,6 +67,27 @@ const SuperAdminContext = SystemContext.extend({
 })
 type SuperAdminContext = z.infer<typeof SuperAdminContext>
 
+const tokenPublicKey = readFileSync(env.CERT_PUBLIC_KEY_PATH)
+
+const TokenClaims = z.object({
+  sub: z.string(),
+  userType: TokenUserType,
+  scope: z.array(z.string())
+})
+type TokenClaims = z.infer<typeof TokenClaims>
+
+function verifyToken(token: TokenWithBearer): TokenClaims {
+  const jwtToken = token.split(' ')[1]
+
+  const verified = jwt.verify(jwtToken, tokenPublicKey, {
+    algorithms: ['RS256'],
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  })
+
+  return TokenClaims.parse(verified)
+}
+
 export type TrpcUserContext = SystemContext | UserContext | SuperAdminContext
 
 type HeadersLike =
@@ -95,12 +117,13 @@ function normalizeHeaders(
 async function resolveUserDetails(
   token: TokenWithBearer
 ): Promise<TrpcUserContext> {
-  let userId: string | undefined
+  let userId: string
   let userType: TokenUserType
 
   try {
-    userId = getUserId(token)
-    userType = getUserTypeFromToken(token)
+    const claims = verifyToken(token)
+    userId = claims.sub
+    userType = claims.userType
   } catch {
     logger.error('Error while parsing token')
 

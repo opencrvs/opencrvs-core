@@ -9,17 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { join } from 'path'
+import { readFileSync } from 'fs'
 import superjson from 'superjson'
 import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
 import { http, HttpResponse } from 'msw'
 import { TRPCError } from '@trpc/server'
+import * as jwt from 'jsonwebtoken'
 import {
   ActionStatus,
   ActionType,
-  BearerTokenByUserType,
+  encodeScope,
   getTokenPayload,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
+  TokenUserType,
   TestUserRole
 } from '@opencrvs/commons'
 import { AppRouter } from './router'
@@ -37,6 +41,31 @@ import { setupTestCase } from './tests/utils'
 let serverInstance: ReturnType<typeof server>
 let url: string
 let customClient: ReturnType<typeof createTRPCClient<AppRouter>>
+const cert = readFileSync(join(process.cwd(), 'src/tests/cert.key'))
+
+function createValidToken(payload: Record<string, unknown> = {}) {
+  return jwt.sign(
+    {
+      scope: [
+        encodeScope({
+          type: 'record.create',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
+      ],
+      userType: TokenUserType.enum.user,
+      role: TestUserRole.enum.LOCAL_REGISTRAR,
+      ...payload
+    },
+    cert,
+    {
+      subject: '67ef7f83d6a9cb92e9edaa99',
+      algorithm: 'RS256',
+      expiresIn: '1h',
+      audience: 'opencrvs:gateway-user',
+      issuer: 'opencrvs:auth-service'
+    }
+  )
+}
 
 beforeAll(() => {
   serverInstance = server()
@@ -87,6 +116,15 @@ async function createEvent(token: string) {
   return res
 }
 
+function forgeUnsignedToken(payload: object) {
+  const header = Buffer.from(
+    JSON.stringify({ alg: 'none', typ: 'JWT' })
+  ).toString('base64url')
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url')
+
+  return `${header}.${body}.`
+}
+
 test('Server starts up and returns an event based on context dependency values', async () => {
   const { locations } = await setupTestCase()
   expect(serverInstance).toBeDefined()
@@ -112,13 +150,13 @@ test('Server starts up and returns an event based on context dependency values',
     {
       context: {
         headers: {
-          authorization: `Bearer ${BearerTokenByUserType.localRegistrar}`
+          authorization: `Bearer ${createValidToken()}`
         }
       }
     }
   )
 
-  const userId = getTokenPayload(BearerTokenByUserType.localRegistrar).sub
+  const userId = getTokenPayload(createValidToken()).sub
 
   expect(response.actions.length).toEqual(2)
   const [createAction] = response.actions
@@ -148,9 +186,9 @@ test('Server will accept requests after error', async () => {
     })
   )
 
-  await expect(
-    createEvent(BearerTokenByUserType.localRegistrar)
-  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
+  await expect(createEvent(createValidToken())).rejects.toMatchObject({
+    data: { code: 'UNAUTHORIZED' }
+  })
 
   mswServer.use(
     http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
@@ -162,9 +200,7 @@ test('Server will accept requests after error', async () => {
     })
   )
 
-  await expect(
-    createEvent(BearerTokenByUserType.fieldAgent)
-  ).resolves.toBeDefined()
+  await expect(createEvent(createValidToken())).resolves.toBeDefined()
 })
 
 test('Throws when dependency payload returns malformed data', async () => {
@@ -177,9 +213,9 @@ test('Throws when dependency payload returns malformed data', async () => {
     })
   )
 
-  await expect(
-    createEvent(BearerTokenByUserType.localRegistrar)
-  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
+  await expect(createEvent(createValidToken())).rejects.toMatchObject({
+    data: { code: 'UNAUTHORIZED' }
+  })
 })
 
 test('Throws with malformed token', async () => {
@@ -187,6 +223,18 @@ test('Throws with malformed token', async () => {
   expect(url).toBeDefined()
 
   await expect(createEvent('bad-token')).rejects.toMatchObject({
+    data: { code: 'UNAUTHORIZED' }
+  })
+})
+
+test('Throws with unsigned forged token', async () => {
+  expect(serverInstance).toBeDefined()
+  expect(url).toBeDefined()
+
+  const payload = getTokenPayload(createValidToken())
+  const forgedToken = forgeUnsignedToken(payload)
+
+  await expect(createEvent(forgedToken)).rejects.toMatchObject({
     data: { code: 'UNAUTHORIZED' }
   })
 })
