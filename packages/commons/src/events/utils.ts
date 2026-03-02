@@ -420,18 +420,18 @@ export function mapFormState<T, R>(
 }
 
 export function flattenFormState<T>(
-  state: FormState<T[]>,
+  state: FormState<T>,
   path: string[] = []
-): Array<[string[], T[]]> {
-  if (Array.isArray(state)) {
-    if (state.length === 0) {
-      return []
-    }
-    return [[path, state]]
+): Array<[string[], T]> {
+  if (typeof state === 'object' && !Array.isArray(state) && state) {
+    return Object.entries(state)
+      .filter((e): e is [string, FormState<T>] => e[1] !== undefined)
+      .flatMap((e) => flattenFormState(e[1], [...path, e[0]]))
   }
-  return Object.entries(state)
-    .filter((e): e is [string, FormState<T[]>] => e[1] !== undefined)
-    .flatMap((e) => flattenFormState(e[1], [...path, e[0]]))
+  if (Array.isArray(state) && state.length === 0) {
+    return []
+  }
+  return [[path, state]]
 }
 
 export function flattenFieldReference(ref: FieldReference) {
