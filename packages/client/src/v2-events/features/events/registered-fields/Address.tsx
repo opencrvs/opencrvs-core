@@ -219,21 +219,26 @@ function getAdministrativeArea(value?: AddressFieldValue) {
     : undefined
 }
 
-function transformParentValueToNested(
+function transformParentValueToNestedValue(
   value: AddressFieldValue,
   adminLevelIds: string[],
   adminStructureLocations: Location[]
 ): EventState {
+  const { streetLevelDetails, ...valueWithoutStreetLevelDetails } = value
   const administrativeArea = getAdministrativeArea(value)
   const derivedAdminLevels = getAdminLevelHierarchy(
     administrativeArea,
     adminStructureLocations,
     adminLevelIds
   )
-  return { ...value, ...derivedAdminLevels }
+  return {
+    ...valueWithoutStreetLevelDetails,
+    ...derivedAdminLevels,
+    ...streetLevelDetails
+  }
 }
 
-function transformNestedValueToParent(
+function transformNestedValueToParentValue(
   nestedValue: EventState,
   adminLevelIds: string[]
 ): AddressFieldValue {
@@ -259,7 +264,7 @@ function transformNestedValueToParent(
   }
 }
 
-function transformParentTouchedToNested(
+function transformParentTouchedToNestedValue(
   parentTouched: IndexMap<FormState<boolean>>,
   adminLevelIds: string[],
   streetAddressFieldIds: string[]
@@ -290,7 +295,7 @@ function transformParentTouchedToNested(
   return result
 }
 
-function transformTouchedToParentFormat(
+function transformNestedTouchedToParentValue(
   nestedTouched: IndexMap<FormState<boolean>>,
   adminLevelIds: string[],
   streetAddressFieldIds: string[]
@@ -360,12 +365,12 @@ function AddressInput(props: Props) {
 
   const streetAddressFieldIds = addressFields.map((f) => f.id)
 
-  const nestedValue = transformParentValueToNested(
+  const nestedValue = transformParentValueToNestedValue(
     value,
     adminLevelIds,
     adminStructureLocations
   )
-  const nestedTouched = transformParentTouchedToNested(
+  const nestedTouched = transformParentTouchedToNestedValue(
     touched,
     adminLevelIds,
     streetAddressFieldIds
@@ -400,12 +405,12 @@ function AddressInput(props: Props) {
       formValues={nestedValue}
       validatorContext={validatorContext}
       onFormChange={(nestedVal) =>
-        onChange(transformNestedValueToParent(nestedVal, adminLevelIds))
+        onChange(transformNestedValueToParentValue(nestedVal, adminLevelIds))
       }
       onTouchedChange={(newTouched) =>
         onBlur(
           name,
-          transformTouchedToParentFormat(
+          transformNestedTouchedToParentValue(
             newTouched,
             adminLevelIds,
             streetAddressFieldIds
