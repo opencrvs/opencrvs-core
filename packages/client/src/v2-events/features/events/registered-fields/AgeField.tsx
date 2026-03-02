@@ -28,6 +28,10 @@ function AgeInput({ asOfDateRef, value, ...props }: AgeInputProps) {
     value && isNaN(value) ? undefined : value
   )
 
+  React.useEffect(() => {
+    setInputValue(value ?? undefined)
+  }, [value])
+
   return (
     <TextInputComponent
       {...props}

@@ -65,6 +65,13 @@ export function server() {
       return
     }
 
+    // Set 30-minute timeout for reindex endpoint to handle long-running operations
+    if (req.url.includes('reindex')) {
+      const thirtyMinutesInMs = 30 * 60 * 1000
+      req.socket.setTimeout(thirtyMinutesInMs)
+      res.setTimeout(thirtyMinutesInMs)
+    }
+
     if (req.url === '/ping') {
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ status: 'ok' }))

@@ -301,7 +301,8 @@ export function generateActionDeclarationInput(
         ...declaration,
         ...overrides
       },
-      {} // Intentionally empty. Allow generating fields with custom conditionals.
+      {}, // Intentionally empty. Allow generating fields with custom conditionals.
+      true
     )
   }
 

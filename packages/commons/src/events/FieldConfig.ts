@@ -66,6 +66,7 @@ export const FieldReference = z
     $$subfield: z
       .array(z.string())
       .optional()
+      .default([])
       .describe(
         'If the FieldValue is an object, subfield can be used to refer to e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
       )

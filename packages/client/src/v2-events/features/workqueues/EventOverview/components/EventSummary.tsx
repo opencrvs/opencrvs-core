@@ -22,10 +22,11 @@ import {
   TranslationConfig,
   EventDocument
 } from '@opencrvs/commons/client'
-import { FieldValue } from '@opencrvs/commons/client'
+import { FieldValue, FieldConfig, FieldType } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
@@ -208,7 +209,16 @@ export function EventSummary({
         securedFields.includes(fieldId)
       ),
       emptyValueMessage: field.emptyValueMessage,
-      value: intl.formatMessage(field.value, eventIndex)
+      value: intl.safeFormatMessage(
+        field.value,
+        /**
+         * Convert any date fields used in the message to unix timestamps, as the message may be expecting timestamps and not date strings.
+         *
+         * i.e. if the message is something like `{event.updatedAt, date, ::dd MM YYYY}`, then the value of `event.updatedAt`
+         * needs to be a unix timestamp for it to be formatted correctly by `intl.formatMessage`.
+         */
+        convertDateFieldsToUnixTimestamps(eventIndex)
+      )
     }
   })
 

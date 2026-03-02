@@ -15,8 +15,9 @@ import { Loader } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useHomePage } from '@client/hooks/useHomePage'
 import { useCountryConfigWorkqueueConfigurations } from '../features/events/useCountryConfigWorkqueueConfigurations'
+import { withSuspense } from '../components/withSuspense'
 
-export const RedirectToWorkqueue = () => {
+function RedirectToWorkqueueComponent() {
   const workqueues = useCountryConfigWorkqueueConfigurations()
   const navigate = useNavigate()
   const { path } = useHomePage()
@@ -40,3 +41,5 @@ export const RedirectToWorkqueue = () => {
 
   return <Loader id="redirect_to_workqueue" />
 }
+
+export const RedirectToWorkqueue = withSuspense(RedirectToWorkqueueComponent)

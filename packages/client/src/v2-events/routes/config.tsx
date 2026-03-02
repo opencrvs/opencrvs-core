@@ -13,6 +13,7 @@ import React, { useEffect } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
+import { onlineManager } from '@tanstack/react-query'
 import { ActionType, SCOPES } from '@opencrvs/commons/client'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
@@ -87,6 +88,56 @@ function PrefetchQueries() {
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
+    useEffect(() => {
+      let cancelled = false
+
+      onlineManager.setOnline(false)
+
+      async function probeNetwork() {
+        try {
+          const controller = new AbortController()
+          setTimeout(() => controller.abort(), 3000)
+
+          const res = await fetch('/api/ping', {
+            method: 'GET',
+            cache: 'no-store',
+            signal: controller.signal
+          })
+
+          const status = await res.json()
+          const services = [
+            'auth',
+            'search',
+            'user-mgnt',
+            'metrics',
+            'notification',
+            'countryconfig',
+            'workflow'
+          ]
+
+          const allServicesReady =
+            res.ok &&
+            services.every((service) => {
+              return status[service] === true
+            })
+
+          if (!cancelled) {
+            onlineManager.setOnline(allServicesReady)
+          }
+        } catch {
+          if (!cancelled) {
+            onlineManager.setOnline(false)
+          }
+        }
+      }
+
+      void probeNetwork()
+
+      return () => {
+        cancelled = true
+      }
+    }, [])
+
     const currentUser = useSelector(getUserDetails)
 
     if (!currentUser) {
