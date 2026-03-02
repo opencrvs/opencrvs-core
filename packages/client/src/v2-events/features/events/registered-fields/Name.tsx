@@ -43,10 +43,20 @@ interface Props {
   value?: NameFieldValue
 }
 
-const defaultNameFieldValue: NameFieldValue = {
-  firstname: '',
-  middlename: '',
-  surname: ''
+function defaultNameFieldValue(
+  config: NonNullable<NameField['configuration']>['name'] | undefined
+): NameFieldValue {
+  if (config?.middlename) {
+    return {
+      firstname: '',
+      middlename: '',
+      surname: ''
+    }
+  }
+  return {
+    firstname: '',
+    surname: ''
+  }
 }
 
 function FocusNameInputsOnHash({
@@ -122,19 +132,20 @@ function FocusNameInputsOnHash({
   return null
 }
 
-function NameInput(props: Props) {
-  const {
-    id,
-    name,
-    onChange,
-    onBlur,
-    touched = {},
-    disabled,
-    value = defaultNameFieldValue,
-    eventConfig,
-    configuration,
-    validatorContext
-  } = props
+function NameInput({
+  id,
+  name,
+  onChange,
+  onBlur,
+  touched = {},
+  disabled,
+  value,
+  eventConfig,
+  configuration,
+  validatorContext,
+  ...props
+}: Props) {
+  value ??= defaultNameFieldValue(configuration?.name)
 
   const { maxLength, order } = configuration || {}
 
@@ -232,7 +243,12 @@ function NameInput(props: Props) {
         id={id}
         validatorContext={validatorContext}
         onFormChange={(values) =>
-          onChange(mergeWithoutNullsOrUndefined(defaultNameFieldValue, values))
+          onChange(
+            mergeWithoutNullsOrUndefined(
+              defaultNameFieldValue(configuration?.name),
+              values
+            )
+          )
         }
         onTouchedChange={(newTouched) =>
           onBlur(name, { ...touched, ...newTouched })
