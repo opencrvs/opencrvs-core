@@ -15,7 +15,6 @@ import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
 import { DeclarationFormConfig } from './FormConfig'
 import { FieldReference } from './FieldConfig'
-import { isFieldReference } from '../conditionals/conditionals'
 import { EventMetadataDateFieldIdInput } from './EventMetadata'
 import { FlagConfig } from './Flag'
 import {
