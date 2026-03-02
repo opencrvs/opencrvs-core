@@ -34,6 +34,8 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
+          cache: true
+          version: v0.69.2
 
   security-scan-development:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
@@ -48,6 +50,8 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
+          cache: true
+          version: v0.69.2
 
   security-scan-manual:
     if: github.event_name == 'workflow_dispatch'
@@ -62,6 +66,8 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
+          cache: true
+          version: v0.69.2
 
   security-scan-pull-request:
     if: github.event_name == 'pull_request'
@@ -87,6 +93,8 @@ jobs:
           format: 'sarif'
           output: './trivy-results-base.sarif'
           exit-code: '0'
+          cache: true
+          version: v0.69.2
 
       - name: Gather Trivy output from PR branch
         uses: aquasecurity/trivy-action@0.34.1
@@ -97,6 +105,8 @@ jobs:
           format: 'sarif'
           output: './trivy-results-branch.sarif'
           exit-code: '0'
+          cache: true
+          version: v0.69.2
 
       - name: Remove lines that are always expected to be different
         run: |
