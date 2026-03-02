@@ -55,25 +55,24 @@ function isJurisdictionFilter(
  *
  * @param scopeAttributeReference - The scope attribute reference to resolve. This will contain scope and attribute names.
  * @param scopes - The scopes to resolve the scope attribute reference from.
- * @returns The jurisdiction filter.
+ * @returns The jurisdiction filter or undefined if the scope is not found or the attribute is not a valid jurisdiction filter.
  */
 function resolveJurisdictionScopeAttributeReference(
   scopeAttributeReference: ScopeAttributeReference,
   scopes: RawScopes[]
-): JurisdictionFilter {
+): JurisdictionFilter | undefined {
   const { $scope, $attribute } = scopeAttributeReference
   const scope = findScopeV2(scopes, $scope)
 
-  // If no scope is found, return the least permissive jurisdiction filter
   if (!scope) {
-    return JurisdictionFilter.enum.location
+    return
   }
 
   const attributeValue = getScopeAttributeValue(scope, $attribute)
 
   // If attribute is set but not a jurisdiction filter, return the least permissive jurisdiction filter
   if (!isJurisdictionFilter(attributeValue)) {
-    return JurisdictionFilter.enum.location
+    return
   }
 
   return attributeValue
@@ -83,12 +82,12 @@ function resolveJurisdictionScopeAttributeReference(
  * Resolves a jurisdiction reference to a jurisdiction filter.
  *
  * @param jurisdictionReference - The jurisdiction reference to resolve. This can be a plain jurisdiction filter or a scope attribute reference.
- * @returns The jurisdiction filter.
+ * @returns The jurisdiction filter or undefined if the jurisdiction reference is not valid.
  */
 export function resolveJurisdictionReference(
   jurisdictionReference: JurisdictionReference | undefined,
   scopes?: RawScopes[] | null
-): JurisdictionFilter {
+): JurisdictionFilter | undefined {
   if (!jurisdictionReference) {
     return JurisdictionFilter.enum.all
   }
@@ -105,7 +104,7 @@ export function resolveJurisdictionReference(
     return resolveJurisdictionScopeAttributeReference(jurisdiction, scopes)
   }
 
-  throw 'Failed to resolve jurisdiction filter'
+  return
 }
 
 /** Functions for referencing values from the logged in user's details */
