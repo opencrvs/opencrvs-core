@@ -743,6 +743,7 @@ export const GeneratedInputField = React.memo(
             form
           )}
           form={form}
+          parentValue={form[field.config.configuration.trigger.$$field]}
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
