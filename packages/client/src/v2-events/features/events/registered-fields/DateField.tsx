@@ -116,7 +116,7 @@ function DateOutput({ value }: { value?: string }) {
 
   if (parsed.success) {
     return format(
-      new Date(parsed.data),
+      new Date(parsed.data).setHours(12, 0, 0, 0),
       intl.formatMessage(messages.dateFormat)
     )
   }
