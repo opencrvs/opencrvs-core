@@ -320,7 +320,6 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Outbox',
     description: 'Title of outbox workqueue'
   },
-  action: { type: ActionType.READ },
   slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
 }

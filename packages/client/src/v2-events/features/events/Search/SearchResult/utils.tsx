@@ -319,23 +319,25 @@ function buildAvailableActionComponents({
 }: {
   event: EventIndex
   localEventStatus: EventIndex['status'] | keyof typeof ExtendedEventStatuses
-  action: { type: WorkqueueActionType }
+  action?: { type: WorkqueueActionType }
   isWideScreen: boolean
   redirectParam: string
 }) {
   const actionConfigs: Array<{ actionComponent: () => React.ReactNode }> = []
 
   if (isWideScreen) {
-    actionConfigs.push({
-      actionComponent: () => (
-        <ActionCta
-          key={'ActionCta-' + event.id}
-          actionType={action.type}
-          event={event}
-          redirectParam={redirectParam}
-        />
-      )
-    })
+    if (action) {
+      actionConfigs.push({
+        actionComponent: () => (
+          <ActionCta
+            key={'ActionCta-' + event.id}
+            actionType={action.type}
+            event={event}
+            redirectParam={redirectParam}
+          />
+        )
+      })
+    }
 
     if (localEventStatus === ExtendedEventStatuses.OUTBOX) {
       actionConfigs.push({
@@ -421,7 +423,7 @@ export function processEventsToRows({
   }[]
   eventConfigs: EventConfig[]
   outbox: OutboxEventIndex[]
-  action: { type: WorkqueueActionType }
+  action?: { type: WorkqueueActionType }
   redirectParam: string
   isWideScreen: boolean
   isOnline: boolean

@@ -55,6 +55,7 @@ export const WorkqueueConfig = z
     query: CountryConfigQueryType,
     action: z
       .object({ type: WorkqueueActionType })
+      .optional()
       .describe(
         'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
       ),
@@ -77,6 +78,7 @@ export const WorkqueueConfigInput = z.object({
   query: CountryConfigQueryInputType,
   action: z
     .object({ type: WorkqueueActionType })
+    .optional()
     .describe(
       'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
     ),
