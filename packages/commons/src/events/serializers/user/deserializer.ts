@@ -85,6 +85,10 @@ function deserializeQueryExpression(
       ...expression.updatedBy,
       term: userDeserializer(expression.updatedBy.term, user)
     },
+    updatedByUserRole: expression.updatedByUserRole && {
+      ...expression.updatedByUserRole,
+      term: userDeserializer(expression.updatedByUserRole.term, user)
+    },
     createdAtLocation:
       expression.createdAtLocation &&
       (expression.createdAtLocation.type === 'within'
