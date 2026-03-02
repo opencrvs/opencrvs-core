@@ -15,7 +15,7 @@ import {
   RecordScopeAttributeKey,
   getScopeAttributeValue
 } from '../scopes-v2'
-import { RawScopes, Scope } from '../authentication'
+import { RawScopes } from '../authentication'
 import z from 'zod/v4'
 
 const ScopeAttributeReference = z.object({
