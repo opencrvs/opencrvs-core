@@ -28,7 +28,7 @@ import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
-export const RECORD_ALLOWED_SCOPES = {
+const RECORD_ALLOWED_SCOPES = {
   UPDATE: [
     SCOPES.RECORD_REGISTER,
     SCOPES.RECORD_SUBMIT_FOR_UPDATES,
@@ -60,7 +60,7 @@ export const RECORD_DECLARE_SCOPES = [
   SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
 ]
 
-export const RECORD_SEARCH_SCOPES = [
+const RECORD_SEARCH_SCOPES = [
   SCOPES.SEARCH_BIRTH,
   SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
   SCOPES.SEARCH_DEATH,

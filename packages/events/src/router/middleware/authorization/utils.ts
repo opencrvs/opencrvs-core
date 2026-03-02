@@ -64,8 +64,9 @@ function canAccessEventWithScope(
   if (opts?.declaredIn === JurisdictionFilter.enum.administrativeArea) {
     const locationIds = event.legalStatuses?.DECLARED?.createdAtLocation
     if (
-      !locationIds ||
-      !locationIds.some((id) => id === user.administrativeAreaId)
+      (!locationIds ||
+        !locationIds.some((id) => id === user.administrativeAreaId)) &&
+      user.administrativeAreaId !== null
     ) {
       return false
     }
@@ -85,7 +86,8 @@ function canAccessEventWithScope(
     const locationIds = event.legalStatuses?.REGISTERED?.createdAtLocation
     if (
       !locationIds ||
-      !locationIds.some((id) => id === user.administrativeAreaId)
+      (!locationIds.some((id) => id === user.administrativeAreaId) &&
+        user.administrativeAreaId !== null)
     ) {
       return false
     }

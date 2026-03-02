@@ -10,8 +10,3 @@
  */
 export * from './field-mappings'
 export * from './informant-mappings'
-export * from '@client/forms/register/mappings/event-specific-fields/birth/mutation/registration-mappings'
-export * from '@client/forms/register/mappings/event-specific-fields/death/mutation/deceased-mappings'
-export * from '@client/forms/register/mappings/event-specific-fields/death/mutation/registration-mappings'
-export * from '@client/forms/register/mappings/event-specific-fields/marriage/mutation/event-mappings'
-export * from '@client/forms/register/mappings/event-specific-fields/marriage/mutation/registration-mappings'

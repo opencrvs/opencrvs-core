@@ -298,7 +298,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.duplicate.markNotDuplicate, {
 
 type CustomMutationKeys = keyof typeof customApi
 
-export const customMutationKeys = {
+const customMutationKeys = {
   registerOnDeclare: [['registerOnDeclare']],
   editAndRegister: [['editAndRegister']],
   editAndDeclare: [['editAndDeclare']],

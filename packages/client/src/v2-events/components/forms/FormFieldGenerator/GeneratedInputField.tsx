@@ -66,7 +66,8 @@ import {
   isNumberWithUnitFieldType,
   isCustomFieldType,
   isHiddenFieldType,
-  EventConfig
+  EventConfig,
+  isImageViewFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -91,7 +92,8 @@ import {
   AlphaPrintButton,
   Http,
   LinkButton,
-  VerificationStatus
+  VerificationStatus,
+  ImageView
 } from '@client/v2-events/features/events/registered-fields'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
@@ -363,6 +365,15 @@ export const GeneratedInputField = React.memo(
         <PageHeader.Input>
           {intl.formatMessage(fieldDefinition.label)}
         </PageHeader.Input>
+      )
+    }
+
+    if (isImageViewFieldType(field)) {
+      return (
+        <ImageView.Input
+          configuration={field.config.configuration}
+          value={field.value}
+        />
       )
     }
 
@@ -732,7 +743,14 @@ export const GeneratedInputField = React.memo(
             form
           )}
           form={form}
-          parentValue={form[field.config.configuration.trigger.$$field]}
+          trigger={
+            field.config.configuration.trigger
+              ? {
+                  mode: 'onChange',
+                  value: form[field.config.configuration.trigger.$$field]
+                }
+              : { mode: 'onMount' }
+          }
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )

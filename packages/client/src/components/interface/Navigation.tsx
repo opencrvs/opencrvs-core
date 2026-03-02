@@ -26,10 +26,7 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { storage } from '@client/storage'
-import {
-  ALLOWED_STATUS_FOR_RETRY,
-  INPROGRESS_STATUS
-} from '@client/SubmissionController'
+
 import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { EventType } from '@client/utils/gateway'
@@ -237,13 +234,9 @@ const NavigationView = (props: IFullProps) => {
     readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
     readyToIssue: !initialSyncDone ? 0 : filteredData.issueTab?.totalItems || 0,
     outbox: storedDeclarations.filter((draft) =>
-      (
-        [
-          ...ALLOWED_STATUS_FOR_RETRY,
-          ...INPROGRESS_STATUS,
-          SUBMISSION_STATUS.FAILED
-        ] as SUBMISSION_STATUS[]
-      ).includes(draft.submissionStatus as SUBMISSION_STATUS)
+      ([SUBMISSION_STATUS.FAILED] as SUBMISSION_STATUS[]).includes(
+        draft.submissionStatus as SUBMISSION_STATUS
+      )
     ).length
   }
 
