@@ -61,7 +61,7 @@ function createValidToken(payload: Record<string, unknown> = {}) {
       subject: '67ef7f83d6a9cb92e9edaa99',
       algorithm: 'RS256',
       expiresIn: '1h',
-      audience: 'opencrvs:gateway-user',
+      audience: 'opencrvs:events-user',
       issuer: 'opencrvs:auth-service'
     }
   )

@@ -82,7 +82,7 @@ function verifyToken(token: TokenWithBearer): TokenClaims {
   const verified = jwt.verify(jwtToken, tokenPublicKey, {
     algorithms: ['RS256'],
     issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
+    audience: ['opencrvs:gateway-user', 'opencrvs:events-user']
   })
 
   return TokenClaims.parse(verified)

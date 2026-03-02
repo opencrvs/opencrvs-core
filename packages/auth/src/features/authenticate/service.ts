@@ -166,6 +166,7 @@ export async function createTokenForActionConfirmation(
       expiresIn: '7 days',
       audience: [
         'opencrvs:gateway-user',
+        'opencrvs:events-user',
         'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
         'opencrvs:hearth-user',
