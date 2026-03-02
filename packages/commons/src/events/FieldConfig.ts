@@ -779,7 +779,9 @@ const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
   defaultValue: HttpFieldValue.optional(),
   configuration: z.object({
-    trigger: FieldReference,
+    trigger: FieldReference.optional().describe(
+      'Reference to the field that triggers the HTTP request when its value changes. If not provided, the HTTP request is triggered once on component mount.'
+    ),
     url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string(), z.string()).optional(),
