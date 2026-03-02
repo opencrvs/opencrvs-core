@@ -562,7 +562,7 @@ export async function getEventCount({
 }) {
   const esClient = getOrCreateClient()
 
-  const resolvedScopes = acceptedScopes?.map((scope) =>
+  const resolvedScopes = acceptedScopes.map((scope) =>
     resolveRecordActionScopeToIds(scope, user)
   )
 
