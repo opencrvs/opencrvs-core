@@ -16,6 +16,8 @@ import { getClient } from '@events/storage/postgres/events'
 import { NewLocations } from '../events/schema/app/Locations'
 import Schema from '../events/schema/Database'
 
+// This used to be 10k but was decreased due to postgres throwing error on large location amount in data seeding:
+// "bind message has ... parameter formats but 0 parameters"
 const INSERT_MAX_CHUNK_SIZE = 1000
 
 export async function setLocationsInTrx(
