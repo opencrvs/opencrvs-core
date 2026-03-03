@@ -39,33 +39,45 @@ describe('plainDateToLocalDate', () => {
     })
   })
 
-  it('in a negative UTC offset (UTC−X): new Date() shifts to the previous day, plainDateToLocalDate does not', () => {
-    // getTimezoneOffset() returns positive minutes for UTC− zones (e.g. New York = +300).
-    // new Date("2021-01-01") = Jan 1 00:00 UTC = Dec 31 at 19:00 EST, so getDate() = 31.
-    const naive = new Date('2021-01-01')
-    if (naive.getTimezoneOffset() >= 60) {
-      expect(naive.getDate()).not.toBe(1)
-      expect(naive.getMonth()).not.toBe(0) // not January
+  describe('contrast with new Date() via Intl.DateTimeFormat', () => {
+    // new Date('YYYY-MM-DD') is always UTC midnight regardless of the host system timezone.
+    // Intl.DateTimeFormat lets us observe what that UTC instant looks like in any IANA
+    // timezone without touching process.env.TZ or the system clock.
+
+    function datePartsIn(date: Date, timeZone: string) {
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(date)
     }
 
-    const result = plainDateToLocalDate(PlainDate.parse('2021-01-01'))
-    expect(result.getDate()).toBe(1)
-    expect(result.getMonth()).toBe(0) // January
-    expect(result.getFullYear()).toBe(2021)
-  })
+    it('in a negative UTC offset (America/New_York, UTC−5): new Date() shifts to the previous day', () => {
+      // Jan 1 00:00 UTC = Dec 31 19:00 EST → wrong day
+      expect(datePartsIn(new Date('2021-01-01'), 'America/New_York')).toContain(
+        '2020-12-31'
+      )
+    })
 
-  it('in a positive UTC offset (UTC+X): new Date() lands at a non-midnight hour, plainDateToLocalDate gives midnight', () => {
-    // getTimezoneOffset() returns negative minutes for UTC+ zones (e.g. Dhaka = −360).
-    // new Date("2021-06-15") = June 15 00:00 UTC = June 15 at 06:00 BDT, so getHours() = 6.
-    const naive = new Date('2021-06-15')
-    if (naive.getTimezoneOffset() <= -60) {
-      expect(naive.getHours()).not.toBe(0)
-    }
+    it('in a positive UTC offset (Asia/Dhaka, UTC+6): new Date() lands at 06:00, not midnight', () => {
+      // Jan 1 00:00 UTC = Jan 1 06:00 BDT → correct day but wrong hour
+      expect(datePartsIn(new Date('2021-01-01'), 'Asia/Dhaka')).toContain(
+        '06:00'
+      )
+    })
 
-    const result = plainDateToLocalDate(PlainDate.parse('2021-06-15'))
-    expect(result.getHours()).toBe(0)
-    expect(result.getDate()).toBe(15)
-    expect(result.getMonth()).toBe(5) // June
+    it('plainDateToLocalDate always produces local midnight (getHours = 0, correct date components)', () => {
+      // new Date(year, month, day) uses the host timezone → local midnight, always correct.
+      const result = plainDateToLocalDate(PlainDate.parse('2021-01-01'))
+      expect(result.getFullYear()).toBe(2021)
+      expect(result.getMonth()).toBe(0)
+      expect(result.getDate()).toBe(1)
+      expect(result.getHours()).toBe(0)
+    })
   })
 })
 
