@@ -20,7 +20,8 @@ import styled from 'styled-components'
 import {
   applyDraftToEventIndex,
   deepDropNulls,
-  EventStatus
+  EventStatus,
+  ActionType
 } from '@opencrvs/commons/client'
 import {
   AppBar,
@@ -43,6 +44,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 
 const Tab = styled.button`
   border: none;
@@ -86,7 +88,7 @@ const messages = defineMessages({
   }
 })
 
-function EventOverviewTabs() {
+function EventOverviewTabs({ showRecordTab }: { showRecordTab: boolean }) {
   const intl = useIntl()
   const navigate = useNavigate()
   const location = useLocation()
@@ -107,16 +109,23 @@ function EventOverviewTabs() {
       >
         {intl.formatMessage(messages.summary)}
       </Tab>
-      <Tab
-        className={isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''}
-        onClick={() => {
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
-          )
-        }}
-      >
-        {intl.formatMessage(messages.record)}
-      </Tab>
+      {showRecordTab && (
+        <Tab
+          className={
+            isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''
+          }
+          onClick={() => {
+            navigate(
+              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
+                { eventId },
+                { workqueue }
+              )
+            )
+          }}
+        >
+          {intl.formatMessage(messages.record)}
+        </Tab>
+      )}
       <Tab
         className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
         onClick={() => {
@@ -164,6 +173,8 @@ export function EventOverviewLayout({
     : event
 
   const isDraft = event.status === EventStatus.enum.CREATED
+  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const showRecordTab = isActionAllowed(ActionType.READ)
 
   const exit = () => {
     if (workqueue) {
@@ -178,8 +189,8 @@ export function EventOverviewLayout({
     <Frame
       header={
         <AppBar
-          appBarRowTwo={<EventOverviewTabs />}
-          desktopCenter={<EventOverviewTabs />}
+          appBarRowTwo={<EventOverviewTabs showRecordTab={showRecordTab} />}
+          desktopCenter={<EventOverviewTabs showRecordTab={showRecordTab} />}
           desktopRight={
             <Stack>
               <DownloadButton

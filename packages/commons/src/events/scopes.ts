@@ -126,11 +126,17 @@ export function isActionInScope(
 
   // NOTE: This is a temporary measure to allow for the transition to V2 scopes.
   // This will be unified to single check once the V1 scopes are fully deprecated and removed.
-  const isAllowedByV2Scope =
-    getAcceptedScopesByType({
-      acceptedScopes: allowedConfigurableScopes as RecordScopeTypeV2[],
-      scopes
-    }).length > 0
+  const v2Scopes = getAcceptedScopesByType({
+    acceptedScopes: allowedConfigurableScopes as RecordScopeTypeV2[],
+    scopes
+  })
+
+  const isAllowedByV2Scope = v2Scopes.some((scope) => {
+    if (scope.options?.event === undefined) {
+      return true
+    }
+    return scope.options.event.includes(eventType)
+  })
 
   return isAllowedByLegacyScope || isAllowedByV2Scope
 }
