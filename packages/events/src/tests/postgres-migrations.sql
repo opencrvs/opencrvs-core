@@ -56,6 +56,65 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: audit_log; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.audit_log (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    client_id text NOT NULL,
+    client_type app.user_type NOT NULL,
+    operation text NOT NULL,
+    request_data jsonb,
+    response_summary jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE app.audit_log OWNER TO events_migrator;
+
+--
+-- Name: TABLE audit_log; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON TABLE app.audit_log IS 'Stores an audit trail of operations performed by users and system integrations, including request data and a curated response summary.';
+
+
+--
+-- Name: COLUMN audit_log.client_id; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.client_id IS 'ID of the integration client or user making the request.';
+
+
+--
+-- Name: COLUMN audit_log.client_type; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.client_type IS 'Whether the client is a human user or a system integration.';
+
+
+--
+-- Name: COLUMN audit_log.operation; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.operation IS 'The operation that was performed.';
+
+
+--
+-- Name: COLUMN audit_log.request_data; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.request_data IS 'JSON blob of the request payload.';
+
+
+--
+-- Name: COLUMN audit_log.response_summary; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.response_summary IS 'Per-endpoint curated summary of the response (e.g. search terms used and count + IDs of results returned). Not the raw response payload.';
+
+
+--
 -- Name: administrative_areas; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -281,6 +340,14 @@ ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmig
 
 
 --
+-- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.audit_log
+    ADD CONSTRAINT audit_log_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: administrative_areas administrative_areas_external_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -433,6 +500,27 @@ ALTER TABLE ONLY app.users
 
 
 --
+-- Name: idx_audit_log_client_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_audit_log_client_id ON app.audit_log USING btree (client_id);
+
+
+--
+-- Name: idx_audit_log_created_at; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_audit_log_created_at ON app.audit_log USING btree (created_at);
+
+
+--
+-- Name: idx_audit_log_operation; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
+
+
+--
 -- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
@@ -530,6 +618,13 @@ ALTER TABLE ONLY app.users
 --
 
 GRANT USAGE ON SCHEMA app TO events_app;
+
+
+--
+-- Name: TABLE audit_log; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT ON TABLE app.audit_log TO events_app;
 
 
 --

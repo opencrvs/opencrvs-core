@@ -35,6 +35,9 @@ import {
   EditActionInput
 } from '@opencrvs/commons/events'
 import {
+  EventActionAuditLog
+} from '@opencrvs/commons/events'
+import {
   TokenUserType,
   TokenWithBearer
 } from '@opencrvs/commons/authentication'
@@ -56,6 +59,7 @@ import {
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getActionConfirmationToken } from '@events/service/auth'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -163,6 +167,19 @@ const ACTION_PROCEDURE_CONFIG = {
     }
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
+
+/**
+ * Maps action types to their corresponding audit log operation names (tRPC paths).
+ * Only includes action types that should be audit-logged.
+ */
+const AUDIT_LOG_OPERATION_MAP: Partial<
+  Record<keyof typeof ACTION_PROCEDURE_CONFIG, EventActionAuditLog['operation']>
+> = {
+  [ActionType.NOTIFY]: 'event.actions.notify.request',
+  [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request.request',
+  [ActionType.APPROVE_CORRECTION]: 'event.actions.correction.approve.request',
+  [ActionType.REJECT_CORRECTION]: 'event.actions.correction.reject.request'
+}
 
 type ActionProcedure = {
   request: MutationProcedure<{
@@ -370,7 +387,7 @@ export function getDefaultActionProcedures(
           return duplicates.event
         }
 
-        return defaultRequestHandler(
+        const result = await defaultRequestHandler(
           input,
           user,
           token,
@@ -379,6 +396,23 @@ export function getDefaultActionProcedures(
           actionConfig.inputSchema,
           actionConfig.actionConfirmationResponseSchema
         )
+
+        const auditOperation = AUDIT_LOG_OPERATION_MAP[actionType]
+        if (auditOperation) {
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: auditOperation,
+            requestData: { eventId, actionType, transactionId: input.transactionId },
+            responseSummary: {
+              eventId: result.id,
+              eventType: result.type,
+              trackingId: result.trackingId
+            }
+          })
+        }
+
+        return result
       }),
 
     accept: userAndSystemProcedure

@@ -331,7 +331,9 @@ export function withJurisdictionFilters({
     .map((scope) => {
       const must: estypes.QueryDslQueryContainer[] = []
 
-      for (const [filterProperty, value] of Object.entries(scope.options)) {
+      for (const [filterProperty, value] of Object.entries(
+        scope.options ?? {}
+      )) {
         if (!value) {
           continue
         }

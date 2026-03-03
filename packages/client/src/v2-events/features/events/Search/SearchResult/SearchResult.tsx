@@ -66,7 +66,7 @@ export const SearchResultComponent = ({
   title: string
   totalResults: number
   tabBarContent?: React.ReactNode
-  action: { type: WorkqueueActionType }
+  action?: { type: WorkqueueActionType }
   emptyMessage?: TranslationConfig
 }>) => {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)

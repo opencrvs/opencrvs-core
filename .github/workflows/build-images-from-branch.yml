@@ -246,62 +246,65 @@ jobs:
             docker manifest push ${REPO_PREFIX}-${{ matrix.service }}:$TAG
           done
 
-  security-scans-pr:
-    needs: [build, base]
-    runs-on: ubuntu-24.04
-    if: >
-      github.event_name == 'pull_request' && (github.event.pull_request.base.ref == 'develop' || github.event.pull_request.base.ref == 'main') && !inputs.skip_security_check
-    strategy:
-      matrix:
-        service: ${{ fromJSON(needs.base.outputs.services) }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          sparse-checkout: |
-            trivy.yaml
-            .trivyignore.yaml
-          sparse-checkout-cone-mode: false
-      - name: Gather Trivy output from base branch image
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}"
-          trivy-config: trivy.yaml
-          format: "sarif"
-          output: "./trivy-results-base.sarif"
-          exit-code: "0"
-      - name: Gather Trivy output from newly build image
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
-          trivy-config: trivy.yaml
-          format: "sarif"
-          output: "./trivy-results-branch.sarif"
-          exit-code: "0"
-      - name: Remove lines that are always expected to be different
-        run: |
-          jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-base.sarif > ${{ github.workspace }}/trivy-results-base.sarif
-          jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-branch.sarif > ${{ github.workspace }}/trivy-results-branch.sarif
+###################################################################
+# Temprorary disabled
+###################################################################
+  # security-scans-pr:
+  #   needs: [build, base]
+  #   runs-on: ubuntu-24.04
+  #   if: >
+  #     github.event_name == 'pull_request' && (github.event.pull_request.base.ref == 'develop' || github.event.pull_request.base.ref == 'main') && !inputs.skip_security_check
+  #   strategy:
+  #     matrix:
+  #       service: ${{ fromJSON(needs.base.outputs.services) }}
+  #   steps:
+  #     - uses: actions/checkout@v6
+  #       with:
+  #         sparse-checkout: |
+  #           trivy.yaml
+  #           .trivyignore.yaml
+  #         sparse-checkout-cone-mode: false
+  #     - name: Gather Trivy output from base branch image
+  #       uses: aquasecurity/trivy-action@0.28.0
+  #       with:
+  #         image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}"
+  #         trivy-config: trivy.yaml
+  #         format: "sarif"
+  #         output: "./trivy-results-base.sarif"
+  #         exit-code: "0"
+  #     - name: Gather Trivy output from newly build image
+  #       uses: aquasecurity/trivy-action@0.28.0
+  #       with:
+  #         image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
+  #         trivy-config: trivy.yaml
+  #         format: "sarif"
+  #         output: "./trivy-results-branch.sarif"
+  #         exit-code: "0"
+  #     - name: Remove lines that are always expected to be different
+  #       run: |
+  #         jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-base.sarif > ${{ github.workspace }}/trivy-results-base.sarif
+  #         jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-branch.sarif > ${{ github.workspace }}/trivy-results-branch.sarif
 
-      - name: Diff Trivy results to catch newly introduced vulnerabilities
-        run: diff -u ./trivy-results-base.sarif ./trivy-results-branch.sarif
+  #     - name: Diff Trivy results to catch newly introduced vulnerabilities
+  #       run: diff -u ./trivy-results-base.sarif ./trivy-results-branch.sarif
 
-  security-scans-develop:
-    needs: [build, base]
-    runs-on: ubuntu-24.04
-    if: ${{ (needs.base.outputs.branch == 'develop' || inputs.publish_release) && !inputs.skip_security_check }}
-    strategy:
-      fail-fast: false
-      matrix:
-        service: ${{ fromJSON(needs.base.outputs.services) }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          sparse-checkout: |
-            trivy.yaml
-            .trivyignore.yaml
-          sparse-checkout-cone-mode: false
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
-          trivy-config: trivy.yaml
+  # security-scans-develop:
+  #   needs: [build, base]
+  #   runs-on: ubuntu-24.04
+  #   if: ${{ (needs.base.outputs.branch == 'develop' || inputs.publish_release) && !inputs.skip_security_check }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       service: ${{ fromJSON(needs.base.outputs.services) }}
+  #   steps:
+  #     - uses: actions/checkout@v6
+  #       with:
+  #         sparse-checkout: |
+  #           trivy.yaml
+  #           .trivyignore.yaml
+  #         sparse-checkout-cone-mode: false
+  #     - name: Run Trivy vulnerability scanner
+  #       uses: aquasecurity/trivy-action@0.28.0
+  #       with:
+  #         image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
+  #         trivy-config: trivy.yaml

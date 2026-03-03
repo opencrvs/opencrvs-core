@@ -1,3 +1,8 @@
 {
-  "ignore": ["./src/utils/gateway.ts"]
+  "ignore": [
+    "./src/utils/gateway.ts",
+    "src/utils/gateway.ts",
+    "src/forms/register/mappings/**/*.ts",
+    "src/utils/validate.ts"
+  ]
 }

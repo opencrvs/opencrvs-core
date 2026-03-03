@@ -62,8 +62,28 @@ test('single scope, multi-filter combinations', async () => {
   // 2. Each user creates and declares an event using duplicate data.
   for (const user of users) {
     const testClient = createTestClient(user, [
-      'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
-      'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      }),
+      encodeScope({
+        type: 'record.read',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      }),
       'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
       'record.declare[event=birth|death|tennis-club-membership|child-onboarding]'
     ])
@@ -242,8 +262,28 @@ test('multi-scope combinations', async () => {
   // 2. Each user creates and declares an event using duplicate data.
   for (const user of users) {
     const testClient = createTestClient(user, [
-      'record.create[event=birth|death|tennis-club-membership|child-onboarding]',
-      'record.read[event=birth|death|tennis-club-membership|child-onboarding]',
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      }),
+      encodeScope({
+        type: 'record.read',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      }),
       'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
       'record.declare[event=birth|death|tennis-club-membership|child-onboarding]'
     ])
@@ -308,24 +348,24 @@ test('multi-scope combinations', async () => {
         placeOfEvent2
       }) => {
         const scope1 = {
-          type: 'record.search',
+          type: 'record.search' as const,
           options: {
             event: [TENNIS_CLUB_MEMBERSHIP],
             declaredIn: declaredIn1,
             declaredBy: declaredBy1,
             placeOfEvent: placeOfEvent1
           }
-        }
+        } satisfies RecordScopeV2
 
         const scope2 = {
-          type: 'record.search',
+          type: 'record.search' as const,
           options: {
             event: [TENNIS_CLUB_MEMBERSHIP],
             declaredBy: declaredBy2,
             declaredIn: declaredIn2,
             placeOfEvent: placeOfEvent2
           }
-        }
+        } satisfies RecordScopeV2
 
         const scopes = [scope1, scope2]
 
@@ -617,8 +657,18 @@ test('placeOfEvent scope filters out results between locations and administrativ
   const user = users[0]
 
   const clientWithActionScopes = createTestClient(user, [
-    `record.create[event=${eventType}]`,
-    `record.read[event=${eventType}]`,
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: [eventType]
+      }
+    }),
+    encodeScope({
+      type: 'record.read',
+      options: {
+        event: [eventType]
+      }
+    }),
     `record.notify[event=${eventType}]`,
     `record.declare[event=${eventType}]`
   ])

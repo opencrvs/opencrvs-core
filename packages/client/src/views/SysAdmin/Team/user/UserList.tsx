@@ -50,7 +50,6 @@ import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
 import React, { useCallback, useMemo, useState } from 'react'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { SearchUsersQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -63,6 +62,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { Location, UUID } from '@opencrvs/commons/client'
 import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
 import { useOnlineStatus } from '../../../../utils'
+import { LoadingIndicator } from '@client/components/LoadingIndicator'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1

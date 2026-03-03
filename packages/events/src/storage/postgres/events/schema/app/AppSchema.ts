@@ -6,6 +6,7 @@ import type { default as LocationsTable } from './Locations'
 import type { default as UserCredentialsTable } from './UserCredentials'
 import type { default as AdministrativeAreasTable } from './AdministrativeAreas'
 import type { default as EventActionsTable } from './EventActions'
+import type { default as AuditLogTable } from './AuditLog'
 import type { default as UsersTable } from './Users'
 import type { default as EventsTable } from './Events'
 
@@ -19,6 +20,8 @@ export default interface AppSchema {
   administrativeAreas: AdministrativeAreasTable
 
   eventActions: EventActionsTable
+
+  auditLog: AuditLogTable
 
   users: UsersTable
 

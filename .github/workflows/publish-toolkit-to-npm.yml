@@ -81,6 +81,29 @@ jobs:
           jq --arg version "$TOOLKIT_VERSION" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
         working-directory: packages/toolkit
 
+      # Pack the toolkit to verify it can be ran before publishing. Fixes issues where the package is published but is not runnable due to missing dependencies.
+      - name: Pack toolkit
+        if: steps.check-version.outputs.version-exists == 'false'
+        id: pack-toolkit
+        run: |
+          TARBALL_NAME=$(npm pack --silent)
+          echo "tarball-path=$PWD/$TARBALL_NAME" >> $GITHUB_OUTPUT
+        working-directory: packages/toolkit
+
+      - name: Smoke test packed toolkit in clean project
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: |
+          TMP_DIR=$(mktemp -d)
+          npm init -y --prefix "$TMP_DIR" > /dev/null
+          npm install --prefix "$TMP_DIR" --omit=dev "${{ steps.pack-toolkit.outputs.tarball-path }}"
+          TMP_DIR="$TMP_DIR" node - <<'NODE'
+          const { createRequire } = require('node:module')
+          const requireFromTmp = createRequire(process.env.TMP_DIR + '/package.json')
+
+          requireFromTmp('@opencrvs/toolkit/api')
+          requireFromTmp('@opencrvs/toolkit/events')
+          NODE
+
       - name: Publish to npm
         if: steps.check-version.outputs.version-exists == 'false'
         run: npm publish --access public

@@ -15,19 +15,19 @@ import {
 import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { RECORD_DECLARE_SCOPES, usePermissions } from './useAuthorization'
 
-export interface Tab {
+interface Tab {
   name: string
   scopes?: Scope[]
   denyScopes?: Scope[]
 }
 
-export interface Group {
+interface Group {
   group: string
   scopes?: Scope[]
   tabs: Tab[]
 }
 
-export interface NavigationConfig {
+interface NavigationConfig {
   name: string
   scopes?: Scope[]
   tabs: Tab[]

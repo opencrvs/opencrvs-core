@@ -362,7 +362,7 @@ const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
   }
 `
 
-export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
+const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
   query fetchBirthRegistrationForCertificate($id: ID!) {
     fetchBirthRegistration(id: $id) {
       _fhirIDMap

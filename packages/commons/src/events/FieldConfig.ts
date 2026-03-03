@@ -359,6 +359,29 @@ const ParagraphConfiguration = z
 
 export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
 
+const ImageConfiguration = z.object({
+  alt: z.string().optional().describe('Alternative text for the image'),
+  width: z.string().optional().describe('CSS width value for the image'),
+  height: z.string().optional().describe('CSS height value for the image'),
+  textAlign: ParagraphTextAlign.optional().describe(
+    'Text alignment for positioning the image in its container'
+  ),
+  objectFit: z
+    .enum(['contain', 'cover', 'fill', 'none', 'scale-down'])
+    .optional()
+    .describe('How the image should be resized to fit the container')
+})
+
+export type ImageConfiguration = z.infer<typeof ImageConfiguration>
+
+const ImageViewField = BaseField.extend({
+  type: z.literal(FieldType.IMAGE_VIEW),
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: ImageConfiguration
+}).describe('A read-only image component for form pages')
+
+export type ImageViewField = z.infer<typeof ImageViewField>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   defaultValue: NonEmptyTextValue.optional(),
@@ -748,7 +771,9 @@ const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
   defaultValue: HttpFieldValue.optional(),
   configuration: z.object({
-    trigger: FieldReference,
+    trigger: FieldReference.optional().describe(
+      'Reference to the field that triggers the HTTP request when its value changes. If not provided, the HTTP request is triggered once on component mount.'
+    ),
     url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string(), z.string()).optional(),
@@ -923,6 +948,7 @@ export const FieldConfig = z
     TimeField,
     DateRangeField,
     SelectDateRangeField,
+    ImageViewField,
     Paragraph,
     RadioGroup,
     BulletList,

@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as z from 'zod/v4'
 import {
   getScopes,
-  AnyScope,
   decodeScope,
-  ResolvedRecordScopeV2,
   UserFilter,
-  JurisdictionFilter
+  JurisdictionFilter,
+  RecordScopeTypeV2,
+  RecordScopeV2
 } from '@opencrvs/commons'
 import { EventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { UserContext } from '../../../context'
@@ -29,30 +28,30 @@ import { UserContext } from '../../../context'
  */
 function canAccessEventWithScope(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
-  scope: ResolvedRecordScopeV2,
+  scope: RecordScopeV2,
   user: UserContext
 ): boolean {
   const opts = scope.options
 
-  if (opts.event) {
+  if (opts?.event) {
     if (!event.type || !opts.event.includes(event.type)) {
       return false
     }
   }
 
-  if (opts.declaredBy === UserFilter.enum.user) {
+  if (opts?.declaredBy === UserFilter.enum.user) {
     if (event.legalStatuses?.DECLARED?.createdBy !== user.id) {
       return false
     }
   }
 
-  if (opts.registeredBy === UserFilter.enum.user) {
+  if (opts?.registeredBy === UserFilter.enum.user) {
     if (event.legalStatuses?.REGISTERED?.createdBy !== user.id) {
       return false
     }
   }
 
-  if (opts.declaredIn === JurisdictionFilter.enum.location) {
+  if (opts?.declaredIn === JurisdictionFilter.enum.location) {
     const locationIds = event.legalStatuses?.DECLARED?.createdAtLocation
     if (
       !locationIds ||
@@ -62,17 +61,18 @@ function canAccessEventWithScope(
     }
   }
 
-  if (opts.declaredIn === JurisdictionFilter.enum.administrativeArea) {
+  if (opts?.declaredIn === JurisdictionFilter.enum.administrativeArea) {
     const locationIds = event.legalStatuses?.DECLARED?.createdAtLocation
     if (
-      !locationIds ||
-      !locationIds.some((id) => id === user.administrativeAreaId)
+      (!locationIds ||
+        !locationIds.some((id) => id === user.administrativeAreaId)) &&
+      user.administrativeAreaId !== null
     ) {
       return false
     }
   }
 
-  if (opts.registeredIn === JurisdictionFilter.enum.location) {
+  if (opts?.registeredIn === JurisdictionFilter.enum.location) {
     const locationIds = event.legalStatuses?.REGISTERED?.createdAtLocation
     if (
       !locationIds ||
@@ -82,11 +82,12 @@ function canAccessEventWithScope(
     }
   }
 
-  if (opts.registeredIn === JurisdictionFilter.enum.administrativeArea) {
+  if (opts?.registeredIn === JurisdictionFilter.enum.administrativeArea) {
     const locationIds = event.legalStatuses?.REGISTERED?.createdAtLocation
     if (
       !locationIds ||
-      !locationIds.some((id) => id === user.administrativeAreaId)
+      (!locationIds.some((id) => id === user.administrativeAreaId) &&
+        user.administrativeAreaId !== null)
     ) {
       return false
     }
@@ -102,7 +103,7 @@ function canAccessEventWithScope(
  */
 export function canAccessEventWithScopes(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
-  scopes: ResolvedRecordScopeV2[],
+  scopes: RecordScopeV2[],
   user: UserContext
 ) {
   return scopes.some((scope) => canAccessEventWithScope(event, scope, user))
@@ -110,7 +111,7 @@ export function canAccessEventWithScopes(
 
 export function getAcceptedScopesFromToken(
   token: string,
-  acceptedScopes: string[]
+  acceptedScopes: RecordScopeTypeV2[]
 ) {
   const tokenScopes = getScopes(token)
 
@@ -121,5 +122,5 @@ export function getAcceptedScopesFromToken(
         ? parsedScope
         : null
     })
-    .filter((scope): scope is z.infer<typeof AnyScope> => scope !== null)
+    .filter((scope): scope is RecordScopeV2 => scope !== null)
 }
