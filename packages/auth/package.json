@@ -21,6 +21,7 @@
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
     "@opencrvs/commons": "^1.9.0",
+    "@opencrvs/events": "^1.9.0",
     "@trpc/client": "^11.0.0-rc.532",
     "app-module-path": "^2.2.0",
     "dotenv": "^6.1.0",
