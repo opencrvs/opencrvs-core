@@ -116,7 +116,6 @@ export const eventRouter = router({
         config
       })
 
-
       await writeAuditLog({
         clientId: ctx.user.id,
         clientType: ctx.user.type,
@@ -132,7 +131,6 @@ export const eventRouter = router({
           trackingId: result.trackingId
         }
       })
-
 
       return result
     }),
@@ -172,7 +170,6 @@ export const eventRouter = router({
         }
       )
 
-
       await writeAuditLog({
         clientId: ctx.user.id,
         clientType: ctx.user.type,
@@ -184,7 +181,6 @@ export const eventRouter = router({
           trackingId: updatedEvent.trackingId
         }
       })
-
 
       return updatedEvent
     }),
@@ -199,7 +195,9 @@ export const eventRouter = router({
       return getDuplicateEvents(event, ctx)
     }),
   delete: userOnlyProcedure
-    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.DELETE]))
+    .use(
+      middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[ActionType.DELETE])
+    )
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
