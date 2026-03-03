@@ -21,7 +21,11 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes-v2'
+import {
+  canUserCreateEvent,
+  getAcceptedScopesByType,
+  RecordScopeTypeV2
+} from '../scopes-v2'
 
 type AlwaysAllowed = null
 
@@ -131,12 +135,7 @@ export function isActionInScope(
     scopes
   })
 
-  const isAllowedByV2Scope = v2Scopes.some((scope) => {
-    if (scope.options?.event === undefined) {
-      return true
-    }
-    return scope.options.event.includes(eventType)
-  })
+  const isAllowedByV2Scope = canUserCreateEvent(v2Scopes, eventType)
 
   return isAllowedByLegacyScope || isAllowedByV2Scope
 }
