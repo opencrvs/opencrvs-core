@@ -143,7 +143,7 @@ describe('canAccessEventWithScope()', () => {
     )
 
     test.each(eventOptions)(
-      'should access event with even type-based scope %j',
+      'should access event with event type-based scope %j',
       (options) => {
         expect(
           canAccessEventWithScope(
@@ -197,16 +197,48 @@ describe('canAccessEventWithScope()', () => {
     )
 
     test.each(eventOptions)(
-      'should access event with even type-based scope %j',
+      'should access event with event type-based scope %j',
       (options) => {
         expect(
           canAccessEventWithScope(
             registeredEvent,
             { type: 'record.print-certified-copies', options },
-            systemContext
+            userContext
           )
         ).toBe(true)
       }
     )
+  })
+
+  test('should not access event if user does not meet any of the scope options', () => {
+    const userFromAnotherOfficeContext = {
+      type: 'user',
+      id: createdById,
+      primaryOfficeId: generateUuid(rng), // Different office
+      administrativeAreaId: generateUuid(rng), // Different administrative area
+      role: TestUserRole.enum.FIELD_AGENT
+    } satisfies UserContext
+
+    expect(
+      canAccessEventWithScope(
+        registeredEvent,
+        {
+          type: 'record.print-certified-copies',
+          options: { registeredIn: 'location' }
+        },
+        userFromAnotherOfficeContext
+      )
+    ).toBe(false)
+
+    expect(
+      canAccessEventWithScope(
+        registeredEvent,
+        {
+          type: 'record.print-certified-copies',
+          options: { registeredIn: 'administrativeArea' }
+        },
+        userFromAnotherOfficeContext
+      )
+    ).toBe(false)
   })
 })
