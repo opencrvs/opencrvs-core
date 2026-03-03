@@ -121,11 +121,22 @@ export const TEST_USER_DEFAULT_SCOPES = [
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
     }
   }),
-  'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.declare',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
   'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.register[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.register',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+
   'record.registered.print-certified-copies[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.registered.request-correction[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.registered.correct[event=birth|death|tennis-club-membership|child-onboarding]',
