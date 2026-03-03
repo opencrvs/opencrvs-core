@@ -44,7 +44,6 @@ export function Outbox() {
 
   return (
     <SearchResultComponent
-      action={{ type: 'READ' }}
       columns={outboxColumns}
       eventConfigs={eventConfigs}
       queryData={outbox}
