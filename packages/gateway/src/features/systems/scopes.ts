@@ -17,8 +17,7 @@ import {
   logger,
   RecordScopeTypeV2,
   Scope,
-  SCOPES,
-  stringifyScope
+  SCOPES
 } from '@opencrvs/commons'
 import fetch from '@gateway/fetch'
 import { COUNTRY_CONFIG_URL, PRODUCTION } from '@gateway/constants'
