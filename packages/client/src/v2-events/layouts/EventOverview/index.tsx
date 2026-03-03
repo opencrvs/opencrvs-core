@@ -88,12 +88,17 @@ const messages = defineMessages({
   }
 })
 
-function EventOverviewTabs({ showRecordTab }: { showRecordTab: boolean }) {
+function EventOverviewTabs() {
   const intl = useIntl()
   const navigate = useNavigate()
   const location = useLocation()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+  const { searchEventById } = useEvents()
+  const eventResults = searchEventById.useSuspenseQuery(eventId)
+  const event = eventResults.results[0]
+  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const showRecordTab = isActionAllowed(ActionType.READ)
 
   const isActive = (pattern: string) => {
     return !!matchPath({ path: pattern, end: true }, location.pathname)
@@ -173,8 +178,6 @@ export function EventOverviewLayout({
     : event
 
   const isDraft = event.status === EventStatus.enum.CREATED
-  const { isActionAllowed } = useUserAllowedActions(event.type)
-  const showRecordTab = isActionAllowed(ActionType.READ)
 
   const exit = () => {
     if (workqueue) {
@@ -189,8 +192,8 @@ export function EventOverviewLayout({
     <Frame
       header={
         <AppBar
-          appBarRowTwo={<EventOverviewTabs showRecordTab={showRecordTab} />}
-          desktopCenter={<EventOverviewTabs showRecordTab={showRecordTab} />}
+          appBarRowTwo={<EventOverviewTabs />}
+          desktopCenter={<EventOverviewTabs />}
           desktopRight={
             <Stack>
               <DownloadButton
