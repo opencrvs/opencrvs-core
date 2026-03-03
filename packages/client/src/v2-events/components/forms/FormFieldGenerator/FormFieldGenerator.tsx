@@ -34,6 +34,18 @@ import {
 import { FormSectionComponent } from './FormSectionComponent'
 
 export interface FormFieldGeneratorHandle {
+  /**
+   *  @param extraValues optional extra values that are included in the
+   *  payload that's bubbled up using onFormChange
+   *  Submit does four things:
+   *  1. Marks all the current page fields as touched and bubbles that change
+   *  using onTouchedChange if provided.
+   *  2. Bubbles the current page values up (along with the extra values) using
+   *  onFormChange if provided.
+   *  3. If there are no errors present in the form for the currently visible
+   *  fields, calls the onValidSubmit callback if provided.
+   *  4. Returns the form errors
+   */
   submit: (extraValues?: EventState) => string[]
 }
 
@@ -52,7 +64,7 @@ export interface FormFieldGeneratorProps {
   eventConfig?: EventConfig
   /** Full form values, the page values are plucked out of it */
   formValues?: EventState
-  /** Full form touched values, the page values are plucked out of it */
+  /** Full form touched values, the page touched values are plucked out of it */
   formTouched?: IndexMap<FormState<boolean>>
   onFormChange?: (values: EventState) => void
   onTouchedChange?: (touched: IndexMap<FormState<boolean>>) => void
@@ -89,6 +101,14 @@ export const FormFieldGenerator = forwardRef<
     const fullForm = { ...formContext, ...formValues }
 
     useImperativeHandle(ref, () => ({
+      /*
+       * Most of this function can be replaced with a call to `formik.submit` if
+       * the initialValues provided to formik contains initial values for all
+       * the fields as `formik.submit` uses that as basis for figuring out all
+       * the fields that need to be touched during submit. While the
+       * onValidSubmit could be used as the onSubmit callback. Currently we
+       * simulating most of it by hand.
+       */
       submit: (extraValues?: EventState) => {
         const allTouched = buildFormState(fields, (field) => {
           if (field.type === FieldType.NAME) {
@@ -199,6 +219,9 @@ export const FormFieldGenerator = forwardRef<
       <Formik<EventState>
         enableReinitialize={true}
         initialTouched={
+          // Our form values are nested but to make the implementation easier,
+          // we manually assert the value to be nested only when dealing with
+          // field groups e.g. form group, name, address etc.
           formikCompatibleInitialTouched as Record<string, boolean>
         }
         initialValues={formikCompatibleInitialValues}

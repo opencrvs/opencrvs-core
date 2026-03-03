@@ -99,6 +99,10 @@ export function Pages({
   // values is used on the verification page wizard to set the verification page result
   function onNextPage(values?: EventState) {
     const errors = formRef.current?.submit(values) ?? []
+    // onValidSubmit (i.e. switchToNextPage) is called as part of submit only if
+    // there are no errors in the form. But if the current page doesn't require
+    // completion to continue and there are errors on the page, we manually call
+    // switchToNextPage.
     if (!page.requireCompletionToContinue && errors.length > 0) {
       switchToNextPage()
     }
@@ -128,6 +132,8 @@ export function Pages({
       ref={formRef}
       eventConfig={eventConfig}
       fields={page.fields}
+      // This makes the declaration available in the validations/conditionals of
+      // the form without bleeding into the current form values
       formContext={declaration}
       formTouched={formTouched}
       formValues={formData}

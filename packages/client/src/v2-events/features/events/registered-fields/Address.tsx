@@ -53,7 +53,7 @@ type FieldConfigWithoutAddress = Exclude<
 type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   name: string
   onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
-  onChange: (newValue: Partial<AddressFieldValue>) => void
+  onChange: (newValue: AddressFieldValue) => void
   touched: IndexMap<FormState<boolean>> | undefined
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
@@ -264,7 +264,7 @@ function transformNestedValueToParentValue(
   }
 }
 
-function transformParentTouchedToNestedValue(
+function transformParentTouchedToNestedTouched(
   parentTouched: IndexMap<FormState<boolean>>,
   adminLevelIds: string[],
   streetAddressFieldIds: string[]
@@ -295,7 +295,7 @@ function transformParentTouchedToNestedValue(
   return result
 }
 
-function transformNestedTouchedToParentValue(
+function transformNestedTouchedToParentTouched(
   nestedTouched: IndexMap<FormState<boolean>>,
   adminLevelIds: string[],
   streetAddressFieldIds: string[]
@@ -370,7 +370,7 @@ function AddressInput(props: Props) {
     adminLevelIds,
     adminStructureLocations
   )
-  const nestedTouched = transformParentTouchedToNestedValue(
+  const nestedTouched = transformParentTouchedToNestedTouched(
     touched,
     adminLevelIds,
     streetAddressFieldIds
@@ -410,7 +410,7 @@ function AddressInput(props: Props) {
       onTouchedChange={(newTouched) =>
         onBlur(
           name,
-          transformNestedTouchedToParentValue(
+          transformNestedTouchedToParentTouched(
             newTouched,
             adminLevelIds,
             streetAddressFieldIds

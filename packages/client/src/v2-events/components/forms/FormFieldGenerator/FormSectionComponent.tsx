@@ -50,6 +50,9 @@ type AllProps = {
    * Update the form values in the non-formik state.
    */
   onFormChange: (cb: (prevForm: EventState) => EventState) => void
+  /**
+   * Update the touched values in the non-formik state.
+   */
   onTouchedChange: (
     cb: (
       prevTouched: IndexMap<FormState<boolean>>
@@ -67,7 +70,7 @@ type AllProps = {
  */
 type UsedFormikProps = Pick<
   FormikProps<EventState>,
-  'values' | 'setTouched' | 'setValues' | 'touched' | 'resetForm' | 'setErrors'
+  'values' | 'setTouched' | 'setValues' | 'touched' | 'resetForm'
 >
 
 function focusElementByHash() {
@@ -89,8 +92,7 @@ function focusElementByHash() {
  * This is used to reset the values of child fields when a parent field changes.
  *
  * @returns `Record<parentFieldId, Array<[string[], FieldConfig]>` mapping parent
- * field IDs to their child fields. The parentFieldId is the full path of the field
- * where nested fields are concatenated together
+ * field IDs to their child fields along with their full path from root.
  */
 function getParentsOfListenerFields(fields: FieldConfig[]) {
   // Create a reference map of visible parent fields and their their children for quick access.
@@ -126,7 +128,6 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
   return fieldsByParentId
 }
 
-// @TODO: Clarify and unify the naming of the props. What is from formik and what is from the state.
 export function FormSectionComponent({
   values,
   fields: fieldsWithDotSeparator,
@@ -144,7 +145,7 @@ export function FormSectionComponent({
   isCorrection = false,
   validatorContext
 }: AllProps) {
-  // Conditionals need to be able to react to whether the user is online or not -
+  // Conditionals need to be able to react to whether the user is online or not
   useOnlineStatus()
   const prevIdRef = useRef(id)
 

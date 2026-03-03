@@ -244,7 +244,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
               ]}
               id="my-form"
               validatorContext={getTestValidatorContext()}
-              />
+            />
           )
         },
         initialPath: '/event/123-abcd-213'

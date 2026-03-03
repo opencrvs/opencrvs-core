@@ -145,6 +145,9 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
     values: Array<{ name: string; value: FieldValue | undefined }>
   ) => void
   form: EventState
+  /**
+   * onBlur is used to set the touched state of the field
+   */
   onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
   disabled?: boolean
   readonlyMode?: boolean
