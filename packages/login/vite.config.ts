@@ -68,7 +68,7 @@ export default defineConfig(({ mode }): any => {
           }
         ],
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/__.*$/]
+        navigateFallbackDenylist: [/^\/__.*$/, /^\/register/]
       },
       devOptions: {
         enabled: false
