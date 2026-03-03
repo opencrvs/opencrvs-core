@@ -17,15 +17,15 @@ import {
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
-import {
-  cleanupTemporaryIndex,
-  finaliseReindexIndex,
-  indexEventsInBulk,
-  prepareReindexIndex
-} from '../indexing/indexing'
+import { indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
 
 import { getInMemoryEventConfigurations } from '../config/config'
+import {
+  cleanupTemporaryIndex,
+  finaliseReindexIndex,
+  prepareReindexIndex
+} from '../indexing/reindex'
 
 /**
  * Notifies country config about a single batch of events.
