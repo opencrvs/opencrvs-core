@@ -10,8 +10,64 @@
  */
 
 import { z } from 'zod'
-import { FieldUpdateValue, safeUnion } from './FieldValue'
+import {
+  FieldUpdateValue,
+  PlainDate,
+  plainDateToLocalDate,
+  safeUnion
+} from './FieldValue'
 import { NameFieldUpdateValue } from './CompositeFieldValue'
+
+describe('plainDateToLocalDate', () => {
+  describe.each([
+    { date: '1990-03-15', year: 1990, month: 2, day: 15 },
+    { date: '2021-01-01', year: 2021, month: 0, day: 1 },
+    { date: '2021-12-31', year: 2021, month: 11, day: 31 }
+  ])('for $date', ({ date, year, month, day }) => {
+    it('returns the correct local year, month and day', () => {
+      const result = plainDateToLocalDate(PlainDate.parse(date))
+      expect(result.getFullYear()).toBe(year)
+      expect(result.getMonth()).toBe(month)
+      expect(result.getDate()).toBe(day)
+    })
+
+    it('places the date at local midnight', () => {
+      const result = plainDateToLocalDate(PlainDate.parse(date))
+      expect(result.getHours()).toBe(0)
+      expect(result.getMinutes()).toBe(0)
+      expect(result.getSeconds()).toBe(0)
+    })
+  })
+
+  it('in a negative UTC offset (UTC−X): new Date() shifts to the previous day, plainDateToLocalDate does not', () => {
+    // getTimezoneOffset() returns positive minutes for UTC− zones (e.g. New York = +300).
+    // new Date("2021-01-01") = Jan 1 00:00 UTC = Dec 31 at 19:00 EST, so getDate() = 31.
+    const naive = new Date('2021-01-01')
+    if (naive.getTimezoneOffset() >= 60) {
+      expect(naive.getDate()).not.toBe(1)
+      expect(naive.getMonth()).not.toBe(0) // not January
+    }
+
+    const result = plainDateToLocalDate(PlainDate.parse('2021-01-01'))
+    expect(result.getDate()).toBe(1)
+    expect(result.getMonth()).toBe(0) // January
+    expect(result.getFullYear()).toBe(2021)
+  })
+
+  it('in a positive UTC offset (UTC+X): new Date() lands at a non-midnight hour, plainDateToLocalDate gives midnight', () => {
+    // getTimezoneOffset() returns negative minutes for UTC+ zones (e.g. Dhaka = −360).
+    // new Date("2021-06-15") = June 15 00:00 UTC = June 15 at 06:00 BDT, so getHours() = 6.
+    const naive = new Date('2021-06-15')
+    if (naive.getTimezoneOffset() <= -60) {
+      expect(naive.getHours()).not.toBe(0)
+    }
+
+    const result = plainDateToLocalDate(PlainDate.parse('2021-06-15'))
+    expect(result.getHours()).toBe(0)
+    expect(result.getDate()).toBe(15)
+    expect(result.getMonth()).toBe(5) // June
+  })
+})
 
 describe('safeUnion', () => {
   const TextValue = z.string().describe('TextValue')
