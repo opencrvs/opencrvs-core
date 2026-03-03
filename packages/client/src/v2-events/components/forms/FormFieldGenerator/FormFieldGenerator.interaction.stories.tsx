@@ -26,13 +26,14 @@ import {
 
 import {
   FormFieldGenerator,
-  FormFieldGeneratorHandle
+  FormFieldGeneratorHandle,
+  FormFieldGeneratorPropsWithoutRef
 } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormWizard } from '@client/v2-events/features/events/components/FormWizard'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'FormFieldGenerator/Interaction',
   decorators: [
     (Story, context) => (
@@ -49,6 +50,8 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const fields = [
   {
@@ -104,7 +107,7 @@ const declaration = {
 /**
  * Test case for a bug where conditional values were not being updated correctly due to the wrong apply order of items.
  */
-export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
+export const UpdateCondtionalValues: Story = {
   name: 'Updating existing declaration with conditional values',
   parameters: {
     layout: 'centered',
@@ -209,7 +212,7 @@ const tennisFamilyMembershipDeclaration = {
 /**
  * Test case for a bug where values of the parent field were not being copied to the dependent field, when the parent field is changed.
  */
-export const UpdateParentFieldValues: StoryObj<typeof FormFieldGenerator> = {
+export const UpdateParentFieldValues: Story = {
   name: 'Updating values of the parent field should update the child field value too',
   parameters: {
     layout: 'centered',
@@ -306,7 +309,7 @@ const tennisStyleFields = [
   }
 ] satisfies FieldConfig[]
 
-export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
+export const EmptiesWhenParentChanges: Story = {
   name: 'Toggling parent field resets children',
   parameters: {
     layout: 'centered',
@@ -386,7 +389,7 @@ export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
+export const RemovesErrorOnParentChange: Story = {
   name: 'Error is reset when parent field changes',
   parameters: {
     layout: 'centered',
@@ -434,9 +437,7 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const CustomRequiredValidationMessage: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const CustomRequiredValidationMessage: Story = {
   name: 'Custom required validation message',
   parameters: {
     layout: 'centered'

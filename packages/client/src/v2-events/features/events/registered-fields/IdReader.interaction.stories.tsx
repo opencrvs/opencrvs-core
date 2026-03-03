@@ -27,7 +27,10 @@ import {
   not
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 interface HTMLMediaElementWithCaptureStream extends HTMLVideoElement {
@@ -66,7 +69,7 @@ function mockCamera(src: string): Decorator {
   }
 }
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/IdReader/Interaction',
   decorators: [
     mockCamera('/assets/qr-sample.webm'),
@@ -85,6 +88,8 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 600px;
   padding: 1rem;
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const fields = [
   {
@@ -254,7 +259,7 @@ const fields = [
   }
 ] as const satisfies FieldConfig[]
 
-export const AuthenticationFlow: StoryObj<typeof FormFieldGenerator> = {
+export const AuthenticationFlow: Story = {
   name: 'Authentication flow',
   parameters: {
     layout: 'centered',
@@ -353,7 +358,7 @@ export const AuthenticationFlow: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const QrReaderFlow: StoryObj<typeof FormFieldGenerator> = {
+export const QrReaderFlow: Story = {
   name: 'QR Reader flow',
   parameters: {
     layout: 'centered'

@@ -21,13 +21,13 @@ import {
 } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
-  FormFieldGeneratorProps
+  FormFieldGeneratorPropsWithoutRef
 } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { NumberWithUnit } from './NumberWithUnit'
 
-const meta: Meta<FormFieldGeneratorProps> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/NumberWithUnit',
   component: FormFieldGenerator,
   argTypes: {},
@@ -125,7 +125,9 @@ const unitOfCurrencyOptions: SelectOption[] = [
   }
 ]
 
-export const SymptomDuration: StoryObj<typeof FormFieldGenerator> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const SymptomDuration: Story = {
   name: 'Symptom Duration',
   parameters: {
     layout: 'centered'
@@ -181,7 +183,7 @@ export const SymptomDuration: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const Fees: StoryObj<typeof FormFieldGenerator> = {
+export const Fees: Story = {
   name: 'Fees',
   parameters: {
     layout: 'centered'

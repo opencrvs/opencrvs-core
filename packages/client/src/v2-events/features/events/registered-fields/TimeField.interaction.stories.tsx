@@ -15,7 +15,10 @@ import React from 'react'
 import styled from 'styled-components'
 import { IntlProvider } from 'react-intl'
 import { FieldType } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { padZero } from '@client/v2-events/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
@@ -42,7 +45,7 @@ function IntlDecorator(messages: Record<string, string>) {
   )
 }
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/TimeField',
   decorators: [withValidatorContext]
 }
@@ -52,6 +55,8 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const Container = styled.div`
   display: flex;
@@ -71,9 +76,7 @@ const OutputDisplay = styled.div`
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FormData = Record<string, any>
 
-export const TimeInput24HourWithInitialValue: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const TimeInput24HourWithInitialValue: Story = {
   decorators: [IntlDecorator(messages24Hour)],
   parameters: {
     layout: 'centered'
@@ -136,7 +139,7 @@ export const TimeInput24HourWithInitialValue: StoryObj<
   }
 }
 
-export const TimeInput12HourDisplay: StoryObj<typeof FormFieldGenerator> = {
+export const TimeInput12HourDisplay: Story = {
   decorators: [IntlDecorator(messages12Hour)],
   parameters: {
     layout: 'centered'
@@ -189,9 +192,7 @@ export const TimeInput12HourDisplay: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const TimeInput12HourDisplayWith24HourInitialValue: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const TimeInput12HourDisplayWith24HourInitialValue: Story = {
   decorators: [IntlDecorator(messages12Hour)],
   parameters: {
     layout: 'centered'
@@ -258,7 +259,7 @@ export const TimeInput12HourDisplayWith24HourInitialValue: StoryObj<
   }
 }
 
-export const TimeFieldEdgeCases: StoryObj<typeof FormFieldGenerator> = {
+export const TimeFieldEdgeCases: Story = {
   decorators: [IntlDecorator(messages24Hour)],
   parameters: {
     layout: 'centered'
@@ -334,7 +335,7 @@ export const TimeFieldEdgeCases: StoryObj<typeof FormFieldGenerator> = {
 }
 
 // Original TimeInput story with 24-hour format
-export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
+export const TimeInput: Story = {
   decorators: [IntlDecorator(messages24Hour)],
   parameters: {
     chromatic: { disableSnapshot: true },

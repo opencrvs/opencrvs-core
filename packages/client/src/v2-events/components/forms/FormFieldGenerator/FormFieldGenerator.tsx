@@ -49,7 +49,7 @@ export interface FormFieldGeneratorHandle {
   submit: (extraValues?: EventState) => string[]
 }
 
-export interface FormFieldGeneratorProps {
+export interface FormFieldGeneratorPropsWithoutRef {
   /** form id */
   id: string
   readonlyMode?: boolean
@@ -76,7 +76,7 @@ export interface FormFieldGeneratorProps {
 
 export const FormFieldGenerator = forwardRef<
   FormFieldGeneratorHandle,
-  FormFieldGeneratorProps
+  FormFieldGeneratorPropsWithoutRef
 >(
   (
     {
@@ -259,7 +259,6 @@ export const FormFieldGenerator = forwardRef<
               isCorrection={isCorrection}
               readonlyMode={readonlyMode}
               resetForm={formikProps.resetForm}
-              setErrors={formikProps.setErrors}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
               touched={formikProps.touched}

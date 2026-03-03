@@ -19,10 +19,10 @@ import {
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<FormFieldGeneratorProps> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Data',
   component: FormFieldGenerator,
   argTypes: {
@@ -44,7 +44,9 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const DataDisplay: Story = {
   name: 'Data display field',
   parameters: {
     layout: 'centered'
@@ -107,9 +109,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const DataDisplayWithConditionallyHiddenFields: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const DataDisplayWithConditionallyHiddenFields: Story = {
   parameters: {
     layout: 'centered',
     userRole: TestUserRole.Enum.REGISTRATION_AGENT
@@ -171,9 +171,7 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
   }
 }
 
-export const DataDisplayWithConditionallyShownFields: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const DataDisplayWithConditionallyShownFields: Story = {
   parameters: {
     layout: 'centered',
     userRole: TestUserRole.Enum.FIELD_AGENT

@@ -15,11 +15,14 @@ import { userEvent, waitFor, within } from '@storybook/testing-library'
 import React, { Suspense } from 'react'
 import styled from 'styled-components'
 import { AgeField, field, FieldType } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Age/Interaction',
   decorators: [
     (Story, context) => (
@@ -38,6 +41,8 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const fields = [
   {
@@ -65,9 +70,7 @@ const fields = [
   } satisfies AgeField
 ]
 
-export const AgeFieldInteractionLeadingZero: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const AgeFieldInteractionLeadingZero: Story = {
   name: 'Leading Zero (00020)',
   parameters: {
     layout: 'centered',
@@ -95,7 +98,7 @@ export const AgeFieldInteractionLeadingZero: StoryObj<
   }
 }
 
-export const AgeFieldInteractionDecimal: StoryObj<typeof FormFieldGenerator> = {
+export const AgeFieldInteractionDecimal: Story = {
   name: 'Decimal (12.6)',
   parameters: {
     layout: 'centered',
@@ -123,9 +126,7 @@ export const AgeFieldInteractionDecimal: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const AgeFieldInteractionExponential: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const AgeFieldInteractionExponential: Story = {
   name: 'Exponential (1e2)',
   parameters: {
     layout: 'centered',
@@ -151,7 +152,7 @@ export const AgeFieldInteractionExponential: StoryObj<
   }
 }
 
-export const AgeFieldInteractionSmaller: StoryObj<typeof FormFieldGenerator> = {
+export const AgeFieldInteractionSmaller: Story = {
   name: ' < 12',
   parameters: {
     layout: 'centered',
@@ -182,7 +183,7 @@ export const AgeFieldInteractionSmaller: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const AgeFieldInteractionGreater: StoryObj<typeof FormFieldGenerator> = {
+export const AgeFieldInteractionGreater: Story = {
   name: ' > 120',
   parameters: {
     layout: 'centered',
@@ -213,7 +214,7 @@ export const AgeFieldInteractionGreater: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const AgeFieldInteractionEmpty: StoryObj<typeof FormFieldGenerator> = {
+export const AgeFieldInteractionEmpty: Story = {
   name: 'Empty (required)',
   parameters: {
     layout: 'centered',
@@ -239,7 +240,7 @@ export const AgeFieldInteractionEmpty: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const AgeFieldInteractionDigits: StoryObj<typeof FormFieldGenerator> = {
+export const AgeFieldInteractionDigits: Story = {
   name: '5 digits',
   parameters: {
     layout: 'centered',

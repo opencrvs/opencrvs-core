@@ -28,14 +28,17 @@ import {
   FieldValue,
   AddressFieldValue
 } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getOfflineData } from '@client/offline/selectors'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Address } from './Address'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Address/Interaction',
   decorators: [
     (Story, context) => (
@@ -52,6 +55,7 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 function isInternationalAddress() {
   return and(
@@ -289,7 +293,7 @@ const streetAddressConfigs = [
   }
 ]
 
-export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
+export const AddressFieldInteraction: Story = {
   name: 'Domestic',
   parameters: {
     layout: 'centered'
@@ -370,7 +374,7 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
+export const GenericAddressFields: Story = {
   name: 'International',
   parameters: {
     layout: 'centered'
@@ -461,9 +465,7 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const AddressFieldInteractionDomesticToInternational: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const AddressFieldInteractionDomesticToInternational: Story = {
   name: 'Switch between Domestic and International',
   parameters: {
     layout: 'centered'
@@ -619,7 +621,7 @@ interface ResolvedAddress {
   }
 }
 
-export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
+export const ToCertificateVariables: Story = {
   name: 'Certificate Variables',
   parameters: {
     layout: 'centered'
@@ -658,8 +660,8 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
               }
             }
           ]}
-          id="my-form"
           formValues={formData}
+          id="my-form"
           onFormChange={(data) => {
             setFormData((prev) => ({ ...prev, ...data }))
             const address = AddressFieldValue.safeParse(

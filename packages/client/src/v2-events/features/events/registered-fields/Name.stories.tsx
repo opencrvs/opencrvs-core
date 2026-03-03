@@ -15,7 +15,7 @@ import styled from 'styled-components'
 import { FieldType, NameField } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGeneratorProps } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGeneratorPropsWithoutRef } from '@client/v2-events/components/forms/FormFieldGenerator/FormFieldGenerator'
 import { ValueOutput } from '../components/Output'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
@@ -39,7 +39,7 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-const meta: Meta<FormFieldGeneratorProps> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Name',
   component: FormFieldGenerator,
   parameters: {
@@ -64,7 +64,7 @@ const meta: Meta<FormFieldGeneratorProps> = {
 
 export default meta
 
-type Story = StoryObj<typeof FormFieldGenerator>
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 export const Basic: Story = {
   name: 'First Name and Last name required, no Middle name'

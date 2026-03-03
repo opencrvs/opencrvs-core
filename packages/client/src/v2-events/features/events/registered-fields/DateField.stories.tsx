@@ -14,12 +14,15 @@ import { userEvent, within, expect } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { padZero } from '@client/v2-events/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/DateField',
   decorators: [
     (Story, context) => (
@@ -37,7 +40,9 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-export const DateInput: StoryObj<typeof FormFieldGenerator> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const DateInput: Story = {
   parameters: {
     layout: 'centered'
   },

@@ -16,11 +16,11 @@ import { ConditionalType, user } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
-import { FormFieldGeneratorProps } from '../../../components/forms/FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGeneratorPropsWithoutRef } from '../../../components/forms/FormFieldGenerator/FormFieldGenerator'
 import { getCleanRedirectURI } from './LinkButton'
 
 const url = 'https://example.com/authenticate'
-const meta: Meta<FormFieldGeneratorProps> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/LinkButton',
   decorators: [
     (Story, context) => (
@@ -42,7 +42,7 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
 
 export default meta
 
-type Story = StoryObj<FormFieldGeneratorProps>
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 export const Redirection: Story = {
   play: async ({ canvasElement }) => {

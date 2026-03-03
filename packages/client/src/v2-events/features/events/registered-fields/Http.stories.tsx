@@ -27,13 +27,16 @@ import {
   PRINT_DIGITAL_ID_CERTIFICATE_FORM
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Review } from '../components/Review'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Http',
   decorators: [
     (Story, context) => (
@@ -50,6 +53,8 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const fetchBrnFields: FieldConfig[] = [
   {
@@ -179,7 +184,7 @@ const fetchBrnFields: FieldConfig[] = [
   }
 ]
 
-export const FetchBrn: StoryObj<typeof FormFieldGenerator> = {
+export const FetchBrn: Story = {
   name: 'Fetch BRN - Response with a Content-Type: application/json',
   parameters: {
     chromatic: {
@@ -249,9 +254,7 @@ export const HttpJsonResponseInCopy: StoryObj<typeof Review> = {
     )
   }
 }
-export const HttpPopulatesWithNonDeclarationFields: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const HttpPopulatesWithNonDeclarationFields: Story = {
   name: 'HTTP Field type populates correctly with fields not in EventConfig.declaration',
   parameters: {
     chromatic: {

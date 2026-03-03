@@ -13,11 +13,14 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
 import { FieldType } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/VerificationStatus',
   decorators: [
     (Story) => (
@@ -35,7 +38,9 @@ const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
 
-export const Status: StoryObj<typeof FormFieldGenerator> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const Status: Story = {
   parameters: {
     layout: 'centered'
   },

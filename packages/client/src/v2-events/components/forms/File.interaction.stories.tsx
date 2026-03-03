@@ -18,12 +18,13 @@ import { FieldType, MimeType, TestUserRole } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { getTestValidatorContext } from '../../../../.storybook/decorators'
-import { FormFieldGeneratorProps } from './FormFieldGenerator/FormFieldGenerator'
+import { FormFieldGeneratorPropsWithoutRef } from './FormFieldGenerator/FormFieldGenerator'
 
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
 `
-const meta: Meta<typeof StyledFormFieldGenerator> = {
+
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/File/Interaction',
   decorators: [
     (Story) => (
@@ -36,9 +37,9 @@ const meta: Meta<typeof StyledFormFieldGenerator> = {
 
 export default meta
 
-export const FileInputWithOptionTest: StoryObj<
-  typeof StyledFormFieldGenerator
-> = {
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
+
+export const FileInputWithOptionTest: Story = {
   name: 'Upload file input with option',
   parameters: {
     layout: 'centered',
@@ -175,7 +176,7 @@ export const FileInputWithOptionTest: StoryObj<
   }
 }
 
-export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
+export const FileInputButton: Story = {
   name: 'File input without option',
   parameters: {
     layout: 'centered',
@@ -289,7 +290,7 @@ async function createImageFile(name: string, width: number, height: number) {
   })
 }
 
-export const FileInputButtonMaxImage: StoryObj<FormFieldGeneratorProps> = {
+export const FileInputButtonMaxImage: Story = {
   name: 'File input without option with maxImageSize configuration',
   parameters: {
     layout: 'centered',

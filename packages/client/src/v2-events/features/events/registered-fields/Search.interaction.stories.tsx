@@ -16,9 +16,12 @@ import React from 'react'
 import styled from 'styled-components'
 import { defineConditional, field, FieldType } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Search',
   decorators: [
     (Story) => (
@@ -34,6 +37,8 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const searchFields = [
   {
@@ -126,8 +131,7 @@ const searchFields = [
   }
 ]
 
-export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
-  {
+export const InvalidValue_NoRecordsFound: Story = {
     name: 'Invalid value - No records found',
     parameters: {
       chromatic: {
@@ -205,8 +209,7 @@ export const InvalidValue_NoRecordsFound: StoryObj<typeof FormFieldGenerator> =
     }
   }
 
-export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
-  {
+export const SearchWithRegistrationNumber: Story = {
     name: 'Search with registration number',
     parameters: {
       chromatic: {
@@ -351,7 +354,7 @@ export const SearchWithRegistrationNumber: StoryObj<typeof FormFieldGenerator> =
     }
   }
 
-export const TimeOut: StoryObj<typeof FormFieldGenerator> = {
+export const TimeOut: Story = {
   parameters: {
     chromatic: {
       disableSnapshot: true
@@ -393,7 +396,7 @@ export const TimeOut: StoryObj<typeof FormFieldGenerator> = {
     )
   }
 }
-export const HttpError: StoryObj<typeof FormFieldGenerator> = {
+export const HttpError: Story = {
   parameters: {
     chromatic: {
       disableSnapshot: true

@@ -11,5 +11,6 @@
 
 export {
   FormFieldGenerator,
-  type FormFieldGeneratorHandle
+  type FormFieldGeneratorHandle,
+  type FormFieldGeneratorPropsWithoutRef
 } from './FormFieldGenerator'
