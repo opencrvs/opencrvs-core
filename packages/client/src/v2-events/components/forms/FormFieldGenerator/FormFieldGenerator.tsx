@@ -121,7 +121,8 @@ const FormFieldGeneratorInner = forwardRef<
         onTouchedChange?.({ ...formTouched, ...allTouched })
         onFormChange?.({
           ...formValues,
-          ...formikRef.current?.values,
+          ...(formikRef.current?.values &&
+            makeFormikFieldIdsOpenCRVSCompatible(formikRef.current.values)),
           ...extraValues
         })
         const currentErrors = flattenFormState(formikRef.current?.errors)
