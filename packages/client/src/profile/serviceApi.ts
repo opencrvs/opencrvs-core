@@ -35,7 +35,7 @@ interface ISendVerifyCodeResponse {
 }
 
 const client = axios.create({
-  baseURL: window.config.API_GATEWAY_URL,
+  baseURL: '/api/gateway',
   headers: {
     Authorization: `Bearer ${getToken()}`
   }
@@ -63,7 +63,7 @@ function request<T>(options: AxiosRequestConfig) {
 
 const sendVerifyCode = (data: ISendVerifyCodeData) => {
   return request<ISendVerifyCodeResponse>({
-    url: new URL('sendVerifyCode', window.config.API_GATEWAY_URL).toString(),
+    url: new URL('sendVerifyCode', '/api/gateway').toString(),
     method: 'POST',
     data
   })
