@@ -11,7 +11,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fireEvent } from '@storybook/test'
-import { userEvent, waitFor, within } from '@storybook/testing-library'
+import { userEvent, within } from '@storybook/testing-library'
 import React, { Suspense } from 'react'
 import styled from 'styled-components'
 import { AgeField, field, FieldType } from '@opencrvs/commons/client'
@@ -77,13 +77,7 @@ export const AgeFieldInteractionLeadingZero: Story = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -105,13 +99,7 @@ export const AgeFieldInteractionDecimal: Story = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -133,13 +121,7 @@ export const AgeFieldInteractionExponential: Story = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -159,13 +141,7 @@ export const AgeFieldInteractionSmaller: Story = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -190,13 +166,7 @@ export const AgeFieldInteractionGreater: Story = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -221,13 +191,7 @@ export const AgeFieldInteractionEmpty: Story = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -247,13 +211,7 @@ export const AgeFieldInteractionDigits: Story = {
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        {...args}
-        fields={fields}
-        id="my-form"
-      />
-    )
+    return <StyledFormFieldGenerator {...args} fields={fields} id="my-form" />
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

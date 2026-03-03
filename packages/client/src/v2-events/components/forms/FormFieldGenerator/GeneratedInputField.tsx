@@ -228,6 +228,7 @@ export const GeneratedInputField = React.memo(
         {}
       const parentInputFieldProps = {
         ...field.inputFieldProps,
+        // only forward error if it is coming from the group custom validations
         error: typeof error === 'string' ? error : ''
       }
       return (
@@ -544,8 +545,6 @@ export const GeneratedInputField = React.memo(
             validatorContext={validatorContext}
             value={field.value}
             onBlur={onBlur}
-            //@TODO: We need to come up with a general solution for complex types.
-            // @ts-ignore
             onChange={(val) => onFieldValueChange(name, val)}
           />
         </InputField>

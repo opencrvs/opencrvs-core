@@ -126,8 +126,8 @@ export const TimeInput24HourWithInitialValue: Story = {
               required: true
             }
           ]}
-          id="my-form-24h"
           formValues={formData}
+          id="my-form-24h"
           onFormChange={(data) => setFormData(data)}
         />
         <OutputDisplay data-testid="time-output">
@@ -179,8 +179,8 @@ export const TimeInput12HourDisplay: Story = {
               required: true
             }
           ]}
-          id="my-form-12h"
           formValues={formData}
+          id="my-form-12h"
           onFormChange={(data) => setFormData(data)}
         />
         <OutputDisplay data-testid="time-output-24h">
@@ -246,8 +246,8 @@ export const TimeInput12HourDisplayWith24HourInitialValue: Story = {
               required: true
             }
           ]}
-          id="my-form-conversion"
           formValues={formData}
+          id="my-form-conversion"
           onFormChange={(data) => setFormData(data)}
         />
         <OutputDisplay data-testid="time-output-conversion">
@@ -318,8 +318,8 @@ export const TimeFieldEdgeCases: Story = {
               required: true
             }
           ]}
-          id="my-form-edge"
           formValues={formData}
+          id="my-form-edge"
           onFormChange={(data) => setFormData(data)}
         />
         <OutputDisplay data-testid="time-output-edge">
@@ -391,8 +391,8 @@ export const TimeInput: Story = {
             required: true
           }
         ]}
-        id="my-form"
         formValues={formData}
+        id="my-form"
         onFormChange={(data) => setFormData(data)}
       />
     )
