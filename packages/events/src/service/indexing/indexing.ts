@@ -237,8 +237,8 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
 export async function createIndex(
   indexName: string,
   formFields: FieldConfig[],
-  { addAlias = true }: { addAlias?: boolean } = {}
-): Promise<void> {
+  addAlias: boolean = true
+) {
   const client = getOrCreateClient()
 
   await client.indices.create({
@@ -321,9 +321,6 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
 
-  // After a blue/green reindex, `indexName` (e.g. "events_birth") is a write
-  // alias rather than a concrete index. finaliseReindexIndex already set up
-  // both the global read alias and the per-type write alias, so nothing to do.
   const isAlreadyWriteAlias = await esClient.indices.existsAlias({
     name: indexName
   })
@@ -340,9 +337,6 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    // Existing deployment: bare concrete index. Add the global read alias so
-    // searches work. The per-type write alias will be created on the next
-    // reindex (triggered automatically on deploy).
     logger.info(`Index ${indexName} already exists as a concrete index.`)
     await ensureAlias(indexName)
   }
@@ -360,10 +354,7 @@ export type BulkResponse = estypes.BulkResponse
 export async function indexEventsInBulk(
   batch: EventDocument[],
   configs: EventConfig[],
-  /**
-   * Optional map of eventType → index name. When provided (e.g. during a
-   * blue/green reindex), writes go to the temporary index instead of the live one.
-   */
+
   indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()

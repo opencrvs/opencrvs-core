@@ -17,22 +17,16 @@ import {
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
-import { indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
-
 import { getInMemoryEventConfigurations } from '../config/config'
+import { indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupTemporaryIndex,
   finaliseReindexIndex,
   prepareReindexIndex
 } from '../indexing/reindex'
 
-/**
- * Notifies country config about a single batch of events.
- * Called once per STREAM_BATCH_SIZE chunk, so each HTTP request is short-lived
- * and not subject to server-level streaming timeouts.
- */
-async function notifyCountryConfigBatch(
+async function reindexBatchToCountryConfig(
   token: TokenWithBearer,
   batch: EventDocument[]
 ): Promise<void> {
@@ -44,13 +38,6 @@ async function notifyCountryConfigBatch(
     },
     body: JSON.stringify(batch)
   })
-
-  if (!response.ok && response.status === 404) {
-    logger.warn(
-      `Country config reindex endpoint not found: ${env.COUNTRY_CONFIG_URL}`
-    )
-    return
-  }
 
   if (!response.ok) {
     throw new Error(
@@ -73,11 +60,10 @@ async function reindexSearch(
     const batch = buffer
     buffer = []
     logger.info(`Reindexing ${batch.length} events`)
-    // Both operations run in parallel per batch. Each is a short-lived call
-    // so neither is subject to long-running connection timeouts.
+
     await Promise.all([
       indexEventsInBulk(batch, configurations, indexNameOverrides),
-      notifyCountryConfigBatch(token, batch)
+      reindexBatchToCountryConfig(token, batch)
     ])
   }
 
@@ -108,22 +94,22 @@ async function reindexSearch(
 async function runReindex(token: TokenWithBearer) {
   const configurations = await getEventConfigurations(token)
 
-  // Build temp indexes for each event type (blue/green pattern).
-  // The live indexes remain intact and searchable throughout.
   const timestamp = Date.now()
-  const indexMap = new Map<string, { tempIndexName: string }>()
+  const indexMap = new Map<string, string>()
 
   for (const configuration of configurations) {
-    const result = await prepareReindexIndex(configuration, timestamp)
-    indexMap.set(configuration.id, result)
+    const indexNameWithTimestamp = await prepareReindexIndex(
+      configuration,
+      timestamp
+    )
+    indexMap.set(configuration.id, indexNameWithTimestamp)
     logger.info(
-      `Prepared temporary index ${result.tempIndexName} for event type ${configuration.id}`
+      `Prepared temporary index ${indexNameWithTimestamp} for event type ${configuration.id}`
     )
   }
 
-  // Map of eventType → temporary index name for bulk writes
   const indexNameOverrides = new Map(
-    [...indexMap.entries()].map(([type, { tempIndexName }]) => [
+    [...indexMap.entries()].map(([type, tempIndexName]) => [
       type,
       tempIndexName
     ])
@@ -140,9 +126,8 @@ async function runReindex(token: TokenWithBearer) {
         .on('error', reject)
     })
   } catch (err) {
-    // Reindexing failed — clean up temp indexes, leave live indexes untouched
     logger.error('Reindex failed, cleaning up temporary indexes', err)
-    for (const { tempIndexName } of indexMap.values()) {
+    for (const tempIndexName of indexMap.values()) {
       await cleanupTemporaryIndex(tempIndexName).catch((cleanupErr) => {
         logger.error(
           `Failed to clean up temporary index ${tempIndexName}`,
@@ -153,8 +138,7 @@ async function runReindex(token: TokenWithBearer) {
     throw err
   }
 
-  // Success — atomically swap aliases from live → temp for each event type.
-  for (const [type, { tempIndexName }] of indexMap.entries()) {
+  for (const [type, tempIndexName] of indexMap.entries()) {
     await finaliseReindexIndex(type, tempIndexName)
   }
 }
