@@ -48,6 +48,28 @@ export const DateValue = z
 
 export type DateValue = z.infer<typeof DateValue>
 
+/**
+ * A branded YYYY-MM-DD date string that must be converted to a JS Date via
+ * {@link plainDateToLocalDate} rather than `new Date()`.
+ *
+ * `new Date("2021-01-01")` treats the string as UTC midnight, which shifts the
+ * displayed day in timezones behind UTC. Use `plainDateToLocalDate` instead to
+ * get local midnight.
+ */
+export const PlainDate = DateValue.brand('PlainDate')
+export type PlainDate = z.infer<typeof PlainDate>
+
+/**
+ * Converts a {@link PlainDate} (YYYY-MM-DD) to a local `Date` at midnight.
+ *
+ * The `Date(year, month, day)` constructor uses the local timezone, unlike
+ * `new Date(dateString)` which interprets bare date strings as UTC midnight.
+ */
+export function plainDateToLocalDate(date: PlainDate): Date {
+  const [year, month, day] = date.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
 export const AgeValue = z.object({
   age: z.number(),
   asOfDateRef: z.string()
