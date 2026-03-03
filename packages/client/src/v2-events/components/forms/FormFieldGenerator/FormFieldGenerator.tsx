@@ -62,7 +62,7 @@ export interface FormFieldGeneratorProps {
   validatorContext: ValidatorContext
 }
 
-const FormFieldGeneratorInner = forwardRef<
+export const FormFieldGenerator = forwardRef<
   FormFieldGeneratorHandle,
   FormFieldGeneratorProps
 >(
@@ -251,5 +251,3 @@ const FormFieldGeneratorInner = forwardRef<
     )
   }
 )
-
-export const FormFieldGenerator = React.memo(FormFieldGeneratorInner)
