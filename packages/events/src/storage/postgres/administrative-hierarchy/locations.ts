@@ -16,7 +16,7 @@ import { getClient } from '@events/storage/postgres/events'
 import { NewLocations } from '../events/schema/app/Locations'
 import Schema from '../events/schema/Database'
 
-const INSERT_MAX_CHUNK_SIZE = 10000
+const INSERT_MAX_CHUNK_SIZE = 1000
 
 export async function setLocationsInTrx(
   trx: Kysely<Schema>,
