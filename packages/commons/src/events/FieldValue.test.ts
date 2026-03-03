@@ -71,10 +71,10 @@ describe('plainDateToLocalDate', () => {
 
 describe('safeUnion', () => {
   const TextValue = z.string().describe('TextValue')
-  const DateValue = z
+  const PlainDateSchema = z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .describe('DateValue')
+    .describe('PlainDate')
   const NumberValue = z.number().describe('NumberFieldValue')
 
   it('returns true if only one schema matches', () => {
@@ -84,15 +84,15 @@ describe('safeUnion', () => {
   })
 
   it('returns false if no schema matches', () => {
-    const schema = safeUnion([DateValue, NumberValue])
+    const schema = safeUnion([PlainDateSchema, NumberValue])
     expect(schema.safeParse({ not: 'valid' }).success).toBe(false)
   })
 
   it('picks the higher priority schema if multiple match', () => {
-    // "2050-01-01" matches both TextValue (string) and DateValue (regex)
-    const schema = safeUnion([TextValue, DateValue])
+    // "2050-01-01" matches both TextValue (string) and PlainDateSchema (regex)
+    const schema = safeUnion([TextValue, PlainDateSchema])
     const result = schema.safeParse('2050-01-01')
-    // Both match, but DateValue wins because it's earlier in PRIORITY_ORDER
+    // Both match, but PlainDate wins because it's earlier in PRIORITY_ORDER
     expect(result.success).toBe(true)
   })
 
