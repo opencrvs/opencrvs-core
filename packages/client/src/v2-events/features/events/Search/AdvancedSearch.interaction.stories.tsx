@@ -107,7 +107,7 @@ export const AdvancedSearchStory: Story = {
         within(accordion).getByRole('button', { name: 'Show' })
       )
 
-      const locationInput = await canvasElement.querySelector(
+      const locationInput = canvasElement.querySelector(
         '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
       )
 
@@ -276,7 +276,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
 
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
-        await canvasElement.querySelector(
+        canvasElement.querySelector(
           '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation'
         )
       ).toHaveTextContent('Ibombo District Office')
@@ -360,7 +360,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
         within(footballAccordion).getByRole('button', { name: 'Show' })
       )
 
-      const locationInput = await canvasElement.querySelector(
+      const locationInput = canvasElement.querySelector(
         '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
       )
 
@@ -378,7 +378,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
       await assertRegistration()
       await userEvent.click(footballTab)
       await expect(
-        await canvasElement.querySelector(
+        canvasElement.querySelector(
           '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation .react-select__single-value'
         )
       ).toHaveTextContent('Ibombo District Office')
@@ -417,7 +417,7 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
       async () => {
         await new Promise((resolve) => setTimeout(resolve, 5000))
 
-        const locationInput = await canvasElement.querySelector(
+        const locationInput = canvasElement.querySelector(
           '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
         )
 
@@ -426,7 +426,7 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
         }
 
         await expect(
-          await canvasElement.querySelector(
+          canvasElement.querySelector(
             '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation .react-select__single-value'
           )
         ).toHaveTextContent('Ibombo District Office')
