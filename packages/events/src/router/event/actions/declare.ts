@@ -17,7 +17,6 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware'
 import { userAndSystemProcedure } from '@events/router/trpc'
 import { getEventById, processAction } from '@events/service/events/events'
 import {
@@ -28,8 +27,7 @@ import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 
 export function declareActionProcedures() {
-  const requireScopesMiddleware = requiresAnyOfScopes(
-    [],
+  const requireScopesMiddleware = middleware.canAccessEventWithScopes(
     ACTION_SCOPE_MAP[ActionType.DECLARE]
   )
 
@@ -38,6 +36,7 @@ export function declareActionProcedures() {
     request: userAndSystemProcedure
       .use(requireScopesMiddleware)
       .input(DeclareActionInput)
+      // @ts-expect-error - deprecated by the end of 2.0
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)

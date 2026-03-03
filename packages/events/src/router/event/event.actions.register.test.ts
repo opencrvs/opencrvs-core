@@ -18,6 +18,7 @@ import {
   ActionUpdate,
   AddressType,
   createPrng,
+  encodeScope,
   EventIndex,
   generateActionDuplicateDeclarationInput,
   generateRegistrationNumber,
@@ -52,7 +53,10 @@ test('prevents forbidden access if missing required scope', async () => {
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.register[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.register',
+      options: { event: ['birth', 'death', 'tennis-club-membership'] }
+    })
   ])
 
   await expect(
@@ -64,7 +68,10 @@ test(`allows access if required scope is present`, async () => {
 
 test('can not register an event that is not first declared and validated', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const event = await createEvent(client, generator, [])
 
   await expect(
@@ -76,7 +83,12 @@ test('can not register an event that is not first declared and validated', async
 
 test('Validation error message contains all the offending fields', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const event = await client.event.create(generator.event.create())
 
   await client.event.actions.declare.request(
@@ -113,7 +125,12 @@ test('Validation error message contains all the offending fields', async () => {
 
 test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const event = await client.event.create(generator.event.create())
 
   const data = generator.event.actions.register(event.id, {
@@ -161,7 +178,12 @@ const declaration = {
 
 test('Skips required field validation when they are conditionally hidden', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const { id: eventId } = await createEvent(client, generator, [
     ActionType.DECLARE
   ])
@@ -188,7 +210,10 @@ test('Skips required field validation when they are conditionally hidden', async
 
 test('Prevents adding birth date in future', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.register' })
+  ])
   const event = await client.event.create(generator.event.create())
 
   const form = {
@@ -241,7 +266,13 @@ describe('Request and confirmation flow', () => {
 
   test('should be able to successfully call action request multiple times, without creating duplicate request actions', async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.read' }),
+      encodeScope({ type: 'record.create' }),
+      encodeScope({ type: 'record.declare' }),
+      encodeScope({ type: 'record.register' })
+    ])
     const originalEvent = await createEvent(client, generator, [
       ActionType.DECLARE
     ])
@@ -285,7 +316,12 @@ describe('Request and confirmation flow', () => {
   describe('Synchronous confirmation flow', () => {
     test('should mark action as accepted if notify API returns HTTP 200', async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
+      ])
       const { id: eventId } = await createEvent(client, generator, [
         ActionType.DECLARE
       ])
@@ -310,7 +346,12 @@ describe('Request and confirmation flow', () => {
 
     test('should not save action if notify API returns invalid registration number', async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
+      ])
       const { id: eventId } = await createEvent(client, generator, [
         ActionType.DECLARE
       ])
@@ -334,7 +375,7 @@ describe('Request and confirmation flow', () => {
         client.event.actions.register.request(data)
       ).rejects.matchSnapshot()
 
-      const event = await client.event.get({eventId})
+      const event = await client.event.get({ eventId })
       const registerActions = event.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
@@ -347,7 +388,11 @@ describe('Request and confirmation flow', () => {
 
     test('should mark action as rejected if notify API returns HTTP 400', async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
+      ])
       const { id: eventId } = await createEvent(client, generator, [
         ActionType.DECLARE
       ])
@@ -375,7 +420,12 @@ describe('Request and confirmation flow', () => {
 
     test(`should not save ${ActionStatus.Accepted} / ${ActionStatus.Rejected} action if notify API returns HTTP 500`, async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
+      ])
 
       const { id: eventId } = await createEvent(client, generator, [
         ActionType.DECLARE
@@ -389,7 +439,7 @@ describe('Request and confirmation flow', () => {
         )
       ).rejects.matchSnapshot()
 
-      const registeredEvent = await client.event.get({eventId})
+      const registeredEvent = await client.event.get({ eventId })
 
       const registerActions = registeredEvent.actions.filter(
         (action) => action.type === ActionType.REGISTER
@@ -405,7 +455,12 @@ describe('Request and confirmation flow', () => {
   describe('Asynchronous confirmation flow', () => {
     test('should save action in requested state if notify API returns HTTP 202', async () => {
       const { user, generator } = await setupTestCase()
-      const client = createTestClient(user)
+      const client = createTestClient(user, [
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.register' })
+      ])
 
       const event = await createEvent(client, generator, [ActionType.DECLARE])
 
@@ -429,7 +484,12 @@ describe('Request and confirmation flow', () => {
     describe('Accepting', () => {
       test('should not be able to accept the action if action is not first requested', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
         const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         mockNotifyApi(202)
@@ -457,7 +517,12 @@ describe('Request and confirmation flow', () => {
 
       test('should not be able to accept action if action is already rejected', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
           ActionType.DECLARE
@@ -519,7 +584,11 @@ describe('Request and confirmation flow', () => {
 
       test('should successfully accept a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
           ActionType.DECLARE
@@ -586,7 +655,12 @@ describe('Request and confirmation flow', () => {
 
       test('should be able to call accept multiple times, without creating duplicate accept actions', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
         const originalEvent = await createEvent(client, generator, [
           ActionType.DECLARE
         ])
@@ -662,7 +736,11 @@ describe('Request and confirmation flow', () => {
 
       test('allows accepting a registration request with the same exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
           ActionType.DECLARE
@@ -729,7 +807,11 @@ describe('Request and confirmation flow', () => {
 
       test('does not allow accepting a registration request with different exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
           ActionType.DECLARE
@@ -784,7 +866,11 @@ describe('Request and confirmation flow', () => {
     describe('Rejecting', () => {
       test('should not be able to reject the action if action is not first requested', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
         const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         mockNotifyApi(202)
@@ -811,7 +897,11 @@ describe('Request and confirmation flow', () => {
 
       test('should not be able to reject the action if action is already accepted', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
         const event = await createEvent(client, generator, [ActionType.DECLARE])
         const eventId = event.id
 
@@ -866,7 +956,11 @@ describe('Request and confirmation flow', () => {
 
       test('should be able to call reject multiple times, without creating duplicate reject actions', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
         const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         const { id: eventId } = event
@@ -931,7 +1025,12 @@ describe('Request and confirmation flow', () => {
 
       test('should successfully reject a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
         const event = await createEvent(client, generator, [ActionType.DECLARE])
 
         const { id: eventId } = event
@@ -986,7 +1085,12 @@ describe('Request and confirmation flow', () => {
 
       test('allows rejecting a registration request with the same exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
           ActionType.DECLARE
@@ -1048,7 +1152,12 @@ describe('Request and confirmation flow', () => {
 
       test('does not allow rejecting a registration request with different exchanged event and action id', async () => {
         const { user, generator } = await setupTestCase()
-        const client = createTestClient(user)
+        const client = createTestClient(user, [
+          encodeScope({ type: 'record.read' }),
+          encodeScope({ type: 'record.create' }),
+          encodeScope({ type: 'record.declare' }),
+          encodeScope({ type: 'record.register' })
+        ])
 
         const originalEvent = await createEvent(client, generator, [
           ActionType.DECLARE
@@ -1111,7 +1220,12 @@ test('deduplication check is performed before register when configured', async (
   )
   const prng = createPrng(73)
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' }),
+    encodeScope({ type: 'record.register' })
+  ])
 
   const existingEvent = await client.event.create(generator.event.create())
   const declarationPayload = generateActionDuplicateDeclarationInput(

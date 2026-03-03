@@ -360,7 +360,11 @@ export function getDefaultActionProcedures(
     )
   }
 
-  const actionsMigratedToV2Scopes = [ActionType.NOTIFY] as const
+  const actionsMigratedToV2Scopes = [
+    ActionType.NOTIFY,
+    ActionType.DECLARE,
+    ActionType.REGISTER
+  ] as const
 
   const canAccessEventMiddleware = actionsMigratedToV2Scopes.some(
     (act) => act === actionType
