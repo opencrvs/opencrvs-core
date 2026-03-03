@@ -19,8 +19,4 @@ LEFT JOIN users u ON u.legacy_id = ls."createdBy";
 
 -- Down Migration
 DELETE FROM system_clients
-WHERE legacy_id IN (
-    SELECT
-      _id
-    FROM
-      legacy_systems);
+WHERE legacy_id IN (SELECT _id FROM legacy_systems);
