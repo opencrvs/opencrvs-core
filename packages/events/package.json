@@ -21,6 +21,7 @@
     "@elastic/elasticsearch": "8.16.2",
     "@opencrvs/commons": "^1.9.0",
     "@trpc/server": "11.4.3",
+    "bcryptjs": "^2.4.3",
     "@types/luxon": "^3.6.2",
     "@types/pg": "^8.15.4",
     "@types/pg-cursor": "^2.7.2",
@@ -45,6 +46,7 @@
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.7",
+    "@types/bcryptjs": "^2.4.2",
     "@eslint/eslintrc": "^3.3.1",
     "@testcontainers/elasticsearch": "^10.15.0",
     "@testcontainers/postgresql": "^11.0.3",

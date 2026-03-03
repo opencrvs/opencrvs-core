@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS system_clients(
   legacy_id TEXT UNIQUE,
   name TEXT NOT NULL,
   scopes JSONB NOT NULL DEFAULT '[]'::jsonb,
-  created_by UUID,
+  created_by TEXT,
   secret_hash TEXT,
   salt TEXT,
   sha_secret TEXT,

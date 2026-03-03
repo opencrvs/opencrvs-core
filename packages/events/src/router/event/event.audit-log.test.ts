@@ -202,22 +202,10 @@ describe('audit log', () => {
 
   describe('integrations.create', () => {
     test('writes an audit log entry when a system client creates an integration', async () => {
-      const systemId = 'test-system'
+      const systemId = '00000000-0000-0000-0000-000000000099'
       const client = createSystemTestClient(systemId, [
         SCOPES.INTEGRATION_CREATE
       ])
-
-      mswServer.use(
-        http.post(`${env.USER_MANAGEMENT_URL}/registerSystem`, () =>
-          HttpResponse.json({
-            system: {
-              clientId: 'new-client-id',
-              shaSecret: 'sha-secret'
-            },
-            clientSecret: 'client-secret'
-          })
-        )
-      )
 
       const result = await client.integrations.create({
         name: 'My Integration',
@@ -243,22 +231,10 @@ describe('audit log', () => {
     })
 
     test('does not include credentials in audit log response summary', async () => {
-      const systemId = 'test-system'
+      const systemId = '00000000-0000-0000-0000-000000000099'
       const client = createSystemTestClient(systemId, [
         SCOPES.INTEGRATION_CREATE
       ])
-
-      mswServer.use(
-        http.post(`${env.USER_MANAGEMENT_URL}/registerSystem`, () =>
-          HttpResponse.json({
-            system: {
-              clientId: 'new-client-id',
-              shaSecret: 'sha-secret'
-            },
-            clientSecret: 'client-secret'
-          })
-        )
-      )
 
       await client.integrations.create({
         name: 'My Integration',

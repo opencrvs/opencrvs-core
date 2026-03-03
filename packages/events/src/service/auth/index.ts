@@ -9,9 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { readFileSync } from 'fs'
+import { promisify } from 'util'
 import fetch from 'node-fetch'
+import * as jwt from 'jsonwebtoken'
 import { UUID } from '@opencrvs/commons'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 import { env } from '@events/environment'
+
+const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
+
+const sign = promisify<
+  Record<string, unknown>,
+  jwt.Secret,
+  jwt.SignOptions,
+  string
+>(jwt.sign)
 
 export async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', env.AUTH_URL).toString())
@@ -57,4 +70,14 @@ export async function getActionConfirmationToken(
     access_token: string
   }
   return accessToken
+}
+
+export async function createSystemToken(systemId: UUID, scope: string[]) {
+  return sign({ scope, userType: TokenUserType.enum.system }, cert, {
+    subject: systemId,
+    algorithm: 'RS256',
+    expiresIn: env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
+    audience: ['opencrvs:gateway-user'],
+    issuer: 'opencrvs:auth-service'
+  })
 }

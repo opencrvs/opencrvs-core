@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { cleanEnv, str, url } from 'envalid'
+import { cleanEnv, num, str, url } from 'envalid'
 
 /**
  * When defining variables aim to be consistent with existing values.
@@ -27,5 +27,7 @@ export const env = cleanEnv(process.env, {
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
-  CONFIG_URL: url({ devDefault: 'http://localhost:2021' })
+  CONFIG_URL: url({ devDefault: 'http://localhost:2021' }),
+  CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
+  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 })
 })

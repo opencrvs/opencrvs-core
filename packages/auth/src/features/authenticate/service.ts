@@ -16,6 +16,8 @@ import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { redis } from '@auth/database'
 import * as t from 'io-ts'
+import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import superjson from 'superjson'
 import {
   NotificationEvent,
   generateVerificationCode,
@@ -28,6 +30,7 @@ import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
+import { AppRouter } from '@opencrvs/events/src/router'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
@@ -38,6 +41,15 @@ const sign = promisify<
   jwt.SignOptions,
   string
 >(jwt.sign)
+
+const eventsClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson
+    })
+  ]
+})
 
 export interface IAuthentication {
   name: IUserName[]
@@ -92,19 +104,10 @@ export async function authenticateSystem(
   client_id: string,
   client_secret: string
 ): Promise<ISystemAuthentication> {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/verifySystem')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ client_id, client_secret }),
-    headers: { 'Content-Type': 'application/json' }
+  const body = await (eventsClient as any).integrations.authenticate.mutate({
+    client_id,
+    client_secret
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  const body = await res.json()
   return {
     systemId: body.id,
     scope: body.scope,
