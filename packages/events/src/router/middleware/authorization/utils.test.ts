@@ -211,34 +211,37 @@ describe('canAccessEventWithScope()', () => {
   })
 
   test('should not access event if user does not meet any of the scope options', () => {
+    // Negative test cases to ensure we don't accidentally remove checks.
     const userFromAnotherOfficeContext = {
       type: 'user',
-      id: createdById,
+      id: generateUuid(), // Different user
       primaryOfficeId: generateUuid(rng), // Different office
       administrativeAreaId: generateUuid(rng), // Different administrative area
       role: TestUserRole.enum.FIELD_AGENT
     } satisfies UserContext
 
-    expect(
-      canAccessEventWithScope(
-        registeredEvent,
-        {
-          type: 'record.print-certified-copies',
-          options: { registeredIn: 'location' }
-        },
-        userFromAnotherOfficeContext
-      )
-    ).toBe(false)
+    const singleOptions = [
+      { placeOfEvent: 'location' },
+      { placeOfEvent: 'administrativeArea' },
+      { declaredIn: 'location' },
+      { declaredIn: 'administrativeArea' },
+      { registeredIn: 'location' },
+      { registeredIn: 'administrativeArea' },
+      { declaredBy: 'user' },
+      { registeredBy: 'user' }
+    ] satisfies RecordScopeV2['options'][]
 
-    expect(
-      canAccessEventWithScope(
-        registeredEvent,
-        {
-          type: 'record.print-certified-copies',
-          options: { registeredIn: 'administrativeArea' }
-        },
-        userFromAnotherOfficeContext
-      )
-    ).toBe(false)
+    singleOptions.forEach((options) => {
+      expect(
+        canAccessEventWithScope(
+          registeredEvent,
+          {
+            type: 'record.print-certified-copies',
+            options
+          },
+          userFromAnotherOfficeContext
+        )
+      ).toBe(false)
+    })
   })
 })
