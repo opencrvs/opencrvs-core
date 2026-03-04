@@ -22,9 +22,9 @@ import {
   findScopeV2,
   getScopeOptionValue,
   JurisdictionFilter,
-  scopesWithDeclaredOptions,
-  scopesWithFullOptions,
-  scopesWithPlaceEventOptions
+  ScopesWithDeclaredOptions,
+  ScopesWithFullOptions,
+  ScopesWithPlaceEventOptions
 } from './scopes-v2'
 
 describe('findScopeV2()', () => {
@@ -244,7 +244,7 @@ describe('parseConfigurableScope()', () => {
 
 describe('2.0 scopes', () => {
   it('Strips out scope options unavailable for the "placeEvent" scope types', () => {
-    const placeEventScopes = scopesWithPlaceEventOptions.options.map((type) =>
+    const placeEventScopes = ScopesWithPlaceEventOptions.options.map((type) =>
       encodeScope({
         type,
         options: {
@@ -276,7 +276,7 @@ describe('2.0 scopes', () => {
   })
 
   it('Strips out scope options unavailable for the "declared" scope types', () => {
-    const declaredEventOptions = scopesWithDeclaredOptions.options.map((type) =>
+    const declaredEventOptions = ScopesWithDeclaredOptions.options.map((type) =>
       encodeScope({
         type,
         options: {
@@ -341,7 +341,7 @@ describe('2.0 scopes', () => {
   })
 
   it('Keeps all scope options for the "full" scope types', () => {
-    const fullEventOptions = scopesWithFullOptions.options.map((type) =>
+    const fullEventOptions = ScopesWithFullOptions.options.map((type) =>
       encodeScope({
         type,
         options: {

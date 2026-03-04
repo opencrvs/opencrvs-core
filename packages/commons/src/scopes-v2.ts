@@ -117,13 +117,13 @@ const ResolvedScopeOptionsFull = ResolvedScopeOptionsDeclared.extend({
   'Resolved options applicable to actions that may take place after REGISTER, with full filtering capabilities and location/user IDs instead of filters.'
 )
 
-export const scopesWithPlaceEventOptions = RecordScopeTypeV2.extract([
+export const ScopesWithPlaceEventOptions = RecordScopeTypeV2.extract([
   'record.create',
   'record.declare',
   'record.notify'
 ])
 
-export const scopesWithDeclaredOptions = RecordScopeTypeV2.extract([
+export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
   'record.validate',
   'record.reject',
   'record.archive',
@@ -131,7 +131,7 @@ export const scopesWithDeclaredOptions = RecordScopeTypeV2.extract([
   'record.register'
 ])
 
-export const scopesWithFullOptions = RecordScopeTypeV2.extract([
+export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.search',
   'record.read',
   'record.print-certified-copies',
@@ -143,15 +143,15 @@ export const scopesWithFullOptions = RecordScopeTypeV2.extract([
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
-      type: scopesWithPlaceEventOptions,
+      type: ScopesWithPlaceEventOptions,
       options: scopeOptionsPlaceEvent.optional()
     }),
     z.object({
-      type: scopesWithDeclaredOptions,
+      type: ScopesWithDeclaredOptions,
       options: scopeOptionsDeclared.optional()
     }),
     z.object({
-      type: scopesWithFullOptions,
+      type: ScopesWithFullOptions,
       options: ScopeOptionsFull.optional()
     })
   ])
@@ -163,33 +163,33 @@ export function scopeUsesDeclaredOptions(
   scope: RecordScopeV2
 ): scope is Extract<
   RecordScopeV2,
-  { type: z.infer<typeof scopesWithDeclaredOptions> }
+  { type: z.infer<typeof ScopesWithDeclaredOptions> }
 > {
   // If the scope has less, it is found here. Otherwise in other categories.
-  return !scopesWithPlaceEventOptions.options.some((opt) => opt === scope.type)
+  return !ScopesWithPlaceEventOptions.options.some((opt) => opt === scope.type)
 }
 
 export function scopeUsesFullOptions(
   scope: RecordScopeV2
 ): scope is Extract<
   RecordScopeV2,
-  { type: z.infer<typeof scopesWithFullOptions> }
+  { type: z.infer<typeof ScopesWithFullOptions> }
 > {
-  return scopesWithFullOptions.options.some((opt) => opt === scope.type)
+  return ScopesWithFullOptions.options.some((opt) => opt === scope.type)
 }
 
 export const ResolvedRecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
-      type: scopesWithPlaceEventOptions,
+      type: ScopesWithPlaceEventOptions,
       options: ResolvedScopeOptionsPlaceEvent.optional()
     }),
     z.object({
-      type: scopesWithDeclaredOptions,
+      type: ScopesWithDeclaredOptions,
       options: ResolvedScopeOptionsDeclared.optional()
     }),
     z.object({
-      type: scopesWithFullOptions,
+      type: ScopesWithFullOptions,
       options: ResolvedScopeOptionsFull.optional()
     })
   ])
