@@ -20,7 +20,7 @@ import z from 'zod/v4'
 
 const ScopeOptionReference = z.object({
   $scope: RecordScopeTypeV2,
-  $attribute: RecordScopeOptionKey
+  $option: RecordScopeOptionKey
 })
 
 type ScopeOptionReference = z.infer<typeof ScopeOptionReference>
@@ -61,14 +61,14 @@ function resolveJurisdictionScopeOptionReference(
   scopeOptionReference: ScopeOptionReference,
   scopes: RawScopes[]
 ): JurisdictionFilter | undefined {
-  const { $scope, $attribute } = scopeOptionReference
+  const { $scope, $option } = scopeOptionReference
   const scope = findScopeV2(scopes, $scope)
 
   if (!scope) {
     return
   }
 
-  const optionValue = getScopeOptionValue(scope, $attribute)
+  const optionValue = getScopeOptionValue(scope, $option)
 
   // If option is set but not a jurisdiction filter, return the least permissive jurisdiction filter
   if (!isJurisdictionFilter(optionValue)) {
@@ -120,7 +120,7 @@ export const userReferenceFunctions = {
      */
     attribute: (option: RecordScopeOptionKey) => ({
       $scope: scope,
-      $attribute: option
+      $option: option
     })
   }),
   /**
