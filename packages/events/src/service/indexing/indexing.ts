@@ -29,7 +29,11 @@ import {
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
-import { logger, RecordScopeV2 } from '@opencrvs/commons'
+import {
+  EventIndexWithAdministrativeHierarchy,
+  logger,
+  RecordScopeV2
+} from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
@@ -41,7 +45,6 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
-  EventIndexWithAdministrativeHierarchy,
   getEventIndexWithAdministrativeHierarchy,
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
