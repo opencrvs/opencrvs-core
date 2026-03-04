@@ -15,21 +15,54 @@ import {
   UserFilter,
   JurisdictionFilter,
   RecordScopeTypeV2,
-  RecordScopeV2
+  RecordScopeV2,
+  UUID,
+  scopeUsesFullOptions,
+  scopeUsesDeclaredOptions
 } from '@opencrvs/commons'
 import { EventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
-import { UserContext } from '../../../context'
+import { SystemContext, UserContext } from '../../../context'
+
+/**
+ *
+ * @param locationIds location hierarchy from event index
+ * @param filter jurisdiction filter from the scope
+ * @param user user context to resolve scopes against.
+ * @returns whether the locationIds satisfy the jurisdiction filter for the user.
+ */
+function matchesJurisdictionFilter(
+  locationIds: UUID[] | null | undefined,
+  filter: JurisdictionFilter,
+  user: UserContext | SystemContext
+): boolean {
+  if (!locationIds) {
+    return false
+  }
+
+  if (filter === JurisdictionFilter.enum.location) {
+    return locationIds.some((id) => id === user.primaryOfficeId)
+  }
+  if (filter === JurisdictionFilter.enum.administrativeArea) {
+    return (
+      user.administrativeAreaId === null ||
+      locationIds.some((id) => id === user.administrativeAreaId)
+    )
+  }
+
+  return true
+}
 
 /**
  * Given indexed event and resolved scope, determine if the scope allows access to the event.
  *
  * All of the options within the scope must be satisfied for access to be granted.
+ * Return false early to break out of checks as soon as possible - if any option is not satisfied, the scope does not allow access to the event, so no need to check further options.
  *
  */
-function canAccessEventWithScope(
+export function canAccessEventWithScope(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
   scope: RecordScopeV2,
-  user: UserContext
+  user: UserContext | SystemContext
 ): boolean {
   const opts = scope.options
 
@@ -39,55 +72,87 @@ function canAccessEventWithScope(
     }
   }
 
-  if (opts?.declaredBy === UserFilter.enum.user) {
-    if (event.legalStatuses?.DECLARED?.createdBy !== user.id) {
-      return false
-    }
+  if (
+    opts?.placeOfEvent === JurisdictionFilter.enum.location &&
+    !matchesJurisdictionFilter(
+      event.placeOfEvent,
+      JurisdictionFilter.enum.location,
+      user
+    )
+  ) {
+    return false
   }
 
-  if (opts?.registeredBy === UserFilter.enum.user) {
-    if (event.legalStatuses?.REGISTERED?.createdBy !== user.id) {
-      return false
-    }
+  if (
+    opts?.placeOfEvent === JurisdictionFilter.enum.administrativeArea &&
+    !matchesJurisdictionFilter(
+      event.placeOfEvent,
+      JurisdictionFilter.enum.administrativeArea,
+      user
+    )
+  ) {
+    return false
   }
 
-  if (opts?.declaredIn === JurisdictionFilter.enum.location) {
-    const locationIds = event.legalStatuses?.DECLARED?.createdAtLocation
+  if (scopeUsesDeclaredOptions(scope)) {
+    const { options } = scope
+
+    if (options?.declaredBy === UserFilter.enum.user) {
+      if (event.legalStatuses?.DECLARED?.createdBy !== user.id) {
+        return false
+      }
+    }
+
     if (
-      !locationIds ||
-      !locationIds.some((id) => id === user.primaryOfficeId)
+      options?.declaredIn === JurisdictionFilter.enum.location &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.DECLARED?.createdAtLocation,
+        JurisdictionFilter.enum.location,
+        user
+      )
+    ) {
+      return false
+    }
+
+    if (
+      options?.declaredIn === JurisdictionFilter.enum.administrativeArea &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.DECLARED?.createdAtLocation,
+        JurisdictionFilter.enum.administrativeArea,
+        user
+      )
     ) {
       return false
     }
   }
 
-  if (opts?.declaredIn === JurisdictionFilter.enum.administrativeArea) {
-    const locationIds = event.legalStatuses?.DECLARED?.createdAtLocation
+  if (scopeUsesFullOptions(scope)) {
+    const { options } = scope
+
+    if (options?.registeredBy === UserFilter.enum.user) {
+      if (event.legalStatuses?.REGISTERED?.createdBy !== user.id) {
+        return false
+      }
+    }
+
     if (
-      (!locationIds ||
-        !locationIds.some((id) => id === user.administrativeAreaId)) &&
-      user.administrativeAreaId !== null
+      options?.registeredIn === JurisdictionFilter.enum.location &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.REGISTERED?.createdAtLocation,
+        JurisdictionFilter.enum.location,
+        user
+      )
     ) {
       return false
     }
-  }
 
-  if (opts?.registeredIn === JurisdictionFilter.enum.location) {
-    const locationIds = event.legalStatuses?.REGISTERED?.createdAtLocation
     if (
-      !locationIds ||
-      !locationIds.some((id) => id === user.primaryOfficeId)
-    ) {
-      return false
-    }
-  }
-
-  if (opts?.registeredIn === JurisdictionFilter.enum.administrativeArea) {
-    const locationIds = event.legalStatuses?.REGISTERED?.createdAtLocation
-    if (
-      !locationIds ||
-      (!locationIds.some((id) => id === user.administrativeAreaId) &&
-        user.administrativeAreaId !== null)
+      options?.registeredIn === JurisdictionFilter.enum.administrativeArea &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.REGISTERED?.createdAtLocation,
+        JurisdictionFilter.enum.administrativeArea,
+        user
+      )
     ) {
       return false
     }
@@ -101,10 +166,10 @@ function canAccessEventWithScope(
  *
  * One of the scopes must allow access for the event to be accessible.
  */
-export function canAccessEventWithScopes(
+export function userCanAccessEventWithScopes(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
   scopes: RecordScopeV2[],
-  user: UserContext
+  user: UserContext | SystemContext
 ) {
   return scopes.some((scope) => canAccessEventWithScope(event, scope, user))
 }
