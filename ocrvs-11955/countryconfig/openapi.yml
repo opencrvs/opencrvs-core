@@ -9142,6 +9142,8 @@ components:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
           $ref: "#/components/schemas/ExactUserType"
+        updatedByUserRole:
+          $ref: "#/components/schemas/Exact"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
