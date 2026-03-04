@@ -110,7 +110,12 @@ function EventOverviewTabs() {
 
   const loggedInUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
-  const [currentUser] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
+
+  if (!loggedInUser?.id) {
+    throw new Error('User is not logged in')
+  }
+
+  const [currentUser] = getUser.useSuspenseQuery(loggedInUser.id)
 
   const readScopes = getAcceptedScopesByType({
     acceptedScopes: ['record.read'],

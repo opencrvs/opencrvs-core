@@ -44,7 +44,7 @@ export function getLocationHierarchy(
         loc.administrativeAreaId,
         administrativeAreas
       )
-      return [...hierarchy.reverse().map((area) => area.id), loc.id]
+      return [...hierarchy.toReversed().map((area) => area.id), loc.id]
     }
     return [loc.id]
   }
@@ -53,7 +53,7 @@ export function getLocationHierarchy(
     selectedId,
     administrativeAreas
   )
-  return hierarchy.reverse().map((area) => area.id)
+  return hierarchy.toReversed().map((area) => area.id)
 }
 
 /**
