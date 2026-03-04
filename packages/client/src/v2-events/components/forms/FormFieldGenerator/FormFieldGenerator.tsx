@@ -158,49 +158,6 @@ export const FormFieldGenerator = forwardRef<
     const getDefaultValues = useDefaultValue()
     const defaultPageValues = getDefaultValues(fields)
 
-    //@todo: move the logic inside NAME field
-    // const updateTouchFields = (
-    //   touched: FormikTouched<Record<string, boolean | undefined>>
-    // ) => {
-    //   const newlyTouched =
-    //     Object.keys(touched).length > 0 &&
-    //     !isEqual(touched, touchedFields) &&
-    //     Object.keys(touched).filter((key) => !(key in touchedFields))
-    //
-    //   if (newlyTouched && newlyTouched.length > 0) {
-    //     const newlyTouchedFields = parentId
-    //       ? newlyTouched.reduce((prev, fieldId) => {
-    //           let markParentDirty = false
-    //           if (eventConfig) {
-    //             const fieldConfig = getDeclarationFields(eventConfig).find(
-    //               (x) => x.id === makeFormikFieldIdOpenCRVSCompatible(parentId)
-    //             )
-    //             /**
-    //              * For NAME fields with hideSubFieldError enabled, we need to mark its parent as dirty to ensure proper validation error
-    //              * message is shown at Name field level, since subfield validation error message is hidden
-    //              */
-    //             markParentDirty =
-    //               fieldConfig?.type === FieldType.NAME &&
-    //               !!fieldConfig.configuration?.showParentFieldError
-    //           }
-    //
-    //           return {
-    //             ...prev,
-    //             /**
-    //              * If we are touching  `firstname` from `child____name`,
-    //              * we mark `child____name____firstname` as dirty
-    //              */
-    //             [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true,
-    //             ...(markParentDirty && {
-    //               [parentId]: true
-    //             })
-    //           }
-    //         }, {})
-    //       : touched
-    //   }
-    //   setAllTouchedFields(deepMerge(touchedFields, touched))
-    // }
-
     const formikCompatibleInitialValues = makeFormFieldIdsFormikCompatible({
       ...defaultPageValues,
       ...pick(

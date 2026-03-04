@@ -69,7 +69,8 @@ import {
   isFieldVisible,
   IndexMap,
   FormState,
-  flattenFieldReference
+  flattenFieldReference,
+  flattenFormState
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -226,8 +227,14 @@ export const GeneratedInputField = React.memo(
       const groupTouched =
         (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
         {}
+
+      const anySubfieldTouched = flattenFormState(groupTouched).some(
+        ([, nestedTouched]) => nestedTouched
+      )
+
       const parentInputFieldProps = {
         ...field.inputFieldProps,
+        touched: anySubfieldTouched,
         // only forward error if it is coming from the group custom validations
         error: typeof error === 'string' ? error : ''
       }
@@ -271,13 +278,23 @@ export const GeneratedInputField = React.memo(
         (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
         {}
 
+      const anySubfieldTouched = flattenFormState(groupTouched).some(
+        ([, nestedTouched]) => nestedTouched
+      )
+
+      const nameInputFieldProps = {
+        ...field.inputFieldProps,
+        touched: anySubfieldTouched,
+        // skip when nested errors are there
+        error:
+          typeof field.inputFieldProps.error === 'string'
+            ? field.inputFieldProps.error
+            : ''
+      }
+
       return (
         // We are showing errors to underlying text input, so we need to ignore them here
-        <InputField
-          {...(field.config.configuration?.showParentFieldError
-            ? field.inputFieldProps
-            : omit(field.inputFieldProps, 'error'))}
-        >
+        <InputField {...nameInputFieldProps}>
           <Name.Input
             configuration={field.config.configuration}
             disabled={disabled}

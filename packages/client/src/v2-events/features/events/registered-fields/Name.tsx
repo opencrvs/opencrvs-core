@@ -182,9 +182,7 @@ function NameInput({
             description: 'This is the label for the firstname field',
             id: 'field.name.firstname.label'
           },
-          validation: configuration?.showParentFieldError
-            ? undefined
-            : getValidatorsForField('firstname', validators)
+          validation: getValidatorsForField('firstname', validators)
         } satisfies TextField
       case 'middlename':
         return {
@@ -203,9 +201,7 @@ function NameInput({
             description: 'This is the label for the middlename field',
             id: 'field.name.middlename.label'
           },
-          validation: configuration?.showParentFieldError
-            ? undefined
-            : getValidatorsForField('middlename', validators)
+          validation: getValidatorsForField('middlename', validators)
         }
       case 'surname':
         return {
@@ -224,9 +220,7 @@ function NameInput({
             description: 'This is the label for the surname field',
             id: 'field.name.surname.label'
           },
-          validation: configuration?.showParentFieldError
-            ? undefined
-            : getValidatorsForField('surname', validators)
+          validation: getValidatorsForField('surname', validators)
         }
       default:
         throw new Error(`Unknown field type: ${field}`)
