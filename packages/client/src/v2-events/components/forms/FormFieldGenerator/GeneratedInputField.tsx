@@ -530,8 +530,8 @@ export const GeneratedInputField = React.memo(
             configuration={field.config.configuration}
             disabled={disabled}
             eventType={eventConfig?.id}
-            value={field.value}
             validatorContext={validatorContext}
+            value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -688,6 +688,7 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />
