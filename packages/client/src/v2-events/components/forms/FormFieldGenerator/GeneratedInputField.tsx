@@ -156,717 +156,714 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   validatorContext: ValidatorContext
 }
 
-export const GeneratedInputField = React.memo(
-  <T extends FieldConfig>(props: GeneratedInputFieldProps<T>) => {
-    const {
-      fieldDefinition,
-      eventConfig,
-      name,
-      validatorContext,
-      onFieldValueChange,
-      onBatchFieldValueChange,
-      onBlur,
-      allKnownFields,
-      form,
-      disabled,
-      readonlyMode
-    } = props
-    const intl = useIntl()
-    const [input, meta] = useField<FieldValue>(name)
-    const { touched: allTouched } = useFormikContext<EventState>()
-    const error = disabled ? '' : meta.error
+export const GeneratedInputField = <T extends FieldConfig>(
+  props: GeneratedInputFieldProps<T>
+) => {
+  const {
+    fieldDefinition,
+    eventConfig,
+    name,
+    validatorContext,
+    onFieldValueChange,
+    onBatchFieldValueChange,
+    onBlur,
+    allKnownFields,
+    form,
+    disabled,
+    readonlyMode
+  } = props
+  const intl = useIntl()
+  const [input, meta] = useField<FieldValue>(name)
+  const { touched: allTouched } = useFormikContext<EventState>()
+  const error = disabled ? '' : meta.error
+  // If label is hidden or default message is empty, we don't need to render label
+  const label =
+    fieldDefinition.hideLabel || !fieldDefinition.label.defaultMessage
+      ? undefined
+      : intl.formatMessage(fieldDefinition.label)
+
+  const inputFieldProps = {
+    id: name,
     // If label is hidden or default message is empty, we don't need to render label
-    const label =
-      fieldDefinition.hideLabel || !fieldDefinition.label.defaultMessage
-        ? undefined
-        : intl.formatMessage(fieldDefinition.label)
+    label,
+    required:
+      typeof fieldDefinition.required === 'boolean'
+        ? fieldDefinition.required
+        : !!fieldDefinition.required,
+    disabled: readonlyMode,
+    helperText: fieldDefinition.helperText
+      ? intl.formatMessage(fieldDefinition.helperText)
+      : undefined,
+    error,
+    touched: meta.touched
+  }
 
-    const inputFieldProps = {
-      id: name,
-      // If label is hidden or default message is empty, we don't need to render label
-      label,
-      required:
-        typeof fieldDefinition.required === 'boolean'
-          ? fieldDefinition.required
-          : !!fieldDefinition.required,
-      disabled: readonlyMode,
-      helperText: fieldDefinition.helperText
-        ? intl.formatMessage(fieldDefinition.helperText)
-        : undefined,
-      error,
-      touched: meta.touched
+  function handleBlur<E>(_: React.FocusEvent<E>) {
+    onBlur(name, true)
+  }
+
+  const inputProps = {
+    disabled: disabled || readonlyMode,
+    error: Boolean(error),
+    id: name,
+    name,
+    onBlur: handleBlur,
+    onChange: onFieldValueChange.bind(null, name),
+    placeholder:
+      fieldDefinition.placeholder &&
+      intl.formatMessage(fieldDefinition.placeholder),
+    touched: meta.touched
+  }
+
+  /**
+   * Combines the field definition with the current value and input field props
+   * USED FOR: rendering the correct input field based on the FieldConfig guards
+   */
+  const field = {
+    inputFieldProps,
+    config: fieldDefinition,
+    value: input.value
+  }
+  if (isFieldGroupFieldType(field)) {
+    const groupTouched =
+      (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ?? {}
+
+    const anySubfieldTouched = flattenFormState(groupTouched).some(
+      ([, nestedTouched]) => nestedTouched
+    )
+
+    const parentInputFieldProps = {
+      ...field.inputFieldProps,
+      touched: anySubfieldTouched,
+      // only forward error if it is coming from the group custom validations
+      error: typeof error === 'string' ? error : ''
     }
-
-    function handleBlur<E>(_: React.FocusEvent<E>) {
-      onBlur(name, true)
-    }
-
-    const inputProps = {
-      disabled: disabled || readonlyMode,
-      error: Boolean(error),
-      id: name,
-      name,
-      onBlur: handleBlur,
-      onChange: onFieldValueChange.bind(null, name),
-      placeholder:
-        fieldDefinition.placeholder &&
-        intl.formatMessage(fieldDefinition.placeholder),
-      touched: meta.touched
-    }
-
-    /**
-     * Combines the field definition with the current value and input field props
-     * USED FOR: rendering the correct input field based on the FieldConfig guards
-     */
-    const field = {
-      inputFieldProps,
-      config: fieldDefinition,
-      value: input.value
-    }
-    if (isFieldGroupFieldType(field)) {
-      const groupTouched =
-        (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
-        {}
-
-      const anySubfieldTouched = flattenFormState(groupTouched).some(
-        ([, nestedTouched]) => nestedTouched
-      )
-
-      const parentInputFieldProps = {
-        ...field.inputFieldProps,
-        touched: anySubfieldTouched,
-        // only forward error if it is coming from the group custom validations
-        error: typeof error === 'string' ? error : ''
-      }
-      return (
-        <InputField {...parentInputFieldProps}>
-          {field.config.fields.map((subfield) => {
-            if (!isFieldVisible(subfield, form, validatorContext)) {
-              return null
-            }
-            const subfieldName = makeFormFieldIdFormikCompatible(subfield.id)
-            const subfieldFullName = `${name}.${subfieldName}`
-            return (
-              <FormItem
-                key={subfieldFullName}
-                ignoreBottomMargin={subfield.type === FieldType.PAGE_HEADER}
-              >
-                <GeneratedInputField
-                  {...props}
-                  fieldDefinition={subfield}
-                  name={subfieldFullName}
-                  onBlur={(_, nestedTouched) =>
-                    onBlur(name, {
-                      ...groupTouched,
-                      [subfieldName]: nestedTouched
-                    })
-                  }
-                />
-              </FormItem>
-            )
-          })}
-        </InputField>
-      )
-    }
-
-    if (isNameFieldType(field)) {
-      const validation = getValidatorsForField(
-        makeFormikFieldIdOpenCRVSCompatible(field.config.id),
-        field.config.validation || []
-      )
-      const groupTouched =
-        (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
-        {}
-
-      const anySubfieldTouched = flattenFormState(groupTouched).some(
-        ([, nestedTouched]) => nestedTouched
-      )
-
-      const nameInputFieldProps = {
-        ...field.inputFieldProps,
-        touched: anySubfieldTouched,
-        // skip when nested errors are there
-        error:
-          typeof field.inputFieldProps.error === 'string'
-            ? field.inputFieldProps.error
-            : ''
-      }
-
-      return (
-        // We are showing errors to underlying text input, so we need to ignore them here
-        <InputField {...nameInputFieldProps}>
-          <Name.Input
-            configuration={field.config.configuration}
-            disabled={disabled}
-            eventConfig={eventConfig}
-            id={fieldDefinition.id}
-            name={name}
-            touched={groupTouched}
-            validation={validation}
-            validatorContext={validatorContext}
-            value={field.value}
-            onBlur={onBlur}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
-        </InputField>
-      )
-    }
-
-    if (isPhoneFieldType(field)) {
-      return (
-        <InputField {...field.inputFieldProps}>
-          <Text.Input
-            {...inputProps}
-            isDisabled={inputProps.disabled}
-            type="text"
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
-
-    if (isIdFieldType(field)) {
-      return (
-        <InputField {...field.inputFieldProps}>
-          <Text.Input
-            {...inputProps}
-            isDisabled={inputProps.disabled}
-            type="text"
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
-
-    if (isDateFieldType(field)) {
-      return (
-        <InputField {...field.inputFieldProps}>
-          <DateField.Input {...inputProps} value={field.value} />
-        </InputField>
-      )
-    }
-
-    if (isAgeFieldType(field)) {
-      return (
-        <InputField
-          {...inputFieldProps}
-          postfix={
-            field.config.configuration.postfix &&
-            intl.formatMessage(field.config.configuration.postfix)
+    return (
+      <InputField {...parentInputFieldProps}>
+        {field.config.fields.map((subfield) => {
+          if (!isFieldVisible(subfield, form, validatorContext)) {
+            return null
           }
-          prefix={
-            field.config.configuration.prefix &&
-            intl.formatMessage(field.config.configuration.prefix)
-          }
-        >
-          <AgeField.Input
-            {...inputProps}
-            asOfDateRef={field.config.configuration.asOfDate.$$field}
-            value={field.value?.age}
-          />
-        </InputField>
-      )
+          const subfieldName = makeFormFieldIdFormikCompatible(subfield.id)
+          const subfieldFullName = `${name}.${subfieldName}`
+          return (
+            <FormItem
+              key={subfieldFullName}
+              ignoreBottomMargin={subfield.type === FieldType.PAGE_HEADER}
+            >
+              <GeneratedInputField
+                {...props}
+                fieldDefinition={subfield}
+                name={subfieldFullName}
+                onBlur={(_, nestedTouched) =>
+                  onBlur(name, {
+                    ...groupTouched,
+                    [subfieldName]: nestedTouched
+                  })
+                }
+              />
+            </FormItem>
+          )
+        })}
+      </InputField>
+    )
+  }
+
+  if (isNameFieldType(field)) {
+    const validation = getValidatorsForField(
+      makeFormikFieldIdOpenCRVSCompatible(field.config.id),
+      field.config.validation || []
+    )
+    const groupTouched =
+      (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ?? {}
+
+    const anySubfieldTouched = flattenFormState(groupTouched).some(
+      ([, nestedTouched]) => nestedTouched
+    )
+
+    const nameInputFieldProps = {
+      ...field.inputFieldProps,
+      touched: anySubfieldTouched,
+      // skip when nested errors are there
+      error:
+        typeof field.inputFieldProps.error === 'string'
+          ? field.inputFieldProps.error
+          : ''
     }
 
-    if (isTimeFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <TimeField.Input
-            {...inputProps}
-            use12HourFormat={field.config.configuration?.use12HourFormat}
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
-
-    if (isDateRangeFieldType(field)) {
-      const parsed = DateRangeFieldValue.safeParse(field.value)
-      return (
-        <InputField {...field.inputFieldProps}>
-          <DateRangeField.Input {...inputProps} value={parsed.data} />
-        </InputField>
-      )
-    }
-
-    if (isSelectDateRangeFieldType(field)) {
-      return (
-        <InputField {...field.inputFieldProps}>
-          <SelectDateRangeField.Input
-            {...inputProps}
-            options={field.config.options}
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
-
-    if (isPageHeaderFieldType(field)) {
-      return (
-        <PageHeader.Input>
-          {intl.formatMessage(fieldDefinition.label)}
-        </PageHeader.Input>
-      )
-    }
-
-    if (isParagraphFieldType(field)) {
-      // @todo: is this even needed?
-      const message = intl.formatMessage(fieldDefinition.label, {
-        [fieldDefinition.id]: field.value
-      })
-
-      return (
-        <Paragraph.Input
+    return (
+      // We are showing errors to underlying text input, so we need to ignore them here
+      <InputField {...nameInputFieldProps}>
+        <Name.Input
           configuration={field.config.configuration}
-          message={message}
+          disabled={disabled}
+          eventConfig={eventConfig}
+          id={fieldDefinition.id}
+          name={name}
+          touched={groupTouched}
+          validation={validation}
+          validatorContext={validatorContext}
+          value={field.value}
+          onBlur={onBlur}
+          onChange={(val) => onFieldValueChange(name, val)}
         />
-      )
-    }
+      </InputField>
+    )
+  }
 
-    if (isTextFieldType(field)) {
-      return (
-        <InputField
-          {...inputFieldProps}
-          postfix={
-            field.config.configuration?.postfix &&
-            intl.formatMessage(field.config.configuration.postfix)
-          }
-          prefix={
-            field.config.configuration?.prefix &&
-            intl.formatMessage(field.config.configuration.prefix)
-          }
-        >
-          <Text.Input
-            {...inputProps}
-            isDisabled={disabled}
-            maxLength={field.config.configuration?.maxLength}
-            type={field.config.configuration?.type ?? 'text'}
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
+  if (isPhoneFieldType(field)) {
+    return (
+      <InputField {...field.inputFieldProps}>
+        <Text.Input
+          {...inputProps}
+          isDisabled={inputProps.disabled}
+          type="text"
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
 
-    if (isEmailFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <Text.Input
-            {...inputProps}
-            isDisabled={inputProps.disabled}
-            maxLength={field.config.configuration?.maxLength}
-            type="email"
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
-    if (isNumberFieldType(field)) {
-      return (
-        <InputField
-          {...inputFieldProps}
-          postfix={
-            field.config.configuration?.postfix &&
-            intl.formatMessage(field.config.configuration.postfix)
-          }
-          prefix={
-            field.config.configuration?.prefix &&
-            intl.formatMessage(field.config.configuration.prefix)
-          }
-        >
-          <Number.Input
-            {...inputProps}
-            max={field.config.configuration?.max}
-            min={field.config.configuration?.min}
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
-    if (isNumberWithUnitFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <NumberWithUnit.Input
-            {...inputProps}
-            configuration={field.config.configuration}
-            options={field.config.options}
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
+  if (isIdFieldType(field)) {
+    return (
+      <InputField {...field.inputFieldProps}>
+        <Text.Input
+          {...inputProps}
+          isDisabled={inputProps.disabled}
+          type="text"
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
 
-    if (isTextAreaFieldType(field)) {
-      return (
-        <InputField
-          {...inputFieldProps}
-          postfix={
-            field.config.configuration?.postfix &&
-            intl.formatMessage(field.config.configuration.postfix)
-          }
-          prefix={
-            field.config.configuration?.prefix &&
-            intl.formatMessage(field.config.configuration.prefix)
-          }
-        >
-          <TextArea
-            {...inputProps}
-            maxLength={field.config.configuration?.maxLength}
-            value={field.value}
-            onChange={(e) => onFieldValueChange(name, e.target.value)}
-          />
-        </InputField>
-      )
-    }
+  if (isDateFieldType(field)) {
+    return (
+      <InputField {...field.inputFieldProps}>
+        <DateField.Input {...inputProps} value={field.value} />
+      </InputField>
+    )
+  }
 
-    if (isFileFieldType(field)) {
-      const uploadedFileNameLabel = field.config.configuration.fileName
-        ? intl.formatMessage(field.config.configuration.fileName)
-        : intl.formatMessage(field.config.label)
+  if (isAgeFieldType(field)) {
+    return (
+      <InputField
+        {...inputFieldProps}
+        postfix={
+          field.config.configuration.postfix &&
+          intl.formatMessage(field.config.configuration.postfix)
+        }
+        prefix={
+          field.config.configuration.prefix &&
+          intl.formatMessage(field.config.configuration.prefix)
+        }
+      >
+        <AgeField.Input
+          {...inputProps}
+          asOfDateRef={field.config.configuration.asOfDate.$$field}
+          value={field.value?.age}
+        />
+      </InputField>
+    )
+  }
 
-      return (
-        <InputField {...inputFieldProps}>
-          <File.Input
-            {...inputProps}
-            acceptedFileTypes={field.config.configuration.acceptedFileTypes}
-            disabled={disabled}
-            error={inputFieldProps.error}
-            label={uploadedFileNameLabel}
-            maxFileSize={field.config.configuration.maxFileSize}
-            maxImageSize={field.config.configuration.maxImageSize}
-            value={field.value}
-            width={field.config.configuration.style?.width}
-          />
-        </InputField>
-      )
-    }
-    if (isBulletListFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <BulletList.Input {...field.config} />
-        </InputField>
-      )
-    }
-    if (isAddressFieldType(field)) {
-      const groupTouched =
-        (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ??
-        {}
-      return (
-        // We are showing errors to underlying inputs, so we need to ignore them here
-        <InputField {...omit(field.inputFieldProps, 'error')}>
-          <Address.Input
-            {...field.config}
-            configuration={field.config.configuration}
-            disabled={disabled}
-            name={name}
-            touched={groupTouched}
-            validatorContext={validatorContext}
-            value={field.value}
-            onBlur={onBlur}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
-        </InputField>
-      )
-    }
-    if (isSelectFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <Select.Input
-            {...inputProps}
-            noOptionsMessage={field.config.noOptionsMessage}
-            options={field.config.options}
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
-    if (isCountryFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <SelectCountry.Input {...inputProps} value={field.value} />
-        </InputField>
-      )
-    }
-    if (isCheckboxFieldType(field)) {
-      return (
-        <Checkbox.Input
+  if (isTimeFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <TimeField.Input
+          {...inputProps}
+          use12HourFormat={field.config.configuration?.use12HourFormat}
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
+
+  if (isDateRangeFieldType(field)) {
+    const parsed = DateRangeFieldValue.safeParse(field.value)
+    return (
+      <InputField {...field.inputFieldProps}>
+        <DateRangeField.Input {...inputProps} value={parsed.data} />
+      </InputField>
+    )
+  }
+
+  if (isSelectDateRangeFieldType(field)) {
+    return (
+      <InputField {...field.inputFieldProps}>
+        <SelectDateRangeField.Input
+          {...inputProps}
+          options={field.config.options}
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
+
+  if (isPageHeaderFieldType(field)) {
+    return (
+      <PageHeader.Input>
+        {intl.formatMessage(fieldDefinition.label)}
+      </PageHeader.Input>
+    )
+  }
+
+  if (isParagraphFieldType(field)) {
+    // @todo: is this even needed?
+    const message = intl.formatMessage(fieldDefinition.label, {
+      [fieldDefinition.id]: field.value
+    })
+
+    return (
+      <Paragraph.Input
+        configuration={field.config.configuration}
+        message={message}
+      />
+    )
+  }
+
+  if (isTextFieldType(field)) {
+    return (
+      <InputField
+        {...inputFieldProps}
+        postfix={
+          field.config.configuration?.postfix &&
+          intl.formatMessage(field.config.configuration.postfix)
+        }
+        prefix={
+          field.config.configuration?.prefix &&
+          intl.formatMessage(field.config.configuration.prefix)
+        }
+      >
+        <Text.Input
+          {...inputProps}
+          isDisabled={disabled}
+          maxLength={field.config.configuration?.maxLength}
+          type={field.config.configuration?.type ?? 'text'}
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
+
+  if (isEmailFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Text.Input
+          {...inputProps}
+          isDisabled={inputProps.disabled}
+          maxLength={field.config.configuration?.maxLength}
+          type="email"
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
+  if (isNumberFieldType(field)) {
+    return (
+      <InputField
+        {...inputFieldProps}
+        postfix={
+          field.config.configuration?.postfix &&
+          intl.formatMessage(field.config.configuration.postfix)
+        }
+        prefix={
+          field.config.configuration?.prefix &&
+          intl.formatMessage(field.config.configuration.prefix)
+        }
+      >
+        <Number.Input
+          {...inputProps}
+          max={field.config.configuration?.max}
+          min={field.config.configuration?.min}
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
+  if (isNumberWithUnitFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <NumberWithUnit.Input
+          {...inputProps}
+          configuration={field.config.configuration}
+          options={field.config.options}
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
+
+  if (isTextAreaFieldType(field)) {
+    return (
+      <InputField
+        {...inputFieldProps}
+        postfix={
+          field.config.configuration?.postfix &&
+          intl.formatMessage(field.config.configuration.postfix)
+        }
+        prefix={
+          field.config.configuration?.prefix &&
+          intl.formatMessage(field.config.configuration.prefix)
+        }
+      >
+        <TextArea
+          {...inputProps}
+          maxLength={field.config.configuration?.maxLength}
+          value={field.value}
+          onChange={(e) => onFieldValueChange(name, e.target.value)}
+        />
+      </InputField>
+    )
+  }
+
+  if (isFileFieldType(field)) {
+    const uploadedFileNameLabel = field.config.configuration.fileName
+      ? intl.formatMessage(field.config.configuration.fileName)
+      : intl.formatMessage(field.config.label)
+
+    return (
+      <InputField {...inputFieldProps}>
+        <File.Input
+          {...inputProps}
+          acceptedFileTypes={field.config.configuration.acceptedFileTypes}
+          disabled={disabled}
+          error={inputFieldProps.error}
+          label={uploadedFileNameLabel}
+          maxFileSize={field.config.configuration.maxFileSize}
+          maxImageSize={field.config.configuration.maxImageSize}
+          value={field.value}
+          width={field.config.configuration.style?.width}
+        />
+      </InputField>
+    )
+  }
+  if (isBulletListFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <BulletList.Input {...field.config} />
+      </InputField>
+    )
+  }
+  if (isAddressFieldType(field)) {
+    const groupTouched =
+      (get(allTouched, name) as IndexMap<FormState<boolean>> | undefined) ?? {}
+    return (
+      // We are showing errors to underlying inputs, so we need to ignore them here
+      <InputField {...omit(field.inputFieldProps, 'error')}>
+        <Address.Input
+          {...field.config}
+          configuration={field.config.configuration}
+          disabled={disabled}
+          name={name}
+          touched={groupTouched}
+          validatorContext={validatorContext}
+          value={field.value}
+          onBlur={onBlur}
+          onChange={(val) => onFieldValueChange(name, val)}
+        />
+      </InputField>
+    )
+  }
+  if (isSelectFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Select.Input
+          {...inputProps}
+          noOptionsMessage={field.config.noOptionsMessage}
+          options={field.config.options}
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
+  if (isCountryFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <SelectCountry.Input {...inputProps} value={field.value} />
+      </InputField>
+    )
+  }
+  if (isCheckboxFieldType(field)) {
+    return (
+      <Checkbox.Input
+        {...field.config}
+        disabled={disabled}
+        value={field.value}
+        onChange={(val) => onFieldValueChange(name, val)}
+      />
+    )
+  }
+  if (isRadioGroupFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <RadioGroup.Input
           {...field.config}
           disabled={disabled}
           value={field.value}
           onChange={(val) => onFieldValueChange(name, val)}
         />
-      )
-    }
-    if (isRadioGroupFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <RadioGroup.Input
-            {...field.config}
-            disabled={disabled}
-            value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
-        </InputField>
-      )
-    }
+      </InputField>
+    )
+  }
 
-    if (isSignatureFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <SignatureField.Input
-            {...field.config}
-            disabled={disabled}
-            maxFileSize={field.config.configuration.maxFileSize}
-            modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
-            name={name}
-            required={inputFieldProps.required}
-            value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
-        </InputField>
-      )
-    }
-
-    if (isAdministrativeAreaFieldType(field)) {
-      const partOfRef = field.config.configuration.partOf
-
-      const partOf = partOfRef && get(form, flattenFieldReference(partOfRef))
-
-      return (
-        <InputField {...inputFieldProps} htmlFor={name}>
-          <AdministrativeArea.Input
-            {...inputProps}
-            partOf={typeof partOf === 'string' ? partOf : null}
-            value={field.value}
-          />
-        </InputField>
-      )
-    }
-
-    if (isLocationFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <LocationSearch.Input
-            {...field.config}
-            disabled={disabled}
-            searchableResource={
-              field.config.configuration.searchableResource.length > 0
-                ? field.config.configuration.searchableResource
-                : ['locations']
-            }
-            value={field.value}
-            onBlur={handleBlur}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
-        </InputField>
-      )
-    }
-
-    if (isOfficeFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <LocationSearch.Input
-            {...field.config}
-            disabled={disabled}
-            searchableResource={['offices']}
-            value={field.value}
-            onBlur={handleBlur}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
-        </InputField>
-      )
-    }
-
-    if (isFacilityFieldType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <LocationSearch.Input
-            {...field.config}
-            disabled={disabled}
-            searchableResource={['facilities']}
-            value={field.value}
-            onBlur={handleBlur}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
-        </InputField>
-      )
-    }
-    if (isDividerFieldType(field)) {
-      return <Divider.Input />
-    }
-    if (isFileFieldWithOptionType(field)) {
-      return (
-        <InputField {...inputFieldProps}>
-          <FileWithOption.Input
-            {...inputProps}
-            acceptedFileTypes={field.config.configuration.acceptedFileTypes}
-            error={inputFieldProps.error}
-            maxFileSize={field.config.configuration.maxFileSize}
-            maxImageSize={field.config.configuration.maxImageSize}
-            options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            value={field.value ?? []}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
-        </InputField>
-      )
-    }
-
-    if (isDataFieldType(field)) {
-      return (
-        <Data.Input
+  if (isSignatureFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <SignatureField.Input
           {...field.config}
-          allKnownFields={allKnownFields}
-          formData={form}
-          onChange={(val) => onFieldValueChange(name, val)}
-        />
-      )
-    }
-
-    if (isPrintButtonFieldType(field)) {
-      return (
-        <AlphaPrintButton.Input
-          buttonLabel={field.config.configuration.buttonLabel}
           disabled={disabled}
-          id={name}
-          template={field.config.configuration.template}
+          maxFileSize={field.config.configuration.maxFileSize}
+          modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
+          name={name}
+          required={inputFieldProps.required}
           value={field.value}
           onChange={(val) => onFieldValueChange(name, val)}
         />
-      )
-    }
+      </InputField>
+    )
+  }
 
-    if (isButtonFieldType(field)) {
-      return (
-        // Button can be always 'touched' to show errors.
-        // Button doesn't have a similar `onBlur -> FocusEvent -> touched -> errors` flow as other InputFields
-        <InputField {...inputFieldProps} touched={true}>
-          <Button.Input
-            configuration={field.config.configuration}
-            disabled={inputProps.disabled}
-            id={field.config.id}
-            value={field.value}
-            onChange={(clicks) => onFieldValueChange(name, clicks)}
-          />
-        </InputField>
-      )
-    }
+  if (isAdministrativeAreaFieldType(field)) {
+    const partOfRef = field.config.configuration.partOf
 
-    if (isHttpFieldType(field)) {
-      return (
-        <Http.Input
-          key={name}
-          configuration={parseFieldReferencesInConfiguration(
-            field.config.configuration,
-            form
-          )}
-          form={form}
-          parentValue={form[field.config.configuration.trigger.$$field]}
+    const partOf = partOfRef && get(form, flattenFieldReference(partOfRef))
+
+    return (
+      <InputField {...inputFieldProps} htmlFor={name}>
+        <AdministrativeArea.Input
+          {...inputProps}
+          partOf={typeof partOf === 'string' ? partOf : null}
+          value={field.value}
+        />
+      </InputField>
+    )
+  }
+
+  if (isLocationFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <LocationSearch.Input
+          {...field.config}
+          disabled={disabled}
+          searchableResource={
+            field.config.configuration.searchableResource.length > 0
+              ? field.config.configuration.searchableResource
+              : ['locations']
+          }
+          value={field.value}
+          onBlur={handleBlur}
           onChange={(val) => onFieldValueChange(name, val)}
         />
-      )
-    }
-    if (isSearchFieldType(field)) {
-      const {
-        label: inputLabel,
-        helperText,
-        ...restInputFieldProps
-      } = inputFieldProps
+      </InputField>
+    )
+  }
 
-      return (
-        <InputField {...restInputFieldProps}>
-          <Search.Input
-            key={name}
-            configuration={field.config.configuration}
-            form={form}
-            helperText={fieldDefinition.helperText}
-            label={inputLabel}
-            value={field.value}
-            onChange={(val) => onFieldValueChange(name, val)}
-          />
-        </InputField>
-      )
-    }
+  if (isOfficeFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <LocationSearch.Input
+          {...field.config}
+          disabled={disabled}
+          searchableResource={['offices']}
+          value={field.value}
+          onBlur={handleBlur}
+          onChange={(val) => onFieldValueChange(name, val)}
+        />
+      </InputField>
+    )
+  }
 
-    if (isLinkButtonFieldType(field)) {
-      return (
-        <LinkButton.Input
+  if (isFacilityFieldType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <LocationSearch.Input
+          {...field.config}
+          disabled={disabled}
+          searchableResource={['facilities']}
+          value={field.value}
+          onBlur={handleBlur}
+          onChange={(val) => onFieldValueChange(name, val)}
+        />
+      </InputField>
+    )
+  }
+  if (isDividerFieldType(field)) {
+    return <Divider.Input />
+  }
+  if (isFileFieldWithOptionType(field)) {
+    return (
+      <InputField {...inputFieldProps}>
+        <FileWithOption.Input
+          {...inputProps}
+          acceptedFileTypes={field.config.configuration.acceptedFileTypes}
+          error={inputFieldProps.error}
+          maxFileSize={field.config.configuration.maxFileSize}
+          maxImageSize={field.config.configuration.maxImageSize}
+          options={field.config.options}
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          value={field.value ?? []}
+          onChange={(val) => onFieldValueChange(name, val)}
+        />
+      </InputField>
+    )
+  }
+
+  if (isDataFieldType(field)) {
+    return (
+      <Data.Input
+        {...field.config}
+        allKnownFields={allKnownFields}
+        formData={form}
+        onChange={(val) => onFieldValueChange(name, val)}
+      />
+    )
+  }
+
+  if (isPrintButtonFieldType(field)) {
+    return (
+      <AlphaPrintButton.Input
+        buttonLabel={field.config.configuration.buttonLabel}
+        disabled={disabled}
+        id={name}
+        template={field.config.configuration.template}
+        value={field.value}
+        onChange={(val) => onFieldValueChange(name, val)}
+      />
+    )
+  }
+
+  if (isButtonFieldType(field)) {
+    return (
+      // Button can be always 'touched' to show errors.
+      // Button doesn't have a similar `onBlur -> FocusEvent -> touched -> errors` flow as other InputFields
+      <InputField {...inputFieldProps} touched={true}>
+        <Button.Input
           configuration={field.config.configuration}
           disabled={inputProps.disabled}
           id={field.config.id}
-        />
-      )
-    }
-
-    if (isVerificationStatusType(field)) {
-      return (
-        <VerificationStatus.Input
-          configuration={field.config.configuration}
-          id={field.config.id}
           value={field.value}
-          onReset={() => {
-            if (Array.isArray(fieldDefinition.parent)) {
-              onBatchFieldValueChange([
-                ...fieldDefinition.parent.map((parentField) => ({
-                  name: makeFormFieldIdFormikCompatible(parentField.$$field),
-                  value: undefined
-                })),
-                { name, value: null }
-              ])
-            } else if (fieldDefinition.parent) {
-              onBatchFieldValueChange([
-                {
-                  name: makeFormFieldIdFormikCompatible(
-                    fieldDefinition.parent.$$field
-                  ),
-                  value: undefined
-                },
-                { name, value: null }
-              ])
-            }
-          }}
+          onChange={(clicks) => onFieldValueChange(name, clicks)}
         />
-      )
-    }
-
-    if (isQueryParamReaderFieldType(field)) {
-      return (
-        <QueryParamReader.Input
-          configuration={field.config.configuration}
-          onChange={(val) => onFieldValueChange(name, val)}
-        />
-      )
-    }
-
-    if (isIdReaderFieldType(field)) {
-      return (
-        <IdReader.Input
-          id={field.config.id}
-          methods={field.config.methods}
-          onChange={(val) => onFieldValueChange(name, val)}
-        />
-      )
-    }
-
-    if (isQrReaderFieldType(field)) {
-      return (
-        <QrReader.Input
-          configuration={field.config.configuration}
-          onChange={(val) => onFieldValueChange(name, val)}
-        />
-      )
-    }
-
-    if (isLoaderFieldType(field)) {
-      return (
-        <Loader.Input
-          configuration={field.config.configuration}
-          id={field.config.id}
-        />
-      )
-    }
-
-    throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
+      </InputField>
+    )
   }
-)
+
+  if (isHttpFieldType(field)) {
+    return (
+      <Http.Input
+        key={name}
+        configuration={parseFieldReferencesInConfiguration(
+          field.config.configuration,
+          form
+        )}
+        form={form}
+        parentValue={form[field.config.configuration.trigger.$$field]}
+        onChange={(val) => onFieldValueChange(name, val)}
+      />
+    )
+  }
+  if (isSearchFieldType(field)) {
+    const {
+      label: inputLabel,
+      helperText,
+      ...restInputFieldProps
+    } = inputFieldProps
+
+    return (
+      <InputField {...restInputFieldProps}>
+        <Search.Input
+          key={name}
+          configuration={field.config.configuration}
+          form={form}
+          helperText={fieldDefinition.helperText}
+          label={inputLabel}
+          value={field.value}
+          onChange={(val) => onFieldValueChange(name, val)}
+        />
+      </InputField>
+    )
+  }
+
+  if (isLinkButtonFieldType(field)) {
+    return (
+      <LinkButton.Input
+        configuration={field.config.configuration}
+        disabled={inputProps.disabled}
+        id={field.config.id}
+      />
+    )
+  }
+
+  if (isVerificationStatusType(field)) {
+    return (
+      <VerificationStatus.Input
+        configuration={field.config.configuration}
+        id={field.config.id}
+        value={field.value}
+        onReset={() => {
+          if (Array.isArray(fieldDefinition.parent)) {
+            onBatchFieldValueChange([
+              ...fieldDefinition.parent.map((parentField) => ({
+                name: makeFormFieldIdFormikCompatible(parentField.$$field),
+                value: undefined
+              })),
+              { name, value: null }
+            ])
+          } else if (fieldDefinition.parent) {
+            onBatchFieldValueChange([
+              {
+                name: makeFormFieldIdFormikCompatible(
+                  fieldDefinition.parent.$$field
+                ),
+                value: undefined
+              },
+              { name, value: null }
+            ])
+          }
+        }}
+      />
+    )
+  }
+
+  if (isQueryParamReaderFieldType(field)) {
+    return (
+      <QueryParamReader.Input
+        configuration={field.config.configuration}
+        onChange={(val) => onFieldValueChange(name, val)}
+      />
+    )
+  }
+
+  if (isIdReaderFieldType(field)) {
+    return (
+      <IdReader.Input
+        id={field.config.id}
+        methods={field.config.methods}
+        onChange={(val) => onFieldValueChange(name, val)}
+      />
+    )
+  }
+
+  if (isQrReaderFieldType(field)) {
+    return (
+      <QrReader.Input
+        configuration={field.config.configuration}
+        onChange={(val) => onFieldValueChange(name, val)}
+      />
+    )
+  }
+
+  if (isLoaderFieldType(field)) {
+    return (
+      <Loader.Input
+        configuration={field.config.configuration}
+        id={field.config.id}
+      />
+    )
+  }
+
+  throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
+}
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
