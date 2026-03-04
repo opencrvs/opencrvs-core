@@ -19,8 +19,9 @@ import {
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdministrativeAreaHierarchy } from '@client/v2-events/utils'
+import { getToken } from '@client/utils/authUtils'
 import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 import { useLocations } from '../../../hooks/useLocations'
@@ -35,7 +36,7 @@ import { LocationSearch } from './LocationSearch'
 function useUserAdministrativeAreaHierarchy() {
   const userDetails = useSelector(getUserDetails)
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
   const userLocationId = userDetails?.primaryOffice.id
@@ -71,7 +72,7 @@ function useAvailableAdministrativeAreas(
   jurisdictionFilter?: JurisdictionFilter
 ) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery({})
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const userAdministrativeAreaHierarchy = useUserAdministrativeAreaHierarchy()
 
   const options = React.useMemo(() => {
@@ -115,10 +116,10 @@ function AdministrativeAreaInput({
   configuration: AdministrativeAreaField['configuration']
   id: string
 }) {
-  const scopes = useSelector(getScope)
+  const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
     configuration.allowedLocations,
-    scopes
+    token
   )
 
   const administrativeAreas = useAvailableAdministrativeAreas(

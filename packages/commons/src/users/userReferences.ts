@@ -11,11 +11,10 @@
 import {
   JurisdictionFilter,
   RecordScopeTypeV2,
-  findScopeV2,
   ScopeOptionKey,
+  getAcceptedScopesFromToken,
   getScopeOptionValue
 } from '../scopes-v2'
-import { RawScopes } from '../authentication'
 import z from 'zod/v4'
 
 const ScopeOptionReference = z.object({
@@ -59,23 +58,34 @@ function isJurisdictionFilter(
  */
 function resolveJurisdictionScopeOptionReference(
   scopeOptionReference: ScopeOptionReference,
-  scopes: RawScopes[]
+  token: string,
+  eventType: string
 ): JurisdictionFilter | undefined {
   const { $scope, $option } = scopeOptionReference
-  const scope = findScopeV2(scopes, $scope)
+  const acceptedScopes = getAcceptedScopesFromToken(token, [$scope])
 
-  if (!scope) {
-    return
-  }
+  const acceptedScopesMatchingEventType = acceptedScopes.filter(
+    (scope) =>
+      scope.options?.event?.includes(eventType) ||
+      scope.options?.event === undefined
+  )
 
-  const optionValue = getScopeOptionValue(scope, $option)
+  const acceptedJurisdictionFilters = acceptedScopesMatchingEventType
+    .map((scope) => getScopeOptionValue(scope, $option))
+    .filter((val) => isJurisdictionFilter(val))
 
-  // If option is set but not a jurisdiction filter, return the least permissive jurisdiction filter
-  if (!isJurisdictionFilter(optionValue)) {
-    return
-  }
+  // Return the first matching jurisdiction filter by priority order
+  const priorityOrder = [
+    JurisdictionFilter.enum.all,
+    JurisdictionFilter.enum.administrativeArea,
+    JurisdictionFilter.enum.location
+  ]
 
-  return optionValue
+  const jurisdictionFilter = priorityOrder.find((f) =>
+    acceptedJurisdictionFilters.includes(f)
+  )
+
+  return jurisdictionFilter ?? undefined
 }
 
 /**
@@ -86,7 +96,8 @@ function resolveJurisdictionScopeOptionReference(
  */
 export function resolveJurisdictionReference(
   jurisdictionReference: JurisdictionReference | undefined,
-  scopes?: RawScopes[] | null
+  token?: string,
+  eventType?: string
 ): JurisdictionFilter | undefined {
   if (!jurisdictionReference) {
     return JurisdictionFilter.enum.all
@@ -100,8 +111,12 @@ export function resolveJurisdictionReference(
   }
 
   // If the jurisdiction is a scope option reference, resolve it
-  if (jurisdiction['$scope'] && scopes) {
-    return resolveJurisdictionScopeOptionReference(jurisdiction, scopes)
+  if (jurisdiction['$scope'] && token && eventType) {
+    return resolveJurisdictionScopeOptionReference(
+      jurisdiction,
+      token,
+      eventType
+    )
   }
 
   return

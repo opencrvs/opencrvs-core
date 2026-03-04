@@ -26,9 +26,10 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
+import { getToken } from '@client/utils/authUtils'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 /**
@@ -51,7 +52,7 @@ function useAvailableLocations(
 ) {
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const locations = getLocations.useSuspenseQuery({})
+  const locations = getLocations.useSuspenseQuery()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const userDetails = useSelector(getUserDetails)
   const userLocationId = userDetails?.primaryOffice.id
@@ -116,6 +117,7 @@ function LocationSearchInput({
   searchableResource,
   onBlur,
   id,
+  eventType,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -124,11 +126,13 @@ function LocationSearchInput({
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
   id: string
+  eventType?: string
 }) {
-  const scopes = useSelector(getScope)
+  const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
     props.configuration?.allowedLocations,
-    scopes
+    token,
+    eventType
   )
 
   const locations = useAvailableLocations(

@@ -529,8 +529,9 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             configuration={field.config.configuration}
             disabled={disabled}
-            validatorContext={validatorContext}
+            eventType={eventConfig?.id}
             value={field.value}
+            validatorContext={validatorContext}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -629,6 +630,7 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             searchableResource={
               field.config.configuration.searchableResource.length > 0
                 ? field.config.configuration.searchableResource
@@ -648,6 +650,7 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             searchableResource={['offices']}
             value={field.value}
             onBlur={onBlur}
@@ -663,6 +666,7 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             searchableResource={['facilities']}
             value={field.value}
             onBlur={onBlur}
@@ -684,7 +688,6 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />

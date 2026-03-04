@@ -19,37 +19,12 @@ import {
   decodeScope,
   encodeScope,
   v1ScopeToV2Scope,
-  findScopeV2,
   getScopeOptionValue,
   JurisdictionFilter,
   ScopesWithDeclaredOptions,
   ScopesWithFullOptions,
   ScopesWithPlaceEventOptions
 } from './scopes-v2'
-
-describe('findScopeV2()', () => {
-  it('should return undefined if the scope is not found', () => {
-    const result = findScopeV2([], 'record.create')
-    expect(result).toEqual(undefined)
-  })
-
-  it('should return the scope if it is found', () => {
-    const result = findScopeV2(
-      [
-        'type=record.create&event=birth,death,tennis-club-membership&placeOfEvent=administrativeArea'
-      ],
-      'record.create'
-    )
-
-    expect(result).toEqual({
-      type: 'record.create',
-      options: {
-        event: ['birth', 'death', 'tennis-club-membership'],
-        placeOfEvent: 'administrativeArea'
-      }
-    })
-  })
-})
 
 describe('getScopeOptionValue()', () => {
   it('should return the default value if the scope option is not set', () => {

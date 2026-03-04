@@ -59,6 +59,7 @@ type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   configuration?: AddressField['configuration']
   disabled?: boolean
   validatorContext: ValidatorContext
+  eventType?: string
 }
 
 const COUNTRY_FIELD = {
@@ -230,15 +231,16 @@ function getAdministrativeAreaIdFromAddress(value?: AddressFieldValue) {
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
  * - In search mode, only displays admin structure and town/village fields.
  */
-function AddressInput(props: Props) {
-  const {
-    onChange,
-    defaultValue,
-    disabled,
-    value,
-    validatorContext,
-    ...otherProps
-  } = props
+function AddressInput({
+  onChange,
+  defaultValue,
+  disabled,
+  value,
+  validatorContext,
+  eventType,
+  ...otherProps
+}: Props) {
+  const { id, configuration, required } = otherProps
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -247,7 +249,7 @@ function AddressInput(props: Props) {
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
-  const customAddressFields = props.configuration?.streetAddressForm
+  const customAddressFields = configuration?.streetAddressForm
   const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
 
   const resolveAdministrativeArea = (
@@ -288,8 +290,8 @@ function AddressInput(props: Props) {
 
   const adminStructure = generateAdministrativeAreaFields(
     appConfigAdminLevels,
-    otherProps.required,
-    props.configuration?.allowedLocations
+    required,
+    configuration?.allowedLocations
   )
 
   const addressFields =
@@ -304,7 +306,7 @@ function AddressInput(props: Props) {
    * 3. Address line inputs (e.g. Town, Residential Area, Street etc.)
    */
   const fields = [
-    { ...COUNTRY_FIELD, required: otherProps.required },
+    { ...COUNTRY_FIELD, required },
     ...adminStructure,
     ...addressFields
   ].map((x) => {
@@ -358,7 +360,7 @@ function AddressInput(props: Props) {
       {...otherProps}
       fields={fields}
       initialValues={{ ...resolvedValue, ...derivedAdminLevels }}
-      parentId={props.id}
+      parentId={id}
       validatorContext={validatorContext}
       onChange={handleChange}
     />
