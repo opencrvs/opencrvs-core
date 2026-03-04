@@ -54,9 +54,6 @@ jest.mock('@metrics/configApi', () => {
         MINIO_URL: 'http://localhost:3535',
         RESOURCES_URL: 'http://localhost:3040',
         APPLICATION_NAME: 'Farajaland CRVS',
-        FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
-        DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
-        EXTERNAL_VALIDATION_WORKQUEUE: false,
         PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
         NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
         CURRENCY: {

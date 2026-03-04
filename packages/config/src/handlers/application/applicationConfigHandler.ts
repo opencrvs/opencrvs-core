@@ -21,14 +21,6 @@ import { pipe } from 'fp-ts/lib/function'
 import { verifyToken } from '@config/utils/verifyToken'
 import { SCOPES } from '@opencrvs/commons/authentication'
 
-const SystemRoleType = [
-  'FIELD_AGENT',
-  'LOCAL_REGISTRAR',
-  'LOCAL_SYSTEM_ADMIN',
-  'NATIONAL_REGISTRAR',
-  'REGISTRATION_AGENT'
-]
-
 export default async function configHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -115,7 +107,6 @@ export async function getLoginConfigHandler(
     'APPLICATION_NAME',
     'COUNTRY_LOGO',
     'PHONE_NUMBER_PATTERN',
-    'LOGIN_BACKGROUND',
     'USER_NOTIFICATION_DELIVERY_METHOD',
     'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
   ])
@@ -139,11 +130,6 @@ const applicationConfigResponseValidation = Joi.object({
       file: Joi.string().required()
     })
     .required(),
-  LOGIN_BACKGROUND: Joi.object({
-    backgroundColor: Joi.string().allow('').optional(),
-    backgroundImage: Joi.string().allow('').optional(),
-    imageFit: Joi.string().allow('').optional()
-  }).required(),
   CURRENCY: Joi.object()
     .keys({
       isoCode: Joi.string().required(),
@@ -152,39 +138,8 @@ const applicationConfigResponseValidation = Joi.object({
     .required(),
   PHONE_NUMBER_PATTERN: Joi.string().required(),
   NID_NUMBER_PATTERN: Joi.string().required(),
-  BIRTH: Joi.object()
-    .keys({
-      REGISTRATION_TARGET: Joi.number().required(),
-      LATE_REGISTRATION_TARGET: Joi.number().required(),
-      PRINT_IN_ADVANCE: Joi.boolean().required()
-    })
-    .required(),
-  DEATH: Joi.object()
-    .keys({
-      REGISTRATION_TARGET: Joi.number().required(),
-      PRINT_IN_ADVANCE: Joi.boolean().required()
-    })
-    .required(),
-  MARRIAGE: Joi.object()
-    .keys({
-      REGISTRATION_TARGET: Joi.number().required(),
-      PRINT_IN_ADVANCE: Joi.boolean().required()
-    })
-    .required(),
-  FIELD_AGENT_AUDIT_LOCATIONS: Joi.string().required(),
-  DECLARATION_AUDIT_LOCATIONS: Joi.string().required(),
-  FEATURES: {
-    DEATH_REGISTRATION: Joi.boolean().required(),
-    MARRIAGE_REGISTRATION: Joi.boolean().required(),
-    EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean().required(),
-    PRINT_DECLARATION: Joi.boolean().required(),
-    DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required()
-  },
   USER_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
-  SIGNATURE_REQUIRED_FOR_ROLES: Joi.array().items(
-    Joi.string().valid(...SystemRoleType)
-  ),
   SEARCH_DEFAULT_CRITERIA: Joi.string()
     .valid(...searchCriteria)
     .optional()

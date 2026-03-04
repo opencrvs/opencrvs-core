@@ -76,11 +76,6 @@ interface ICountryLogo {
   fileName: string
   file: string
 }
-interface ILoginBackground {
-  backgroundColor?: string
-  backgroundImage?: string
-  imageFit?: string
-}
 interface ICertificateConfigData {
   id: string
   event: EventType
@@ -121,40 +116,16 @@ export interface AdminStructureItem {
 export interface IApplicationConfigAnonymous {
   APPLICATION_NAME: string
   COUNTRY_LOGO: ICountryLogo
-  LOGIN_BACKGROUND: ILoginBackground
   PHONE_NUMBER_PATTERN: RegExp | string
 }
 
 export interface IApplicationConfig {
   APPLICATION_NAME: string
-  BIRTH: {
-    REGISTRATION_TARGET: number
-    LATE_REGISTRATION_TARGET: number
-    PRINT_IN_ADVANCE: boolean
-  }
   ADMIN_STRUCTURE: AdminStructureItem[]
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
-  DEATH: {
-    REGISTRATION_TARGET: number
-    PRINT_IN_ADVANCE: boolean
-  }
-  MARRIAGE: {
-    REGISTRATION_TARGET: number
-    PRINT_IN_ADVANCE: boolean
-  }
-  FEATURES: {
-    DEATH_REGISTRATION: boolean
-    MARRIAGE_REGISTRATION: boolean
-    EXTERNAL_VALIDATION_WORKQUEUE: boolean
-    PRINT_DECLARATION: boolean
-    DATE_OF_BIRTH_UNKNOWN: boolean
-  }
-  FIELD_AGENT_AUDIT_LOCATIONS: string
-  DECLARATION_AUDIT_LOCATIONS: string
   PHONE_NUMBER_PATTERN: RegExp | string
   NID_NUMBER_PATTERN: RegExp
-  LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
   SEARCH_DEFAULT_CRITERIA?: SearchCriteriaType

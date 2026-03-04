@@ -43,7 +43,6 @@ import {
 } from '@gateway/utils/validators'
 import { checkUserAssignment, findUserAssignment } from '@gateway/authorisation'
 
-import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
 import {
   archiveRegistration,
   certifyRegistration,
@@ -761,7 +760,6 @@ async function markEventAsCertified(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  await setCollectorForPrintInAdvance(details, authHeader)
   const certificateDetails = details.registration?.certificates?.[0]
   if (!certificateDetails) {
     return Promise.reject(new Error('Certificate details required'))

@@ -227,10 +227,6 @@ const NavigationView = (props: IFullProps) => {
     sentForReview: !initialSyncDone
       ? 0
       : filteredData.sentForReviewTab?.totalItems || 0,
-    externalValidation:
-      window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
-        ? 0
-        : filteredData.externalValidationTab?.totalItems || 0,
     readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
     readyToIssue: !initialSyncDone ? 0 : filteredData.issueTab?.totalItems || 0,
     outbox: storedDeclarations.filter((draft) =>
@@ -394,26 +390,6 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE &&
-            hasAccess(WORKQUEUE_TABS.externalValidation) && (
-              <NavigationItem
-                icon={() => <Icon name="Files" size="small" />}
-                id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
-                label={intl.formatMessage(
-                  navigationMessages[WORKQUEUE_TABS.externalValidation]
-                )}
-                count={declarationCount.externalValidation}
-                isSelected={tabId === WORKQUEUE_TABS.externalValidation}
-                onClick={() => {
-                  props.router.navigate(
-                    generateGoToHomeTabUrl({
-                      tabId: WORKQUEUE_TABS.externalValidation
-                    })
-                  )
-                  menuCollapse && menuCollapse()
-                }}
-              />
-            )}
           {hasAccess(WORKQUEUE_TABS.readyToPrint) && (
             <NavigationItem
               icon={() => <Icon name="Printer" size="small" />}

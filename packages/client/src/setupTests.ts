@@ -37,19 +37,10 @@ const config = {
   MINIO_BASE_URL: 'http://localhost:3535',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
-  BIRTH: {
-    REGISTRATION_TARGET: 45,
-    LATE_REGISTRATION_TARGET: 365,
-    PRINT_IN_ADVANCE: true
-  },
   COUNTRY: 'BGD',
   CURRENCY: {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
-  },
-  DEATH: {
-    REGISTRATION_TARGET: 45,
-    PRINT_IN_ADVANCE: true
   },
   ADMIN_STRUCTURE: [
     {
@@ -81,11 +72,7 @@ const config = {
     }
   ],
   FEATURES: {
-    V2_EVENTS: false,
-    DEATH_REGISTRATION: true,
-    MARRIAGE_REGISTRATION: true,
-    EXTERNAL_VALIDATION_WORKQUEUE: false,
-    PRINT_DECLARATION: true
+    V2_EVENTS: false
   },
   LANGUAGES: 'en,bn,fr',
   USER_NOTIFICATION_DELIVERY_METHOD: 'sms',

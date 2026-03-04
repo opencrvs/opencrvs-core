@@ -13,11 +13,6 @@ interface Window {
   config: {
     APPLICATION_NAME: string
     API_GATEWAY_URL: string
-    BIRTH: {
-      REGISTRATION_TARGET: number
-      LATE_REGISTRATION_TARGET: number
-      PRINT_IN_ADVANCE: boolean
-    }
     CONFIG_API_URL: string
     COUNTRY: string
     COUNTRY_LOGO: {
@@ -28,20 +23,7 @@ interface Window {
       isoCode: string
       languagesAndCountry: string[]
     }
-    DEATH: {
-      REGISTRATION_TARGET: number
-      PRINT_IN_ADVANCE: boolean
-    }
-    MARRIAGE: {
-      REGISTRATION_TARGET: number
-      PRINT_IN_ADVANCE: boolean
-    }
     FEATURES: {
-      DEATH_REGISTRATION: boolean
-      MARRIAGE_REGISTRATION: boolean
-      EXTERNAL_VALIDATION_WORKQUEUE: boolean
-      PRINT_DECLARATION: boolean
-      DATE_OF_BIRTH_UNKNOWN: boolean
       V2_EVENTS: boolean
     }
     LANGUAGES: string
@@ -54,10 +36,8 @@ interface Window {
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
-    FIELD_AGENT_AUDIT_LOCATIONS: string
     PHONE_NUMBER_PATTERN: RegExp
     NID_NUMBER_PATTERN: RegExp
-    DECLARATION_AUDIT_LOCATIONS: string
     SENTRY: string
     DASHBOARDS: Array<{
       id: string
@@ -68,7 +48,6 @@ interface Window {
       }
       url: string
     }>
-    SIGNATURE_REQUIRED_FOR_ROLES: string[]
     SYSTEM_IANA_TIMEZONE: string
   }
   __localeId__: string
