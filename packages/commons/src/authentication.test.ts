@@ -23,7 +23,7 @@ function withBearer(token: string): TokenWithBearer {
 
 const ERROR = 'ERROR'
 
-export function signToken(params: {
+function signToken(params: {
   sub: string
   userType: string
   scope?: string[]

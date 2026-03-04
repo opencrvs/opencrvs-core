@@ -13,7 +13,8 @@ import {
   resolveJurisdictionReference
 } from './userReferences'
 import { JurisdictionFilter } from '../scopes-v2'
-import { signToken } from '../authentication.test'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 
 describe('userReferenceFunctions', () => {
   describe('user.scope()', () => {
@@ -50,10 +51,10 @@ describe('userReferenceFunctions', () => {
 })
 
 function createTestToken(scopes: string[]) {
-  return signToken({
-    sub: 'foo',
-    userType: 'system',
-    scope: scopes
+  return jwt.sign({ scope: scopes }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:workflow-user'
   })
 }
 
