@@ -8,10 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Readable, Transform, PassThrough } from 'node:stream'
-import { Agent } from 'node:http'
+import { Readable, Transform } from 'node:stream'
 import fetch from 'node-fetch'
-import { JsonStreamStringify } from 'json-stream-stringify'
 import { EventDocument } from '@opencrvs/commons/events'
 import { logger, TokenWithBearer } from '@opencrvs/commons'
 import {
@@ -19,12 +17,39 @@ import {
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
-import { ensureIndexExists, indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
-
 import { getInMemoryEventConfigurations } from '../config/config'
+import { indexEventsInBulk } from '../indexing/indexing'
+import {
+  cleanupTemporaryIndex,
+  finaliseReindexIndex,
+  prepareReindexIndex
+} from '../indexing/reindex'
 
-async function reindexSearch(token: TokenWithBearer) {
+async function reindexBatchToCountryConfig(
+  token: TokenWithBearer,
+  batch: EventDocument[]
+): Promise<void> {
+  const response = await fetch(new URL('/reindex', env.COUNTRY_CONFIG_URL), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    },
+    body: JSON.stringify(batch)
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to reindex country config batch: ${response.status} ${response.statusText}`
+    )
+  }
+}
+
+async function reindexSearch(
+  token: TokenWithBearer,
+  indexNameOverrides: Map<string, string>
+) {
   const configurations = await getInMemoryEventConfigurations(token)
   let buffer: EventDocument[] = []
 
@@ -32,10 +57,14 @@ async function reindexSearch(token: TokenWithBearer) {
     if (buffer.length === 0) {
       return
     }
-    logger.info(`Reindexing ${buffer.length} events`)
-    // Index the buffered events in bulk
-    await indexEventsInBulk(buffer, configurations)
+    const batch = buffer
     buffer = []
+    logger.info(`Reindexing ${batch.length} events`)
+
+    await Promise.all([
+      indexEventsInBulk(batch, configurations, indexNameOverrides),
+      reindexBatchToCountryConfig(token, batch)
+    ])
   }
 
   return new Transform({
@@ -62,63 +91,56 @@ async function reindexSearch(token: TokenWithBearer) {
   })
 }
 
-export async function runReindex(token: TokenWithBearer) {
+async function runReindex(token: TokenWithBearer) {
   const configurations = await getEventConfigurations(token)
+
+  const timestamp = Date.now()
+  const indexMap = new Map<string, string>()
+
   for (const configuration of configurations) {
-    logger.info(`Ensuring index exists for: ${configuration.id}`)
-    await ensureIndexExists(configuration, { overwrite: true })
+    const indexNameWithTimestamp = await prepareReindexIndex(
+      configuration,
+      timestamp
+    )
+    indexMap.set(configuration.id, indexNameWithTimestamp)
+    logger.info(
+      `Prepared temporary index ${indexNameWithTimestamp} for event type ${configuration.id}`
+    )
   }
 
+  const indexNameOverrides = new Map(
+    [...indexMap.entries()].map(([type, tempIndexName]) => [
+      type,
+      tempIndexName
+    ])
+  )
+
   const objStream = Readable.from(streamEventDocuments())
+  const searchIndexingStream = await reindexSearch(token, indexNameOverrides)
 
-  // Stream to reindex endpoint in country config. PassThrough forks the stream.
-  const eventDocumentStreamForCountryConfig = new PassThrough({
-    objectMode: true
-  })
-  objStream.pipe(eventDocumentStreamForCountryConfig)
-
-  // Stream to ES indexing
-  const eventDocumentStreamForSearch = new PassThrough({ objectMode: true })
-  objStream.pipe(eventDocumentStreamForSearch)
-
-  const searchIndexingStream = await reindexSearch(token)
-  const searchIndexingPromise = new Promise((resolve, reject) => {
-    eventDocumentStreamForSearch
-      .pipe(searchIndexingStream)
-      .on('finish', resolve)
-      .on('error', reject)
-  })
-
-  const countryConfigIndexingPromise = fetch(
-    new URL('/reindex', env.COUNTRY_CONFIG_URL),
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      },
-      // Converts object stream to JSON string stream so that it can
-      // be sent to the country config reindex endpoint
-      body: new JsonStreamStringify(eventDocumentStreamForCountryConfig),
-      // Ensure HTTP socket of previous GET /events request is not reused
-      // to avoid connections being closed preemptively by Node.js
-      agent: new Agent({ keepAlive: false })
+  try {
+    await new Promise<void>((resolve, reject) => {
+      objStream
+        .pipe(searchIndexingStream)
+        .on('finish', resolve)
+        .on('error', reject)
+    })
+  } catch (err) {
+    logger.error('Reindex failed, cleaning up temporary indexes', err)
+    for (const tempIndexName of indexMap.values()) {
+      await cleanupTemporaryIndex(tempIndexName).catch((cleanupErr) => {
+        logger.error(
+          `Failed to clean up temporary index ${tempIndexName}`,
+          cleanupErr
+        )
+      })
     }
-  ).then((response) => {
-    if (!response.ok && response.status === 404) {
-      logger.warn(
-        `Country config reindex endpoint not found: ${env.COUNTRY_CONFIG_URL}`
-      )
-      return
-    }
-    if (!response.ok) {
-      throw new Error(
-        `Failed to reindex country config: ${response.status} ${response.statusText}`
-      )
-    }
-  })
+    throw err
+  }
 
-  return Promise.all([searchIndexingPromise, countryConfigIndexingPromise])
+  for (const [type, tempIndexName] of indexMap.entries()) {
+    await finaliseReindexIndex(type, tempIndexName)
+  }
 }
 
 export function reindex(token: TokenWithBearer) {
