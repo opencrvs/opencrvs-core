@@ -16,14 +16,29 @@ interface SaltedHash {
   salt: string
 }
 
-export function generateHash(content: string, salt: string): string {
-  return bcrypt.hashSync(content, salt)
+export async function generateHash(content: string, salt: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    bcrypt.hash(content, salt, (err, hash) => {
+      if (err) {
+        return reject(err)
+      }
+      resolve(hash)
+    })
+  })
 }
 
-export function generateSaltedHash(password: string): SaltedHash {
-  const salt = bcrypt.genSaltSync(10)
+export async function generateSaltedHash(password: string): Promise<SaltedHash> {
+  const salt = await new Promise<string>((resolve, reject) => {
+    bcrypt.genSalt(10, (err, generatedSalt) => {
+      if (err) {
+        return reject(err)
+      }
+      resolve(generatedSalt)
+    })
+  })
+
   return {
-    hash: generateHash(password, salt),
+    hash: await generateHash(password, salt),
     salt
   }
 }
