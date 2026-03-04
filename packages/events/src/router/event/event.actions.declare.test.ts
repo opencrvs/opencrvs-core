@@ -30,7 +30,11 @@ import {
   tennisClubMembershipEvent,
   tennisClubMembershipEventWithDedupCheck
 } from '@opencrvs/commons/fixtures'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 import { CreatedUser, payloadGenerator } from '@events/tests/generators'
 import {
   getEventIndexName,
@@ -492,4 +496,23 @@ test('deduplication and annotation check is performed after declaration', async 
   ).toEqual([
     { id: existingEventId, trackingId: existingEventIndex.trackingId }
   ])
+})
+
+test('System user can not declare an event, even with the right scope', async () => {
+  const { generator, locations } = await setupTestCase()
+  const systemUserClient = createSystemTestClient('test-system', [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' })
+  ])
+
+  const event = await systemUserClient.event.create({
+    ...generator.event.create(),
+    createdAtLocation: locations[0].id
+  })
+
+  await expect(
+    systemUserClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })

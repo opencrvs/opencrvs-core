@@ -17,7 +17,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
-import { userAndSystemProcedure } from '@events/router/trpc'
+import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 import { getEventById, processAction } from '@events/service/events/events'
 import {
   defaultRequestHandler,
@@ -33,7 +33,7 @@ export function declareActionProcedures() {
 
   return {
     ...getDefaultActionProcedures(ActionType.DECLARE),
-    request: userAndSystemProcedure
+    request: userOnlyProcedure
       .use(requireScopesMiddleware)
       .input(DeclareActionInput)
       // @ts-expect-error - deprecated by the end of 2.0

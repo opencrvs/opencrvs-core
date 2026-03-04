@@ -34,7 +34,8 @@ import {
   createEvent,
   createTestClient,
   createCountryConfigClient,
-  setupTestCase
+  setupTestCase,
+  createSystemTestClient
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -1265,4 +1266,25 @@ test('deduplication check is performed before register when configured', async (
       { id: existingEvent.id, trackingId: existingEvent.trackingId }
     ]
   } satisfies Partial<EventIndex>)
+})
+
+test.only('System user can not register an event, even with the right scope', async () => {
+  const { generator, user } = await setupTestCase()
+
+  const humanUserClient = createTestClient(user)
+
+  const systemUserClient = createSystemTestClient('test-system', [
+    encodeScope({ type: 'record.register' })
+  ])
+
+  const event = await humanUserClient.event.create(generator.event.create())
+  await humanUserClient.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  await expect(
+    systemUserClient.event.actions.register.request(
+      generator.event.actions.register(event.id)
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
