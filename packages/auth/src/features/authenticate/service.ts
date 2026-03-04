@@ -104,7 +104,7 @@ export async function authenticateSystem(
   client_id: string,
   client_secret: string
 ): Promise<ISystemAuthentication> {
-  const body = await (eventsClient as any).integrations.authenticate.mutate({
+  const body = await eventsClient.integrations.authenticate.mutate({
     client_id,
     client_secret
   })
