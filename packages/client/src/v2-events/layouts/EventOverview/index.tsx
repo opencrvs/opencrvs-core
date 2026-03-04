@@ -17,11 +17,13 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import styled from 'styled-components'
+import { useSelector } from 'react-redux'
 import {
   applyDraftToEventIndex,
   deepDropNulls,
   EventStatus,
-  ActionType
+  userCanAccessEventWithScopes,
+  getAcceptedScopesByType
 } from '@opencrvs/commons/client'
 import {
   AppBar,
@@ -44,7 +46,9 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
+import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { buildEventIndexWithHierarchy } from './utils'
 
 const Tab = styled.button`
   border: none;
@@ -96,9 +100,38 @@ function EventOverviewTabs() {
   const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
   const { searchEventById } = useEvents()
   const eventResults = searchEventById.useSuspenseQuery(eventId)
+  const scopes = useSelector(getScope)
   const event = eventResults.results[0]
-  const { isActionAllowed } = useUserAllowedActions(event.type)
-  const showRecordTab = isActionAllowed(ActionType.READ)
+
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+
+  const loggedInUser = useSelector(getUserDetails)
+  const { getUser } = useUsers()
+  const [currentUser] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
+
+  const readScopes = getAcceptedScopesByType({
+    acceptedScopes: ['record.read'],
+    scopes: scopes ?? []
+  })
+
+  const eventWithHierarchy = buildEventIndexWithHierarchy(event, {
+    administrativeAreas,
+    locations
+  })
+
+  const showRecordTab =
+    currentUser.type === 'user' &&
+    userCanAccessEventWithScopes(eventWithHierarchy, readScopes, {
+      id: currentUser.id,
+      primaryOfficeId: currentUser.primaryOfficeId,
+      administrativeAreaId: currentUser.administrativeAreaId ?? null,
+      role: currentUser.role,
+      signature: currentUser.signature,
+      type: currentUser.type
+    })
 
   const isActive = (pattern: string) => {
     return !!matchPath({ path: pattern, end: true }, location.pathname)
