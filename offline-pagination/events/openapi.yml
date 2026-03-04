@@ -774,7 +774,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: c7edd5b0-815c-4f2d-9ab3-68f9147f553b
+                transactionId: 6defd2a5-1c2b-4708-bdbb-22756d2a01b4
                 type: birth
       responses:
         "200":
@@ -860,7 +860,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 5900898e-c635-41b5-b08d-e550e76d12d4
+                transactionId: 9c183607-e37a-4dfb-a99a-d59f70e7dc47
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9887,6 +9887,8 @@ components:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
           $ref: "#/components/schemas/ExactUserType"
+        updatedByUserRole:
+          $ref: "#/components/schemas/Exact"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
