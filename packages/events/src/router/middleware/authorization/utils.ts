@@ -17,8 +17,8 @@ import {
   RecordScopeTypeV2,
   RecordScopeV2,
   UUID,
-  scopeHasDeclaredOptions,
-  scopeHasFullOptions
+  scopeUsesFullOptions,
+  scopeUsesDeclaredOptions
 } from '@opencrvs/commons'
 import { EventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { SystemContext, UserContext } from '../../../context'
@@ -94,7 +94,7 @@ export function canAccessEventWithScope(
     return false
   }
 
-  if (scopeHasDeclaredOptions(scope)) {
+  if (scopeUsesDeclaredOptions(scope)) {
     const { options } = scope
 
     if (options?.declaredBy === UserFilter.enum.user) {
@@ -126,7 +126,7 @@ export function canAccessEventWithScope(
     }
   }
 
-  if (scopeHasFullOptions(scope)) {
+  if (scopeUsesFullOptions(scope)) {
     const { options } = scope
 
     if (options?.registeredBy === UserFilter.enum.user) {
@@ -140,6 +140,17 @@ export function canAccessEventWithScope(
       !matchesJurisdictionFilter(
         event.legalStatuses?.REGISTERED?.createdAtLocation,
         JurisdictionFilter.enum.location,
+        user
+      )
+    ) {
+      return false
+    }
+
+    if (
+      options?.registeredIn === JurisdictionFilter.enum.administrativeArea &&
+      !matchesJurisdictionFilter(
+        event.legalStatuses?.REGISTERED?.createdAtLocation,
+        JurisdictionFilter.enum.administrativeArea,
         user
       )
     ) {

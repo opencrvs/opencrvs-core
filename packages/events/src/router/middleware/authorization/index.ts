@@ -347,6 +347,10 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   return next()
 }
 
+/**
+ * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
+ *
+ */
 export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
   const fn: MiddlewareFunction<
     TrpcContext,

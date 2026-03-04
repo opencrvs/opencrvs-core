@@ -159,7 +159,7 @@ export const RecordScopeV2 = z
     "Scopes used to check user's permission to perform actions on a record."
   )
 
-export function scopeHasDeclaredOptions(
+export function scopeUsesDeclaredOptions(
   scope: RecordScopeV2
 ): scope is Extract<
   RecordScopeV2,
@@ -169,7 +169,7 @@ export function scopeHasDeclaredOptions(
   return !scopesWithPlaceEventOptions.options.some((opt) => opt === scope.type)
 }
 
-export function scopeHasFullOptions(
+export function scopeUsesFullOptions(
   scope: RecordScopeV2
 ): scope is Extract<
   RecordScopeV2,
