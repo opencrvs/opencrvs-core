@@ -33,7 +33,8 @@ import {
   DomesticAddressFieldValue,
   UUID,
   AdministrativeAreaField,
-  AdministrativeArea
+  AdministrativeArea,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -59,7 +60,7 @@ type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   configuration?: AddressField['configuration']
   disabled?: boolean
   validatorContext: ValidatorContext
-  eventType?: string
+  eventConfig?: EventConfig
 }
 
 const COUNTRY_FIELD = {
@@ -237,7 +238,7 @@ function AddressInput({
   disabled,
   value,
   validatorContext,
-  eventType,
+  eventConfig,
   ...otherProps
 }: Props) {
   const { id, configuration, required } = otherProps
@@ -358,6 +359,7 @@ function AddressInput({
   return (
     <FormFieldGenerator
       {...otherProps}
+      eventConfig={eventConfig}
       fields={fields}
       initialValues={{ ...resolvedValue, ...derivedAdminLevels }}
       parentId={id}

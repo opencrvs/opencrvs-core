@@ -107,7 +107,8 @@ function AdministrativeAreaInput({
   partOf,
   id,
   disabled,
-  configuration
+  configuration,
+  eventType
 }: {
   onChange: (val: string | null) => void
   partOf: string | null
@@ -115,11 +116,13 @@ function AdministrativeAreaInput({
   disabled?: boolean
   configuration: AdministrativeAreaField['configuration']
   id: string
+  eventType?: string
 }) {
   const token = useSelector(getToken)
   const jurisdictionFilter = resolveJurisdictionReference(
     configuration.allowedLocations,
-    token
+    token,
+    eventType
   )
 
   const administrativeAreas = useAvailableAdministrativeAreas(

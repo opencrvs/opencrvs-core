@@ -33,9 +33,7 @@ export function getAcceptedScopesFromToken(
   token: string,
   acceptedScopes: RecordScopeTypeV2[]
 ) {
-  console.log('TEST3', token)
   const tokenScopes = getScopes(token)
-  console.log('TEST4', tokenScopes)
 
   return tokenScopes
     .map((scope) => {

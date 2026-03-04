@@ -529,7 +529,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             configuration={field.config.configuration}
             disabled={disabled}
-            eventType={eventConfig?.id}
+            eventConfig={eventConfig}
             validatorContext={validatorContext}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
@@ -611,11 +611,14 @@ export const GeneratedInputField = React.memo(
       const partOf =
         partOfRef && makeFormikFieldIdsOpenCRVSCompatible(form)[partOfRef]
 
+      console.log('eventConfig', eventConfig)
+
       return (
         <InputField {...inputFieldProps} htmlFor={fieldDefinition.id}>
           <AdministrativeArea.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             partOf={typeof partOf === 'string' ? partOf : null}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -688,7 +691,6 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />
