@@ -16,12 +16,12 @@ import { JurisdictionFilter } from '../scopes-v2'
 
 describe('userReferenceFunctions', () => {
   describe('user.scope()', () => {
-    it('should return a scope attribute reference', () => {
+    it('should return a scope option reference', () => {
       const result = user.scope('record.create').attribute('placeOfEvent')
 
       expect(result).toEqual({
         $scope: 'record.create',
-        $attribute: 'placeOfEvent'
+        $option: 'placeOfEvent'
       })
     })
   })
@@ -37,12 +37,12 @@ describe('userReferenceFunctions', () => {
       })
     })
 
-    it("user.jurisdiction(user.scope('record.create').attribute('placeOfEvent')) should return a scope attribute reference", () => {
+    it("user.jurisdiction(user.scope('record.create').attribute('placeOfEvent')) should return a scope option reference", () => {
       const result = user.jurisdiction(
         user.scope('record.create').attribute('placeOfEvent')
       )
       expect(result).toEqual({
-        $jurisdiction: { $scope: 'record.create', $attribute: 'placeOfEvent' }
+        $jurisdiction: { $scope: 'record.create', $option: 'placeOfEvent' }
       })
     })
   })
@@ -58,7 +58,7 @@ describe('resolveJurisdictionReference()', () => {
     expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
   })
 
-  it('should return a jurisdiction filter for a scope attribute reference', () => {
+  it('should return a jurisdiction filter for a scope option reference', () => {
     const scopeAttributeReference = user.jurisdiction(
       user.scope('record.create').attribute('placeOfEvent')
     )
@@ -70,7 +70,7 @@ describe('resolveJurisdictionReference()', () => {
     expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
   })
 
-  it('should return the default jurisdiction filter for a scope attribute reference', () => {
+  it('should return the default jurisdiction filter for a scope option reference', () => {
     const scopeAttributeReference = user.jurisdiction(
       user.scope('record.create').attribute('placeOfEvent')
     )

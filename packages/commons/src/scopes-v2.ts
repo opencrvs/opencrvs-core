@@ -80,7 +80,7 @@ export const ResolvedRecordScopeV2 = z
 export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
 /** Note! Moving on these should be called attributes and not options. */
-export const RecordScopeAttributes = z
+export const RecordScopeOptions = z
   .object({
     event: scopeByEvent,
     placeOfEvent: JurisdictionFilter.optional(),
@@ -93,14 +93,14 @@ export const RecordScopeAttributes = z
     'Limits access to records using provided filters. Combined as "AND". Use multiple scopes for "OR" behavior.'
   )
 
-export type RecordScopeAttributes = z.infer<typeof RecordScopeAttributes>
-export const RecordScopeAttributeKey = RecordScopeAttributes.keyof()
-export type RecordScopeAttributeKey = z.infer<typeof RecordScopeAttributeKey>
+export type RecordScopeOptions = z.infer<typeof RecordScopeOptions>
+export const RecordScopeOptionKey = RecordScopeOptions.keyof()
+export type RecordScopeOptionKey = z.infer<typeof RecordScopeOptionKey>
 
 export const RecordScopeV2 = z
   .object({
     type: RecordScopeTypeV2,
-    options: RecordScopeAttributes.optional()
+    options: RecordScopeOptions.optional()
   })
   .describe(
     "Scopes used to check user's permission to perform actions on a record."
@@ -145,27 +145,25 @@ export function findScopeV2(scopes: string[], scopeType: RecordScopeTypeV2) {
   return parsedScopes.find((scope) => scope?.type === scopeType)
 }
 
-const DEFAULT_SCOPE_ATTRIBUTES: RecordScopeAttributes = {
+const DEFAULT_SCOPE_OPTIONS: RecordScopeOptions = {
   placeOfEvent: JurisdictionFilter.enum.all
 }
 
 /**
- * Function to get the value of a scope attribute (aka. scope option)
+ * Function to get the value of a scope option (aka. scope attribute)
  *
- * @param scope - The scope to get the value of the attribute from.
- * @param attribute - The attribute to get the value of.
- * @returns The value of the scope attribute. Will return the default value if the attribute is not set.
+ * @param scope - The scope to get the value of the option from.
+ * @param option - The option to get the value of.
+ * @returns The value of the scope option. Will return the default value if the option is not set.
  */
-export function getScopeAttributeValue<T extends RecordScopeAttributeKey>(
+export function getScopeOptionValue<T extends RecordScopeOptionKey>(
   scope: RecordScopeV2,
-  attribute: T
-): RecordScopeAttributes[T] | undefined {
-  const value = scope.options?.[attribute]
+  option: T
+): RecordScopeOptions[T] | undefined {
+  const value = scope.options?.[option]
 
   const defaultValue =
-    attribute in DEFAULT_SCOPE_ATTRIBUTES
-      ? DEFAULT_SCOPE_ATTRIBUTES[attribute]
-      : undefined
+    option in DEFAULT_SCOPE_OPTIONS ? DEFAULT_SCOPE_OPTIONS[option] : undefined
 
   return value ?? defaultValue
 }

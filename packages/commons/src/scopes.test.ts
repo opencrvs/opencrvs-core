@@ -20,7 +20,8 @@ import {
   encodeScope,
   v1ScopeToV2Scope,
   findScopeV2,
-  getScopeAttributeValue
+  getScopeOptionValue,
+  JurisdictionFilter
 } from './scopes-v2'
 
 describe('findScopeV2()', () => {
@@ -47,13 +48,26 @@ describe('findScopeV2()', () => {
   })
 })
 
-describe('getScopeAttributeValue()', () => {
-  it('should return the default value if the scope attribute is not set', () => {
+describe('getScopeOptionValue()', () => {
+  it('should return the default value if the scope option is not set', () => {
     const scope = {
       type: 'record.create'
     } as const
-    const result = getScopeAttributeValue(scope, 'placeOfEvent')
+
+    const result = getScopeOptionValue(scope, 'placeOfEvent')
     expect(result).toEqual('all')
+  })
+
+  it('should return the value if the scope option is set', () => {
+    const scope = {
+      type: 'record.create',
+      options: {
+        placeOfEvent: JurisdictionFilter.enum.administrativeArea
+      }
+    } as const
+
+    const result = getScopeOptionValue(scope, 'placeOfEvent')
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
   })
 })
 

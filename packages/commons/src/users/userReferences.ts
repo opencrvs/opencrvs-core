@@ -12,21 +12,21 @@ import {
   JurisdictionFilter,
   RecordScopeTypeV2,
   findScopeV2,
-  RecordScopeAttributeKey,
-  getScopeAttributeValue
+  RecordScopeOptionKey,
+  getScopeOptionValue
 } from '../scopes-v2'
 import { RawScopes } from '../authentication'
 import z from 'zod/v4'
 
-const ScopeAttributeReference = z.object({
+const ScopeOptionReference = z.object({
   $scope: RecordScopeTypeV2,
-  $attribute: RecordScopeAttributeKey
+  $option: RecordScopeOptionKey
 })
 
-type ScopeAttributeReference = z.infer<typeof ScopeAttributeReference>
+type ScopeOptionReference = z.infer<typeof ScopeOptionReference>
 
 export const JurisdictionReference = z.object({
-  $jurisdiction: JurisdictionFilter.or(ScopeAttributeReference)
+  $jurisdiction: JurisdictionFilter.or(ScopeOptionReference)
 })
 export type JurisdictionReference = z.infer<typeof JurisdictionReference>
 
@@ -51,37 +51,37 @@ function isJurisdictionFilter(
 }
 
 /**
- * Resolves a scope attribute reference to a jurisdiction filter.
+ * Resolves a scope option reference to a jurisdiction filter.
  *
- * @param scopeAttributeReference - The scope attribute reference to resolve. This will contain scope and attribute names.
- * @param scopes - The scopes to resolve the scope attribute reference from.
- * @returns The jurisdiction filter or undefined if the scope is not found or the attribute is not a valid jurisdiction filter.
+ * @param scopeOptionReference - The scope option reference to resolve. This will contain scope and option names.
+ * @param scopes - The scopes to resolve the scope option reference from.
+ * @returns The jurisdiction filter or undefined if the scope is not found or the option is not a valid jurisdiction filter.
  */
-function resolveJurisdictionScopeAttributeReference(
-  scopeAttributeReference: ScopeAttributeReference,
+function resolveJurisdictionScopeOptionReference(
+  scopeOptionReference: ScopeOptionReference,
   scopes: RawScopes[]
 ): JurisdictionFilter | undefined {
-  const { $scope, $attribute } = scopeAttributeReference
+  const { $scope, $option } = scopeOptionReference
   const scope = findScopeV2(scopes, $scope)
 
   if (!scope) {
     return
   }
 
-  const attributeValue = getScopeAttributeValue(scope, $attribute)
+  const optionValue = getScopeOptionValue(scope, $option)
 
-  // If attribute is set but not a jurisdiction filter, return the least permissive jurisdiction filter
-  if (!isJurisdictionFilter(attributeValue)) {
+  // If option is set but not a jurisdiction filter, return the least permissive jurisdiction filter
+  if (!isJurisdictionFilter(optionValue)) {
     return
   }
 
-  return attributeValue
+  return optionValue
 }
 
 /**
  * Resolves a jurisdiction reference to a jurisdiction filter.
  *
- * @param jurisdictionReference - The jurisdiction reference to resolve. This can be a plain jurisdiction filter or a scope attribute reference.
+ * @param jurisdictionReference - The jurisdiction reference to resolve. This can be a plain jurisdiction filter or a scope option reference.
  * @returns The jurisdiction filter or undefined if the jurisdiction reference is not valid.
  */
 export function resolveJurisdictionReference(
@@ -99,9 +99,9 @@ export function resolveJurisdictionReference(
     return jurisdiction
   }
 
-  // If the jurisdiction is a scope attribute reference, resolve it
+  // If the jurisdiction is a scope option reference, resolve it
   if (jurisdiction['$scope'] && scopes) {
-    return resolveJurisdictionScopeAttributeReference(jurisdiction, scopes)
+    return resolveJurisdictionScopeOptionReference(jurisdiction, scopes)
   }
 
   return
@@ -111,31 +111,29 @@ export function resolveJurisdictionReference(
 export const userReferenceFunctions = {
   scope: (scope: RecordScopeTypeV2) => ({
     /**
-     * user.scope().attribute() is used to create a scope attribute reference.
+     * user.scope().attribute() is used to create a scope option reference.
      *
      * E.g.: user.scope('record.create').attribute('placeOfEvent')
      *
-     * @param attribute - The attribute to create a reference for.
+     * @param option - The option to create a reference for.
      * @returns A scope option reference.
      */
-    attribute: (attribute: RecordScopeAttributeKey) => ({
+    attribute: (option: RecordScopeOptionKey) => ({
       $scope: scope,
-      $attribute: attribute
+      $option: option
     })
   }),
   /**
    * user.jurisdicton() accepts two different kinds of parameters, either:
    *
    * 1. a plain jurisdiction filter: user.jurisdiction('administrativeArea')
-   * 2. a scope attribute reference: user.jurisdiction(user.scope('record.create').attribute('placeOfEvent'))
+   * 2. a scope option reference: user.jurisdiction(user.scope('record.create').attribute('placeOfEvent'))
    *
    * These will be resolved during runtime.
    *
    * @param jurisdiction - The jurisdiction to resolve.
    */
-  jurisdiction: (
-    jurisdiction: JurisdictionFilter | ScopeAttributeReference
-  ) => ({
+  jurisdiction: (jurisdiction: JurisdictionFilter | ScopeOptionReference) => ({
     $jurisdiction: jurisdiction
   })
 }

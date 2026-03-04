@@ -633,7 +633,6 @@ const LocationInput = BaseField.extend({
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
     searchableResource: z.array(z.enum(['locations', 'facilities', 'offices'])),
-    configuration: z.object({ allowedLocations: AllowedLocations }).optional(),
     allowedLocations: AllowedLocations
   })
 }).describe('Input field for a location')
