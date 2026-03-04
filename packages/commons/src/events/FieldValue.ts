@@ -25,6 +25,8 @@ import {
   QrReaderFieldValue,
   IdReaderFieldValue
 } from './CompositeFieldValue'
+import { PlainDate, plainDateToLocalDate } from './PlainDate'
+export { PlainDate, plainDateToLocalDate }
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
@@ -40,32 +42,6 @@ import {
 
 export const TextValue = z.string()
 export const NonEmptyTextValue = TextValue.min(1)
-
-/**
- * A branded YYYY-MM-DD date string that must be converted to a JS Date via
- * {@link plainDateToLocalDate} rather than `new Date()`.
- *
- * `new Date("2021-01-01")` treats the string as UTC midnight, which shifts the
- * displayed day in timezones behind UTC. Use `plainDateToLocalDate` instead to
- * get local midnight.
- */
-export const PlainDate = z
-  .string()
-  .date()
-  .brand('PlainDate')
-  .describe('Date in the format YYYY-MM-DD')
-export type PlainDate = z.infer<typeof PlainDate>
-
-/**
- * Converts a {@link PlainDate} (YYYY-MM-DD) to a local `Date` at midnight.
- *
- * The `Date(year, month, day)` constructor uses the local timezone, unlike
- * `new Date(dateString)` which interprets bare date strings as UTC midnight.
- */
-export function plainDateToLocalDate(date: PlainDate): Date {
-  const [year, month, day] = date.split('-').map(Number)
-  return new Date(year, month - 1, day)
-}
 
 export const AgeValue = z.object({
   age: z.number(),

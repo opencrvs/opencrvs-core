@@ -43,11 +43,8 @@ import {
 import { IStoreState } from '@client/store'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
-import {
-  formattedDuration,
-  isValidPlainDate,
-  plainDateToLocalDate
-} from '@client/utils/date-formatting'
+import { plainDateToLocalDate } from '@opencrvs/commons/client'
+import { formattedDuration, isValidPlainDate } from '@client/utils/date-formatting'
 import { RegStatus } from '@client/utils/gateway'
 import type {
   GQLEventSearchResultSet,
