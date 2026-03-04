@@ -291,7 +291,7 @@ function AddressInput(props: Props) {
 
   const adminStructure = generateAdministrativeAreaFields(
     appConfigAdminLevels,
-    props.required,
+    otherProps.required,
     props.configuration?.allowedLocations
   )
 
@@ -307,7 +307,7 @@ function AddressInput(props: Props) {
    * 3. Address line inputs (e.g. Town, Residential Area, Street etc.)
    */
   const fields = [
-    { ...COUNTRY_FIELD, required: props.required },
+    { ...COUNTRY_FIELD, required: otherProps.required },
     ...adminStructure,
     ...addressFields
   ].map((x) => {
