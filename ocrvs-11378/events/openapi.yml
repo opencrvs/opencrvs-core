@@ -2213,7 +2213,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
-                            $option:
+                            $attribute:
                               type: string
                               enum:
                                 - event
@@ -2224,7 +2224,7 @@ components:
                                 - registeredBy
                           required:
                             - $scope
-                            - $option
+                            - $attribute
                           additionalProperties: false
                   required:
                     - $jurisdiction
@@ -6288,7 +6288,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
-                            $option:
+                            $attribute:
                               type: string
                               enum:
                                 - event
@@ -6299,7 +6299,7 @@ components:
                                 - registeredBy
                           required:
                             - $scope
-                            - $option
+                            - $attribute
                           additionalProperties: false
                   required:
                     - $jurisdiction
@@ -6650,7 +6650,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
-                            $option:
+                            $attribute:
                               type: string
                               enum:
                                 - event
@@ -6661,7 +6661,7 @@ components:
                                 - registeredBy
                           required:
                             - $scope
-                            - $option
+                            - $attribute
                           additionalProperties: false
                   required:
                     - $jurisdiction
@@ -6857,7 +6857,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
-                            $option:
+                            $attribute:
                               type: string
                               enum:
                                 - event
@@ -6868,7 +6868,7 @@ components:
                                 - registeredBy
                           required:
                             - $scope
-                            - $option
+                            - $attribute
                           additionalProperties: false
                   required:
                     - $jurisdiction
@@ -7061,7 +7061,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
-                            $option:
+                            $attribute:
                               type: string
                               enum:
                                 - event
@@ -7072,7 +7072,7 @@ components:
                                 - registeredBy
                           required:
                             - $scope
-                            - $option
+                            - $attribute
                           additionalProperties: false
                   required:
                     - $jurisdiction
