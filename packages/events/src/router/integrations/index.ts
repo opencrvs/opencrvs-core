@@ -72,7 +72,7 @@ export const integrationsRouter = router({
     .mutation(async ({ input, ctx }) => {
       const clientSecret = randomUUID()
       const shaSecret = randomUUID()
-      const { hash: secretHash, salt } = generateSaltedHash(clientSecret)
+      const { hash: secretHash, salt } = await generateSaltedHash(clientSecret)
 
       const row = await createSystemClient({
         name: input.name,
