@@ -34,9 +34,7 @@ import {
   CustomActionInput,
   EditActionInput
 } from '@opencrvs/commons/events'
-import {
-  EventActionAuditLog
-} from '@opencrvs/commons/events'
+import { EventActionAuditLog } from '@opencrvs/commons/events'
 import {
   TokenUserType,
   TokenWithBearer
@@ -46,7 +44,7 @@ import {
   requiresAnyOfScopes,
   setBearerForToken
 } from '@events/router/middleware'
-import { userAndSystemProcedure } from '@events/router/trpc'
+import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
@@ -329,6 +327,16 @@ export type AsyncActionConfirmationResponseSchema = z.infer<
 >
 
 /**
+ * To prevent accidental access granting, we want to make sure that system users can only access events with scopes that explicitly allow system user access, even if the scope options would match the system user's context.
+ */
+const SYSTEM_USER_ALLOWED_ACTIONS = [
+  ActionType.NOTIFY,
+  ActionType.REJECT_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REQUEST_CORRECTION
+] as const
+
+/**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
  *
@@ -352,18 +360,30 @@ export function getDefaultActionProcedures(
     )
   }
 
-  const requireScopesForRequestMiddleware = requiresAnyOfScopes(
-    [],
-    ACTION_SCOPE_MAP[actionType]
+  const actionsMigratedToV2Scopes = [ActionType.NOTIFY] as const
+
+  const canAccessEventMiddleware = actionsMigratedToV2Scopes.some(
+    (act) => act === actionType
   )
+    ? // @TODO
+      // @ts-expect-error - All scopes do not overlap between 2.0 and 1.9. Since scopes are migrated one by one, we can ignore this error until all scopes for the action are migrated as long as @see actionsMigratedToV2Scopes is updated accordingly.
+      middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType])
+    : requiresAnyOfScopes([], ACTION_SCOPE_MAP[actionType])
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
+  const userTypeBasedProcedure = SYSTEM_USER_ALLOWED_ACTIONS.some(
+    (act) => act === actionType
+  )
+    ? userAndSystemProcedure
+    : userOnlyProcedure
+
   return {
-    request: userAndSystemProcedure
+    request: userTypeBasedProcedure
       .meta(meta)
-      .use(requireScopesForRequestMiddleware)
+      .use(canAccessEventMiddleware)
       .input(actionConfig.inputSchema.strict())
+      // @ts-expect-error - deprecated by the end of 2.0
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
@@ -403,7 +423,11 @@ export function getDefaultActionProcedures(
             clientId: user.id,
             clientType: user.type,
             operation: auditOperation,
-            requestData: { eventId, actionType, transactionId: input.transactionId },
+            requestData: {
+              eventId,
+              actionType,
+              transactionId: input.transactionId
+            },
             responseSummary: {
               eventId: result.id,
               eventType: result.type,
