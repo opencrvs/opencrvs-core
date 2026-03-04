@@ -1625,7 +1625,12 @@ test('User with "location" scope only sees events created by system user to thei
         event: [TENNIS_CLUB_MEMBERSHIP]
       }
     }),
-    `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+    encodeScope({
+      type: 'record.notify',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   const ownOfficeId = user.primaryOfficeId

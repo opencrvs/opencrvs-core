@@ -35,6 +35,12 @@ export const UserFilter = z
   .describe('Filters based on the user. Limits to self.')
 export type UserFilter = z.infer<typeof UserFilter>
 
+/**
+ * The different types of scopes that can be used to control access to records. Each type has different options that can be used to further filter the records that the scope applies to.
+ * When adding new scope types, they should be added to the appropriate section based on the options they require.
+ *
+ * @see scopeOptionsPlaceEvent @see scopeOptionsDeclared @see scopeOptionsFull
+ */
 export const RecordScopeTypeV2 = z.enum([
   'record.search',
   'record.create',
@@ -61,46 +67,136 @@ const scopeByEvent = z
   )
   .describe('Event type, e.g. birth, death')
 
-export const ResolvedRecordScopeV2 = z
+const scopeOptionsPlaceEvent = z
   .object({
-    type: RecordScopeTypeV2,
-    options: z
-      .object({
-        event: scopeByEvent,
-        placeOfEvent: UUID.nullish(),
-        declaredIn: UUID.nullish(),
-        declaredBy: z.string().or(z.undefined()).optional(),
-        registeredIn: UUID.nullish(),
-        registeredBy: z.string().or(z.undefined()).optional()
-      })
-      .optional()
+    event: scopeByEvent,
+    placeOfEvent: JurisdictionFilter.optional()
   })
-  .describe('Resolved scope with location/user IDs instead of filters.')
+  .describe('Options applicable to all record scopes.')
 
-export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
+const scopeOptionsDeclared = scopeOptionsPlaceEvent
+  .extend({
+    declaredIn: JurisdictionFilter.optional(),
+    declaredBy: UserFilter.optional()
+  })
+  .describe('Options applicable to actions that may take place after DECLARE')
+
+const scopeOptionsFull = scopeOptionsDeclared
+  .extend({
+    registeredIn: JurisdictionFilter.optional(),
+    registeredBy: UserFilter.optional()
+  })
+  .describe(
+    'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
+  )
+
+const resolvedScopeOptionsPlaceEvent = z
+  .object({
+    event: scopeByEvent,
+    placeOfEvent: UUID.nullish()
+  })
+  .describe(
+    'Resolved options applicable to all record scopes, with location ID instead of jurisdiction filter.'
+  )
+
+const resolvedScopeOptionsDeclared = resolvedScopeOptionsPlaceEvent
+  .extend({
+    declaredIn: UUID.nullish(),
+    declaredBy: z.string().optional()
+  })
+  .describe(
+    'Resolved options applicable to actions that may take place after DECLARE, with location ID and user ID instead of filters.'
+  )
+
+const resolvedScopeOptionsFull = resolvedScopeOptionsDeclared
+  .extend({
+    registeredIn: UUID.nullish(),
+    registeredBy: z.string().optional()
+  })
+  .describe(
+    'Resolved options applicable to actions that may take place after REGISTER, with full filtering capabilities and location/user IDs instead of filters.'
+  )
+
+export const scopesWithPlaceEventOptions = RecordScopeTypeV2.extract([
+  'record.create',
+  'record.declare',
+  'record.notify'
+])
+
+export const scopesWithDeclaredOptions = RecordScopeTypeV2.extract([
+  'record.validate',
+  'record.reject',
+  'record.archive',
+  'record.review-duplicates',
+  'record.register'
+])
+
+export const scopesWithFullOptions = RecordScopeTypeV2.extract([
+  'record.search',
+  'record.read',
+  'record.print-certified-copies',
+  'record.request-correction',
+  'record.correct',
+  'record.unassign-others'
+])
 
 export const RecordScopeV2 = z
-  .object({
-    type: RecordScopeTypeV2,
-    options: z
-      .object({
-        event: scopeByEvent,
-        placeOfEvent: JurisdictionFilter.optional(),
-        declaredIn: JurisdictionFilter.optional(),
-        declaredBy: UserFilter.optional(),
-        registeredIn: JurisdictionFilter.optional(),
-        registeredBy: UserFilter.optional()
-      })
-      .optional()
-      .describe(
-        'Limits access to records using provided filters. Combined as "AND". Use multiple scopes for "OR" behavior.'
-      )
-  })
+  .discriminatedUnion('type', [
+    z.object({
+      type: scopesWithPlaceEventOptions,
+      options: scopeOptionsPlaceEvent.optional()
+    }),
+    z.object({
+      type: scopesWithDeclaredOptions,
+      options: scopeOptionsDeclared.optional()
+    }),
+    z.object({
+      type: scopesWithFullOptions,
+      options: scopeOptionsFull.optional()
+    })
+  ])
   .describe(
     "Scopes used to check user's permission to perform actions on a record."
   )
 
+export function scopeUsesDeclaredOptions(
+  scope: RecordScopeV2
+): scope is Extract<
+  RecordScopeV2,
+  { type: z.infer<typeof scopesWithDeclaredOptions> }
+> {
+  // If the scope has less, it is found here. Otherwise in other categories.
+  return !scopesWithPlaceEventOptions.options.some((opt) => opt === scope.type)
+}
+
+export function scopeUsesFullOptions(
+  scope: RecordScopeV2
+): scope is Extract<
+  RecordScopeV2,
+  { type: z.infer<typeof scopesWithFullOptions> }
+> {
+  return scopesWithFullOptions.options.some((opt) => opt === scope.type)
+}
+
+export const ResolvedRecordScopeV2 = z
+  .discriminatedUnion('type', [
+    z.object({
+      type: scopesWithPlaceEventOptions,
+      options: resolvedScopeOptionsPlaceEvent.optional()
+    }),
+    z.object({
+      type: scopesWithDeclaredOptions,
+      options: resolvedScopeOptionsDeclared.optional()
+    }),
+    z.object({
+      type: scopesWithFullOptions,
+      options: resolvedScopeOptionsFull.optional()
+    })
+  ])
+  .describe('Resolved scope with location/user IDs instead of filters.')
+
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
+export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
 const flattenScope = (scope: RecordScopeV2) => ({
   type: scope.type,
@@ -131,6 +227,7 @@ export const decodeScope = (query: string) => {
   })
 
   const unflattenedScope = unflattenScope(scope)
+
   return RecordScopeV2.safeParse(unflattenedScope)?.data
 }
 

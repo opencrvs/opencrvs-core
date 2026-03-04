@@ -479,26 +479,6 @@ export function parseLiteralScope(scope: string) {
 }
 
 /**
- * @deprecated - Will be removed in v2.0
- * Stringifies a ConfigurableScopes object into a scope string.
- * @param {ConfigurableScopes} scope - The scope object to stringify
- * @returns {string} The stringified scope in format "type[key1=value1|value2,key2=value3|value4]"
- * @example
- * stringifyScope({
- *   type: "record.notify",
- *   options: { event: ["birth", "tennis-club-membership"] }
- * })
- * // Returns: "record.notify[event=birth|tennis-club-membership]"
- */
-export function stringifyScope(scope: z.infer<typeof ConfigurableRawScopes>) {
-  const options = Object.entries(scope.options)
-    .map(([key, value]) => `${key}=${value.join('|')}`)
-    .join(',')
-
-  return `${scope.type}[${options}]`
-}
-
-/**
  * Extracts authorized event identifiers (e.g. birth, death) from the provided configurable scopes.
  *
  * @param scopes - Array of configurable scopes with options
