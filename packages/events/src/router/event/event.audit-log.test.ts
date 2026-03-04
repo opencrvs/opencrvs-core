@@ -107,7 +107,10 @@ describe('audit log', () => {
           type: 'record.create',
           options: { event: [TENNIS_CLUB_MEMBERSHIP] }
         }),
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+        encodeScope({
+          type: 'record.notify',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
       ])
 
       const event = await client.event.create({
@@ -313,7 +316,9 @@ describe('audit log', () => {
       expect(logs).toHaveLength(1)
       expect(logs[0].operation).toBe('attachments.upload')
       expect(logs[0].clientType).toBe('system')
-      expect(logs[0].responseSummary).toMatchObject({ fileUrl: expectedFileUrl })
+      expect(logs[0].responseSummary).toMatchObject({
+        fileUrl: expectedFileUrl
+      })
     })
   })
 })

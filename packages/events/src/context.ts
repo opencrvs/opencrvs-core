@@ -43,7 +43,8 @@ export const SystemContext = System.pick({
   administrativeAreaId: true,
   signature: true
 })
-type SystemContext = z.infer<typeof SystemContext>
+
+export type SystemContext = z.infer<typeof SystemContext>
 
 export const TrpcContext = z.object({
   token: TokenWithBearer,

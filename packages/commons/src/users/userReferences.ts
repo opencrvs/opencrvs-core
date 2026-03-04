@@ -12,7 +12,7 @@ import {
   JurisdictionFilter,
   RecordScopeTypeV2,
   findScopeV2,
-  RecordScopeOptionKey,
+  ScopeOptionKey,
   getScopeOptionValue
 } from '../scopes-v2'
 import { RawScopes } from '../authentication'
@@ -20,7 +20,7 @@ import z from 'zod/v4'
 
 const ScopeOptionReference = z.object({
   $scope: RecordScopeTypeV2,
-  $option: RecordScopeOptionKey
+  $option: ScopeOptionKey
 })
 
 type ScopeOptionReference = z.infer<typeof ScopeOptionReference>
@@ -118,7 +118,7 @@ export const userReferenceFunctions = {
      * @param option - The option to create a reference for.
      * @returns A scope option reference.
      */
-    attribute: (option: RecordScopeOptionKey) => ({
+    attribute: (option: ScopeOptionKey) => ({
       $scope: scope,
       $option: option
     })
