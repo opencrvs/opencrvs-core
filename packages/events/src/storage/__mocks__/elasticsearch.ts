@@ -15,6 +15,8 @@ import { inject, vi } from 'vitest'
 export const getEventIndexName = vi.fn()
 /** @knipignore */
 export const getEventAliasName = vi.fn()
+/** @knipignore */
+export const getTemporaryIndexName = vi.fn()
 
 /** @knipignore */
 export function getOrCreateClient() {

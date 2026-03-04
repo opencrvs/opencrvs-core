@@ -15,6 +15,10 @@ query: {
 }
 ```
 
+### Improvements
+
+- Change reindex call to background process and use aliases to make operation non-destructive [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
+
 ## 1.9.10
 
 ### New features

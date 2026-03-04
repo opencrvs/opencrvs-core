@@ -25,13 +25,27 @@ vi.mock('@events/storage/mongodb/user-mgnt')
 vi.mock('@events/storage/elasticsearch')
 
 async function resetESServer() {
-  const { getEventIndexName, getEventAliasName } = await import(
-    // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
-    '@events/storage/elasticsearch'
+  const { getEventIndexName, getEventAliasName, getTemporaryIndexName } =
+    await import(
+      // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
+      '@events/storage/elasticsearch'
+    )
+  const random = `${Date.now()}_${Math.floor(Math.random() * 10000)}`
+
+  const randomIndex = (eventType: string) => `events_${eventType}_${random}`
+  const index = randomIndex('tennis-club-membership')
+
+  getEventAliasName.mockReturnValue(`events_${random}`)
+  getEventIndexName.mockImplementation((eventType: string) =>
+    randomIndex(eventType || 'tennis-club-membership')
   )
-  const index = 'events_tennis_club_membership' + Date.now() + Math.random()
-  getEventIndexName.mockReturnValue(index)
-  getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
+
+  getTemporaryIndexName.mockImplementation(
+    (eventType: string, timestamp: number) =>
+      randomIndex(eventType || 'tennis-club-membership') +
+      `_${Math.floor(Math.random() * 10000)}${timestamp}`
+  )
+
   await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
 }
 

@@ -91,7 +91,7 @@ async function reindexSearch(
   })
 }
 
-async function runReindex(token: TokenWithBearer) {
+export async function runReindex(token: TokenWithBearer) {
   const configurations = await getEventConfigurations(token)
 
   const timestamp = Date.now()
