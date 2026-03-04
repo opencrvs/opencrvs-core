@@ -9,11 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Kysely } from 'kysely'
+import { Kysely, RawBuilder, sql } from 'kysely'
 import { UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { NewSystemClients } from './schema/app/SystemClients'
 import Schema from './schema/Database'
+
+function json<T> (object: T): RawBuilder<T> {
+  return sql`cast (${JSON.stringify(object)} as jsonb)`
+}
 
 export async function createSystemClient(
   data: NewSystemClients,
@@ -24,9 +28,7 @@ export async function createSystemClient(
     .insertInto('systemClients')
     .values({
       ...data,
-      // JSONB columns require explicit JSON serialisation because Kysely's
-      // pg driver doesn't do it automatically for array values.
-      scopes: JSON.stringify(data.scopes ?? []) as unknown as string[]
+      scopes: json(data.scopes ?? [])
     })
     .returning(['id', 'name', 'scopes', 'status', 'shaSecret', 'createdAt'])
     .executeTakeFirstOrThrow()
