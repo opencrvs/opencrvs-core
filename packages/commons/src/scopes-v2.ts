@@ -236,6 +236,7 @@ export function findScopeV2(scopes: string[], scopeType: RecordScopeTypeV2) {
   return parsedScopes.find((scope) => scope?.type === scopeType)
 }
 
+/** If a certain scope option is not set, we use the default value. */
 const DEFAULT_SCOPE_OPTIONS: ScopeOptionsFull = {
   placeOfEvent: JurisdictionFilter.enum.all
 }
