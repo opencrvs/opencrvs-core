@@ -17,7 +17,7 @@ import { publicProcedure, router, userAndSystemProcedure } from '@events/router/
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import { createSystemClient, getSystemClientById, listSystemClients } from '@events/storage/postgres/events/system-clients'
-import { generateHash, generateSaltedHash } from '@events/service/auth/hash'
+import { compare, generateSaltedHash } from '@events/service/auth/hash'
 
 const CreateIntegrationInput = z.object({
   name: z.string().min(1, 'Integration name is required'),
@@ -111,9 +111,7 @@ export const integrationsRouter = router({
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 
-      const computedHash = generateHash(input.client_secret, systemClient.salt)
-
-      if (computedHash !== systemClient.secretHash) {
+      if (!(await compare(input.client_secret, systemClient.secretHash))) {
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 

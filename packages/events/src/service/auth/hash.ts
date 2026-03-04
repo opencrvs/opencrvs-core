@@ -16,7 +16,19 @@ interface SaltedHash {
   salt: string
 }
 
-export function generateHash(content: string, salt: string): string {
+export function compare(password: string, hash: string) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(password, hash, (err, res) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(res)
+      }
+    })
+  })
+}
+
+function generateHash(content: string, salt: string): string {
   return bcrypt.hashSync(content, salt)
 }
 
