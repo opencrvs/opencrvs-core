@@ -24,6 +24,8 @@ import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 vi.mock('@events/storage/mongodb/user-mgnt')
 vi.mock('@events/storage/elasticsearch')
 
+let _tempIndexCounter = 0
+
 async function resetESServer() {
   const { getEventIndexName, getEventAliasName, getTemporaryIndexName } =
     await import(
@@ -32,21 +34,25 @@ async function resetESServer() {
     )
   const random = `${Date.now()}_${Math.floor(Math.random() * 10000)}`
 
-  const randomIndex = (eventType: string) => `events_${eventType}_${random}`
-  const index = randomIndex('tennis-club-membership')
+  // The global alias used by all searches.
+  const alias = `events_${random}`
 
-  getEventAliasName.mockReturnValue(`events_${random}`)
-  getEventIndexName.mockImplementation((eventType: string) =>
-    randomIndex(eventType || 'tennis-club-membership')
-  )
+  const concreteIndex = `${alias}_idx`
+
+  getEventAliasName.mockReturnValue(alias)
+
+  getEventIndexName.mockReturnValue(concreteIndex)
 
   getTemporaryIndexName.mockImplementation(
-    (eventType: string, timestamp: number) =>
-      randomIndex(eventType || 'tennis-club-membership') +
-      `_${Math.floor(Math.random() * 10000)}${timestamp}`
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_eventType: string, _timestamp: number) =>
+      `${concreteIndex}_${++_tempIndexCounter}`
   )
 
-  await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
+  await createIndex(
+    concreteIndex,
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
 }
 
 async function resetPostgresServer() {
