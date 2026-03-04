@@ -72,7 +72,8 @@ import {
   ButtonFieldValue,
   VerificationStatusValue,
   AgeValue,
-  FieldUpdateValue
+  FieldUpdateValue,
+  FieldGroupValue
 } from './FieldValue'
 import { FullDocumentPath } from '../documents'
 import {
@@ -122,18 +123,12 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     | NullishFieldValueSchema
     | DynamicNameValue
     | DynamicAddressFieldValue
-    | z.AnyZodObject
 
   switch (field.type) {
-    case FieldType.FIELD_GROUP:
-      schema = z.object(
-        field.fields.reduce((acc, subfield) => {
-          return {
-            ...acc,
-            [subfield.id]: mapFieldTypeToZod(subfield)
-          }
-        }, {})
-      )
+    case FieldType.FIELD_GROUP: {
+      schema = FieldGroupValue
+      break
+    }
     case FieldType.DATE:
       schema = DateValue
       break
