@@ -252,8 +252,8 @@ export function getScopeOptionValue<T extends ScopeOptionKey>(
   scope: RecordScopeV2,
   option: T
 ): ScopeOptionsFull[T] | undefined {
-  // @ts-expect-error - TODO: fix this
-  const value = scope.options?.[option]
+  const options = scope.options as Partial<ScopeOptionsFull> | undefined
+  const value = options?.[option]
 
   const defaultValue =
     option in DEFAULT_SCOPE_OPTIONS ? DEFAULT_SCOPE_OPTIONS[option] : undefined
