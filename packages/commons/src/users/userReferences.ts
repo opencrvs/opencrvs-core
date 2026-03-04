@@ -12,9 +12,9 @@ import {
   JurisdictionFilter,
   RecordScopeTypeV2,
   ScopeOptionKey,
-  getAcceptedScopesFromToken,
   getScopeOptionValue
 } from '../scopes-v2'
+import { getAcceptedScopesFromToken } from '../authentication'
 import z from 'zod/v4'
 
 const ScopeOptionReference = z.object({

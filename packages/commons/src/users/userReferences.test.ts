@@ -9,10 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  userReferenceFunctions as user
-  // resolveJurisdictionReference
+  userReferenceFunctions as user,
+  resolveJurisdictionReference
 } from './userReferences'
 import { JurisdictionFilter } from '../scopes-v2'
+import { signToken } from '../authentication.test'
 
 describe('userReferenceFunctions', () => {
   describe('user.scope()', () => {
@@ -48,61 +49,127 @@ describe('userReferenceFunctions', () => {
   })
 })
 
-// describe('resolveJurisdictionReference()', () => {
-//   it('should return a jurisdiction filter for a plain jurisdiction reference', () => {
-//     const jurisdictionReference = user.jurisdiction(
-//       JurisdictionFilter.enum.administrativeArea
-//     )
+function createTestToken(scopes: string[]) {
+  return signToken({
+    sub: 'foo',
+    userType: 'system',
+    scope: scopes
+  })
+}
 
-//     const result = resolveJurisdictionReference(jurisdictionReference)
-//     expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
-//   })
+describe('resolveJurisdictionReference()', () => {
+  it('should return a jurisdiction filter for a plain jurisdiction reference', () => {
+    const jurisdictionReference = user.jurisdiction(
+      JurisdictionFilter.enum.administrativeArea
+    )
 
-//   it('should return a jurisdiction filter for a scope option reference', () => {
-//     const scopeAttributeReference = user.jurisdiction(
-//       user.scope('record.create').attribute('placeOfEvent')
-//     )
+    const result = resolveJurisdictionReference(jurisdictionReference)
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
 
-//     const result = resolveJurisdictionReference(scopeAttributeReference, [
-//       `type=record.create&event=birth,death,tennis-club-membership&placeOfEvent=${JurisdictionFilter.enum.administrativeArea}`
-//     ])
+  it('should return a jurisdiction filter for a scope option reference', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.create').attribute('placeOfEvent')
+    )
 
-//     expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
-//   })
+    const token = createTestToken([
+      `type=record.create&event=birth,death&placeOfEvent=${JurisdictionFilter.enum.administrativeArea}`
+    ])
 
-//   it('should return the default jurisdiction filter for a scope option reference', () => {
-//     const scopeAttributeReference = user.jurisdiction(
-//       user.scope('record.create').attribute('placeOfEvent')
-//     )
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
 
-//     const result = resolveJurisdictionReference(scopeAttributeReference, [
-//       'type=record.create&event=birth,death,tennis-club-membership'
-//     ])
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
 
-//     expect(result).toEqual(JurisdictionFilter.enum.all)
-//   })
+  it('should return the default jurisdiction filter for a scope option reference', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.create').attribute('placeOfEvent')
+    )
 
-//   it('should return undefined if scope is not found', () => {
-//     const scopeAttributeReference = user.jurisdiction(
-//       user.scope('record.create').attribute('placeOfEvent')
-//     )
+    const token = createTestToken(['type=record.create&event=birth,death'])
 
-//     const result = resolveJurisdictionReference(scopeAttributeReference, [
-//       'type=record.declare&event=birth,death,tennis-club-membership&placeOfEvent=administrativeArea'
-//     ])
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
 
-//     expect(result).toEqual(undefined)
-//   })
+    expect(result).toEqual(JurisdictionFilter.enum.all)
+  })
 
-//   it('should return undefined if scope has invalid attribute', () => {
-//     const scopeAttributeReference = user.jurisdiction(
-//       user.scope('record.create').attribute('placeOfEvent')
-//     )
+  it('should return undefined if scope is not found', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.create').attribute('placeOfEvent')
+    )
 
-//     const result = resolveJurisdictionReference(scopeAttributeReference, [
-//       'type=record.create&event=birth,death,tennis-club-membership&placeOfEvent=foobar'
-//     ])
+    const token = createTestToken([
+      'type=record.declare&event=birth,death&placeOfEvent=administrativeArea'
+    ])
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
 
-//     expect(result).toEqual(undefined)
-//   })
-// })
+    expect(result).toEqual(undefined)
+  })
+
+  it('should return undefined if scope has invalid attribute', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.create').attribute('placeOfEvent')
+    )
+
+    const token = createTestToken([
+      'type=record.create&event=birth,death&placeOfEvent=foobar'
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
+
+    expect(result).toEqual(undefined)
+  })
+
+  it('should return most permissive jurisdiction filter if multiple matching scopes are present', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.create').attribute('placeOfEvent')
+    )
+
+    const token = createTestToken([
+      `type=record.create&event=birth,death&placeOfEvent=${JurisdictionFilter.enum.location}`,
+      `type=record.create&placeOfEvent=${JurisdictionFilter.enum.administrativeArea}`
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'birth'
+    )
+
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
+
+  it('should return undefined for scope with matching type but wrong event type', () => {
+    const scopeAttributeReference = user.jurisdiction(
+      user.scope('record.create').attribute('placeOfEvent')
+    )
+
+    const token = createTestToken([
+      'type=record.create&event=birth&placeOfEvent=administrativeArea'
+    ])
+
+    const result = resolveJurisdictionReference(
+      scopeAttributeReference,
+      token,
+      'death'
+    )
+
+    expect(result).toEqual(undefined)
+  })
+})

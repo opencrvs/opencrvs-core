@@ -17,7 +17,6 @@ import {
   parseLiteralScope
 } from './scopes'
 import { UUID } from './uuid'
-import { getScopes } from './authentication'
 
 /*
  * V2 file will be unified with the scopes during 2.0 development.
@@ -371,27 +370,4 @@ export function canUserCreateEvent(
 
     return false
   })
-}
-
-/**
- * Returns an array of accepted scopes from a JWT token, filtered by the given accepted scope types.
- *
- * @param token - The JWT token containing scope definitions.
- * @param acceptedScopes - An array of acceptable scope types to filter by.
- * @returns An array of parsed RecordScopeV2 objects that are found in the token and match the accepted scope types.
- */
-export function getAcceptedScopesFromToken(
-  token: string,
-  acceptedScopes: RecordScopeTypeV2[]
-) {
-  const tokenScopes = getScopes(token)
-
-  return tokenScopes
-    .map((scope) => {
-      const parsedScope = decodeScope(scope)
-      return parsedScope && acceptedScopes.includes(parsedScope.type)
-        ? parsedScope
-        : null
-    })
-    .filter((scope): scope is RecordScopeV2 => scope !== null)
 }
