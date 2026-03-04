@@ -13,12 +13,8 @@ import {
   getScopes,
   decodeScope,
   RecordScopeTypeV2,
-  RecordScopeV2,
-  canAccessEventWithScope,
-  userCanAccessEventWithScopes
+  RecordScopeV2
 } from '@opencrvs/commons'
-
-export { canAccessEventWithScope, userCanAccessEventWithScopes }
 
 export function getAcceptedScopesFromToken(
   token: string,
