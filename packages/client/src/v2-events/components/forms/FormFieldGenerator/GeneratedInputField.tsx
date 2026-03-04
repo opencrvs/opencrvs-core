@@ -611,8 +611,6 @@ export const GeneratedInputField = React.memo(
       const partOf =
         partOfRef && makeFormikFieldIdsOpenCRVSCompatible(form)[partOfRef]
 
-      console.log('eventConfig', eventConfig)
-
       return (
         <InputField {...inputFieldProps} htmlFor={fieldDefinition.id}>
           <AdministrativeArea.Input
@@ -691,6 +689,7 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />
