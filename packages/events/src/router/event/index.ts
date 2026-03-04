@@ -359,7 +359,7 @@ export const eventRouter = router({
         tags: ['events']
       }
     })
-    .mutation(async ({ ctx }) => {
-      await reindex(ctx.token)
+    .mutation(({ ctx }) => {
+      reindex(ctx.token)
     })
 })
