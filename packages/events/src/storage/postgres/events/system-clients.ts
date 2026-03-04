@@ -43,13 +43,25 @@ export async function listSystemClients(
   const db = trx ?? getClient()
   let query = db
     .selectFrom('systemClients')
-    .select(['id', 'name', 'scopes', 'status'])
+    .select(['id', 'name', 'scopes', 'status', 'legacyId'])
 
   if (filter?.status) {
     query = query.where('status', '=', filter.status)
   }
 
   return query.execute()
+}
+
+export async function getSystemByLegacyId(
+  legacyId: string,
+  trx?: Kysely<Schema>
+) {
+  const db = trx ?? getClient()
+  return db
+    .selectFrom('systemClients')
+    .selectAll()
+    .where('legacyId', '=', legacyId)
+    .executeTakeFirstOrThrow()
 }
 
 export async function getSystemClientById(
@@ -61,5 +73,5 @@ export async function getSystemClientById(
     .selectFrom('systemClients')
     .selectAll()
     .where('id', '=', id)
-    .executeTakeFirst()
+    .executeTakeFirstOrThrow()
 }
