@@ -232,16 +232,16 @@ function getAdministrativeAreaIdFromAddress(value?: AddressFieldValue) {
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
  * - In search mode, only displays admin structure and town/village fields.
  */
-function AddressInput({
-  onChange,
-  defaultValue,
-  disabled,
-  value,
-  validatorContext,
-  eventConfig,
-  ...otherProps
-}: Props) {
-  const { id, configuration, required } = otherProps
+function AddressInput(props: Props) {
+  const {
+    onChange,
+    defaultValue,
+    disabled,
+    value,
+    validatorContext,
+    eventConfig,
+    ...otherProps
+  } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -250,7 +250,7 @@ function AddressInput({
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
-  const customAddressFields = configuration?.streetAddressForm
+  const customAddressFields = props.configuration?.streetAddressForm
   const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
 
   const resolveAdministrativeArea = (
@@ -291,8 +291,8 @@ function AddressInput({
 
   const adminStructure = generateAdministrativeAreaFields(
     appConfigAdminLevels,
-    required,
-    configuration?.allowedLocations
+    props.required,
+    props.configuration?.allowedLocations
   )
 
   const addressFields =
@@ -307,7 +307,7 @@ function AddressInput({
    * 3. Address line inputs (e.g. Town, Residential Area, Street etc.)
    */
   const fields = [
-    { ...COUNTRY_FIELD, required },
+    { ...COUNTRY_FIELD, required: props.required },
     ...adminStructure,
     ...addressFields
   ].map((x) => {
@@ -362,7 +362,7 @@ function AddressInput({
       eventConfig={eventConfig}
       fields={fields}
       initialValues={{ ...resolvedValue, ...derivedAdminLevels }}
-      parentId={id}
+      parentId={props.id}
       validatorContext={validatorContext}
       onChange={handleChange}
     />
