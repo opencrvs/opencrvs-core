@@ -132,227 +132,214 @@ const searchFields = [
 ]
 
 export const InvalidValue_NoRecordsFound: Story = {
-    name: 'Invalid value - No records found',
-    parameters: {
-      chromatic: {
-        disableSnapshot: true
-      },
-      layout: 'centered',
-      msw: {
-        handlers: {
-          nidApi: [
-            http.post('/api/events/events/search', async () => {
-              await new Promise((resolve) => setTimeout(resolve, 2000))
-              return HttpResponse.json({
-                results: [],
-                total: 0
-              })
+  name: 'Invalid value - No records found',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered',
+    msw: {
+      handlers: {
+        nidApi: [
+          http.post('/api/events/events/search', async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            return HttpResponse.json({
+              results: [],
+              total: 0
             })
-          ]
-        }
+          })
+        ]
       }
-    },
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement)
-
-      await userEvent.type(
-        await canvas.findByTestId('text__firstname'),
-        'firstname'
-      )
-
-      await userEvent.type(
-        await canvas.findByTestId('text__surname'),
-        'surname'
-      )
-
-      await userEvent.type(
-        await canvas.findByTestId('search-input'),
-        '456988542'
-      )
-
-      await canvas.findByTestId('search-input-error')
-
-      await userEvent.type(await canvas.findByTestId('search-input'), '1')
-      await waitFor(async () =>
-        expect(
-          canvas.queryByTestId('search-input-error')
-        ).not.toBeInTheDocument()
-      )
-      await userEvent.click(
-        await canvas.findByRole('button', { name: /Confirm/i })
-      )
-      await expect(canvas.getByText('Validating...')).toBeInTheDocument()
-
-      await waitFor(
-        async () =>
-          expect(canvas.getByText('No record found')).toBeInTheDocument(),
-        { timeout: 3000 }
-      )
-
-      // names should not clear because search was not successfull
-      await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
-        'firstname'
-      )
-      await expect(await canvas.findByTestId('text__surname')).toHaveValue(
-        'surname'
-      )
-    },
-    render: function Component(args) {
-      return (
-        <StyledFormFieldGenerator
-          {...args}
-          fields={searchFields}
-          id="my-form"
-          validatorContext={{}}
-        />
-      )
     }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await userEvent.type(
+      await canvas.findByTestId('text__firstname'),
+      'firstname'
+    )
+
+    await userEvent.type(await canvas.findByTestId('text__surname'), 'surname')
+
+    await userEvent.type(await canvas.findByTestId('search-input'), '456988542')
+
+    await canvas.findByTestId('search-input-error')
+
+    await userEvent.type(await canvas.findByTestId('search-input'), '1')
+    await waitFor(async () =>
+      expect(canvas.queryByTestId('search-input-error')).not.toBeInTheDocument()
+    )
+    await userEvent.click(
+      await canvas.findByRole('button', { name: /Confirm/i })
+    )
+    await expect(canvas.getByText('Validating...')).toBeInTheDocument()
+
+    await waitFor(
+      async () =>
+        expect(canvas.getByText('No record found')).toBeInTheDocument(),
+      { timeout: 3000 }
+    )
+
+    // names should not clear because search was not successfull
+    await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+      'firstname'
+    )
+    await expect(await canvas.findByTestId('text__surname')).toHaveValue(
+      'surname'
+    )
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={searchFields}
+        id="my-form"
+        validatorContext={{}}
+      />
+    )
   }
+}
 
 export const SearchWithRegistrationNumber: Story = {
-    name: 'Search with registration number',
-    parameters: {
-      chromatic: {
-        disableSnapshot: true
-      },
-      layout: 'centered',
-      msw: {
-        handlers: {
-          nidApi: [
-            http.post('/api/events/events/search', async () => {
-              await new Promise((resolve) => setTimeout(resolve, 1000 * 2))
-              return HttpResponse.json({
-                results: [
-                  {
-                    id: 'd65a1ecd-b26a-4520-b51c-bfdd43785471',
-                    type: 'birth',
-                    status: 'REGISTERED',
-                    legalStatuses: {
-                      DECLARED: {
-                        createdAt: '2025-09-10T07:08:48.495Z',
-                        createdBy: '68c122bc28f080e722d4927c',
-                        createdAtLocation:
-                          'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
-                        createdByUserType: 'user',
-                        acceptedAt: '2025-09-10T07:08:48.959Z',
-                        createdByRole: 'LOCAL_REGISTRAR'
-                      },
-                      REGISTERED: {
-                        createdAt: '2025-09-10T07:08:51.963Z',
-                        createdBy: '68c122bc28f080e722d4927c',
-                        createdAtLocation:
-                          'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
-                        createdByUserType: 'user',
-                        acceptedAt: '2025-09-10T07:08:52.195Z',
-                        createdByRole: 'LOCAL_REGISTRAR',
-                        registrationNumber: 'I3G2AIUXF4SU'
-                      }
+  name: 'Search with registration number',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered',
+    msw: {
+      handlers: {
+        nidApi: [
+          http.post('/api/events/events/search', async () => {
+            await new Promise((resolve) => setTimeout(resolve, 1000 * 2))
+            return HttpResponse.json({
+              results: [
+                {
+                  id: 'd65a1ecd-b26a-4520-b51c-bfdd43785471',
+                  type: 'birth',
+                  status: 'REGISTERED',
+                  legalStatuses: {
+                    DECLARED: {
+                      createdAt: '2025-09-10T07:08:48.495Z',
+                      createdBy: '68c122bc28f080e722d4927c',
+                      createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+                      createdByUserType: 'user',
+                      acceptedAt: '2025-09-10T07:08:48.959Z',
+                      createdByRole: 'LOCAL_REGISTRAR'
                     },
-                    createdAt: '2025-09-10T07:08:47.987Z',
-                    dateOfEvent: '2025-09-09',
-                    createdBy: '68c122bc28f080e722d4927c',
-                    createdByUserType: 'user',
-                    updatedByUserRole: 'LOCAL_REGISTRAR',
-                    createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
-                    updatedAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
-                    updatedAt: '2025-09-10T07:08:52.195Z',
-                    updatedBy: '68c122bc28f080e722d4927c',
-                    trackingId: 'TFY9FK',
-                    potentialDuplicates: [],
-                    flags: ['pending-certification'],
-                    declaration: {
-                      'child.name': {
-                        surname: 'Dietrich',
-                        firstname: 'Royal'
-                      },
-                      'child.gender': 'female',
-                      'informant.relation': 'MOTHER',
-                      'mother.name': {
-                        surname: 'Schaden',
-                        firstname: 'Jayce'
-                      },
-                      'mother.nationality': 'FAR',
-                      'mother.idType': 'NATIONAL_ID',
-                      'mother.nid': '6097821229',
-                      'father.detailsNotAvailable': true,
-                      'father.reason': 'Father is missing.'
+                    REGISTERED: {
+                      createdAt: '2025-09-10T07:08:51.963Z',
+                      createdBy: '68c122bc28f080e722d4927c',
+                      createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+                      createdByUserType: 'user',
+                      acceptedAt: '2025-09-10T07:08:52.195Z',
+                      createdByRole: 'LOCAL_REGISTRAR',
+                      registrationNumber: 'I3G2AIUXF4SU'
                     }
+                  },
+                  createdAt: '2025-09-10T07:08:47.987Z',
+                  dateOfEvent: '2025-09-09',
+                  createdBy: '68c122bc28f080e722d4927c',
+                  createdByUserType: 'user',
+                  updatedByUserRole: 'LOCAL_REGISTRAR',
+                  createdAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+                  updatedAtLocation: 'f3da7778-161e-44a1-9e64-ab93dc1fe77f',
+                  updatedAt: '2025-09-10T07:08:52.195Z',
+                  updatedBy: '68c122bc28f080e722d4927c',
+                  trackingId: 'TFY9FK',
+                  potentialDuplicates: [],
+                  flags: ['pending-certification'],
+                  declaration: {
+                    'child.name': {
+                      surname: 'Dietrich',
+                      firstname: 'Royal'
+                    },
+                    'child.gender': 'female',
+                    'informant.relation': 'MOTHER',
+                    'mother.name': {
+                      surname: 'Schaden',
+                      firstname: 'Jayce'
+                    },
+                    'mother.nationality': 'FAR',
+                    'mother.idType': 'NATIONAL_ID',
+                    'mother.nid': '6097821229',
+                    'father.detailsNotAvailable': true,
+                    'father.reason': 'Father is missing.'
                   }
-                ],
-                total: 1
-              })
+                }
+              ],
+              total: 1
             })
-          ]
-        }
+          })
+        ]
       }
-    },
-    play: async ({ canvasElement }) => {
-      const canvas = within(canvasElement)
-
-      await userEvent.type(
-        await canvas.findByTestId('text__firstname'),
-        'firstname'
-      )
-
-      await userEvent.type(
-        await canvas.findByTestId('text__surname'),
-        'surname'
-      )
-
-      await userEvent.type(
-        await canvas.findByTestId('search-input'),
-        '6097821229'
-      )
-      await userEvent.click(
-        await canvas.findByRole('button', { name: /Confirm/i })
-      )
-
-      await waitFor(
-        async () =>
-          expect(canvas.getByText('Found 1 results')).toBeInTheDocument(),
-        { timeout: 3000 }
-      )
-
-      // names should clear because search was successfull
-      await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
-        'Royal'
-      )
-      await expect(await canvas.findByTestId('text__surname')).toHaveValue(
-        'Dietrich'
-      )
-
-      await expect(await canvas.findByTestId('search-input')).toBeDisabled()
-
-      await fireEvent.click(await canvas.findByText('Clear'))
-
-      await expect(
-        await canvas.findByText('Clear search results?')
-      ).toBeInTheDocument()
-      await expect(
-        await canvas.findByText('This will remove the current search results.')
-      ).toBeInTheDocument()
-
-      await fireEvent.click(await canvas.findByText('Confirm'))
-
-      // names should clear because of the clear button
-      await waitFor(
-        async () =>
-          expect(await canvas.findByTestId('text__firstname')).toHaveValue(''),
-        { timeout: 3000 }
-      )
-      await expect(await canvas.findByTestId('text__surname')).toHaveValue('')
-    },
-    render: function Component(args) {
-      return (
-        <StyledFormFieldGenerator
-          {...args}
-          fields={searchFields}
-          id="my-form"
-          validatorContext={{}}
-        />
-      )
     }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await userEvent.type(
+      await canvas.findByTestId('text__firstname'),
+      'firstname'
+    )
+
+    await userEvent.type(await canvas.findByTestId('text__surname'), 'surname')
+
+    await userEvent.type(
+      await canvas.findByTestId('search-input'),
+      '6097821229'
+    )
+    await userEvent.click(
+      await canvas.findByRole('button', { name: /Confirm/i })
+    )
+
+    await waitFor(
+      async () =>
+        expect(canvas.getByText('Found 1 results')).toBeInTheDocument(),
+      { timeout: 3000 }
+    )
+
+    // names should clear because search was successfull
+    await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+      'Royal'
+    )
+    await expect(await canvas.findByTestId('text__surname')).toHaveValue(
+      'Dietrich'
+    )
+
+    await expect(await canvas.findByTestId('search-input')).toBeDisabled()
+
+    await fireEvent.click(await canvas.findByText('Clear'))
+
+    await expect(
+      await canvas.findByText('Clear search results?')
+    ).toBeInTheDocument()
+    await expect(
+      await canvas.findByText('This will remove the current search results.')
+    ).toBeInTheDocument()
+
+    await fireEvent.click(await canvas.findByText('Confirm'))
+
+    // names should clear because of the clear button
+    await waitFor(
+      async () =>
+        expect(await canvas.findByTestId('text__firstname')).toHaveValue(''),
+      { timeout: 3000 }
+    )
+    await expect(await canvas.findByTestId('text__surname')).toHaveValue('')
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={searchFields}
+        id="my-form"
+        validatorContext={{}}
+      />
+    )
   }
+}
 
 export const TimeOut: Story = {
   parameters: {

@@ -8,14 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FieldConfig, FieldType, EventState } from '@opencrvs/commons/client'
-
 /*
  * Formik has a feature that automatically nests all form keys that have a dot in them.
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
  */
-export const FIELD_SEPARATOR = '____'
+const FIELD_SEPARATOR = '____'
 const DOT_SEPARATOR = '.'
 
 export function makeFormFieldIdFormikCompatible(fieldId: string) {
