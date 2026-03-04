@@ -250,6 +250,11 @@ function AddressInput(props: Props) {
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
+  const adminStructure = generateAdministrativeAreaFields(
+    appConfigAdminLevels,
+    otherProps.required,
+    props.configuration?.allowedLocations
+  )
   const customAddressFields = props.configuration?.streetAddressForm
   const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
 
@@ -289,16 +294,16 @@ function AddressInput(props: Props) {
     administrativeArea: resolvedAdministrativeArea
   }
 
-  const adminStructure = generateAdministrativeAreaFields(
-    appConfigAdminLevels,
-    otherProps.required,
-    props.configuration?.allowedLocations
-  )
-
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
       ? customAddressFields
       : []
+
+  const derivedAdminLevels = getAdminLevelHierarchy(
+    resolvedAdministrativeArea,
+    administrativeAreas,
+    adminLevelIds
+  )
 
   /**
    * An address field consists of:
@@ -349,12 +354,6 @@ function AddressInput(props: Props) {
 
     onChange(cleanedAddressValue as AddressFieldValue)
   }
-
-  const derivedAdminLevels = getAdminLevelHierarchy(
-    resolvedAdministrativeArea,
-    administrativeAreas,
-    adminLevelIds
-  )
 
   return (
     <FormFieldGenerator
