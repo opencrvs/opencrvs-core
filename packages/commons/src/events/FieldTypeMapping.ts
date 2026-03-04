@@ -473,7 +473,10 @@ export const isRadioGroupFieldType = (field: {
 export const isFieldGroupFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
-}): field is { value: Record<string, FieldValue>; config: FieldGroup } => {
+}): field is {
+  value: Record<string, FieldValue> | undefined
+  config: FieldGroup
+} => {
   return field.config.type === FieldType.FIELD_GROUP
 }
 

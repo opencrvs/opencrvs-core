@@ -77,7 +77,7 @@ export function mapFieldToDefaultValue(
       return mapFieldToDefaultValue(subfield, context)
     })
   }
-  if (!field.defaultValue) {
+  if (field.defaultValue === undefined) {
     return
   }
   switch (field.type) {
@@ -173,11 +173,11 @@ export function useDefaultValue() {
     () => config.ADMIN_STRUCTURE.map((level) => level.id),
     [config.ADMIN_STRUCTURE]
   )
-  function getDefaultValue(field: FieldConfig): FieldValue
+  function getDefaultValue(field: FieldConfig): FieldValue | undefined
   function getDefaultValue(fields: FieldConfig[]): EventState
   function getDefaultValue(
     fieldOrFields: FieldConfig | FieldConfig[]
-  ): FieldValue | EventState {
+  ): FieldValue | EventState | undefined {
     if (Array.isArray(fieldOrFields)) {
       const fields = fieldOrFields
       return buildFormState(fields, (field) => getDefaultValue(field))

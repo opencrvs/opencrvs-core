@@ -390,7 +390,7 @@ export function buildFormState<T>(
         return acc
       }
       const mappedValue = mapper(field)
-      if (mappedValue) {
+      if (mappedValue !== undefined) {
         acc[field.id] = mappedValue
       }
       return acc

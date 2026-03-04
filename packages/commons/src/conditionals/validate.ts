@@ -600,7 +600,7 @@ export function runFieldValidations({
       buildFormState(field.config.fields, (subfield) =>
         runFieldValidations({
           field: subfield,
-          value: field.value[subfield.id],
+          value: field.value?.[subfield.id],
           form,
           context
         })
