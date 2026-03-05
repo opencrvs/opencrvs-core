@@ -660,6 +660,52 @@ paths:
         "401": *a1
         "403": *a2
         "500": *a3
+    get:
+      operationId: integrations-list
+      summary: List integration clients
+      tags:
+        - Integrations
+      security:
+        - Authorization: []
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - active
+              - disabled
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    scopes:
+                      type: array
+                      items:
+                        type: string
+                    status:
+                      type: string
+                  required:
+                    - id
+                    - name
+                    - scopes
+                    - status
+                  additionalProperties: false
+        "400": *a4
+        "401": *a1
+        "403": *a2
+        "404": *a5
+        "500": *a3
   /attachments:
     post:
       summary: Upload a file attachment
