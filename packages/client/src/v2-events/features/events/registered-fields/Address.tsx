@@ -33,7 +33,8 @@ import {
   DomesticAddressFieldValue,
   UUID,
   AdministrativeAreaField,
-  AdministrativeArea
+  AdministrativeArea,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -59,6 +60,7 @@ type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   configuration?: AddressField['configuration']
   disabled?: boolean
   validatorContext: ValidatorContext
+  eventConfig?: EventConfig
 }
 
 const COUNTRY_FIELD = {
@@ -137,7 +139,8 @@ function isDomesticAddress() {
 
 function generateAdministrativeAreaFields(
   inputArray: AdminStructureItem[],
-  required: RequireConfig
+  required: RequireConfig,
+  allowedLocations?: AdministrativeAreaField['configuration']['allowedLocations']
 ): AdministrativeAreaField[] {
   return inputArray.map((item, index) => {
     const { id, label } = item
@@ -159,14 +162,15 @@ function generateAdministrativeAreaFields(
     ]
 
     const configuration: AdministrativeAreaField['configuration'] = {
-      type: AdministrativeAreas.enum.ADMIN_STRUCTURE
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
+      allowedLocations
     }
 
     if (!isFirst && prevItem?.id) {
       configuration.partOf = { $declaration: prevItem.id }
     }
 
-    const field: AdministrativeAreaField = {
+    return {
       id,
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
@@ -174,9 +178,7 @@ function generateAdministrativeAreaFields(
       required,
       label,
       configuration
-    }
-
-    return field
+    } satisfies AdministrativeAreaField
   })
 }
 
@@ -237,6 +239,7 @@ function AddressInput(props: Props) {
     disabled,
     value,
     validatorContext,
+    eventConfig,
     ...otherProps
   } = props
   const { config } = useSelector(getOfflineData)
@@ -244,16 +247,15 @@ function AddressInput(props: Props) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const locations = getLocations.useSuspenseQuery()
-
   const userDetails = useSelector(getUserDetails)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
   const adminStructure = generateAdministrativeAreaFields(
     appConfigAdminLevels,
-    otherProps.required
+    otherProps.required,
+    props.configuration?.allowedLocations
   )
   const customAddressFields = props.configuration?.streetAddressForm
-
   const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
 
   const resolveAdministrativeArea = (
@@ -303,6 +305,12 @@ function AddressInput(props: Props) {
     adminLevelIds
   )
 
+  /**
+   * An address field consists of:
+   * 1. A country selection input
+   * 2. Admin structure selection inputs (e.g. Province, District)
+   * 3. Address line inputs (e.g. Town, Residential Area, Street etc.)
+   */
   const fields = [
     { ...COUNTRY_FIELD, required: otherProps.required },
     ...adminStructure,
@@ -311,6 +319,7 @@ function AddressInput(props: Props) {
     const existingEnableCondition =
       x.conditionals?.find((c) => c.type === ConditionalType.ENABLE)
         ?.conditional ?? not(not(alwaysTrue()))
+
     return {
       ...x,
       conditionals: [
@@ -349,6 +358,7 @@ function AddressInput(props: Props) {
   return (
     <FormFieldGenerator
       {...otherProps}
+      eventConfig={eventConfig}
       fields={fields}
       initialValues={{ ...resolvedValue, ...derivedAdminLevels }}
       parentId={props.id}
@@ -370,7 +380,6 @@ function AddressOutput({
   const validatorContext = useValidatorContext()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
-
   const { config } = useSelector(getOfflineData)
   const customAddressFields = configuration?.configuration
     ?.streetAddressForm as FieldConfigWithoutAddress[]
@@ -381,23 +390,12 @@ function AddressOutput({
   }
 
   const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
-
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
-
-  const adminLevels = getAdminLevelHierarchy(
-    administrativeAreaId,
-    administrativeAreas,
-    adminLevelIds
-  )
-
-  const addressValues = {
-    ...value,
-    ...adminLevels
-  }
 
   const adminStructure = generateAdministrativeAreaFields(
     appConfigAdminLevels,
-    configuration?.required
+    configuration?.required,
+    undefined
   )
 
   const addressFields =
@@ -417,6 +415,12 @@ function AddressOutput({
     }
   }
 
+  const adminLevels = getAdminLevelHierarchy(
+    administrativeAreaId,
+    administrativeAreas,
+    adminLevelIds
+  )
+  const addressValues = { ...value, ...adminLevels }
   const flattenedAddressValues = flattenAddressObject(addressValues)
 
   const fieldsToShow = [

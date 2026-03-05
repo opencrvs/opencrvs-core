@@ -31,8 +31,7 @@ jest.mock('./utils', () => {
   const originalModule = jest.requireActual('./utils')
   return {
     __esModule: true,
-    ...originalModule,
-    getRegistrationTargetDays: () => 45
+    ...originalModule
   }
 })
 

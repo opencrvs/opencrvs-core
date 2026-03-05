@@ -18,6 +18,7 @@ import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 import { EventStatus } from '../events/EventMetadata'
+import { userReferenceFunctions } from '../users/userReferences'
 
 /* eslint-disable max-lines */
 
@@ -195,6 +196,7 @@ export const now = Object.assign(todayDateTimeValueSerializer, {})
  * Generate conditional rules for user.
  */
 export const user = Object.assign(userSerializer, {
+  ...userReferenceFunctions,
   hasScope: (scope: Scope) =>
     defineConditional({
       type: 'object',
@@ -244,9 +246,7 @@ export const user = Object.assign(userSerializer, {
       required: ['$online']
     }),
   locationLevel: (adminLevelId: string) => ({
-    $user: {
-      $location: adminLevelId
-    }
+    $user: { $location: adminLevelId }
   })
 })
 

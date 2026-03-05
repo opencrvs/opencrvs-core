@@ -25,8 +25,7 @@ import {
 } from '@metrics/features/metrics/constants'
 import {
   EVENT_TYPE,
-  fetchChildLocationIdsByParentId,
-  getRegistrationTargetDays
+  fetchChildLocationIdsByParentId
 } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration/'
 import { deleteMeasurements } from '@metrics/influxdb/client'
@@ -75,11 +74,6 @@ export async function metricsHandler(
     authHeader
   )
 
-  const registrationTargetInDays = await getRegistrationTargetDays(
-    event,
-    authHeader.Authorization
-  )
-
   const timeFrames = await fetchRegWithinTimeFrames(
     timeStart,
     timeEnd,
@@ -87,8 +81,7 @@ export async function metricsHandler(
     currentLocationLevel,
     lowerLocationLevel,
     event,
-    childLocationIds,
-    registrationTargetInDays
+    childLocationIds
   )
 
   const payments = await fetchCertificationPayments(
@@ -119,8 +112,7 @@ export async function metricsHandler(
     lowerLocationLevel,
     event,
     childLocationIds,
-    authHeader,
-    registrationTargetInDays
+    authHeader
   )
 
   return { timeFrames, payments, genderBasisMetrics, estimatedTargetDayMetrics }

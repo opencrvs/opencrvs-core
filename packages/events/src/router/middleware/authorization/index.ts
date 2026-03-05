@@ -40,7 +40,8 @@ import {
   RecordScopeV2,
   canUserCreateEvent,
   getEventConfigById,
-  userCanAccessEventWithScopes
+  userCanAccessEventWithScopes,
+  getAcceptedScopesFromToken
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -49,7 +50,6 @@ import { getUserOrSystem } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
-import { getAcceptedScopesFromToken } from './utils'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
