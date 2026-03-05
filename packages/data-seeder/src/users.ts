@@ -135,8 +135,8 @@ async function getUsers(token: string) {
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'roles')
-  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'events')
+  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
+  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
     fetch(rolesUrl),
