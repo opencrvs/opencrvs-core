@@ -105,9 +105,9 @@ export const FormFieldGenerator = forwardRef<
        * Most of this function can be replaced with a call to `formik.submit` if
        * the initialValues provided to formik contains initial values for all
        * the fields as `formik.submit` uses that as basis for figuring out all
-       * the fields that need to be touched during submit. While the
-       * onValidSubmit could be used as the onSubmit callback. Currently we
-       * simulating most of it by hand.
+       * the fields that need to be touched during submit, while the
+       * onValidSubmit could be passed as the onSubmit callback. Currently we
+       * are simulating most of it by hand.
        */
       submit: (extraValues?: EventState) => {
         const allTouched = buildFormState(fields, (field) => {
