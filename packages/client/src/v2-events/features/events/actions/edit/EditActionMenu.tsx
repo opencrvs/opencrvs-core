@@ -155,8 +155,9 @@ function EditActionModal({
 
 function useEditActions(event: EventDocument) {
   const { eventConfiguration } = useEventConfiguration(event.type)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
   const navigate = useNavigate()
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.EDIT.REVIEW
   )
@@ -169,7 +170,6 @@ function useEditActions(event: EventDocument) {
   const declaration = useEventFormData((state) => state.getFormValues())
   const validatorContext = useValidatorContext()
   const reviewConfig = getActionReview(eventConfiguration, ActionType.DECLARE)
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
 
   const formFields = formConfig.pages.flatMap((page) => page.fields)
   const changedFields = formFields.filter((f) =>

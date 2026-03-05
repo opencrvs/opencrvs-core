@@ -57,7 +57,7 @@ function useActionGuard(
 ) {
   const eventState = getCurrentEventState(event, configuration)
   const availableActions = getAvailableActionsForEvent(eventState)
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { isActionAllowed } = useUserAllowedActions(eventState)
   const { redirectToEventOverviewPage } = useToastAndRedirect()
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {

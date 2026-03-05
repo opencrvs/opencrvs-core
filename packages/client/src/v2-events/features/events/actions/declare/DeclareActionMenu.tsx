@@ -135,7 +135,8 @@ function useDeclarationActions(event: EventDocument) {
     reviewFields: reviewConfig.fields
   })
 
-  const { isActionAllowed } = useUserAllowedActions(eventType)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const eventId = event.id
 
   const onDelete = useCallback(async () => {
@@ -171,7 +172,6 @@ function useDeclarationActions(event: EventDocument) {
     }
   }
 
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
   const availableActions = getAvailableActionsForEvent(eventIndex)
 
   return {
