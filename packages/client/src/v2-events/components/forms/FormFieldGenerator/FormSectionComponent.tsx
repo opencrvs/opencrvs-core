@@ -263,19 +263,15 @@ export function FormSectionComponent({
     }
 
     if (eventConfig) {
-      const prevForm = {
-        ...fullForm,
-        ...makeFormikFieldIdsOpenCRVSCompatible(values)
-      }
-      const currentForm = {
+      const updatedFullForm = {
         ...fullForm,
         ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
       }
 
       applyVisibilityTransitions(
         eventConfig,
-        prevForm,
-        currentForm,
+        fullForm,
+        updatedFullForm,
         updatedValues,
         validatorContext,
         cacheHiddenFieldValue,
@@ -327,20 +323,15 @@ export function FormSectionComponent({
     }
 
     if (eventConfig) {
-      const prevForm = {
-        ...fullForm,
-        ...makeFormikFieldIdsOpenCRVSCompatible(values)
-      }
-
-      const currentForm = {
+      const updatedFullForm = {
         ...fullForm,
         ...makeFormikFieldIdsOpenCRVSCompatible(updatedValues)
       }
 
       applyVisibilityTransitions(
         eventConfig,
-        prevForm,
-        currentForm,
+        fullForm,
+        updatedFullForm,
         updatedValues,
         validatorContext,
         cacheHiddenFieldValue,
