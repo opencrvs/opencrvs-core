@@ -111,7 +111,7 @@ const createUserMutation = print(gql`
 `)
 
 async function getUsers(token: string) {
-  const url = new URL('users', env.COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
     headers: {

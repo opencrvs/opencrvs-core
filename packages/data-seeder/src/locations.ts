@@ -121,7 +121,7 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
 }
 
 async function getLocations() {
-  const url = new URL('locations', env.COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('config/locations', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the locations from ${url}`)
