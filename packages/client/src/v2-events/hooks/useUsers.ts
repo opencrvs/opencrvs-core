@@ -138,8 +138,10 @@ export function useUsers() {
             queryKey: trpc.user.get.queryKey()
           })
           .flatMap(([, data]) => data)
-          .filter((user): user is User => Boolean(user))
-          .filter((userOrSystem) => userOrSystem.type === TokenUserType.enum.user)
+          .filter(
+            (userOrSystem): userOrSystem is User =>
+              userOrSystem?.type === TokenUserType.enum.user
+          )
       }
     },
     getSystem: {
@@ -149,8 +151,10 @@ export function useUsers() {
             queryKey: trpc.user.get.queryKey()
           })
           .flatMap(([, data]) => data)
-          .filter((system): system is System => Boolean(system))
-          .filter((userOrSystem) => userOrSystem.type === TokenUserType.enum.system)
+          .filter(
+            (userOrSystem): userOrSystem is System =>
+              userOrSystem?.type === TokenUserType.enum.system
+          )
       }
     },
     getUsers: {
