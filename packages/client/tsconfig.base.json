@@ -18,7 +18,9 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["vitest/globals", "fhir"],
     "paths": {
-      "@client/*": ["./*"]
+      "@client/*": ["./*"],
+      "@gateway/*": ["../../gateway/src/*"],
+      "@events/*": ["../../events/src/*"]
     }
   },
   "include": [
