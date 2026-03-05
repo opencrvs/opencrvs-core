@@ -8,4 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export type { AppRouter } from '@opencrvs/events/src/router'
+export type { AppRouter } from '@opencrvs/events/router'

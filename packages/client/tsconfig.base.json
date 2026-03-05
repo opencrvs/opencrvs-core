@@ -19,8 +19,7 @@
     "types": ["vitest/globals", "fhir"],
     "paths": {
       "@client/*": ["./*"],
-      "@gateway/*": ["../../gateway/src/*"],
-      "@events/*": ["../../events/src/*"]
+      "@gateway/*": ["../../gateway/src/*"]
     }
   },
   "include": [
