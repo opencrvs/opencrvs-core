@@ -615,9 +615,7 @@ const AdministrativeAreaField = BaseField.extend({
   configuration: z
     .object({
       partOf: z
-        .object({
-          $declaration: z.string()
-        })
+        .object({ $declaration: z.string() })
         .optional()
         .describe('Parent location'),
       type: AdministrativeAreas,
