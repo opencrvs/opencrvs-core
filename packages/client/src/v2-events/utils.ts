@@ -34,7 +34,9 @@ import {
   TextField,
   DefaultAddressFieldValue,
   AdministrativeArea,
-  ActionType
+  ActionType,
+  RecordScopeTypeV2,
+  getAcceptedScopesByType
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -283,7 +285,12 @@ export function hasOutboxWorkqueue(scopes: Scope[]) {
 }
 
 export function hasDraftWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => scope.startsWith('record.declare'))
+  return (
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.create'],
+      scopes
+    }).length > 0
+  )
 }
 
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
