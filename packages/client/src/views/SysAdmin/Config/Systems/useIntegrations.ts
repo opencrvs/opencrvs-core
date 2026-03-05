@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useMutation as useGqlMutation } from '@apollo/client'
 import { registerSystem } from './mutations'
@@ -57,13 +57,8 @@ export function useIntegrations() {
       variables: {
         system: {
           name: input.name,
-          type: input.type as RegisterSystemMutationVariables['system'] extends
-            | infer T
-            | undefined
-            ? T extends { type: infer U }
-              ? U
-              : never
-            : never
+          // Type cast is safe: the UI only allows HEALTH or RECORD_SEARCH
+          type: input.type as 'HEALTH' | 'RECORD_SEARCH'
         }
       }
     })
