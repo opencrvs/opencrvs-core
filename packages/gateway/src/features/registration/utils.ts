@@ -11,6 +11,12 @@
 
 import { IAuthHeader } from '@opencrvs/commons'
 import { fetchDocuments } from '@gateway/features/documents/service'
+import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput
+} from '@gateway/graphql/schema'
 
 export async function getPresignedUrlFromUri(
   filePath: string,
@@ -26,3 +32,34 @@ export async function getPresignedUrlFromUri(
   return response.presignedURL
 }
 
+export async function setCollectorForPrintInAdvance(
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
+  authHeader: IAuthHeader
+) {
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  const userId = tokenPayload.sub
+  const userDetails = await getUser({ userId }, authHeader)
+  const name = userDetails.name.map((nameItem) => ({
+    use: nameItem.use,
+    familyName: nameItem.family,
+    firstNames: nameItem.given.join(' ')
+  }))
+
+  details?.registration?.certificates?.forEach((certificate) => {
+    if (!certificate) return
+    if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
+      certificate.collector = {
+        name,
+        relationship: 'PRINT_IN_ADVANCE',
+        otherRelationship: userDetails.role,
+        identifier: []
+      }
+    }
+    return certificate
+  })
+
+  return details
+}

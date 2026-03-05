@@ -26,6 +26,11 @@ interface Window {
     FEATURES: {
       V2_EVENTS: boolean
     }
+    REGISTER_BACKGROUND: {
+      backgroundColor?: string
+      backgroundImage?: string
+      imageFit?: string
+    }
     LANGUAGES: string
     LOGIN_URL: string
     AUTH_URL: string

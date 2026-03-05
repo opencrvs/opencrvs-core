@@ -467,6 +467,36 @@ export async function fetchKeyFigures(
       estimatedFigureForTargetDays.totalEstimation
     )
   )
+  /* Populating > 45D and < 365D data */
+  const estimatedFigureFor1Year = await fetchEstimateByLocation(
+    location,
+    EVENT_TYPE.BIRTH,
+    authHeader,
+    timeStart,
+    timeEnd
+  )
+  const within1YearData: IGroupedByGender[] = await query(
+    `SELECT COUNT(ageInDays) AS total
+      FROM birth_registration
+    WHERE time >= ${timeStart}
+      AND time <= ${timeEnd}
+      AND (${officeLocationInChildren})
+      AND ageInDays > 30
+      AND ageInDays <= 365
+    GROUP BY gender`,
+    {
+      placeholders: {
+        ...locationPlaceholders
+      }
+    }
+  )
+  keyFigures.push(
+    populateBirthKeyFigurePoint(
+      WITHIN_TARGET_DAYS_TO_1_YEAR,
+      within1YearData,
+      estimatedFigureFor1Year.totalEstimation
+    )
+  )
   /* Populating < 365D data */
   let fullData: IGroupedByGender[] = []
   if (withinTargetDaysData) {

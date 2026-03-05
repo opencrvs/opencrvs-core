@@ -27,9 +27,7 @@ import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/adva
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { storage } from '@client/storage'
 
-import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { EventType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -46,7 +44,6 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { useNavigation } from '@client/hooks/useNavigation'
 import {
   TAB_GROUPS,
   WORKQUEUE_TABS
@@ -188,13 +185,6 @@ const NavigationView = (props: IFullProps) => {
     storedDeclarations
   )
   const runningVer = String(localStorage.getItem('running-version'))
-
-  const isOnePrintInAdvanceOn = Object.values(EventType).some(
-    (event: EventType) => {
-      const upperCaseEvent = event.toUpperCase() as Uppercase<EventType>
-      return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
-    }
-  )
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
@@ -410,7 +400,7 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {isOnePrintInAdvanceOn && hasAccess(WORKQUEUE_TABS.readyToIssue) && (
+          {hasAccess(WORKQUEUE_TABS.readyToIssue) && (
             <NavigationItem
               icon={() => <Icon name="Handshake" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}

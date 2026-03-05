@@ -67,7 +67,6 @@ import {
 } from '@metrics/features/registration/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { fetchTaskHistory } from '@metrics/api'
-import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 import { getTokenPayload } from '@metrics/utils/authUtils'
 import { getUser } from '@metrics/features/audit/handler'
 

@@ -18,7 +18,6 @@ import {
   differenceInSeconds,
   differenceInYears
 } from 'date-fns'
-import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 type YYYY_MM_DD = string
 type ISO_DATE = string

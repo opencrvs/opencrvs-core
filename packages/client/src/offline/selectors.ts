@@ -60,7 +60,7 @@ const getAdminStructureLocations = createSelector(
 )
 
 export const selectCountryBackground = () => {
-  const countryBackground = window.config.LOGIN_BACKGROUND
+  const countryBackground = window.config.REGISTER_BACKGROUND
   if (countryBackground?.backgroundImage) {
     return {
       backgroundImage: countryBackground.backgroundImage,

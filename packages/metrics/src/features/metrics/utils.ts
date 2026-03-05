@@ -36,7 +36,6 @@ import {
   fetchFHIR,
   fetchChildLocationsByParentId
 } from '@metrics/api'
-import { getApplicationConfig } from '@metrics/configApi'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'

@@ -69,6 +69,7 @@ import { SCOPES } from '@opencrvs/commons/authentication'
 import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
 import { Context } from '@gateway/graphql/context'
 import { GraphQLResolveInfo } from 'graphql'
+import { setCollectorForPrintInAdvance } from './utils'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -760,6 +761,7 @@ async function markEventAsCertified(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
+  await setCollectorForPrintInAdvance(details, authHeader)
   const certificateDetails = details.registration?.certificates?.[0]
   if (!certificateDetails) {
     return Promise.reject(new Error('Certificate details required'))
