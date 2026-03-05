@@ -136,7 +136,7 @@ export interface IApplicationConfigResponse {
 }
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {
-  const url = `${window.config.CONFIG_API_URL}/config`
+  const url = '/api/config/config'
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -180,7 +180,7 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
 async function loadConfigAnonymousUser(): Promise<
   Partial<IApplicationConfigResponse>
 > {
-  const url = `${window.config.CONFIG_API_URL}/publicConfig`
+  const url = '/api/config/publicConfig'
   const res = await fetch(url, {
     method: 'GET'
   })
@@ -192,7 +192,7 @@ async function loadConfigAnonymousUser(): Promise<
 }
 
 async function loadForms(): Promise<LoadFormsResponse> {
-  const url = `${window.config.CONFIG_API_URL}/forms`
+  const url = '/api/config/forms'
 
   const res = await fetch(url, {
     method: 'GET',
@@ -219,10 +219,12 @@ async function loadForms(): Promise<LoadFormsResponse> {
 }
 
 export type LoadValidatorsResponse = Record<string, Validator>
+const countryconfigBase: string = '/api/countryconfig'
+
 async function importValidators(): Promise<LoadValidatorsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const validators = await import(
-    /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/validators.js`
+    /* @vite-ignore */ `${countryconfigBase}/validators.js`
   )
 
   return validators
@@ -232,7 +234,7 @@ export type LoadConditionalsResponse = Record<string, Conditional>
 async function importConditionals(): Promise<LoadConditionalsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const { conditionals } = await import(
-    /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/conditionals.js`
+    /* @vite-ignore */ `${countryconfigBase}/conditionals.js`
   )
   return conditionals
 }
@@ -250,7 +252,7 @@ async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
   try {
     // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
     const handlebars = await import(
-      /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/handlebars.js`
+      /* @vite-ignore */ `${countryconfigBase}/handlebars.js`
     )
     return handlebars
   } catch (error) {
@@ -259,7 +261,7 @@ async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
 }
 
 async function loadContent(): Promise<IContentResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
+  const url = `${countryconfigBase}/content/client`
 
   const res = await fetch(url, {
     method: 'GET',

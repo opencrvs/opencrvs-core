@@ -12,8 +12,6 @@
 interface Window {
   config: {
     APPLICATION_NAME: string
-    API_GATEWAY_URL: string
-    CONFIG_API_URL: string
     COUNTRY: string
     COUNTRY_LOGO: {
       fileName: string
@@ -31,13 +29,10 @@ interface Window {
       backgroundImage?: string
       imageFit?: string
     }
-    LANGUAGES: string
-    LOGIN_URL: string
-    AUTH_URL: string
+    LANGUAGES: string[]
     MINIO_URL: string
     MINIO_BASE_URL: string // URL without path/bucket information, used for file uploads, v2
     MINIO_BUCKET: string
-    COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'

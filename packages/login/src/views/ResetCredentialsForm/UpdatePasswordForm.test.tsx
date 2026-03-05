@@ -16,7 +16,7 @@ import { setupServer } from 'msw/node'
 
 //mock api calls
 const server = setupServer(
-  rest.post(`${window.config.AUTH_API_URL}/changePassword`, (_, res, _2) => {
+  rest.post(`/api/auth/changePassword`, (_, res, _2) => {
     return res()
   })
 )

@@ -26,6 +26,9 @@ services:
       - base
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
+      - LOGIN_URL=http://login:3020
+      - AUTH_URL_INTERNAL=http://auth:4040
+      - CONFIG_API_URL_INTERNAL=http://config:2021
       - GATEWAY_URL_INTERNAL=http://gateway:7070
   login:
     image: ghcr.io/opencrvs/ocrvs-login:${VERSION}
@@ -38,7 +41,10 @@ services:
       - base
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
-
+      - CLIENT_APP_URL=http://register:3000
+      - AUTH_URL_INTERNAL=http://auth:4040
+      - CONFIG_API_URL_INTERNAL=http://config:2021
+      - GATEWAY_URL_INTERNAL=http://gateway:7070
   gateway:
     image: ghcr.io/opencrvs/ocrvs-gateway:${VERSION}
     #platform: linux/amd64

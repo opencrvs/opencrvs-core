@@ -23,6 +23,21 @@ dns.setDefaultResultOrder('ipv4first')
 export default defineConfig(({ mode }): any => {
   const env = loadEnv(mode, 'env')
 
+  const registerRedirectPlugin = () => ({
+    name: 'register-redirect',
+    configureServer(server: import('vite').ViteDevServer) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.startsWith('/register')) {
+          const suffix = req.url.replace(/^\/register/, '') || '/'
+          res.writeHead(302, { Location: `http://localhost:3000${suffix}` })
+          res.end()
+          return
+        }
+        next()
+      })
+    }
+  })
+
   const htmlPlugin = () => {
     return {
       name: 'html-transform',
@@ -53,7 +68,7 @@ export default defineConfig(({ mode }): any => {
           }
         ],
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/__.*$/]
+        navigateFallbackDenylist: [/^\/__.*$/, /^\/register/]
       },
       devOptions: {
         enabled: false
@@ -69,7 +84,13 @@ export default defineConfig(({ mode }): any => {
         transformMixedEsModules: true
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths(), vitePWAPlugin()],
+    plugins: [
+      htmlPlugin(),
+      react(),
+      tsconfigPaths(),
+      vitePWAPlugin(),
+      registerRedirectPlugin()
+    ],
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',
@@ -89,6 +110,21 @@ export default defineConfig(({ mode }): any => {
           target: 'http://localhost:3040',
           changeOrigin: true,
           rewrite: (path: string) => path.replace(/^\/api\/countryconfig/, '')
+        },
+        '/api/auth/': {
+          target: 'http://localhost:4040',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/api\/auth/, '')
+        },
+        '/api/config/': {
+          target: 'http://localhost:2021',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/api\/config/, '')
+        },
+        '/api/': {
+          target: 'http://localhost:7070',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/api/, '')
         },
         '/health/ready': {
           target: 'http://localhost:3040',

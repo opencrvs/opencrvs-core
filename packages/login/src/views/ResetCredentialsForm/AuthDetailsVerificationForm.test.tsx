@@ -18,25 +18,22 @@ import { createMemoryRouter } from 'react-router-dom'
 
 //mock api calls
 const server = setupServer(
-  rest.get(
-    `${window.config.COUNTRY_CONFIG_URL}/content/login`,
-    (req, res, ctx) => {
-      return res(
-        ctx.json({
-          languages: [
-            {
-              lang: 'en',
-              displayName: 'Français',
-              messages: {
-                defaultMessage: 'Bangladesh'
-              }
+  rest.get('/api/countryconfig/content/login', (req, res, ctx) => {
+    return res(
+      ctx.json({
+        languages: [
+          {
+            lang: 'en',
+            displayName: 'Français',
+            messages: {
+              defaultMessage: 'Bangladesh'
             }
-          ]
-        })
-      )
-    }
-  ),
-  rest.get(`${window.config.CONFIG_API_URL}/publicConfig`, (req, res, ctx) => {
+          }
+        ]
+      })
+    )
+  }),
+  rest.get('/api/config/publicConfig', (req, res, ctx) => {
     return res(
       ctx.json({
         config: {
@@ -51,7 +48,7 @@ const server = setupServer(
       })
     )
   }),
-  rest.post(`${window.config.AUTH_API_URL}/verifyUser`, (req, res, ctx) => {
+  rest.post('/api/auth/verifyUser', (req, res, ctx) => {
     return res(
       ctx.json({
         nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
@@ -199,17 +196,14 @@ describe('Test phone number verification form', () => {
     it('continue button will redirect to RECOVERY_CODE_ENTRY route', async () => {
       //change verifyUser api response
       server.use(
-        rest.post(
-          `${window.config.AUTH_API_URL}/verifyUser`,
-          (req, res, ctx) => {
-            return res(
-              ctx.status(200),
-              ctx.json({
-                nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
-              })
-            )
-          }
-        )
+        rest.post(`/api/auth/verifyUser`, (req, res, ctx) => {
+          return res(
+            ctx.status(200),
+            ctx.json({
+              nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
+            })
+          )
+        })
       )
       app
         .find('#phone-number-input')
@@ -232,15 +226,12 @@ describe('Test phone number verification form', () => {
     it('should show error message if number is not found', async () => {
       //change verifyUser api response
       server.use(
-        rest.post(
-          `${window.config.AUTH_API_URL}/verifyUser`,
-          (req, res, ctx) => {
-            return res(
-              ctx.status(401),
-              ctx.json({ message: 'Internal Server Error' })
-            )
-          }
-        )
+        rest.post(`/api/auth/verifyUser`, (req, res, ctx) => {
+          return res(
+            ctx.status(401),
+            ctx.json({ message: 'Internal Server Error' })
+          )
+        })
       )
 
       router.navigate(routes.PHONE_NUMBER_VERIFICATION, {

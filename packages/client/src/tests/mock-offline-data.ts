@@ -458,7 +458,7 @@ export const mockOfflineData = {
       }
     ],
     HEALTH_FACILITY_FILTER: 'DISTRICT',
-    LANGUAGES: 'en,bn',
+    LANGUAGES: ['en', 'bn'],
     _id: '61a8c105c04ac94fe46ceb27',
     COUNTRY: 'BGD',
     COUNTRY_LOGO: {
