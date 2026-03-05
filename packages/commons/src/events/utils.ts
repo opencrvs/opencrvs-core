@@ -366,19 +366,66 @@ export function findLastAssignmentAction(actions: Action[]) {
     >((latestAction, action) => (!latestAction || action.createdAt > latestAction.createdAt ? action : latestAction), undefined)
 }
 
-/** Tell compiler that accessing record with arbitrary key might result to undefined
+/**
+ * Tell compiler that accessing record with arbitrary key might result to undefined
  * Use when you **cannot guarantee**  that key exists in the record
  */
 export type IndexMap<T> = {
   [id: string]: T | undefined
 }
 
+/**
+ * Recursive union type that mirrors the shape of a form configuration.
+ *
+ * A `FormState<T>` is either:
+ * - A leaf value of type `T` (e.g. a field's current value, error message, or
+ *   touched flag), or
+ * - A nested object whose values are themselves `FormState<T>`, representing a
+ *   `FIELD_GROUP` whose children each carry their own state.
+ *
+ * This makes it possible to represent form field values as well as metadata
+ * (errors, touched state, etc.) in a single recursive structure that naturally
+ * matches the nesting of the form configuration.
+ */
 export type FormState<T> =
   | T
   | {
       [id: string]: FormState<T> | undefined
     }
 
+/**
+ * Construct a `FormState` map from a list of `FieldConfig` items by applying a
+ * mapper function to every leaf field.
+ *
+ * `FIELD_GROUP` fields are handled recursively: instead of calling `mapper` on
+ * the group itself, `buildFormState` descends into the group's `fields` and
+ * stores the resulting nested state under the group's id.
+ *
+ * Leaf fields for which `mapper` returns `undefined` are omitted from the
+ * result entirely.
+ *
+ * @param fields - Flat or nested list (using FIELD_GROUP) of field configurations
+ *   to process.
+ * @param mapper - Called for every non-group field. Return a value to include
+ *   that field in the state, or `undefined` to omit it.
+ * @returns A nested state map whose structure mirrors the field hierarchy.
+ *
+ * @example
+ * const fields = [
+ *   { id: 'firstName', type: 'TEXT' },
+ *   {
+ *     id: 'address',
+ *     type: 'FIELD_GROUP',
+ *     fields: [
+ *       { id: 'street', type: 'TEXT'},
+ *       { id: 'city', type: 'TEXT'}
+ *     ]
+ *   }
+ * ]
+ * // Mark every field as untouched (false)
+ * const touched = buildFormState(fields, () => false)
+ * // { firstName: false, address: { street: false, city: false } }
+ */
 export function buildFormState<T>(
   fields: FieldConfig[],
   mapper: (field: FieldConfig) => T | undefined
@@ -399,26 +446,59 @@ export function buildFormState<T>(
   )
 }
 
+/**
+ * Transform every leaf value in a `FormState` via a mapping function,
+ * preserving the nested structure.
+ *
+ * `undefined` entries are dropped from the result. Objects
+ * are treated as nested groups and traversed recursively
+ * Leaf values are passed to `fn`.
+ *
+ * @param state - The source state to transform.
+ * @param fn - Transformer applied to each leaf value.
+ * @returns A new state with the same shape but with leaf values replaced by the
+ *   return value of `fn`.
+ *
+ * @example
+ * // Convert an error state from string[] to boolean (has-error flag)
+ * const hasErrors = mapFormState(formErrors, (msgs) => msgs.length > 0)
+ */
 export function mapFormState<T, R>(
   state: IndexMap<FormState<T>>,
-  fn: (err: T) => R
+  fn: (leafState: T) => R
 ): IndexMap<FormState<R>> {
   return Object.entries(state).reduce(
-    (mappedState: IndexMap<FormState<R>>, [key, value]) => {
-      if (!value) {
+    (mappedState, [key, value]) => {
+      if (value === undefined) {
         return mappedState
       }
-      if (Array.isArray(value)) {
-        mappedState[key] = fn(value)
+      if (typeof value === 'object' && !Array.isArray(value) && value) {
+        mappedState[key] = mapFormState(value as IndexMap<FormState<T>>, fn)
         return mappedState
       }
-      mappedState[key] = mapFormState(value, fn)
+      mappedState[key] = fn(value)
       return mappedState
     },
-    {}
+    {} as IndexMap<FormState<R>>
   )
 }
 
+/**
+ * Flatten a nested `FormState` into an array of `[path, value]` pairs, where
+ * `path` is the sequence of keys that leads to the leaf value.
+ *
+ * Empty arrays are treated as "no value" and are omitted from the output.
+ *
+ * @param state - The state to flatten.
+ * @param path - Internal accumulator for the current key path. Callers should
+ *   omit this parameter (defaults to `[]`).
+ * @returns An array of `[string[], T]` tuples — one entry per leaf value.
+ *
+ * @example
+ * const errors = { firstName: ['Required'], address: { city: ['Required'] } }
+ * flattenFormState(errors)
+ * // => [ [['firstName'], ['Required']], [['address', 'city'], ['Required']] ]
+ */
 export function flattenFormState<T>(
   state: FormState<T>,
   path: string[] = []
