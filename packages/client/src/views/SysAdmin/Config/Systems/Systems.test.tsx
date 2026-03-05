@@ -12,22 +12,9 @@
 import React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
-import {
-  createTestComponent,
-  flushPromises,
-  mockOfflineDataDispatch
-} from '@client/tests/util'
+import { createTestComponent } from '@client/tests/util'
 import { SystemList } from '@client/views/SysAdmin/Config/Systems/Systems'
-
 import { describe } from 'vitest'
-import {
-  activateSystem,
-  deactivateSystem,
-  deleteSystem,
-  registerSystem
-} from '@client/views/SysAdmin/Config/Systems/mutations'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { offlineDataReady } from '@client/offline/actions'
 
 describe('render system integration', () => {
   let component: ReactWrapper<{}, {}>
@@ -48,40 +35,13 @@ describe('render system integration', () => {
 describe('render create system integrations', () => {
   let component: ReactWrapper<{}, {}>
 
-  const mocks = [
-    {
-      request: {
-        query: registerSystem,
-        variables: {
-          system: {
-            name: 'Sweet Health Org',
-            type: 'HEALTH'
-          }
-        }
-      },
-      result: {
-        data: {
-          registerSystem: {
-            __typename: 'registerSystem',
-            system: {
-              client: '4090df15-f4e5-4f16-ae7e-bb518129d493',
-              name: 'Sweet Health Org',
-              type: 'HEALTH'
-            }
-          }
-        }
-      }
-    }
-  ]
-
   beforeEach(async () => {
     const { store } = createStore()
 
     const { component: testComponent } = await createTestComponent(
       <SystemList />,
       {
-        store,
-        graphqlMocks: mocks
+        store
       }
     )
     component = testComponent
@@ -90,220 +50,5 @@ describe('render create system integrations', () => {
   it('should show the system creation modal after click the create button', async () => {
     component.find('#createClientButton').hostNodes().simulate('click')
     expect(component.exists('ResponsiveModal')).toBeTruthy()
-  })
-
-  it('should show the registered system modal ', async () => {
-    component.find('#createClientButton').hostNodes().simulate('click')
-
-    component
-      .find('#client_name')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'Sweet Health Org' }
-      })
-
-    component
-      .find('#permissions-selectors')
-      .hostNodes()
-      .simulate('change', {
-        target: { value: 'HEALTH' }
-      })
-
-    component.find('#submitClientForm').hostNodes().simulate('click')
-    component.update()
-
-    await new Promise((resolve) => {
-      setTimeout(resolve, 0)
-    })
-
-    const modal = await waitForElement(component, '#createClientModal')
-    expect(modal.first().props().title).toEqual('Sweet Health Org')
-  })
-})
-
-describe('render toggle settings', () => {
-  let component: ReactWrapper<{}, {}>
-
-  describe('delete system integration', () => {
-    beforeEach(async () => {
-      const { store } = createStore()
-      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
-      await flushPromises()
-
-      const mocks = [
-        {
-          request: {
-            query: deleteSystem,
-            variables: {
-              clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a'
-            }
-          },
-          result: {
-            data: {
-              deleteSystem: {
-                __typename: 'deleteSystem',
-                clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
-                name: 'Health Integration 1'
-              }
-            }
-          }
-        }
-      ]
-
-      const { component: testComponent } = await createTestComponent(
-        <SystemList />,
-        {
-          store,
-          graphqlMocks: mocks
-        }
-      )
-      component = testComponent
-    })
-
-    it('should delete system successfully', async () => {
-      component
-        .find('#toggleMenu-4a7ba5bc-46c7-469e-8d61-20dd4d86e79a-dropdownMenu')
-        .hostNodes()
-        .first()
-        .simulate('click')
-
-      component
-        .find(
-          '#toggleMenu-4a7ba5bc-46c7-469e-8d61-20dd4d86e79a-Dropdown-Content'
-        )
-        .find('li')
-        .hostNodes()
-        .at(2)
-        .simulate('click')
-
-      component.find('#delete').hostNodes().simulate('click')
-      component.update()
-      const modal = await waitForElement(component, '#systemToDeleteSuccess')
-      expect(modal.first().text()).toBe('System has been deleted successfully')
-    })
-  })
-
-  describe('deactivate system integration', () => {
-    beforeEach(async () => {
-      const { store } = createStore()
-      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
-      await flushPromises()
-
-      const mocks = [
-        {
-          request: {
-            query: deactivateSystem,
-            variables: {
-              clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a'
-            }
-          },
-          result: {
-            data: {
-              deactivateSystem: {
-                __typename: 'deactivateSystem',
-                clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
-                status: 'deactivated'
-              }
-            }
-          }
-        }
-      ]
-
-      const { component: testComponent } = await createTestComponent(
-        <SystemList />,
-        {
-          store,
-          graphqlMocks: mocks
-        }
-      )
-      component = testComponent
-    })
-
-    it('should deactivated system successfully', async () => {
-      component
-        .find('#toggleMenu-4a7ba5bc-46c7-469e-8d61-20dd4d86e79a-dropdownMenu')
-        .hostNodes()
-        .first()
-        .simulate('click')
-
-      component
-        .find(
-          '#toggleMenu-4a7ba5bc-46c7-469e-8d61-20dd4d86e79a-Dropdown-Content'
-        )
-        .find('li')
-        .hostNodes()
-        .at(1)
-        .simulate('click')
-      component.find('#confirm').hostNodes().simulate('click')
-      component.update()
-      const modal = await waitForElement(
-        component,
-        '#toggleClientDeActiveStatusToast'
-      )
-      expect(modal.first().text()).toBe('Client deactivated')
-    })
-  })
-
-  describe('active system integration', () => {
-    beforeEach(async () => {
-      const { store } = createStore()
-      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
-      await flushPromises()
-
-      const mocks = [
-        {
-          request: {
-            query: activateSystem,
-            variables: {
-              clientId: '5923118f-c633-40c6-ba97-c3e3cbb412aa'
-            }
-          },
-          result: {
-            data: {
-              reactivateSystem: {
-                __typename: 'reactivateSystem',
-                clientId: '5923118f-c633-40c6-ba97-c3e3cbb412aa'
-              }
-            }
-          }
-        }
-      ]
-
-      const { component: testComponent } = await createTestComponent(
-        <SystemList />,
-        {
-          store,
-          graphqlMocks: mocks
-        }
-      )
-      component = testComponent
-    })
-
-    it('should active system successfully', async () => {
-      component
-        .find('#toggleMenu-5923118f-c633-40c6-ba97-c3e3cbb412aa-dropdownMenu')
-        .hostNodes()
-        .last()
-        .simulate('click')
-
-      component
-        .find(
-          '#toggleMenu-5923118f-c633-40c6-ba97-c3e3cbb412aa-Dropdown-Content'
-        )
-        .hostNodes()
-        .last()
-        .find('li')
-        .hostNodes()
-        .at(1)
-        .simulate('click')
-
-      component.find('#confirm').hostNodes().simulate('click')
-      component.update()
-      const modal = await waitForElement(
-        component,
-        '#toggleClientActiveStatusToast'
-      )
-      expect(modal.first().text()).toBe('Client activated')
-    })
   })
 })

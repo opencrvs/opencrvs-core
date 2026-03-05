@@ -8,18 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Integration } from '@config/models/config'
-import { fetchUserManagement } from '@config/services/userManagement'
-import { getToken } from '@config/utils/auth'
 import * as Hapi from '@hapi/hapi'
 
+/**
+ * Systems are now managed via the events service integrations endpoints.
+ * The admin UI loads systems directly via TRPC integrations.list.
+ * This handler returns an empty array for backward compatibility.
+ */
 export default async function getSystems(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const authHeader = getToken(request)
-
-  return fetchUserManagement<Integration[]>('/getAllSystems', {
-    Authorization: authHeader
-  })
+  return []
 }
