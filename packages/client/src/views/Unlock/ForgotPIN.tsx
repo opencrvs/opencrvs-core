@@ -106,9 +106,7 @@ export function ForgotPIN(props: IForgotPINProps) {
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.preventDefault()
       logout()
-      window.location.assign(
-        window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
-      )
+      window.location.assign(`/login/forgotten-item?lang=${language}`)
     },
     [language, logout]
   )

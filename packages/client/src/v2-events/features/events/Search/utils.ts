@@ -35,7 +35,7 @@ import {
   ValidatorContext,
   getAcceptedScopesByType
 } from '@opencrvs/commons/client'
-import { findScope, getAllUniqueFields } from '@opencrvs/commons/client'
+import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {

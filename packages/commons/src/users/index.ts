@@ -8,12 +8,5 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi } from 'vitest'
-
-const config = {
-  COUNTRY: 'FAR',
-  LANGUAGES: ['en', 'fr'],
-  USER_NOTIFICATION_DELIVERY_METHOD: 'sms'
-}
-
-vi.stubGlobal('config', config)
+export * from './User'
+export * from './userReferences'

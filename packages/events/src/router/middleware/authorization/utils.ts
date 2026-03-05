@@ -10,11 +10,8 @@
  */
 
 import {
-  getScopes,
-  decodeScope,
   UserFilter,
   JurisdictionFilter,
-  RecordScopeTypeV2,
   RecordScopeV2,
   UUID,
   scopeUsesFullOptions,
@@ -172,20 +169,4 @@ export function userCanAccessEventWithScopes(
   user: UserContext | SystemContext
 ) {
   return scopes.some((scope) => canAccessEventWithScope(event, scope, user))
-}
-
-export function getAcceptedScopesFromToken(
-  token: string,
-  acceptedScopes: RecordScopeTypeV2[]
-) {
-  const tokenScopes = getScopes(token)
-
-  return tokenScopes
-    .map((scope) => {
-      const parsedScope = decodeScope(scope)
-      return parsedScope && acceptedScopes.includes(parsedScope.type)
-        ? parsedScope
-        : null
-    })
-    .filter((scope): scope is RecordScopeV2 => scope !== null)
 }

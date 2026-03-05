@@ -20,3 +20,4 @@ grafana
 packages/*
 !packages/commons
 !packages/auth
+!packages/events

@@ -18,11 +18,6 @@ import {
   differenceInSeconds,
   differenceInYears
 } from 'date-fns'
-import {
-  EVENT_TYPE,
-  getRegistrationTargetDays,
-  getRegistrationLateTargetDays
-} from '@metrics/features/metrics/utils'
 
 type YYYY_MM_DD = string
 type ISO_DATE = string
@@ -141,21 +136,8 @@ export async function populateBundleFromPayload(
   return bundle
 }
 
-export async function getTimeLabel(
-  timeInDays: number,
-  event: EVENT_TYPE,
-  authorization: string
-): Promise<string> {
-  const regTargetDays = await getRegistrationTargetDays(event, authorization)
-  const regLateTargetDays = await getRegistrationLateTargetDays(
-    event,
-    authorization
-  )
-  if (timeInDays <= regTargetDays) {
-    return 'withinTarget'
-  } else if (regLateTargetDays && timeInDays <= regLateTargetDays) {
-    return 'withinLate'
-  } else if (timeInDays <= 365) {
+export function getTimeLabel(timeInDays: number): string {
+  if (timeInDays <= 365) {
     return 'within1Year'
   } else if (timeInDays <= 1825) {
     return 'within5Years'

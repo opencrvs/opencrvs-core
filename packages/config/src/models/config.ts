@@ -9,19 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { model, Schema, Document } from 'mongoose'
-interface IBirth {
-  REGISTRATION_TARGET: number
-  LATE_REGISTRATION_TARGET: number
-  PRINT_IN_ADVANCE: boolean
-}
-interface IDeath {
-  REGISTRATION_TARGET: number
-  PRINT_IN_ADVANCE: boolean
-}
-interface IMarriage {
-  REGISTRATION_TARGET: number
-  PRINT_IN_ADVANCE: boolean
-}
 interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
@@ -32,49 +19,16 @@ interface ICountryLogo {
   file: string
 }
 
-interface ILoginBackground {
-  backgroundColor: string
-  backgroundImage: string
-  imageFit: string
-}
-
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
-  BIRTH: IBirth
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
-  DEATH: IDeath
-  MARRIAGE: IMarriage
   PHONE_NUMBER_PATTERN: RegExp
-  NID_NUMBER_PATTERN: string
-  LOGIN_BACKGROUND: ILoginBackground
 }
-
-const birthSchema = new Schema<IBirth>({
-  REGISTRATION_TARGET: { type: Number, default: 45 },
-  LATE_REGISTRATION_TARGET: { type: Number, default: 365 },
-  PRINT_IN_ADVANCE: { type: Boolean, default: true }
-})
-
-const deathSchema = new Schema<IDeath>({
-  REGISTRATION_TARGET: { type: Number, default: 45 },
-  PRINT_IN_ADVANCE: { type: Boolean, default: true }
-})
-
-const marriageSchema = new Schema<IMarriage>({
-  REGISTRATION_TARGET: { type: Number, default: 45 },
-  PRINT_IN_ADVANCE: { type: Boolean, default: true }
-})
 
 const countryLogoSchema = new Schema<ICountryLogo>({
   fileName: String,
   file: String
-})
-
-const backgroundImageSchema = new Schema<ILoginBackground>({
-  backgroundColor: String,
-  backgroundImage: String,
-  imageFit: String
 })
 
 const currencySchema = new Schema<ICurrency>({
@@ -89,14 +43,9 @@ export interface Integration {
 
 const configSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
-  BIRTH: { type: birthSchema, required: false },
   COUNTRY_LOGO: { type: countryLogoSchema, required: false },
   CURRENCY: { type: currencySchema, required: false },
-  DEATH: { type: deathSchema, required: false },
-  MARRIAGE: { type: marriageSchema, required: false },
-  PHONE_NUMBER_PATTERN: { type: String, required: false },
-  NID_NUMBER_PATTERN: { type: String, required: false },
-  LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false }
+  PHONE_NUMBER_PATTERN: { type: String, required: false }
 })
 
 export default model<IApplicationConfigurationModel>('Config', configSchema)

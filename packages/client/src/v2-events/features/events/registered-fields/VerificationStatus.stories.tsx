@@ -10,8 +10,8 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within } from '@storybook/test'
-import React, { useEffect } from 'react'
+import { fn } from '@storybook/test'
+import React from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
 import { FieldType, TestUserRole } from '@opencrvs/commons/client'

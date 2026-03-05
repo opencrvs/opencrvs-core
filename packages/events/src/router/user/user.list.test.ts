@@ -17,6 +17,7 @@ import {
   setupTestCase
 } from '@events/tests/utils'
 import { mswServer } from '../../tests/msw'
+import { createSystemClient } from '@events/storage/postgres/events/system-clients'
 
 test('Returns empty list when no ids provided', async () => {
   const { user } = await setupTestCase()
@@ -102,29 +103,10 @@ test('Returns both normal users and system users', async () => {
 
   const systemUserId = '67bda93bfc07dee78ae55114'
 
-  mswServer.use(
-    http.post(`http://localhost:3030/getSystem`, async ({ request }) => {
-      const body = (await request.clone().json()) as { systemId: string }
-
-      if (body.systemId === systemUserId) {
-        return HttpResponse.json({
-          name: 'My health system integration',
-          createdBy: '',
-          username: '',
-          client_id: 'string',
-          status: '',
-          scope: [''],
-          sha_secret: ''
-        })
-      }
-
-      return HttpResponse.json(
-        null,
-        // @ts-expect-error - MSW does not have a type for this?
-        { status: 401 }
-      )
-    })
-  )
+  await createSystemClient({
+    name: 'My health system integration',
+    legacyId: systemUserId
+  })
 
   const fetchedUsers = await client.user.list([...userIds, systemUserId])
 

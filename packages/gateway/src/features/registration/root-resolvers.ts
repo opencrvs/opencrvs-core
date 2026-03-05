@@ -43,7 +43,6 @@ import {
 } from '@gateway/utils/validators'
 import { checkUserAssignment, findUserAssignment } from '@gateway/authorisation'
 
-import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
 import {
   archiveRegistration,
   certifyRegistration,
@@ -70,6 +69,7 @@ import { SCOPES } from '@opencrvs/commons/authentication'
 import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
 import { Context } from '@gateway/graphql/context'
 import { GraphQLResolveInfo } from 'graphql'
+import { setCollectorForPrintInAdvance } from './utils'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())

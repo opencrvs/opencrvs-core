@@ -107,9 +107,14 @@ export const AdvancedSearchStory: Story = {
         within(accordion).getByRole('button', { name: 'Show' })
       )
 
-      const locationInput = await canvas.findByTestId(
-        'event____legalStatuses____REGISTERED____createdAtLocation'
+      const locationInput = canvasElement.querySelector(
+        '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
       )
+
+      if (!locationInput) {
+        throw new Error('Location input not found')
+      }
+
       await userEvent.type(locationInput, 'Ibombo', { delay: 100 })
       const locationOption = await canvas.findAllByText(
         'Ibombo District Office'
@@ -271,10 +276,10 @@ export const AdvancedSearchTabsBehaviour: Story = {
 
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
-        await canvas.findByTestId(
-          'event____legalStatuses____REGISTERED____createdAtLocation'
+        canvasElement.querySelector(
+          '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation'
         )
-      ).toHaveValue('Ibombo District Office')
+      ).toHaveTextContent('Ibombo District Office')
       await within(accordion).findByText('June 2024 to June 2025')
       await within(accordion).findByText('Any status')
     }
@@ -354,21 +359,29 @@ export const AdvancedSearchTabsBehaviour: Story = {
       await userEvent.click(
         within(footballAccordion).getByRole('button', { name: 'Show' })
       )
-      const input = await canvas.findByTestId(
-        'event____legalStatuses____REGISTERED____createdAtLocation'
+
+      const locationInput = canvasElement.querySelector(
+        '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
       )
-      await userEvent.type(input, 'Ibombo', { delay: 100 })
-      const option = await canvas.findAllByText('Ibombo District Office')
-      await userEvent.click(option[0])
+
+      if (!locationInput) {
+        throw new Error('Location input not found')
+      }
+
+      await userEvent.type(locationInput, 'Ibombo', { delay: 100 })
+      const locationOption = await canvas.findAllByText(
+        'Ibombo District Office'
+      )
+      await userEvent.click(locationOption[0])
 
       await userEvent.click(tennisTab)
       await assertRegistration()
       await userEvent.click(footballTab)
       await expect(
-        await canvas.findByTestId(
-          'event____legalStatuses____REGISTERED____createdAtLocation'
+        canvasElement.querySelector(
+          '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation .react-select__single-value'
         )
-      ).toHaveValue('Ibombo District Office')
+      ).toHaveTextContent('Ibombo District Office')
     })
   }
 }
@@ -402,17 +415,23 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     await step(
       'Clear Place and Date of Registration, perform search',
       async () => {
-        const locationInput = await canvas.findByTestId(
-          'event____legalStatuses____REGISTERED____createdAtLocation',
-          {},
-          {
-            timeout: 5000
-          }
+        await new Promise((resolve) => setTimeout(resolve, 5000))
+
+        const locationInput = canvasElement.querySelector(
+          '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
         )
 
-        await expect(locationInput).toHaveValue('Ibombo District Office')
+        if (!locationInput) {
+          throw new Error('Location input not found')
+        }
+
+        await expect(
+          canvasElement.querySelector(
+            '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation .react-select__single-value'
+          )
+        ).toHaveTextContent('Ibombo District Office')
+
         await userEvent.clear(locationInput)
-        locationInput.blur()
 
         const dateToggle = (await canvas.findAllByRole('checkbox')).find(
           (el) =>

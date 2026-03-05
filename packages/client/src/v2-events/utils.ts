@@ -34,7 +34,8 @@ import {
   TextField,
   DefaultAddressFieldValue,
   AdministrativeArea,
-  ActionType
+  ActionType,
+  getAcceptedScopesByType
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -51,8 +52,8 @@ export function getUsersFullName(name: UserOrSystem['name'], language: string) {
 type AllKeys<T> = T extends T ? keyof T : never
 
 /**
- * @returns unique ids of users are referenced in the ActionDocument array.
  * Used for fetching user data in bulk.
+ * @returns unique ids of users which are referenced in the ActionDocument array.
  */
 export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   const userIdFields = [
@@ -283,7 +284,12 @@ export function hasOutboxWorkqueue(scopes: Scope[]) {
 }
 
 export function hasDraftWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => scope.startsWith('record.declare'))
+  return (
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.create'],
+      scopes
+    }).length > 0
+  )
 }
 
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
