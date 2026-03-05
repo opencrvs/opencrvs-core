@@ -333,6 +333,28 @@ COMMENT ON COLUMN app.users.legacy_id IS 'References the user id from the legacy
 
 
 --
+-- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.system_clients (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    legacy_id text,
+    name text NOT NULL,
+    scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
+    created_by text,
+    secret_hash text,
+    salt text,
+    sha_secret text,
+    status text DEFAULT 'active'::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT system_clients_status_check CHECK ((status = ANY (ARRAY['active'::text, 'disabled'::text])))
+);
+
+
+ALTER TABLE app.system_clients OWNER TO events_migrator;
+
+
+--
 -- Name: pgmigrations id; Type: DEFAULT; Schema: app; Owner: events_migrator
 --
 
@@ -497,6 +519,21 @@ ALTER TABLE ONLY app.users
 
 ALTER TABLE ONLY app.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: system_clients system_clients_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_clients
+    ADD CONSTRAINT system_clients_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: system_clients_legacy_id_idx; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE UNIQUE INDEX system_clients_legacy_id_idx ON app.system_clients USING btree (legacy_id) WHERE (legacy_id IS NOT NULL);
 
 
 --
@@ -674,6 +711,13 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.user_credentials TO events_app;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
+
+
+--
+-- Name: TABLE system_clients; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_clients TO events_app;
 
 
 --
