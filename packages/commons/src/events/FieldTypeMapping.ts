@@ -72,8 +72,7 @@ import {
   ButtonFieldValue,
   VerificationStatusValue,
   AgeValue,
-  FieldUpdateValue,
-  FieldGroupValue
+  FieldUpdateValue
 } from './FieldValue'
 import { FullDocumentPath } from '../documents'
 import {
@@ -106,27 +105,24 @@ import { ActionType } from './ActionType'
  */
 
 /**
- * Optionality of a field is defined in FieldConfig, not in FieldValue.
- * Allows for nullishness of a field value during validations based on FieldConfig.
- */
-type NullishFieldValueSchema = z.ZodOptional<
-  z.ZodNullable<FieldUpdateValueSchema>
->
-
-/**
  * Mapping of field types to Zod schema.
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
   let schema:
     | FieldUpdateValueSchema
-    | NullishFieldValueSchema
     | DynamicNameValue
     | DynamicAddressFieldValue
+    | z.ZodObject<z.ZodRawShape>
 
   switch (field.type) {
     case FieldType.FIELD_GROUP: {
-      schema = FieldGroupValue
+      schema = z.object(
+        field.fields.reduce((acc, subfield) => {
+          acc[subfield.id] = mapFieldTypeToZod(subfield, actionType)
+          return acc
+        }, {} as z.ZodRawShape)
+      )
       break
     }
     case FieldType.DATE:
