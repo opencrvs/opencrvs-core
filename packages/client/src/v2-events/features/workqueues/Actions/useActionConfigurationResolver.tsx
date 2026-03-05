@@ -22,7 +22,6 @@ import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { buttonMessages } from '@client/i18n/messages'
-import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import {
   useAssignmentActions,
   useEventActionsOnClick
@@ -49,10 +48,8 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { onClick, modals } = useEventActionsOnClick(event)
   const validatorContext = useValidatorContext()
-  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
-    event.type
-  )
-  const canAccessAction = useCanAccessEventWithScopes(event.id, ['record.read'])
+  const { isActionAllowed: isActionAllowedForUser } =
+    useUserAllowedActions(event)
 
   const events = useEvents()
   const isOnline = useOnlineStatus()
@@ -92,13 +89,12 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         type: actionType,
         icon: actionConfig?.icon || actionIcons[actionType],
         onClick: async (workqueue?: string) => onClick(actionType, workqueue),
-        disabled: !enabled || !canAccessAction,
+        disabled: !enabled,
         hidden: !visible
       }
     },
     [
       drafts,
-      canAccessAction,
       event,
       validatorContext,
       isActionAllowedForUser,
@@ -122,9 +118,8 @@ export function useResolveActionConditionals(
   isDeclareDraftOpen: boolean
 ) {
   const validatorContext = useValidatorContext()
-  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
-    event.type
-  )
+  const { isActionAllowed: isActionAllowedForUser } =
+    useUserAllowedActions(event)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const events = useEvents()
   const isOnline = useOnlineStatus()
@@ -155,9 +150,8 @@ export function useResolveActionConditionals(
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const validatorContext = useValidatorContext()
-  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
-    event.type
-  )
+  const { isActionAllowed: isActionAllowedForUser } =
+    useUserAllowedActions(event)
   const events = useEvents()
   const isOnline = useOnlineStatus()
   const { useFindEventFromCache } = events.getEvent

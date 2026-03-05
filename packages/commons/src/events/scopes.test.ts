@@ -12,6 +12,31 @@
 import { configurableEventScopeAllowed, isActionInScope } from './scopes'
 import { ActionType } from './ActionType'
 import { encodeScope } from '../scopes-v2'
+import { EventIndexWithAdministrativeHierarchy } from './locations'
+import { UserContext } from '../users/User'
+import { createPrng, generateUuid, TestUserRole } from './test.utils'
+
+const rng = createPrng(1)
+const officeUuid = generateUuid(rng)
+
+const testUser: UserContext = {
+  type: 'user',
+  id: generateUuid(rng),
+  primaryOfficeId: officeUuid,
+  administrativeAreaId: null,
+  role: TestUserRole.enum.FIELD_AGENT
+}
+
+/**
+ * Minimal event fixture for scope tests. Jurisdiction fields are empty since
+ * these tests focus on scope-type and event-type matching, not jurisdiction filtering.
+ */
+function makeEvent(eventType: string): EventIndexWithAdministrativeHierarchy {
+  return {
+    type: eventType,
+    legalStatuses: { DECLARED: undefined, REGISTERED: undefined }
+  } as unknown as EventIndexWithAdministrativeHierarchy
+}
 
 describe('configurableEventScopeAllowed()', () => {
   describe('scope: record.custom-action', () => {
@@ -97,32 +122,48 @@ describe('configurableEventScopeAllowed()', () => {
 describe('isActionInScope()', () => {
   describe('actions with null scope map (always allowed)', () => {
     it('should return true for ASSIGN regardless of scopes', () => {
-      expect(isActionInScope([], ActionType.ASSIGN, 'birth')).toBe(true)
+      expect(
+        isActionInScope({
+          scopes: [],
+          action: ActionType.ASSIGN,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(true)
     })
 
     it('should return true for UNASSIGN regardless of scopes', () => {
-      expect(isActionInScope([], ActionType.UNASSIGN, 'death')).toBe(true)
+      expect(
+        isActionInScope({
+          scopes: [],
+          action: ActionType.UNASSIGN,
+          event: makeEvent('death'),
+          currentUser: testUser
+        })
+      ).toBe(true)
     })
   })
 
   describe('actions with empty scope map (never allowed)', () => {
     it('should return false for DUPLICATE_DETECTED even with scopes', () => {
       expect(
-        isActionInScope(
-          ['record.read[event=birth]'],
-          ActionType.DUPLICATE_DETECTED,
-          'birth'
-        )
+        isActionInScope({
+          scopes: ['record.read[event=birth]'],
+          action: ActionType.DUPLICATE_DETECTED,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
       ).toBe(false)
     })
 
     it('should return false for CUSTOM even with scopes', () => {
       expect(
-        isActionInScope(
-          ['record.read[event=birth]'],
-          ActionType.CUSTOM,
-          'birth'
-        )
+        isActionInScope({
+          scopes: ['record.read[event=birth]'],
+          action: ActionType.CUSTOM,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
       ).toBe(false)
     })
   })
@@ -130,33 +171,45 @@ describe('isActionInScope()', () => {
   describe('non-encoded scopes', () => {
     it('should allow READ when legacy scope includes the event type', () => {
       expect(
-        isActionInScope(['record.read[event=birth]'], ActionType.READ, 'birth')
+        isActionInScope({
+          scopes: ['record.read[event=birth]'],
+          action: ActionType.READ,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
       ).toBe(true)
     })
 
     it('should deny READ when legacy scope does not include the event type', () => {
       expect(
-        isActionInScope(['record.read[event=birth]'], ActionType.READ, 'death')
+        isActionInScope({
+          scopes: ['record.read[event=birth]'],
+          action: ActionType.READ,
+          event: makeEvent('death'),
+          currentUser: testUser
+        })
       ).toBe(false)
     })
 
     it('should allow DECLARE when user has record.declare scope for the event', () => {
       expect(
-        isActionInScope(
-          ['record.declare[event=birth|death]'],
-          ActionType.DECLARE,
-          'birth'
-        )
+        isActionInScope({
+          scopes: ['record.declare[event=birth|death]'],
+          action: ActionType.DECLARE,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
       ).toBe(true)
     })
 
     it('should allow DECLARE when user has record.register scope for the event', () => {
       expect(
-        isActionInScope(
-          ['record.register[event=birth]'],
-          ActionType.DECLARE,
-          'birth'
-        )
+        isActionInScope({
+          scopes: ['record.register[event=birth]'],
+          action: ActionType.DECLARE,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
       ).toBe(true)
     })
   })
@@ -168,21 +221,30 @@ describe('isActionInScope()', () => {
         options: { event: ['birth', 'death'] }
       })
 
-      expect(isActionInScope([encodedScope], ActionType.READ, 'birth')).toBe(
-        true
-      )
+      expect(
+        isActionInScope({
+          scopes: [encodedScope],
+          action: ActionType.READ,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(true)
     })
 
-    it('should allow READ when V2 scope type matches even if event option does not include the event type', () => {
+    it('should deny READ when V2 scope event option does not include the event type', () => {
       const encodedScope = encodeScope({
         type: 'record.read',
         options: { event: ['birth'] }
       })
 
-      // V2 scope check currently only verifies scope type, not event options
-      expect(isActionInScope([encodedScope], ActionType.READ, 'death')).toBe(
-        true
-      )
+      expect(
+        isActionInScope({
+          scopes: [encodedScope],
+          action: ActionType.READ,
+          event: makeEvent('death'),
+          currentUser: testUser
+        })
+      ).toBe(false)
     })
 
     it('should allow action when V2 scope has no event option (unrestricted)', () => {
@@ -191,11 +253,12 @@ describe('isActionInScope()', () => {
       })
 
       expect(
-        isActionInScope(
-          [encodedScope],
-          ActionType.READ,
-          'tennis-club-membership'
-        )
+        isActionInScope({
+          scopes: [encodedScope],
+          action: ActionType.READ,
+          event: makeEvent('tennis-club-membership'),
+          currentUser: testUser
+        })
       ).toBe(true)
     })
 
@@ -205,9 +268,14 @@ describe('isActionInScope()', () => {
         options: { event: ['birth'] }
       })
 
-      expect(isActionInScope([encodedScope], ActionType.READ, 'birth')).toBe(
-        false
-      )
+      expect(
+        isActionInScope({
+          scopes: [encodedScope],
+          action: ActionType.READ,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(false)
     })
 
     it('should allow REGISTER with V2 scope for matching event', () => {
@@ -217,28 +285,29 @@ describe('isActionInScope()', () => {
       })
 
       expect(
-        isActionInScope(
-          [encodedScope],
-          ActionType.REGISTER,
-          'tennis-club-membership'
-        )
+        isActionInScope({
+          scopes: [encodedScope],
+          action: ActionType.REGISTER,
+          event: makeEvent('tennis-club-membership'),
+          currentUser: testUser
+        })
       ).toBe(true)
     })
 
-    it('should allow REGISTER with V2 scope type match even when event is not included', () => {
+    it('should deny REGISTER when V2 scope event option does not include the event type', () => {
       const encodedScope = encodeScope({
         type: 'record.register',
         options: { event: ['birth', 'death'] }
       })
 
-      // V2 scope check currently only verifies scope type, not event options
       expect(
-        isActionInScope(
-          [encodedScope],
-          ActionType.REGISTER,
-          'tennis-club-membership'
-        )
-      ).toBe(true)
+        isActionInScope({
+          scopes: [encodedScope],
+          action: ActionType.REGISTER,
+          event: makeEvent('tennis-club-membership'),
+          currentUser: testUser
+        })
+      ).toBe(false)
     })
   })
 
@@ -251,11 +320,12 @@ describe('isActionInScope()', () => {
       })
 
       expect(
-        isActionInScope(
-          [encodedScope, nonEncodedScope],
-          ActionType.READ,
-          'death'
-        )
+        isActionInScope({
+          scopes: [encodedScope, nonEncodedScope],
+          action: ActionType.READ,
+          event: makeEvent('death'),
+          currentUser: testUser
+        })
       ).toBe(true)
     })
 
@@ -267,35 +337,43 @@ describe('isActionInScope()', () => {
       })
 
       expect(
-        isActionInScope(
-          [nonEncodedScope, encodedScope],
-          ActionType.READ,
-          'birth'
-        )
+        isActionInScope({
+          scopes: [nonEncodedScope, encodedScope],
+          action: ActionType.READ,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
       ).toBe(true)
     })
 
-    it('should allow when V1 denies but V2 scope type matches', () => {
+    it('should deny when both V1 and V2 deny', () => {
       const nonEncodedScope = 'record.read[event=birth]'
       const encodedScope = encodeScope({
         type: 'record.read',
         options: { event: ['death'] }
       })
 
-      // V2 scope check currently only verifies scope type, not event options
       expect(
-        isActionInScope(
-          [nonEncodedScope, encodedScope],
-          ActionType.READ,
-          'tennis-club-membership'
-        )
-      ).toBe(true)
+        isActionInScope({
+          scopes: [nonEncodedScope, encodedScope],
+          action: ActionType.READ,
+          event: makeEvent('tennis-club-membership'),
+          currentUser: testUser
+        })
+      ).toBe(false)
     })
   })
 
   describe('no scopes', () => {
     it('should deny action when user has no scopes', () => {
-      expect(isActionInScope([], ActionType.READ, 'birth')).toBe(false)
+      expect(
+        isActionInScope({
+          scopes: [],
+          action: ActionType.READ,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(false)
     })
 
     it('should deny action when user has unrelated scopes', () => {
@@ -304,9 +382,14 @@ describe('isActionInScope()', () => {
         options: { event: ['birth'] }
       })
 
-      expect(isActionInScope([encodedScope], ActionType.READ, 'birth')).toBe(
-        false
-      )
+      expect(
+        isActionInScope({
+          scopes: [encodedScope],
+          action: ActionType.READ,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(false)
     })
   })
 })
