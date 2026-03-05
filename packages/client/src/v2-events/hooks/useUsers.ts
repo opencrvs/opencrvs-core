@@ -12,6 +12,7 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import {
   FullDocumentUrl,
+  System,
   TokenUserType,
   User,
   UserOrSystem
@@ -137,7 +138,23 @@ export function useUsers() {
             queryKey: trpc.user.get.queryKey()
           })
           .flatMap(([, data]) => data)
-          .filter((user): user is User => Boolean(user))
+          .filter(
+            (userOrSystem): userOrSystem is User =>
+              userOrSystem?.type === TokenUserType.enum.user
+          )
+      }
+    },
+    getSystem: {
+      getAllCached: () => {
+        return queryClient
+          .getQueriesData<System>({
+            queryKey: trpc.user.get.queryKey()
+          })
+          .flatMap(([, data]) => data)
+          .filter(
+            (userOrSystem): userOrSystem is System =>
+              userOrSystem?.type === TokenUserType.enum.system
+          )
       }
     },
     getUsers: {

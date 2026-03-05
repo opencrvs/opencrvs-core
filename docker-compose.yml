@@ -175,6 +175,7 @@ services:
       - base
     environment:
       - REDIS_HOST=redis
+      - EVENTS_URL=http://events:5555/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
