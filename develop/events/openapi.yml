@@ -2180,6 +2180,55 @@ components:
                       - label
                       - type
                     additionalProperties: false
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               additionalProperties: false
             defaultValue:
               type: object
@@ -6206,6 +6255,55 @@ components:
                     - ADMIN_STRUCTURE
                     - HEALTH_FACILITY
                     - CRVS_OFFICE
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               required:
                 - type
               additionalProperties: false
@@ -6519,6 +6617,55 @@ components:
                       - locations
                       - facilities
                       - offices
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               required:
                 - searchableResource
               additionalProperties: false
@@ -6674,6 +6821,59 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            configuration:
+              type: object
+              properties:
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
+              additionalProperties: false
           required:
             - id
             - label
@@ -6825,6 +7025,59 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            configuration:
+              type: object
+              properties:
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.validate
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
+              additionalProperties: false
           required:
             - id
             - label
