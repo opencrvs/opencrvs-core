@@ -36,11 +36,11 @@ import {
   NumberWithUnitFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
-
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
 import { SerializedNowDateTime } from './serializers/date/serializer'
+import { JurisdictionReference } from '../users/userReferences'
 
 const FieldId = z
   .string()
@@ -599,28 +599,29 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
+const AllowedLocations = JurisdictionReference.optional().describe(
+  'Limits which location options are selectable depending on user jurisdiction and location.'
+)
+
 export const AdministrativeAreas = z.enum([
   'ADMIN_STRUCTURE',
   'HEALTH_FACILITY',
   'CRVS_OFFICE'
 ])
 
-const AdministrativeAreaConfiguration = z
-  .object({
-    partOf: z
-      .object({
-        $declaration: z.string()
-      })
-      .optional()
-      .describe('Parent location'),
-    type: AdministrativeAreas
-  })
-  .describe('Administrative area options')
-
 const AdministrativeAreaField = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: AdministrativeAreaConfiguration
+  configuration: z
+    .object({
+      partOf: z
+        .object({ $declaration: z.string() })
+        .optional()
+        .describe('Parent location'),
+      type: AdministrativeAreas,
+      allowedLocations: AllowedLocations
+    })
+    .describe('Administrative area options')
 }).describe('Administrative area input field e.g. facility, office')
 
 export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
@@ -629,7 +630,8 @@ const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
-    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices']))
+    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices'])),
+    allowedLocations: AllowedLocations
   })
 }).describe('Input field for a location')
 
@@ -663,14 +665,16 @@ export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
@@ -699,7 +703,8 @@ const Address = BaseField.extend({
             parent: FieldReference.optional()
           })
         )
-        .optional()
+        .optional(),
+      allowedLocations: AllowedLocations
     })
     .optional(),
   defaultValue: DefaultAddressFieldValue.optional()
@@ -1005,10 +1010,6 @@ export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
 >
 
 export type SelectOption = z.infer<typeof SelectOption>
-
-export type AdministrativeAreaConfiguration = z.infer<
-  typeof AdministrativeAreaConfiguration
->
 
 /**
  * Union of file-related fields. Using common type should help with compiler to know where to add new cases.

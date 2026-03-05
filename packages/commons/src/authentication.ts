@@ -14,8 +14,36 @@ import * as z from 'zod/v4'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
 import { UUID } from './uuid'
-import { encodeScope } from './scopes-v2'
+import {
+  encodeScope,
+  RecordScopeTypeV2,
+  RecordScopeV2,
+  decodeScope
+} from './scopes-v2'
 export * from './scopes'
+
+/**
+ * Returns an array of accepted scopes from a JWT token, filtered by the given accepted scope types.
+ *
+ * @param token - The JWT token containing scope definitions.
+ * @param acceptedScopes - An array of acceptable scope types to filter by.
+ * @returns An array of parsed RecordScopeV2 objects that are found in the token and match the accepted scope types.
+ */
+export function getAcceptedScopesFromToken(
+  token: string,
+  acceptedScopes: RecordScopeTypeV2[]
+) {
+  const tokenScopes = getScopes(token)
+
+  return tokenScopes
+    .map((scope) => {
+      const parsedScope = decodeScope(scope)
+      return parsedScope && acceptedScopes.includes(parsedScope.type)
+        ? parsedScope
+        : null
+    })
+    .filter((scope): scope is RecordScopeV2 => scope !== null)
+}
 
 export const DEFAULT_ROLES_DEFINITION = [
   {

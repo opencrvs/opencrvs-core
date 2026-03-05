@@ -81,7 +81,7 @@ const scopeOptionsDeclared = scopeOptionsPlaceEvent
   })
   .describe('Options applicable to actions that may take place after DECLARE')
 
-const scopeOptionsFull = scopeOptionsDeclared
+const ScopeOptionsFull = scopeOptionsDeclared
   .extend({
     registeredIn: JurisdictionFilter.optional(),
     registeredBy: UserFilter.optional()
@@ -90,7 +90,11 @@ const scopeOptionsFull = scopeOptionsDeclared
     'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
   )
 
-const resolvedScopeOptionsPlaceEvent = z
+export type ScopeOptionsFull = z.infer<typeof ScopeOptionsFull>
+export const ScopeOptionKey = ScopeOptionsFull.keyof()
+export type ScopeOptionKey = z.infer<typeof ScopeOptionKey>
+
+const ResolvedScopeOptionsPlaceEvent = z
   .object({
     event: scopeByEvent,
     placeOfEvent: UUID.nullish()
@@ -99,31 +103,27 @@ const resolvedScopeOptionsPlaceEvent = z
     'Resolved options applicable to all record scopes, with location ID instead of jurisdiction filter.'
   )
 
-const resolvedScopeOptionsDeclared = resolvedScopeOptionsPlaceEvent
-  .extend({
-    declaredIn: UUID.nullish(),
-    declaredBy: z.string().optional()
-  })
-  .describe(
-    'Resolved options applicable to actions that may take place after DECLARE, with location ID and user ID instead of filters.'
-  )
+const ResolvedScopeOptionsDeclared = ResolvedScopeOptionsPlaceEvent.extend({
+  declaredIn: UUID.nullish(),
+  declaredBy: z.string().optional()
+}).describe(
+  'Resolved options applicable to actions that may take place after DECLARE, with location ID and user ID instead of filters.'
+)
 
-const resolvedScopeOptionsFull = resolvedScopeOptionsDeclared
-  .extend({
-    registeredIn: UUID.nullish(),
-    registeredBy: z.string().optional()
-  })
-  .describe(
-    'Resolved options applicable to actions that may take place after REGISTER, with full filtering capabilities and location/user IDs instead of filters.'
-  )
+const ResolvedScopeOptionsFull = ResolvedScopeOptionsDeclared.extend({
+  registeredIn: UUID.nullish(),
+  registeredBy: z.string().optional()
+}).describe(
+  'Resolved options applicable to actions that may take place after REGISTER, with full filtering capabilities and location/user IDs instead of filters.'
+)
 
-export const scopesWithPlaceEventOptions = RecordScopeTypeV2.extract([
+export const ScopesWithPlaceEventOptions = RecordScopeTypeV2.extract([
   'record.create',
   'record.declare',
   'record.notify'
 ])
 
-export const scopesWithDeclaredOptions = RecordScopeTypeV2.extract([
+export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
   'record.validate',
   'record.reject',
   'record.archive',
@@ -131,7 +131,7 @@ export const scopesWithDeclaredOptions = RecordScopeTypeV2.extract([
   'record.register'
 ])
 
-export const scopesWithFullOptions = RecordScopeTypeV2.extract([
+export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.search',
   'record.read',
   'record.print-certified-copies',
@@ -143,16 +143,16 @@ export const scopesWithFullOptions = RecordScopeTypeV2.extract([
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
-      type: scopesWithPlaceEventOptions,
+      type: ScopesWithPlaceEventOptions,
       options: scopeOptionsPlaceEvent.optional()
     }),
     z.object({
-      type: scopesWithDeclaredOptions,
+      type: ScopesWithDeclaredOptions,
       options: scopeOptionsDeclared.optional()
     }),
     z.object({
-      type: scopesWithFullOptions,
-      options: scopeOptionsFull.optional()
+      type: ScopesWithFullOptions,
+      options: ScopeOptionsFull.optional()
     })
   ])
   .describe(
@@ -163,34 +163,34 @@ export function scopeUsesDeclaredOptions(
   scope: RecordScopeV2
 ): scope is Extract<
   RecordScopeV2,
-  { type: z.infer<typeof scopesWithDeclaredOptions> }
+  { type: z.infer<typeof ScopesWithDeclaredOptions> }
 > {
   // If the scope has less, it is found here. Otherwise in other categories.
-  return !scopesWithPlaceEventOptions.options.some((opt) => opt === scope.type)
+  return !ScopesWithPlaceEventOptions.options.some((opt) => opt === scope.type)
 }
 
 export function scopeUsesFullOptions(
   scope: RecordScopeV2
 ): scope is Extract<
   RecordScopeV2,
-  { type: z.infer<typeof scopesWithFullOptions> }
+  { type: z.infer<typeof ScopesWithFullOptions> }
 > {
-  return scopesWithFullOptions.options.some((opt) => opt === scope.type)
+  return ScopesWithFullOptions.options.some((opt) => opt === scope.type)
 }
 
 export const ResolvedRecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
-      type: scopesWithPlaceEventOptions,
-      options: resolvedScopeOptionsPlaceEvent.optional()
+      type: ScopesWithPlaceEventOptions,
+      options: ResolvedScopeOptionsPlaceEvent.optional()
     }),
     z.object({
-      type: scopesWithDeclaredOptions,
-      options: resolvedScopeOptionsDeclared.optional()
+      type: ScopesWithDeclaredOptions,
+      options: ResolvedScopeOptionsDeclared.optional()
     }),
     z.object({
-      type: scopesWithFullOptions,
-      options: resolvedScopeOptionsFull.optional()
+      type: ScopesWithFullOptions,
+      options: ResolvedScopeOptionsFull.optional()
     })
   ])
   .describe('Resolved scope with location/user IDs instead of filters.')
@@ -229,6 +229,31 @@ export const decodeScope = (query: string) => {
   const unflattenedScope = unflattenScope(scope)
 
   return RecordScopeV2.safeParse(unflattenedScope)?.data
+}
+
+/** If a certain scope option is not set, we use the default value. */
+const DEFAULT_SCOPE_OPTIONS: ScopeOptionsFull = {
+  placeOfEvent: JurisdictionFilter.enum.all
+}
+
+/**
+ * Function to get the value of a scope option (aka. scope attribute)
+ *
+ * @param scope - The scope to get the value of the option from.
+ * @param option - The option to get the value of.
+ * @returns The value of the scope option. Will return the default value if the option is not set.
+ */
+export function getScopeOptionValue<T extends ScopeOptionKey>(
+  scope: RecordScopeV2,
+  option: T
+): ScopeOptionsFull[T] | undefined {
+  const options = scope.options as Partial<ScopeOptionsFull> | undefined
+  const value = options?.[option]
+
+  const defaultValue =
+    option in DEFAULT_SCOPE_OPTIONS ? DEFAULT_SCOPE_OPTIONS[option] : undefined
+
+  return value ?? defaultValue
 }
 
 type LegacyScopeType = ConfigurableScopeType

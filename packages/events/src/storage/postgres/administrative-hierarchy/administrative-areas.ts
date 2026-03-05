@@ -47,7 +47,7 @@ export async function getAdministrativeAreas({
   return query.execute()
 }
 
-const INSERT_MAX_CHUNK_SIZE = 10000
+const INSERT_MAX_CHUNK_SIZE = 1000
 
 export async function setAdministrativeAreasInTrx(
   trx: Kysely<Schema>,

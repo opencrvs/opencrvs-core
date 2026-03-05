@@ -18,11 +18,36 @@ import {
 import {
   decodeScope,
   encodeScope,
-  scopesWithDeclaredOptions,
-  scopesWithFullOptions,
-  scopesWithPlaceEventOptions,
-  v1ScopeToV2Scope
+  v1ScopeToV2Scope,
+  getScopeOptionValue,
+  JurisdictionFilter,
+  ScopesWithDeclaredOptions,
+  ScopesWithFullOptions,
+  ScopesWithPlaceEventOptions
 } from './scopes-v2'
+
+describe('getScopeOptionValue()', () => {
+  it('should return the default value if the scope option is not set', () => {
+    const scope = {
+      type: 'record.create'
+    } as const
+
+    const result = getScopeOptionValue(scope, 'placeOfEvent')
+    expect(result).toEqual('all')
+  })
+
+  it('should return the value if the scope option is set', () => {
+    const scope = {
+      type: 'record.create',
+      options: {
+        placeOfEvent: JurisdictionFilter.enum.administrativeArea
+      }
+    } as const
+
+    const result = getScopeOptionValue(scope, 'placeOfEvent')
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
+})
 
 describe('findScope()', () => {
   const userScopes = [
@@ -194,7 +219,7 @@ describe('parseConfigurableScope()', () => {
 
 describe('2.0 scopes', () => {
   it('Strips out scope options unavailable for the "placeEvent" scope types', () => {
-    const placeEventScopes = scopesWithPlaceEventOptions.options.map((type) =>
+    const placeEventScopes = ScopesWithPlaceEventOptions.options.map((type) =>
       encodeScope({
         type,
         options: {
@@ -226,7 +251,7 @@ describe('2.0 scopes', () => {
   })
 
   it('Strips out scope options unavailable for the "declared" scope types', () => {
-    const declaredEventOptions = scopesWithDeclaredOptions.options.map((type) =>
+    const declaredEventOptions = ScopesWithDeclaredOptions.options.map((type) =>
       encodeScope({
         type,
         options: {
@@ -291,7 +316,7 @@ describe('2.0 scopes', () => {
   })
 
   it('Keeps all scope options for the "full" scope types', () => {
-    const fullEventOptions = scopesWithFullOptions.options.map((type) =>
+    const fullEventOptions = ScopesWithFullOptions.options.map((type) =>
       encodeScope({
         type,
         options: {
