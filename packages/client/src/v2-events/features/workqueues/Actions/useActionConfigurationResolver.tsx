@@ -22,6 +22,7 @@ import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { buttonMessages } from '@client/i18n/messages'
+import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import {
   useAssignmentActions,
   useEventActionsOnClick
@@ -51,6 +52,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
     event.type
   )
+  const canAccessAction = useCanAccessEventWithScopes(event.id, ['record.read'])
 
   const events = useEvents()
   const isOnline = useOnlineStatus()
@@ -90,19 +92,20 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         type: actionType,
         icon: actionConfig?.icon || actionIcons[actionType],
         onClick: async (workqueue?: string) => onClick(actionType, workqueue),
-        disabled: !enabled,
+        disabled: !enabled || !canAccessAction,
         hidden: !visible
       }
     },
     [
       drafts,
+      canAccessAction,
       event,
       validatorContext,
       isActionAllowedForUser,
       eventConfiguration,
       isOnline,
       isDownloaded,
-      events,
+      events.actions.assignment.assign,
       onClick
     ]
   )
