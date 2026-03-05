@@ -8,68 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { GQLResolver, GQLSystemType } from '@gateway/graphql/schema'
-import fetch from '@gateway/fetch'
-import { RECORD_SEARCH_QUOTA, USER_MANAGEMENT_URL, WEBHOOKS_URL } from '@gateway/constants'
-import { getSystem, hasScope } from '@gateway/features/user/utils'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { hasScope } from '@gateway/features/user/utils'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import {
   getSystemScopesFromType,
   getInMemoryEventConfigurations,
   isValidSystemIntegrationType
 } from './scopes'
+import { api } from '@gateway/v2-events/events/service'
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async reactivateSystem(_, { clientId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
-        throw new Error('Activate user is only allowed for this user')
-      }
-      const res = await fetch(`${USER_MANAGEMENT_URL}reactivateSystem`, {
-        method: 'POST',
-        body: JSON.stringify({ clientId }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      if (res.status !== 200) {
-        throw new Error(
-          `Something went wrong on user management service. Couldn't activate system`
-        )
-      }
-      return res.json()
-    },
-    async deactivateSystem(_, { clientId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
-        throw new Error('Deactivate user is not allowed for this user')
-      }
-      const res = await fetch(`${USER_MANAGEMENT_URL}deactivateSystem`, {
-        method: 'POST',
-        body: JSON.stringify({ clientId }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      if (res.status !== 200) {
-        return Promise.reject(
-          new Error(
-            `Something went wrong on user management service. Couldn't deactivate system`
-          )
-        )
-      }
-      return res.json()
-    },
     async registerSystem(_, { system }, { headers: authHeader }) {
       if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
         return Promise.reject(new Error('User is not allowed to create client'))
       }
 
-      const { type, name, integratingSystemType } = system!
-      let { settings } = system!
+      const { type, name } = system!
 
       // Validate the type
       if (!isValidSystemIntegrationType(type)) {
@@ -81,114 +37,16 @@ export const resolvers: GQLResolver = {
         await getInMemoryEventConfigurations(authHeader)
       const eventIds = eventConfigurations.map((config) => config.id)
 
-      // Set default settings based on type if not provided
-      if (type === GQLSystemType.RECORD_SEARCH && !settings) {
-        settings = {
-          dailyQuota: RECORD_SEARCH_QUOTA
-        }
-      }
-
       // Convert type to scopes
-      const scope = getSystemScopesFromType(type, eventIds)
+      const scopes = getSystemScopesFromType(type, eventIds)
 
-      // Build the payload with type, name, and computed scopes
-      const payload = {
-        type,
-        name,
-        scope,
-        ...(integratingSystemType && { integratingSystemType }),
-        ...(settings && { settings })
-      }
+      // Call events service integrations.create via TRPC
+      const result = await api.integrations.create.mutate(
+        { name, scopes },
+        { context: { headers: authHeader } }
+      )
 
-      const res = await fetch(`${USER_MANAGEMENT_URL}registerSystem`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      if (res.status !== 201) {
-        throw new Error(
-          `Something went wrong on user management service. Couldn't register new system`
-        )
-      }
-      return res.json()
-    },
-    async refreshSystemSecret(_, { clientId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
-        throw new Error('Only system user can update refresh client secret')
-      }
-      const res = await fetch(`${USER_MANAGEMENT_URL}refreshSystemSecret`, {
-        method: 'POST',
-        body: JSON.stringify({ clientId: clientId }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-      if (res.status !== 200) {
-        throw new Error(`No user details found by given clientId`)
-      }
-
-      return res.json()
-    },
-    async updatePermissions(_, { setting }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
-        throw new Error('Only system user can update refresh client secret')
-      }
-      const res = await fetch(`${USER_MANAGEMENT_URL}updatePermissions`, {
-        method: 'POST',
-        body: JSON.stringify(setting),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-      if (res.status !== 200) {
-        throw new Error(`Something went wrong`)
-      }
-
-      return res.json()
-    },
-    async deleteSystem(_, { clientId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
-        throw new Error('Only system user can delete the system')
-      }
-      const res = await fetch(`${USER_MANAGEMENT_URL}deleteSystem`, {
-        method: 'POST',
-        body: JSON.stringify({ clientId: clientId }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      if (res.status !== 200) {
-        throw new Error(`No System found by given clientId`)
-      }
-
-      await fetch(`${WEBHOOKS_URL}deleteWebhooksByClientId`, {
-        method: 'POST',
-        body: JSON.stringify({ clientId: clientId }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-
-      return res.json()
-    }
-  },
-
-  Query: {
-    async fetchSystem(_, { clientId }, { headers: authHeader }) {
-      if (authHeader && !hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
-        throw new Error('Fetch integration is not allowed for this user')
-      }
-
-      return getSystem({ clientId }, authHeader)
+      return result
     }
   }
 }

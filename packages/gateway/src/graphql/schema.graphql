@@ -136,7 +136,6 @@ type Query {
     sort: String
   ): EventProgressResultSet
   getUserRoles: [UserRole!]!
-  fetchSystem(clientId: ID!): System
 }
 
 type Mutation {
@@ -247,12 +246,7 @@ type Mutation {
   resendInvite(userId: String!): String
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
-  reactivateSystem(clientId: ID!): System
-  deactivateSystem(clientId: ID!): System
-  registerSystem(system: SystemInput): SystemSecret
-  refreshSystemSecret(clientId: String!): SystemSecret
-  updatePermissions(setting: UpdatePermissionsInput!): System
-  deleteSystem(clientId: ID!): System
+  registerSystem(system: SystemInput): RegisterSystemResult
   bookmarkAdvancedSearch(
     bookmarkSearchInput: BookmarkSearchInput!
   ): BookMarkedSearches

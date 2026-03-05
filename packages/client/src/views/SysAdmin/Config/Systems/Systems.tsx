@@ -13,8 +13,6 @@ import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { System, SystemStatus, SystemType } from '@client/utils/gateway'
-import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
 import { z } from 'zod'
 import {
   Alert,
@@ -27,8 +25,7 @@ import {
   Spinner,
   Stack,
   TextInput,
-  Toast,
-  ToggleMenu
+  Toast
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
@@ -39,17 +36,11 @@ import { Text } from '@opencrvs/components/lib/Text'
 import React, { useCallback, useState } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { useSystems } from './useSystems'
+import {
+  useIntegrations,
+  IntegrationItem
+} from './useIntegrations'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
-
-interface ToggleModal {
-  modalVisible: boolean
-  selectedClient: System | null
-}
-
-const ButtonLink = styled(Link)`
-  text-align: left;
-`
 
 const PaddedAlert = styled(Alert)`
   margin-top: 16px;
@@ -108,105 +99,47 @@ function WithFrame({
 export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
-  const [toggleKeyModal, setToggleKeyModal] = useState<ToggleModal>({
-    modalVisible: false,
-    selectedClient: null
-  })
+  const [newClientName, setNewClientName] = useState(EMPTY_STRING)
+  const [newSystemType, setNewSystemType] = useState<string>(
+    SystemRole.enum.HEALTH
+  )
 
   const toggleModal = useCallback(() => {
     setShowModal((prev) => !prev)
   }, [])
 
   const {
-    systemToDeleteData,
-    deleteSystem,
-    systemToDelete,
-    setSystemToDelete,
-    systemToDeleteLoading,
-    systemToDeleteError,
-    existingSystems,
-    deactivateSystem,
-    systemToToggleActivation,
-    setSystemToToggleActivation,
-    activateSystem,
-    registerSystem,
-    registerSystemData,
-    newClientName,
-    newSystemType,
-    setNewSystemType,
-    onChangeClientName,
-    activateSystemLoading,
-    deactivateSystemLoading,
-    registerSystemLoading,
-    registerSystemError,
-    activateSystemData,
-    deactivateSystemData,
-    activateSystemError,
-    deactivateSystemError,
-    clearNewSystemDraft,
-    clientRefreshToken,
-    refreshTokenData,
-    refreshTokenLoading,
-    refreshTokenError,
-    resetData
-  } = useSystems()
+    integrations,
+    isLoading,
+    createIntegrationAsync,
+    createResult,
+    isCreating,
+    createError,
+    resetCreate
+  } = useIntegrations()
 
-  function changeActiveStatusIntl(status: SystemStatus) {
-    if (status !== SystemStatus.Active) {
-      return intl.formatMessage(integrationMessages.activate)
-    } else {
-      return intl.formatMessage(integrationMessages.deactivate)
-    }
+  const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewClientName(String(event.target.value))
   }
 
-  const toggleRevealKeyModal = useCallback(
-    function toggleRevealKeyModal(system?: System) {
-      if (system !== undefined) {
-        setToggleKeyModal({
-          ...toggleKeyModal,
-          modalVisible: true,
-          selectedClient: system
-        })
-      } else {
-        setToggleKeyModal({
-          ...toggleKeyModal,
-          modalVisible: false
-        })
-      }
-    },
-    [toggleKeyModal]
-  )
-
-  const getMenuItems = (system: System) => {
-    const menuItems: { handler: () => void; label: string }[] = [
-      {
-        handler: () => {
-          toggleRevealKeyModal(system)
-        },
-        label: intl.formatMessage(integrationMessages.revealKeys)
-      }
-    ]
-
-    menuItems.push({
-      handler: () => {
-        setSystemToToggleActivation(system)
-      },
-      label: changeActiveStatusIntl(system.status)
-    })
-
-    menuItems.push({
-      handler: () => {
-        setSystemToDelete(system)
-      },
-      label: intl.formatMessage(integrationMessages.delete)
-    })
-
-    return menuItems
+  const clearNewSystemDraft = () => {
+    setNewClientName(EMPTY_STRING)
+    setNewSystemType(SystemRole.enum.HEALTH)
   }
 
-  const systemToLabel = (system: System) => {
-    return intl.formatMessage(integrationMessages.integrationType, {
-      type: system.type
+  const systemToLabel = (system: IntegrationItem) => {
+    return system.scopes.join(', ')
+  }
+
+  const handleRegisterSystem = async () => {
+    // Map type to scopes - this matches the gateway's getSystemScopesFromType logic
+    // for the base scopes. The gateway resolver handles the full expansion.
+    await createIntegrationAsync({
+      name: newClientName,
+      scopes:
+        newSystemType === SystemRole.enum.HEALTH
+          ? ['notification-api']
+          : ['recordsearch']
     })
   }
 
@@ -232,13 +165,15 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
       >
         {intl.formatMessage(integrationMessages.pageIntroduction)}
 
+        {isLoading && <Spinner id="system-list-spinner" size={24} />}
+
         <ListViewSimplified>
-          {existingSystems.map((system: System) => (
+          {integrations.map((system: IntegrationItem) => (
             <ListViewItemSimplified
-              key={system.clientId}
+              key={system.id}
               actions={
                 <>
-                  {system.status === SystemStatus.Active ? (
+                  {system.status === 'active' ? (
                     <Pill
                       label={intl.formatMessage(integrationMessages.active)}
                       type="active"
@@ -249,174 +184,17 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                       type="inactive"
                     />
                   )}
-
-                  <ToggleMenu
-                    id={`toggleMenu-${system.clientId}`}
-                    menuItems={getMenuItems(system)}
-                    toggleButton={
-                      <Icon
-                        name="DotsThreeVertical"
-                        color="primary"
-                        size="large"
-                      />
-                    }
-                  />
                 </>
               }
               label={system.name}
               value={systemToLabel(system)}
             />
           ))}
-
-          {systemToToggleActivation && (
-            <ResponsiveModal
-              title={
-                systemToToggleActivation.status === SystemStatus.Active
-                  ? intl.formatMessage(integrationMessages.deactivateClient)
-                  : intl.formatMessage(integrationMessages.activateClient)
-              }
-              contentHeight={50}
-              responsive={false}
-              actions={[
-                <Button
-                  type="tertiary"
-                  id="cancel"
-                  key="cancel"
-                  onClick={() => {
-                    setSystemToToggleActivation(undefined)
-                  }}
-                >
-                  {intl.formatMessage(buttonMessages.cancel)}
-                </Button>,
-
-                systemToToggleActivation.status === SystemStatus.Active ? (
-                  <Button
-                    type="primary"
-                    key="confirm"
-                    id="confirm"
-                    loading={deactivateSystemLoading}
-                    onClick={() => {
-                      deactivateSystem()
-                    }}
-                  >
-                    {intl.formatMessage(buttonMessages.confirm)}
-                  </Button>
-                ) : (
-                  <Button
-                    type="primary"
-                    key="confirm"
-                    id="confirm"
-                    loading={activateSystemLoading}
-                    onClick={() => {
-                      activateSystem()
-                    }}
-                  >
-                    {intl.formatMessage(buttonMessages.confirm)}
-                  </Button>
-                )
-              ]}
-              show={true}
-              handleClose={() => setSystemToToggleActivation(undefined)}
-            >
-              {systemToToggleActivation.status === SystemStatus.Active
-                ? intl.formatMessage(integrationMessages.deactivateClientText)
-                : intl.formatMessage(integrationMessages.activateClientText)}
-            </ResponsiveModal>
-          )}
         </ListViewSimplified>
-        <ResponsiveModal
-          actions={[
-            <Link
-              key="cancel-link"
-              onClick={() => {
-                toggleRevealKeyModal()
-                resetData()
-              }}
-            >
-              {intl.formatMessage(buttonMessages.cancel)}
-            </Link>
-          ]}
-          autoHeight={true}
-          width={512}
-          titleHeightAuto={true}
-          show={toggleKeyModal.modalVisible}
-          handleClose={() => {
-            toggleRevealKeyModal()
-            resetData()
-          }}
-          title={toggleKeyModal.selectedClient?.name ?? ''}
-        >
-          <Text variant="reg16" element="p" id="revealKeyId">
-            {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
-          </Text>
-
-          <Stack alignItems="stretch" direction="column" gap={16}>
-            <Stack alignItems="stretch" direction="column" gap={8}>
-              <Text variant="bold16" element="span">
-                {intl.formatMessage(integrationMessages.clientId)}
-              </Text>
-              <Stack justifyContent="space-between" alignItems="center">
-                <Text variant="reg16" element="span">
-                  {toggleKeyModal.selectedClient?.clientId}
-                </Text>
-                <CopyButton
-                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
-                  copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={toggleKeyModal.selectedClient?.clientId as string}
-                />
-              </Stack>
-            </Stack>
-            <Stack direction="column" alignItems="stretch" gap={8}>
-              <Text variant="bold16" element="span">
-                {intl.formatMessage(integrationMessages.clientSecret)}
-              </Text>
-              {refreshTokenLoading ? (
-                <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
-              ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
-                <Stack justifyContent="space-between" alignItems="center">
-                  <Text variant="reg16" element="span">
-                    {refreshTokenData.refreshSystemSecret?.clientSecret}
-                  </Text>
-                  <CopyButton
-                    copiedLabel={intl.formatMessage(buttonMessages.copied)}
-                    copyLabel={intl.formatMessage(buttonMessages.copy)}
-                    data={
-                      refreshTokenData.refreshSystemSecret
-                        ?.clientSecret as string
-                    }
-                  />
-                </Stack>
-              ) : (
-                <ButtonLink
-                  onClick={() => {
-                    clientRefreshToken(toggleKeyModal.selectedClient?.clientId)
-                  }}
-                >
-                  {intl.formatMessage(buttonMessages.refresh)}
-                </ButtonLink>
-              )}
-            </Stack>
-            <Stack direction="column" alignItems="stretch" gap={8}>
-              <Text variant="bold16" element="span">
-                {intl.formatMessage(integrationMessages.shaSecret)}
-              </Text>
-              <Stack justifyContent="space-between" alignItems="center">
-                <Text variant="reg16" element="span">
-                  {toggleKeyModal.selectedClient?.shaSecret}
-                </Text>
-                <CopyButton
-                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
-                  copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={toggleKeyModal.selectedClient?.shaSecret as string}
-                />
-              </Stack>
-            </Stack>
-          </Stack>
-        </ResponsiveModal>
       </Content>
       <ResponsiveModal
         actions={
-          registerSystemData
+          createResult
             ? []
             : [
                 <Link
@@ -424,7 +202,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                   onClick={() => {
                     toggleModal()
                     clearNewSystemDraft()
-                    resetData()
+                    resetCreate()
                   }}
                 >
                   {intl.formatMessage(buttonMessages.cancel)}
@@ -434,7 +212,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                   id="submitClientForm"
                   disabled={!newSystemType || newClientName === EMPTY_STRING}
                   onClick={() => {
-                    registerSystem()
+                    handleRegisterSystem()
                   }}
                   type="primary"
                 >
@@ -449,21 +227,22 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
         handleClose={() => {
           toggleModal()
           clearNewSystemDraft()
-          resetData()
+          resetCreate()
         }}
         title={
-          registerSystemData?.registerSystem?.system.name ??
-          intl.formatMessage(integrationMessages.createClient)
+          createResult
+            ? newClientName
+            : intl.formatMessage(integrationMessages.createClient)
         }
         id="createClientModal"
       >
         <Text variant="reg16" element="p" id="uniqueKeyId">
-          {!registerSystemData && !registerSystemLoading
+          {!createResult && !isCreating
             ? intl.formatMessage(integrationMessages.newIntegrationDescription)
             : intl.formatMessage(integrationMessages.uniqueKeysDescription)}
         </Text>
 
-        {!registerSystemData && !registerSystemLoading && (
+        {!createResult && !isCreating && (
           <>
             <Field>
               <InputField
@@ -490,9 +269,9 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               >
                 <Select
                   onChange={(val) => {
-                    setNewSystemType(val as SystemType)
+                    setNewSystemType(val)
                   }}
-                  value={newSystemType ?? SystemType.Health}
+                  value={newSystemType}
                   options={[
                     {
                       label: intl.formatMessage(
@@ -551,7 +330,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           </>
         )}
 
-        {!registerSystemData && registerSystemLoading && (
+        {!createResult && isCreating && (
           <>
             <Text variant="bold16" element="span">
               {intl.formatMessage(integrationMessages.clientId)}
@@ -568,7 +347,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           </>
         )}
 
-        {registerSystemData?.registerSystem && (
+        {createResult && (
           <Stack alignItems="stretch" direction="column" gap={16}>
             <Stack alignItems="stretch" direction="column" gap={4}>
               <Text variant="bold16" element="span">
@@ -576,14 +355,12 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               </Text>
               <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
-                  {registerSystemData.registerSystem.system.clientId}
+                  {createResult.clientId}
                 </Text>
                 <CopyButton
                   copiedLabel={intl.formatMessage(buttonMessages.copied)}
                   copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={
-                    registerSystemData.registerSystem.system.clientId as string
-                  }
+                  data={createResult.clientId}
                 />
               </Stack>
             </Stack>
@@ -593,14 +370,12 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               </Text>
               <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
-                  {registerSystemData.registerSystem.clientSecret}
+                  {createResult.clientSecret}
                 </Text>
                 <CopyButton
                   copiedLabel={intl.formatMessage(buttonMessages.copied)}
                   copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={
-                    registerSystemData.registerSystem.clientSecret as string
-                  }
+                  data={createResult.clientSecret}
                 />
               </Stack>
             </Stack>
@@ -610,14 +385,12 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               </Text>
               <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
-                  {registerSystemData.registerSystem.system.shaSecret}
+                  {createResult.shaSecret}
                 </Text>
                 <CopyButton
                   copiedLabel={intl.formatMessage(buttonMessages.copied)}
                   copyLabel={intl.formatMessage(buttonMessages.copy)}
-                  data={
-                    registerSystemData.registerSystem.system.shaSecret as string
-                  }
+                  data={createResult.shaSecret}
                 />
               </Stack>
             </Stack>
@@ -625,54 +398,12 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
         )}
       </ResponsiveModal>
 
-      {systemToDelete && (
-        <DeleteSystemModal
-          system={systemToDelete}
-          loading={systemToDeleteLoading}
-          closeModal={() => setSystemToDelete(undefined)}
-          deleteSystem={deleteSystem}
-        />
-      )}
-
-      {activateSystemData && (
-        <Toast
-          type="success"
-          id="toggleClientActiveStatusToast"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.activateClientStatus)}
-        </Toast>
-      )}
-      {deactivateSystemData && (
-        <Toast
-          type="success"
-          id="toggleClientDeActiveStatusToast"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.deactivateClientStatus)}
-        </Toast>
-      )}
-
-      {systemToDeleteData && (
-        <Toast
-          type="success"
-          id="systemToDeleteSuccess"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.deleteSystemMsg)}
-        </Toast>
-      )}
-
-      {(activateSystemError ||
-        deactivateSystemError ||
-        registerSystemError ||
-        refreshTokenError ||
-        systemToDeleteError) && (
+      {createError && (
         <Toast
           type="error"
           id="toggleClientStatusToast"
           onClose={() => {
-            resetData()
+            resetCreate()
           }}
         >
           {intl.formatMessage(integrationMessages.error)}
@@ -681,3 +412,4 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     </WithFrame>
   )
 }
+

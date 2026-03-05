@@ -6,99 +6,27 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
-#
-# OpenCRVS is also distributed under the terms of the Civil Registration
-# & Healthcare Disclaimer located at http://opencrvs.org/license.
-#
-# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-enum SystemStatus {
-  active
-  deactivated
-}
-
-# SystemType is now just a client-side annotation for display purposes.
-# The actual permissions are determined by the scopes array stored in the database.
-# Gateway converts the type to appropriate scopes when creating a system.
-# WEBHOOK type has been deprecated and removed.
-# REINDEX is hidden from UI - it's managed internally.
+# SystemType determines the scopes that will be assigned to the system.
+# Gateway converts type to scopes before calling the integrations service.
 enum SystemType {
-  NATIONAL_ID
   HEALTH
   RECORD_SEARCH
-  IMPORT_EXPORT
-  CUSTOM
 }
 
-enum IntegratingSystemType {
-  OTHER
-}
-
-type SystemSettings {
-  dailyQuota: Int
-  webhook: [WebhookPermission!]
-  openIdProviderClientId: String
-  openIdProviderBaseUrl: String
-  openIdProviderClaims: String
-}
-
-type System {
-  _id: ID!
+# Result returned when creating a new integration client.
+# clientSecret is only shown once at creation time.
+type RegisterSystemResult {
   clientId: ID!
-  shaSecret: ID!
-  status: SystemStatus!
-  name: String!
-  # Type is now just an annotation - scopes are the source of truth for permissions
-  type: SystemType!
-  integratingSystemType: IntegratingSystemType
-  settings: SystemSettings
+  clientSecret: String!
+  shaSecret: String!
 }
 
-type SystemSecret {
-  system: System!
-  clientSecret: ID!
-}
-
-type WebhookPermission {
-  event: String!
-  permissions: [String!]!
-}
-
-input WebhookInput {
-  event: String!
-  permissions: [String]!
-}
-
-input SystemSettingsInput {
-  dailyQuota: Int
-  webhook: [WebhookInput]
-}
 input SystemInput {
   name: String!
-  # Type determines the scopes that will be assigned to the system.
-  # Gateway converts type to scopes before storing in the database.
   type: SystemType!
-  settings: SystemSettingsInput
-  integratingSystemType: IntegratingSystemType
-}
-
-input UpdatePermissionsInput {
-  clientId: String!
-  webhook: [WebhookInput!]!
-}
-
-type Query {
-  fetchSystem(clientId: ID!): System
 }
 
 type Mutation {
-  reactivateSystem(clientId: ID!): System
-  deactivateSystem(clientId: ID!): System
-  registerSystem(system: SystemInput): SystemSecret
-  refreshSystemSecret(clientId: String!): SystemSecret
-  updatePermissions(setting: UpdatePermissionsInput!): System
-  deleteSystem(clientId: ID!): System
+  registerSystem(system: SystemInput): RegisterSystemResult
 }

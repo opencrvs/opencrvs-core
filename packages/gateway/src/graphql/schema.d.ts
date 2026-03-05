@@ -47,7 +47,6 @@ export interface GQLQuery {
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getUserRoles: Array<GQLUserRole>
-  fetchSystem?: GQLSystem
 }
 
 export interface GQLMutation {
@@ -97,12 +96,7 @@ export interface GQLMutation {
   resendInvite?: string
   usernameReminder?: string
   resetPasswordInvite?: string
-  reactivateSystem?: GQLSystem
-  deactivateSystem?: GQLSystem
-  registerSystem?: GQLSystemSecret
-  refreshSystemSecret?: GQLSystemSecret
-  updatePermissions?: GQLSystem
-  deleteSystem?: GQLSystem
+  registerSystem?: GQLRegisterSystemResult
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
 }
@@ -613,21 +607,15 @@ export interface GQLAvatarInput {
   data: string
 }
 
-export interface GQLSystemSecret {
-  system: GQLSystem
+export interface GQLRegisterSystemResult {
+  clientId: string
   clientSecret: string
+  shaSecret: string
 }
 
 export interface GQLSystemInput {
   name: string
   type: GQLSystemType
-  settings?: GQLSystemSettingsInput
-  integratingSystemType?: GQLIntegratingSystemType
-}
-
-export interface GQLUpdatePermissionsInput {
-  clientId: string
-  webhook: Array<GQLWebhookInput>
 }
 
 export interface GQLBookMarkedSearches {
@@ -980,9 +968,7 @@ export const enum GQLSystemStatus {
 export const enum GQLSystemType {
   NATIONAL_ID = 'NATIONAL_ID',
   HEALTH = 'HEALTH',
-  RECORD_SEARCH = 'RECORD_SEARCH',
-  IMPORT_EXPORT = 'IMPORT_EXPORT',
-  CUSTOM = 'CUSTOM'
+  RECORD_SEARCH = 'RECORD_SEARCH'
 }
 
 export const enum GQLIntegratingSystemType {
@@ -2400,12 +2386,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendInvite?: MutationToResendInviteResolver<TParent>
   usernameReminder?: MutationToUsernameReminderResolver<TParent>
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
-  reactivateSystem?: MutationToReactivateSystemResolver<TParent>
-  deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>
-  refreshSystemSecret?: MutationToRefreshSystemSecretResolver<TParent>
-  updatePermissions?: MutationToUpdatePermissionsResolver<TParent>
-  deleteSystem?: MutationToDeleteSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
 }
