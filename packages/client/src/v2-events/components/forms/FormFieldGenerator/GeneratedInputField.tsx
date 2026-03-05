@@ -279,10 +279,9 @@ export const GeneratedInputField = <T extends FieldConfig>(
       ...field.inputFieldProps,
       touched: anySubfieldTouched,
       // skip when nested errors are there
-      error:
-        typeof field.inputFieldProps.error === 'string'
-          ? field.inputFieldProps.error
-          : ''
+      error: field.config.configuration?.showParentFieldError
+        ? field.inputFieldProps.error
+        : undefined
     }
 
     return (
