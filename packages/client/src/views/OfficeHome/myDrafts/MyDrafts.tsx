@@ -24,10 +24,10 @@ import {
   DRAFT_MARRIAGE_FORM_PAGE
 } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
+import { plainDateToLocalDate } from '@opencrvs/commons/client'
 import {
   formattedDuration,
-  isValidPlainDate,
-  plainDateToLocalDate
+  isValidPlainDate
 } from '@client/utils/date-formatting'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import { EventType } from '@client/utils/gateway'

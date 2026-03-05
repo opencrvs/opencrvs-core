@@ -43,10 +43,10 @@ import {
 import { IStoreState } from '@client/store'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
+import { plainDateToLocalDate } from '@opencrvs/commons/client'
 import {
   formattedDuration,
-  isValidPlainDate,
-  plainDateToLocalDate
+  isValidPlainDate
 } from '@client/utils/date-formatting'
 import { RegStatus } from '@client/utils/gateway'
 import type {

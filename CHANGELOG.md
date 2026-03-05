@@ -15,6 +15,10 @@ query: {
 }
 ```
 
+### Bug fixes
+
+Fix the rendered date on the review page and the certificate display issue in negative UTC offset time zones. [#11955](https://github.com/opencrvs/opencrvs-core/issues/11955)
+
 ## 1.9.10
 
 ### New features
