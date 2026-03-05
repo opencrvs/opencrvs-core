@@ -34,7 +34,8 @@ import { IAuthHeader } from '@metrics/features/registration'
 import {
   fetchLocation,
   fetchFHIR,
-  fetchChildLocationsByParentId
+  fetchChildLocationsByParentId,
+  fetchFromResource
 } from '@metrics/api'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
@@ -49,6 +50,9 @@ export const LABEL_FOMRAT = {
 export interface IPoint {
   time: string
   count: number
+}
+export interface ICrudeDeathRate {
+  crudeDeathRate: number
 }
 
 export interface IMonthRangeFilter {
@@ -207,6 +211,18 @@ export const fetchEstimateByLocation = async (
       locationLevel: getLocationLevelFromLocationData(locationData)
     }
   }
+
+  if (event === EVENT_TYPE.DEATH) {
+    const crudeDeathRateResponse: ICrudeDeathRate = await fetchFromResource(
+      'crude-death-rate',
+      authHeader
+    )
+
+    for (let i = 0; i < yearArray.length; i++) {
+      crudArray.push(Number(crudeDeathRateResponse.crudeDeathRate))
+    }
+  }
+
   for (let i = 0; i < yearArray.length; i++) {
     totalEstimation =
       totalEstimation +
