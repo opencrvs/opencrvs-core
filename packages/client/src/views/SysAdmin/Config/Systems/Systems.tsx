@@ -143,10 +143,11 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }
 
   const handleRegisterSystem = async () => {
-    await createIntegration({
-      name: newClientName,
-      type: newSystemType as 'HEALTH' | 'RECORD_SEARCH'
-    })
+    const type = newSystemType
+    if (type !== 'HEALTH' && type !== 'RECORD_SEARCH') {
+      return
+    }
+    await createIntegration({ name: newClientName, type })
   }
 
   return (

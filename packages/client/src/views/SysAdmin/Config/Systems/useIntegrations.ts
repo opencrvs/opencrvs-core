@@ -64,7 +64,6 @@ export function useIntegrations() {
   const trpc = useTRPC()
   const queryClient = useQueryClient()
   const eventConfigurations = useEventConfigurations()
-  const eventIds = eventConfigurations.map((config) => config.id)
 
   // List integrations via TRPC
   const listQuery = useQuery(trpc.integrations.list.queryOptions())
@@ -72,6 +71,7 @@ export function useIntegrations() {
   // Create integration via TRPC directly
   const createMutation = useMutation({
     mutationFn: (input: { name: string; type: SystemIntegrationType }) => {
+      const eventIds = eventConfigurations.map((config) => config.id)
       const scopes = getSystemScopesFromType(input.type, eventIds)
       return trpcClient.integrations.create.mutate({ name: input.name, scopes })
     },
