@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
@@ -20,15 +21,19 @@ import {
   encodeScope,
   EventConfig,
   EventDocument,
+  EventIndex,
   generateActionDeclarationInput,
   generateRandomSignature,
   generateRegistrationNumber,
   generateUuid,
   getUUID,
+  JurisdictionFilter,
   Scope,
   SCOPES,
   TokenUserType,
-  TokenWithBearer
+  TokenWithBearer,
+  UserFilter,
+  UUID
 } from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
@@ -448,7 +453,7 @@ export async function seedEvent(
     rng
   }: {
     eventConfig: EventConfig
-    actions: DeclarationActionType[]
+    actions: (DeclarationActionType | typeof ActionType.UNASSIGN)[]
     user: Omit<UserContext, 'type'>
     rng: () => number
   }
@@ -476,8 +481,23 @@ export async function seedEvent(
       annotation: null
     }
 
+    const dateNow = Date.now()
+
     const generatedActions: NewEventActions[] = actions.flatMap(
       (actionType): NewEventActions[] => {
+        if (actionType === ActionType.UNASSIGN) {
+          return [
+            {
+              ...baseAction,
+              actionType,
+              transactionId: generateUuid(rng),
+              status: ActionStatus.Accepted,
+              declaration: {},
+              createdAt: new Date(dateNow + 1).toISOString() // make sure unassign comes after assign
+            }
+          ]
+        }
+
         return [
           {
             ...baseAction,
@@ -519,6 +539,7 @@ export async function seedEvent(
           actionType: ActionTypes.enum.ASSIGN,
           assignedTo: user.id,
           transactionId: generateUuid(rng),
+          createdAt: new Date(dateNow).toISOString(),
           status: ActionStatus.Accepted
         },
         ...generatedActions
@@ -528,4 +549,121 @@ export async function seedEvent(
       )
       .execute()
   })
+}
+
+/** Determine if an event index matches the provided scope filters. */
+export function eventMatchesScope({
+  eventIndex,
+  user,
+  placeOfEvent,
+  declaredBy,
+  registeredBy,
+  declaredIn,
+  registeredIn,
+  event,
+  isUnderAdministrativeArea
+}: {
+  eventIndex: EventIndex
+  user: { id: UUID; primaryOfficeId: UUID; administrativeAreaId: UUID | null }
+  placeOfEvent?: JurisdictionFilter
+  declaredBy?: UserFilter
+  registeredBy?: UserFilter
+  declaredIn?: JurisdictionFilter
+  registeredIn?: JurisdictionFilter
+  event?: string[]
+  isUnderAdministrativeArea: (
+    locationId: UUID,
+    adminAreaId: UUID | null
+  ) => boolean
+}): boolean {
+  if (declaredBy === UserFilter.enum.user) {
+    if (eventIndex.legalStatuses.DECLARED?.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (registeredBy === UserFilter.enum.user) {
+    if (eventIndex.legalStatuses.REGISTERED?.createdBy !== user.id) {
+      return false
+    }
+  }
+
+  if (declaredIn === JurisdictionFilter.enum.location) {
+    if (
+      eventIndex.legalStatuses.DECLARED?.createdAtLocation !==
+      user.primaryOfficeId
+    ) {
+      return false
+    }
+  }
+
+  if (placeOfEvent === JurisdictionFilter.enum.location) {
+    if (eventIndex.placeOfEvent !== user.primaryOfficeId) {
+      return false
+    }
+  }
+
+  if (placeOfEvent === JurisdictionFilter.enum.administrativeArea) {
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.placeOfEvent),
+        user.administrativeAreaId
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (declaredIn === JurisdictionFilter.enum.administrativeArea) {
+    const declaredLocation =
+      eventIndex.legalStatuses.DECLARED?.createdAtLocation
+
+    if (!declaredLocation) {
+      return false
+    }
+
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.legalStatuses.DECLARED?.createdAtLocation),
+        user.administrativeAreaId
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (registeredIn === JurisdictionFilter.enum.location) {
+    if (
+      eventIndex.legalStatuses.REGISTERED?.createdAtLocation !==
+      user.primaryOfficeId
+    ) {
+      return false
+    }
+  }
+
+  if (registeredIn === JurisdictionFilter.enum.administrativeArea) {
+    const registeredLocation =
+      eventIndex.legalStatuses.REGISTERED?.createdAtLocation
+
+    if (!registeredLocation) {
+      return false
+    }
+
+    if (
+      !isUnderAdministrativeArea(
+        UUID.parse(eventIndex.legalStatuses.REGISTERED?.createdAtLocation),
+        user.administrativeAreaId
+      )
+    ) {
+      return false
+    }
+  }
+
+  if (event) {
+    if (!event.includes(eventIndex.type)) {
+      return false
+    }
+  }
+
+  return true
 }

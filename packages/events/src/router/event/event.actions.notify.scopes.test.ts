@@ -11,15 +11,15 @@
 
 import fc from 'fast-check'
 import {
-  ActionTypes,
-  DeclarationActionType,
+  ActionType,
   EventDocument,
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
   createPrng,
   encodeScope,
-  getCurrentEventState
+  getCurrentEventState,
+  getUUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -31,7 +31,7 @@ import { setupHierarchyWithUsers } from '@events/tests/generators'
 import { getClient } from '../../storage/postgres/events'
 import { EventNotFoundError } from '../../service/events/events'
 
-test('Check scopes against get.event', async () => {
+test('Check scopes against event.actions.notify', async () => {
   const { users, isUnderAdministrativeArea } = await setupHierarchyWithUsers()
 
   // Client that can read all events,  used to fetch events that test clients cannot access for comparison.
@@ -44,17 +44,11 @@ test('Check scopes against get.event', async () => {
     })
   ])
 
+  // 1. Seed EVENTS at 'CREATED' state with various combinations of users and actions.
   const rng = createPrng(1243453)
-
   const eventsDb = getClient()
 
-  // 1. Seed events with various combinations of users and actions.
-  const actionsArb = fc.constantFrom<DeclarationActionType[]>(
-    [ActionTypes.enum.DECLARE],
-    [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
-  )
-
-  const usersArb = fc.constantFrom(...users)
+  const testUsers = fc.constantFrom(...users)
 
   const eventConfigArb = fc.constantFrom(tennisClubMembershipEvent, {
     ...tennisClubMembershipEvent,
@@ -63,17 +57,16 @@ test('Check scopes against get.event', async () => {
 
   const eventSeedArb = fc.record({
     eventConfig: eventConfigArb,
-    actions: actionsArb,
-    user: usersArb
+    user: testUsers
   })
-  const sampleSize = 200
 
+  const sampleSize = 200
   const sampledEvents = fc.sample(eventSeedArb, sampleSize)
 
   for (const seed of sampledEvents) {
     await seedEvent(eventsDb, {
       eventConfig: seed.eventConfig,
-      actions: seed.actions,
+      actions: [ActionType.UNASSIGN],
       user: seed.user,
       rng
     })
@@ -93,13 +86,7 @@ test('Check scopes against get.event', async () => {
     { nil: undefined }
   )
 
-  const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
-    nil: undefined
-  })
-
-  const testUsers = fc.constantFrom(...users)
-
-  const eventIdsArb = fc.constantFrom(...events.map((e) => e.id))
+  const eventIds = events.map(({ id }) => id)
   const eventTypes = fc.option(
     fc.constantFrom<string[]>(
       [TENNIS_CLUB_MEMBERSHIP],
@@ -108,50 +95,54 @@ test('Check scopes against get.event', async () => {
     ),
     { nil: undefined }
   )
+
   const scopeCombinations = fc.record({
-    eventId: eventIdsArb,
     user: testUsers,
-    declaredIn: jurisdictionOptions,
-    declaredBy: userOptions,
-    registeredIn: jurisdictionOptions,
-    registeredBy: userOptions,
-    event: eventTypes,
-    placeOfEvent: jurisdictionOptions
+    placeOfEvent: jurisdictionOptions,
+    event: eventTypes
   })
 
   // 4. Property based test to verify each combination works as expected.
   await fc.assert(
     fc.asyncProperty(
       scopeCombinations,
-      async ({
-        eventId,
-        user,
-        declaredIn,
-        declaredBy,
-        event,
-        registeredIn,
-        registeredBy,
-        placeOfEvent
-      }) => {
-        const searchScope = encodeScope({
-          type: 'record.read',
+      async ({ user, event, placeOfEvent }) => {
+        const notifyScope = encodeScope({
+          type: 'record.notify',
           options: {
             event,
-            declaredIn,
-            declaredBy,
-            registeredIn,
-            registeredBy,
             placeOfEvent
           }
         })
 
+        // Pick random event for the case. Exclude used events.
+        const randomIndex = Math.floor(Math.random() * eventIds.length)
+        const [eventId] = eventIds.splice(randomIndex, 1)
+
         // 5. Create test client with the generated scope and try to fetch the event.
-        const testClient = createTestClient(user, [searchScope])
+        const testClient = createTestClient(user, [notifyScope])
+
+        await expect(
+          testClient.event.actions.assignment.assign({
+            eventId,
+            transactionId: getUUID(),
+            assignedTo: user.id,
+            type: ActionType.ASSIGN
+          })
+        ).resolves.not.toThrow() // Sanity check to ensure the generated scope is valid and does not cause errors unrelated to permissions.
+
         let result:
           | { success: true; event: EventDocument }
           | { success: false; event: EventDocument } // fetched as admin because the test user could not access it.
         try {
-          const response = await testClient.event.get({ eventId })
+          // We are not testing the notify action itself here, just if the scopes are correctly applied, payload is arbitrary as long as it is valid for the action.
+          const response = await testClient.event.actions.notify.request({
+            eventId,
+            transactionId: getUUID(),
+            declaration: {
+              'applicant.email': 'test@openrvs.org'
+            }
+          })
           result = { success: true, event: response }
         } catch (error) {
           if (error instanceof EventNotFoundError) {
@@ -175,19 +166,19 @@ test('Check scopes against get.event', async () => {
 
         const eventIndex = getCurrentEventState(result.event, config)
         // 6. Verify that the result matches the expected outcome based on scope filters.
-        const isReadableWithScope = eventMatchesScope({
+        const isAccessibleWithScope = eventMatchesScope({
           eventIndex,
           user,
-          declaredBy,
-          registeredBy,
-          declaredIn,
-          registeredIn,
+          declaredBy: undefined,
+          registeredBy: undefined,
+          declaredIn: undefined,
+          registeredIn: undefined,
           event,
           placeOfEvent,
           isUnderAdministrativeArea
         })
 
-        expect(result.success).toBe(isReadableWithScope)
+        expect(result.success).toBe(isAccessibleWithScope)
       }
     ),
     {
