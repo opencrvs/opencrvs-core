@@ -107,7 +107,7 @@ export const integrationsRouter = router({
     .mutation(async ({ input }) => {
       const systemClient = await getSystemClientById(input.client_id)
 
-      if (!systemClient || !systemClient.secretHash || !systemClient.salt) {
+      if (!systemClient.secretHash || !systemClient.salt) {
         throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 
