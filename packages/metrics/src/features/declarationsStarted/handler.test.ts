@@ -24,8 +24,7 @@ jest.mock('../metrics/utils', () => {
   const originalModule = jest.requireActual('../metrics//utils')
   return {
     __esModule: true,
-    ...originalModule,
-    getRegistrationTargetDays: () => 45
+    ...originalModule
   }
 })
 

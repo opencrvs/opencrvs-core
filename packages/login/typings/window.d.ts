@@ -19,6 +19,7 @@ interface Window {
     INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     CLIENT_APP_URL: string
     PHONE_NUMBER_PATTERN: RegExp
+    LOGIN_BACKGROUND: { backgroundColor?: string; backgroundImage?: string; imageFit?: string }
     SENTRY: string
   }
 }

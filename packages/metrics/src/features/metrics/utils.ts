@@ -33,11 +33,10 @@ import {
 import { IAuthHeader } from '@metrics/features/registration'
 import {
   fetchLocation,
-  fetchFromResource,
   fetchFHIR,
-  fetchChildLocationsByParentId
+  fetchChildLocationsByParentId,
+  fetchFromResource
 } from '@metrics/api'
-import { getApplicationConfig } from '@metrics/configApi'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -52,7 +51,6 @@ export interface IPoint {
   time: string
   count: number
 }
-
 export interface ICrudeDeathRate {
   crudeDeathRate: number
 }
@@ -213,6 +211,7 @@ export const fetchEstimateByLocation = async (
       locationLevel: getLocationLevelFromLocationData(locationData)
     }
   }
+
   if (event === EVENT_TYPE.DEATH) {
     const crudeDeathRateResponse: ICrudeDeathRate = await fetchFromResource(
       'crude-death-rate',
@@ -433,32 +432,6 @@ export function getMonthRangeFilterListFromTimeRage(
   }
 
   return monthFilterList
-}
-
-export async function getRegistrationTargetDays(
-  event: string,
-  authorization: string
-) {
-  const applicationConfig = await getApplicationConfig(authorization)
-  const targetDays =
-    event === EVENT_TYPE.BIRTH
-      ? applicationConfig.BIRTH?.REGISTRATION_TARGET
-      : event === EVENT_TYPE.DEATH
-        ? applicationConfig.DEATH?.REGISTRATION_TARGET
-        : applicationConfig.MARRIAGE?.REGISTRATION_TARGET
-  return targetDays
-}
-
-export async function getRegistrationLateTargetDays(
-  event: string,
-  authorization: string
-): Promise<number | null> {
-  const applicationConfig = await getApplicationConfig(authorization)
-  const targetDays =
-    event === EVENT_TYPE.BIRTH
-      ? applicationConfig.BIRTH?.LATE_REGISTRATION_TARGET
-      : null
-  return targetDays
 }
 
 export function getPercentage(value: number, total: number, decimalPoint = 2) {

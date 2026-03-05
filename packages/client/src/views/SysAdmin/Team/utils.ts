@@ -98,10 +98,3 @@ export function getUserAuditDescription(
 ): MessageDescriptor | undefined {
   return AuditDescriptionMapping[status] || undefined
 }
-
-function checkExternalValidationStatus(status?: string | null): boolean {
-  return !(
-    !window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE &&
-    status === 'WAITING_VALIDATION'
-  )
-}
