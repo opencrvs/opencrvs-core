@@ -111,7 +111,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   const {
     integrations,
     isLoading,
-    createIntegrationAsync,
+    createIntegration,
     createResult,
     isCreating,
     createError,
@@ -128,18 +128,25 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }
 
   const systemToLabel = (system: IntegrationItem) => {
+    // Derive a human-readable type label from scopes
+    if (system.scopes.includes('notification-api')) {
+      return intl.formatMessage(integrationMessages.integrationType, {
+        type: 'HEALTH'
+      })
+    }
+    if (system.scopes.includes('recordsearch')) {
+      return intl.formatMessage(integrationMessages.integrationType, {
+        type: 'RECORD_SEARCH'
+      })
+    }
     return system.scopes.join(', ')
   }
 
   const handleRegisterSystem = async () => {
-    // Map type to scopes - this matches the gateway's getSystemScopesFromType logic
-    // for the base scopes. The gateway resolver handles the full expansion.
-    await createIntegrationAsync({
+    // The gateway resolver handles type→scopes conversion
+    await createIntegration({
       name: newClientName,
-      scopes:
-        newSystemType === SystemRole.enum.HEALTH
-          ? ['notification-api']
-          : ['recordsearch']
+      type: newSystemType
     })
   }
 

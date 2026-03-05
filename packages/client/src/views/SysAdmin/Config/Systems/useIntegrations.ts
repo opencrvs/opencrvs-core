@@ -10,7 +10,13 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useTRPC, trpcClient } from '@client/v2-events/trpc'
+import { useTRPC } from '@client/v2-events/trpc'
+import { useMutation as useGqlMutation } from '@apollo/client'
+import { registerSystem } from './mutations'
+import {
+  RegisterSystemMutation,
+  RegisterSystemMutationVariables
+} from '@client/utils/gateway'
 
 /** Data shape returned by integrations.list */
 export interface IntegrationItem {
@@ -20,7 +26,7 @@ export interface IntegrationItem {
   status: string
 }
 
-/** Data shape returned by integrations.create */
+/** Data shape returned by registerSystem GraphQL mutation */
 export interface CreateIntegrationResult {
   clientId: string
   shaSecret: string
@@ -31,30 +37,48 @@ export function useIntegrations() {
   const trpc = useTRPC()
   const queryClient = useQueryClient()
 
+  // List integrations via TRPC
   const listQuery = useQuery(trpc.integrations.list.queryOptions())
 
-  const createMutation = useMutation({
-    mutationFn: (input: { name: string; scopes: string[] }) =>
-      trpcClient.integrations.create.mutate(input),
-    onSuccess: () => {
+  // Create integration via GraphQL (gateway handles type→scopes conversion)
+  const [registerSystemMutation, registerSystemState] = useGqlMutation<
+    RegisterSystemMutation,
+    RegisterSystemMutationVariables
+  >(registerSystem, {
+    onCompleted: () => {
       queryClient.invalidateQueries({
         queryKey: trpc.integrations.list.queryKey()
       })
     }
   })
 
+  const createIntegration = async (input: { name: string; type: string }) => {
+    return registerSystemMutation({
+      variables: {
+        system: {
+          name: input.name,
+          type: input.type as RegisterSystemMutationVariables['system'] extends
+            | infer T
+            | undefined
+            ? T extends { type: infer U }
+              ? U
+              : never
+            : never
+        }
+      }
+    })
+  }
+
+  const createResult = registerSystemState.data?.registerSystem ?? null
+
   return {
     integrations: (listQuery.data ?? []) as IntegrationItem[],
     isLoading: listQuery.isLoading,
     isError: listQuery.isError,
-    createIntegration: createMutation.mutate,
-    createIntegrationAsync: createMutation.mutateAsync,
-    createResult: createMutation.data as
-      | CreateIntegrationResult
-      | null
-      | undefined,
-    isCreating: createMutation.isPending,
-    createError: createMutation.error,
-    resetCreate: createMutation.reset
+    createIntegration,
+    createResult: createResult as CreateIntegrationResult | null,
+    isCreating: registerSystemState.loading,
+    createError: registerSystemState.error,
+    resetCreate: registerSystemState.reset
   }
 }

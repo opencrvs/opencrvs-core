@@ -9,5 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// System client mutations have been migrated to TRPC integrations endpoints.
-// See useIntegrations.ts for the new implementation.
+import { gql } from '@apollo/client'
+
+// System listing is done via TRPC integrations.list (see useIntegrations.ts).
+// The registerSystem mutation goes through Gateway which handles
+// type-to-scopes conversion before calling the events service.
+export const registerSystem = gql`
+  mutation registerSystem($system: SystemInput) {
+    registerSystem(system: $system) {
+      clientId
+      clientSecret
+      shaSecret
+    }
+  }
+`
