@@ -36,3 +36,6 @@ grafana
 deploy_key
 .lh
 .vscode
+
+# local markdown files
+*.local.md
