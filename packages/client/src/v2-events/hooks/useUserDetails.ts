@@ -39,9 +39,9 @@ const messages = defineMessages({
 
 export function useUserDetails() {
   const intl = useIntl()
-  const { getUser } = useUsers()
+  const { getUser, getSystem } = useUsers()
   const users = getUser.getAllCached()
-  const { systems } = useSelector(getOfflineData)
+  const systems = getSystem.getAllCached()
 
   const getUserDetails = ({
     createdByUserType,
@@ -58,16 +58,6 @@ export function useUserDetails() {
     name: string
     role: string | undefined
   } => {
-
-    if (createdByUserType === 'system') {
-      const system = systems.find((s) => s._id === createdBy)
-      return {
-        type: 'integration',
-        name: system?.name ?? intl.formatMessage(messages.systemDefaultName),
-        role: undefined
-      } as const
-    }
-
     const role = intl.formatMessage(messages.role, {
       role: createdByRole || ''
     })
@@ -81,19 +71,31 @@ export function useUserDetails() {
     }
 
     const user = users.find((u) => u.id === createdBy)
-    const splitNames = user?.name
-      ? personNameFromV1ToV2(user.name)
-      : {
-          firstname: '',
-          middlename: '',
-          surname: ''
-        }
+    const system = systems.find(
+      (s) => s.id === createdBy || s.legacyId === createdBy
+    )
+    if(system) {
+      return {
+        type: 'integration',
+        name: system.name,
+        role
+      } as const
+    }
+
+    if(!user) {
+      return {
+        type: 'user',
+        name: 'Missing user',
+        role
+      } as const
+    }
+
 
     return {
       type: 'user',
-      name: user ? getUsersFullName(user.name, intl.locale) : 'Missing user',
+      name: getUsersFullName(user.name, intl.locale),
       role,
-      ...splitNames
+      ...personNameFromV1ToV2(user.name)
     } as const
   }
 

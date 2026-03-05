@@ -21,6 +21,7 @@ export function createProductionEnvironmentServer() {
     NODE_ENV: 'production',
     AUTH_HOST: '0.0.0.0',
     AUTH_PORT: '4040',
+    EVENTS_URL: 'http://localhost:5555/',
     CLIENT_APP_URL: 'http://localhost:3000/',
     COUNTRY_CONFIG_URL_EXTERNAL: 'http://localhost:3040/',
     COUNTRY_CONFIG_URL_INTERNAL: 'http://localhost:3040/',

@@ -52,7 +52,8 @@ export const System = z.object({
   administrativeAreaId: z.undefined().optional(),
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
-  fullHonorificName: z.string().optional()
+  fullHonorificName: z.string().optional(),
+  legacyId: z.string().optional()
 })
 export type System = z.infer<typeof System>
 
