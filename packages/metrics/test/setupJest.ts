@@ -55,7 +55,6 @@ jest.mock('@metrics/configApi', () => {
         RESOURCES_URL: 'http://localhost:3040',
         APPLICATION_NAME: 'Farajaland CRVS',
         PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
-        NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
         CURRENCY: {
           isoCode: 'ZMW',
           languagesAndCountry: ['en-ZM']

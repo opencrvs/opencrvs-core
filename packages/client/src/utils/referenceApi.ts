@@ -125,7 +125,6 @@ export interface IApplicationConfig {
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   PHONE_NUMBER_PATTERN: RegExp | string
-  NID_NUMBER_PATTERN: RegExp
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
   SEARCH_DEFAULT_CRITERIA?: SearchCriteriaType

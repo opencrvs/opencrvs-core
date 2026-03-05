@@ -647,30 +647,6 @@ export const oneOf = (
   }
 }
 
-export const isAValidNIDNumberFormat = (value: string): boolean => {
-  const pattern = window.config.NID_NUMBER_PATTERN
-  return new RegExp(pattern).test(value)
-}
-
-export const validIDNumber =
-  (typeOfID: string): Validation =>
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  (value: any) => {
-    value = (value && value.toString()) || ''
-
-    const cast = value as string
-    const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()
-    if (typeOfID === NATIONAL_ID) {
-      if (isAValidNIDNumberFormat(trimmedValue) || !trimmedValue) {
-        return undefined
-      }
-
-      return {
-        message: messages.validNationalId
-      }
-    }
-    return undefined
-  }
 export const duplicateIDNumber =
   (fieldToDuplicateCheck: string): Validation =>
   (value: IFormFieldValue, drafts) => {

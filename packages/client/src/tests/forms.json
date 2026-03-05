@@ -1051,10 +1051,6 @@
                   "initialValue": "",
                   "validator": [
                     {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
-                    {
                       "operation": "duplicateIDNumber",
                       "parameters": ["deceased.deceasedID"]
                     },
@@ -2225,10 +2221,6 @@
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
-                    {
                       "operation": "duplicateIDNumber",
                       "parameters": ["father.iD"]
                     }
@@ -2754,10 +2746,6 @@
                   "required": false,
                   "initialValue": "",
                   "validate": [
-                    {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
                     {
                       "operation": "duplicateIDNumber",
                       "parameters": ["mother.iD"]
@@ -3649,10 +3637,6 @@
                   "required": false,
                   "initialValue": "",
                   "validate": [
-                    {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
                     {
                       "operation": "duplicateIDNumber",
                       "parameters": ["informant.informantID"]
@@ -4766,10 +4750,6 @@
                   "required": false,
                   "initialValue": "",
                   "validator": [
-                    {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
                     {
                       "operation": "duplicateIDNumber",
                       "parameters": ["deceased.deceasedID"]
@@ -6689,10 +6669,6 @@
                   "initialValue": "",
                   "validator": [
                     {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
-                    {
                       "operation": "duplicateIDNumber",
                       "parameters": ["deceased.deceasedID"]
                     },
@@ -8065,10 +8041,6 @@
                   "initialValue": "",
                   "validator": [
                     {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
-                    {
                       "operation": "duplicateIDNumber",
                       "parameters": ["bride.iD"]
                     }
@@ -9316,10 +9288,6 @@
                   "required": false,
                   "initialValue": "",
                   "validator": [
-                    {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
                     {
                       "operation": "duplicateIDNumber",
                       "parameters": ["groom.iD"]

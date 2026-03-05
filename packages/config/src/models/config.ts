@@ -24,7 +24,6 @@ export interface IApplicationConfigurationModel extends Document {
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   PHONE_NUMBER_PATTERN: RegExp
-  NID_NUMBER_PATTERN: string
 }
 
 const countryLogoSchema = new Schema<ICountryLogo>({
@@ -46,8 +45,7 @@ const configSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   COUNTRY_LOGO: { type: countryLogoSchema, required: false },
   CURRENCY: { type: currencySchema, required: false },
-  PHONE_NUMBER_PATTERN: { type: String, required: false },
-  NID_NUMBER_PATTERN: { type: String, required: false }
+  PHONE_NUMBER_PATTERN: { type: String, required: false }
 })
 
 export default model<IApplicationConfigurationModel>('Config', configSchema)

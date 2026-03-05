@@ -137,7 +137,6 @@ const applicationConfigResponseValidation = Joi.object({
     })
     .required(),
   PHONE_NUMBER_PATTERN: Joi.string().required(),
-  NID_NUMBER_PATTERN: Joi.string().required(),
   USER_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   SEARCH_DEFAULT_CRITERIA: Joi.string()

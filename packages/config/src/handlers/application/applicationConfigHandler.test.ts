@@ -43,7 +43,6 @@ const mockConfig = {
     languagesAndCountry: ['en-ZM']
   },
   PHONE_NUMBER_PATTERN: '^0(7|9)[0-9]{8}$',
-  NID_NUMBER_PATTERN: '^[0-9]{10}$',
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
