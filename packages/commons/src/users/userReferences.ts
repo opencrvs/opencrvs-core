@@ -43,9 +43,7 @@ function isJurisdictionFilter(
   }
 
   // Do this instead of using safeParse for performance reasons.
-  const allowedJurisdictionFilters: string[] = Object.values(
-    JurisdictionFilter.enum
-  )
+  const allowedJurisdictionFilters: string[] = JurisdictionFilter.options
   return allowedJurisdictionFilters.includes(jurisdiction)
 }
 
