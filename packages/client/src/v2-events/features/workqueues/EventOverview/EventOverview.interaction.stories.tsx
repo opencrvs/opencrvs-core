@@ -89,7 +89,7 @@ export const WithConfigurableSummaryFieldHavingEventMetadataValue: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
