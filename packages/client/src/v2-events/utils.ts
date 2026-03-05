@@ -35,7 +35,6 @@ import {
   DefaultAddressFieldValue,
   AdministrativeArea,
   ActionType,
-  RecordScopeTypeV2,
   getAcceptedScopesByType
 } from '@opencrvs/commons/client'
 
