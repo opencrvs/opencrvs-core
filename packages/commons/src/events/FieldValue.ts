@@ -25,6 +25,8 @@ import {
   QrReaderFieldValue,
   IdReaderFieldValue
 } from './CompositeFieldValue'
+import { PlainDate, plainDateToLocalDate } from './PlainDate'
+export { PlainDate, plainDateToLocalDate }
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
@@ -40,13 +42,6 @@ import {
 
 export const TextValue = z.string()
 export const NonEmptyTextValue = TextValue.min(1)
-
-export const DateValue = z
-  .string()
-  .date()
-  .describe('Date in the format YYYY-MM-DD')
-
-export type DateValue = z.infer<typeof DateValue>
 
 export const AgeValue = z.object({
   age: z.number(),
@@ -69,10 +64,10 @@ export const SelectDateRangeValue = z.enum([
 
 export const DateRangeFieldValue = z
   .object({
-    start: DateValue,
-    end: DateValue
+    start: PlainDate,
+    end: PlainDate
   })
-  .or(DateValue)
+  .or(PlainDate)
   .describe(
     'Date range with start and end dates in the format YYYY-MM-DD. Inclusive start, exclusive end.'
   )
@@ -105,7 +100,7 @@ export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 const LeafFieldValues = z.union([
   AddressFieldValue,
   TextValue,
-  DateValue,
+  PlainDate,
   AgeValue,
   TimeValue,
   DateRangeFieldValue,
@@ -139,6 +134,7 @@ export const DataFieldValue = z
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
 export type FieldValue = LeafFieldValues | DataFieldValue | FieldGroupValue
+
 export const FieldValue: z.ZodType<FieldValue> = z.union([
   LeafFieldValues,
   DataFieldValue,
@@ -149,12 +145,12 @@ export const FieldValue: z.ZodType<FieldValue> = z.union([
 // When multiple schemas pass validation (safeParse succeeds),
 // we’ll pick the one that appears *earlier* in this list.
 //
-// Example: if both TextValue and DateValue succeed for "2050-01-01",
+// Example: if both TextValue and PlainDate succeed for "2050-01-01",
 // we choose "TextValue" because it's higher priority here.
 const PRIORITY_ORDER = [
   'NameFieldUpdateValue',
   'DateRangeFieldValue',
-  'DateValue',
+  'PlainDate',
   'TextValue',
   'TimeValue',
   'AgeUpdateValue',
@@ -204,7 +200,7 @@ export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
     //   "2050-01-01",
     //   "2050-01-01"
     // ]
-    // description [ "TextValue", "DateValue", "DateRangeFieldValue" ]
+    // description [ "TextValue", "PlainDate", "DateRangeFieldValue" ]
     // best "DateRangeFieldValue"
     //
     // Here all three schemas think the value is valid,
@@ -217,7 +213,7 @@ export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
 
 export type FieldUpdateValue =
   | z.infer<typeof TextValue>
-  | z.infer<typeof DateValue>
+  | PlainDate
   | z.infer<typeof TimeValue>
   | z.infer<typeof AgeUpdateValue>
   | z.infer<typeof AddressFieldUpdateValue>
@@ -238,7 +234,7 @@ export type FieldUpdateValue =
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
 export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   TextValue.describe('TextValue'),
-  DateValue.describe('DateValue'),
+  PlainDate.describe('PlainDate'),
   TimeValue.describe('TimeValue'),
   AgeUpdateValue.describe('AgeUpdateValue'),
   AddressFieldUpdateValue.describe('AddressFieldUpdateValue'),
@@ -277,6 +273,7 @@ export type FieldValueSchema =
  * FieldValueInputSchema uses Input types which have set optional values as nullish
  * */
 export type FieldUpdateValueSchema =
+  | typeof PlainDate
   | typeof DateRangeFieldValue
   | typeof AgeValue
   | typeof SelectDateRangeValue

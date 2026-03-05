@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.9.11
+
+### New features
+
+- Added support of `updatedByUserRole` for workqueue configuration.
+  Workqueues can now be filtered by a specific role or `user('role')`. [#11848](https://github.com/opencrvs/opencrvs-core/issues/11848)
+
+**Usage example**
+
+```ts
+query: {
+  updatedByUserRole: { type: 'exact', term: user('role') }
+}
+```
+
+### Bug fixes
+
+- Fix newly created drafts in offline mode are not accessible [#11820](https://github.com/opencrvs/opencrvs-core/issues/11820)
+- Fix the rendered date on the review page and the certificate display issue in negative UTC offset time zones. [#11955](https://github.com/opencrvs/opencrvs-core/issues/11955)
+
+### Improvements
+
+- Explicitly nullify hidden field values to prevent stale data in database and fix incorrect search results [#11695](https://github.com/opencrvs/opencrvs-core/pull/11849)
+
 ## 1.9.10
 
 ### New features
@@ -34,7 +58,12 @@ summary: {
 
 ### Bug fixes
 
-- Extended the `record.registered.print-certified-copies[event=tennis-club-membership]` scope to support an optional `templates` parameter (e.g. `templates=v2.tennis-club-membership-certificate-alpha`). When `templates` is specified, users are restricted to printing only the listed certificate templates. If `templates` is omitted, all certificate templates for the event remain available, preserving existing behavior [[#11753](https://github.com/opencrvs/opencrvs-core/issues/11753)]
+- Fix bug that requires users to log in when offline instead of unlocking with a PIN. [#11243](https://github.com/opencrvs/opencrvs-core/issues/11243)
+
+### Improvements
+
+- Improve BRN lookup experience by making the search field clearer and more intuitive, properly handling base/success/error states, and providing clearer, context-specific error messaging for users. [#11181](https://github.com/opencrvs/opencrvs-core/issues/11181)
+- Extended the `record.registered.print-certified-copies[event=tennis-club-membership]` scope to support an optional `templates` parameter (e.g. `templates=v2.tennis-club-membership-certificate-alpha`). When `templates` is specified, users are restricted to printing only the listed certificate templates. If `templates` is omitted, all certificate templates for the event remain available, preserving existing behavior [#11753](https://github.com/opencrvs/opencrvs-core/issues/11753)
 
 ## 1.9.9
 

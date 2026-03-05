@@ -163,6 +163,8 @@ const StyledContainer = styled(Box)`
 `
 
 const SearchInputWrapper = styled.div`
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: 4px;
   display: flex;
   width: 100%;
   gap: 8px;

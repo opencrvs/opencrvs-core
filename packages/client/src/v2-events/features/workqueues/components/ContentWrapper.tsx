@@ -45,6 +45,7 @@ interface BodyProps {
   loading?: boolean
   error?: boolean
   children: React.ReactNode | React.ReactNode[]
+  paginationVisibleOffline?: boolean
 }
 
 interface ContentWrapperProps extends BodyProps {
@@ -64,6 +65,7 @@ function Body({
   error,
   noContent,
   noResultText,
+  paginationVisibleOffline,
   children
 }: BodyProps) {
   const isOnline = useOnlineStatus()
@@ -78,7 +80,7 @@ function Body({
           !!paginationId &&
           !!totalPages &&
           onPageChange &&
-          isOnline && (
+          (isOnline || paginationVisibleOffline) && (
             <Pagination
               currentPage={paginationId}
               totalPages={totalPages}
@@ -113,7 +115,8 @@ export function WQContentWrapper({
   paginationId,
   totalPages,
   noResultText,
-  children
+  children,
+  paginationVisibleOffline
 }: ContentWrapperProps) {
   return (
     <>
@@ -135,6 +138,7 @@ export function WQContentWrapper({
               noContent={noContent}
               noResultText={noResultText}
               paginationId={paginationId}
+              paginationVisibleOffline={paginationVisibleOffline}
               totalPages={totalPages}
               onPageChange={onPageChange}
             >
@@ -157,6 +161,7 @@ export function WQContentWrapper({
             noContent={noContent}
             noResultText={noResultText}
             paginationId={paginationId}
+            paginationVisibleOffline={paginationVisibleOffline}
             totalPages={totalPages}
             onPageChange={onPageChange}
           >

@@ -11,7 +11,12 @@
 
 import { useEffect, useRef } from 'react'
 import { create } from 'zustand'
-import { EventState, FormState, IndexMap } from '@opencrvs/commons/client'
+import {
+  EventState,
+  FormState,
+  IndexMap,
+  FieldValue
+} from '@opencrvs/commons/client'
 
 type FormTouched = IndexMap<FormState<boolean>>
 
@@ -22,6 +27,9 @@ interface EventFormData {
   formTouched: FormTouched
   setFormTouched: (formTouched: FormTouched) => void
   getFormTouched: (initialTouched?: FormTouched) => FormTouched
+  hiddenFieldCache: null | EventState
+  cacheHiddenFieldValue: (fieldId: string, value: FieldValue) => void
+  popHiddenFieldValue: (fieldId: string) => FieldValue
   clear: () => void
 }
 
@@ -48,6 +56,7 @@ export const useEventFormData = create<EventFormData>()((set, get) => {
   return {
     formValues: {},
     formTouched: {},
+    hiddenFieldCache: {},
 
     getFormValues: (initialValues?: EventState) =>
       get().formValues || initialValues || {},
@@ -63,8 +72,29 @@ export const useEventFormData = create<EventFormData>()((set, get) => {
 
     setFormTouched: (formTouched) => set(() => ({ formTouched })),
 
+    cacheHiddenFieldValue: (fieldId: string, value: FieldValue) => {
+      set((state) => ({
+        hiddenFieldCache: {
+          ...state.hiddenFieldCache,
+          [fieldId]: value
+        }
+      }))
+    },
+
+    popHiddenFieldValue: (fieldId: string) => {
+      const state = get()
+      const value = state.hiddenFieldCache?.[fieldId]
+
+      if (value !== undefined && state.hiddenFieldCache) {
+        const { [fieldId]: _, ...rest } = state.hiddenFieldCache
+        set(() => ({ hiddenFieldCache: rest }))
+      }
+
+      return value
+    },
+
     clear: () => {
-      set(() => ({ formValues: {}, formTouched: {} }))
+      set(() => ({ formValues: {}, formTouched: {}, hiddenFieldCache: {} }))
     }
   }
 })

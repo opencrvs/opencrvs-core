@@ -23,7 +23,8 @@ import {
   FieldConfig,
   EventState,
   generateTranslationConfig,
-  UUID
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -277,7 +278,7 @@ const fields = [
     id: 'membership.startDate',
     type: FieldType.DATE,
     label: generateTranslationConfig('Start Date'),
-    defaultValue: '2025-01-01',
+    defaultValue: PlainDate.parse('2025-01-01'),
     configuration: {
       notice: generateTranslationConfig(
         'Membership will be active from this date'
@@ -299,7 +300,10 @@ const fields = [
     id: 'membership.duration',
     type: FieldType.DATE_RANGE,
     label: generateTranslationConfig('Membership Duration'),
-    defaultValue: { start: '2025-01-01', end: '2025-12-31' },
+    defaultValue: {
+      start: PlainDate.parse('2025-01-01'),
+      end: PlainDate.parse('2025-12-31')
+    },
     configuration: {
       notice: generateTranslationConfig('Select the full membership duration')
     }
@@ -428,11 +432,11 @@ const declaration = {
   ],
   'membership.type': 'standard',
   'membership.level': 'silver',
-  'membership.startDate': '2025-01-01',
+  'membership.startDate': PlainDate.parse('2025-01-01'),
   'membership.startTime': '09:00',
   'membership.duration': {
-    start: '2025-01-01',
-    end: '2025-12-31'
+    start: PlainDate.parse('2025-01-01'),
+    end: PlainDate.parse('2025-12-31')
   },
   'membership.trainingPeriod': 'last30Days',
   'membership.facility': 'Gym Hall',
@@ -517,7 +521,7 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
             fields={fields}
             formValues={{
               ...declaration,
-              'membership.duration': '2025-12-31'
+              'membership.duration': PlainDate.parse('2025-12-31')
             }}
             id="my-form"
             // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
@@ -584,7 +588,7 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
               .filter(Boolean)}
             formValues={{
               ...declaration,
-              'membership.duration': '2025-12-31',
+              'membership.duration': PlainDate.parse('2025-12-31'),
               'applicant.age': 30
             }}
             id="my-form"
