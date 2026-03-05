@@ -67,6 +67,25 @@ const queryData = Array.from(
   (_, i) => eventQueryDataGenerator(undefined, i * 52) // quite literally a magic number. It gives a sample where the test workqueues are not empty
 )
 
+const downloadEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [
+    { type: ActionType.CREATE },
+    {
+      type: ActionType.DECLARE,
+      declarationOverrides: {
+        'applicant.name': {
+          firstname: 'Riku',
+          surname: 'Rouvila'
+        }
+      }
+    },
+    {
+      type: ActionType.ASSIGN
+    }
+  ]
+})
+
 export const PaginationAfterDownload: Story = {
   parameters: {
     userRole: TestUserRole.Enum.LOCAL_REGISTRAR,
@@ -564,22 +583,3 @@ export const DraftPaginationOffline: Story = {
     await expect(secondPageRows).toHaveLength(5)
   }
 }
-
-const downloadEvent = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [
-    { type: ActionType.CREATE },
-    {
-      type: ActionType.DECLARE,
-      declarationOverrides: {
-        'applicant.name': {
-          firstname: 'Riku',
-          surname: 'Rouvila'
-        }
-      }
-    },
-    {
-      type: ActionType.ASSIGN
-    }
-  ]
-})
