@@ -149,7 +149,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   /**
    * onBlur is used to set the touched state of the field
    */
-  onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
+  onBlur: (formikFieldId: string, newTouched?: FormState<boolean>) => void
   disabled?: boolean
   readonlyMode?: boolean
   allKnownFields: FieldConfig[]
@@ -199,7 +199,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
   }
 
   function handleBlur<E>(_: React.FocusEvent<E>) {
-    onBlur(name, true)
+    onBlur(name)
   }
 
   const inputProps = {
@@ -255,12 +255,6 @@ export const GeneratedInputField = <T extends FieldConfig>(
                 {...props}
                 fieldDefinition={subfield}
                 name={subfieldFullName}
-                onBlur={(_, nestedTouched) =>
-                  onBlur(name, {
-                    ...groupTouched,
-                    [subfieldName]: nestedTouched
-                  })
-                }
               />
             </FormItem>
           )

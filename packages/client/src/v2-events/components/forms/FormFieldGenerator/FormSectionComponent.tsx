@@ -273,6 +273,39 @@ export function FormSectionComponent({
     }))
   }
 
+  // This function updates the nested value more performantly than cloning the
+  // full object. The field value updates should be refactored to use the same
+  // approach too
+  function handleBlur(formikFieldId: string, newState?: FormState<boolean>) {
+    const formikPath = formikFieldId.split('.')
+    const opencrvsPath = formikFieldId
+      .split('.')
+      .map(makeFormikFieldIdOpenCRVSCompatible)
+    function setNested(
+      obj: IndexMap<FormState<boolean>> | undefined,
+      path: string[]
+    ): IndexMap<FormState<boolean>> {
+      if (path.length === 1) {
+        return {
+          ...obj,
+          [path[0]]: newState ?? true
+        }
+      }
+      const [part, ...rest] = path
+      const nestedObject =
+        typeof obj?.[part] === 'object' ? obj[part] : undefined
+      return {
+        ...obj,
+        [part]: setNested(nestedObject, rest)
+      }
+    }
+    void setTouched(
+      // @ts-ignore Formik types don't work well with nested values
+      setNested(touched as IndexMap<FormState<boolean>>, formikPath)
+    )
+    onTouchedChange((prevTouched) => setNested(prevTouched, opencrvsPath))
+  }
+
   useEffect(() => {
     focusElementByHash()
   }, [])
@@ -328,15 +361,7 @@ export function FormSectionComponent({
               readonlyMode={readonlyMode}
               validatorContext={validatorContext}
               onBatchFieldValueChange={onBatchFieldValueChange}
-              onBlur={(formikFieldId, newTouched) => {
-                // @ts-ignore Formik types don't work well with nested values
-                void setTouched({ ...touched, [formikFieldId]: newTouched })
-                onTouchedChange((prevTouched) => ({
-                  ...prevTouched,
-                  [makeFormikFieldIdOpenCRVSCompatible(formikFieldId)]:
-                    newTouched
-                }))
-              }}
+              onBlur={handleBlur}
               onFieldValueChange={onFieldValueChange}
             />
           </FormItem>
