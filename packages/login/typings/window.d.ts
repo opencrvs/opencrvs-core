@@ -15,6 +15,7 @@ interface Window {
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'
     PHONE_NUMBER_PATTERN: RegExp
+    LOGIN_BACKGROUND: { backgroundColor?: string; backgroundImage?: string; imageFit?: string }
     SENTRY: string
   }
 }

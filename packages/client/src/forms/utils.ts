@@ -100,10 +100,7 @@ const VIEW_TYPE = {
   HIDDEN: 'hidden'
 }
 
-const REGISTRATION_TARGET_DAYS =
-  window.config &&
-  window.config.BIRTH &&
-  window.config.BIRTH.REGISTRATION_TARGET
+const REGISTRATION_TARGET_DAYS = 30
 
 interface IRange {
   start: number
