@@ -13,7 +13,6 @@ import { logger } from '@opencrvs/commons'
 import { badData } from '@hapi/boom'
 import * as Joi from 'joi'
 import { pick } from 'lodash'
-import getSystems from '@config/handlers/system/systemHandler'
 import { env } from '@config/environment'
 import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
@@ -26,15 +25,13 @@ export default async function configHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const [certificates, config, systems] = await Promise.all([
+    const [certificates, config] = await Promise.all([
       getCertificatesConfig(request, h),
-      getApplicationConfig(request, h),
-      getSystems(request, h)
+      getApplicationConfig(request, h)
     ])
     return {
       config,
-      certificates,
-      systems
+      certificates
     }
   } catch (ex) {
     logger.error(ex)

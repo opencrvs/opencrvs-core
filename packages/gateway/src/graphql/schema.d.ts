@@ -96,7 +96,6 @@ export interface GQLMutation {
   resendInvite?: string
   usernameReminder?: string
   resetPasswordInvite?: string
-  registerSystem?: GQLRegisterSystemResult
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
 }
@@ -605,12 +604,6 @@ export interface GQLAvatar {
 export interface GQLAvatarInput {
   type: string
   data: string
-}
-
-export interface GQLRegisterSystemResult {
-  clientId: string
-  clientSecret: string
-  shaSecret: string
 }
 
 export interface GQLSystemInput {
@@ -2386,7 +2379,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendInvite?: MutationToResendInviteResolver<TParent>
   usernameReminder?: MutationToUsernameReminderResolver<TParent>
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
-  registerSystem?: MutationToRegisterSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
 }
@@ -3135,21 +3127,6 @@ export interface MutationToDeactivateSystemResolver<
   (
     parent: TParent,
     args: MutationToDeactivateSystemArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToRegisterSystemArgs {
-  system?: GQLSystemInput
-}
-export interface MutationToRegisterSystemResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRegisterSystemArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

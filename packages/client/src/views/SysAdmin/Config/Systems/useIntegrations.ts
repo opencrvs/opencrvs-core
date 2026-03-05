@@ -9,14 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useTRPC } from '@client/v2-events/trpc'
-import { useMutation as useGqlMutation } from '@apollo/client'
-import { registerSystem } from './mutations'
-import {
-  RegisterSystemMutation,
-  RegisterSystemMutationVariables
-} from '@client/utils/gateway'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTRPC, trpcClient } from '@client/v2-events/trpc'
+import { SCOPES, encodeScope, RecordScopeTypeV2 } from '@opencrvs/commons'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 /** Data shape returned by integrations.list */
 export interface IntegrationItem {
@@ -26,54 +22,74 @@ export interface IntegrationItem {
   status: string
 }
 
-/** Data shape returned by registerSystem GraphQL mutation */
+/** Data shape returned by integrations.create */
 export interface CreateIntegrationResult {
   clientId: string
   shaSecret: string
   clientSecret: string
 }
 
+type SystemIntegrationType = 'HEALTH' | 'RECORD_SEARCH'
+
+const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, string[]> = {
+  HEALTH: [SCOPES.NOTIFICATION_API],
+  RECORD_SEARCH: [SCOPES.RECORDSEARCH]
+}
+
+const CONFIGURABLE_SCOPES_BY_TYPE: Record<
+  SystemIntegrationType,
+  RecordScopeTypeV2[]
+> = {
+  HEALTH: ['record.create', 'record.notify'],
+  RECORD_SEARCH: []
+}
+
+function getSystemScopesFromType(
+  type: SystemIntegrationType,
+  eventIds: string[]
+): string[] {
+  const literalScopes = DEFAULT_SCOPES_BY_TYPE[type]
+  const v2Scopes = CONFIGURABLE_SCOPES_BY_TYPE[type].map(
+    (scope: RecordScopeTypeV2) =>
+      encodeScope({
+        type: scope,
+        options: { event: eventIds }
+      })
+  )
+
+  return [...literalScopes, ...v2Scopes]
+}
+
 export function useIntegrations() {
   const trpc = useTRPC()
   const queryClient = useQueryClient()
+  const eventConfigurations = useEventConfigurations()
+  const eventIds = eventConfigurations.map((config) => config.id)
 
   // List integrations via TRPC
   const listQuery = useQuery(trpc.integrations.list.queryOptions())
 
-  // Create integration via GraphQL (gateway handles type→scopes conversion)
-  const [registerSystemMutation, registerSystemState] = useGqlMutation<
-    RegisterSystemMutation,
-    RegisterSystemMutationVariables
-  >(registerSystem, {
-    onCompleted: () => {
+  // Create integration via TRPC directly
+  const createMutation = useMutation({
+    mutationFn: (input: { name: string; type: SystemIntegrationType }) => {
+      const scopes = getSystemScopesFromType(input.type, eventIds)
+      return trpcClient.integrations.create.mutate({ name: input.name, scopes })
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: trpc.integrations.list.queryKey()
       })
     }
   })
 
-  const createIntegration = async (input: { name: string; type: string }) => {
-    return registerSystemMutation({
-      variables: {
-        system: {
-          name: input.name,
-          // Type cast is safe: the UI only allows HEALTH or RECORD_SEARCH
-          type: input.type as 'HEALTH' | 'RECORD_SEARCH'
-        }
-      }
-    })
-  }
-
-  const createResult = registerSystemState.data?.registerSystem ?? null
-
   return {
     integrations: (listQuery.data ?? []) as IntegrationItem[],
     isLoading: listQuery.isLoading,
     isError: listQuery.isError,
-    createIntegration,
-    createResult: createResult as CreateIntegrationResult | null,
-    isCreating: registerSystemState.loading,
-    createError: registerSystemState.error,
-    resetCreate: registerSystemState.reset
+    createIntegration: createMutation.mutateAsync,
+    createResult: (createMutation.data ?? null) as CreateIntegrationResult | null,
+    isCreating: createMutation.isPending,
+    createError: createMutation.error,
+    resetCreate: createMutation.reset
   }
 }

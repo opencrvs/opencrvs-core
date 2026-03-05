@@ -32,7 +32,6 @@ import {
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { isOfflineDataLoaded } from './selectors'
 import { merge } from 'lodash'
@@ -116,7 +115,6 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-  systems: System[]
   config: IApplicationConfig
   anonymousConfig: IApplicationConfigAnonymous
 }
@@ -375,32 +373,16 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
-    case actions.UPDATE_OFFLINE_SYSTEMS: {
-      const newOfflineData = {
-        ...state.offlineData,
-        systems: action.payload.systems
-      }
-
-      return loop(
-        {
-          ...state,
-          offlineData: newOfflineData
-        },
-        Cmd.run(saveOfflineData, { args: [newOfflineData] })
-      )
-    }
-
     /*
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, systems } = action.payload
+      const { certificates, config } = action.payload
       merge(window.config, config)
 
       const newOfflineData = {
         ...state.offlineData,
         config,
-        systems,
         templates: {
           ...state.offlineData.templates,
           certificates: (certificates as ICertificateData[]).map((x) => {

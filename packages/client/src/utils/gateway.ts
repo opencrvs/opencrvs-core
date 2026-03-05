@@ -972,7 +972,6 @@ type Mutation = {
   markMarriageAsValidated?: Maybe<Scalars['ID']>
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
-  registerSystem?: Maybe<SystemSecret>
   rejectRegistration: Scalars['ID']
   rejectRegistrationCorrection: Scalars['ID']
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
@@ -1195,10 +1194,6 @@ type MutationReactivateSystemArgs = {
 
 type MutationRefreshSystemSecretArgs = {
   clientId: Scalars['String']
-}
-
-type MutationRegisterSystemArgs = {
-  system?: InputMaybe<SystemInput>
 }
 
 type MutationRejectRegistrationArgs = {
@@ -7056,20 +7051,6 @@ type EmailAllUsersQuery = {
   sendNotificationToAllUsers?: {
     __typename?: 'NotificationResult'
     success: boolean
-  } | null
-}
-
-export type RegisterSystemMutationVariables = Exact<{
-  system?: InputMaybe<SystemInput>
-}>
-
-export type RegisterSystemMutation = {
-  __typename?: 'Mutation'
-  registerSystem?: {
-    __typename?: 'RegisterSystemResult'
-    clientId: string
-    clientSecret: string
-    shaSecret: string
   } | null
 }
 

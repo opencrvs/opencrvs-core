@@ -246,7 +246,6 @@ type Mutation {
   resendInvite(userId: String!): String
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
-  registerSystem(system: SystemInput): RegisterSystemResult
   bookmarkAdvancedSearch(
     bookmarkSearchInput: BookmarkSearchInput!
   ): BookMarkedSearches

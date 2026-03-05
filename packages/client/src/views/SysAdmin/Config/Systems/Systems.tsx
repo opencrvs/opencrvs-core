@@ -143,10 +143,9 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }
 
   const handleRegisterSystem = async () => {
-    // The gateway resolver handles type→scopes conversion
     await createIntegration({
       name: newClientName,
-      type: newSystemType
+      type: newSystemType as 'HEALTH' | 'RECORD_SEARCH'
     })
   }
 

@@ -15,7 +15,6 @@ import type {
   Facility,
   IForms
 } from '@client/offline/reducer'
-import { System } from '@client/utils/gateway'
 import {
   CertificateConfiguration,
   ICertificateData
@@ -27,9 +26,6 @@ import templates from './templates.json'
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
-// Systems are now managed via the events service integrations endpoints.
-// The admin UI loads systems directly via TRPC integrations.list.
-const systems: System[] = []
 const facilities: Record<string, Facility> = {
   '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
     id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
@@ -466,8 +462,7 @@ export const mockOfflineData = {
       file: `data:image;base64,${validImageB64String}`
     },
     PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$'
-  },
-  systems
+  }
 }
 
 export const mockOfflineLocationsWithHierarchy: {

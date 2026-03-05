@@ -16,7 +16,6 @@ import {
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
-import { System } from '@client/utils/gateway'
 import {
   IApplicationConfig,
   IApplicationConfigAnonymous,
@@ -133,12 +132,6 @@ export const ANONYMOUS_USER_OFFLINE_CONFIG =
 type ApplicationConfigAnonymousUserAction = {
   type: typeof ANONYMOUS_USER_OFFLINE_CONFIG
   payload: { anonymousConfig: IApplicationConfigAnonymous }
-}
-
-export const UPDATE_OFFLINE_SYSTEMS = 'OFFLINE/UPDATE_OFFLINE_SYSTEMS' as const
-type UpdateOfflineSystemsAction = {
-  type: typeof UPDATE_OFFLINE_SYSTEMS
-  payload: { systems: System[] }
 }
 
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
@@ -271,13 +264,6 @@ export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   payload: error
 })
 
-export const updateOfflineSystems = (payload: {
-  systems: System[]
-}): UpdateOfflineSystemsAction => ({
-  type: UPDATE_OFFLINE_SYSTEMS,
-  payload: payload
-})
-
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
@@ -335,7 +321,6 @@ export type Action =
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | UpdateOfflineSystemsAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
