@@ -21,7 +21,7 @@ import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import {
-  DateValue,
+  PlainDate,
   FieldUpdateValue,
   FieldValue,
   AgeValue
@@ -203,7 +203,7 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
         const maybeAgeValue = AgeValue.safeParse(value)
         if (maybeAgeValue.success) {
           const age = maybeAgeValue.data.age
-          const maybeAsOfDate = DateValue.safeParse(
+          const maybeAsOfDate = PlainDate.safeParse(
             data.$form[maybeAgeValue.data.asOfDateRef]
           )
 
@@ -213,7 +213,9 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
               age,
               dob: ageToDate(
                 age,
-                maybeAsOfDate.success ? maybeAsOfDate.data : data.$now
+                maybeAsOfDate.success
+                  ? maybeAsOfDate.data
+                  : PlainDate.parse(data.$now)
               )
             }
           ]

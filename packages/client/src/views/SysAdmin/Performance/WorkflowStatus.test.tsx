@@ -24,7 +24,7 @@ import { GraphQLError } from 'graphql'
 import { parse, stringify } from 'query-string'
 import * as React from 'react'
 import { vi } from 'vitest'
-import { PlainDate } from '@client/utils/date-formatting'
+import { PlainDate } from '@opencrvs/commons/client'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 
 describe('Workflow status tests', () => {

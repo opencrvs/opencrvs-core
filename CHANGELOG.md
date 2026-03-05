@@ -18,6 +18,7 @@ query: {
 ### Bug fixes
 
 - Fix newly created drafts in offline mode are not accessible [#11820](https://github.com/opencrvs/opencrvs-core/issues/11820)
+- Fix the rendered date on the review page and the certificate display issue in negative UTC offset time zones. [#11955](https://github.com/opencrvs/opencrvs-core/issues/11955)
 
 ### Improvements
 

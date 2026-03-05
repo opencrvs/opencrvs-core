@@ -43,10 +43,8 @@ import {
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import styled, { withTheme } from 'styled-components'
-import {
-  formattedDuration,
-  plainDateToLocalDate
-} from '@client/utils/date-formatting'
+import { plainDateToLocalDate } from '@opencrvs/commons/client'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   IconWithName,
