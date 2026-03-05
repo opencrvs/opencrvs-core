@@ -138,7 +138,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           (getState: () => IStoreState) => {
             if (action.payload.token) {
               window.location.assign(
-                `${window.config.CLIENT_APP_URL}?token=${
+                `/register/?token=${
                   action.payload.token
                 }&lang=${getState().i18n.language}`
               )
@@ -231,17 +231,13 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         Cmd.run(
           (getState: () => IStoreState) => {
             const redirectToURL = getState().login.redirectToURL
-            const fullURL = new URL(
-              redirectToURL
-                ? `${redirectToURL}?token=${action.payload.token}&lang=${
-                    getState().i18n.language
-                  }`
-                : `?token=${action.payload.token}&lang=${
-                    getState().i18n.language
-                  }`,
-
-              window.config.CLIENT_APP_URL
-            ).toString()
+            const fullURL = redirectToURL
+              ? `/register/${redirectToURL}?token=${action.payload.token}&lang=${
+                  getState().i18n.language
+                }`
+              : `/register?token=${action.payload.token}&lang=${
+                  getState().i18n.language
+                }`
 
             window.location.assign(fullURL)
           },
@@ -254,9 +250,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           ...state
         },
         Cmd.run(() => {
-          window.location.assign(
-            `${window.config.CLIENT_APP_URL}?token=${state.token}`
-          )
+          window.location.assign(`/register/?token=${state.token}`)
         })
       )
     case actions.RELOAD_MODAL_VISIBILITY:

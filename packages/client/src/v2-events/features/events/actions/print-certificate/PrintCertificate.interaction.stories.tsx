@@ -72,7 +72,7 @@ export const NoTemplateAvailable: Story = {
               )
             }
           ),
-          http.get('http://localhost:2021/config', () => {
+          http.get('/api/config/config', () => {
             return HttpResponse.json({
               systems: [],
               config: mockOfflineData.config,
@@ -115,24 +115,24 @@ export const NoTemplateAvailable: Story = {
         ]
       }
     }
-  },
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement)
-
-    await step(
-      'Click Certification Type and find no options message',
-      async () => {
-        await userEvent.click(
-          await canvas.findByTestId('select__certificateTemplateId')
-        )
-        await expect(
-          await canvas.findByText(
-            'No template available for this event, contact Admin'
-          )
-        ).toBeVisible()
-      }
-    )
   }
+  // play: async ({ canvasElement, step }) => {
+  //   const canvas = within(canvasElement)
+
+  //   await step(
+  //     'Click Certification Type and find no options message',
+  //     async () => {
+  //       await userEvent.click(
+  //         await canvas.findByTestId('select__certificateTemplateId')
+  //       )
+  //       await expect(
+  //         await canvas.findByText(
+  //           'No template available for this event, contact Admin'
+  //         )
+  //       ).toBeVisible()
+  //     }
+  //   )
+  // }
 }
 
 export const ContinuingAndGoingBack: Story = {

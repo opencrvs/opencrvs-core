@@ -115,7 +115,12 @@ export const TEST_USER_DEFAULT_SCOPES = [
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
     }
   }),
-  'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.notify',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
   'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
   'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',

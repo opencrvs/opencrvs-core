@@ -34,7 +34,7 @@ import {
 } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { Http, Props } from './Http'
+import { Http, Props as HttpInputProps } from './Http'
 
 const defaultIndicators = {
   loading: {
@@ -260,7 +260,7 @@ function SearchInput({
   label,
   helperText,
   value
-}: Omit<Props, 'configuration'> & {
+}: Omit<HttpInputProps, 'configuration' | 'trigger'> & {
   configuration: SearchField['configuration']
   value: HttpFieldValue | null | undefined
   label?: string
@@ -446,7 +446,7 @@ function SearchInput({
               }
             }}
             form={form}
-            parentValue={buttonPressed}
+            trigger={{ mode: 'onChange', value: buttonPressed }}
             onChange={onHTTPChange}
           />
           {isEditable && (

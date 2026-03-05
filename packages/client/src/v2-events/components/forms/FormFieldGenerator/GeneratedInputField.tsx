@@ -529,6 +529,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             configuration={field.config.configuration}
             disabled={disabled}
+            eventConfig={eventConfig}
             validatorContext={validatorContext}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
@@ -615,6 +616,7 @@ export const GeneratedInputField = React.memo(
           <AdministrativeArea.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             partOf={typeof partOf === 'string' ? partOf : null}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -629,6 +631,7 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             searchableResource={
               field.config.configuration.searchableResource.length > 0
                 ? field.config.configuration.searchableResource
@@ -648,6 +651,7 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             searchableResource={['offices']}
             value={field.value}
             onBlur={onBlur}
@@ -663,6 +667,7 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             searchableResource={['facilities']}
             value={field.value}
             onBlur={onBlur}
@@ -743,7 +748,14 @@ export const GeneratedInputField = React.memo(
             form
           )}
           form={form}
-          parentValue={form[field.config.configuration.trigger.$$field]}
+          trigger={
+            field.config.configuration.trigger
+              ? {
+                  mode: 'onChange',
+                  value: form[field.config.configuration.trigger.$$field]
+                }
+              : { mode: 'onMount' }
+          }
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )

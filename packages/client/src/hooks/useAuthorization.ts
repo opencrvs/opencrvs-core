@@ -23,7 +23,7 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-import { isOfficeUnderJurisdiction } from '@client/utils/locationUtils'
+import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
@@ -116,9 +116,9 @@ export function usePermissions() {
       return user.primaryOffice.id === userPrimaryOffice?.id
     }
     if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdiction({
-        officeId: userPrimaryOffice.id,
-        otherOfficeId: user.primaryOffice.id,
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOffice.id,
+        otherLocationId: user.primaryOffice.id,
         locations,
         administrativeAreas
       })
@@ -149,9 +149,9 @@ export function usePermissions() {
       if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
         return false
       }
-      return isOfficeUnderJurisdiction({
-        officeId: userPrimaryOffice.id,
-        otherOfficeId: user.primaryOffice.id,
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOffice.id,
+        otherLocationId: user.primaryOffice.id,
         locations,
         administrativeAreas
       })
@@ -178,9 +178,9 @@ export function usePermissions() {
     }
 
     if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdiction({
-        officeId: userPrimaryOffice.id,
-        otherOfficeId: office.id,
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOffice.id,
+        otherLocationId: office.id,
         locations,
         administrativeAreas
       })
@@ -196,9 +196,9 @@ export function usePermissions() {
       return true
     }
     if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdiction({
-        officeId: userPrimaryOffice.id,
-        otherOfficeId: office.id,
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOffice.id,
+        otherLocationId: office.id,
         locations,
         administrativeAreas
       })

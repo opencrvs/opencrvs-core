@@ -8,15 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-const REGISTERED = 'registered'
-const CERTIFIED = 'certified'
-const ISSUED = 'issued'
 export const EMPTY_STRING = ''
-const REJECTED = 'REJECTED'
-const IN_PROGRESS = 'IN_PROGRESS'
-const DECLARED = 'DECLARED'
-const VALIDATED = 'VALIDATED'
-const ARCHIVED = 'ARCHIVED'
 export const LANG_EN = 'en'
 
 export const REGEXP_BLOCK_ALPHA_NUMERIC_DOT = '^[0-9A-Z.]+$'
@@ -29,34 +21,18 @@ export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
 export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 
 export const ADVANCED_SEARCH_TEXT = 'advanced-search'
-const SEARCH_RESULT_SORT = 'DESC'
 export const NATIONAL_ID = 'NATIONAL_ID'
 
 export const BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER'
 export const DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER'
 
-const MARRIAGE_SIGNATURE_KEYS = [
-  'groomSignature',
-  'brideSignature',
-  'witnessOneSignature',
-  'witnessTwoSignature'
-] as const
-
-const SIGNATURE_KEYS = [
-  ...MARRIAGE_SIGNATURE_KEYS,
-  'informantsSignature'
-] as const
-
-const SYNC_WORKQUEUE_TIME = 500
 export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
 export const AVATAR_API =
   'https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name='
-const ACCUMULATED_FILE_SIZE = 20480000
 
 export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
 export const APPLICATION_VERSION = APP_VERSION
-export const IS_PROD_ENVIRONMENT = import.meta.env.PROD

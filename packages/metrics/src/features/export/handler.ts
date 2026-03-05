@@ -16,8 +16,6 @@ import { metricsHandler } from '@metrics/features/metrics/handler'
 import stringify from 'csv-stringify'
 import { fetchLocation } from '@metrics/api'
 import { EVENT } from '@metrics/features/metrics/constants'
-//import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
-import { getRegistrationTargetDays } from '@metrics/features/metrics/utils'
 
 async function getMeasurementNames() {
   const points = await query<Array<{ key: string }>>('SHOW SERIES')
@@ -50,11 +48,6 @@ export async function monthlyExportHandler(
   }
 
   const monthlyMetrics = await metricsHandler(request, h)
-
-  const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
-    event,
-    auth.token
-  )
 
   const csvStreams = []
   // populating csv for gender based registration data
@@ -99,13 +92,13 @@ export async function monthlyExportHandler(
       })
       stream.push({
         Location: loc.name,
-        [`Within ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]: `${
+        [`Within target days`]: `${
           timeFrameData.regWithinTargetd
         } (${getPercentage(
           timeFrameData.regWithinTargetd,
           timeFrameData.total
         )}%)`,
-        [`${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days - 1 year`]: `${
+        [`Target days - 1 year`]: `${
           timeFrameData.regWithinTargetdTo1yr
         } (${getPercentage(
           timeFrameData.regWithinTargetdTo1yr,
@@ -140,13 +133,13 @@ export async function monthlyExportHandler(
         Location: loc.name,
         'Estimated no. of registrations':
           estimatedTargetDayData.estimatedRegistration,
-        [`Total registered in ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]:
+        [`Total registered in target days`]:
           estimatedTargetDayData.registrationInTargetDay,
         'Percentage of estimate': `${estimatedTargetDayData.estimationPercentage}%`
       })
     }
     csvStreams.push([
-      `Estimated vs total registered in ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`,
+      `Estimated vs total registered in target days`,
       stringify(stream, { header: true })
     ])
   }
