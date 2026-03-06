@@ -5,6 +5,9 @@ USER node
 
 COPY --chown=node:node packages/events /app/packages/events
 
+WORKDIR /app/packages/events
+RUN yarn build:types
+
 WORKDIR /app/packages/auth
 COPY --chown=node:node packages/auth/*.json /app/packages/auth/
 RUN yarn install --frozen-lockfile
