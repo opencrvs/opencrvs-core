@@ -195,7 +195,8 @@ export const SearchResultComponent = ({
   emptyMessage,
   allowRetry,
   totalResults,
-  paginationVisibleOffline = false
+  paginationVisibleOffline = false,
+  clientSidePagination = false
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -209,6 +210,7 @@ export const SearchResultComponent = ({
   actions?: WorkqueueActionsWithDefault[]
   emptyMessage?: TranslationConfig
   paginationVisibleOffline?: boolean
+  clientSidePagination?: boolean
 }>) => {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
@@ -439,7 +441,11 @@ export const SearchResultComponent = ({
 
   const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
 
-  const rows = mapEventsToResultRows(sortedResult)
+  const currentPageResult = clientSidePagination
+    ? sortedResult.slice(offset, offset + limit)
+    : sortedResult
+
+  const rows = mapEventsToResultRows(currentPageResult)
 
   const currentPageNumber = Math.floor(offset / limit) + 1
 

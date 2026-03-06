@@ -61,19 +61,15 @@ export function Draft() {
         : currentEventState
     })
 
-  const currentPageDrafts = eventsWithDrafts.slice(
-    searchParams.offset || 0,
-    searchParams.offset + searchParams.limit
-  )
-
   return (
     <SearchResultComponent
       key={`${CoreWorkqueues.DRAFT}-${outboxIds.length}`}
       actions={['DEFAULT']}
+      clientSidePagination={true}
       columns={mandatoryColumns}
       eventConfigs={eventConfigs}
       paginationVisibleOffline={true}
-      queryData={currentPageDrafts}
+      queryData={eventsWithDrafts}
       title={intl.formatMessage(WORKQUEUE_DRAFT.name)}
       totalResults={eventsWithDrafts.length}
       {...searchParams}
