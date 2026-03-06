@@ -199,12 +199,19 @@ test.only('running reindex appears with running status', async () => {
   // Start reindex without awaiting it to observe the intermediate state
   const reindexPromise = runReindex(reindexToken)
 
-  // Poll until we see at least one entry
+  // Poll until we see at least one entry.
+  // The index may briefly have unavailable shards right after creation,
+  // so we swallow transient Elasticsearch errors and keep retrying.
   let history: Awaited<ReturnType<typeof client.event.reindex.status>> = []
   for (let i = 0; i < 20; i++) {
-    history = await client.event.reindex.status()
-    if (history.length > 0) {
-      break
+    try {
+      history = await client.event.reindex.status()
+      if (history.length > 0) {
+        break
+      }
+    } catch {
+      // Transient ES error (e.g. no_shard_available_action_exception)
+      // — retry after a short delay
     }
     await new Promise((r) => setTimeout(r, 50))
   }
