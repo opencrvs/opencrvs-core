@@ -191,7 +191,7 @@ export function EventSummary({
          * i.e. if the message is something like `{event.updatedAt, date, ::dd MM YYYY}`, then the value of `event.updatedAt`
          * needs to be a unix timestamp for it to be formatted correctly by `intl.formatMessage`.
          */
-        convertDateFieldsToUnixTimestamps(eventIndex)
+        convertDateFieldsToUnixTimestamps(event)
       )
     }
   })
