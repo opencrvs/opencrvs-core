@@ -15,7 +15,39 @@ import {
   parseLiteralScope,
   SCOPES
 } from './scopes'
-import { decodeScope, encodeScope, v1ScopeToV2Scope } from './scopes-v2'
+import {
+  decodeScope,
+  encodeScope,
+  v1ScopeToV2Scope,
+  getScopeOptionValue,
+  JurisdictionFilter,
+  ScopesWithDeclaredOptions,
+  ScopesWithFullOptions,
+  ScopesWithPlaceEventOptions
+} from './scopes-v2'
+
+describe('getScopeOptionValue()', () => {
+  it('should return the default value if the scope option is not set', () => {
+    const scope = {
+      type: 'record.create'
+    } as const
+
+    const result = getScopeOptionValue(scope, 'placeOfEvent')
+    expect(result).toEqual('all')
+  })
+
+  it('should return the value if the scope option is set', () => {
+    const scope = {
+      type: 'record.create',
+      options: {
+        placeOfEvent: JurisdictionFilter.enum.administrativeArea
+      }
+    } as const
+
+    const result = getScopeOptionValue(scope, 'placeOfEvent')
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
+})
 
 describe('findScope()', () => {
   const userScopes = [
@@ -186,33 +218,186 @@ describe('parseConfigurableScope()', () => {
 })
 
 describe('2.0 scopes', () => {
-  it('encodeScope()', () => {
-    const encodedScope = encodeScope({
-      type: 'record.create',
-      options: {
-        event: ['birth', 'death'],
-        declaredBy: 'user',
-        declaredIn: 'administrativeArea'
-      }
-    })
-
-    expect(encodedScope).toBe(
-      'type=record.create&event=birth,death&declaredBy=user&declaredIn=administrativeArea'
+  it('Strips out scope options unavailable for the "placeEvent" scope types', () => {
+    const placeEventScopes = ScopesWithPlaceEventOptions.options.map((type) =>
+      encodeScope({
+        type,
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
+          declaredBy: 'user' as const,
+          declaredIn: 'administrativeArea' as const,
+          registeredBy: 'user' as const,
+          registeredIn: 'administrativeArea' as const
+        }
+      })
     )
+
+    expect(placeEventScopes.map(decodeScope)).toEqual([
+      {
+        options: { event: ['birth', 'death'], placeOfEvent: 'location' },
+        type: 'record.create'
+      },
+      {
+        options: { event: ['birth', 'death'], placeOfEvent: 'location' },
+        type: 'record.declare'
+      },
+      {
+        options: { event: ['birth', 'death'], placeOfEvent: 'location' },
+        type: 'record.notify'
+      }
+    ])
   })
 
-  it('decodeScope()', () => {
-    const encodedScope =
-      'type=record.create&event=birth,death&declaredBy=user&declaredIn=administrativeArea'
+  it('Strips out scope options unavailable for the "declared" scope types', () => {
+    const declaredEventOptions = ScopesWithDeclaredOptions.options.map((type) =>
+      encodeScope({
+        type,
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location' as const,
+          declaredBy: 'user' as const,
+          declaredIn: 'administrativeArea' as const,
+          // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
+          registeredBy: 'user' as const,
+          registeredIn: 'administrativeArea' as const
+        }
+      })
+    )
 
-    expect(decodeScope(encodedScope)).toEqual({
-      type: 'record.create',
-      options: {
-        event: ['birth', 'death'],
-        declaredBy: 'user',
-        declaredIn: 'administrativeArea'
+    expect(declaredEventOptions.map(decodeScope)).toEqual([
+      {
+        type: 'record.validate',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      },
+      {
+        type: 'record.reject',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      },
+      {
+        type: 'record.archive',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      },
+      {
+        type: 'record.review-duplicates',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      },
+      {
+        type: 'record.register',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
       }
-    })
+    ])
+  })
+
+  it('Keeps all scope options for the "full" scope types', () => {
+    const fullEventOptions = ScopesWithFullOptions.options.map((type) =>
+      encodeScope({
+        type,
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location' as const,
+          declaredBy: 'user' as const,
+          declaredIn: 'administrativeArea' as const,
+          registeredBy: 'user' as const,
+          registeredIn: 'administrativeArea' as const
+        }
+      })
+    )
+
+    expect(fullEventOptions.map(decodeScope)).toEqual([
+      {
+        type: 'record.search',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.read',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.print-certified-copies',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.request-correction',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.correct',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.unassign-others',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      }
+    ])
   })
 })
 

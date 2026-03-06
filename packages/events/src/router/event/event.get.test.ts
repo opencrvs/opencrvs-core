@@ -123,6 +123,10 @@ test('Returns event with all actions', async () => {
     encodeScope({
       type: 'record.read',
       options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+    }),
+    encodeScope({
+      type: 'record.notify',
+      options: { event: [TENNIS_CLUB_MEMBERSHIP] }
     })
   ])
 
@@ -400,6 +404,10 @@ describe('Event indexing behavior', () => {
         }),
         encodeScope({
           type: 'record.read',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        }),
+        encodeScope({
+          type: 'record.notify',
           options: { event: [TENNIS_CLUB_MEMBERSHIP] }
         })
       ])

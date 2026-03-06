@@ -38,16 +38,18 @@ import {
   EventInput,
   RecordScopeTypeV2,
   RecordScopeV2,
-  canUserCreateEvent
+  canUserCreateEvent,
+  getEventConfigById,
+  userCanAccessEventWithScopes,
+  getAcceptedScopesFromToken
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
-import { TrpcContext, UserContext } from '@events/context'
+import { TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
-import { canAccessEventWithScopes, getAcceptedScopesFromToken } from './utils'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -181,6 +183,8 @@ export function requiresAnyOfScopes(
 
 /**
  * Middleware function that checks if the event type is authorized for the user.
+ *
+ * @deprecated in 2.0. @see canAccessEventWithScopes checks event access based on scope options, including event types.
  *
  * The function accepts either an eventId or event type directly in the input.
  * If an eventId is provided, it fetches the event to determine its type.
@@ -341,55 +345,45 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   return next()
 }
 
-export const userCanAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
+/**
+ * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
+ *
+ */
+export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
     TrpcContext,
     TrpcContext & { eventId: UUID; eventType: string },
-    EventIdParam
-  > = async ({ next, ctx, input }) => {
+    unknown
+  > = async ({ next, ctx, getRawInput }) => {
     const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-
     const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
     if (acceptedScopes.length === 0) {
       throw new TRPCError({ code: 'FORBIDDEN' })
     }
 
-    const event = await getEventById(input.eventId)
-    const humanUser = UserContext.safeParse(ctx.user)
+    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+    const rawInput = await getRawInput()
+    const input = EventIdParam.safeParse(rawInput)?.data
 
-    const eventConfig = eventConfigs.find((c) => c.id === event.type)
-
-    if (!eventConfig) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: `Event configuration not found with type: ${event.type}`
-      })
+    if (!input) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
     }
+
+    const event = await getEventById(input.eventId)
+    const eventConfig = getEventConfigById(eventConfigs, event.type)
 
     const eventIndex = getCurrentEventState(event, eventConfig)
     const eventIndexWithLocationHierarchy =
       await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
 
-    if (!humanUser.success) {
-      // System users bypass location-based access checks.
-      // They are granted access to any event if they have the required scope.
-      return next({
-        ctx: {
-          ...ctx,
-          acceptedScopes,
-          eventId: input.eventId,
-          eventType: event.type
-        }
-      })
-    }
-
-    const hasAccess = canAccessEventWithScopes(
+    const hasAccess = userCanAccessEventWithScopes(
       eventIndexWithLocationHierarchy,
       acceptedScopes,
-      humanUser.data
+      ctx.user
     )
 
     if (!hasAccess) {

@@ -13,7 +13,7 @@ inputs:
   pattern:
     description: 'Regex pattern for branch name validation'
     required: false
-    default: '^[a-z][a-z0-9\/\-]{1,44}$'
+    default: '^[a-z][a-z0-9\/\-\.]{1,44}$'
 
 runs:
   using: 'composite'

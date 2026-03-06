@@ -91,7 +91,7 @@ registerRoute(MINIO_REGEX, new CacheFirst())
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('/index.html'), {
     ...(import.meta.env.DEV && { allowlist: [/^\/$/] }),
-    denylist: [/^\/__.*$/]
+    denylist: [/^\/__.*$/, /^\/login/]
   })
 )
 

@@ -84,7 +84,17 @@ test('single scope, multi-filter combinations', async () => {
           ]
         }
       }),
-      'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      }),
       'record.declare[event=birth|death|tennis-club-membership|child-onboarding]'
     ])
 
@@ -284,7 +294,17 @@ test('multi-scope combinations', async () => {
           ]
         }
       }),
-      'record.notify[event=birth|death|tennis-club-membership|child-onboarding]',
+      encodeScope({
+        type: 'record.notify',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      }),
       'record.declare[event=birth|death|tennis-club-membership|child-onboarding]'
     ])
 
@@ -669,7 +689,13 @@ test('placeOfEvent scope filters out results between locations and administrativ
         event: [eventType]
       }
     }),
-    `record.notify[event=${eventType}]`,
+    encodeScope({
+      type: 'record.notify',
+      options: {
+        event: [eventType]
+      }
+    }),
+
     `record.declare[event=${eventType}]`
   ])
 

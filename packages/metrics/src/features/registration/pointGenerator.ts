@@ -67,7 +67,6 @@ import {
 } from '@metrics/features/registration/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { fetchTaskHistory } from '@metrics/api'
-import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 import { getTokenPayload } from '@metrics/utils/authUtils'
 import { getUser } from '@metrics/features/audit/handler'
 
@@ -209,14 +208,7 @@ export const generateBirthRegPoint = async (
     dateLabel: !Number.isNaN(compositionDate.getTime())
       ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`
       : undefined,
-    timeLabel:
-      (ageInDays &&
-        (await getTimeLabel(
-          ageInDays,
-          EVENT_TYPE.BIRTH,
-          authHeader.Authorization
-        ))) ||
-      undefined,
+    timeLabel: (ageInDays && getTimeLabel(ageInDays)) || undefined,
     officeLocation: getRegLastOffice(payload)
   }
 
@@ -285,14 +277,7 @@ export const generateDeathRegPoint = async (
     registrarPractitionerId,
     ageLabel:
       (deceasedAgeInDays && getAgeLabel(deceasedAgeInDays)) || undefined,
-    timeLabel:
-      (deathDays &&
-        (await getTimeLabel(
-          deathDays,
-          EVENT_TYPE.DEATH,
-          authHeader.Authorization
-        ))) ||
-      undefined,
+    timeLabel: (deathDays && getTimeLabel(deathDays)) || undefined,
     dateLabel: !Number.isNaN(compositionDate.getTime())
       ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`
       : undefined,
@@ -628,11 +613,7 @@ export async function generateMarriageRegPoint(
       : undefined,
     timeLabel:
       (marriageExtension.valueString &&
-        (await getTimeLabel(
-          Number(marriageExtension?.valueString),
-          EVENT_TYPE.MARRIAGE,
-          authHeader.Authorization
-        ))) ||
+        getTimeLabel(Number(marriageExtension?.valueString))) ||
       undefined,
     officeLocation: getRegLastOffice(payload)
   }

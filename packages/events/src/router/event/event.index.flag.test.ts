@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
- 
 
 import { HttpResponse, http } from 'msw'
 import {
@@ -320,6 +319,12 @@ test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called
       options: {
         event: [type]
       }
+    }),
+    encodeScope({
+      type: 'record.notify',
+      options: {
+        event: [type]
+      }
     })
   ])
 
@@ -351,6 +356,12 @@ test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.EDIT} + ${Acti
     ...TEST_USER_DEFAULT_SCOPES,
     encodeScope({
       type: 'record.search',
+      options: {
+        event: [type]
+      }
+    }),
+    encodeScope({
+      type: 'record.notify',
       options: {
         event: [type]
       }

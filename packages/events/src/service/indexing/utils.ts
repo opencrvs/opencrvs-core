@@ -11,7 +11,6 @@
 import _ from 'lodash'
 import { type estypes } from '@elastic/elasticsearch'
 import {
-  ActionCreationMetadata,
   AddressFieldValue,
   AddressType,
   ageToDate,
@@ -27,7 +26,6 @@ import {
   isNameFieldType,
   NameFieldValue,
   QueryInputType,
-  RegistrationCreationMetadata,
   UUID
 } from '@opencrvs/commons/events'
 import {
@@ -220,36 +218,6 @@ export function getEventIndexWithoutLocationHierarchy(
   }
 
   return event
-}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type WrapArrayPreserveNullish<V> = V extends readonly any[]
-  ? V
-  : NonNullable<V>[] | Extract<V, null | undefined>
-
-/**
- * For type T, convert fields K to arrays. If field is string, convert to string[].
- */
-type ToArrayFields<T, K extends PropertyKey> = T extends unknown
-  ? T extends object
-    ? { [P in keyof T]: P extends K ? WrapArrayPreserveNullish<T[P]> : T[P] }
-    : T
-  : never
-
-/**
- * Event index type where all location fields are arrays representing full location hierarchy.
- */
-export type EventIndexWithAdministrativeHierarchy = Omit<
-  ToArrayFields<EventIndex, 'createdAtLocation' | 'updatedAtLocation'>,
-  'legalStatuses'
-> & {
-  legalStatuses: {
-    DECLARED:
-      | ToArrayFields<ActionCreationMetadata, 'createdAtLocation'>
-      | undefined
-    REGISTERED:
-      | ToArrayFields<RegistrationCreationMetadata, 'createdAtLocation'>
-      | undefined
-  }
 }
 
 /**
@@ -505,8 +473,12 @@ export function resolveRecordActionScopeToIds(
   scope: RecordScopeV2,
   user: TrpcUserContext
 ): ResolvedRecordScopeV2 {
-  const { type, options } = scope
-  return {
+  const { type } = scope
+
+  // We parse on the next step, and by default fields that do not match, are stripped out.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const options = scope.options as any
+  const resolved = ResolvedRecordScopeV2.parse({
     type,
     options: {
       event: options?.event,
@@ -518,5 +490,7 @@ export function resolveRecordActionScopeToIds(
       registeredBy:
         options?.registeredBy === UserFilter.enum.user ? user.id : undefined
     }
-  }
+  })
+
+  return resolved
 }

@@ -18,47 +18,21 @@ import {
   SavedLocation
 } from '@opencrvs/commons/types'
 
-interface IBirth {
-  REGISTRATION_TARGET: number
-  LATE_REGISTRATION_TARGET: number
-  PRINT_IN_ADVANCE: boolean
-}
-interface IDeath {
-  REGISTRATION_TARGET: number
-  PRINT_IN_ADVANCE: boolean
-}
-
-interface IMarriage {
-  REGISTRATION_TARGET: number
-  PRINT_IN_ADVANCE: boolean
-}
 export interface ICountryLogo {
   fileName: string
   file: string
 }
 
-export interface ILoginBackground {
-  backgroundColor: string
-  backgroundImage: string
-  imageFit: string
-}
 interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
 }
 export interface IApplicationConfig {
   APPLICATION_NAME: string
-  BIRTH: IBirth
   CURRENCY: ICurrency
   COUNTRY_LOGO: ICountryLogo
-  DEATH: IDeath
-  MARRIAGE: IMarriage
   HEALTH_FACILITY_FILTER: string
-  FIELD_AGENT_AUDIT_LOCATIONS: string
-  DECLARATION_AUDIT_LOCATIONS: string
-  EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
-  LOGIN_BACKGROUND: ILoginBackground
 }
 
 type LocationType = 'CRVS_OFFICE' | 'HEALTH_FACILITY' | 'ADMIN_STRUCTURE'

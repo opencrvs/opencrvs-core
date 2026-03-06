@@ -29,27 +29,13 @@ import createFetchMock from 'vitest-fetch-mock'
  */
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 const config = {
-  API_GATEWAY_URL: 'http://localhost:7070/',
-  CONFIG_API_URL: 'http://localhost:2021',
-  LOGIN_URL: 'http://localhost:3020',
-  AUTH_URL: 'http://localhost:4040',
   MINIO_BUCKET: 'ocrvs',
   MINIO_BASE_URL: 'http://localhost:3535',
-  COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
-  BIRTH: {
-    REGISTRATION_TARGET: 45,
-    LATE_REGISTRATION_TARGET: 365,
-    PRINT_IN_ADVANCE: true
-  },
   COUNTRY: 'BGD',
   CURRENCY: {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
-  },
-  DEATH: {
-    REGISTRATION_TARGET: 45,
-    PRINT_IN_ADVANCE: true
   },
   ADMIN_STRUCTURE: [
     {
@@ -81,17 +67,12 @@ const config = {
     }
   ],
   FEATURES: {
-    V2_EVENTS: false,
-    DEATH_REGISTRATION: true,
-    MARRIAGE_REGISTRATION: true,
-    EXTERNAL_VALIDATION_WORKQUEUE: false,
-    PRINT_DECLARATION: true
+    V2_EVENTS: false
   },
-  LANGUAGES: 'en,bn,fr',
+  LANGUAGES: ['en', 'bn', 'fr'],
   USER_NOTIFICATION_DELIVERY_METHOD: 'sms',
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'sms',
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
-  NID_NUMBER_PATTERN: /^[0-9]{9}$/,
   PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
 }
 

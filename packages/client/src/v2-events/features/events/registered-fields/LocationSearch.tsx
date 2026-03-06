@@ -8,16 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useMemo } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import {
   FieldPropsWithoutReferenceValue,
   Location,
   UUID,
   joinValues,
-  AdministrativeArea
+  AdministrativeArea,
+  JurisdictionFilter,
+  resolveJurisdictionReference
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
@@ -25,13 +26,11 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { SearchableSelect } from '@client/v2-events/components/forms/inputs/SearchableSelect'
+import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
+import { getToken } from '@client/utils/authUtils'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
-
-interface SearchLocation {
-  id: string
-  searchableText: string
-  displayLabel: string
-}
 
 /**
  * @deprecated
@@ -44,15 +43,30 @@ const resourceTypeMap: Record<'locations' | 'facilities' | 'offices', string> =
     offices: 'CRVS_OFFICE'
   }
 
-function useCreateSearchOptions(
-  searchableResource: ('locations' | 'facilities' | 'offices')[]
+/**
+ * Return the available location options. The options will be filtered based on the jurisdiction filter.
+ */
+function useAvailableLocations(
+  searchableResource: ('locations' | 'facilities' | 'offices')[],
+  jurisdictionFilter?: JurisdictionFilter
 ) {
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
-  const locations = getLocations.useSuspenseQuery({})
+  const locations = getLocations.useSuspenseQuery()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const userDetails = useSelector(getUserDetails)
+  const userLocationId = userDetails?.primaryOffice.id
 
-  return React.useMemo(() => {
+  // If the jurisdiction filter is only for users current location, we return the location as a single option.
+  if (
+    jurisdictionFilter === JurisdictionFilter.enum.location &&
+    userLocationId
+  ) {
+    const location = locations.get(UUID.parse(userLocationId))
+    return location ? [location] : []
+  }
+
+  const options = useMemo(() => {
     const searchableResources: (Location | AdministrativeArea)[] = []
 
     if (searchableResource.includes('locations')) {
@@ -72,22 +86,38 @@ function useCreateSearchOptions(
       }
     }
 
-    return searchableResources.map((resource) => ({
-      id: resource.id,
-      searchableText: resource.name.toLowerCase(),
-      displayLabel: resource.name
-    }))
+    return searchableResources
   }, [searchableResource, locations, administrativeAreas])
+
+  // If jurisdiction filter is administrative area, we filter the options to only include locations that are under the user's admin area jurisdiction.
+  if (
+    jurisdictionFilter === JurisdictionFilter.enum.administrativeArea &&
+    userLocationId
+  ) {
+    return useMemo(
+      () =>
+        options.filter((o) =>
+          isLocationUnderJurisdiction({
+            locationId: userLocationId,
+            otherLocationId: o.id,
+            locations,
+            administrativeAreas
+          })
+        ),
+      [options, userLocationId, locations, administrativeAreas]
+    )
+  }
+
+  return options
 }
 
-/**
- * @deprecated -- Replace internals using SearchableSelect v2.0 onwards.
- */
 function LocationSearchInput({
   onChange,
   value,
   searchableResource,
   onBlur,
+  id,
+  eventType,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -95,31 +125,39 @@ function LocationSearchInput({
   value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
+  id: string
+  eventType?: string
 }) {
-  const options = useCreateSearchOptions(searchableResource)
-  const selectedOption = options.find((option) => option.id === value)
+  const token = useSelector(getToken)
+  const jurisdictionFilter = resolveJurisdictionReference(
+    props.configuration?.allowedLocations,
+    token,
+    eventType
+  )
+
+  const locations = useAvailableLocations(
+    searchableResource,
+    jurisdictionFilter
+  )
+
+  const options = useMemo(
+    () => locations.map((l) => ({ value: l.id, label: l.name })),
+    [locations]
+  )
+
+  const selectedOption =
+    options.find((option) => option.value === value) ?? null
 
   return (
-    <LocationSearchComponent
-      buttonLabel="Health facility"
-      locationList={options}
-      searchHandler={(location: SearchLocation) => {
-        if (location.id === '0') {
-          onChange(undefined)
-          return
-        }
-
-        onChange(location.id)
+    <SearchableSelect
+      data-testid={'location__' + id}
+      disabled={props.disabled}
+      id={id}
+      options={options}
+      value={selectedOption}
+      onChange={(opt) => {
+        onChange(opt?.value ?? undefined)
       }}
-      selectedLocation={selectedOption}
-      onBlur={(...args) => {
-        /*
-         * This is here purely for legacy reasons.
-         * As without passing this in, onChange will not trigger.
-         */
-        onBlur?.(...args)
-      }}
-      {...props}
     />
   )
 }
