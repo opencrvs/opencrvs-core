@@ -286,9 +286,6 @@ jobs:
         run: |
           cd packages/components && yarn build
 
-      - name: Build events router types
-        run: cd packages/events && tsc -p tsconfig.router.json
-
       - name: Upload filesystem as artifact
         uses: actions/upload-artifact@v4.5.0
         with:
@@ -328,6 +325,9 @@ jobs:
 
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
+
+      - name: Build events router types
+        run: cd packages/events && tsc -p tsconfig.router.json
 
       - name: Compile
         run: cd packages/client && yarn test:compilation
@@ -553,8 +553,8 @@ jobs:
         run: yarn build
         working-directory: packages/commons
 
-      - name: Build events
-        run: yarn build
+      - name: Build events & events router types
+        run: yarn build && tsc -p tsconfig.router.json
         working-directory: packages/events
 
       - name: Build toolkit
