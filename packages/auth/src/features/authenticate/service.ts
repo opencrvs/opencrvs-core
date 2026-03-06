@@ -30,7 +30,7 @@ import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
-import { AppRouter } from '@opencrvs/events/src/router'
+import { AppRouter } from '@opencrvs/events/router'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
