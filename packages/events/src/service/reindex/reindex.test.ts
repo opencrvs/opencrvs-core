@@ -188,7 +188,7 @@ test('allows access with reindex scope', async () => {
   await expect(client.event.reindex.trigger()).resolves.not.toThrow()
 })
 
-test.only('reindexing indexes all events into Elasticsearch', async () => {
+test('reindexing indexes all events into Elasticsearch', async () => {
   mswServer.use(postHandler)
   await runReindex(reindexToken)
 
