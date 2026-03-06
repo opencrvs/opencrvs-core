@@ -111,7 +111,7 @@ const createUserMutation = print(gql`
 `)
 
 async function getUsers(token: string) {
-  const url = new URL('users', env.COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -135,8 +135,8 @@ async function getUsers(token: string) {
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'roles')
-  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'events')
+  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
+  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
     fetch(rolesUrl),

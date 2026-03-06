@@ -165,7 +165,7 @@ const modiedchildOnboardingEvent = defineConfig({
 describe('Overwriting parent field', () => {
   it('should overwrite informant.relation via REQUEST_CORRECTION action', async () => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([modiedchildOnboardingEvent])
       }),
       http.post(
