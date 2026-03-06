@@ -130,8 +130,3 @@ export async function cleanupTemporaryIndex(tempIndexName: string) {
     logger.info(`Temporary index ${tempIndexName} deleted`)
   }
 }
-
-export function listAllIndices() {
-  const esClient = getOrCreateClient()
-  return esClient.cat.indices({ format: 'json' })
-}
