@@ -10,14 +10,19 @@
  */
 
 import React, { useEffect, useMemo } from 'react'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useNavigate } from 'react-router-dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
 import {
   ActionType,
   applyDraftToEventIndex,
   getDeclaration,
   getOrThrow,
-  getCurrentEventState
+  getCurrentEventState,
+  UUID
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -29,10 +34,10 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import { removeCachedFiles } from '../files/cache'
 
-function ReadonlyView() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
+function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
   const event = events.getEvent.useGetOrDownloadEvent(eventId)
   const validatorContext = useValidatorContext(event)
@@ -96,6 +101,20 @@ function ReadonlyView() {
       onEdit={noop}
     />
   )
+}
+
+function ReadonlyView() {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT.RECORD)
+  const navigate = useNavigate()
+  const canAccess = useCanAccessEventWithScopes(eventId, ['record.read'])
+
+  if (!canAccess) {
+    navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { workqueue }))
+    return null
+  }
+
+  return <ReadonlyViewContent eventId={eventId} />
 }
 
 export const ReadonlyViewIndex = withSuspense(ReadonlyView)

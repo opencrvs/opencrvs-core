@@ -23,6 +23,11 @@ import {
   DisplayableAction
 } from './ActionType'
 import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes-v2'
+import {
+  EventIndexWithAdministrativeHierarchy,
+  userCanAccessEventWithScopes
+} from './locations'
+import { UserContext } from '../users/User'
 
 type AlwaysAllowed = null
 
@@ -92,23 +97,33 @@ export function configurableEventScopeAllowed(
 }
 
 /**
- * Checks if a given action is allowed for the provided scopes and event type.
+ * Checks if a given action is allowed for the provided scopes, event, and user context.
  *
  * This function determines whether the user, with the given set of scopes, is authorized
- * to perform the specified action on an event of the given type. It checks both "plain" scopes
- * (hardcoded, non-configurable) and "configurable" scopes (which may be tied to specific event types).
+ * to perform the specified action on the given event. It checks both legacy V1 scopes
+ * (hardcoded, non-configurable) and V2 scopes, which validate event type, jurisdiction,
+ * and user context via {@link userCanAccessEventWithScopes}.
  *
- * @param {Scope[]} scopes - The list of scopes the user possesses.
+ * @param {Scope[]} scopes - The raw encoded scope strings the user possesses (from JWT).
  * @param {DisplayableAction} action - The action to check authorization for.
- * @param {string} eventType - The type of event for which the action is being checked.
+ * @param {EventIndexWithAdministrativeHierarchy} event - The event with resolved administrative hierarchy.
+ * @param {UserContext} currentUser - The current user's context used for V2 scope validation.
+ * @param {string} [customActionType] - Optional custom action type for CUSTOM actions.
  * @returns {boolean} True if the action is in scope for the user, otherwise false.
  */
-export function isActionInScope(
-  scopes: Scope[],
-  action: DisplayableAction,
-  eventType: string,
+export function isActionInScope({
+  scopes,
+  action,
+  event,
+  currentUser,
+  customActionType
+}: {
+  scopes: Scope[]
+  action: DisplayableAction
+  event: EventIndexWithAdministrativeHierarchy
+  currentUser: UserContext
   customActionType?: string
-) {
+}): boolean {
   const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
 
   // 'null' means that the action is always allowed
@@ -124,17 +139,30 @@ export function isActionInScope(
   const isAllowedByLegacyScope = configurableEventScopeAllowed(
     scopes,
     allowedConfigurableScopes,
-    eventType,
+    event.type,
     customActionType
   )
 
+  // @TODO
   // NOTE: This is a temporary measure to allow for the transition to V2 scopes.
   // This will be unified to single check once the V1 scopes are fully deprecated and removed.
-  const isAllowedByV2Scope =
-    getAcceptedScopesByType({
-      acceptedScopes: allowedConfigurableScopes as RecordScopeTypeV2[],
-      scopes
-    }).length > 0
+  const matchingScopes = getAcceptedScopesByType({
+    acceptedScopes: allowedConfigurableScopes as RecordScopeTypeV2[],
+    scopes
+  })
+
+  const isAllowedByV2Scope = userCanAccessEventWithScopes(
+    event,
+    matchingScopes,
+    {
+      id: currentUser.id,
+      primaryOfficeId: currentUser.primaryOfficeId,
+      administrativeAreaId: currentUser.administrativeAreaId ?? null,
+      role: currentUser.role,
+      signature: currentUser.signature,
+      type: currentUser.type
+    }
+  )
 
   return isAllowedByLegacyScope || isAllowedByV2Scope
 }

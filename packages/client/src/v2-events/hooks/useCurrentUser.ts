@@ -34,6 +34,16 @@ export function useCurrentUser() {
 
   const name = getUsersFullName(user.name, 'en')
 
+  const sharedFields = {
+    id: user.id,
+    name,
+    role: user.role,
+    type: user.type,
+    primaryOfficeId: user.primaryOfficeId,
+    administrativeAreaId: user.administrativeAreaId ?? undefined,
+    signature: user.signature
+  }
+
   if (user.primaryOfficeId) {
     const primaryOfficeLocation = locations.get(user.primaryOfficeId)
     const officeAdministrativeAreaId =
@@ -47,16 +57,10 @@ export function useCurrentUser() {
       adminLevelIds
     )
     return {
-      id: user.id,
-      name,
-      role: user.role,
+      ...sharedFields,
       ...adminLevels
     }
   }
 
-  return {
-    id: user.id,
-    name,
-    role: user.role
-  }
+  return sharedFields
 }

@@ -10,163 +10,24 @@
  */
 
 import {
-  UserFilter,
-  JurisdictionFilter,
-  RecordScopeV2,
-  UUID,
-  scopeUsesFullOptions,
-  scopeUsesDeclaredOptions
+  getScopes,
+  decodeScope,
+  RecordScopeTypeV2,
+  RecordScopeV2
 } from '@opencrvs/commons'
-import { EventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
-import { SystemContext, UserContext } from '../../../context'
 
-/**
- *
- * @param locationIds location hierarchy from event index
- * @param filter jurisdiction filter from the scope
- * @param user user context to resolve scopes against.
- * @returns whether the locationIds satisfy the jurisdiction filter for the user.
- */
-function matchesJurisdictionFilter(
-  locationIds: UUID[] | null | undefined,
-  filter: JurisdictionFilter,
-  user: UserContext | SystemContext
-): boolean {
-  if (!locationIds) {
-    return false
-  }
-
-  if (filter === JurisdictionFilter.enum.location) {
-    return locationIds.some((id) => id === user.primaryOfficeId)
-  }
-  if (filter === JurisdictionFilter.enum.administrativeArea) {
-    return (
-      user.administrativeAreaId === null ||
-      locationIds.some((id) => id === user.administrativeAreaId)
-    )
-  }
-
-  return true
-}
-
-/**
- * Given indexed event and resolved scope, determine if the scope allows access to the event.
- *
- * All of the options within the scope must be satisfied for access to be granted.
- * Return false early to break out of checks as soon as possible - if any option is not satisfied, the scope does not allow access to the event, so no need to check further options.
- *
- */
-export function canAccessEventWithScope(
-  event: Partial<EventIndexWithAdministrativeHierarchy>,
-  scope: RecordScopeV2,
-  user: UserContext | SystemContext
-): boolean {
-  const opts = scope.options
-
-  if (opts?.event) {
-    if (!event.type || !opts.event.includes(event.type)) {
-      return false
-    }
-  }
-
-  if (
-    opts?.placeOfEvent === JurisdictionFilter.enum.location &&
-    !matchesJurisdictionFilter(
-      event.placeOfEvent,
-      JurisdictionFilter.enum.location,
-      user
-    )
-  ) {
-    return false
-  }
-
-  if (
-    opts?.placeOfEvent === JurisdictionFilter.enum.administrativeArea &&
-    !matchesJurisdictionFilter(
-      event.placeOfEvent,
-      JurisdictionFilter.enum.administrativeArea,
-      user
-    )
-  ) {
-    return false
-  }
-
-  if (scopeUsesDeclaredOptions(scope)) {
-    const { options } = scope
-
-    if (options?.declaredBy === UserFilter.enum.user) {
-      if (event.legalStatuses?.DECLARED?.createdBy !== user.id) {
-        return false
-      }
-    }
-
-    if (
-      options?.declaredIn === JurisdictionFilter.enum.location &&
-      !matchesJurisdictionFilter(
-        event.legalStatuses?.DECLARED?.createdAtLocation,
-        JurisdictionFilter.enum.location,
-        user
-      )
-    ) {
-      return false
-    }
-
-    if (
-      options?.declaredIn === JurisdictionFilter.enum.administrativeArea &&
-      !matchesJurisdictionFilter(
-        event.legalStatuses?.DECLARED?.createdAtLocation,
-        JurisdictionFilter.enum.administrativeArea,
-        user
-      )
-    ) {
-      return false
-    }
-  }
-
-  if (scopeUsesFullOptions(scope)) {
-    const { options } = scope
-
-    if (options?.registeredBy === UserFilter.enum.user) {
-      if (event.legalStatuses?.REGISTERED?.createdBy !== user.id) {
-        return false
-      }
-    }
-
-    if (
-      options?.registeredIn === JurisdictionFilter.enum.location &&
-      !matchesJurisdictionFilter(
-        event.legalStatuses?.REGISTERED?.createdAtLocation,
-        JurisdictionFilter.enum.location,
-        user
-      )
-    ) {
-      return false
-    }
-
-    if (
-      options?.registeredIn === JurisdictionFilter.enum.administrativeArea &&
-      !matchesJurisdictionFilter(
-        event.legalStatuses?.REGISTERED?.createdAtLocation,
-        JurisdictionFilter.enum.administrativeArea,
-        user
-      )
-    ) {
-      return false
-    }
-  }
-
-  return true
-}
-
-/**
- * Given indexed event and list of resolved scopes, determine if any of the scopes allow access to the event.
- *
- * One of the scopes must allow access for the event to be accessible.
- */
-export function userCanAccessEventWithScopes(
-  event: Partial<EventIndexWithAdministrativeHierarchy>,
-  scopes: RecordScopeV2[],
-  user: UserContext | SystemContext
+export function getAcceptedScopesFromToken(
+  token: string,
+  acceptedScopes: RecordScopeTypeV2[]
 ) {
-  return scopes.some((scope) => canAccessEventWithScope(event, scope, user))
+  const tokenScopes = getScopes(token)
+
+  return tokenScopes
+    .map((scope) => {
+      const parsedScope = decodeScope(scope)
+      return parsedScope && acceptedScopes.includes(parsedScope.type)
+        ? parsedScope
+        : null
+    })
+    .filter((scope): scope is RecordScopeV2 => scope !== null)
 }

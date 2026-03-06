@@ -59,9 +59,8 @@ export function useEventActionsOnClick(event: EventIndex) {
     false
   )
   const { onQuickAction, quickActionModal } = useQuickActionModal(
-    event.id,
     eventConfiguration,
-    event.type
+    event
   )
 
   const eventId = event.id
