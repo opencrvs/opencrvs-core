@@ -27,11 +27,15 @@ vi.mock('@events/storage/elasticsearch')
 let _tempIndexCounter = 0
 
 async function resetESServer() {
-  const { getEventIndexName, getEventAliasName, getTemporaryIndexName } =
-    await import(
-      // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
-      '@events/storage/elasticsearch'
-    )
+  const {
+    getEventIndexName,
+    getEventAliasName,
+    getTemporaryIndexName,
+    getReindexingStatusIndexName
+  } = await import(
+    // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
+    '@events/storage/elasticsearch'
+  )
   const random = `${Date.now()}_${Math.floor(Math.random() * 10000)}`
 
   // The global alias used by all searches.
@@ -48,6 +52,8 @@ async function resetESServer() {
     (_eventType: string, _timestamp: number) =>
       `${concreteIndex}_${++_tempIndexCounter}`
   )
+
+  getReindexingStatusIndexName.mockReturnValue(`reindexing_status_${random}`)
 
   await createIndex(
     concreteIndex,

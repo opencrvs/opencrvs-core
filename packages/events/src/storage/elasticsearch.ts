@@ -40,3 +40,7 @@ export function getEventIndexName(eventType: string) {
 export function getTemporaryIndexName(eventType: string, timestamp: number) {
   return `${getEventIndexName(eventType)}_${timestamp}`
 }
+
+export function getReindexingStatusIndexName() {
+  return 'reindexing_status'
+}

@@ -17,6 +17,8 @@ export const getEventIndexName = vi.fn()
 export const getEventAliasName = vi.fn()
 /** @knipignore */
 export const getTemporaryIndexName = vi.fn()
+/** @knipignore */
+export const getReindexingStatusIndexName = vi.fn()
 
 /** @knipignore */
 export function getOrCreateClient() {

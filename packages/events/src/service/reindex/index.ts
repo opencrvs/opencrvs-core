@@ -11,20 +11,29 @@
 import { Readable, Transform } from 'node:stream'
 import fetch from 'node-fetch'
 import { EventDocument } from '@opencrvs/commons/events'
-import { logger, TokenWithBearer } from '@opencrvs/commons'
+import { getUUID, logger, TokenWithBearer } from '@opencrvs/commons'
 import {
   STREAM_BATCH_SIZE,
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
-import { getEventConfigurations } from '../config/config'
-import { getInMemoryEventConfigurations } from '../config/config'
+import {
+  getEventConfigurations,
+  getInMemoryEventConfigurations
+} from '../config/config'
 import { indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupTemporaryIndex,
   finaliseReindexIndex,
   prepareReindexIndex
-} from '../indexing/reindex'
+} from './indexing'
+import {
+  completeReindexingStatus,
+  createReindexingStatusEntry,
+  failReindexingStatus,
+  pruneOldReindexingStatusEntries,
+  updateReindexingProgress
+} from './status'
 
 async function reindexBatchToCountryConfig(
   token: TokenWithBearer,
@@ -48,7 +57,8 @@ async function reindexBatchToCountryConfig(
 
 async function reindexSearch(
   token: TokenWithBearer,
-  indexNameOverrides: Map<string, string>
+  indexNameOverrides: Map<string, string>,
+  onBatchProcessed?: (count: number) => Promise<void>
 ) {
   const configurations = await getInMemoryEventConfigurations(token)
   let buffer: EventDocument[] = []
@@ -65,6 +75,8 @@ async function reindexSearch(
       indexEventsInBulk(batch, configurations, indexNameOverrides),
       reindexBatchToCountryConfig(token, batch)
     ])
+
+    await onBatchProcessed?.(batch.length)
   }
 
   return new Transform({
@@ -92,6 +104,11 @@ async function reindexSearch(
 }
 
 export async function runReindex(token: TokenWithBearer) {
+  const runId = getUUID()
+  const startTimestamp = new Date().toISOString()
+
+  await createReindexingStatusEntry(runId, startTimestamp)
+
   const configurations = await getEventConfigurations(token)
 
   const timestamp = Date.now()
@@ -115,8 +132,16 @@ export async function runReindex(token: TokenWithBearer) {
     ])
   )
 
+  let processedCount = 0
   const objStream = Readable.from(streamEventDocuments())
-  const searchIndexingStream = await reindexSearch(token, indexNameOverrides)
+  const searchIndexingStream = await reindexSearch(
+    token,
+    indexNameOverrides,
+    async (batchSize) => {
+      processedCount += batchSize
+      await updateReindexingProgress(runId, processedCount)
+    }
+  )
 
   try {
     await new Promise<void>((resolve, reject) => {
@@ -127,6 +152,8 @@ export async function runReindex(token: TokenWithBearer) {
     })
   } catch (err) {
     logger.error('Reindex failed, cleaning up temporary indexes', err)
+    const errorMessage = err instanceof Error ? err.message : String(err)
+    await failReindexingStatus(runId, errorMessage, new Date().toISOString())
     for (const tempIndexName of indexMap.values()) {
       await cleanupTemporaryIndex(tempIndexName).catch((cleanupErr) => {
         logger.error(
@@ -138,14 +165,18 @@ export async function runReindex(token: TokenWithBearer) {
     throw err
   }
 
-  for (const [type, tempIndexName] of indexMap.entries()) {
-    await finaliseReindexIndex(type, tempIndexName)
-  }
+  await finaliseReindexIndex(
+    [...indexMap.entries()].map(([eventType, tempIndexName]) => ({
+      eventType,
+      tempIndexName
+    }))
+  )
+
+  await completeReindexingStatus(runId, new Date().toISOString())
+  await pruneOldReindexingStatusEntries()
 }
 
 export function reindex(token: TokenWithBearer) {
   logger.info('Reindex started in background')
-  runReindex(token).catch((err) => {
-    logger.error('Reindex failed', err)
-  })
+  return runReindex(token)
 }

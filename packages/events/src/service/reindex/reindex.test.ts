@@ -35,12 +35,12 @@ import {
 } from '@events/storage/elasticsearch'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
-import { runReindex } from '@events/service/events/reindex'
+import { runReindex } from '@events/service/reindex'
 
 // Mock reindex endpoint so there are no side effects
-vi.mock('@events/service/events/reindex', async (importOriginal) => {
+vi.mock('@events/service/reindex', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@events/service/events/reindex')>()
+    await importOriginal<typeof import('@events/service/reindex')>()
   return {
     ...actual,
     reindex: vi.fn()
@@ -177,7 +177,7 @@ beforeEach(async () => {
 test(`prevents forbidden access if missing required scope`, async () => {
   const client = createSystemTestClient('test-system', [])
 
-  await expect(client.event.reindex()).rejects.toMatchObject(
+  await expect(client.event.reindex.trigger()).rejects.toMatchObject(
     new TRPCError({ code: 'FORBIDDEN' })
   )
 })
@@ -185,7 +185,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
 test('allows access with reindex scope', async () => {
   const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
 
-  await expect(client.event.reindex()).resolves.not.toThrow()
+  await expect(client.event.reindex.trigger()).resolves.not.toThrow()
 })
 
 test('reindexing indexes all events into Elasticsearch', async () => {
@@ -376,6 +376,40 @@ test('reindex events go to the correct (timestamped) index via write alias', asy
   const indexBehindWriteAlias = Object.keys(writeAliasInfo)[0]
 
   expect(indexBehindWriteAlias).toEqual(liveIndex)
+})
+
+test('runReindex records completed status in reindexing_status index', async () => {
+  mswServer.use(postHandler)
+  await runReindex(reindexToken)
+
+  const client = createSystemTestClient('reindex-system', [
+    SCOPES.RECORD_REINDEX
+  ])
+  const history = await client.event.reindex.status()
+
+  expect(history).toHaveLength(1)
+  expect(history[0].status).toBe('completed')
+  expect(history[0].error_message).toBeNull()
+  expect(history[0].completed_at).not.toBeNull()
+  expect(history[0].progress.processed).toBeGreaterThanOrEqual(0)
+})
+
+test('runReindex records failed status when country config returns 500', async () => {
+  mswServer.use(failingPostHandler)
+
+  await runReindex(reindexToken).catch(() => {
+    // Swallow the error — we only want to inspect status
+  })
+
+  const client = createSystemTestClient('reindex-system', [
+    SCOPES.RECORD_REINDEX
+  ])
+  const history = await client.event.reindex.status()
+
+  expect(history).toHaveLength(1)
+  expect(history[0].status).toBe('failed')
+  expect(history[0].error_message).toBeTruthy()
+  expect(history[0].completed_at).not.toBeNull()
 })
 
 test('reindex per-type write alias is re-pointed on every subsequent reindex', async () => {
