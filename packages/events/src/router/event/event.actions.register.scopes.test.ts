@@ -14,6 +14,7 @@ import {
   ActionType,
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
+  UserFilter,
   encodeScope,
   getUUID
 } from '@opencrvs/commons'
@@ -24,16 +25,29 @@ import {
   setupScopeTestFixture
 } from '@events/tests/utils'
 
-test('Check scopes against event.actions.notify', async () => {
+test('Check scopes against event.actions.register', async () => {
   const { users, isUnderAdministrativeArea, eventIds } =
-    await setupScopeTestFixture(124345333, [ActionType.UNASSIGN])
+    await setupScopeTestFixture(124334532, [
+      ActionType.DECLARE,
+      ActionType.UNASSIGN
+    ])
 
-  // Client that can read all events,  used to fetch events that test clients cannot access for comparison.
   const clientReadingAllEvents = createTestClient(users[0], [
     encodeScope({
       type: 'record.read'
     })
   ])
+
+  const jurisdictionOptions = fc.option(
+    fc.constantFrom(...JurisdictionFilter.options),
+    {
+      nil: undefined
+    }
+  )
+
+  const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
+    nil: undefined
+  })
 
   const combinations = fc.record({
     user: fc.constantFrom(...users),
@@ -45,19 +59,18 @@ test('Check scopes against event.actions.notify', async () => {
       ),
       { nil: undefined }
     ),
-    placeOfEvent: fc.option(fc.constantFrom(...JurisdictionFilter.options), {
-      nil: undefined
-    })
+    placeOfEvent: jurisdictionOptions,
+    declaredBy: userOptions,
+    declaredIn: jurisdictionOptions
   })
 
   await fc.assert(
-    fc.asyncProperty(combinations, async ({ user, event, placeOfEvent }) => {
+    fc.asyncProperty(combinations, async ({ user, ...options }) => {
       const scope = encodeScope({
-        type: 'record.notify',
-        options: { event, placeOfEvent }
+        type: 'record.register',
+        options
       })
 
-      // Pick random event for the case. Exclude used events.
       const randomIndex = Math.floor(Math.random() * eventIds.length)
       const [eventId] = eventIds.splice(randomIndex, 1)
 
@@ -67,20 +80,19 @@ test('Check scopes against event.actions.notify', async () => {
         scope,
         clientReadingAllEvents,
         (client) =>
-          client.event.actions.notify.request({
+          client.event.actions.register.request({
             eventId,
             transactionId: getUUID(),
-            declaration: { 'applicant.email': 'test@openrvs.org' }
+            declaration: {}
           })
       )
 
       assertScopeResult(result, {
         user,
-        event,
-        placeOfEvent,
-        isUnderAdministrativeArea
+        isUnderAdministrativeArea,
+        ...options
       })
     }),
-    { numRuns: 40 }
+    { numRuns: 20 }
   )
 })

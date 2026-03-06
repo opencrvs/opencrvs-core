@@ -12,10 +12,13 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
+import fc from 'fast-check'
 import {
   ActionStatus,
   ActionType,
   ActionTypes,
+  ActionUpdate,
+  AdministrativeArea,
   createPrng,
   DeclarationActionType,
   encodeScope,
@@ -23,25 +26,36 @@ import {
   EventDocument,
   EventIndex,
   generateActionDeclarationInput,
+  generateRandomDatetime,
   generateRandomSignature,
   generateRegistrationNumber,
   generateUuid,
+  getCurrentEventState,
   getUUID,
   JurisdictionFilter,
+  Location,
   Scope,
   SCOPES,
+  TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   TokenWithBearer,
   UserFilter,
   UUID
 } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import { SystemContext, UserContext } from '@events/context'
 import { getClient } from '@events/storage/postgres/events'
+import { EventNotFoundError } from '@events/service/events/events'
 import { getLocations } from '../service/locations/locations'
 import { NewEventActions } from '../storage/postgres/events/schema/app/EventActions'
-import { CreatedUser, payloadGenerator, seeder } from './generators'
+import {
+  CreatedUser,
+  payloadGenerator,
+  seeder,
+  setupHierarchyWithUsers
+} from './generators'
 
 /**
  * Known unstable fields in events that should be sanitized for snapshot testing.
@@ -450,14 +464,27 @@ export async function seedEvent(
     eventConfig,
     actions,
     user,
-    rng
+    rng,
+    administrativeHierarchy
   }: {
     eventConfig: EventConfig
     actions: (DeclarationActionType | typeof ActionType.UNASSIGN)[]
     user: Omit<UserContext, 'type'>
     rng: () => number
+    administrativeHierarchy?: {
+      administrativeAreas: AdministrativeArea[]
+      locations: Location[]
+    }
   }
 ) {
+  const SEED_START = new Date('2020-01-01')
+  const SEED_END = new Date('2023-01-01')
+
+  const baseTime = new Date(
+    generateRandomDatetime(rng, SEED_START, SEED_END)
+  ).getTime()
+  let offset = 0
+
   await dbClient.transaction().execute(async (trx) => {
     const event = await trx
       .insertInto('events')
@@ -481,7 +508,22 @@ export async function seedEvent(
       annotation: null
     }
 
-    const dateNow = Date.now()
+    const createAction: NewEventActions = {
+      ...baseAction,
+      actionType: ActionTypes.enum.CREATE,
+      transactionId: generateUuid(rng),
+      status: ActionStatus.Accepted,
+      createdAt: new Date(baseTime + ++offset).toISOString()
+    }
+
+    const assignAction: NewEventActions = {
+      ...baseAction,
+      actionType: ActionTypes.enum.ASSIGN,
+      assignedTo: user.id,
+      transactionId: generateUuid(rng),
+      status: ActionStatus.Accepted,
+      createdAt: new Date(baseTime + ++offset).toISOString()
+    }
 
     const generatedActions: NewEventActions[] = actions.flatMap(
       (actionType): NewEventActions[] => {
@@ -493,32 +535,40 @@ export async function seedEvent(
               transactionId: generateUuid(rng),
               status: ActionStatus.Accepted,
               declaration: {},
-              createdAt: new Date(dateNow + 1).toISOString() // make sure unassign comes after assign
+              createdAt: new Date(baseTime + ++offset).toISOString()
             }
           ]
         }
+
+        const originalActionId = getUUID()
 
         return [
           {
             ...baseAction,
             actionType,
+            id: originalActionId,
             transactionId: generateUuid(rng),
             status: ActionStatus.Requested,
+            createdAt: new Date(baseTime + ++offset).toISOString(),
             declaration: generateActionDeclarationInput(
               eventConfig,
               actionType,
-              rng
+              rng,
+              undefined,
+              administrativeHierarchy
             )
           },
           {
             ...baseAction,
+            actionType,
+            transactionId: generateUuid(rng),
+            originalActionId,
+            status: ActionStatus.Accepted,
+            createdAt: new Date(baseTime + ++offset).toISOString(),
             registrationNumber:
               actionType === ActionTypes.enum.REGISTER
                 ? generateRegistrationNumber(rng)
                 : null,
-            actionType,
-            transactionId: generateUuid(rng),
-            status: ActionStatus.Accepted,
             declaration: {}
           }
         ]
@@ -527,23 +577,7 @@ export async function seedEvent(
 
     await trx
       .insertInto('eventActions')
-      .values([
-        {
-          ...baseAction,
-          actionType: ActionTypes.enum.CREATE,
-          transactionId: generateUuid(rng),
-          status: ActionStatus.Accepted
-        },
-        {
-          ...baseAction,
-          actionType: ActionTypes.enum.ASSIGN,
-          assignedTo: user.id,
-          transactionId: generateUuid(rng),
-          createdAt: new Date(dateNow).toISOString(),
-          status: ActionStatus.Accepted
-        },
-        ...generatedActions
-      ])
+      .values([createAction, assignAction, ...generatedActions])
       .onConflict((oc) =>
         oc.columns(['transactionId', 'actionType', 'status']).doNothing()
       )
@@ -564,7 +598,9 @@ export function eventMatchesScope({
   isUnderAdministrativeArea
 }: {
   eventIndex: EventIndex
-  user: { id: UUID; primaryOfficeId: UUID; administrativeAreaId: UUID | null }
+  user:
+    | { id: UUID; primaryOfficeId: UUID; administrativeAreaId: UUID | null }
+    | CreatedUser
   placeOfEvent?: JurisdictionFilter
   declaredBy?: UserFilter
   registeredBy?: UserFilter
@@ -607,7 +643,7 @@ export function eventMatchesScope({
     if (
       !isUnderAdministrativeArea(
         UUID.parse(eventIndex.placeOfEvent),
-        user.administrativeAreaId
+        user.administrativeAreaId || null
       )
     ) {
       return false
@@ -625,7 +661,7 @@ export function eventMatchesScope({
     if (
       !isUnderAdministrativeArea(
         UUID.parse(eventIndex.legalStatuses.DECLARED?.createdAtLocation),
-        user.administrativeAreaId
+        user.administrativeAreaId || null
       )
     ) {
       return false
@@ -652,7 +688,7 @@ export function eventMatchesScope({
     if (
       !isUnderAdministrativeArea(
         UUID.parse(eventIndex.legalStatuses.REGISTERED?.createdAtLocation),
-        user.administrativeAreaId
+        user.administrativeAreaId || null
       )
     ) {
       return false
@@ -666,4 +702,159 @@ export function eventMatchesScope({
   }
 
   return true
+}
+
+/**
+ *
+ * @param rngSeed random seed
+ * @param seedActions actions to be performed on the seeded events.
+ *
+ * Setups test fixtures for scope testing. Seeds users and location hiearchy, with sample of events with given actions performed on them.
+ * Provides utility client with all scopes to be used in tests and helper functions to attempt actions with specific scopes and assert results.
+ *
+ */
+export async function setupScopeTestFixture(
+  rngSeed: number,
+  seedActions:
+    | (DeclarationActionType | typeof ActionType.UNASSIGN)[]
+    | fc.Arbitrary<(DeclarationActionType | typeof ActionType.UNASSIGN)[]>
+) {
+  const sampleSize = 200
+
+  const { users, isUnderAdministrativeArea, administrativeAreas, locations } =
+    await setupHierarchyWithUsers()
+
+  const rng = createPrng(rngSeed)
+  const eventsDb = getClient()
+
+  const actionsArb = Array.isArray(seedActions)
+    ? fc.constant(seedActions)
+    : seedActions
+
+  const eventConfigArb = fc.constantFrom(tennisClubMembershipEvent, {
+    ...tennisClubMembershipEvent,
+    id: 'tennis-club-membership_premium'
+  })
+
+  const sampledEvents = fc.sample(
+    fc.record({
+      eventConfig: eventConfigArb,
+      user: fc.constantFrom(...users),
+      actions: actionsArb
+    }),
+    sampleSize
+  )
+
+  for (const seed of sampledEvents) {
+    await seedEvent(eventsDb, {
+      eventConfig: seed.eventConfig,
+      actions: seed.actions,
+      user: seed.user,
+      rng,
+      administrativeHierarchy: {
+        administrativeAreas,
+        locations
+      }
+    })
+  }
+
+  const events = await eventsDb
+    .selectFrom('events')
+    .select(['id', 'eventType'])
+    .execute()
+
+  expect(events.length).toEqual(sampleSize)
+
+  return {
+    users,
+    administrativeAreas,
+    isUnderAdministrativeArea,
+    eventIds: events.map(({ id }) => id)
+  }
+}
+
+/**
+ *
+ * @param eventIds
+ * @param user
+ * @param scope
+ * @param clientReadingAllEvents
+ * @param action
+ * @returns
+ */
+export async function attemptScopedAction(
+  eventId: string,
+  user: CreatedUser,
+  scope: string,
+  clientReadingAllEvents: any,
+  action: (testClient: any) => Promise<EventDocument>
+): Promise<{ success: boolean; event: EventDocument }> {
+  const testClient = createTestClient(user, [scope])
+
+  await expect(
+    testClient.event.actions.assignment.assign({
+      eventId,
+      transactionId: getUUID(),
+      assignedTo: user.id,
+      type: ActionType.ASSIGN
+    })
+  ).resolves.not.toThrow()
+
+  try {
+    const event = await action(testClient)
+    return { success: true, event }
+  } catch (error) {
+    if (error instanceof EventNotFoundError) {
+      const event = await clientReadingAllEvents.event.get({ eventId })
+      return { success: false, event }
+    }
+    throw error
+  }
+}
+
+export function assertScopeResult(
+  result: { success: boolean; event: EventDocument },
+  {
+    user,
+    event,
+    placeOfEvent,
+    isUnderAdministrativeArea,
+    declaredBy,
+    declaredIn,
+    registeredBy,
+    registeredIn
+  }: {
+    user: CreatedUser
+    event: string[] | undefined
+    placeOfEvent: JurisdictionFilter | undefined
+    isUnderAdministrativeArea: (
+      locationId: UUID,
+      adminAreaId: UUID | null
+    ) => boolean
+    declaredBy?: UserFilter
+    registeredBy?: UserFilter
+    declaredIn?: JurisdictionFilter
+    registeredIn?: JurisdictionFilter
+  }
+) {
+  const eventConfig =
+    result.event.type === TENNIS_CLUB_MEMBERSHIP
+      ? tennisClubMembershipEvent
+      : { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+
+  const eventIndex = getCurrentEventState(result.event, eventConfig)
+
+  const isAccessibleWithScope = eventMatchesScope({
+    eventIndex,
+    user,
+    declaredBy,
+    registeredBy,
+    declaredIn,
+    registeredIn,
+    event,
+    placeOfEvent,
+    isUnderAdministrativeArea
+  })
+
+  expect(result.success).toBe(isAccessibleWithScope)
 }

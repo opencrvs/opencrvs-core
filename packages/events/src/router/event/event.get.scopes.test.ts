@@ -12,186 +12,96 @@
 import fc from 'fast-check'
 import {
   ActionTypes,
-  DeclarationActionType,
   EventDocument,
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
-  createPrng,
-  encodeScope,
-  getCurrentEventState
+  encodeScope
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
+  assertScopeResult,
   createTestClient,
-  eventMatchesScope,
-  seedEvent
+  setupScopeTestFixture
 } from '@events/tests/utils'
-import { setupHierarchyWithUsers } from '@events/tests/generators'
-import { getClient } from '../../storage/postgres/events'
 import { EventNotFoundError } from '../../service/events/events'
 
-test('Check scopes against get.event', async () => {
-  const { users, isUnderAdministrativeArea } = await setupHierarchyWithUsers()
+test('Check scopes against event.get', async () => {
+  const { users, isUnderAdministrativeArea, eventIds } =
+    await setupScopeTestFixture(
+      1243453343,
+      fc.constantFrom(
+        [ActionTypes.enum.DECLARE],
+        [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
+      )
+    )
 
-  // Client that can read all events,  used to fetch events that test clients cannot access for comparison.
   const clientReadingAllEvents = createTestClient(users[0], [
     encodeScope({
-      type: 'record.read',
-      options: {
-        event: ['tennis-club-membership', 'tennis-club-membership_premium']
-      }
+      type: 'record.read'
     })
   ])
 
-  const rng = createPrng(1243453)
-
-  const eventsDb = getClient()
-
-  // 1. Seed events with various combinations of users and actions.
-  const actionsArb = fc.constantFrom<DeclarationActionType[]>(
-    [ActionTypes.enum.DECLARE],
-    [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
-  )
-
-  const usersArb = fc.constantFrom(...users)
-
-  const eventConfigArb = fc.constantFrom(tennisClubMembershipEvent, {
-    ...tennisClubMembershipEvent,
-    id: 'tennis-club-membership_premium'
-  })
-
-  const eventSeedArb = fc.record({
-    eventConfig: eventConfigArb,
-    actions: actionsArb,
-    user: usersArb
-  })
-  const sampleSize = 200
-
-  const sampledEvents = fc.sample(eventSeedArb, sampleSize)
-
-  for (const seed of sampledEvents) {
-    await seedEvent(eventsDb, {
-      eventConfig: seed.eventConfig,
-      actions: seed.actions,
-      user: seed.user,
-      rng
-    })
-  }
-
-  // 2. Fetch all events that were just seeded.
-  const events = await eventsDb
-    .selectFrom('events')
-    .select(['id', 'eventType'])
-    .execute()
-
-  expect(events.length).toEqual(sampleSize)
-
-  // 3. Setup test combinations with every possible scope and just created events and users.
   const jurisdictionOptions = fc.option(
     fc.constantFrom(...JurisdictionFilter.options),
-    { nil: undefined }
+    {
+      nil: undefined
+    }
   )
 
   const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
     nil: undefined
   })
 
-  const testUsers = fc.constantFrom(...users)
-
-  const eventIdsArb = fc.constantFrom(...events.map((e) => e.id))
-  const eventTypes = fc.option(
-    fc.constantFrom<string[]>(
-      [TENNIS_CLUB_MEMBERSHIP],
-      [TENNIS_CLUB_MEMBERSHIP, 'tennis-club-membership_premium'],
-      ['tennis-club-membership_premium']
+  const combinations = fc.record({
+    user: fc.constantFrom(...users),
+    event: fc.option(
+      fc.constantFrom<string[]>(
+        [TENNIS_CLUB_MEMBERSHIP],
+        [TENNIS_CLUB_MEMBERSHIP, 'tennis-club-membership_premium'],
+        ['tennis-club-membership_premium']
+      ),
+      { nil: undefined }
     ),
-    { nil: undefined }
-  )
-  const scopeCombinations = fc.record({
-    eventId: eventIdsArb,
-    user: testUsers,
-    declaredIn: jurisdictionOptions,
+    placeOfEvent: jurisdictionOptions,
     declaredBy: userOptions,
-    registeredIn: jurisdictionOptions,
+    declaredIn: jurisdictionOptions,
     registeredBy: userOptions,
-    event: eventTypes,
-    placeOfEvent: jurisdictionOptions
+    registeredIn: jurisdictionOptions
   })
 
-  // 4. Property based test to verify each combination works as expected.
   await fc.assert(
-    fc.asyncProperty(
-      scopeCombinations,
-      async ({
-        eventId,
-        user,
-        declaredIn,
-        declaredBy,
-        event,
-        registeredIn,
-        registeredBy,
-        placeOfEvent
-      }) => {
-        const searchScope = encodeScope({
-          type: 'record.read',
-          options: {
-            event,
-            declaredIn,
-            declaredBy,
-            registeredIn,
-            registeredBy,
-            placeOfEvent
-          }
-        })
+    fc.asyncProperty(combinations, async ({ user, ...options }) => {
+      const scope = encodeScope({
+        type: 'record.read',
+        options
+      })
 
-        // 5. Create test client with the generated scope and try to fetch the event.
-        const testClient = createTestClient(user, [searchScope])
-        let result:
-          | { success: true; event: EventDocument }
-          | { success: false; event: EventDocument } // fetched as admin because the test user could not access it.
-        try {
-          const response = await testClient.event.get({ eventId })
-          result = { success: true, event: response }
-        } catch (error) {
-          if (error instanceof EventNotFoundError) {
-            const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
-              eventId
-            })
+      const randomIndex = Math.floor(Math.random() * eventIds.length)
+      const [eventId] = eventIds.splice(randomIndex, 1)
 
-            result = { success: false, event: eventFetchedAsAdmin }
-          } else {
-            throw error
-          }
+      const testClient = createTestClient(user, [scope])
+
+      let result: { success: boolean; event: EventDocument }
+      try {
+        const eventFetchedAsUser = await testClient.event.get({ eventId })
+        result = { success: true, event: eventFetchedAsUser }
+      } catch (error) {
+        if (error instanceof EventNotFoundError) {
+          const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
+            eventId
+          })
+          result = { success: false, event: eventFetchedAsAdmin }
+        } else {
+          throw error
         }
-
-        const config =
-          result.event.type === TENNIS_CLUB_MEMBERSHIP
-            ? tennisClubMembershipEvent
-            : {
-                ...tennisClubMembershipEvent,
-                id: 'tennis-club-membership_premium'
-              }
-
-        const eventIndex = getCurrentEventState(result.event, config)
-        // 6. Verify that the result matches the expected outcome based on scope filters.
-        const isReadableWithScope = eventMatchesScope({
-          eventIndex,
-          user,
-          declaredBy,
-          registeredBy,
-          declaredIn,
-          registeredIn,
-          event,
-          placeOfEvent,
-          isUnderAdministrativeArea
-        })
-
-        expect(result.success).toBe(isReadableWithScope)
       }
-    ),
-    {
-      numRuns: 40
-    }
+
+      assertScopeResult(result, {
+        user,
+        isUnderAdministrativeArea,
+        ...options
+      })
+    }),
+    { numRuns: 40 }
   )
 })
