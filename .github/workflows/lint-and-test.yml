@@ -170,6 +170,11 @@ jobs:
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
         run: |
           cd packages/components && yarn build
+
+      - name: Build events router types
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/events')
+        run: cd packages/events && tsc -p tsconfig.router.json
+
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
@@ -280,6 +285,9 @@ jobs:
       - name: Build components
         run: |
           cd packages/components && yarn build
+
+      - name: Build events router types
+        run: cd packages/events && tsc -p tsconfig.router.json
 
       - name: Upload filesystem as artifact
         uses: actions/upload-artifact@v4.5.0
