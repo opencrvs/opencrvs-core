@@ -432,7 +432,7 @@ describe('Declare action', () => {
 
 test('deduplication and annotation check is performed after declaration', async () => {
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
         tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
       ])

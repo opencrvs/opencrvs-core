@@ -108,7 +108,7 @@ test('Returns single duplicate when found', async () => {
     tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
 
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
     })
   )
@@ -194,7 +194,7 @@ test('Returns multiple duplicates when found', async () => {
     tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
 
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([tennisClubMembershipWithDedupCheckConfig])
     })
   )

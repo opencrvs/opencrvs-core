@@ -1213,7 +1213,7 @@ describe('Request and confirmation flow', () => {
 
 test('deduplication check is performed before register when configured', async () => {
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
         tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
       ])

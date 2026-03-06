@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -29,7 +30,11 @@ import {
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
-import { logger, RecordScopeV2 } from '@opencrvs/commons'
+import {
+  EventIndexWithAdministrativeHierarchy,
+  logger,
+  RecordScopeV2
+} from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
@@ -41,7 +46,6 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
-  EventIndexWithAdministrativeHierarchy,
   getEventIndexWithAdministrativeHierarchy,
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
