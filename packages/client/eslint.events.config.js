@@ -25,7 +25,7 @@ module.exports = defineConfig([
     ],
     rules: {
       ...eventsConfig.rules,
-      ...(process.env.CI === 'true' ? typescriptConfig.rules : {}),
+      ...typescriptConfig.rules,
       'max-lines': ['warn', 600],
       'no-console': 'warn',
       '@typescript-eslint/ban-ts-comment': 'off',
