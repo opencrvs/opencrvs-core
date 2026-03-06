@@ -667,7 +667,7 @@ test('placeOfEvent scope filters out results between locations and administrativ
   })
 
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([eventWithOptionalAddress])
     })
   )
