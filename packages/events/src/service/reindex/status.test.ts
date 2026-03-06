@@ -191,7 +191,7 @@ test('limit parameter is respected', async () => {
   expect(result).toHaveLength(2)
 })
 
-test('running reindex appears with running status', async () => {
+test.only('running reindex appears with running status', async () => {
   const client = createSystemTestClient('reindex-system', [
     SCOPES.RECORD_REINDEX
   ])

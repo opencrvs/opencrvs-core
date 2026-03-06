@@ -18,47 +18,25 @@ import {
 } from '@events/storage/postgres/events'
 
 import { createIndex } from '@events/service/indexing/indexing'
+import { getReindexingStatusIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { mswServer } from './msw'
 import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
 vi.mock('@events/storage/mongodb/user-mgnt')
 vi.mock('@events/storage/elasticsearch')
 
-let _tempIndexCounter = 0
-
 async function resetESServer() {
-  const {
-    getEventIndexName,
-    getEventAliasName,
-    getTemporaryIndexName,
-    getReindexingStatusIndexName
-  } = await import(
+  const { getEventIndexName, getEventAliasName } = await import(
     // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
     '@events/storage/elasticsearch'
   )
-  const random = `${Date.now()}_${Math.floor(Math.random() * 10000)}`
-
-  // The global alias used by all searches.
-  const alias = `events_${random}`
-
-  const concreteIndex = `${alias}_idx`
-
-  getEventAliasName.mockReturnValue(alias)
-
-  getEventIndexName.mockReturnValue(concreteIndex)
-
-  getTemporaryIndexName.mockImplementation(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_eventType: string, _timestamp: number) =>
-      `${concreteIndex}_${++_tempIndexCounter}`
+  const index = 'events_tennis_club_membership' + Date.now() + Math.random()
+  getEventIndexName.mockReturnValue(index)
+  getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
+  getReindexingStatusIndexName.mockReturnValue(
+    'reindexing_status_' + Date.now() + Math.random()
   )
-
-  getReindexingStatusIndexName.mockReturnValue(`reindexing_status_${random}`)
-
-  await createIndex(
-    concreteIndex,
-    getDeclarationFields(tennisClubMembershipEvent)
-  )
+  await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
 }
 
 async function resetPostgresServer() {

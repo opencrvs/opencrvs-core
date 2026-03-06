@@ -15,14 +15,17 @@ import { inject, vi } from 'vitest'
 export const getEventIndexName = vi.fn()
 /** @knipignore */
 export const getEventAliasName = vi.fn()
-/** @knipignore */
-export const getTemporaryIndexName = vi.fn()
-/** @knipignore */
-export const getReindexingStatusIndexName = vi.fn()
 
 /** @knipignore */
 export function getOrCreateClient() {
   return new elasticsearch.Client({
     node: `http://${inject('ELASTICSEARCH_URI')}`
   })
+}
+/** @knipignore */
+export const getReindexingStatusIndexName = vi.fn()
+
+/** @knipignore */
+export function getTemporaryIndexName(eventType: string, timestamp: number) {
+  return `${getEventIndexName(eventType)}_${timestamp}`
 }

@@ -18,7 +18,7 @@ import {
 } from '@events/storage/elasticsearch'
 import { createIndex } from '../indexing/indexing'
 
-export async function prepareReindexIndex(
+export async function prepareTemporaryIndex(
   eventConfiguration: EventConfig,
   timestamp: number
 ) {
@@ -26,91 +26,99 @@ export async function prepareReindexIndex(
   const formFields = getDeclarationFields(eventConfiguration)
 
   logger.info(`Preparing temporary reindex index ${tempIndexName}`)
+
   await createIndex(tempIndexName, formFields, false)
 
   return tempIndexName
 }
 
+async function getIndicesBehindAlias(
+  esClient: ReturnType<typeof getOrCreateClient>,
+  alias: string
+): Promise<string[]> {
+  try {
+    return Object.keys(await esClient.indices.getAlias({ name: alias }))
+  } catch {
+    // Alias doesn't exist yet — first reindex
+    return []
+  }
+}
+
 export async function finaliseReindexIndex(
-  entries: Array<{ eventType: string; tempIndexName: string }>
+  eventType: string,
+  tempIndexName: string
 ) {
   const esClient = getOrCreateClient()
   const globalAliasName = getEventAliasName()
+  const writeAliasName = getEventIndexName(eventType)
 
-  let existingAliasInfo: Record<string, unknown> = {}
+  let currentLiveIndex: string | undefined
   try {
-    existingAliasInfo = await esClient.indices.getAlias({
-      name: globalAliasName
-    })
+    const aliasInfo = await getIndicesBehindAlias(esClient, globalAliasName)
+    const eventIndexPrefix = getEventIndexName(eventType)
+    currentLiveIndex = aliasInfo.find((idx) => idx.startsWith(eventIndexPrefix))
   } catch {
-    // Alias doesn't exist yet — first reindex for all types
+    // Alias doesn't exist yet — this is the first reindex
   }
 
-  const actions: Array<Record<string, unknown>> = []
-  const indicesToDelete: string[] = []
-  // First-time entries: old concrete index had the same name as the write alias,
-  // so we must delete it before we can create the alias with that name.
-  const deferredWriteAliases: Array<{
-    tempIndexName: string
-    writeAliasName: string
-  }> = []
+  if (currentLiveIndex) {
+    const writeAliasConflictsWithConcreteIndex =
+      currentLiveIndex === writeAliasName
 
-  for (const { eventType, tempIndexName } of entries) {
-    const writeAliasName = getEventIndexName(eventType)
-    const currentLiveIndex = Object.keys(existingAliasInfo).find((idx) =>
-      idx.startsWith(writeAliasName)
-    )
-
-    if (currentLiveIndex) {
-      actions.push({
-        remove: { index: currentLiveIndex, alias: globalAliasName }
+    if (writeAliasConflictsWithConcreteIndex) {
+      logger.warn('First-time reindex')
+      await esClient.indices.updateAliases({
+        body: {
+          actions: [
+            { remove: { index: currentLiveIndex, alias: globalAliasName } },
+            { add: { index: tempIndexName, alias: globalAliasName } }
+          ]
+        }
       })
-      actions.push({ add: { index: tempIndexName, alias: globalAliasName } })
-
-      if (currentLiveIndex === writeAliasName) {
-        // The concrete index occupies the name we want for the write alias;
-        // defer creating it until after the old index is deleted.
-        logger.warn(`First-time reindex for event type ${eventType}`)
-        deferredWriteAliases.push({ tempIndexName, writeAliasName })
-      } else {
-        actions.push({ add: { index: tempIndexName, alias: writeAliasName } })
-      }
-
-      indicesToDelete.push(currentLiveIndex)
-    } else {
       logger.info(
-        `No existing index for ${eventType} — creating aliases ${globalAliasName} and ${writeAliasName} → ${tempIndexName}`
+        `Global alias swapped. Deleting old concrete index ${currentLiveIndex}`
       )
-      actions.push({ add: { index: tempIndexName, alias: globalAliasName } })
-      actions.push({ add: { index: tempIndexName, alias: writeAliasName } })
-    }
-  }
-
-  logger.info(`Swapping aliases for ${entries.length} event type(s) atomically`)
-  await esClient.indices.updateAliases({ body: { actions } })
-
-  await Promise.all(
-    indicesToDelete.map((index) => {
-      logger.info(`Deleting old index ${index}`)
-      return esClient.indices.delete({ index })
-    })
-  )
-
-  await Promise.all(
-    deferredWriteAliases.map(({ tempIndexName, writeAliasName }) => {
+      await esClient.indices.delete({ index: currentLiveIndex })
       logger.info(
         `Creating per-type write alias ${writeAliasName} → ${tempIndexName}`
       )
-      return esClient.indices.putAlias({
+      await esClient.indices.putAlias({
         index: tempIndexName,
         name: writeAliasName
       })
+    } else {
+      logger.info(
+        `Swapping aliases [${globalAliasName}, ${writeAliasName}] from ${currentLiveIndex} to ${tempIndexName}`
+      )
+      await esClient.indices.updateAliases({
+        body: {
+          actions: [
+            { remove: { index: currentLiveIndex, alias: globalAliasName } },
+            { add: { index: tempIndexName, alias: globalAliasName } },
+            { add: { index: tempIndexName, alias: writeAliasName } }
+          ]
+        }
+      })
+      logger.info(
+        `Aliases swapped atomically. Deleting old index ${currentLiveIndex}`
+      )
+      await esClient.indices.delete({ index: currentLiveIndex })
+    }
+  } else {
+    logger.info(
+      `No existing index for ${eventType}, creating aliases ${globalAliasName} and ${writeAliasName} → ${tempIndexName}`
+    )
+    await esClient.indices.updateAliases({
+      body: {
+        actions: [
+          { add: { index: tempIndexName, alias: globalAliasName } },
+          { add: { index: tempIndexName, alias: writeAliasName } }
+        ]
+      }
     })
-  )
+  }
 
-  logger.info(
-    `Reindex finalised: ${entries.map((e) => e.tempIndexName).join(', ')} now live`
-  )
+  logger.info(`Reindex finalised: ${tempIndexName} is now live`)
 }
 
 export async function cleanupTemporaryIndex(tempIndexName: string) {

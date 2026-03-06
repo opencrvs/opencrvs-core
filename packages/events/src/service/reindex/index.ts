@@ -10,13 +10,15 @@
  */
 import { Readable, Transform } from 'node:stream'
 import fetch from 'node-fetch'
-import { EventDocument } from '@opencrvs/commons/events'
 import { getUUID, logger, TokenWithBearer } from '@opencrvs/commons'
+import { EventDocument } from '@opencrvs/commons/events'
+import { env } from '@events/environment'
+
 import {
   STREAM_BATCH_SIZE,
   streamEventDocuments
 } from '@events/storage/postgres/events/events'
-import { env } from '@events/environment'
+import { getTemporaryIndexName } from '@events/storage/elasticsearch'
 import {
   getEventConfigurations,
   getInMemoryEventConfigurations
@@ -25,7 +27,7 @@ import { indexEventsInBulk } from '../indexing/indexing'
 import {
   cleanupTemporaryIndex,
   finaliseReindexIndex,
-  prepareReindexIndex
+  prepareTemporaryIndex
 } from './indexing'
 import {
   completeReindexingStatus,
@@ -56,11 +58,18 @@ async function reindexBatchToCountryConfig(
 }
 
 async function reindexSearch(
+  timestamp: number,
   token: TokenWithBearer,
-  indexNameOverrides: Map<string, string>,
   onBatchProcessed?: (count: number) => Promise<void>
 ) {
   const configurations = await getInMemoryEventConfigurations(token)
+  const indexNameOverrides = new Map(
+    configurations.map((config) => [
+      config.id,
+      getTemporaryIndexName(config.id, timestamp)
+    ])
+  )
+
   let buffer: EventDocument[] = []
 
   async function flush() {
@@ -104,39 +113,36 @@ async function reindexSearch(
 }
 
 export async function runReindex(token: TokenWithBearer) {
+  const start = new Date()
+  const timestamp = start.valueOf()
   const runId = getUUID()
-  const startTimestamp = new Date().toISOString()
+  const startTimestamp = start.toISOString()
 
   await createReindexingStatusEntry(runId, startTimestamp)
 
   const configurations = await getEventConfigurations(token)
 
-  const timestamp = Date.now()
-  const indexMap = new Map<string, string>()
-
-  for (const configuration of configurations) {
-    const indexNameWithTimestamp = await prepareReindexIndex(
-      configuration,
-      timestamp
-    )
-    indexMap.set(configuration.id, indexNameWithTimestamp)
-    logger.info(
-      `Prepared temporary index ${indexNameWithTimestamp} for event type ${configuration.id}`
-    )
-  }
-
-  const indexNameOverrides = new Map(
-    [...indexMap.entries()].map(([type, tempIndexName]) => [
-      type,
-      tempIndexName
-    ])
+  /*
+   * Create temporary indices for all event types
+   */
+  const temporaryIndices = await Promise.all(
+    configurations.map(async (configuration) => {
+      const indexNameWithTimestamp = await prepareTemporaryIndex(
+        configuration,
+        timestamp
+      )
+      logger.info(
+        `Prepared temporary index ${indexNameWithTimestamp} for event type ${configuration.id}`
+      )
+      return indexNameWithTimestamp
+    })
   )
 
   let processedCount = 0
   const objStream = Readable.from(streamEventDocuments())
   const searchIndexingStream = await reindexSearch(
+    timestamp,
     token,
-    indexNameOverrides,
     async (batchSize) => {
       processedCount += batchSize
       await updateReindexingProgress(runId, processedCount)
@@ -154,7 +160,7 @@ export async function runReindex(token: TokenWithBearer) {
     logger.error('Reindex failed, cleaning up temporary indexes', err)
     const errorMessage = err instanceof Error ? err.message : String(err)
     await failReindexingStatus(runId, errorMessage, new Date().toISOString())
-    for (const tempIndexName of indexMap.values()) {
+    for (const tempIndexName of temporaryIndices) {
       await cleanupTemporaryIndex(tempIndexName).catch((cleanupErr) => {
         logger.error(
           `Failed to clean up temporary index ${tempIndexName}`,
@@ -164,12 +170,13 @@ export async function runReindex(token: TokenWithBearer) {
     }
     throw err
   }
-
-  await finaliseReindexIndex(
-    [...indexMap.entries()].map(([eventType, tempIndexName]) => ({
-      eventType,
-      tempIndexName
-    }))
+  await Promise.all(
+    configurations.map((config) =>
+      finaliseReindexIndex(
+        config.id,
+        getTemporaryIndexName(config.id, timestamp)
+      )
+    )
   )
 
   await completeReindexingStatus(runId, new Date().toISOString())
