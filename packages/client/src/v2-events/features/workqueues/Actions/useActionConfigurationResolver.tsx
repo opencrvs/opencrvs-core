@@ -48,9 +48,8 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { onClick, modals } = useEventActionsOnClick(event)
   const validatorContext = useValidatorContext()
-  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
-    event.type
-  )
+  const { isActionAllowed: isActionAllowedForUser } =
+    useUserAllowedActions(event)
 
   const events = useEvents()
   const isOnline = useOnlineStatus()
@@ -102,7 +101,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       eventConfiguration,
       isOnline,
       isDownloaded,
-      events,
+      events.actions.assignment.assign,
       onClick
     ]
   )
@@ -119,9 +118,8 @@ export function useResolveActionConditionals(
   isDeclareDraftOpen: boolean
 ) {
   const validatorContext = useValidatorContext()
-  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
-    event.type
-  )
+  const { isActionAllowed: isActionAllowedForUser } =
+    useUserAllowedActions(event)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const events = useEvents()
   const isOnline = useOnlineStatus()
@@ -152,9 +150,8 @@ export function useResolveActionConditionals(
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const validatorContext = useValidatorContext()
-  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
-    event.type
-  )
+  const { isActionAllowed: isActionAllowedForUser } =
+    useUserAllowedActions(event)
   const events = useEvents()
   const isOnline = useOnlineStatus()
   const { useFindEventFromCache } = events.getEvent
