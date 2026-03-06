@@ -64,7 +64,7 @@ let inMemoryEventConfigurations: EventConfig[] | null = null
 async function getEventConfigurations(
   authHeader: IAuthHeader
 ): Promise<EventConfig[]> {
-  const url = joinUrl(COUNTRY_CONFIG_URL, '/events')
+  const url = joinUrl(COUNTRY_CONFIG_URL, '/config/events')
 
   const res = await fetch(url, {
     headers: {

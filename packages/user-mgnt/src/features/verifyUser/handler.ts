@@ -65,7 +65,7 @@ export default async function verifyUserHandler(
   }
 
   const roles = await fetchJSON<Roles>(
-    joinUrl(env.COUNTRY_CONFIG_URL, '/roles')
+    joinUrl(env.COUNTRY_CONFIG_URL, '/config/roles')
   )
 
   const response: IVerifyResponse = {

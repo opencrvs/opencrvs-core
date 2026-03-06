@@ -16,7 +16,7 @@ export const resolvers: GQLResolver = {
   Query: {
     async getUserRoles(_, __, { headers: authHeader }) {
       const roles = await fetchJSON<Roles[]>(
-        joinUrl(COUNTRY_CONFIG_URL, `/roles`),
+        joinUrl(COUNTRY_CONFIG_URL, '/config/roles'),
         {
           headers: {
             'Content-Type': 'application/json',

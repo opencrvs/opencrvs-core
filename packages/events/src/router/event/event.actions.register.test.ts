@@ -334,7 +334,7 @@ describe('Request and confirmation flow', () => {
         client.event.actions.register.request(data)
       ).rejects.matchSnapshot()
 
-      const event = await client.event.get({eventId})
+      const event = await client.event.get({ eventId })
       const registerActions = event.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
@@ -389,7 +389,7 @@ describe('Request and confirmation flow', () => {
         )
       ).rejects.matchSnapshot()
 
-      const registeredEvent = await client.event.get({eventId})
+      const registeredEvent = await client.event.get({ eventId })
 
       const registerActions = registeredEvent.actions.filter(
         (action) => action.type === ActionType.REGISTER
@@ -1103,7 +1103,7 @@ describe('Request and confirmation flow', () => {
 
 test('deduplication check is performed before register when configured', async () => {
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
         tennisClubMembershipEventWithDedupCheck(ActionType.REGISTER)
       ])

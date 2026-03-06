@@ -498,7 +498,7 @@ test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.EDIT} + ${Action
 suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
   beforeEach(() => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([
           tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
         ])

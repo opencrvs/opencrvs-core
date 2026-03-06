@@ -1027,7 +1027,7 @@ describe('placeOfEvent location hierarchy handling', () => {
       placeOfEvent: field('locationId')
     }
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([modifiedEventConfig])
       })
     )
@@ -1423,7 +1423,7 @@ describe('placeOfEvent location hierarchy handling', () => {
   test('records are indexed with createdAtLocation for no placeOfEvent config', async () => {
     // Step 1: Create and declare events with international address
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([
           { ...modifiedEventConfig, placeOfEvent: undefined }
         ])
