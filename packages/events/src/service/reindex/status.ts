@@ -19,7 +19,7 @@ import {
 // Zod schemas
 // ---------------------------------------------------------------------------
 
-export const ReindexingProgressSchema = z.object({
+const ReindexingProgressSchema = z.object({
   processed: z.number().int()
 })
 
@@ -32,7 +32,7 @@ export const ReindexingStatusSchema = z.object({
   completed_at: z.string().datetime().nullable()
 })
 
-export type ReindexingStatus = z.infer<typeof ReindexingStatusSchema>
+type ReindexingStatus = z.infer<typeof ReindexingStatusSchema>
 
 // ---------------------------------------------------------------------------
 // Internal helpers
