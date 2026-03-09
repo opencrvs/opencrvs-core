@@ -22,3 +22,10 @@ export function getOrCreateClient() {
     node: `http://${inject('ELASTICSEARCH_URI')}`
   })
 }
+/** @knipignore */
+export const getReindexingStatusIndexName = vi.fn()
+
+/** @knipignore */
+export function getTemporaryIndexName(eventType: string, timestamp: number) {
+  return `${getEventIndexName(eventType)}_${timestamp}`
+}

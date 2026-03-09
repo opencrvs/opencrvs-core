@@ -43,7 +43,8 @@ import {
   omitHiddenPaginatedFields,
   runFieldValidations,
   runStructuralValidations,
-  ValidatorContext
+  ValidatorContext,
+  getDeclarationFieldById
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -55,7 +56,8 @@ import {
   getValidatorContext,
   getInvalidUpdateKeys,
   getVerificationPageErrors,
-  throwWhenNotEmpty
+  throwWhenNotEmpty,
+  omitUncorrectableFields
 } from './utils'
 
 export function getFieldErrors(
@@ -131,17 +133,37 @@ function validateDeclarationUpdateAction({
    * We need to validate the update against the cleaned declaration, which is a merged version of the previous declaration and the update.
    */
 
+  const declarationConfig = getDeclaration(eventConfig)
   // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
   const previousDeclaration = getCurrentEventState(
     event,
     eventConfig
   ).declaration
+
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
-  const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
+  const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
-  const declarationConfig = getDeclaration(eventConfig)
+  // 2. Check for any invalid key that doesn't exist in declaration config
+  // getDeclarationFieldById will throw if any field is not in the declaration config
+  Object.keys(mergedDeclaration).forEach((key) => {
+    getDeclarationFieldById(eventConfig, key)
+  })
 
-  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
+  // For REQUEST_CORRECTION, `previousDeclaration` may contain uncorrectable fields that are conditionally hidden.
+  // When merged into `completeDeclaration`, these hidden uncorrectable fields would incorrectly trigger
+  // "Hidden or disabled field should not receive a value" error during invalid key check.
+  // We cannot resolve this by sending them as null in `declarationUpdate` either,
+  // because `validateCorrectableFields` below rejects any uncorrectable field in a REQUEST_CORRECTION.
+  // Stripping uncorrectable fields from `completeDeclaration` (which is previousDeclaration + declarationUpdate) entirely is the only clean solution —
+  // and it's safe because `validateCorrectableFields` already catches the case where
+  // the client wrongly includes uncorrectable fields in `declarationUpdate`.
+  const completeDeclaration = deepDropNulls(
+    actionType === ActionType.REQUEST_CORRECTION
+      ? omitUncorrectableFields(eventConfig, mergedDeclaration)
+      : mergedDeclaration
+  )
+
+  // 3. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
   // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
@@ -149,10 +171,9 @@ function validateDeclarationUpdateAction({
     context
   )
 
-  // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
-  // Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
+  // 4. When completeDeclaration update has fields that are not in the cleaned declaration, payload is invalid.
   const invalidKeys = getInvalidUpdateKeys({
-    update: declarationUpdate,
+    update: completeDeclaration,
     cleaned: cleanedDeclaration
   })
 
@@ -160,7 +181,7 @@ function validateDeclarationUpdateAction({
     return invalidKeys
   }
 
-  // 4. Validate declaration update against conditional rules, taking into account conditional pages.
+  // 5. Validate declaration update against conditional rules, taking into account conditional pages.
   const allVisiblePageFields = declarationConfig.pages
     .filter((page) => isPageVisible(page, cleanedDeclaration, context))
     .flatMap((page) => page.fields)
@@ -174,7 +195,7 @@ function validateDeclarationUpdateAction({
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
-  // 5. Validate against action review fields, if applicable
+  // 6. Validate against action review fields, if applicable
   const reviewFields = declarationActionParse.success
     ? getActionReviewFields(eventConfig, declarationActionParse.data)
     : []

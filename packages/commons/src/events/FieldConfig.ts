@@ -15,7 +15,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
-  DateValue,
+  PlainDate,
   NumberFieldValue,
   NonEmptyTextValue,
   TextValue,
@@ -263,7 +263,7 @@ export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: SerializedNowDateTime.or(DateValue)
+  defaultValue: SerializedNowDateTime.or(PlainDate)
     .optional()
     .openapi({ effectType: 'input', type: 'string' })
     .describe('Default date value(yyyy-MM-dd)'),

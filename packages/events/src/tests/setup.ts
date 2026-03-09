@@ -8,16 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { inject, vi } from 'vitest'
 import { Client } from 'pg'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { inject, vi } from 'vitest'
 import { getDeclarationFields } from '@opencrvs/commons/events'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
-  resetServer as resetEventsPostgresServer,
-  getPool
+  getPool,
+  resetServer as resetEventsPostgresServer
 } from '@events/storage/postgres/events'
 
 import { createIndex } from '@events/service/indexing/indexing'
+import { getReindexingStatusIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { mswServer } from './msw'
 import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
@@ -32,6 +33,9 @@ async function resetESServer() {
   const index = 'events_tennis_club_membership' + Date.now() + Math.random()
   getEventIndexName.mockReturnValue(index)
   getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
+  getReindexingStatusIndexName.mockReturnValue(
+    'reindexing_status_' + Date.now() + Math.random()
+  )
   await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
 }
 
