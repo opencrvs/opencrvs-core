@@ -38,7 +38,7 @@ export const ApplicationConfig = z.object({
       label: TranslationConfig
     })
   ),
-  PHONE_NUMBER_PATTERN: z.string(),
+  PHONE_NUMBER_PATTERN: z.string().or(z.instanceof(RegExp)),
   USER_NOTIFICATION_DELIVERY_METHOD: z.string(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: z.string(),
   SEARCH_DEFAULT_CRITERIA: SearchCriteria.optional().default('TRACKING_ID')
@@ -71,7 +71,7 @@ export const LoginConfig = z.object({
   LANGUAGES: z.array(z.string()),
   USER_NOTIFICATION_DELIVERY_METHOD: z.string(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: z.string(),
-  PHONE_NUMBER_PATTERN: z.string(),
+  PHONE_NUMBER_PATTERN: z.string().or(z.instanceof(RegExp)),
   LOGIN_BACKGROUND: BackgroundConfig,
   SENTRY: z.string()
 })
