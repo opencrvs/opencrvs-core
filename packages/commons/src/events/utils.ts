@@ -22,7 +22,8 @@ import {
   uniqBy,
   cloneDeep,
   orderBy,
-  isEqual
+  isEqual,
+  isEmpty
 } from 'lodash'
 import {
   ActionType,
@@ -452,7 +453,11 @@ export function buildFormState<T>(
   return fields.reduce(
     (acc, field) => {
       if (field.type === FieldType.FIELD_GROUP) {
-        acc[field.id] = buildFormState(field.fields, mapper)
+        const nestedState = buildFormState(field.fields, mapper)
+        if (isEmpty(nestedState)) {
+          return acc
+        }
+        acc[field.id] = nestedState
         return acc
       }
       const mappedValue = mapper(field)

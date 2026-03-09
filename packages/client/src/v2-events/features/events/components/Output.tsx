@@ -48,7 +48,8 @@ import {
   isSignatureFieldType,
   isDataFieldType,
   EventConfig,
-  isAgeFieldType
+  isAgeFieldType,
+  isFieldGroupFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -278,16 +279,7 @@ export function isEmptyValue(field: FieldConfig, value: unknown) {
   return !Boolean(value)
 }
 
-export function Output({
-  field,
-  value,
-  previousValue,
-  showPreviouslyMissingValuesAsChanged = false,
-  previousForm,
-  formConfig,
-  eventConfig,
-  displayEmptyAsDash = false
-}: {
+export function Output(props: {
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
@@ -297,6 +289,40 @@ export function Output({
   formConfig?: FormConfig
   displayEmptyAsDash?: boolean
 }) {
+  const {
+    field,
+    value,
+    showPreviouslyMissingValuesAsChanged = false,
+    previousForm,
+    formConfig,
+    eventConfig,
+    displayEmptyAsDash = false
+  } = props
+  let { previousValue } = props
+
+  const fieldWithValue = { config: field, value }
+
+  if (isFieldGroupFieldType(fieldWithValue)) {
+    return (
+      <>
+        {fieldWithValue.config.fields.map((subfield, idx, subfields) => (
+          <React.Fragment key={subfield.id}>
+            <Output
+              {...props}
+              field={subfield}
+              previousValue={
+                (previousValue as Record<string, FieldValue> | undefined)?.[
+                  subfield.id
+                ]
+              }
+              value={fieldWithValue.value?.[subfield.id]}
+            />
+            {idx < subfields.length ? <br /> : undefined}
+          </React.Fragment>
+        ))}
+      </>
+    )
+  }
   // Explicitly check for undefined, so that e.g. number 0 is considered a value,
   // even null is considered as value removed
   const hasValue = !isUndefined(value)

@@ -18,10 +18,12 @@ import {
   FieldType,
   generateTranslationConfig,
   not,
-  field
+  field,
+  defineDeclarationForm
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { Review } from '@client/v2-events/features/events/components/Review'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
@@ -78,6 +80,17 @@ const addressFields = [
   }
 ] satisfies FieldConfig[]
 
+const fieldGroupFormConfig = defineDeclarationForm({
+  label: generateTranslationConfig('Address Form'),
+  pages: [
+    {
+      id: 'address-page',
+      title: generateTranslationConfig('Address'),
+      fields: addressFields
+    }
+  ]
+})
+
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
@@ -112,6 +125,7 @@ const meta: Meta<typeof FormFieldGenerator> = {
 export default meta
 
 type Story = StoryObj<typeof FormFieldGenerator>
+type ReviewStory = StoryObj<typeof Review.Body>
 
 export const Basic: Story = {
   name: 'Address field with optional location level'
@@ -131,5 +145,77 @@ export const WithOptionalLocationLevel: Story = {
         province: true
       }
     }
+  }
+}
+
+export const FieldGroupReviewEmpty: ReviewStory = {
+  name: 'Review output (Empty)',
+  render: function Component(args) {
+    return (
+      <Review.Body
+        {...args}
+        form={{}}
+        formConfig={fieldGroupFormConfig}
+        title="Address field group review (empty)"
+        // eslint-disable-next-line no-console
+        onEdit={(values) => console.log(values)}
+      >
+        <div />
+      </Review.Body>
+    )
+  }
+}
+
+export const FieldGroupReviewFilled: ReviewStory = {
+  name: 'Review output (Filled)',
+  render: function Component(args) {
+    return (
+      <Review.Body
+        {...args}
+        form={{
+          'storybook.address': {
+            country: 'BGD',
+            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+            district: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+          }
+        }}
+        formConfig={fieldGroupFormConfig}
+        title="Address field group review (filled)"
+        // eslint-disable-next-line no-console
+        onEdit={(values) => console.log(values)}
+      >
+        <div />
+      </Review.Body>
+    )
+  }
+}
+
+export const FieldGroupReviewChanged: ReviewStory = {
+  name: 'Review output (Changed)',
+  render: function Component(args) {
+    return (
+      <Review.Body
+        {...args}
+        form={{
+          'storybook.address': {
+            country: 'BGD',
+            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+            district: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+          }
+        }}
+        previousFormValues={{
+          'storybook.address': {
+            country: 'BGD',
+            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+          }
+        }}
+        formConfig={fieldGroupFormConfig}
+        title="Address field group review (changed)"
+        // eslint-disable-next-line no-console
+        onEdit={(values) => console.log(values)}
+      >
+        <div />
+      </Review.Body>
+    )
   }
 }
