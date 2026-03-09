@@ -129,7 +129,10 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
   })
 
   const results = await searchForDuplicates(
-    eventQueryDataGenerator({ declaration: newEvent, type: ChildOnboardingEvent.id }, 37),
+    eventQueryDataGenerator(
+      { declaration: newEvent, type: ChildOnboardingEvent.id },
+      37
+    ),
     DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
     ChildOnboardingEvent
   )
@@ -138,7 +141,10 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
 }
 
 beforeEach(async () => {
-  return createIndex(getEventIndexName(ChildOnboardingEvent.id), getDeclarationFields(ChildOnboardingEvent))
+  return createIndex(
+    getEventIndexName(ChildOnboardingEvent.id),
+    getDeclarationFields(ChildOnboardingEvent)
+  )
 })
 
 describe('deduplication query input conversion', () => {
