@@ -17,7 +17,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
-import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
+import { userOnlyProcedure } from '@events/router/trpc'
 import { getEventById, processAction } from '@events/service/events/events'
 import {
   defaultRequestHandler,

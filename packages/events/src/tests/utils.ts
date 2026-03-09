@@ -586,7 +586,7 @@ export async function seedEvent(
 }
 
 /** Determine if an event index matches the provided scope filters. */
-export function eventMatchesScope({
+function eventMatchesScope({
   eventIndex,
   user,
   placeOfEvent,
