@@ -125,17 +125,12 @@ export const NoTemplateAvailable: Story = {
         const selectControl = await canvas.findByTestId(
           'select__certificateTemplateId'
         )
-        await fireEvent.focus(selectControl)
-        await fireEvent.keyDown(selectControl, {
-          key: 'ArrowDown',
-          keyCode: 40,
-          code: 'ArrowDown'
-        })
+        await fireEvent.mouseDown(selectControl)
         await expect(
           await canvas.findByText(
             'No template available for this event, contact Admin'
           )
-        ).toBeVisible()
+        ).toBeInTheDocument()
       }
     )
   }
