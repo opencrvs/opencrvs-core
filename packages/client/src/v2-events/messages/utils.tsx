@@ -15,7 +15,8 @@ import {
   isArgumentElement,
   isSelectElement,
   isPluralElement,
-  parse
+  parse,
+  isDateElement
 } from '@formatjs/icu-messageformat-parser'
 import { useMemo } from 'react'
 import { EventState } from '@opencrvs/commons/client'
@@ -84,7 +85,7 @@ function convertDotInCurlyBraces(str: string): string {
 }
 
 function getVariablesFromElement(element: MessageFormatElement): string[] {
-  if (isArgumentElement(element)) {
+  if (isArgumentElement(element) || isDateElement(element)) {
     return [element.value]
   }
   if (isSelectElement(element)) {
@@ -192,9 +193,23 @@ export function useIntlFormatMessageWithFlattenedParams() {
     return formatted.replaceAll(EMPTY_TOKEN, '').trim()
   }
 
+  function safeFormatMessage<T extends {}>(
+    message: MessageDescriptor,
+    params?: T
+  ): string {
+    try {
+      return formatMessage(message, params)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error formatting message:', error)
+      return ''
+    }
+  }
+
   return {
     ...intl,
     formatMessage,
+    safeFormatMessage,
     variablesUsed: (message: MessageDescriptor) =>
       variablesUsed(getDefaultMessage(message))
   }

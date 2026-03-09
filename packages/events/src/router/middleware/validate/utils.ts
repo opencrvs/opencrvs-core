@@ -10,13 +10,12 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import _ from 'lodash'
 import {
   ActionUpdate,
   errorMessages,
   ValidatorContext
 } from '@opencrvs/commons/events'
-import { getOrThrow } from '@opencrvs/commons'
+import { getOrThrow, flattenEntries } from '@opencrvs/commons'
 import { getTokenPayload } from '@opencrvs/commons/authentication'
 import { getLeafLevelAdministrativeAreaIds } from '../../../storage/postgres/administrative-hierarchy/administrative-areas'
 
@@ -51,29 +50,6 @@ export function throwWhenNotEmpty(errors: unknown[]) {
       message: JSON.stringify(errors)
     })
   }
-}
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return _.isPlainObject(value)
-}
-
-/**
- * Flattens an object into a list of [key, value] pairs using dot/bracket notation.
- */
-function flattenEntries<T>(obj: T, path: string = ''): [string, unknown][] {
-  if (Array.isArray(obj)) {
-    return obj.flatMap((value, index) =>
-      flattenEntries(value, `${path}[${index}]`)
-    )
-  }
-
-  if (isObject(obj)) {
-    return Object.entries(obj).flatMap(([key, value]) =>
-      flattenEntries(value, path ? `${path}.${key}` : key)
-    )
-  }
-
-  return obj === undefined ? [] : [[path, obj]]
 }
 
 /**
