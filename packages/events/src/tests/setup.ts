@@ -8,16 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { inject, vi } from 'vitest'
 import { Client } from 'pg'
+import { inject, vi } from 'vitest'
+import { getDeclarationFields, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { getDeclarationFields } from '@opencrvs/commons/events'
 import {
-  resetServer as resetEventsPostgresServer,
-  getPool
+  getPool,
+  resetServer as resetEventsPostgresServer
 } from '@events/storage/postgres/events'
 
 import { createIndex } from '@events/service/indexing/indexing'
+import { getReindexingStatusIndexName, getTemporaryIndexName } from '@events/storage/__mocks__/elasticsearch'
+import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { mswServer } from './msw'
 import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
@@ -29,10 +31,27 @@ async function resetESServer() {
     // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
     '@events/storage/elasticsearch'
   )
-  const index = 'events_tennis_club_membership' + Date.now() + Math.random()
-  getEventIndexName.mockReturnValue(index)
-  getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
-  await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
+  const id = Date.now() + Math.random()
+
+  getEventIndexName.mockImplementation((type: string) => type + '_' + id)
+  getEventAliasName.mockReturnValue('events_' + id)
+  getReindexingStatusIndexName.mockReturnValue(
+    'reindexing_status_' + id
+  )
+  getTemporaryIndexName.mockImplementation((eventType: string, timestamp: number) => {
+    return `${getEventIndexName(eventType)}_${timestamp}`
+  })
+const client = getOrCreateClient()
+  await client.cluster.putSettings({
+  body: {
+    persistent: {
+      "action.auto_create_index": "false"
+    }
+  }
+});
+
+  // Create concrete indices
+  await createIndex(getEventIndexName(TENNIS_CLUB_MEMBERSHIP), getDeclarationFields(tennisClubMembershipEvent))
 }
 
 async function resetPostgresServer() {
