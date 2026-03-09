@@ -428,6 +428,7 @@ function ReviewComponent({
   isReviewCorrection?: boolean
   banner?: React.ReactNode
 }) {
+  const intl = useIntl()
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
 
@@ -440,8 +441,14 @@ function ReviewComponent({
     )
     .map(({ id }) => id)
 
-  const hasReviewFieldsToUpdate =
-    annotation && onAnnotationChange && reviewFields && reviewFields.length > 0
+  const hasAnnotationFieldsToShow =
+    annotation !== undefined && reviewFields && reviewFields.length > 0
+
+  const displayedAnnotationFields = hasAnnotationFieldsToShow
+    ? reviewFields.filter(
+        ({ type }) => !FieldTypesToHideInReview.some((t) => t === type)
+      )
+    : []
 
   return (
     <Row>
@@ -463,7 +470,7 @@ function ReviewComponent({
             onEdit={onEdit}
           />
 
-          {hasReviewFieldsToUpdate && (
+          {hasAnnotationFieldsToShow && onAnnotationChange && (
             <FormData>
               <ReviewContainter>
                 <FormFieldGenerator
@@ -477,6 +484,27 @@ function ReviewComponent({
               </ReviewContainter>
             </FormData>
           )}
+
+          {hasAnnotationFieldsToShow &&
+            displayedAnnotationFields.length > 0 && (
+              <FormData>
+                <ReviewContainter>
+                  <ListReview id="annotation">
+                    {displayedAnnotationFields.map((field) => (
+                      <ListReview.Row
+                        key={field.id}
+                        actions={null}
+                        id={field.id}
+                        label={intl.formatMessage(field.label)}
+                        value={
+                          <Output field={field} value={annotation[field.id]} />
+                        }
+                      />
+                    ))}
+                  </ListReview>
+                </ReviewContainter>
+              </FormData>
+            )}
         </Card>
         {children}
       </LeftColumn>

@@ -19,6 +19,9 @@ import { noop } from 'lodash'
 import {
   ActionType,
   applyDraftToEventIndex,
+  EventState,
+  getActionAnnotation,
+  getActionAnnotationFields,
   getDeclaration,
   getOrThrow,
   getCurrentEventState,
@@ -79,6 +82,24 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
 
   const formConfig = getDeclaration(configuration)
 
+  const annotation = useMemo((): EventState | undefined => {
+    // Collect annotations from all past non-READ actions that have annotation fields
+    const pastActionsWithAnnotation = configuration.actions
+      .filter((a) => a.type !== ActionType.READ)
+      .filter((a) => getActionAnnotationFields(a).length > 0)
+      .reduce<EventState>((acc, actionConfig) => {
+        const actionAnnotation = getActionAnnotation({
+          event,
+          actionType: actionConfig.type
+        })
+        return { ...acc, ...actionAnnotation }
+      }, {})
+
+    return Object.keys(pastActionsWithAnnotation).length > 0
+      ? pastActionsWithAnnotation
+      : undefined
+  }, [configuration.actions, event])
+
   useEffect(() => {
     return () => {
       if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
@@ -93,6 +114,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   return (
     <ReviewComponent.Body
       readonlyMode
+      annotation={annotation}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}
