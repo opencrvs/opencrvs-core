@@ -42,5 +42,5 @@ export function getTemporaryIndexName(eventType: string, timestamp: number) {
 }
 
 export function getReindexingStatusIndexName() {
-  return 'reindexing_status'
+  return env.ES_REINDEXING_STATUS_INDEX
 }

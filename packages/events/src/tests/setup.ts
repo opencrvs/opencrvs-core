@@ -8,13 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { inject, vi } from 'vitest'
 import { Client } from 'pg'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { inject, vi } from 'vitest'
 import { getDeclarationFields } from '@opencrvs/commons/events'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
-  resetServer as resetEventsPostgresServer,
-  getPool
+  getPool,
+  resetServer as resetEventsPostgresServer
 } from '@events/storage/postgres/events'
 
 import { createIndex } from '@events/service/indexing/indexing'
