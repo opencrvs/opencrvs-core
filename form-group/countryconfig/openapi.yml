@@ -5663,8 +5663,18 @@ components:
               type: string
               const: ADMINISTRATIVE_AREA
             defaultValue:
-              type: string
-              minLength: 1
+              anyOf:
+                - type: string
+                  minLength: 1
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum: *a11
+                    $location:
+                      type: string
+                  required:
+                    - $userField
             configuration:
               type: object
               properties:

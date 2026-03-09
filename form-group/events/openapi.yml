@@ -776,7 +776,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 552dac04-88d9-4478-ba2b-02855b080632
+                transactionId: f97c137c-b348-4d70-ac3f-447404e9d017
                 type: birth
       responses:
         "200":
@@ -862,7 +862,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ab45331a-0964-45c7-a53e-4e485b39bd8b
+                transactionId: 3b1e9a55-215a-423d-80fc-ca8489fad67b
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -6354,8 +6354,18 @@ components:
               enum:
                 - ADMINISTRATIVE_AREA
             defaultValue:
-              type: string
-              minLength: 1
+              anyOf:
+                - type: string
+                  minLength: 1
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum: *a12
+                    $location:
+                      type: string
+                  required:
+                    - $userField
             configuration:
               type: object
               properties:
