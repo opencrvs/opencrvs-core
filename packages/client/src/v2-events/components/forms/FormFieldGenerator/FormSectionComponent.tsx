@@ -417,7 +417,7 @@ export function FormSectionComponent({
               allKnownFields={fullFormFields}
               disabled={isDisabled}
               eventConfig={eventConfig}
-              fieldDefinition={field}
+              fieldDefinition={{ ...field, id: formikFieldId }}
               form={fullForm}
               name={formikFieldId}
               readonlyMode={readonlyMode}
