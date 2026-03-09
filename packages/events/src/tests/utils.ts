@@ -145,19 +145,48 @@ export const TEST_USER_DEFAULT_SCOPES = [
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
     }
   }),
-  'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.edit',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.reject',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.archive',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
   encodeScope({
     type: 'record.register',
     options: {
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
     }
   }),
-
-  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.registered.request-correction[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.registered.correct[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.print-certified-copies',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.request-correction',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.correct',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
   'record.unassign-others[event=birth|death|tennis-club-membership|child-onboarding]'
 ]
 

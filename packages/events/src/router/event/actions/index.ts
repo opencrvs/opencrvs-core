@@ -363,7 +363,13 @@ export function getDefaultActionProcedures(
   const actionsMigratedToV2Scopes = [
     ActionType.NOTIFY,
     ActionType.DECLARE,
-    ActionType.REGISTER
+    ActionType.REGISTER,
+    ActionType.ARCHIVE,
+    ActionType.REJECT,
+    ActionType.EDIT,
+    ActionType.REJECT_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REQUEST_CORRECTION
   ] as const
 
   const canAccessEventMiddleware = actionsMigratedToV2Scopes.some(
