@@ -122,14 +122,17 @@ export async function createToken(
   issuer: string,
   role?: string | number | undefined,
   temporary = false,
-  userType: TokenUserType = TokenUserType.enum.user
+  userType: TokenUserType = TokenUserType.enum.user,
+  expiresInSeconds?: number
 ): Promise<string> {
   return sign({ scope, userType, role }, cert, {
     subject: userId,
     algorithm: 'RS256',
-    expiresIn: temporary
-      ? env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
-      : env.CONFIG_TOKEN_EXPIRY_SECONDS,
+    expiresIn:
+      expiresInSeconds ??
+      (temporary
+        ? env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
+        : env.CONFIG_TOKEN_EXPIRY_SECONDS),
     audience,
     issuer
   })

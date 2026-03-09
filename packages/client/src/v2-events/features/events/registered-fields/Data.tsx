@@ -55,9 +55,10 @@ function getFieldFromDataEntry({
   let formattedValue: string
 
   if (isFieldReference(rawValue)) {
-    formattedValue = rawValue.$$subfield
-      ? get(formData[rawValue.$$field], rawValue.$$subfield)
-      : formData[rawValue.$$field]
+    formattedValue =
+      rawValue.$$subfield.length > 0
+        ? get(formData[rawValue.$$field], rawValue.$$subfield)
+        : formData[rawValue.$$field]
   } else {
     formattedValue =
       typeof rawValue === 'object' &&
@@ -154,9 +155,10 @@ function DataInput({
     const value = entry.value
 
     if (isFieldReference(value)) {
-      const resolvedValue = value.$$subfield
-        ? get(formData[value.$$field], value.$$subfield)
-        : formData[value.$$field]
+      const resolvedValue =
+        value.$$subfield.length > 0
+          ? get(formData[value.$$field], value.$$subfield)
+          : formData[value.$$field]
 
       return getFieldFromDataEntry({
         intl,

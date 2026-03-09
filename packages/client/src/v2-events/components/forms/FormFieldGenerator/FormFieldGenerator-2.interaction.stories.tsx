@@ -339,7 +339,7 @@ const fields = [
     label: generateTranslationConfig('API Membership Check'),
     defaultValue: { loading: false, data: null, error: null },
     configuration: {
-      trigger: { $$field: 'membership.type' },
+      trigger: { $$field: 'membership.type', $$subfield: [] },
       url: '/api/membership/check',
       method: 'GET',
       headers: { Authorization: 'Bearer token' },
