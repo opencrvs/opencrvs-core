@@ -22,7 +22,7 @@ query: {
 
 ### Improvements
 
-- Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
+- Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 
 - Explicitly nullify hidden field values to prevent stale data in database and fix incorrect search results [#11695](https://github.com/opencrvs/opencrvs-core/pull/11849)
 
