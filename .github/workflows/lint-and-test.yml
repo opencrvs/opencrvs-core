@@ -554,7 +554,7 @@ jobs:
         working-directory: packages/commons
 
       - name: Build events & events router types
-        run: yarn build && tsc -p tsconfig.router.json
+        run: yarn build
         working-directory: packages/events
 
       - name: Build toolkit
