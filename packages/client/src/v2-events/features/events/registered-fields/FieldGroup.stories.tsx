@@ -90,8 +90,6 @@ const meta: Meta<typeof FormFieldGenerator> = {
     formValues: {
       'storybook.address': {
         country: 'BGD',
-        //The address value clashes with "ADDRESS" field value
-        //@ts-ignore
         province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
         district: '62a0ccb4-880d-4f30-8882-f256007dfff9'
       }
@@ -123,8 +121,6 @@ export const WithOptionalLocationLevel: Story = {
   name: 'Address field with error shown',
   args: {
     formValues: {
-      //The address value clashes with "ADDRESS" field value
-      //@ts-ignore
       ['storybook.address']: {
         country: 'BGD'
       }
