@@ -208,10 +208,10 @@ function mapFieldTypeToMockValue(
     case FieldType.VERIFICATION_STATUS:
       return 'verified'
     case FieldType.FACILITY:
-      return (
-        pickRandom(rng, administrativeHierarchy?.locations ?? [])?.id ??
-        ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID)
-      )
+      return administrativeHierarchy?.locations
+        ? pickRandom(rng, administrativeHierarchy.locations)?.id
+        : ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID)
+
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
@@ -229,9 +229,9 @@ function mapFieldTypeToMockValue(
       return {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea:
-          pickRandom(rng, leafLevelAdministrativeAreas ?? [])?.id ??
-          ('27160bbd-32d1-4625-812f-860226bfb92a' as UUID),
+        administrativeArea: leafLevelAdministrativeAreas
+          ? pickRandom(rng, leafLevelAdministrativeAreas)?.id
+          : ('27160bbd-32d1-4625-812f-860226bfb92a' as UUID),
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',

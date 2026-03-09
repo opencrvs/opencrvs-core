@@ -1268,7 +1268,7 @@ test('deduplication check is performed before register when configured', async (
   } satisfies Partial<EventIndex>)
 })
 
-test.only('System user can not register an event, even with the right scope', async () => {
+test('System user can not register an event, even with the right scope', async () => {
   const { generator, user } = await setupTestCase()
 
   const humanUserClient = createTestClient(user)
