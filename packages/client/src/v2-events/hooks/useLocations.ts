@@ -18,7 +18,7 @@ setQueryDefaults(trpcOptionsProxy.locations.list, {
   meta: {
     useLargeQueryStorage: true
   },
-  queryFn: async (...params) => {
+  queryFn: (...params) => {
     const queryOptions = trpcOptionsProxy.locations.list.queryOptions()
     if (typeof queryOptions.queryFn !== 'function') {
       throw new Error('queryFn is not a function')
