@@ -71,6 +71,10 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
     [results, outbox]
   )
 
+  if (!workqueueConfig) {
+    throw new Error('Workqueue configuration not found for' + workqueueSlug)
+  }
+
   return (
     <SearchResultComponent
       key={workqueueSlug}

@@ -154,6 +154,10 @@ export function ActionMenu({
 
   const eventIndex = eventResults.results[0]
 
+  if (!eventIndex) {
+    throw new Error(`Event ${eventId} not found`)
+  }
+
   const assignedToUser = getUser.useQuery(eventIndex.assignedTo || '', {
     enabled: !!eventIndex.assignedTo
   }).data
