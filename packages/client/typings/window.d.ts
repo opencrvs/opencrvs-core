@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ClientConfig, ApplicationConfig } from '@opencrvs/commons'
+import { ClientConfig, ApplicationConfig } from '@opencrvs/commons/client'
 
 declare global {
   interface Window {
