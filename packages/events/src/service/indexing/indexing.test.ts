@@ -1308,7 +1308,7 @@ describe('placeOfEvent location hierarchy handling', () => {
       SCOPES.RECORD_REINDEX
     ])
 
-    await sysClient.event.reindex()
+    await sysClient.event.reindex.trigger()
 
     // Refresh index to make reindexed documents searchable
     await esClient.indices.refresh({
