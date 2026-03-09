@@ -17,7 +17,6 @@ import {
   ActionStatus,
   ActionType,
   ActionTypes,
-  ActionUpdate,
   AdministrativeArea,
   createPrng,
   DeclarationActionType,
@@ -477,12 +476,14 @@ export async function seedEvent(
     }
   }
 ) {
+  // Setup arbitrary timestamps for actions in the past to ensure consistent ordering.
   const SEED_START = new Date('2020-01-01')
   const SEED_END = new Date('2023-01-01')
 
   const baseTime = new Date(
     generateRandomDatetime(rng, SEED_START, SEED_END)
   ).getTime()
+  /** offset variable for timestamps, ensures the array order is maintained. */
   let offset = 0
 
   await dbClient.transaction().execute(async (trx) => {
@@ -540,6 +541,7 @@ export async function seedEvent(
           ]
         }
 
+        // Without setting the originalActionId, the accepted action will not be linked to the requested action and will not update the event state, which is important for testing scopes based on event state.
         const originalActionId = getUUID()
 
         return [
@@ -727,6 +729,7 @@ export async function setupScopeTestFixture(
   const rng = createPrng(rngSeed)
   const eventsDb = getClient()
 
+  // Create arbitrary combinations of actions, ensure they end up in fc format.
   const actionsArb = Array.isArray(seedActions)
     ? fc.constant(seedActions)
     : seedActions
@@ -786,8 +789,10 @@ export async function attemptScopedAction(
   eventId: string,
   user: CreatedUser,
   scope: string,
-  clientReadingAllEvents: any,
-  action: (testClient: any) => Promise<EventDocument>
+  clientReadingAllEvents: ReturnType<typeof createTestClient>,
+  action: (
+    testClient: ReturnType<typeof createTestClient>
+  ) => Promise<EventDocument>
 ): Promise<{ success: boolean; event: EventDocument }> {
   const testClient = createTestClient(user, [scope])
 
@@ -801,10 +806,12 @@ export async function attemptScopedAction(
   ).resolves.not.toThrow()
 
   try {
+    // 1. Perform the action with the given test client.
     const event = await action(testClient)
     return { success: true, event }
   } catch (error) {
     if (error instanceof EventNotFoundError) {
+      // 2. If action fails, attempt to fetch the event with the client that has access to all events to verify the failure was due to scope restrictions.
       const event = await clientReadingAllEvents.event.get({ eventId })
       return { success: false, event }
     }

@@ -26,9 +26,11 @@ import {
 } from '@events/tests/utils'
 
 test('Check scopes against event.actions.declare', async () => {
+  // 1. Setup test fixture with a known set of users, administrative areas, and events.
   const { users, administrativeAreas, isUnderAdministrativeArea, eventIds } =
     await setupScopeTestFixture(12434532, [ActionType.UNASSIGN])
 
+  // Known lead level id
   const administrativeAreaId = administrativeAreas.find(
     (aa) => aa.name === 'District C'
   )?.id
@@ -39,6 +41,7 @@ test('Check scopes against event.actions.declare', async () => {
     })
   ])
 
+  // 2. Create option combinations for scopes and users
   const combinations = fc.record({
     user: fc.constantFrom(...users),
     event: fc.option(
@@ -55,6 +58,7 @@ test('Check scopes against event.actions.declare', async () => {
     scopeType: fc.constantFrom('record.declare', 'record.register')
   })
 
+  // 3. Test combination against random event and assert results
   await fc.assert(
     fc.asyncProperty(
       combinations,
@@ -64,6 +68,7 @@ test('Check scopes against event.actions.declare', async () => {
           options: { event, placeOfEvent }
         })
 
+        // Pick random event for the case. Exclude used events.
         const randomIndex = Math.floor(Math.random() * eventIds.length)
         const [eventId] = eventIds.splice(randomIndex, 1)
 

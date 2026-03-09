@@ -168,6 +168,9 @@ function mapFieldTypeToMockValue(
   field: FieldConfig,
   i: number,
   rng: () => number,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
   administrativeHierarchy?: {
     administrativeAreas: AdministrativeArea[]
     locations: Location[]
@@ -285,6 +288,9 @@ function mapFieldTypeToMockValue(
 export function fieldConfigsToActionPayload(
   fields: FieldConfig[],
   rng: () => number,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
   administrativeHierarchy?: {
     administrativeAreas: AdministrativeArea[]
     locations: Location[]
@@ -309,6 +315,9 @@ export function generateActionDeclarationInput(
   action: ActionType,
   rng: () => number,
   overrides?: ActionUpdate,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
   administrativeHierarchy?: {
     administrativeAreas: AdministrativeArea[]
     locations: Location[]

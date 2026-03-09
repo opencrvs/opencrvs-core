@@ -26,6 +26,7 @@ import {
 } from '@events/tests/utils'
 
 test('Check scopes against event.actions.register', async () => {
+  // 1. Setup test fixture with a known set of users, administrative areas, and events.
   const { users, isUnderAdministrativeArea, eventIds } =
     await setupScopeTestFixture(124334532, [
       ActionType.DECLARE,
@@ -49,6 +50,7 @@ test('Check scopes against event.actions.register', async () => {
     nil: undefined
   })
 
+  // 2. Create option combinations for scopes and users
   const combinations = fc.record({
     user: fc.constantFrom(...users),
     event: fc.option(
@@ -63,6 +65,8 @@ test('Check scopes against event.actions.register', async () => {
     declaredBy: userOptions,
     declaredIn: jurisdictionOptions
   })
+
+  // 3. Test combination against random event and assert results
 
   await fc.assert(
     fc.asyncProperty(combinations, async ({ user, ...options }) => {

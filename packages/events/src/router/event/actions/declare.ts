@@ -36,6 +36,7 @@ export function declareActionProcedures() {
     request: userOnlyProcedure
       .use(requireScopesMiddleware)
       .input(DeclareActionInput)
+      // @TODO:
       // @ts-expect-error - deprecated by the end of 2.0
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)

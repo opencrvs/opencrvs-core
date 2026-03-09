@@ -25,6 +25,7 @@ import {
 } from '@events/tests/utils'
 
 test('Check scopes against event.actions.notify', async () => {
+  // 1. Setup test fixture with a known set of users, administrative areas, and events.
   const { users, isUnderAdministrativeArea, eventIds } =
     await setupScopeTestFixture(124345333, [ActionType.UNASSIGN])
 
@@ -35,6 +36,7 @@ test('Check scopes against event.actions.notify', async () => {
     })
   ])
 
+  // 2. Create option combinations for scopes and users
   const combinations = fc.record({
     user: fc.constantFrom(...users),
     event: fc.option(
@@ -50,6 +52,7 @@ test('Check scopes against event.actions.notify', async () => {
     })
   })
 
+  // 3. Test combination against random event and assert results
   await fc.assert(
     fc.asyncProperty(combinations, async ({ user, event, placeOfEvent }) => {
       const scope = encodeScope({
@@ -70,6 +73,7 @@ test('Check scopes against event.actions.notify', async () => {
           client.event.actions.notify.request({
             eventId,
             transactionId: getUUID(),
+            // Arbitrary content.
             declaration: { 'applicant.email': 'test@openrvs.org' }
           })
       )

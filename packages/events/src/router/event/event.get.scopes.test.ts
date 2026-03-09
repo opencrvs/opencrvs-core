@@ -26,6 +26,7 @@ import {
 import { EventNotFoundError } from '../../service/events/events'
 
 test('Check scopes against event.get', async () => {
+  // 1. Setup test fixture with a known set of users, administrative areas, and events.
   const { users, isUnderAdministrativeArea, eventIds } =
     await setupScopeTestFixture(
       1243453343,
@@ -52,6 +53,7 @@ test('Check scopes against event.get', async () => {
     nil: undefined
   })
 
+  // 2. Create option combinations for scopes and users
   const combinations = fc.record({
     user: fc.constantFrom(...users),
     event: fc.option(
@@ -69,6 +71,7 @@ test('Check scopes against event.get', async () => {
     registeredIn: jurisdictionOptions
   })
 
+  // 3. Test combination against random event and assert results
   await fc.assert(
     fc.asyncProperty(combinations, async ({ user, ...options }) => {
       const scope = encodeScope({
@@ -83,10 +86,12 @@ test('Check scopes against event.get', async () => {
 
       let result: { success: boolean; event: EventDocument }
       try {
+        // 1. Perform the action with the given test client.
         const eventFetchedAsUser = await testClient.event.get({ eventId })
         result = { success: true, event: eventFetchedAsUser }
       } catch (error) {
         if (error instanceof EventNotFoundError) {
+          // 2. If action fails, attempt to fetch the event with the client that has access to all events to verify the failure was due to scope restrictions.
           const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
             eventId
           })
