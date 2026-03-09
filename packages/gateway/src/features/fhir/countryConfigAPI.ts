@@ -16,6 +16,6 @@ export default class CountryConfigAPI extends OpenCRVSRESTDataSource {
   override baseURL = COUNTRY_CONFIG_URL
 
   getRoles(): Promise<Roles> {
-    return this.get(`/roles`)
+    return this.get(`/config/roles`)
   }
 }
