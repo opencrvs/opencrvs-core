@@ -26,6 +26,4 @@ export function getOrCreateClient() {
 export const getReindexingStatusIndexName = vi.fn()
 
 /** @knipignore */
-export function getTemporaryIndexName(eventType: string, timestamp: number) {
-  return `${getEventIndexName(eventType)}_${timestamp}`
-}
+export const getTemporaryIndexName = vi.fn()

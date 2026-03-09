@@ -10,7 +10,7 @@
  */
 import { Client } from 'pg'
 import { inject, vi } from 'vitest'
-import { getDeclarationFields } from '@opencrvs/commons/events'
+import { getDeclarationFields, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   getPool,
@@ -18,7 +18,7 @@ import {
 } from '@events/storage/postgres/events'
 
 import { createIndex } from '@events/service/indexing/indexing'
-import { getReindexingStatusIndexName } from '@events/storage/__mocks__/elasticsearch'
+import { getReindexingStatusIndexName, getTemporaryIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { mswServer } from './msw'
 import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
@@ -30,13 +30,19 @@ async function resetESServer() {
     // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
     '@events/storage/elasticsearch'
   )
-  const index = 'events_tennis_club_membership' + Date.now() + Math.random()
-  getEventIndexName.mockReturnValue(index)
-  getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
+  const id = Date.now() + Math.random()
+
+  getEventIndexName.mockImplementation((type: string) => type + '_' + id)
+  getEventAliasName.mockReturnValue('events_' + id)
   getReindexingStatusIndexName.mockReturnValue(
-    'reindexing_status_' + Date.now() + Math.random()
+    'reindexing_status_' + id
   )
-  await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
+  getTemporaryIndexName.mockImplementation((eventType: string, timestamp: number) => {
+    return `${getEventIndexName(eventType)}_${timestamp}`
+  })
+
+  // Create concrete index
+  await createIndex(getEventIndexName(TENNIS_CLUB_MEMBERSHIP), getDeclarationFields(tennisClubMembershipEvent))
 }
 
 async function resetPostgresServer() {

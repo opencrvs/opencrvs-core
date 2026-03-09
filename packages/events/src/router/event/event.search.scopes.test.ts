@@ -855,7 +855,7 @@ test('For users in locations directly under country "administrativeArea" and "al
   )
   const reindexClient = createTestClient(users[0], [SCOPES.RECORD_REINDEX])
 
-  await expect(reindexClient.event.reindex()).resolves.not.toThrow()
+  await expect(reindexClient.event.reindex.trigger()).resolves.not.toThrow()
 
   const esClient = getOrCreateClient()
 
