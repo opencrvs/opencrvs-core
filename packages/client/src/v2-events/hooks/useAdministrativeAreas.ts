@@ -18,7 +18,7 @@ setQueryDefaults(trpcOptionsProxy.administrativeAreas.list, {
   meta: {
     useLargeQueryStorage: true
   },
-  queryFn: (...params) => {
+  queryFn: async (...params) => {
     const queryOptions =
       trpcOptionsProxy.administrativeAreas.list.queryOptions()
     if (typeof queryOptions.queryFn !== 'function') {
