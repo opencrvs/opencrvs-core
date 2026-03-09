@@ -5,10 +5,10 @@ info:
 servers:
   - url: http://localhost:3000/api/events
 paths:
-  /config:
-    get:
-      operationId: event-config-get
-      summary: List event configurations
+  /events/reindex:
+    post:
+      operationId: event-reindex-trigger
+      summary: Triggers reindexing of search, workqueues and notifies country config
       tags:
         - events
       security:
@@ -18,11 +18,7 @@ paths:
           description: Successful response
           content:
             application/json:
-              schema:
-                type: array
-                items:
-                  description: Configuration defining an event type.
-                  $ref: "#/components/schemas/EventConfig"
+              schema: {}
         "401": &a1
           description: Authorization not provided
           content:
@@ -41,6 +37,108 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+    get:
+      operationId: event-reindex-status
+      summary: Returns the status of current and past reindexing calls
+      tags:
+        - events
+      security:
+        - Authorization: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+                    timestamp:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                    status:
+                      type: string
+                      enum:
+                        - running
+                        - completed
+                        - failed
+                    progress:
+                      type: object
+                      properties:
+                        processed:
+                          type: integer
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
+                      required:
+                        - processed
+                      additionalProperties: false
+                    error_message:
+                      anyOf:
+                        - type: string
+                        - type: "null"
+                    completed_at:
+                      anyOf:
+                        - type: string
+                          format: date-time
+                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                        - type: "null"
+                  required:
+                    - id
+                    - timestamp
+                    - status
+                    - progress
+                    - error_message
+                    - completed_at
+                  additionalProperties: false
+        "400": &a4
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401": *a1
+        "403": *a2
+        "404": &a5
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.NOT_FOUND"
+        "500": *a3
+  /config:
+    get:
+      operationId: event-config-get
+      summary: List event configurations
+      tags:
+        - events
+      security:
+        - Authorization: []
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  description: Configuration defining an event type.
+                  $ref: "#/components/schemas/EventConfig"
+        "401": *a1
+        "403": *a2
+        "500": *a3
   /events:
     post:
       operationId: event-create
@@ -78,12 +176,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventDocument"
-        "400": &a4
-          description: Invalid input data
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "400": *a4
         "401": *a1
         "403": *a2
         "500": *a3
@@ -113,12 +206,7 @@ paths:
         "400": *a4
         "401": *a1
         "403": *a2
-        "404": &a5
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error.NOT_FOUND"
+        "404": *a5
         "500": *a3
   /events/{eventId}/notify:
     post:
@@ -514,94 +602,6 @@ paths:
         "400": *a4
         "401": *a1
         "403": *a2
-        "500": *a3
-  /events/reindex:
-    post:
-      operationId: event-reindex-trigger
-      summary: Triggers reindexing of search, workqueues and notifies country config
-      tags:
-        - events
-      security:
-        - Authorization: []
-      responses:
-        "200":
-          description: Successful response
-          content:
-            application/json:
-              schema: {}
-        "401": *a1
-        "403": *a2
-        "500": *a3
-    get:
-      operationId: event-reindex-status
-      summary: Returns the status of current and past reindexing calls
-      tags:
-        - events
-      security:
-        - Authorization: []
-      parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-      responses:
-        "200":
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uuid
-                      pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-                    timestamp:
-                      type: string
-                      format: date-time
-                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-                    status:
-                      type: string
-                      enum:
-                        - running
-                        - completed
-                        - failed
-                    progress:
-                      type: object
-                      properties:
-                        processed:
-                          type: integer
-                          minimum: -9007199254740991
-                          maximum: 9007199254740991
-                      required:
-                        - processed
-                      additionalProperties: false
-                    error_message:
-                      anyOf:
-                        - type: string
-                        - type: "null"
-                    completed_at:
-                      anyOf:
-                        - type: string
-                          format: date-time
-                          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-                        - type: "null"
-                  required:
-                    - id
-                    - timestamp
-                    - status
-                    - progress
-                    - error_message
-                    - completed_at
-                  additionalProperties: false
-        "400": *a4
-        "401": *a1
-        "403": *a2
-        "404": *a5
         "500": *a3
   /locations:
     get:
@@ -1135,6 +1135,171 @@ components:
       required:
         - type
         - terms
+    error.UNAUTHORIZED:
+      title: Authorization not provided error (401)
+      description: The error information
+      example:
+        code: UNAUTHORIZED
+        message: Authorization not provided
+        issues: []
+      type: object
+      properties:
+        message:
+          description: The error message
+          example: Authorization not provided
+          type: string
+        code:
+          description: The error code
+          example: UNAUTHORIZED
+          type: string
+        issues:
+          description: An array of issues that were responsible for the error
+          example: []
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+            additionalProperties: false
+      required:
+        - message
+        - code
+      additionalProperties: false
+    error.FORBIDDEN:
+      title: Insufficient access error (403)
+      description: The error information
+      example:
+        code: FORBIDDEN
+        message: Insufficient access
+        issues: []
+      type: object
+      properties:
+        message:
+          description: The error message
+          example: Insufficient access
+          type: string
+        code:
+          description: The error code
+          example: FORBIDDEN
+          type: string
+        issues:
+          description: An array of issues that were responsible for the error
+          example: []
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+            additionalProperties: false
+      required:
+        - message
+        - code
+      additionalProperties: false
+    error.INTERNAL_SERVER_ERROR:
+      title: Internal server error error (500)
+      description: The error information
+      example:
+        code: INTERNAL_SERVER_ERROR
+        message: Internal server error
+        issues: []
+      type: object
+      properties:
+        message:
+          description: The error message
+          example: Internal server error
+          type: string
+        code:
+          description: The error code
+          example: INTERNAL_SERVER_ERROR
+          type: string
+        issues:
+          description: An array of issues that were responsible for the error
+          example: []
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+            additionalProperties: false
+      required:
+        - message
+        - code
+      additionalProperties: false
+    error.BAD_REQUEST:
+      title: Invalid input data error (400)
+      description: The error information
+      example:
+        code: BAD_REQUEST
+        message: Invalid input data
+        issues: []
+      type: object
+      properties:
+        message:
+          description: The error message
+          example: Invalid input data
+          type: string
+        code:
+          description: The error code
+          example: BAD_REQUEST
+          type: string
+        issues:
+          description: An array of issues that were responsible for the error
+          example: []
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+            additionalProperties: false
+      required:
+        - message
+        - code
+      additionalProperties: false
+    error.NOT_FOUND:
+      title: Not found error (404)
+      description: The error information
+      example:
+        code: NOT_FOUND
+        message: Not found
+        issues: []
+      type: object
+      properties:
+        message:
+          description: The error message
+          example: Not found
+          type: string
+        code:
+          description: The error code
+          example: NOT_FOUND
+          type: string
+        issues:
+          description: An array of issues that were responsible for the error
+          example: []
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+            additionalProperties: false
+      required:
+        - message
+        - code
+      additionalProperties: false
     EventConfig:
       type: object
       properties:
@@ -12635,105 +12800,6 @@ components:
         - form
         - auditHistoryLabel
       additionalProperties: false
-    error.UNAUTHORIZED:
-      title: Authorization not provided error (401)
-      description: The error information
-      example:
-        code: UNAUTHORIZED
-        message: Authorization not provided
-        issues: []
-      type: object
-      properties:
-        message:
-          description: The error message
-          example: Authorization not provided
-          type: string
-        code:
-          description: The error code
-          example: UNAUTHORIZED
-          type: string
-        issues:
-          description: An array of issues that were responsible for the error
-          example: []
-          type: array
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-            additionalProperties: false
-      required:
-        - message
-        - code
-      additionalProperties: false
-    error.FORBIDDEN:
-      title: Insufficient access error (403)
-      description: The error information
-      example:
-        code: FORBIDDEN
-        message: Insufficient access
-        issues: []
-      type: object
-      properties:
-        message:
-          description: The error message
-          example: Insufficient access
-          type: string
-        code:
-          description: The error code
-          example: FORBIDDEN
-          type: string
-        issues:
-          description: An array of issues that were responsible for the error
-          example: []
-          type: array
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-            additionalProperties: false
-      required:
-        - message
-        - code
-      additionalProperties: false
-    error.INTERNAL_SERVER_ERROR:
-      title: Internal server error error (500)
-      description: The error information
-      example:
-        code: INTERNAL_SERVER_ERROR
-        message: Internal server error
-        issues: []
-      type: object
-      properties:
-        message:
-          description: The error message
-          example: Internal server error
-          type: string
-        code:
-          description: The error code
-          example: INTERNAL_SERVER_ERROR
-          type: string
-        issues:
-          description: An array of issues that were responsible for the error
-          example: []
-          type: array
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-            additionalProperties: false
-      required:
-        - message
-        - code
-      additionalProperties: false
     EventDocument:
       type: object
       properties:
@@ -14659,72 +14725,6 @@ components:
         - status
         - type
         - customActionType
-      additionalProperties: false
-    error.BAD_REQUEST:
-      title: Invalid input data error (400)
-      description: The error information
-      example:
-        code: BAD_REQUEST
-        message: Invalid input data
-        issues: []
-      type: object
-      properties:
-        message:
-          description: The error message
-          example: Invalid input data
-          type: string
-        code:
-          description: The error code
-          example: BAD_REQUEST
-          type: string
-        issues:
-          description: An array of issues that were responsible for the error
-          example: []
-          type: array
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-            additionalProperties: false
-      required:
-        - message
-        - code
-      additionalProperties: false
-    error.NOT_FOUND:
-      title: Not found error (404)
-      description: The error information
-      example:
-        code: NOT_FOUND
-        message: Not found
-        issues: []
-      type: object
-      properties:
-        message:
-          description: The error message
-          example: Not found
-          type: string
-        code:
-          description: The error code
-          example: NOT_FOUND
-          type: string
-        issues:
-          description: An array of issues that were responsible for the error
-          example: []
-          type: array
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-            additionalProperties: false
-      required:
-        - message
-        - code
       additionalProperties: false
     EventIndex:
       type: object
