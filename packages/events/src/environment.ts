@@ -23,6 +23,7 @@ export const env = cleanEnv(process.env, {
   USER_MGNT_MONGO_URL: url({ devDefault: 'mongodb://localhost/user-mgnt' }),
   ES_URL: url({ devDefault: 'http://localhost:9200' }),
   ES_INDEX_PREFIX: str({ default: 'events' }),
+  ES_REINDEXING_STATUS_INDEX: str({ default: 'reindexing_status' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),

@@ -51,7 +51,11 @@ import {
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { bulkImportEvents } from '@events/service/events/import'
 import { findRecordsByQuery } from '@events/service/indexing/indexing'
-import { reindex } from '@events/service/events/reindex'
+import { reindex } from '@events/service/reindex'
+import {
+  getReindexingStatusHistory,
+  ReindexingStatusSchema
+} from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import { cleanupUnreferencedFiles } from '@events/service/files'
@@ -346,20 +350,37 @@ export const eventRouter = router({
     .input(z.array(EventDocument))
     .output(z.any())
     .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
-  reindex: systemProcedure
-    .input(z.void())
-    .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
-    .output(z.void())
-    .meta({
-      openapi: {
-        summary:
-          'Triggers reindexing of search, workqueues and notifies country config',
-        method: 'POST',
-        path: '/events/reindex',
-        tags: ['events']
-      }
-    })
-    .mutation(async ({ ctx }) => {
-      await reindex(ctx.token)
-    })
+  reindex: router({
+    trigger: systemProcedure
+      .input(z.void())
+      .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
+      .output(z.void())
+      .meta({
+        openapi: {
+          summary:
+            'Triggers reindexing of search, workqueues and notifies country config',
+          method: 'POST',
+          path: '/events/reindex',
+          tags: ['events']
+        }
+      })
+      .mutation(({ ctx }) => reindex(ctx.token)),
+    status: systemProcedure
+      .meta({
+        openapi: {
+          summary: 'Returns the status of current and past reindexing calls',
+          method: 'GET',
+          path: '/events/reindex',
+          tags: ['events']
+        }
+      })
+      .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .output(z.array(ReindexingStatusSchema))
+      .query(async ({ input }) => getReindexingStatusHistory(input?.limit))
+  })
 })
