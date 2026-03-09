@@ -310,7 +310,7 @@ describe('getCurrentEventState()', () => {
       declaration: deepDropNulls(
         declareRequestAction.declaration
       ) as EventState,
-      dateOfEvent: event.createdAt.split('T')[0],
+      dateOfEvent: createAction.createdAt.split('T')[0],
       flags: [InherentFlags.PENDING_CERTIFICATION],
       potentialDuplicates: [],
       legalStatuses: {
@@ -430,7 +430,7 @@ describe('getCurrentEventState()', () => {
       updatedByUserRole: registerAcceptAction.createdByRole,
       updatedAtLocation: registerAcceptAction.createdAtLocation,
       declaration: deepDropNulls(declareAcceptAction.declaration) as EventState,
-      dateOfEvent: event.createdAt.split('T')[0],
+      dateOfEvent: createAction.createdAt.split('T')[0],
       flags: [InherentFlags.PENDING_CERTIFICATION],
       potentialDuplicates: [],
       legalStatuses: {
@@ -736,6 +736,28 @@ describe('getCurrentEventState()', () => {
         middlename: 'sdsa'
       }
     })
+  })
+
+  test('sets dateOfEvent correctly when configured', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        { type: ActionType.CREATE },
+        {
+          type: ActionType.DECLARE
+        },
+        { type: ActionType.REGISTER }
+      ]
+    })
+
+    const state = getCurrentEventState(event, {
+      ...tennisClubMembershipEvent,
+      dateOfEvent: { $$event: 'legalStatuses.REGISTERED.acceptedAt' }
+    })
+
+    expect(state.dateOfEvent).toEqual(
+      state.legalStatuses[EventStatus.enum.REGISTERED]?.acceptedAt.split('T')[0]
+    )
   })
 })
 

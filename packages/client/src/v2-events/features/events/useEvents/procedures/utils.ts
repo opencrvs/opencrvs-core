@@ -167,10 +167,16 @@ export function setQueryDefaults<
     ) => QueryOutput
   }
 ) {
-  queryClient.setQueryDefaults(
-    query.queryKey(),
-    options as Parameters<typeof queryClient.setQueryDefaults>[1]
-  )
+  /**
+   * When a persister is used with Tanstack query, networkMode is defaulted to "offlineFirst".
+   * Which causes the queries to run even when the user is offline and fail because the tRPC client cannot reach the server.
+   * Setting networkMode to "online" ensures that the query will not run when the user is offline.
+   * https://tanstack.com/query/v5/docs/framework/react/plugins/createPersister#:~:text=The%20createPersister%20plugin,no%20network%20connection
+   */
+  queryClient.setQueryDefaults(query.queryKey(), {
+    ...(options as Parameters<typeof queryClient.setQueryDefaults>[1]),
+    networkMode: 'online'
+  })
 }
 
 export function createEventActionMutationFn<
