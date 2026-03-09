@@ -19,6 +19,7 @@ import {
 
 import { createIndex } from '@events/service/indexing/indexing'
 import { getReindexingStatusIndexName, getTemporaryIndexName } from '@events/storage/__mocks__/elasticsearch'
+import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { mswServer } from './msw'
 import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
@@ -40,8 +41,16 @@ async function resetESServer() {
   getTemporaryIndexName.mockImplementation((eventType: string, timestamp: number) => {
     return `${getEventIndexName(eventType)}_${timestamp}`
   })
+const client = getOrCreateClient()
+  await client.cluster.putSettings({
+  body: {
+    persistent: {
+      "action.auto_create_index": "false"
+    }
+  }
+});
 
-  // Create concrete index
+  // Create concrete indices
   await createIndex(getEventIndexName(TENNIS_CLUB_MEMBERSHIP), getDeclarationFields(tennisClubMembershipEvent))
 }
 
