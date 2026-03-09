@@ -11,20 +11,80 @@
 
 import { createSearchConfig } from '../searchConfigs'
 import {
-  EventFieldIdInput,
+  EventFieldIdInput as AdvancedSearchEventFieldIdInput,
   METADATA_FIELD_PREFIX
 } from '../events/AdvancedSearchConfig'
+import { EventMetadataDateFieldIdInput } from '../client'
+
+export type NonSearchableEventMetadataTimeFieldIdInput = Exclude<
+  EventMetadataDateFieldIdInput,
+  AdvancedSearchEventFieldIdInput
+>
+
+function isNonSearchableEventMetadataTimeFieldId(
+  fieldId:
+    | AdvancedSearchEventFieldIdInput
+    | NonSearchableEventMetadataTimeFieldIdInput
+): fieldId is NonSearchableEventMetadataTimeFieldIdInput {
+  return !AdvancedSearchEventFieldIdInput.safeParse(fieldId).success
+}
+
+export type AdvancedSearchConfig = {
+  $$event: AdvancedSearchEventFieldIdInput
+} & ReturnType<
+  typeof createSearchConfig<{
+    fieldId: `${typeof METADATA_FIELD_PREFIX}${AdvancedSearchEventFieldIdInput}`
+    fieldType: 'event'
+  }>
+>
+
+export function createEventFieldConfig(
+  fieldId: AdvancedSearchEventFieldIdInput
+): AdvancedSearchConfig
+
+export function createEventFieldConfig(
+  fieldId: NonSearchableEventMetadataTimeFieldIdInput
+): {
+  $$event: NonSearchableEventMetadataTimeFieldIdInput
+}
+
+export function createEventFieldConfig(
+  fieldId:
+    | AdvancedSearchEventFieldIdInput
+    | NonSearchableEventMetadataTimeFieldIdInput
+):
+  | AdvancedSearchConfig
+  | { $$event: NonSearchableEventMetadataTimeFieldIdInput }
 
 /**
  * Creates a search configuration object for a given event metadata field.
  *
  * @param fieldId - The field ID to search on.
  */
-export function createEventFieldConfig(fieldId: EventFieldIdInput) {
+export function createEventFieldConfig(
+  fieldId:
+    | AdvancedSearchEventFieldIdInput
+    | NonSearchableEventMetadataTimeFieldIdInput
+) {
   const baseField = {
     fieldId: `${METADATA_FIELD_PREFIX}${fieldId}` as const,
     fieldType: 'event' as const
   }
 
-  return createSearchConfig(baseField)
+  if (isNonSearchableEventMetadataTimeFieldId(fieldId)) {
+    /**
+     * Do not return search config for non-searchable event metadata time fields, as they are not meant to be used in advanced search.
+     */
+    return {
+      $$event: fieldId
+    }
+  }
+
+  return {
+    /**
+     * Internal reference to the event field.
+     */
+    $$event: fieldId,
+    ...createSearchConfig(baseField)
+  }
 }
