@@ -16,7 +16,10 @@
     "noEmit": true,
     "jsx": "react",
     "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/globals", "fhir"]
+    "types": ["vitest/globals", "fhir"],
+    "paths": {
+      "@client/*": ["./*"]
+    }
   },
   "include": [
     "src",
