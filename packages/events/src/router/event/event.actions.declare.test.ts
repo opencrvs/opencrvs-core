@@ -316,7 +316,7 @@ describe('Declare action', () => {
 
     const data = generator.event.actions.declare(eventId)
     await client.event.actions.declare.request(data)
-    const updatedEvent = await client.event.get({eventId})
+    const updatedEvent = await client.event.get({ eventId })
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -383,7 +383,7 @@ describe('Declare action', () => {
 
 test('deduplication and annotation check is performed after declaration', async () => {
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
         tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
       ])

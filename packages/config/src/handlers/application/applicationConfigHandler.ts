@@ -93,7 +93,7 @@ async function getCertificatesConfig(
 }
 
 async function getConfigFromCountry(authToken?: string) {
-  const url = new URL('application-config', env.COUNTRY_CONFIG_URL).toString()
+  const url = new URL('config/application', env.COUNTRY_CONFIG_URL).toString()
 
   const res = await fetch(url)
   if (!res.ok) {

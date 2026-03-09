@@ -16,7 +16,7 @@ import { resolveLocationChildren } from '@user-mgnt/utils/location'
 export async function countUsersByLocation(locationId: UUID | undefined) {
   // For the whole country
   const roles = await fetchJSON<Roles>(
-    joinUrl(env.COUNTRY_CONFIG_URL, '/roles')
+    joinUrl(env.COUNTRY_CONFIG_URL, '/config/roles')
   )
   const registrarRoles = roles
     .filter((role) => role.scopes.includes(SCOPES.RECORD_REGISTER))
