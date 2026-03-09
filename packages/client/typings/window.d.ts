@@ -30,8 +30,7 @@ interface Window {
       imageFit?: string
     }
     LANGUAGES: string[]
-    MINIO_URL: string
-    MINIO_BASE_URL: string // URL without path/bucket information, used for file uploads, v2
+    MINIO_BASE_URL: string
     MINIO_BUCKET: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
     USER_NOTIFICATION_DELIVERY_METHOD: 'sms' | 'email'

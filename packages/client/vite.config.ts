@@ -50,12 +50,25 @@ export default defineConfig(({ mode }) => {
   }
 
   const htmlPlugin = () => {
+    const coreConfigDefaults: Record<string, string> = {
+      MINIO_BUCKET: 'ocrvs',
+      MINIO_BASE_URL: 'http://localhost:3535'
+    }
     return {
       name: 'html-transform',
       transformIndexHtml(html: string) {
-        return html.replace(/%(.*?)%/g, function (_, p1) {
+        let result = html.replace(/%(.*?)%/g, function (_, p1) {
           return env[p1]
         })
+        // Only replace {{VAR}} placeholders in dev mode.
+        // In production builds, they survive into the output HTML
+        // and are substituted at container startup by nginx-deploy-config.sh.
+        if (mode === 'development') {
+          for (const [key, val] of Object.entries(coreConfigDefaults)) {
+            result = result.replaceAll(`{{${key}}}`, val)
+          }
+        }
+        return result
       }
     }
   }

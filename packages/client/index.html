@@ -32,6 +32,10 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
     replace this file to change runtime configuration
   -->
     <script src="/api/countryconfig/client-config.js"></script>
+    <script>
+      window.config.MINIO_BUCKET = '{{MINIO_BUCKET}}';
+      window.config.MINIO_BASE_URL = '{{MINIO_BASE_URL}}';
+    </script>
     <!--
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
