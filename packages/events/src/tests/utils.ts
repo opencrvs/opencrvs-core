@@ -496,7 +496,11 @@ export async function seedEvent(
     administrativeHierarchy
   }: {
     eventConfig: EventConfig
-    actions: (DeclarationActionType | typeof ActionType.UNASSIGN)[]
+    actions: (
+      | DeclarationActionType
+      | typeof ActionType.UNASSIGN
+      | typeof ActionType.REQUEST_CORRECTION
+    )[]
     user: Omit<UserContext, 'type'>
     rng: () => number
     administrativeHierarchy?: {
@@ -573,6 +577,18 @@ export async function seedEvent(
         // Without setting the originalActionId, the accepted action will not be linked to the requested action and will not update the event state, which is important for testing scopes based on event state.
         const originalActionId = getUUID()
 
+        // correction, partial declaration which changes a value without uncorrectable: true is enough.
+        const declaration =
+          actionType === ActionType.REQUEST_CORRECTION
+            ? { ' applicant.age': 16 }
+            : generateActionDeclarationInput(
+                eventConfig,
+                actionType,
+                rng,
+                undefined,
+                administrativeHierarchy
+              )
+
         return [
           {
             ...baseAction,
@@ -581,13 +597,7 @@ export async function seedEvent(
             transactionId: generateUuid(rng),
             status: ActionStatus.Requested,
             createdAt: new Date(baseTime + ++offset).toISOString(),
-            declaration: generateActionDeclarationInput(
-              eventConfig,
-              actionType,
-              rng,
-              undefined,
-              administrativeHierarchy
-            )
+            declaration
           },
           {
             ...baseAction,
@@ -747,8 +757,18 @@ function eventMatchesScope({
 export async function setupScopeTestFixture(
   rngSeed: number,
   seedActions:
-    | (DeclarationActionType | typeof ActionType.UNASSIGN)[]
-    | fc.Arbitrary<(DeclarationActionType | typeof ActionType.UNASSIGN)[]>
+    | (
+        | DeclarationActionType
+        | typeof ActionType.REQUEST_CORRECTION
+        | typeof ActionType.UNASSIGN
+      )[]
+    | fc.Arbitrary<
+        (
+          | DeclarationActionType
+          | typeof ActionType.REQUEST_CORRECTION
+          | typeof ActionType.UNASSIGN
+        )[]
+      >
 ) {
   const sampleSize = 200
 
