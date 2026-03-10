@@ -360,7 +360,11 @@ export function getDefaultActionProcedures(
     )
   }
 
-  const actionsMigratedToV2Scopes = [ActionType.NOTIFY] as const
+  const actionsMigratedToV2Scopes = [
+    ActionType.NOTIFY,
+    ActionType.DECLARE,
+    ActionType.REGISTER
+  ] as const
 
   const canAccessEventMiddleware = actionsMigratedToV2Scopes.some(
     (act) => act === actionType
@@ -383,6 +387,7 @@ export function getDefaultActionProcedures(
       .meta(meta)
       .use(canAccessEventMiddleware)
       .input(actionConfig.inputSchema.strict())
+      // @TODO:
       // @ts-expect-error - deprecated by the end of 2.0
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
