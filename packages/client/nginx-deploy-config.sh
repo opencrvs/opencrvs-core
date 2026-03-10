@@ -22,8 +22,11 @@ sed -e s~{{COUNTRY_CONFIG_URL_INTERNAL}}~$COUNTRY_CONFIG_URL_INTERNAL~g \
     -e s~{{AUTH_URL_INTERNAL}}~$AUTH_URL_INTERNAL~g \
     -e s~{{CONFIG_API_URL_INTERNAL}}~$CONFIG_API_URL_INTERNAL~g \
     -e s~{{GATEWAY_URL_INTERNAL}}~$GATEWAY_URL_INTERNAL~g \
-    -e s~{{MINIO_BUCKET}}~$MINIO_BUCKET~g \
-    -e s~{{MINIO_BASE_URL}}~$MINIO_BASE_URL~g \
     /usr/share/nginx/html/index.html > /tmp/index.html
 cat /tmp/index.html > /usr/share/nginx/html/index.html
+
+cat > /usr/share/nginx/html/core-config.js <<EOF
+window.config.MINIO_BUCKET = '$MINIO_BUCKET';
+window.config.MINIO_BASE_URL = '$MINIO_BASE_URL';
+EOF
 
