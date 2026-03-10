@@ -38,6 +38,7 @@ export interface CreatedUser {
   role: string
   name: Array<Name>
   fullHonorificName?: string
+  administrativeAreaId?: UUID | null
 }
 
 interface CreateUser {
