@@ -131,7 +131,7 @@ export function isActionInScope({
 
   const isAllowedByLegacyScope = configurableEventScopeAllowed(
     scopes,
-    // @ts-expect-error -TODO remove
+    // @ts-expect-error - TODO: remove legacy scopes once evrything is migrated to V2
     allowedConfigurableScopes,
     event.type,
     customActionType
