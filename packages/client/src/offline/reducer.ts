@@ -39,7 +39,6 @@ import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
 import { initConditionals } from '@client/forms/conditionals'
 import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
-import { initValidators } from '@client/forms/validators'
 import {
   Action as NotificationAction,
   configurationErrorNotification
@@ -247,11 +246,6 @@ const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
 const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
   successActionCreator: actions.conditionalsLoaded,
   failActionCreator: actions.conditionalsFailed
-})
-
-const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
-  successActionCreator: actions.validatorsLoaded,
-  failActionCreator: actions.validatorsFailed
 })
 
 const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
