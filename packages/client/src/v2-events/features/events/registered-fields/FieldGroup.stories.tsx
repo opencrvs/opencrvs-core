@@ -203,13 +203,14 @@ export const FieldGroupReviewChanged: ReviewStory = {
             district: '62a0ccb4-880d-4f30-8882-f256007dfff9'
           }
         }}
+        formConfig={fieldGroupFormConfig}
         previousFormValues={{
           'storybook.address': {
             country: 'BGD',
-            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+            province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+            district: ''
           }
         }}
-        formConfig={fieldGroupFormConfig}
         title="Address field group review (changed)"
         // eslint-disable-next-line no-console
         onEdit={(values) => console.log(values)}
