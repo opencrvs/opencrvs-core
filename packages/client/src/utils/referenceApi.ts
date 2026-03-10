@@ -21,7 +21,7 @@ import {
 import { getToken } from '@client/utils/authUtils'
 import { EventType, System } from '@client/utils/gateway'
 import { cacheFile } from '@client/v2-events/cache'
-import { TranslationConfig } from '@opencrvs/commons/client'
+import { ApplicationConfig, TranslationConfig } from '@opencrvs/commons/client'
 import { IntlShape } from 'react-intl'
 import { fetchFileFromUrl } from './imageUtils'
 import { last } from 'lodash'
@@ -119,18 +119,8 @@ export interface IApplicationConfigAnonymous {
   PHONE_NUMBER_PATTERN: RegExp | string
 }
 
-export interface IApplicationConfig {
-  APPLICATION_NAME: string
-  ADMIN_STRUCTURE: AdminStructureItem[]
-  COUNTRY_LOGO: ICountryLogo
-  CURRENCY: ICurrency
-  PHONE_NUMBER_PATTERN: RegExp | string
-  USER_NOTIFICATION_DELIVERY_METHOD: string
-  INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
-  SEARCH_DEFAULT_CRITERIA?: SearchCriteriaType
-}
 export interface IApplicationConfigResponse {
-  config: IApplicationConfig
+  config: ApplicationConfig
   certificates: ICertificateConfigData[]
   systems: System[]
 }

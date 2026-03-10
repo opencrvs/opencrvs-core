@@ -26,6 +26,7 @@ import {
   encodeScope,
   generateEventConfig,
   generateTranslationConfig,
+  getDeclarationFields,
   getOrThrow,
   pickRandom
 } from '@opencrvs/commons'
@@ -40,6 +41,7 @@ import {
   payloadGenerator,
   setupHierarchyWithUsers
 } from '@events/tests/generators'
+import { createIndex } from '@events/service/indexing/indexing'
 import { env } from '../../environment'
 import { getClient } from '../../storage/postgres/events'
 import {
@@ -685,7 +687,7 @@ test('placeOfEvent scope filters out results between locations and administrativ
     ],
     placeOfEventId: addressFieldId
   })
-
+  await createIndex(getEventIndexName('event-with-optional-address'), getDeclarationFields(eventWithOptionalAddress))
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([eventWithOptionalAddress])
@@ -879,7 +881,7 @@ test('For users in locations directly under country "administrativeArea" and "al
   )
   const reindexClient = createTestClient(users[0], [SCOPES.RECORD_REINDEX])
 
-  await expect(reindexClient.event.reindex()).resolves.not.toThrow()
+  await expect(reindexClient.event.reindex.trigger()).resolves.not.toThrow()
 
   const esClient = getOrCreateClient()
 
