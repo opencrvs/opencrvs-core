@@ -553,7 +553,7 @@ jobs:
         run: yarn build
         working-directory: packages/commons
 
-      - name: Build events & events router types
+      - name: Build events
         run: yarn build
         working-directory: packages/events
 
