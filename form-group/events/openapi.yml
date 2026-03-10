@@ -776,7 +776,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f97c137c-b348-4d70-ac3f-447404e9d017
+                transactionId: 4be0b62e-cd0a-46c1-a275-87aac28db8cb
                 type: birth
       responses:
         "200":
@@ -862,7 +862,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 3b1e9a55-215a-423d-80fc-ca8489fad67b
+                transactionId: 75bfbef4-4d7d-4f84-be24-9451cc43ae09
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1404,7 +1404,7 @@ paths:
                 $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
   /events/reindex:
     post:
-      operationId: event-reindex
+      operationId: event-reindex-trigger
       summary: Triggers reindexing of search, workqueues and notifies country config
       tags:
         - events
@@ -1428,6 +1428,93 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+    get:
+      operationId: event-reindex-status
+      summary: Returns the status of current and past reindexing calls
+      tags:
+        - events
+      security:
+        - Authorization: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    timestamp:
+                      type: string
+                      format: date-time
+                    status:
+                      type: string
+                      enum:
+                        - running
+                        - completed
+                        - failed
+                    progress:
+                      type: object
+                      properties:
+                        processed:
+                          type: integer
+                      required:
+                        - processed
+                    error_message:
+                      type: string
+                      nullable: true
+                    completed_at:
+                      type: string
+                      nullable: true
+                      format: date-time
+                  required:
+                    - id
+                    - timestamp
+                    - status
+                    - progress
+                    - error_message
+                    - completed_at
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.NOT_FOUND"
         "500":
           description: Internal server error
           content:
@@ -13053,4 +13140,35 @@ components:
         - potentialDuplicates
         - flags
         - declaration
+    error.NOT_FOUND:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+          example: Not found
+        code:
+          type: string
+          description: The error code
+          example: NOT_FOUND
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+          description: An array of issues that were responsible for the error
+          example: []
+      required:
+        - message
+        - code
+      title: Not found error (404)
+      description: The error information
+      example:
+        code: NOT_FOUND
+        message: Not found
+        issues: []
 
