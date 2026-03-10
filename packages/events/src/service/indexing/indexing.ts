@@ -259,6 +259,8 @@ export async function createIndex(
   indexName: string,
   formFields: FieldConfig[],
   addAlias: boolean = true
+  formFields: FieldConfig[],
+  addAlias: boolean = true
 ) {
   const client = getOrCreateClient()
 

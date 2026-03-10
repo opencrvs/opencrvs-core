@@ -310,6 +310,13 @@ function FormReview({
             (!isCorrection || hasCorrectableFields) &&
             !isReviewCorrection
 
+          const hasMandatoryFields = page.fields.some(
+            (field) => !!field.required
+          )
+          const hasAnyCompletedField = page.fields.some(
+            (field) => form[field.id] != null && form[field.id] !== ''
+          )
+
           return (
             <DeclarationDataContainer
               key={'Section_' + page.title.defaultMessage}
@@ -327,7 +334,7 @@ function FormReview({
                     </Link>
                   )
                 }
-                expand={true}
+                expand={hasMandatoryFields || hasAnyCompletedField}
                 label={intl.formatMessage(page.title)}
                 labelForHideAction="Hide"
                 labelForShowAction="Show"

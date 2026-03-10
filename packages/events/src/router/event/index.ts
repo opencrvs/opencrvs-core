@@ -156,7 +156,6 @@ export const eventRouter = router({
         config
       })
 
-
       await writeAuditLog({
         clientId: ctx.user.id,
         clientType: ctx.user.type,
@@ -172,7 +171,6 @@ export const eventRouter = router({
           trackingId: result.trackingId
         }
       })
-
 
       return result
     }),
@@ -212,7 +210,6 @@ export const eventRouter = router({
         }
       )
 
-
       await writeAuditLog({
         clientId: ctx.user.id,
         clientType: ctx.user.type,
@@ -224,7 +221,6 @@ export const eventRouter = router({
           trackingId: updatedEvent.trackingId
         }
       })
-
 
       return updatedEvent
     }),

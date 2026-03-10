@@ -14,7 +14,7 @@
  */
 
 /* eslint-disable */
-import { PlainDate } from '@client/utils/date-formatting'
+import { PlainDate } from '@opencrvs/commons/client'
 
 export type Maybe<T> = T | null
 type InputMaybe<T> = Maybe<T>

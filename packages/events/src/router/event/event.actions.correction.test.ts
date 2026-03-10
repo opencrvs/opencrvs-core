@@ -159,6 +159,7 @@ test(`REQUEST_CORRECTION validation error message contains all the offending fie
     declaration: {
       'applicant.dob': '02-02',
       'applicant.dobUnknown': false,
+      'applicant.age': null,
       'recommender.none': true
     }
   })
@@ -212,6 +213,7 @@ test(`REQUEST_CORRECTION Skips required field validation when they are condition
   const form = {
     'applicant.dob': '2024-02-01',
     'applicant.dobUnknown': false,
+    'applicant.age': null,
     'applicant.name': {
       firstname: 'John',
       surname: 'Doe'
