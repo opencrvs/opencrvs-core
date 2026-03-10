@@ -27,6 +27,7 @@ import {
   setupTestCase,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
+import { EventNotFoundError } from '@events/service/events/events'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 import AppSchema from '../../storage/postgres/events/schema/app/AppSchema'
@@ -60,7 +61,7 @@ test('prevents forbidden access if the scope doesnt allow the event type', async
 
   await expect(
     myClient.event.getDuplicates({ eventId: event.id })
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  ).rejects.toMatchObject(new EventNotFoundError(event.id))
 })
 
 test('prevents forbidden access without assignment but with right scope', async () => {

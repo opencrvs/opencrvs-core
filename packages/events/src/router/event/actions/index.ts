@@ -369,7 +369,8 @@ export function getDefaultActionProcedures(
     ActionType.EDIT,
     ActionType.REJECT_CORRECTION,
     ActionType.APPROVE_CORRECTION,
-    ActionType.REQUEST_CORRECTION
+    ActionType.REQUEST_CORRECTION,
+    ActionType.PRINT_CERTIFICATE
   ] as const
 
   const canAccessEventMiddleware = actionsMigratedToV2Scopes.some(
