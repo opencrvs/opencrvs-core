@@ -92,7 +92,12 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
           event,
           actionType: actionConfig.type
         })
-        return { ...acc, ...actionAnnotation }
+        // NOTIFY shares the DECLARE action config, so also collect NOTIFY annotations
+        const notifyAnnotation =
+          actionConfig.type === ActionType.DECLARE
+            ? getActionAnnotation({ event, actionType: ActionType.NOTIFY })
+            : {}
+        return { ...acc, ...actionAnnotation, ...notifyAnnotation }
       }, {})
 
     return Object.keys(pastActionsWithAnnotation).length > 0
