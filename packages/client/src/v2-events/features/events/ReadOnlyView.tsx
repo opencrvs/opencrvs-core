@@ -70,14 +70,6 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     authentication.sub
   )
 
-  const actionConfiguration = configuration.actions.find(
-    (a) => a.type === ActionType.READ
-  )
-  if (!actionConfiguration) {
-    throw new Error('Action configuration not found')
-  }
-
-  const { title, fields } = actionConfiguration.review
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
@@ -115,6 +107,15 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       })()
     }
   }, [event, assignmentStatus])
+
+  const actionConfiguration = configuration.actions.find(
+    (a) => a.type === ActionType.READ
+  )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const { title, fields } = actionConfiguration.review
 
   return (
     <ReviewComponent.Body
