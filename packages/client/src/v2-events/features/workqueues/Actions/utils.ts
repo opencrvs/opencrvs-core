@@ -68,7 +68,7 @@ export const actionLabels = {
     id: 'event.birth.action.register.label'
   },
   [ActionType.MARK_AS_DUPLICATE]: {
-    defaultMessage: 'Review',
+    defaultMessage: 'Review potential duplicates',
     description: 'Label for review potential duplicate button in dropdown menu',
     id: 'event.birth.action.mark-as-duplicate.label'
   },
@@ -84,7 +84,7 @@ export const actionLabels = {
     id: 'event.birth.action.delete.label'
   },
   [ActionType.REQUEST_CORRECTION]: {
-    defaultMessage: 'Correct record',
+    defaultMessage: 'Correct',
     description: 'Label for request correction button in dropdown menu',
     id: 'event.birth.action.request-correction.label'
   },
