@@ -446,7 +446,9 @@ function ReviewComponent({
 
   const displayedAnnotationFields = hasAnnotationFieldsToShow
     ? reviewFields.filter(
-        ({ type }) => !FieldTypesToHideInReview.some((t) => t === type)
+        (field) =>
+          !FieldTypesToHideInReview.some((t) => t === field.type) &&
+          isFieldDisplayedOnReview(field, annotation, validatorContext)
       )
     : []
 
