@@ -31,12 +31,29 @@ export const EventFieldReference = z
     'Reference to a field defined in the event metadata, using the field id.'
   )
 
+export type EventFieldReference = z.infer<typeof EventFieldReference>
+
+export type EventConfig = {
+  id: string
+  dateOfEvent?: FieldReference | EventFieldReference
+  placeOfEvent?: FieldReference
+  title: TranslationConfig
+  fallbackTitle?: TranslationConfig
+  summary: SummaryConfig
+  label: TranslationConfig
+  actions: ActionConfig[]
+  actionOrder?: string[]
+  declaration: DeclarationFormConfig
+  advancedSearch: AdvancedSearchConfig[]
+  flags: FlagConfig[]
+}
+
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
  *
  * `Event.parse(config)` will throw an error if the configuration is invalid.
  */
-export const EventConfig = z
+const _EventConfigBase: z.ZodType<EventConfig> = z
   .object({
     id: z
       .string()
@@ -92,6 +109,8 @@ export const EventConfig = z
         'Configuration of flags associated with the actions of this event type.'
       )
   })
+
+export const EventConfig: z.ZodType<EventConfig> = _EventConfigBase
   .superRefine((event, ctx) => {
     validateAdvancedSearchConfig(event, ctx)
     validateDateOfEvent(event, ctx)
@@ -103,5 +122,3 @@ export const EventConfig = z
     id: 'EventConfig'
   })
   .describe('Configuration defining an event type.')
-
-export type EventConfig = z.infer<typeof EventConfig>

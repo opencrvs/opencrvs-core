@@ -138,9 +138,10 @@ export const DataFieldValue = z
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
 export type FieldValue = FieldValuesWithoutDataField | DataFieldValue
-export const FieldValue: z.ZodType<FieldValue, z.ZodTypeDef, unknown> = z.union(
-  [FieldValuesWithoutDataField, DataFieldValue]
-)
+export const FieldValue: z.ZodType<FieldValue> = z.union([
+  FieldValuesWithoutDataField,
+  DataFieldValue
+])
 
 // Priority order for schema matching.
 // When multiple schemas pass validation (safeParse succeeds),
