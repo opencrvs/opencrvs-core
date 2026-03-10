@@ -209,7 +209,12 @@ function SignatureOutput({ value }: { value?: FileFieldValue }) {
   if (!value) {
     return null
   }
-  return <SignaturePreview alt="" src={getUnsignedFileUrl(value.path)} />
+  return (
+    <SignaturePreview
+      alt="Signature preview"
+      src={getUnsignedFileUrl(value.path)}
+    />
+  )
 }
 
 export const SignatureField = {
