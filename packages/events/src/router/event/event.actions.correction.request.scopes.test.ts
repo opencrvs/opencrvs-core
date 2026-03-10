@@ -75,15 +75,16 @@ test('Check scopes against event.actions.correction.request', async () => {
     declaredBy: userOptions,
     declaredIn: jurisdictionOptions,
     registeredBy: userOptions,
-    registeredIn: jurisdictionOptions
+    registeredIn: jurisdictionOptions,
+    scopeType: fc.constantFrom('record.request-correction', 'record.correct')
   })
 
   // 3. Test combination against random event and assert results
 
   await fc.assert(
-    fc.asyncProperty(combinations, async ({ user, ...options }) => {
+    fc.asyncProperty(combinations, async ({ user, scopeType, ...options }) => {
       const scope = encodeScope({
-        type: 'record.request-correction',
+        type: scopeType,
         options
       })
 
