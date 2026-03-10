@@ -103,5 +103,6 @@ export const FieldTypesToHideInReview = [
   FieldType.HTTP,
   FieldType.QUERY_PARAM_READER,
   FieldType.DATA,
+  FieldType.ALPHA_PRINT_BUTTON,
   FieldType.ALPHA_HIDDEN
 ]
