@@ -57,8 +57,10 @@ export async function tokenExchangeHandler(
 
   const { sub, userType } = decodedOrError.right
 
-  const rejectScopeOfUserAssignedRole = decodedOrError.right.scope.find((s) =>
-    s.startsWith('record.declared.reject')
+  const rejectScopeOfUserAssignedRole = decodedOrError.right.scope.find(
+    (s) =>
+      s.startsWith('record.declared.reject') ||
+      s.startsWith('type=record.reject')
   )
 
   // @TODO: If in the future we have a fine grained access control for records, check here that the subject actually has access to the record requested
