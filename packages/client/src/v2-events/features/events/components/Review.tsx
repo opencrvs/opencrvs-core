@@ -189,6 +189,11 @@ const reviewMessages = defineMessages({
     id: 'rejectModal.markAsDuplicate',
     defaultMessage: 'Mark as a duplicate',
     description: 'The label for mark as duplicate checkbox of reject modal'
+  },
+  annotationsTitle: {
+    id: 'review.annotations.title',
+    defaultMessage: 'Annotations',
+    description: 'Title for the annotations accordion section in review'
   }
 })
 
@@ -474,41 +479,60 @@ function ReviewComponent({
 
           {/* edit annotation fields  */}
           {hasAnnotationFieldsToShow && onAnnotationChange && (
-            <FormData>
-              <ReviewContainter>
-                <FormFieldGenerator
-                  fields={reviewFields}
-                  id={'review'}
-                  initialValues={annotation}
-                  readonlyMode={readonlyMode}
-                  validatorContext={validatorContext}
-                  onChange={onAnnotationChange}
-                />
-              </ReviewContainter>
-            </FormData>
+            <ReviewContainter>
+              <DeclarationDataContainer>
+                <Accordion
+                  expand={true}
+                  label={intl.formatMessage(reviewMessages.annotationsTitle)}
+                  labelForHideAction="Hide"
+                  labelForShowAction="Show"
+                  name="annotation"
+                >
+                  <FormFieldGenerator
+                    fields={reviewFields}
+                    id={'review'}
+                    initialValues={annotation}
+                    readonlyMode={readonlyMode}
+                    validatorContext={validatorContext}
+                    onChange={onAnnotationChange}
+                  />
+                </Accordion>
+              </DeclarationDataContainer>
+            </ReviewContainter>
           )}
 
           {/* show annotation fields */}
           {hasAnnotationFieldsToShow &&
             readonlyMode &&
             displayedAnnotationFields.length > 0 && (
-              <FormData>
-                <ReviewContainter>
-                  <ListReview id="annotation">
-                    {displayedAnnotationFields.map((field) => (
-                      <ListReview.Row
-                        key={field.id}
-                        actions={null}
-                        id={field.id}
-                        label={intl.formatMessage(field.label)}
-                        value={
-                          <Output field={field} value={annotation[field.id]} />
-                        }
-                      />
-                    ))}
-                  </ListReview>
-                </ReviewContainter>
-              </FormData>
+              <ReviewContainter>
+                <DeclarationDataContainer>
+                  <Accordion
+                    expand={true}
+                    label={intl.formatMessage(reviewMessages.annotationsTitle)}
+                    labelForHideAction="Hide"
+                    labelForShowAction="Show"
+                    name="annotation"
+                  >
+                    <ListReview id="annotation">
+                      {displayedAnnotationFields.map((field) => (
+                        <ListReview.Row
+                          key={field.id}
+                          actions={null}
+                          id={field.id}
+                          label={intl.formatMessage(field.label)}
+                          value={
+                            <Output
+                              field={field}
+                              value={annotation[field.id]}
+                            />
+                          }
+                        />
+                      ))}
+                    </ListReview>
+                  </Accordion>
+                </DeclarationDataContainer>
+              </ReviewContainter>
             )}
         </Card>
         {children}
