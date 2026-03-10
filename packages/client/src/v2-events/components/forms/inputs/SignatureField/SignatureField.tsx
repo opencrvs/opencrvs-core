@@ -205,6 +205,14 @@ function SignatureFieldInput({
   )
 }
 
+function SignatureOutput({ value }: { value?: FileFieldValue }) {
+  if (!value) {
+    return null
+  }
+  return <SignaturePreview alt="" src={getUnsignedFileUrl(value.path)} />
+}
+
 export const SignatureField = {
-  Input: SignatureFieldInput
+  Input: SignatureFieldInput,
+  Output: SignatureOutput
 }
