@@ -11,38 +11,36 @@
 
 import fc from 'fast-check'
 import {
-  ActionTypes,
-  EventDocument,
+  ActionType,
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
   encodeScope,
-  getDeclarationFields
+  getDeclarationFields,
+  getUUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   assertScopeResult,
+  attemptScopedAction,
   createTestClient,
   setupScopeTestFixture
 } from '@events/tests/utils'
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
-import { EventNotFoundError } from '../../service/events/events'
 
-test('Check scopes against event.get', async () => {
+test('Check scopes against event.actions.register', async () => {
   await createIndex(
     getEventIndexName('tennis-club-membership_premium'),
     getDeclarationFields(tennisClubMembershipEvent)
   )
+
   // 1. Setup test fixture with a known set of users, administrative areas, and events.
   const { users, isUnderAdministrativeArea, eventIds } =
-    await setupScopeTestFixture(
-      1243453343,
-      fc.constantFrom(
-        [ActionTypes.enum.DECLARE],
-        [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
-      )
-    )
+    await setupScopeTestFixture(124334532, [
+      ActionType.DECLARE,
+      ActionType.UNASSIGN
+    ])
 
   const clientReadingAllEvents = createTestClient(users[0], [
     encodeScope({
@@ -74,40 +72,33 @@ test('Check scopes against event.get', async () => {
     ),
     placeOfEvent: jurisdictionOptions,
     declaredBy: userOptions,
-    declaredIn: jurisdictionOptions,
-    registeredBy: userOptions,
-    registeredIn: jurisdictionOptions
+    declaredIn: jurisdictionOptions
   })
 
   // 3. Test combination against random event and assert results
+
   await fc.assert(
     fc.asyncProperty(combinations, async ({ user, ...options }) => {
       const scope = encodeScope({
-        type: 'record.read',
+        type: 'record.register',
         options
       })
 
       const randomIndex = Math.floor(Math.random() * eventIds.length)
       const [eventId] = eventIds.splice(randomIndex, 1)
 
-      const testClient = createTestClient(user, [scope])
-
-      let result: { success: boolean; event: EventDocument }
-      try {
-        // 1. Perform the action with the given test client.
-        const eventFetchedAsUser = await testClient.event.get({ eventId })
-        result = { success: true, event: eventFetchedAsUser }
-      } catch (error) {
-        if (error instanceof EventNotFoundError) {
-          // 2. If action fails, attempt to fetch the event with the client that has access to all events to verify the failure was due to scope restrictions.
-          const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
-            eventId
+      const result = await attemptScopedAction(
+        eventId,
+        user,
+        scope,
+        clientReadingAllEvents,
+        (client) =>
+          client.event.actions.register.request({
+            eventId,
+            transactionId: getUUID(),
+            declaration: {}
           })
-          result = { success: false, event: eventFetchedAsAdmin }
-        } else {
-          throw error
-        }
-      }
+      )
 
       assertScopeResult(result, {
         user,
@@ -115,6 +106,6 @@ test('Check scopes against event.get', async () => {
         ...options
       })
     }),
-    { numRuns: 40 }
+    { numRuns: 20 }
   )
 })
