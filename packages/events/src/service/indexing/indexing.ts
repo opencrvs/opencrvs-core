@@ -257,7 +257,8 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
 
 export async function createIndex(
   indexName: string,
-  formFields: FieldConfig[]
+  formFields: FieldConfig[],
+  addAlias: boolean = true
 ) {
   const client = getOrCreateClient()
 
@@ -333,31 +334,34 @@ export async function createIndex(
     }
   })
 
-  return ensureAlias(indexName)
+  if (addAlias) {
+    await ensureAlias(indexName)
+  }
 }
 
-export async function ensureIndexExists(
-  eventConfiguration: EventConfig,
-  { overwrite }: { overwrite?: boolean } = { overwrite: false }
-) {
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
 
-  if (!hasEventsIndex) {
+  const isAlreadyWriteAlias = await esClient.indices.existsAlias({
+    name: indexName
+  })
+  if (isAlreadyWriteAlias) {
+    logger.info(
+      `Write alias ${indexName} already exists — index setup already complete`
+    )
+    return
+  }
+
+  const hasConcreteIndex = await esClient.indices.exists({ index: indexName })
+
+  if (!hasConcreteIndex) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    logger.info(`Index ${indexName} already exists.`)
-    if (overwrite) {
-      logger.info(`. - Overwriting index ${indexName}`)
-      await esClient.indices.delete({ index: indexName })
-      await createIndex(indexName, getDeclarationFields(eventConfiguration))
-    }
+    logger.info(`Index ${indexName} already exists as a concrete index.`)
+    await ensureAlias(indexName)
   }
-  return ensureAlias(indexName)
 }
 
 type _Combine<
@@ -371,7 +375,9 @@ export type BulkResponse = estypes.BulkResponse
 
 export async function indexEventsInBulk(
   batch: EventDocument[],
-  configs: EventConfig[]
+  configs: EventConfig[],
+
+  indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()
 
@@ -388,7 +394,13 @@ export async function indexEventsInBulk(
           locationHierarchyCache
         )
       return [
-        { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+        {
+          index: {
+            _index:
+              indexNameOverrides?.get(doc.type) ?? getEventIndexName(doc.type),
+            _id: doc.id
+          }
+        },
         eventIndexWithLocationHierarchy
       ]
     })
@@ -396,7 +408,23 @@ export async function indexEventsInBulk(
 
   const body = indexedDocs.flat()
 
-  return esClient.bulk({ refresh: false, body })
+  const response = await esClient.bulk({ refresh: false, body })
+
+  if (response.errors) {
+    const failures = response.items
+      .filter((item) => item.index?.error)
+      .map((item) => ({
+        id: item.index?._id,
+        index: item.index?._index,
+        error: item.index?.error
+      }))
+    logger.error(
+      `Bulk indexing had ${failures.length} failure(s) out of ${batch.length} documents`,
+      { failures }
+    )
+  }
+
+  return response
 }
 
 export async function indexEvent(event: EventDocument, config: EventConfig) {

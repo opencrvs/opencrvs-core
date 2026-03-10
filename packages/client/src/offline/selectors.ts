@@ -72,20 +72,6 @@ export const selectCountryBackground = () => {
   }
 }
 
-const selectCountryLogo = (store: IStoreState) => {
-  return (
-    getKey(store, 'offlineData').config?.COUNTRY_LOGO?.file ||
-    getKey(store, 'offlineData').anonymousConfig?.COUNTRY_LOGO?.file
-  )
-}
-
-function selectApplicationName(store: IStoreState) {
-  return (
-    getKey(store, 'offlineData').config?.APPLICATION_NAME ||
-    getKey(store, 'offlineData').anonymousConfig?.APPLICATION_NAME
-  )
-}
-
 export const getOfflineLoadingError = (
   store: IStoreState
 ): IOfflineDataState['loadingError'] => getKey(store, 'loadingError')
