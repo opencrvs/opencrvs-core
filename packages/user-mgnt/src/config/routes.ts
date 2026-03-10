@@ -45,14 +45,6 @@ import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
-import {
-  verifySystemHandler,
-  verifySystemReqSchema,
-  verifySystemResSchema,
-  getSystemRequestSchema,
-  getSystemResponseSchema,
-  getSystemHandler
-} from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
@@ -461,39 +453,6 @@ export const getRoutes = () => {
         },
         description:
           'Reset password via sms for given userid and make the corresponding user pending'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/verifySystem',
-      handler: verifySystemHandler,
-      options: {
-        auth: false,
-        tags: ['api'],
-        description: 'Verify system',
-        notes: 'Verify system exist and access details are correct',
-        validate: {
-          payload: verifySystemReqSchema
-        },
-        response: {
-          schema: verifySystemResSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/getSystem',
-      handler: getSystemHandler,
-      options: {
-        tags: ['api'],
-        description: 'Get system details',
-        notes: 'Get system details for authentication',
-        validate: {
-          payload: getSystemRequestSchema
-        },
-        response: {
-          schema: getSystemResponseSchema
-        }
       }
     },
     {

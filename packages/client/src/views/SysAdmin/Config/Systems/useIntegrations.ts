@@ -13,6 +13,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTRPC, trpcClient } from '@client/v2-events/trpc'
 import { SCOPES, encodeScope, RecordScopeTypeV2 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { UUID } from '@opencrvs/commons'
 
 /** Data shape returned by integrations.list */
 export interface IntegrationItem {
@@ -27,6 +28,15 @@ export interface CreateIntegrationResult {
   clientId: string
   shaSecret: string
   clientSecret: string
+}
+
+/** Data shape returned by integrations.get (for revealing keys) */
+export interface IntegrationDetails {
+  id: string
+  name: string
+  scopes: string[]
+  status: string
+  shaSecret: string | null
 }
 
 type SystemIntegrationType = 'HEALTH' | 'RECORD_SEARCH'
@@ -82,6 +92,50 @@ export function useIntegrations() {
     }
   })
 
+  // Deactivate integration
+  const deactivateMutation = useMutation({
+    mutationFn: (id: string) =>
+      trpcClient.integrations.deactivate.mutate({ id: id as UUID }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: trpc.integrations.list.queryKey()
+      })
+    }
+  })
+
+  // Activate integration
+  const activateMutation = useMutation({
+    mutationFn: (id: string) =>
+      trpcClient.integrations.activate.mutate({ id: id as UUID }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: trpc.integrations.list.queryKey()
+      })
+    }
+  })
+
+  // Delete integration
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) =>
+      trpcClient.integrations.delete.mutate({ id: id as UUID }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: trpc.integrations.list.queryKey()
+      })
+    }
+  })
+
+  // Get integration details (for revealing keys)
+  const getIntegration = async (id: string) => {
+    return trpcClient.integrations.get.query({ id: id as UUID })
+  }
+
+  // Refresh client secret
+  const refreshSecretMutation = useMutation({
+    mutationFn: (id: string) =>
+      trpcClient.integrations.refreshSecret.mutate({ id: id as UUID })
+  })
+
   return {
     integrations: (listQuery.data ?? []) as IntegrationItem[],
     isLoading: listQuery.isLoading,
@@ -90,6 +144,21 @@ export function useIntegrations() {
     createResult: (createMutation.data ?? null) as CreateIntegrationResult | null,
     isCreating: createMutation.isPending,
     createError: createMutation.error,
-    resetCreate: createMutation.reset
+    resetCreate: createMutation.reset,
+    deactivateIntegration: deactivateMutation.mutateAsync,
+    isDeactivating: deactivateMutation.isPending,
+    deactivateError: deactivateMutation.error,
+    activateIntegration: activateMutation.mutateAsync,
+    isActivating: activateMutation.isPending,
+    activateError: activateMutation.error,
+    deleteIntegration: deleteMutation.mutateAsync,
+    isDeleting: deleteMutation.isPending,
+    deleteError: deleteMutation.error,
+    getIntegration,
+    refreshSecret: refreshSecretMutation.mutateAsync,
+    refreshSecretData: refreshSecretMutation.data ?? null,
+    isRefreshingSecret: refreshSecretMutation.isPending,
+    refreshSecretError: refreshSecretMutation.error,
+    resetRefreshSecret: refreshSecretMutation.reset
   }
 }
