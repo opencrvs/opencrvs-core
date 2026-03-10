@@ -21,11 +21,14 @@ import {
   UserFilter,
   createPrng,
   encodeScope,
-  getCurrentEventState
+  getCurrentEventState,
+  getDeclarationFields
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, seedEvent } from '@events/tests/utils'
 import { setupHierarchyWithUsers } from '@events/tests/generators'
+import { createIndex } from '@events/service/indexing/indexing'
+import { getEventIndexName } from '@events/storage/elasticsearch'
 import { getClient } from '../../storage/postgres/events'
 import { EventNotFoundError } from '../../service/events/events'
 
@@ -126,6 +129,13 @@ function eventMatchesScope({
 
   return true
 }
+
+beforeEach(async () => {
+  await createIndex(
+    getEventIndexName('tennis-club-membership_premium'),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
+})
 
 test('Check scopes against get.event', async () => {
   const { users, isUnderAdministrativeArea } = await setupHierarchyWithUsers()
@@ -244,12 +254,13 @@ test('Check scopes against get.event', async () => {
           | { success: true; event: EventDocument }
           | { success: false; event: EventDocument } // fetched as admin because the test user could not access it.
         try {
-          const response = await testClient.event.get({eventId})
+          const response = await testClient.event.get({ eventId })
           result = { success: true, event: response }
         } catch (error) {
           if (error instanceof EventNotFoundError) {
-            const eventFetchedAsAdmin =
-              await clientReadingAllEvents.event.get({eventId})
+            const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
+              eventId
+            })
 
             result = { success: false, event: eventFetchedAsAdmin }
           } else {
