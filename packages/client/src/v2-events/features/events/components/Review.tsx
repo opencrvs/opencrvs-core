@@ -486,6 +486,7 @@ function ReviewComponent({
           )}
 
           {hasAnnotationFieldsToShow &&
+            readonlyMode &&
             displayedAnnotationFields.length > 0 && (
               <FormData>
                 <ReviewContainter>
