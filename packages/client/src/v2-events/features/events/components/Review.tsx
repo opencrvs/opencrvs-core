@@ -472,6 +472,7 @@ function ReviewComponent({
             onEdit={onEdit}
           />
 
+          {/* edit annotation fields  */}
           {hasAnnotationFieldsToShow && onAnnotationChange && (
             <FormData>
               <ReviewContainter>
@@ -487,6 +488,7 @@ function ReviewComponent({
             </FormData>
           )}
 
+          {/* show annotation fields */}
           {hasAnnotationFieldsToShow &&
             readonlyMode &&
             displayedAnnotationFields.length > 0 && (
