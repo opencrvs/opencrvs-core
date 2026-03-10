@@ -16,16 +16,25 @@ import {
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   encodeScope,
+  getDeclarationFields,
   getUUID
 } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   assertScopeResult,
   attemptScopedAction,
   createTestClient,
   setupScopeTestFixture
 } from '@events/tests/utils'
+import { createIndex } from '@events/service/indexing/indexing'
+import { getEventIndexName } from '@events/storage/elasticsearch'
 
 test('Check scopes against event.actions.declare', async () => {
+  await createIndex(
+    getEventIndexName('tennis-club-membership_premium'),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
+
   // 1. Setup test fixture with a known set of users, administrative areas, and events.
   const { users, administrativeAreas, isUnderAdministrativeArea, eventIds } =
     await setupScopeTestFixture(12434532, [ActionType.UNASSIGN])

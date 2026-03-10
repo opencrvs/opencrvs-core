@@ -54,7 +54,11 @@ import {
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { bulkImportEvents } from '@events/service/events/import'
 import { findRecordsByQuery } from '@events/service/indexing/indexing'
-import { reindex } from '@events/service/events/reindex'
+import { reindex } from '@events/service/reindex'
+import {
+  getReindexingStatusHistory,
+  ReindexingStatusSchema
+} from '@events/service/reindex/status'
 import { markAsDuplicate } from '@events/service/events/actions/mark-as-duplicate'
 import { markNotDuplicate } from '@events/service/events/actions/mark-not-duplicate'
 import { cleanupUnreferencedFiles } from '@events/service/files'
@@ -66,6 +70,42 @@ import { getDefaultActionProcedures } from './actions'
 import { customActionProcedures } from './actions/custom'
 
 export const eventRouter = router({
+  /*
+   * This must be defined before event.get or otherwise the rest route /events/:eventId will catch the request before it reaches this route. This is because "reindex" can be mistaken as an eventId in the get route.
+   */
+  reindex: router({
+    trigger: userAndSystemProcedure
+      .input(z.void())
+      .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
+      .output(z.void())
+      .meta({
+        openapi: {
+          summary:
+            'Triggers reindexing of search, workqueues and notifies country config',
+          method: 'POST',
+          path: '/events/reindex',
+          tags: ['events']
+        }
+      })
+      .mutation(({ ctx }) => reindex(ctx.token)),
+    status: userAndSystemProcedure
+      .meta({
+        openapi: {
+          summary: 'Returns the status of current and past reindexing calls',
+          method: 'GET',
+          path: '/events/reindex',
+          tags: ['events']
+        }
+      })
+      .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .output(z.array(ReindexingStatusSchema))
+      .query(async ({ input }) => getReindexingStatusHistory(input?.limit))
+  }),
   config: router({
     /**
      * Event configurations are intentionally available to all user types.
@@ -403,21 +443,5 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .input(z.array(EventDocument))
     .output(z.any())
-    .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token)),
-  reindex: userAndSystemProcedure
-    .input(z.void())
-    .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
-    .output(z.void())
-    .meta({
-      openapi: {
-        summary:
-          'Triggers reindexing of search, workqueues and notifies country config',
-        method: 'POST',
-        path: '/events/reindex',
-        tags: ['events']
-      }
-    })
-    .mutation(async ({ ctx }) => {
-      await reindex(ctx.token)
-    })
+    .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token))
 })

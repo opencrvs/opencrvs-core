@@ -375,10 +375,10 @@ export function getDefaultActionProcedures(
   const canAccessEventMiddleware = actionsMigratedToV2Scopes.some(
     (act) => act === actionType
   )
-    ? // @TODO
+    ? middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType])
+    : // @TODO
       // @ts-expect-error - All scopes do not overlap between 2.0 and 1.9. Since scopes are migrated one by one, we can ignore this error until all scopes for the action are migrated as long as @see actionsMigratedToV2Scopes is updated accordingly.
-      middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType])
-    : requiresAnyOfScopes([], ACTION_SCOPE_MAP[actionType])
+      requiresAnyOfScopes([], ACTION_SCOPE_MAP[actionType])
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 

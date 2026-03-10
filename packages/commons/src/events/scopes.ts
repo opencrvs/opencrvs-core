@@ -13,7 +13,6 @@ import {
   ConfigurableScopeType,
   getAuthorizedEventsFromScopes,
   Scope,
-  RecordScopeType,
   findScopes
 } from '../scopes'
 import {
@@ -132,6 +131,7 @@ export function isActionInScope({
 
   const isAllowedByLegacyScope = configurableEventScopeAllowed(
     scopes,
+    // @ts-expect-error -TODO remove
     allowedConfigurableScopes,
     event.type,
     customActionType
