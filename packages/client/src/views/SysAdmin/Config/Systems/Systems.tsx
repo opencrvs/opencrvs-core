@@ -35,7 +35,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Text } from '@opencrvs/components/lib/Text'
 import React, { useCallback, useState } from 'react'
-import { IntlShape, useIntl } from 'react-intl'
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import {
   useIntegrations,
@@ -469,13 +469,10 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           show={true}
           handleClose={() => setDeleteConfirm({ integration: null })}
         >
-          <span
-            dangerouslySetInnerHTML={{
-              __html: intl.formatMessage(
-                integrationMessages.deleteSystemText
-              )
-            }}
-          />
+          <FormattedMessage
+              {...integrationMessages.deleteSystemText}
+              values={{ b: (chunks: React.ReactNode) => <b>{chunks}</b> }}
+            />
         </ResponsiveModal>
       )}
 
