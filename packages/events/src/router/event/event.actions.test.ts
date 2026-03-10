@@ -27,7 +27,8 @@ import {
   TestUserRole,
   AddressType,
   deepMerge,
-  encodeScope
+  encodeScope,
+  getDeclarationFields
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -38,6 +39,8 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
+import { createIndex } from '@events/service/indexing/indexing'
+import { getEventIndexName } from '@events/storage/elasticsearch'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 
@@ -258,6 +261,13 @@ const multiFileConfig = {
   },
   advancedSearch: []
 } satisfies EventConfig
+
+beforeEach(() => {
+  return createIndex(
+    getEventIndexName(multiFileConfig.id),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
+})
 
 describe('Action updates', () => {
   const deleteFileMock = vi.fn()

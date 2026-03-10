@@ -36,3 +36,11 @@ export function getEventIndexName(eventType: string) {
     .toLowerCase()
     .replaceAll('.', FIELD_ID_SEPARATOR)
 }
+
+export function getTemporaryIndexName(eventType: string, timestamp: number) {
+  return `${getEventIndexName(eventType)}_${timestamp}`
+}
+
+export function getReindexingStatusIndexName() {
+  return env.ES_REINDEXING_STATUS_INDEX
+}
