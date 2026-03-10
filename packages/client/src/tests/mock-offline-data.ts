@@ -453,7 +453,9 @@ export const mockOfflineData = {
     DEATH_REGISTRATION_TARGET: 45,
     SENTRY: 'https://sentry.com',
     USER_NOTIFICATION_DELIVERY_METHOD: 'email',
-    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email'
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email',
+    SYSTEM_IANA_TIMEZONE: 'Asia/Dhaka',
+    SEARCH_DEFAULT_CRITERIA: 'TRACKING_ID' as const
   },
   anonymousConfig: {
     APPLICATION_NAME: 'Farajaland CRVS',

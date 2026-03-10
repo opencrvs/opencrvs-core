@@ -27,7 +27,8 @@ import {
   TestUserRole,
   AddressType,
   deepMerge,
-  encodeScope
+  encodeScope,
+  getDeclarationFields
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -38,6 +39,8 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
+import { createIndex } from '@events/service/indexing/indexing'
+import { getEventIndexName } from '@events/storage/elasticsearch'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 
@@ -93,7 +96,7 @@ describe('Adding actions', () => {
     )
     await client.event.actions.register.request(generatedRegistration)
 
-    const updatedEvent = await client.event.get({eventId: originalEvent.id})
+    const updatedEvent = await client.event.get({ eventId: originalEvent.id })
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -172,7 +175,7 @@ describe('Action drafts', () => {
 
     const draftEvents = await client.event.draft.list()
 
-    const event = await client.event.get({eventId: originalEvent.id})
+    const event = await client.event.get({ eventId: originalEvent.id })
     // this triggers READ action
     expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
 
@@ -259,6 +262,13 @@ const multiFileConfig = {
   advancedSearch: []
 } satisfies EventConfig
 
+beforeEach(() => {
+  return createIndex(
+    getEventIndexName(multiFileConfig.id),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
+})
+
 describe('Action updates', () => {
   const deleteFileMock = vi.fn()
   const fileExistsMock = vi.fn()
@@ -268,7 +278,7 @@ describe('Action updates', () => {
     fileExistsMock.mockClear()
 
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([multiFileConfig, tennisClubMembershipEvent])
       }),
       http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
@@ -342,7 +352,7 @@ describe('Action updates', () => {
       transactionId: getUUID()
     })
 
-    const event = await client.event.get({eventId: originalEvent.id})
+    const event = await client.event.get({ eventId: originalEvent.id })
     const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(eventState.declaration).toMatchSnapshot()
   })
@@ -586,7 +596,7 @@ test('PRINT_CERTIFICATE action can include a valid content.templateId property i
   )
   expect(result).toBeDefined()
 
-  const updatedEvent = await client.event.get({eventId: originalEvent.id})
+  const updatedEvent = await client.event.get({ eventId: originalEvent.id })
   const printAction = updatedEvent.actions.find(
     (action) => action.type === ActionType.PRINT_CERTIFICATE
   ) as PrintCertificateAction

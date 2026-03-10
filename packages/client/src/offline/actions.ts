@@ -17,7 +17,6 @@ import {
   IOfflineData
 } from '@client/offline/reducer'
 import {
-  IApplicationConfig,
   IApplicationConfigAnonymous,
   IApplicationConfigResponse,
   IContentResponse,
@@ -30,6 +29,7 @@ import {
   LoadValidatorsResponse
 } from '@client/utils/referenceApi'
 import { UserDetails } from '@client/utils/userUtils'
+import { ApplicationConfig } from '@opencrvs/commons/client'
 
 const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -124,7 +124,7 @@ type CertificatesLoadFailedAction = {
 export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
 type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
-  payload: { config: IApplicationConfig }
+  payload: { config: ApplicationConfig }
 }
 
 export const ANONYMOUS_USER_OFFLINE_CONFIG =

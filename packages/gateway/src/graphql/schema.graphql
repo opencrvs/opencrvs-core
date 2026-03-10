@@ -577,17 +577,6 @@ type UserRole {
   scopes: [String!]!
 }
 
-type System {
-  _id: ID!
-  clientId: ID!
-  shaSecret: ID!
-  status: SystemStatus!
-  name: String!
-  type: SystemType!
-  integratingSystemType: IntegratingSystemType
-  settings: SystemSettings
-}
-
 input CorrectionInput {
   requester: String!
   requesterOther: String
@@ -721,23 +710,6 @@ type Avatar {
 input AvatarInput {
   type: String!
   data: String!
-}
-
-type SystemSecret {
-  system: System!
-  clientSecret: ID!
-}
-
-input SystemInput {
-  name: String!
-  type: SystemType!
-  settings: SystemSettingsInput
-  integratingSystemType: IntegratingSystemType
-}
-
-input UpdatePermissionsInput {
-  clientId: String!
-  webhook: [WebhookInput!]!
 }
 
 type BookMarkedSearches {
@@ -1058,31 +1030,6 @@ type I18nMessage {
   description: String!
 }
 
-enum SystemStatus {
-  active
-  deactivated
-}
-
-enum SystemType {
-  NATIONAL_ID
-  HEALTH
-  RECORD_SEARCH
-  IMPORT_EXPORT
-  CUSTOM
-}
-
-enum IntegratingSystemType {
-  OTHER
-}
-
-type SystemSettings {
-  dailyQuota: Int
-  webhook: [WebhookPermission!]
-  openIdProviderClientId: String
-  openIdProviderBaseUrl: String
-  openIdProviderClaims: String
-}
-
 input AttachmentInput {
   _fhirID: ID
   contentType: String
@@ -1262,16 +1209,6 @@ input UserIdentifierInput {
 input SignatureInput {
   data: String!
   type: String
-}
-
-input SystemSettingsInput {
-  dailyQuota: Int
-  webhook: [WebhookInput]
-}
-
-input WebhookInput {
-  event: String!
-  permissions: [String]!
 }
 
 type AssignmentData {
@@ -1547,11 +1484,6 @@ type EventProgressData {
   timeInWaitingForApproval: Int
   timeInWaitingForBRIS: Int
   timeInReadyToPrint: Int
-}
-
-type WebhookPermission {
-  event: String!
-  permissions: [String!]!
 }
 
 enum AttachmentInputStatus {

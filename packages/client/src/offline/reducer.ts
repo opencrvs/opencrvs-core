@@ -21,7 +21,6 @@ import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import {
-  IApplicationConfig,
   IApplicationConfigAnonymous,
   ILocationDataResponse,
   referenceApi,
@@ -45,6 +44,7 @@ import {
   configurationErrorNotification
 } from '@client/notification/actions'
 import { getToken } from '@client/utils/authUtils'
+import { ApplicationConfig } from '@opencrvs/commons/client'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -115,7 +115,8 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-  config: IApplicationConfig
+  systems: System[]
+  config: ApplicationConfig
   anonymousConfig: IApplicationConfigAnonymous
 }
 

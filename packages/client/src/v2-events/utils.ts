@@ -34,7 +34,10 @@ import {
   TextField,
   DefaultAddressFieldValue,
   AdministrativeArea,
-  ActionType
+  ActionType,
+  flattenEntries,
+  EventMetadataDateFieldId,
+  getAcceptedScopesByType
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -67,18 +70,44 @@ export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   return uniq(userIds)
 }
 
+function eventMetadataObjectFromEntries(entries: [string, unknown][]) {
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of entries) {
+    result[`event.${key}`] = value
+  }
+  return result
+}
+
 export function flattenEventIndex(event: EventIndex) {
   const { declaration, trackingId, status, ...rest } = event
   return {
-    ...rest,
     ...declaration,
-    'event.trackingId': trackingId,
-    'event.status': status,
+    ...eventMetadataObjectFromEntries(
+      flattenEntries({ trackingId, status, ...rest })
+    ),
     'event.registrationNumber':
       rest.legalStatuses.REGISTERED?.registrationNumber,
     'event.registeredAt': rest.legalStatuses.REGISTERED?.createdAtLocation,
     'event.registeredBy': rest.legalStatuses.REGISTERED?.createdBy
   }
+}
+
+export function convertDateFieldsToUnixTimestamps(
+  eventIndex: Record<string, unknown>
+) {
+  return Object.fromEntries(
+    Object.entries(eventIndex).map(([key, value]) => {
+      if (
+        EventMetadataDateFieldId.options.includes(
+          key as EventMetadataDateFieldId
+        ) &&
+        typeof value === 'string'
+      ) {
+        return [key, new Date(value).getTime()]
+      }
+      return [key, value]
+    })
+  )
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
@@ -283,7 +312,12 @@ export function hasOutboxWorkqueue(scopes: Scope[]) {
 }
 
 export function hasDraftWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => scope.startsWith('record.declare'))
+  return (
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.create'],
+      scopes
+    }).length > 0
+  )
 }
 
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
