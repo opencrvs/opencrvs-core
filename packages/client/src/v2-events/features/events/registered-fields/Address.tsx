@@ -16,9 +16,8 @@ import {
   AddressFieldValue,
   and,
   ConditionalType,
+  Country as CountryField,
   field as fieldHelper,
-  FieldConfig,
-  FieldPropsWithoutReferenceValue,
   FieldType,
   Location,
   not,
@@ -27,10 +26,10 @@ import {
   AddressType,
   isFieldDisplayedOnReview,
   AddressField,
-  AdministrativeArea,
+  AdministrativeArea as AdministrativeAreaField,
+  TextField,
   LocationType,
   ValidatorContext,
-  RequireConfig,
   IndexMap,
   FormState
 } from '@opencrvs/commons/client'
@@ -44,19 +43,14 @@ import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 
-// ADDRESS field may not contain another ADDRESS field
-type FieldConfigWithoutAddress = Exclude<
-  FieldConfig,
-  { type: typeof FieldType.ADDRESS }
->
-
-type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
+interface Props {
+  id: string
   name: string
   onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
   onChange: (newValue: AddressFieldValue) => void
   touched: IndexMap<FormState<boolean>> | undefined
   value?: AddressFieldValue
-  configuration?: AddressField['configuration']
+  config: AddressField
   disabled?: boolean
   validatorContext: ValidatorContext
 }
@@ -71,7 +65,7 @@ const COUNTRY_FIELD = {
     description: 'This is the label for the field'
   },
   type: FieldType.COUNTRY
-} as const satisfies FieldConfigWithoutAddress
+} satisfies CountryField
 
 const ADDRESS_TYPE_FIELD = {
   id: 'addressType',
@@ -87,7 +81,7 @@ const ADDRESS_TYPE_FIELD = {
     id: 'messages.emptyString'
   },
   type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
+} satisfies TextField
 
 const ADMINISTRATIVE_AREA_FIELD = {
   id: 'administrativeArea',
@@ -103,7 +97,7 @@ const ADMINISTRATIVE_AREA_FIELD = {
     id: 'messages.emptyString'
   },
   type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
+} satisfies TextField
 
 const STREET_LEVEL_DETAILS_FIELD = {
   id: 'streetLevelDetails',
@@ -119,7 +113,7 @@ const STREET_LEVEL_DETAILS_FIELD = {
     id: 'messages.emptyString'
   },
   type: FieldType.TEXT
-} as const satisfies FieldConfigWithoutAddress
+} satisfies TextField
 
 const ALL_ADDRESS_FIELDS = [
   COUNTRY_FIELD,
@@ -135,28 +129,70 @@ function isDomesticAddress() {
   )
 }
 
-function generateAdminStructureFields(
-  inputArray: AdminStructureItem[],
-  required: RequireConfig
-): AdministrativeArea[] {
-  return inputArray.map((item, index) => {
-    const { id, label } = item
-    const isFirst = index === 0
+function generateAddressFields(
+  config: AddressField,
+  adminStructure: AdminStructureItem[]
+): {
+  countryField: CountryField
+  domesticFields: AdministrativeAreaField[]
+  streetAddressFields: TextField[]
+} {
+  const configFields = config.configuration?.fields
+  const countryFieldConfig = configFields?.find(
+    (f) => f.type === FieldType.COUNTRY
+  )
+  const countryField: CountryField = {
+    ...COUNTRY_FIELD,
+    ...countryFieldConfig,
+    required: countryFieldConfig?.required ?? config.required,
+    type: FieldType.COUNTRY
+  }
 
-    const prevItem = index > 0 ? inputArray[index - 1] : null
+  const adminConfigs =
+    configFields?.filter((f) => f.type === FieldType.ADMINISTRATIVE_AREA) ??
+    adminStructure.map((admin) => ({
+      ...admin,
+      type: FieldType.ADMINISTRATIVE_AREA,
+      required: config.required,
+      conditionals: []
+    }))
+
+  const domesticFields = adminConfigs.map((adminConfig, index) => {
+    const { id } = adminConfig
+    const isFirst = index === 0
+    const adminItem = adminStructure.find((s) => s.id === id)
+    if (!adminItem) {
+      throw new Error(
+        `Invalid field ${id} in address configuration ${config.id}`
+      )
+    }
+    const label = adminItem.label
+
+    const prevItem = index > 0 ? adminConfigs[index - 1] : null
     const parentId = isFirst ? 'country' : (prevItem?.id ?? '')
 
+    const mandatoryShowCondition = and(
+      isDomesticAddress(),
+      not(fieldHelper(parentId).isFalsy())
+    )
+
+    const existingShowConditional = adminConfig.conditionals?.find(
+      ({ type }) => type === ConditionalType.SHOW
+    )
+
     const conditionals = [
+      ...(adminConfig.conditionals ?? []).filter(
+        ({ type }) => type !== ConditionalType.SHOW
+      ),
       {
         type: ConditionalType.SHOW,
-        conditional: and(
-          isDomesticAddress(),
-          not(fieldHelper(parentId).isFalsy())
-        )
+        conditional: existingShowConditional
+          ? and(existingShowConditional.conditional, mandatoryShowCondition)
+          : mandatoryShowCondition
       }
     ]
 
-    const configuration: AdministrativeArea['configuration'] = {
+    const configuration: AdministrativeAreaField['configuration'] = {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE
     }
 
@@ -164,18 +200,26 @@ function generateAdminStructureFields(
       configuration.partOf = fieldHelper(prevItem.id)
     }
 
-    const field: AdministrativeArea = {
+    const field: AdministrativeAreaField = {
       id,
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
       parent: !isFirst ? fieldHelper(parentId) : undefined,
-      required,
+      required: adminConfig.required ?? config.required,
       label,
       configuration
     }
 
     return field
   })
+
+  const streetAddressFields = config.configuration?.streetAddressForm ?? []
+
+  return {
+    countryField,
+    domesticFields,
+    streetAddressFields
+  }
 }
 
 function extractAddressLines(
@@ -219,12 +263,11 @@ function getAdministrativeArea(value?: AddressFieldValue) {
     : undefined
 }
 
-function transformParentValueToNestedValue(
+function withHierarchyExpanded(
   value: AddressFieldValue,
   adminLevelIds: string[],
   adminStructureLocations: Location[]
-): EventState {
-  const { streetLevelDetails, ...valueWithoutStreetLevelDetails } = value
+): AddressFieldValue {
   const administrativeArea = getAdministrativeArea(value)
   const derivedAdminLevels = getAdminLevelHierarchy(
     administrativeArea,
@@ -232,8 +275,20 @@ function transformParentValueToNestedValue(
     adminLevelIds
   )
   return {
+    ...value,
+    ...derivedAdminLevels
+  }
+}
+
+function transformParentValueToNestedValue(
+  value: AddressFieldValue,
+  adminLevelIds: string[],
+  adminStructureLocations: Location[]
+): EventState {
+  const { streetLevelDetails, ...valueWithoutStreetLevelDetails } =
+    withHierarchyExpanded(value, adminLevelIds, adminStructureLocations)
+  return {
     ...valueWithoutStreetLevelDetails,
-    ...derivedAdminLevels,
     ...streetLevelDetails
   }
 }
@@ -334,6 +389,7 @@ function AddressInput(props: Props) {
   const {
     onBlur,
     onChange,
+    config: addressConfig,
     disabled,
     name,
     value = {
@@ -352,18 +408,11 @@ function AddressInput(props: Props) {
   })
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
-  const adminStructure = generateAdminStructureFields(
-    appConfigAdminLevels,
-    otherProps.required
-  )
-  const customAddressFields = props.configuration?.streetAddressForm
 
-  const addressFields =
-    Array.isArray(customAddressFields) && customAddressFields.length > 0
-      ? customAddressFields
-      : []
+  const { countryField, domesticFields, streetAddressFields } =
+    generateAddressFields(addressConfig, appConfigAdminLevels)
 
-  const streetAddressFieldIds = addressFields.map((f) => f.id)
+  const streetAddressFieldIds = streetAddressFields.map((f) => f.id)
 
   const nestedValue = transformParentValueToNestedValue(
     value,
@@ -376,25 +425,7 @@ function AddressInput(props: Props) {
     streetAddressFieldIds
   )
 
-  const fields = [
-    { ...COUNTRY_FIELD, required: otherProps.required },
-    ...adminStructure,
-    ...addressFields
-  ].map((x) => {
-    const existingEnableCondition =
-      x.conditionals?.find((c) => c.type === ConditionalType.ENABLE)
-        ?.conditional ?? not(not(alwaysTrue()))
-    return {
-      ...x,
-      conditionals: [
-        ...(x.conditionals ?? []),
-        {
-          type: ConditionalType.ENABLE,
-          conditional: disabled ? not(alwaysTrue()) : existingEnableCondition
-        }
-      ]
-    }
-  })
+  const fields = [countryField, ...domesticFields, ...streetAddressFields]
 
   return (
     <FormFieldGenerator
@@ -432,63 +463,34 @@ function AddressOutput({
 }) {
   const validatorContext = useValidatorContext()
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const [adminStructureLocations] = getLocations.useSuspenseQuery({
+    locationType: LocationType.enum.ADMIN_STRUCTURE
+  })
   const { config } = useSelector(getOfflineData)
-  const customAddressFields = configuration?.configuration
-    ?.streetAddressForm as FieldConfigWithoutAddress[]
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
 
-  if (!value) {
+  if (!value || !configuration) {
     return ''
   }
 
-  const administrativeArea = getAdministrativeArea(value)
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === LocationType.enum.ADMIN_STRUCTURE
-  )
-
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
-  const adminLevels = getAdminLevelHierarchy(
-    administrativeArea,
-    adminStructureLocations,
-    adminLevelIds
+  const addressValueWithHierarchyExpanded = withHierarchyExpanded(
+    value,
+    adminLevelIds,
+    adminStructureLocations
   )
 
-  const addressValues = {
-    ...value,
-    ...adminLevels
-  }
-
-  const adminStructure = generateAdminStructureFields(
-    appConfigAdminLevels,
-    configuration?.required
+  const flattenedAddressValues = transformParentValueToNestedValue(
+    value,
+    adminLevelIds,
+    adminStructureLocations
   )
 
-  const addressFields =
-    Array.isArray(customAddressFields) && customAddressFields.length > 0
-      ? customAddressFields
-      : []
+  const { countryField, domesticFields, streetAddressFields } =
+    generateAddressFields(configuration, appConfigAdminLevels)
 
-  function flattenAddressObject(
-    obj: AddressFieldValue
-  ): Record<string, string | undefined> {
-    const { streetLevelDetails, ...rest } = obj
-    return {
-      ...rest,
-      ...(streetLevelDetails && typeof streetLevelDetails === 'object'
-        ? streetLevelDetails
-        : {})
-    }
-  }
-
-  const flattenedAddressValues = flattenAddressObject(addressValues)
-
-  const fieldsToShow = [
-    { ...COUNTRY_FIELD, required: configuration?.required },
-    ...adminStructure,
-    ...addressFields
-  ]
+  const fieldsToShow = [countryField, ...domesticFields, ...streetAddressFields]
     .map((field) => ({
       field,
       value: flattenedAddressValues[field.id]
@@ -497,8 +499,8 @@ function AddressOutput({
       (field) =>
         field.value &&
         isFieldDisplayedOnReview(
-          field.field satisfies FieldConfig,
-          addressValues,
+          field.field,
+          addressValueWithHierarchyExpanded,
           validatorContext
         )
     )
