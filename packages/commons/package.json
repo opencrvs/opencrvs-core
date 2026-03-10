@@ -14,6 +14,7 @@
     "./fixtures": "./build/dist/common/fixtures.js",
     "./assignment": "./build/dist/common/assignment.js",
     "./client": "./build/dist/esm/client.js",
+    "./application-config": "./build/dist/common/application-config.js",
     "./events": "./build/dist/common/events/index.js",
     "./events/deduplication": "./build/dist/common/events/deduplication.js"
   },
