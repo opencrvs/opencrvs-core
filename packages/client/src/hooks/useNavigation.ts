@@ -133,7 +133,7 @@ const routeAccess: NavigationConfig[] = [
       },
       {
         name: WORKQUEUE_TABS.systems,
-        scopes: [SCOPES.CONFIG_UPDATE_ALL]
+        scopes: [SCOPES.INTEGRATION_CREATE]
       },
       {
         name: WORKQUEUE_TABS.communications,

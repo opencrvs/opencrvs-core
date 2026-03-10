@@ -10,7 +10,6 @@
  */
 import { model, Schema, Document } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
-import { integratingSystemTypes } from '@user-mgnt/utils/system'
 
 export interface ISystem {
   name: string
@@ -83,7 +82,7 @@ const systemSchema = new Schema({
   },
   integratingSystemType: {
     type: String,
-    enum: [integratingSystemTypes.MOSIP, integratingSystemTypes.OTHER]
+    enum: ['MOSIP', 'OTHER']
   }
 })
 
