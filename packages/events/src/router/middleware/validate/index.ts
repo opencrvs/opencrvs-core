@@ -219,7 +219,11 @@ function validateActionAnnotation({
     context
   )
 
-  const formFields = pages.flatMap(({ fields }) =>
+  const visiblePages = pages.filter((page) =>
+    isPageVisible(page, annotation, context)
+  )
+
+  const formFields = visiblePages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )
 

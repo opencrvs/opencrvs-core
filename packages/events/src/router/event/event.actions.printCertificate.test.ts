@@ -10,12 +10,19 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, PageTypes } from '@opencrvs/commons'
+import { http, HttpResponse } from 'msw'
+import { ActionType, FieldType, never, PageTypes } from '@opencrvs/commons'
+import {
+  PRINT_CERTIFICATE_FORM,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -152,4 +159,70 @@ test(`PRINT_CERTIFICATE is idempotent`, async () => {
   )
 
   expect(firstResponse).toEqual(secondResponse)
+})
+
+test.only(`should not have validation errors for required fields on a hidden page`, async () => {
+  const hiddenConditionalPage = {
+    id: 'hiddenConditionalPageTest',
+    type: PageTypes.enum.FORM,
+    title: {
+      id: 'event.tennis-club-membership.action.print.hiddenPageTest.title',
+      defaultMessage: 'Hidden Page Test',
+      description: 'This is the title of the section'
+    },
+    conditional: never(), // forces hidden → this is what we want to test
+    fields: [
+      {
+        id: 'hiddenConditionalFieldTest',
+        type: FieldType.TEXT,
+        required: true,
+        label: {
+          defaultMessage: 'Hidden Conditional Field Test',
+          description:
+            'Field for entering Hidden Conditional Field details test',
+          id: 'event.tennis-club-membership.action.form.section.hiddenConditionalFieldTest.label'
+        }
+      }
+    ]
+  }
+
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.REGISTER
+  ])
+
+  const printCertificateForm = {
+    ...PRINT_CERTIFICATE_FORM,
+    pages: [hiddenConditionalPage]
+  }
+
+  const customTennisClubMembershipEvent = {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) => {
+      if (action.type === ActionType.PRINT_CERTIFICATE) {
+        return {
+          ...action,
+          printForm: printCertificateForm
+        }
+      }
+      return action
+    })
+  }
+
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([customTennisClubMembershipEvent])
+    })
+  )
+
+  await expect(
+    client.event.actions.printCertificate.request(
+      generator.event.actions.printCertificate(event.id, {
+        annotation: {}
+      })
+    )
+  ).resolves.toBeDefined()
 })
