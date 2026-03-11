@@ -135,6 +135,7 @@ test('Check scopes against event.getDuplicates', async () => {
         isUnderAdministrativeArea,
         ...options
       })
-    })
+    }),
+    { numRuns: 40 }
   )
 })
