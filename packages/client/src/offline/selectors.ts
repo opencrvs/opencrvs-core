@@ -18,7 +18,7 @@ import {
 import { IStoreState } from '@client/store'
 import { createSelector } from '@reduxjs/toolkit'
 import { merge } from 'lodash'
-import { IndexMap } from '@client/utils'
+import { IndexMap } from '@opencrvs/commons/client'
 
 const getOfflineState = (store: IStoreState): IOfflineDataState => store.offline
 

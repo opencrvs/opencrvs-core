@@ -10,8 +10,8 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fireEvent, fn, userEvent, within } from '@storybook/test'
-import React, { useState } from 'react'
+import { expect, fireEvent, userEvent, within } from '@storybook/test'
+import React, { useRef } from 'react'
 import styled from 'styled-components'
 import { noop } from 'lodash'
 import {
@@ -24,14 +24,17 @@ import {
   generateTranslationConfig
 } from '@opencrvs/commons/client'
 
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorHandle,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormWizard } from '@client/v2-events/features/events/components/FormWizard'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'FormFieldGenerator/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -47,6 +50,8 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: '400px';
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const fields = [
   {
@@ -102,7 +107,7 @@ const declaration = {
 /**
  * Test case for a bug where conditional values were not being updated correctly due to the wrong apply order of items.
  */
-export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
+export const UpdateCondtionalValues: Story = {
   name: 'Updating existing declaration with conditional values',
   parameters: {
     layout: 'centered',
@@ -113,11 +118,8 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         {...args}
         fields={fields}
+        formValues={declaration}
         id="my-form"
-        initialValues={declaration}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -152,14 +154,13 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
     )
 
     await step('fills in age input', async () => {
-      await userEvent.type(
-        await canvas.findByTestId('number__tennis-member____age'),
-        '75'
-      )
+      const ageInput = await canvas.findByTestId('number__tennis-member____age')
+      await userEvent.type(ageInput, '75')
+      ageInput.blur()
     })
 
     await step(
-      'Previous values are visible when checkbox is unchecked',
+      'Previous values are visible when checkbox is unchecked ',
       async () => {
         await fireEvent.click(
           await canvas.findByText('Exact date of birth unknown')
@@ -168,6 +169,19 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
         await canvas.findByDisplayValue(2020)
         await canvas.findByDisplayValue(11)
         await canvas.findByDisplayValue(12)
+
+        await canvas.findByText('Exact date of birth unknown')
+      }
+    )
+
+    await step(
+      'Previous values are visible when checkbox is checked',
+      async () => {
+        await fireEvent.click(
+          await canvas.findByText('Exact date of birth unknown')
+        )
+        await canvas.findByText('Age of the member')
+        await canvas.findByDisplayValue(75)
 
         await canvas.findByText('Exact date of birth unknown')
       }
@@ -210,7 +224,7 @@ const tennisFamilyMembershipDeclaration = {
 /**
  * Test case for a bug where values of the parent field were not being copied to the dependent field, when the parent field is changed.
  */
-export const UpdateParentFieldValues: StoryObj<typeof FormFieldGenerator> = {
+export const UpdateParentFieldValues: Story = {
   name: 'Updating values of the parent field should update the child field value too',
   parameters: {
     layout: 'centered',
@@ -221,11 +235,8 @@ export const UpdateParentFieldValues: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         {...args}
         fields={tennisFamilyMembership}
+        formValues={tennisFamilyMembershipDeclaration}
         id="my-form"
-        initialValues={tennisFamilyMembershipDeclaration}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -310,14 +321,14 @@ const tennisStyleFields = [
   }
 ] satisfies FieldConfig[]
 
-export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
+export const EmptiesWhenParentChanges: Story = {
   name: 'Toggling parent field resets children',
   parameters: {
     layout: 'centered',
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    const initialValues = {
+    const formValues = {
       'tennis.style': 'defensive',
       'tennis.style.firstname': 'Roger'
     }
@@ -326,11 +337,8 @@ export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         {...args}
         fields={tennisStyleFields}
+        formValues={formValues}
         id="my-form"
-        initialValues={initialValues}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -393,14 +401,14 @@ export const EmptiesWhenParentChanges: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
+export const RemovesErrorOnParentChange: Story = {
   name: 'Error is reset when parent field changes',
   parameters: {
     layout: 'centered',
     chromatic: { disableSnapshot: true }
   },
   render: function Component(args) {
-    const initialValues = {
+    const formValues = {
       'tennis.style': 'defensive'
     }
 
@@ -408,11 +416,8 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
       <StyledFormFieldGenerator
         {...args}
         fields={tennisStyleFields}
+        formValues={formValues}
         id="my-form"
-        initialValues={initialValues}
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   },
@@ -444,24 +449,23 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-export const CustomRequiredValidationMessage: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const CustomRequiredValidationMessage: Story = {
   name: 'Custom required validation message',
   parameters: {
     layout: 'centered'
   },
   render: function Component(args) {
-    const [validateAllFields, setValidateAllFields] = useState(false)
+    const formRef = useRef<FormFieldGeneratorHandle>(null)
     return (
       <FormWizard
         currentPage={0}
         pageTitle="Tennis form"
-        onNextPage={() => setValidateAllFields(true)}
+        onNextPage={() => formRef.current?.submit()}
         onSubmit={noop}
       >
         <StyledFormFieldGenerator
           {...args}
+          ref={formRef}
           fields={tennisStyleFields.map((f) => {
             const { parent, ...rest } = f
             return {
@@ -474,12 +478,6 @@ export const CustomRequiredValidationMessage: StoryObj<
             } satisfies FieldConfig
           })}
           id="my-form"
-          initialValues={{}}
-          validateAllFields={validateAllFields}
-          onAllFieldsValidated={() => false}
-          onChange={(data) => {
-            args.onChange(data)
-          }}
         />
       </FormWizard>
     )

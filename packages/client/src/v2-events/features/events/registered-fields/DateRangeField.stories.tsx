@@ -11,7 +11,7 @@
 
 import React, { useState } from 'react'
 import { StoryFn, Meta } from '@storybook/react'
-import { DateRangeFieldValue } from '@opencrvs/commons/client'
+import { DateRangeFieldValue, PlainDate } from '@opencrvs/commons/client'
 import { DateRangeField } from './DateRangeField'
 
 // Storybook metadata
@@ -29,27 +29,23 @@ export default {
 } as Meta
 
 // Helper to parse or pass values
-const initialExactValue = '2022-05-17'
+const initialExactValue = PlainDate.parse('2022-05-17')
 const initialRangeValue: DateRangeFieldValue = {
-  start: '2021-01-01',
-  end: '2021-12-31'
+  start: PlainDate.parse('2021-01-01'),
+  end: PlainDate.parse('2021-12-31')
 }
 
 // Input Story
 export const DateRangeInput: StoryFn = (args) => {
-  const [value, setValue] = useState<
-    | string
-    | {
-        start: string
-        end: string
-      }
-  >(initialExactValue)
+  const [value, setValue] = useState<string | DateRangeFieldValue>(
+    initialExactValue
+  )
 
   return (
     <DateRangeField.Input
       {...args}
       id="date-range-field"
-      value={value as string}
+      value={value}
       onChange={(val) => {
         setValue(val)
       }}

@@ -34,6 +34,7 @@ import {
 } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { makeFormFieldIdsFormikCompatible } from '@client/v2-events/components/forms/FormFieldGenerator/utils'
 import { Http, Props } from './Http'
 
 const defaultIndicators = {
@@ -314,6 +315,14 @@ function SearchInput({
       setHttpState({ ...response, data })
       return
     }
+
+    // As the data will live in formik, it needs to be compatible with it
+    response.data.results = response.data.results.map((result) => {
+      return {
+        ...result,
+        declaration: makeFormFieldIdsFormikCompatible(result.declaration)
+      }
+    })
 
     data.firstResult = response.data.results[0]
     data.input = inputState

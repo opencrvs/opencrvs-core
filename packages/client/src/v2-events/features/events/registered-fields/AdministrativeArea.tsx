@@ -9,16 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useMemo } from 'react'
-import {
-  Location,
-  FieldPropsWithoutReferenceValue,
-  LocationType
-} from '@opencrvs/commons/client'
+import { Location, LocationType } from '@opencrvs/commons/client'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { SearchableSelect } from '../../../components/forms/inputs/SearchableSelect'
+import {
+  SearchableSelect,
+  SearchableSelectProps
+} from '../../../components/forms/inputs/SearchableSelect'
 import { LocationSearch } from './LocationSearch'
 
 function useAdministrativeArea(
@@ -52,18 +51,22 @@ function useAdministrativeArea(
   }, [searchableLocationType, allLocations, parentId])
 }
 
+interface AdministrativeAreaInputProps
+  extends Omit<
+    SearchableSelectProps,
+    'data-testid' | 'value' | 'onChange' | 'options'
+  > {
+  partOf: string | null
+  onChange: (val: string | null) => void
+  value?: string | null
+}
+
 function AdministrativeAreaInput({
-  onChange,
   value,
   partOf,
-  id,
-  disabled
-}: FieldPropsWithoutReferenceValue<'ADMINISTRATIVE_AREA'> & {
-  onChange: (val: string | null) => void
-  partOf: string | null
-  value?: string | null
-  disabled?: boolean
-}) {
+  onChange,
+  ...inputProps
+}: AdministrativeAreaInputProps) {
   const options = useAdministrativeArea(
     LocationType.enum.ADMIN_STRUCTURE,
     partOf
@@ -76,9 +79,8 @@ function AdministrativeAreaInput({
 
   return (
     <SearchableSelect
-      data-testid={'location__' + id}
-      disabled={disabled}
-      id={id}
+      {...inputProps}
+      data-testid={'location__' + inputProps.id}
       options={options}
       value={selectedLocation}
       onChange={(opt) => {

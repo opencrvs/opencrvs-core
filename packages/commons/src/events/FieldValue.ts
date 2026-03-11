@@ -25,6 +25,8 @@ import {
   QrReaderFieldValue,
   IdReaderFieldValue
 } from './CompositeFieldValue'
+import { PlainDate, plainDateToLocalDate } from './PlainDate'
+export { PlainDate, plainDateToLocalDate }
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
@@ -40,13 +42,6 @@ import {
 
 export const TextValue = z.string()
 export const NonEmptyTextValue = TextValue.min(1)
-
-export const DateValue = z
-  .string()
-  .date()
-  .describe('Date in the format YYYY-MM-DD')
-
-export type DateValue = z.infer<typeof DateValue>
 
 export const AgeValue = z.object({
   age: z.number(),
@@ -69,10 +64,10 @@ export const SelectDateRangeValue = z.enum([
 
 export const DateRangeFieldValue = z
   .object({
-    start: DateValue,
-    end: DateValue
+    start: PlainDate,
+    end: PlainDate
   })
-  .or(DateValue)
+  .or(PlainDate)
   .describe(
     'Date range with start and end dates in the format YYYY-MM-DD. Inclusive start, exclusive end.'
   )
@@ -102,10 +97,10 @@ export type VerificationStatusValue = z.infer<typeof VerificationStatusValue>
 
 // We need to create a separate union of all field types excluding the DataFieldValue,
 // because otherwise the DataFieldValue would need to refer to itself.
-const FieldValuesWithoutDataField = z.union([
+const LeafFieldValues = z.union([
   AddressFieldValue,
   TextValue,
-  DateValue,
+  PlainDate,
   AgeValue,
   TimeValue,
   DateRangeFieldValue,
@@ -125,32 +120,37 @@ const FieldValuesWithoutDataField = z.union([
   NumberWithUnitFieldValue,
   NumberWithUnitFieldUpdateValue
 ])
-type FieldValuesWithoutDataField = z.infer<typeof FieldValuesWithoutDataField>
+type LeafFieldValues = z.infer<typeof LeafFieldValues>
+
+export const FieldGroupValue = z.record(z.string(), LeafFieldValues)
+export type FieldGroupValue = z.infer<typeof FieldGroupValue>
 
 // As data field value can refer to other field values, it can contain any other field value types
 export const DataFieldValue = z
   .object({
-    data: z.record(z.string(), FieldValuesWithoutDataField)
+    data: z.record(z.string(), LeafFieldValues)
   })
   .nullish()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
-export type FieldValue = FieldValuesWithoutDataField | DataFieldValue
+export type FieldValue = LeafFieldValues | DataFieldValue | FieldGroupValue
+
 export const FieldValue: z.ZodType<FieldValue> = z.union([
-  FieldValuesWithoutDataField,
-  DataFieldValue
+  LeafFieldValues,
+  DataFieldValue,
+  FieldGroupValue
 ])
 
 // Priority order for schema matching.
 // When multiple schemas pass validation (safeParse succeeds),
 // we’ll pick the one that appears *earlier* in this list.
 //
-// Example: if both TextValue and DateValue succeed for "2050-01-01",
+// Example: if both TextValue and PlainDate succeed for "2050-01-01",
 // we choose "TextValue" because it's higher priority here.
 const PRIORITY_ORDER = [
   'NameFieldUpdateValue',
   'DateRangeFieldValue',
-  'DateValue',
+  'PlainDate',
   'TextValue',
   'TimeValue',
   'AgeUpdateValue',
@@ -161,7 +161,8 @@ const PRIORITY_ORDER = [
   'NumberWithUnitFieldUpdateValue',
   'FileFieldValue',
   'FileFieldWithOptionValue',
-  'DataFieldValue'
+  'DataFieldValue',
+  'GroupFieldValue'
 ] as const
 
 /**
@@ -199,7 +200,7 @@ export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
     //   "2050-01-01",
     //   "2050-01-01"
     // ]
-    // description [ "TextValue", "DateValue", "DateRangeFieldValue" ]
+    // description [ "TextValue", "PlainDate", "DateRangeFieldValue" ]
     // best "DateRangeFieldValue"
     //
     // Here all three schemas think the value is valid,
@@ -212,7 +213,7 @@ export function safeUnion<T extends [z.ZodTypeAny, ...z.ZodTypeAny[]]>(
 
 export type FieldUpdateValue =
   | z.infer<typeof TextValue>
-  | z.infer<typeof DateValue>
+  | PlainDate
   | z.infer<typeof TimeValue>
   | z.infer<typeof AgeUpdateValue>
   | z.infer<typeof AddressFieldUpdateValue>
@@ -223,7 +224,8 @@ export type FieldUpdateValue =
   | z.infer<typeof NumberWithUnitFieldUpdateValue>
   | z.infer<typeof FileFieldValue>
   | z.infer<typeof FileFieldWithOptionValue>
-  | z.infer<typeof DataFieldValue>
+  | DataFieldValue
+  | FieldGroupValue
   | z.infer<typeof NameFieldUpdateValue>
   | z.infer<typeof HttpFieldUpdateValue>
   | z.infer<typeof QueryParamReaderFieldUpdateValue>
@@ -232,7 +234,7 @@ export type FieldUpdateValue =
 // inside safeUnion(). The tag name should match PRIORITY_ORDER.
 export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   TextValue.describe('TextValue'),
-  DateValue.describe('DateValue'),
+  PlainDate.describe('PlainDate'),
   TimeValue.describe('TimeValue'),
   AgeUpdateValue.describe('AgeUpdateValue'),
   AddressFieldUpdateValue.describe('AddressFieldUpdateValue'),
@@ -244,6 +246,7 @@ export const FieldUpdateValue: z.ZodType<FieldUpdateValue> = safeUnion([
   FileFieldValue.describe('FileFieldValue'),
   FileFieldWithOptionValue.describe('FileFieldWithOptionValue'),
   DataFieldValue.describe('DataFieldValue'),
+  FieldGroupValue.describe('GroupFieldValue'),
   NameFieldUpdateValue.describe('NameFieldUpdateValue'),
   HttpFieldUpdateValue.describe('HttpFieldUpdateValue'),
   QueryParamReaderFieldUpdateValue.describe('QueryParamReaderFieldUpdateValue')
@@ -260,6 +263,7 @@ export type FieldValueSchema =
   | typeof NumberFieldValue
   | typeof NumberWithUnitFieldValue
   | typeof DataFieldValue
+  | typeof FieldGroupValue
   | typeof NameFieldValue
   | z.ZodString
   | z.ZodBoolean
@@ -269,6 +273,7 @@ export type FieldValueSchema =
  * FieldValueInputSchema uses Input types which have set optional values as nullish
  * */
 export type FieldUpdateValueSchema =
+  | typeof PlainDate
   | typeof DateRangeFieldValue
   | typeof AgeValue
   | typeof SelectDateRangeValue
@@ -280,6 +285,7 @@ export type FieldUpdateValueSchema =
   | typeof NumberWithUnitFieldValue
   | typeof NumberWithUnitFieldUpdateValue
   | typeof DataFieldValue
+  | typeof FieldGroupValue
   | typeof NameFieldValue
   | typeof NameFieldUpdateValue
   | typeof HttpFieldUpdateValue

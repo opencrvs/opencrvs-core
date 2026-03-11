@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { first } from 'lodash'
+import { first, orderBy } from 'lodash'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import {
@@ -61,7 +61,9 @@ export function Draft() {
         : currentEventState
     })
 
-  const currentPageDrafts = eventsWithDrafts.slice(
+  const sortedDrafts = orderBy(eventsWithDrafts, 'updatedAt', 'desc')
+
+  const currentPageDrafts = sortedDrafts.slice(
     searchParams.offset || 0,
     searchParams.offset + searchParams.limit
   )
@@ -72,6 +74,7 @@ export function Draft() {
       actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={eventConfigs}
+      paginationVisibleOffline={true}
       queryData={currentPageDrafts}
       title={intl.formatMessage(WORKQUEUE_DRAFT.name)}
       totalResults={eventsWithDrafts.length}

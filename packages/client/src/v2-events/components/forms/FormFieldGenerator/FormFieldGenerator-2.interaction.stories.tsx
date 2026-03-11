@@ -11,7 +11,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn, userEvent, within } from '@storybook/test'
+import { expect, userEvent, within } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import {
@@ -23,18 +23,16 @@ import {
   FieldConfig,
   EventState,
   generateTranslationConfig,
-  user,
-  UUID
+  UUID,
+  PlainDate
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { noop } from '@client/v2-events'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'FormFieldGenerator/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -195,7 +193,7 @@ const fields = [
     label: generateTranslationConfig('Region'),
     defaultValue: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     configuration: {
-      partOf: { $declaration: 'country' },
+      partOf: { $$field: 'country', $$subfield: [] },
       type: 'ADMIN_STRUCTURE'
     }
   },
@@ -280,7 +278,7 @@ const fields = [
     id: 'membership.startDate',
     type: FieldType.DATE,
     label: generateTranslationConfig('Start Date'),
-    defaultValue: '2025-01-01',
+    defaultValue: PlainDate.parse('2025-01-01'),
     configuration: {
       notice: generateTranslationConfig(
         'Membership will be active from this date'
@@ -302,7 +300,10 @@ const fields = [
     id: 'membership.duration',
     type: FieldType.DATE_RANGE,
     label: generateTranslationConfig('Membership Duration'),
-    defaultValue: { start: '2025-01-01', end: '2025-12-31' },
+    defaultValue: {
+      start: PlainDate.parse('2025-01-01'),
+      end: PlainDate.parse('2025-12-31')
+    },
     configuration: {
       notice: generateTranslationConfig('Select the full membership duration')
     }
@@ -431,11 +432,11 @@ const declaration = {
   ],
   'membership.type': 'standard',
   'membership.level': 'silver',
-  'membership.startDate': '2025-01-01',
+  'membership.startDate': PlainDate.parse('2025-01-01'),
   'membership.startTime': '09:00',
   'membership.duration': {
-    start: '2025-01-01',
-    end: '2025-12-31'
+    start: PlainDate.parse('2025-01-01'),
+    end: PlainDate.parse('2025-12-31')
   },
   'membership.trainingPeriod': 'last30Days',
   'membership.facility': 'Gym Hall',
@@ -471,12 +472,9 @@ export const DisabledFormFields: StoryObj<typeof FormFieldGenerator> = {
                 }
               ]
             }))}
+            formValues={declaration}
             id="my-form"
-            initialValues={declaration}
             validatorContext={getTestValidatorContext()}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },
@@ -521,18 +519,15 @@ export const EnabledFormFields: StoryObj<typeof FormFieldGenerator> = {
         element: (
           <StyledFormFieldGenerator
             fields={fields}
-            id="my-form"
-            initialValues={{
+            formValues={{
               ...declaration,
-              'membership.duration': '2025-12-31'
+              'membership.duration': PlainDate.parse('2025-12-31')
             }}
+            id="my-form"
             // Setting 'membership.duration' to a single date value allows us to demonstrate the enabled field
             // scenario. The original defaultValue is a range (ex: `{ start: '2025-01-01', end: '2025-12-31' }`), which
             // disables the date field component, making it difficult to check if all fields are enabled via looping.
             validatorContext={getTestValidatorContext()}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },
@@ -591,16 +586,13 @@ export const EnabledFormFieldsByEnableCondition: StoryObj<
                 }
               })
               .filter(Boolean)}
-            id="my-form"
-            initialValues={{
+            formValues={{
               ...declaration,
-              'membership.duration': '2025-12-31',
+              'membership.duration': PlainDate.parse('2025-12-31'),
               'applicant.age': 30
             }}
+            id="my-form"
             validatorContext={getTestValidatorContext()}
-            onChange={(data) => {
-              meta.args?.onChange?.(data) ?? noop()
-            }}
           />
         )
       },

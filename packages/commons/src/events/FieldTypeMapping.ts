@@ -52,12 +52,13 @@ import {
   QrReaderField,
   IdReaderField,
   LoaderField,
-  AgeField
+  AgeField,
+  FieldGroup
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
-  DateValue,
+  PlainDate,
   EmailValue,
   FieldValue,
   FieldUpdateValueSchema,
@@ -104,31 +105,28 @@ import { ActionType } from './ActionType'
  */
 
 /**
- * Optionality of a field is defined in FieldConfig, not in FieldValue.
- * Allows for nullishness of a field value during validations based on FieldConfig.
- */
-type NullishFieldValueSchema = z.ZodOptional<
-  z.ZodNullable<FieldUpdateValueSchema>
->
-
-/**
- * Mapping of field types to Zod schema.
- * Useful for building dynamic validations against FieldConfig
- */
-/**
  * Mapping of field types to Zod schema.
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
   let schema:
     | FieldUpdateValueSchema
-    | NullishFieldValueSchema
     | DynamicNameValue
     | DynamicAddressFieldValue
+    | z.ZodObject<z.ZodRawShape>
 
   switch (field.type) {
+    case FieldType.FIELD_GROUP: {
+      schema = z.object(
+        field.fields.reduce((acc, subfield) => {
+          acc[subfield.id] = mapFieldTypeToZod(subfield, actionType)
+          return acc
+        }, {} as z.ZodRawShape)
+      )
+      break
+    }
     case FieldType.DATE:
-      schema = DateValue
+      schema = PlainDate
       break
     case FieldType.AGE:
       schema = AgeValue
@@ -226,6 +224,15 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
  */
 export function mapFieldTypeToEmptyValue(field: FieldConfig) {
   switch (field.type) {
+    case FieldType.FIELD_GROUP:
+      const nestedEmpty: Record<string, FieldUpdateValue> = field.fields.reduce(
+        (acc, subfield) => ({
+          ...acc,
+          [subfield.id]: mapFieldTypeToEmptyValue(subfield)
+        }),
+        {}
+      )
+      return nestedEmpty
     case FieldType.DIVIDER:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
@@ -457,6 +464,16 @@ export const isRadioGroupFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: RadioGroup } => {
   return field.config.type === FieldType.RADIO_GROUP
+}
+
+export const isFieldGroupFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is {
+  value: Record<string, FieldValue> | undefined
+  config: FieldGroup
+} => {
+  return field.config.type === FieldType.FIELD_GROUP
 }
 
 export const isLocationFieldType = (field: {

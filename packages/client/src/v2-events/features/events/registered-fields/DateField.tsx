@@ -12,18 +12,16 @@
 import format from 'date-fns/format'
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useField } from 'formik'
 import {
   DateField as DateFieldType,
   DatetimeValue,
-  DateValue,
-  SerializedNowDateTime
+  PlainDate,
+  plainDateToLocalDate
 } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
-import { useResolveDefaultValue } from '../useResolveDefaultValue'
 import { StringifierContext } from './RegisteredField'
 
 const messages = defineMessages({
@@ -36,26 +34,13 @@ const messages = defineMessages({
 
 const EMPTY_DATE = '--'
 
-function resolveNowForDateInput(value: string | SerializedNowDateTime): string {
-  if (SerializedNowDateTime.safeParse(value).success) {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const day = String(now.getDate()).padStart(2, '0')
-
-    return `${year}-${month}-${day}`
-  }
-
-  return value.toString()
-}
-
 function DateInput({
   onChange,
   value = '',
   ...props
 }: DateFieldProps & {
   onChange: (newValue: string) => void
-  value: string | SerializedNowDateTime
+  value: string
 }) {
   /**
    * Component library returns '--' for empty dates when input has been touched.
@@ -64,35 +49,15 @@ function DateInput({
   const cleanEmpty = (val: string) => (val === EMPTY_DATE ? '' : val)
   const cleanOnChange = (val: string) => onChange(cleanEmpty(val))
 
-  // Ensure that 'now' is resolved to the current date and set in the form data.
-  // Form values are updated in a single batched operation.
-  // When multiple fields try to resolve `$$now` at the same time,
-  // each calls `setValue`, but only the *last* update in the batch
-  // is applied.
-  //
-  // Example:
-  // applicant.dob = { $$now: true }, applicant.tob = "15:34"
-  // applicant.dob = "1990-01-01", applicant.tob = { $$now: true }
-  // → only one resolved field survives per render cycle.
-  //
-  // `useField` is used to get access to `helpers.setValue`, ensuring
-  // the resolved value is written directly to Formik’s state rather
-  // than relying on local `onChange`, which may be overwritten.
-  const resolvedValue = useResolveDefaultValue({
-    defaultValue: value,
-    resolver: resolveNowForDateInput,
-    fieldName: props.name
-  })
-
   return (
     <DateFieldComponent
       {...props}
       data-testid={`${props.id}`}
-      value={resolvedValue}
+      value={value}
       onBlur={(e) => {
         const segmentType = String(e.target.id.split('-').pop())
         const val = e.target.value
-        const dateSegmentVals = resolvedValue.split('-')
+        const dateSegmentVals = value.split('-')
 
         // Add possibly missing leading 0 for days and months
         if (segmentType === 'dd' && val.length === 1) {
@@ -112,11 +77,11 @@ function DateInput({
 
 function DateOutput({ value }: { value?: string }) {
   const intl = useIntl()
-  const parsed = DateValue.safeParse(value)
+  const parsed = PlainDate.safeParse(value)
 
   if (parsed.success) {
     return format(
-      new Date(parsed.data),
+      plainDateToLocalDate(parsed.data),
       intl.formatMessage(messages.dateFormat)
     )
   }
@@ -128,12 +93,19 @@ function stringify(
   value: string | undefined,
   context: StringifierContext<DateFieldType>
 ) {
-  // We should allow parsing valid datetimes into the configured date format.
-  const parsed = DateValue.or(DatetimeValue).safeParse(value)
-
-  if (parsed.success) {
+  const parsedDate = PlainDate.safeParse(value)
+  if (parsedDate.success) {
     return format(
-      new Date(parsed.data),
+      plainDateToLocalDate(parsedDate.data),
+      context.intl.formatMessage(messages.dateFormat)
+    )
+  }
+
+  // DatetimeValue includes explicit timezone info, so new Date() is safe here.
+  const parsedDatetime = DatetimeValue.safeParse(value)
+  if (parsedDatetime.success) {
+    return format(
+      new Date(parsedDatetime.data),
       context.intl.formatMessage(messages.dateFormat)
     )
   }
