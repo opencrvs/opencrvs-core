@@ -33,6 +33,7 @@ import { DocumentPreview } from './DocumentPreview'
 import { File } from './FileInput'
 import { useOnFileChange } from './useOnFileChange'
 import { SingleDocumentPreview } from './SingleDocumentPreview'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 
 const UploadWrapper = styled.div`
   width: 100%;
@@ -344,7 +345,7 @@ function toCertificateVariables(value: FileFieldWithOptionValue | undefined) {
     return parsed.data.reduce(
       (acc, file) => ({
         ...acc,
-        [file.option]: new URL(file.path, window.config.MINIO_BASE_URL).href
+        [file.option]: getUnsignedFileUrl(file.path)
       }),
       {}
     )

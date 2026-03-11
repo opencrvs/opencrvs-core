@@ -22,7 +22,6 @@ import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
 import {
   cacheFile,
-  getFullDocumentPath,
   getUnsignedFileUrl,
   removeCached
 } from '@client/v2-events/cache'
@@ -178,8 +177,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     onMutate: async ({ file, meta, eventId: dir }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
-      const filePathWithDirectory = joinValues([dir, temporaryFilename], '/')
-      const path = getFullDocumentPath(filePathWithDirectory)
+      const path = joinValues([dir, temporaryFilename], '/')
       const url = getUnsignedFileUrl(path)
       await cacheFile({ url, file })
 

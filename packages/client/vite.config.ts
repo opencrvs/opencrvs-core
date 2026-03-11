@@ -155,6 +155,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
         },
+        '/api/minio/': {
+          target: 'http://localhost:9000/ocrvs',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
+        },
         '/api/auth/': {
           target: 'http://localhost:4040',
           changeOrigin: true,
