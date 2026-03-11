@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.9.8",
+  "version": "1.9.10",
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
@@ -116,7 +116,7 @@
     ],
     "src/**/*.ts": [
       "prettier --write",
-      "eslint -c .eslintrc.js --fix"
+      "eslint -c eslint.config.js --fix"
     ]
   },
   "jest": {

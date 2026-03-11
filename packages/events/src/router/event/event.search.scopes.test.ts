@@ -26,6 +26,7 @@ import {
   encodeScope,
   generateEventConfig,
   generateTranslationConfig,
+  getDeclarationFields,
   getOrThrow,
   pickRandom
 } from '@opencrvs/commons'
@@ -40,6 +41,7 @@ import {
   payloadGenerator,
   setupHierarchyWithUsers
 } from '@events/tests/generators'
+import { createIndex } from '@events/service/indexing/indexing'
 import { env } from '../../environment'
 import { getClient } from '../../storage/postgres/events'
 import {
@@ -95,7 +97,17 @@ test('single scope, multi-filter combinations', async () => {
           ]
         }
       }),
-      'record.declare[event=birth|death|tennis-club-membership|child-onboarding]'
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      })
     ])
 
     const event = await testClient.event.create(generator.event.create())
@@ -305,7 +317,17 @@ test('multi-scope combinations', async () => {
           ]
         }
       }),
-      'record.declare[event=birth|death|tennis-club-membership|child-onboarding]'
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      })
     ])
 
     const event = await testClient.event.create(generator.event.create())
@@ -665,9 +687,9 @@ test('placeOfEvent scope filters out results between locations and administrativ
     ],
     placeOfEventId: addressFieldId
   })
-
+  await createIndex(getEventIndexName('event-with-optional-address'), getDeclarationFields(eventWithOptionalAddress))
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([eventWithOptionalAddress])
     })
   )
@@ -695,8 +717,12 @@ test('placeOfEvent scope filters out results between locations and administrativ
         event: [eventType]
       }
     }),
-
-    `record.declare[event=${eventType}]`
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: [eventType]
+      }
+    })
   ])
 
   // 1. Create event without placeOfEvent filled (defaults to user's location)
@@ -855,7 +881,7 @@ test('For users in locations directly under country "administrativeArea" and "al
   )
   const reindexClient = createTestClient(users[0], [SCOPES.RECORD_REINDEX])
 
-  await expect(reindexClient.event.reindex()).resolves.not.toThrow()
+  await expect(reindexClient.event.reindex.trigger()).resolves.not.toThrow()
 
   const esClient = getOrCreateClient()
 

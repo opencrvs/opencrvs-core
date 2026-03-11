@@ -19,7 +19,7 @@ import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
 import { pipe } from 'fp-ts/lib/function'
 import { verifyToken } from '@config/utils/verifyToken'
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { findScope } from '@opencrvs/commons/authentication'
 
 export default async function configHandler(
   request: Hapi.Request,
@@ -55,26 +55,45 @@ async function getCertificatesConfig(
     return []
   }
   const { scope } = decodedOrError.right
-
-  if (scope.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-    const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
-
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${authToken}` }
-    })
-
-    if (!res.ok) {
-      throw new Error(
-        `Failed to fetch certificates configuration: ${res.statusText} ${url}`
-      )
-    }
-    return res.json()
+  const printCertifiedCopiesScope = findScope(
+    scope,
+    'record.registered.print-certified-copies'
+  )
+  if (!printCertifiedCopiesScope) {
+    return []
   }
-  return []
+
+  const templateIds = printCertifiedCopiesScope.options.templates ?? []
+  const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${authToken}` }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Failed to fetch certificates configuration: ${res.statusText} ${url}`
+    )
+  }
+
+  const certificateConfigs = await res.json()
+
+  // If there are no templateIds specified in the scope, all the certificates configuration will be fetched
+  if (!templateIds.length) {
+    return certificateConfigs
+  }
+
+  // If there are templateIds specified in the scope, only the certificates configuration matching those templateIds will be fetched
+  if (templateIds.length > 0) {
+    return certificateConfigs.filter((config: { id: string }) =>
+      templateIds.includes(config.id)
+    )
+  }
 }
 
 async function getConfigFromCountry(authToken?: string) {
-  const url = new URL('application-config', env.COUNTRY_CONFIG_URL).toString()
+  const url = new URL('config/application', env.COUNTRY_CONFIG_URL).toString()
 
   const res = await fetch(url)
   if (!res.ok) {

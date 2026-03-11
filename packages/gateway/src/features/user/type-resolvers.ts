@@ -164,7 +164,7 @@ export const userTypeResolvers: GQLResolver = {
     },
     role: async (userModel: IUserModelData) => {
       const roles = await fetchJSON<Roles>(
-        joinUrl(COUNTRY_CONFIG_URL, '/roles')
+        joinUrl(COUNTRY_CONFIG_URL, '/config/roles')
       )
 
       logger.info('Fetching roles from country config')
