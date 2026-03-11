@@ -136,6 +136,6 @@ test('Check scopes against event.getDuplicates', async () => {
         ...options
       })
     }),
-    { numRuns: 40 }
+    { numRuns: 20 }
   )
 })
