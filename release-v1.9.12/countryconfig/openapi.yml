@@ -252,6 +252,7 @@ paths:
                                         - PARAGRAPH
                                         - PAGE_HEADER
                                         - RADIO_GROUP
+                                        - FIELD_GROUP
                                         - FILE
                                         - FILE_WITH_OPTIONS
                                         - BULLET_LIST
@@ -538,6 +539,7 @@ paths:
                                         - PARAGRAPH
                                         - PAGE_HEADER
                                         - RADIO_GROUP
+                                        - FIELD_GROUP
                                         - FILE
                                         - FILE_WITH_OPTIONS
                                         - BULLET_LIST
@@ -1057,6 +1059,7 @@ components:
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
+                            - FIELD_GROUP
                             - FILE
                             - FILE_WITH_OPTIONS
                             - BULLET_LIST
@@ -1302,6 +1305,7 @@ components:
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
+                            - FIELD_GROUP
                             - FILE
                             - FILE_WITH_OPTIONS
                             - BULLET_LIST
@@ -1674,6 +1678,160 @@ components:
                   - message
               default:
                 &a10 []
+              description: Additional validation rules applied to the field.
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates whether the field can be modified during record
+                correction.
+            value:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      default: *a5
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                    - $$subfield
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        default: *a5
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                      - $$subfield
+                    description: Reference to a field by its ID
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+            analytics:
+              type: boolean
+              default: false
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+            type:
+              type: string
+              const: FIELD_GROUP
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+          required:
+            - id
+            - label
+            - type
+            - fields
+          description: Common properties shared across all field types.
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier of the field.
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+              description: Human-readable label of the field.
+            parent:
+              anyOf:
+                - type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      default: *a5
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                    - $$subfield
+                  description: Reference to a field by its ID
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      $$field:
+                        type: string
+                        description: Unique identifier for the field
+                      $$subfield:
+                        type: array
+                        items:
+                          type: string
+                        default: *a5
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    required:
+                      - $$field
+                      - $$subfield
+                    description: Reference to a field by its ID
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+            required:
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      $ref: "#/components/schemas/TranslationConfig"
+                      description: Custom required validation message
+                  required:
+                    - message
+              default: false
+              description: Indicates whether the field is mandatory.
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a9
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+            secured:
+              type: boolean
+              default: false
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a10
               description: Additional validation rules applied to the field.
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
@@ -5505,19 +5663,38 @@ components:
               type: string
               const: ADMINISTRATIVE_AREA
             defaultValue:
-              type: string
-              minLength: 1
+              anyOf:
+                - type: string
+                  minLength: 1
+                - type: object
+                  properties:
+                    $userField:
+                      type: string
+                      enum: *a11
+                    $location:
+                      type: string
+                  required:
+                    - $userField
             configuration:
               type: object
               properties:
                 partOf:
                   type: object
                   properties:
-                    $declaration:
+                    $$field:
                       type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      default: *a5
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
-                    - $declaration
-                  description: Parent location
+                    - $$field
+                    - $$subfield
+                  description: Reference to a field by its ID
                 type:
                   type: string
                   enum:
