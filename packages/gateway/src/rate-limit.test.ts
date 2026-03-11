@@ -15,9 +15,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { startContainer, stopContainer } from './utils/redis-test-utils'
 import { StartedTestContainer } from 'testcontainers'
-import { savedAdministrativeLocation } from '@opencrvs/commons/fixtures'
 import { createServer } from '@gateway/server'
-import { UUID } from '@opencrvs/commons'
 import { redis } from './utils/redis'
 
 const fetch = fetchAny as any
@@ -25,6 +23,10 @@ const resolvers = rootResolvers as any
 const locationResolvers = locationRootResolvers as any
 
 let container: StartedTestContainer
+
+jest.mock('@gateway/location', () => ({
+  fetchAllLocations: jest.fn().mockResolvedValue([])
+}))
 
 jest.mock('./constants', () => {
   const originalModule = jest.requireActual('./constants')
@@ -224,13 +226,6 @@ describe('Rate limit', () => {
 
   it('does not throw RateLimitError when a non-rate-limited route is being called 20 times', async () => {
     const resolverCalls = Array.from({ length: 20 }, async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify([
-          savedAdministrativeLocation({
-            partOf: { reference: 'Location/1' as `Location/${UUID}` }
-          })
-        ])
-      )
       await locationResolvers.Query!.isLeafLevelLocation(
         {},
         { locationId: '1' },
