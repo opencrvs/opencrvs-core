@@ -37,7 +37,8 @@ import {
   ActionType,
   flattenEntries,
   EventMetadataDateFieldId,
-  getAcceptedScopesByType
+  getAcceptedScopesByType,
+  decodeScope
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -308,7 +309,10 @@ export function hasOutboxWorkqueue(scopes: Scope[]) {
   const hasConfigurableActionScopes = parsedScopes.some(
     (scope) => ConfigurableActionScopes.safeParse(scope).success
   )
-  return hasLiteralActionScopes || hasConfigurableActionScopes
+
+  const hasV2Scopes = scopes.some((scope) => !!decodeScope(scope))
+
+  return hasLiteralActionScopes || hasConfigurableActionScopes || hasV2Scopes
 }
 
 export function hasDraftWorkqueue(scopes: Scope[]) {
