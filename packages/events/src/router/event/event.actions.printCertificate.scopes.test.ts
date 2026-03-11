@@ -99,7 +99,11 @@ test('Check scopes against event.actions.printCertificate', async () => {
           client.event.actions.printCertificate.request({
             eventId,
             transactionId: getUUID(),
-            declaration: {}
+            declaration: {},
+            annotation: {
+              'collector.requesterId': 'INFORMANT',
+              'collector.identity.verify': true
+            }
           })
       )
 
@@ -109,6 +113,8 @@ test('Check scopes against event.actions.printCertificate', async () => {
         ...options
       })
     }),
-    { numRuns: 20 }
+    {
+      numRuns: 20
+    }
   )
 })
