@@ -55,11 +55,14 @@ export const RecordScopeTypeV2 = z.enum([
   'record.print-certified-copies',
   'record.request-correction',
   'record.correct',
-  'record.unassign-others'
+  'record.unassign-others',
+  'record.custom-action'
 ])
+
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
 const scopeByEvent = z
+  // TODO CIHAN: do we need this for custom action
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
   .preprocess(
     (val) => (val === undefined ? undefined : [val].flat()),
@@ -89,6 +92,13 @@ const ScopeOptionsFull = scopeOptionsDeclared
   .describe(
     'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
   )
+
+const CustomActionScopeOptions = ScopeOptionsFull.extend({
+  customActionTypes: z
+    .array(z.string())
+    .optional()
+    .describe('Allowed custom action types')
+})
 
 export type ScopeOptionsFull = z.infer<typeof ScopeOptionsFull>
 export const ScopeOptionKey = ScopeOptionsFull.keyof()
@@ -140,6 +150,10 @@ export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.unassign-others'
 ])
 
+export const ScopesWithCustomActionOptions = RecordScopeTypeV2.extract([
+  'record.custom-action'
+])
+
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
@@ -153,11 +167,17 @@ export const RecordScopeV2 = z
     z.object({
       type: ScopesWithFullOptions,
       options: ScopeOptionsFull.optional()
+    }),
+    z.object({
+      type: ScopesWithCustomActionOptions,
+      options: CustomActionScopeOptions.optional()
     })
   ])
   .describe(
     "Scopes used to check user's permission to perform actions on a record."
   )
+
+export type RecordScopeV2WithCustomActionOptions = z.infer<typeof RecordScopeV2>
 
 export function scopeUsesDeclaredOptions(
   scope: RecordScopeV2
@@ -227,7 +247,6 @@ export const decodeScope = (query: string) => {
   })
 
   const unflattenedScope = unflattenScope(scope)
-
   return RecordScopeV2.safeParse(unflattenedScope)?.data
 }
 
