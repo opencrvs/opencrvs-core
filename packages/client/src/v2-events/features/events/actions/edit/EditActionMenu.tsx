@@ -221,7 +221,7 @@ function useEditActions(event: EventDocument) {
     modals: [modal],
     actions: [
       {
-        icon: actionIcons[ActionType.REGISTER],
+        icon: actionIcons[ActionType.EDIT],
         label: messages.editAndRegisterLabel,
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
@@ -253,7 +253,7 @@ function useEditActions(event: EventDocument) {
         hidden: !isActionAllowed(ActionType.REGISTER)
       },
       {
-        icon: actionIcons[ActionType.DECLARE],
+        icon: actionIcons[ActionType.EDIT],
         label: messages.editAndDeclareLabel,
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
@@ -284,7 +284,7 @@ function useEditActions(event: EventDocument) {
         hidden: !isActionAllowed(ActionType.DECLARE)
       },
       {
-        icon: actionIcons[ActionType.DECLARE],
+        icon: actionIcons[ActionType.EDIT],
         label: messages.editAndNotifyLabel,
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
