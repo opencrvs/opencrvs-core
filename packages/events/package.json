@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon -r tsconfig-paths/register src/index.ts",
+    "start": "concurrently 'cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon -r tsconfig-paths/register src/index.ts' 'tsc -w -p tsconfig.router.json --preserveWatchOutput'",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && vitest run --coverage",
     "test:watch": "vitest",
@@ -13,6 +13,7 @@
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.router.json",
+    "build:types": "tsc -p tsconfig.router.json",
     "build:clean": "rm -rf build",
     "generate-db-types": "kanel && prettier src/storage/postgres/events/schema --write",
     "generate-db-schema": "docker run --rm postgres:17.6 pg_dump postgres://events_migrator:migrator_password@$( [[ '$OSTYPE' == darwin* ]] && echo host.docker.internal || echo 172.17.0.1 ):5432/events -s > src/tests/postgres-migrations.sql --exclude-schema=analytics"
@@ -77,6 +78,11 @@
     "vitest": "^2.1.5",
     "yaml": "^2.7.1",
     "@types/busboy": "*"
+  },
+  "exports": {
+    "./src/router": {
+      "types": "./build/types/router.d.ts"
+    }
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

@@ -43,7 +43,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       ['Assign']: AssertType.ENABLED,
       ['Print']: AssertType.HIDDEN,
-      ['Correct record']: AssertType.HIDDEN,
+      ['Correct']: AssertType.HIDDEN,
       ['Review correction request']: AssertType.DISABLED
     }
   },
@@ -62,7 +62,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       ['Unassign']: AssertType.ENABLED,
       ['Print']: AssertType.HIDDEN,
-      ['Correct record']: AssertType.HIDDEN,
+      ['Correct']: AssertType.HIDDEN,
       ['Review correction request']: AssertType.ENABLED
     }
   },
@@ -83,7 +83,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       ['Unassign']: AssertType.ENABLED,
       ['Print']: AssertType.HIDDEN,
-      ['Correct record']: AssertType.HIDDEN,
+      ['Correct']: AssertType.HIDDEN,
       ['Review correction request']: AssertType.DISABLED
     }
   }

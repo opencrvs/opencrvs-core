@@ -55,6 +55,7 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
+import { Location, AdministrativeArea } from './locations'
 import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -166,8 +167,22 @@ export function generateRandomSignature(rng: () => number): string {
 function mapFieldTypeToMockValue(
   field: FieldConfig,
   i: number,
-  rng: () => number
+  rng: () => number,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
+  administrativeHierarchy?: {
+    administrativeAreas: AdministrativeArea[]
+    locations: Location[]
+  }
 ): FieldValue {
+  const leafLevelAdministrativeAreas =
+    administrativeHierarchy?.administrativeAreas.filter((aa) =>
+      administrativeHierarchy?.administrativeAreas.every(
+        (other) => other.parentId !== aa.id
+      )
+    )
+
   switch (field.type) {
     case FieldType.DIVIDER:
     case FieldType.TEXT:
@@ -182,7 +197,6 @@ function mapFieldTypeToMockValue(
     case FieldType.PARAGRAPH:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
     case FieldType.PHONE:
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
@@ -193,6 +207,11 @@ function mapFieldTypeToMockValue(
       return `${field.id}-${field.type}-${i}`
     case FieldType.VERIFICATION_STATUS:
       return 'verified'
+    case FieldType.FACILITY:
+      return administrativeHierarchy?.locations
+        ? pickRandom(rng, administrativeHierarchy.locations)?.id
+        : ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID)
+
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
@@ -210,9 +229,9 @@ function mapFieldTypeToMockValue(
       return {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
-        // @TODO:  Find a way to give out context aware mock values in the future.
-        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+        administrativeArea: leafLevelAdministrativeAreas
+          ? pickRandom(rng, leafLevelAdministrativeAreas)?.id
+          : ('27160bbd-32d1-4625-812f-860226bfb92a' as UUID),
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',
@@ -268,12 +287,24 @@ function mapFieldTypeToMockValue(
 
 export function fieldConfigsToActionPayload(
   fields: FieldConfig[],
-  rng: () => number
+  rng: () => number,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
+  administrativeHierarchy?: {
+    administrativeAreas: AdministrativeArea[]
+    locations: Location[]
+  }
 ): ActionUpdate {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
-      [field.id]: mapFieldTypeToMockValue(field, i, rng)
+      [field.id]: mapFieldTypeToMockValue(
+        field,
+        i,
+        rng,
+        administrativeHierarchy
+      )
     }),
     {}
   )
@@ -283,7 +314,14 @@ export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number,
-  overrides?: ActionUpdate
+  overrides?: ActionUpdate,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
+  administrativeHierarchy?: {
+    administrativeAreas: AdministrativeArea[]
+    locations: Location[]
+  }
 ): ActionUpdate {
   const parsed = DeclarationUpdateActions.safeParse(action)
 
@@ -296,7 +334,11 @@ export function generateActionDeclarationInput(
 
     const declarationConfig = getDeclaration(configuration)
 
-    const declaration = fieldConfigsToActionPayload(fields, rng)
+    const declaration = fieldConfigsToActionPayload(
+      fields,
+      rng,
+      administrativeHierarchy
+    )
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors

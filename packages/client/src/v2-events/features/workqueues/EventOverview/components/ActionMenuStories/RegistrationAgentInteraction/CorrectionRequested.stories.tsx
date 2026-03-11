@@ -41,7 +41,7 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Print']: AssertType.HIDDEN,
-      ['Correct record']: AssertType.HIDDEN
+      ['Correct']: AssertType.HIDDEN
     }
   },
   {
@@ -57,7 +57,7 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Print']: AssertType.HIDDEN,
-      ['Correct record']: AssertType.HIDDEN
+      ['Correct']: AssertType.HIDDEN
     }
   },
   {
@@ -75,7 +75,7 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       ['Print']: AssertType.HIDDEN,
-      ['Correct record']: AssertType.HIDDEN
+      ['Correct']: AssertType.HIDDEN
     }
   }
 ]

@@ -235,7 +235,9 @@ export const eventRouter = router({
       return getDuplicateEvents(event, ctx)
     }),
   delete: userOnlyProcedure
-    .use(requiresAnyOfScopes([], ACTION_SCOPE_MAP[ActionType.DELETE]))
+    .use(
+      middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[ActionType.DELETE])
+    )
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {

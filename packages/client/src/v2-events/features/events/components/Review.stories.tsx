@@ -10,8 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-
-import { fireEvent, within, expect, userEvent, waitFor } from '@storybook/test'
+import { fireEvent, within } from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'
@@ -21,15 +20,19 @@ import {
   ConditionalType,
   defineDeclarationForm,
   field,
+  FieldConfig,
   FieldType,
+  FullDocumentPath,
   generateTranslationConfig,
-  TENNIS_CLUB_DECLARATION_FORM,
-  tennisClubMembershipEvent
+  TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { withValidatorContext } from '../../../../../.storybook/decorators'
+import {
+  getTestValidatorContext,
+  withValidatorContext
+} from '../../../../../.storybook/decorators'
 import { RejectionState, Review } from './Review'
 
 /* eslint-disable max-lines */
@@ -457,5 +460,184 @@ export const AccordionCollapsedWhenNoRequiredFieldsAndNoValues: Story = {
     // Page has no required fields and no values, so accordion should be collapsed
     await expect(await canvas.findByText('Show')).toBeInTheDocument()
     await expect(canvas.queryByText('Hide')).not.toBeInTheDocument()
+  }
+}
+
+const annotationTextField: FieldConfig = {
+  id: 'annotation.comment',
+  type: FieldType.TEXT,
+  conditionals: [],
+  label: {
+    id: 'annotation.comment.label',
+    defaultMessage: 'Comment',
+    description: 'Label for annotation comment field'
+  }
+}
+
+const reviewCommentField: FieldConfig = {
+  id: 'review.comment',
+  type: FieldType.TEXT,
+  label: {
+    id: 'review.comment.label',
+    defaultMessage: 'Comment',
+    description: 'Label for review comment field'
+  }
+}
+
+const reviewSignatureField: FieldConfig = {
+  id: 'review.signature',
+  type: FieldType.SIGNATURE,
+  conditionals: [],
+  signaturePromptLabel: {
+    id: 'review.signature.prompt',
+    defaultMessage: 'Please sign here',
+    description: 'Prompt label for review signature modal'
+  },
+  label: {
+    id: 'review.signature.label',
+    defaultMessage: 'Signature',
+    description: 'Label for review signature field'
+  },
+  configuration: {
+    maxFileSize: 5 * 1024 * 1024
+  }
+}
+
+const annotationPrintButtonField: FieldConfig = {
+  id: 'annotation.printButton',
+  type: FieldType.ALPHA_PRINT_BUTTON,
+  conditionals: [],
+  label: {
+    id: 'annotation.printButton.label',
+    defaultMessage: 'Print',
+    description: 'Label for annotation print button field'
+  },
+  configuration: {
+    template: 'birth-certificate'
+  }
+}
+
+const annotationConditionalTextField: FieldConfig = {
+  id: 'annotation.conditionalField',
+  type: FieldType.TEXT,
+  conditionals: [
+    {
+      type: ConditionalType.DISPLAY_ON_REVIEW,
+      conditional: field('annotation.conditionalField').isEqualTo('show-me')
+    }
+  ],
+  label: {
+    id: 'annotation.conditionalField.label',
+    defaultMessage: 'Conditional field',
+    description: 'Label for conditionally shown annotation field'
+  }
+}
+
+/**
+ * During record creation the annotation fields (e.g. signature, comment) are shown
+ * as editable inputs via FormFieldGenerator. The readonly ListReview section is not
+ * shown because there are no previously submitted annotation values to display.
+ *
+ * Requires reactRouter with /event/:eventId so SignatureField.Input can upload files.
+ */
+export const ReviewDuringCreateNoAnnotationFields: Story = {
+  parameters: {
+    reactRouter: {
+      router: {
+        path: '/event/:eventId',
+        element: (
+          <Review.Body
+            annotation={{}}
+            form={mockDeclaration}
+            formConfig={TENNIS_CLUB_DECLARATION_FORM}
+            readonlyMode={false}
+            reviewFields={[reviewCommentField, reviewSignatureField]}
+            title="Member declaration for John Doe"
+            validatorContext={getTestValidatorContext()}
+            onAnnotationChange={noop}
+            onEdit={noop}
+          />
+        )
+      },
+      initialPath: '/event/test-event-123'
+    }
+  }
+}
+
+export const ReadonlyAnnotationListReview: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField],
+    annotation: {
+      'annotation.comment': 'Only annotation'
+    }
+  }
+}
+
+export const ReadonlyAnnotationHidesAlphaPrintButton: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField, annotationPrintButtonField],
+    annotation: {
+      'annotation.comment': 'Hides alpha print button',
+      'annotation.printButton': null
+    }
+  }
+}
+
+export const ReadonlyAnnotationFromNotifyAction: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField],
+    annotation: {
+      'annotation.comment': 'Notified by field agent'
+    }
+  }
+}
+
+export const ReadonlyAnnotationConditionallyHiddenField: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField, annotationConditionalTextField],
+    annotation: {
+      'annotation.comment': 'Always visible. One field hidden.',
+      // condition not satisfied — value does not equal 'show-me'
+      'annotation.conditionalField': 'hidden-value'
+    }
+  }
+}
+
+export const ReadonlyAnnotationConditionallyShownField: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [annotationTextField, annotationConditionalTextField],
+    annotation: {
+      'annotation.comment': 'Always visible.',
+      // condition satisfied — value equals 'show-me'
+      'annotation.conditionalField': 'show-me'
+    }
+  }
+}
+
+export const ReadonlyNoAnnotationSection: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: undefined,
+    annotation: undefined
+  }
+}
+
+export const ReadonlyAnnotationWithSignature: Story = {
+  args: {
+    readonlyMode: true,
+    reviewFields: [reviewCommentField, reviewSignatureField],
+    annotation: {
+      'review.comment': 'commentsssdsdsds',
+      'review.signature': {
+        path: '/ocrvs/55c7b677-bf65-490b-83af-2606cd95259b/f6477c7d-7aac-4bfe-969a-ee27056792fc.png' as FullDocumentPath,
+        type: 'image/png',
+        originalFilename: 'signature-review____signature-1773128010978.png'
+      }
+    }
   }
 }

@@ -11,55 +11,39 @@
 
 import fc from 'fast-check'
 import {
-  ActionTypes,
-  EventDocument,
+  ActionType,
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
-  UserFilter,
   encodeScope,
-  getDeclarationFields
+  getDeclarationFields,
+  getUUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   assertScopeResult,
+  attemptScopedAction,
   createTestClient,
   setupScopeTestFixture
 } from '@events/tests/utils'
-import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
-import { EventNotFoundError } from '../../service/events/events'
+import { createIndex } from '@events/service/indexing/indexing'
 
-test('Check scopes against event.get', async () => {
+test('Check scopes against event.actions.notify', async () => {
   await createIndex(
     getEventIndexName('tennis-club-membership_premium'),
     getDeclarationFields(tennisClubMembershipEvent)
   )
+
   // 1. Setup test fixture with a known set of users, administrative areas, and events.
   const { users, isUnderAdministrativeArea, eventIds } =
-    await setupScopeTestFixture(
-      1243453343,
-      fc.constantFrom(
-        [ActionTypes.enum.DECLARE],
-        [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
-      )
-    )
+    await setupScopeTestFixture(124345333, [ActionType.UNASSIGN])
 
+  // Client that can read all events,  used to fetch events that test clients cannot access for comparison.
   const clientReadingAllEvents = createTestClient(users[0], [
     encodeScope({
       type: 'record.read'
     })
   ])
-
-  const jurisdictionOptions = fc.option(
-    fc.constantFrom(...JurisdictionFilter.options),
-    {
-      nil: undefined
-    }
-  )
-
-  const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
-    nil: undefined
-  })
 
   // 2. Create option combinations for scopes and users
   const combinations = fc.record({
@@ -72,47 +56,42 @@ test('Check scopes against event.get', async () => {
       ),
       { nil: undefined }
     ),
-    placeOfEvent: jurisdictionOptions,
-    declaredBy: userOptions,
-    declaredIn: jurisdictionOptions,
-    registeredBy: userOptions,
-    registeredIn: jurisdictionOptions
+    placeOfEvent: fc.option(fc.constantFrom(...JurisdictionFilter.options), {
+      nil: undefined
+    })
   })
 
   // 3. Test combination against random event and assert results
   await fc.assert(
-    fc.asyncProperty(combinations, async ({ user, ...options }) => {
+    fc.asyncProperty(combinations, async ({ user, event, placeOfEvent }) => {
       const scope = encodeScope({
-        type: 'record.read',
-        options
+        type: 'record.notify',
+        options: { event, placeOfEvent }
       })
 
+      // Pick random event for the case. Exclude used events.
       const randomIndex = Math.floor(Math.random() * eventIds.length)
       const [eventId] = eventIds.splice(randomIndex, 1)
 
-      const testClient = createTestClient(user, [scope])
-
-      let result: { success: boolean; event: EventDocument }
-      try {
-        // 1. Perform the action with the given test client.
-        const eventFetchedAsUser = await testClient.event.get({ eventId })
-        result = { success: true, event: eventFetchedAsUser }
-      } catch (error) {
-        if (error instanceof EventNotFoundError) {
-          // 2. If action fails, attempt to fetch the event with the client that has access to all events to verify the failure was due to scope restrictions.
-          const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
-            eventId
+      const result = await attemptScopedAction(
+        eventId,
+        user,
+        scope,
+        clientReadingAllEvents,
+        (client) =>
+          client.event.actions.notify.request({
+            eventId,
+            transactionId: getUUID(),
+            // Arbitrary content.
+            declaration: { 'applicant.email': 'test@openrvs.org' }
           })
-          result = { success: false, event: eventFetchedAsAdmin }
-        } else {
-          throw error
-        }
-      }
+      )
 
       assertScopeResult(result, {
         user,
-        isUnderAdministrativeArea,
-        ...options
+        event,
+        placeOfEvent,
+        isUnderAdministrativeArea
       })
     }),
     { numRuns: 40 }

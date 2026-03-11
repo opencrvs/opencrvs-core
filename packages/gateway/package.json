@@ -116,7 +116,7 @@
     ],
     "src/**/*.ts": [
       "prettier --write",
-      "eslint -c .eslintrc.js --fix"
+      "eslint -c eslint.config.js --fix"
     ]
   },
   "jest": {
