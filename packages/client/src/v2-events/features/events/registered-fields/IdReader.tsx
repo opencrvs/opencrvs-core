@@ -97,7 +97,7 @@ function IdReaderInput({
             fields={methods}
             id={id}
             validatorContext={validatorContext}
-            onChange={(values) => {
+            onFormChange={(values) => {
               /**
                * Extracts the actual value from nested field definitions (passed as `methods`)
                * to prevent redundant nesting in the resulting form data.

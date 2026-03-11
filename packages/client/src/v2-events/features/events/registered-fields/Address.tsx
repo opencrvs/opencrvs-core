@@ -16,7 +16,7 @@ import {
   AddressFieldValue,
   and,
   ConditionalType,
-  field as createFieldCondition,
+  field as fieldHelper,
   FieldConfig,
   FieldPropsWithoutReferenceValue,
   FieldType,
@@ -28,11 +28,11 @@ import {
   isFieldDisplayedOnReview,
   AddressField,
   AdministrativeArea,
-  DefaultAddressFieldValue,
   LocationType,
   ValidatorContext,
   RequireConfig,
-  DomesticAddressFieldValue
+  IndexMap,
+  FormState
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -40,7 +40,6 @@ import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStrin
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { AdminStructureItem } from '@client/utils/referenceApi'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
@@ -52,7 +51,10 @@ type FieldConfigWithoutAddress = Exclude<
 >
 
 type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
-  onChange: (newValue: Partial<AddressFieldValue>) => void
+  name: string
+  onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
+  onChange: (newValue: AddressFieldValue) => void
+  touched: IndexMap<FormState<boolean>> | undefined
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
   disabled?: boolean
@@ -128,8 +130,8 @@ const ALL_ADDRESS_FIELDS = [
 
 function isDomesticAddress() {
   return and(
-    not(createFieldCondition('country').isUndefined()),
-    createFieldCondition('addressType').isEqualTo(AddressType.DOMESTIC)
+    not(fieldHelper('country').isUndefined()),
+    fieldHelper('addressType').isEqualTo(AddressType.DOMESTIC)
   )
 }
 
@@ -147,12 +149,10 @@ function generateAdminStructureFields(
     const conditionals = [
       {
         type: ConditionalType.SHOW,
-        conditional: isFirst
-          ? isDomesticAddress()
-          : and(
-              isDomesticAddress(),
-              not(createFieldCondition(parentId).isUndefined())
-            )
+        conditional: and(
+          isDomesticAddress(),
+          not(fieldHelper(parentId).isFalsy())
+        )
       }
     ]
 
@@ -161,14 +161,14 @@ function generateAdminStructureFields(
     }
 
     if (!isFirst && prevItem?.id) {
-      configuration.partOf = { $declaration: prevItem.id }
+      configuration.partOf = fieldHelper(prevItem.id)
     }
 
     const field: AdministrativeArea = {
       id,
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
-      parent: createFieldCondition(parentId),
+      parent: !isFirst ? fieldHelper(parentId) : undefined,
       required,
       label,
       configuration
@@ -193,7 +193,7 @@ function extractAddressLines(
     Object.entries(obj).filter(
       ([key, value]) => !keysToIgnore.includes(key) && value
     )
-  )
+  ) as Record<string, string>
 }
 
 function getLeafAdministrativeLevel(
@@ -207,7 +207,7 @@ function getLeafAdministrativeLevel(
   for (let i = keys.length - 1; i >= 0; i--) {
     const key = keys[i] as keyof AddressFieldValue
     if (val[key]) {
-      return val[key]
+      return val[key] as string
     }
   }
   return undefined
@@ -217,6 +217,108 @@ function getAdministrativeArea(value?: AddressFieldValue) {
   return value?.addressType === AddressType.DOMESTIC
     ? value.administrativeArea
     : undefined
+}
+
+function transformParentValueToNestedValue(
+  value: AddressFieldValue,
+  adminLevelIds: string[],
+  adminStructureLocations: Location[]
+): EventState {
+  const { streetLevelDetails, ...valueWithoutStreetLevelDetails } = value
+  const administrativeArea = getAdministrativeArea(value)
+  const derivedAdminLevels = getAdminLevelHierarchy(
+    administrativeArea,
+    adminStructureLocations,
+    adminLevelIds
+  )
+  return {
+    ...valueWithoutStreetLevelDetails,
+    ...derivedAdminLevels,
+    ...streetLevelDetails
+  }
+}
+
+function transformNestedValueToParentValue(
+  nestedValue: EventState,
+  adminLevelIds: string[]
+): AddressFieldValue {
+  const addressLines = extractAddressLines(nestedValue, adminLevelIds)
+  const leafAdminLevelValue = getLeafAdministrativeLevel(
+    nestedValue,
+    adminLevelIds
+  )
+  const country = nestedValue.country as string
+  const defaultCountry = window.config.COUNTRY || 'FAR'
+  if (country === defaultCountry) {
+    return {
+      country,
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: leafAdminLevelValue ?? '',
+      streetLevelDetails: addressLines
+    }
+  }
+  return {
+    country,
+    addressType: AddressType.INTERNATIONAL,
+    streetLevelDetails: addressLines
+  }
+}
+
+function transformParentTouchedToNestedTouched(
+  parentTouched: IndexMap<FormState<boolean>>,
+  adminLevelIds: string[],
+  streetAddressFieldIds: string[]
+): IndexMap<FormState<boolean>> {
+  const result: IndexMap<FormState<boolean>> = {}
+
+  if (parentTouched.administrativeArea) {
+    adminLevelIds.forEach((id) => {
+      result[id] = true
+    })
+  }
+  if (parentTouched.country) {
+    result.country = parentTouched.country
+  }
+
+  const streetLevelDetailsTouched = parentTouched.streetLevelDetails
+  if (
+    streetLevelDetailsTouched &&
+    typeof streetLevelDetailsTouched === 'object'
+  ) {
+    streetAddressFieldIds.forEach((id) => {
+      if (streetLevelDetailsTouched[id]) {
+        result[id] = streetLevelDetailsTouched[id]
+      }
+    })
+  }
+
+  return result
+}
+
+function transformNestedTouchedToParentTouched(
+  nestedTouched: IndexMap<FormState<boolean>>,
+  adminLevelIds: string[],
+  streetAddressFieldIds: string[]
+): IndexMap<FormState<boolean>> {
+  const result: IndexMap<FormState<boolean>> = {}
+
+  const adminLevelTouched = adminLevelIds.some((id) => nestedTouched[id])
+  if (adminLevelTouched) {
+    result.administrativeArea = true
+  }
+  if (nestedTouched.country) {
+    result.country = nestedTouched.country
+  }
+
+  const streetDetailsTouched: Record<string, FormState<boolean>> = {}
+  streetAddressFieldIds.forEach((id) => {
+    if (nestedTouched[id]) {
+      streetDetailsTouched[id] = nestedTouched[id]
+    }
+  })
+  result.streetLevelDetails = streetDetailsTouched
+
+  return result
 }
 
 /**
@@ -230,17 +332,24 @@ function getAdministrativeArea(value?: AddressFieldValue) {
  */
 function AddressInput(props: Props) {
   const {
+    onBlur,
     onChange,
-    defaultValue,
     disabled,
-    value,
+    name,
+    value = {
+      addressType: AddressType.DOMESTIC,
+      country: '',
+      administrativeArea: ''
+    },
     validatorContext,
+    touched = {},
     ...otherProps
   } = props
   const { config } = useSelector(getOfflineData)
   const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
-  const userDetails = useSelector(getUserDetails)
+  const [adminStructureLocations] = getLocations.useSuspenseQuery({
+    locationType: LocationType.enum.ADMIN_STRUCTURE
+  })
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
   const adminStructure = generateAdminStructureFields(
@@ -249,62 +358,22 @@ function AddressInput(props: Props) {
   )
   const customAddressFields = props.configuration?.streetAddressForm
 
-  const adminStructureLocations = locations.filter(
-    (location) => location.locationType === 'ADMIN_STRUCTURE'
-  )
-
-  const administrativeArea = getAdministrativeArea(value)
-
-  const resolveAdministrativeArea = (
-    adminArea:
-      | DomesticAddressFieldValue['administrativeArea']
-      | DefaultAddressFieldValue['administrativeArea']
-  ) => {
-    if (!adminArea) {
-      return undefined
-    }
-    if (typeof adminArea === 'string') {
-      return adminArea
-    }
-    if (adminArea.$location) {
-      const locationId = userDetails?.primaryOffice.id
-
-      const hierarchy = getAdminLevelHierarchy(
-        locationId,
-        locations,
-        adminLevelIds
-      )
-
-      return hierarchy[adminArea.$location]
-    }
-  }
-
-  const resolvedAdministrativeArea =
-    resolveAdministrativeArea(administrativeArea)
-
-  if (
-    value &&
-    value.addressType === AddressType.DOMESTIC &&
-    resolvedAdministrativeArea
-  ) {
-    value.administrativeArea = resolvedAdministrativeArea
-  }
-
-  const resolvedValue = {
-    ...value,
-    ...value?.streetLevelDetails,
-    administrativeArea: resolvedAdministrativeArea
-  }
-
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
       ? customAddressFields
       : []
 
-  const derivedAdminLevels = getAdminLevelHierarchy(
-    resolvedAdministrativeArea,
-    adminStructureLocations,
-    adminLevelIds
+  const streetAddressFieldIds = addressFields.map((f) => f.id)
+
+  const nestedValue = transformParentValueToNestedValue(
+    value,
+    adminLevelIds,
+    adminStructureLocations
+  )
+  const nestedTouched = transformParentTouchedToNestedTouched(
+    touched,
+    adminLevelIds,
+    streetAddressFieldIds
   )
 
   const fields = [
@@ -327,37 +396,27 @@ function AddressInput(props: Props) {
     }
   })
 
-  const handleChange = (values: EventState) => {
-    const addressLines = extractAddressLines(values, adminLevelIds)
-    const leafAdminLevelValue = getLeafAdministrativeLevel(
-      values,
-      adminLevelIds
-    )
-    const { country, addressType } = values
-
-    const addressValue = {
-      country,
-      addressType,
-      administrativeArea:
-        addressType === AddressType.DOMESTIC ? leafAdminLevelValue : undefined,
-      streetLevelDetails: addressLines
-    }
-
-    const cleanedAddressValue = Object.fromEntries(
-      Object.entries(addressValue).filter(([_, v]) => v != null)
-    )
-
-    onChange(cleanedAddressValue as AddressFieldValue)
-  }
-
   return (
     <FormFieldGenerator
       {...otherProps}
       fields={fields}
-      initialValues={{ ...resolvedValue, ...derivedAdminLevels }}
-      parentId={props.id}
+      formContext={{ addressType: value.addressType }}
+      formTouched={nestedTouched}
+      formValues={nestedValue}
       validatorContext={validatorContext}
-      onChange={handleChange}
+      onFormChange={(nestedVal) =>
+        onChange(transformNestedValueToParentValue(nestedVal, adminLevelIds))
+      }
+      onTouchedChange={(newTouched) =>
+        onBlur(
+          name,
+          transformNestedTouchedToParentTouched(
+            newTouched,
+            adminLevelIds,
+            streetAddressFieldIds
+          )
+        )
+      }
     />
   )
 }

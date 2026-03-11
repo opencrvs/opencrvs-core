@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.9.12
+
+### New features
+
+A composite field type (`FIELD_GROUP`) that groups related child fields into a single unit with a shared label, conditionals, and validation.
+
+**Structure:**
+```typescript
+{
+  id: 'person.address',
+  type: fieldtype.field_group,
+  fields: [
+    { id: 'country', type: FieldType.COUNTRY },
+    { id: 'province', type: FieldType.ADMINISTRATIVE_AREA, parent: field('person.address').get('country') },
+    { id: 'district', type: FieldType.ADMINISTRATIVE_AREA, parent: field('person.address').get('province') }
+  ]
+}
+```
+
 ## 1.9.11
 
 ### New features

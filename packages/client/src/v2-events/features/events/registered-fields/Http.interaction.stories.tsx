@@ -10,7 +10,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
@@ -25,19 +25,17 @@ import {
   FieldConfig
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Review } from '../components/Review'
 
-interface Args {
-  onChange: (val: unknown) => void
-}
-
-const meta: Meta<Args> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Http',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -53,6 +51,8 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
+
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 const fetchNidFields: FieldConfig[] = [
   {
@@ -215,7 +215,7 @@ const fetchNidFields: FieldConfig[] = [
   }
 ]
 
-export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
+export const FetchNid: Story = {
   name: 'Fetch NID - Response with Content-Type: text/plain',
   parameters: {
     chromatic: {
@@ -373,15 +373,12 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
 }
 
-export const FetchNidErrors: StoryObj<typeof FormFieldGenerator> = {
+export const FetchNidErrors: Story = {
   name: 'Fetch NID - Response has errors - can enter NID manually',
   parameters: {
     chromatic: {
@@ -413,9 +410,6 @@ export const FetchNidErrors: StoryObj<typeof FormFieldGenerator> = {
         {...args}
         fields={fetchNidFields}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
