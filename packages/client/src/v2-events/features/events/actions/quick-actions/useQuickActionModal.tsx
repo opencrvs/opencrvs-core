@@ -31,7 +31,8 @@ import {
   getCurrentEventState,
   EventConfig,
   omitHiddenFields,
-  EventIndex
+  EventIndex,
+  AvailableIcons
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
@@ -217,7 +218,7 @@ export function useQuickActionModal(
         config={{
           label,
           actionType,
-          icon: actionConfig?.icon,
+          icon: actionConfig?.icon as AvailableIcons,
           supportingCopy,
           ...config.modal
         }}

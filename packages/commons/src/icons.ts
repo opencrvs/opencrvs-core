@@ -117,3 +117,5 @@ export const AvailableIcons = z.enum([
   'PushPin',
   'Timer'
 ])
+
+export type AvailableIcons = z.infer<typeof AvailableIcons>
