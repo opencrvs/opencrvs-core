@@ -97,7 +97,17 @@ test('single scope, multi-filter combinations', async () => {
           ]
         }
       }),
-      'record.declare[event=birth|death|tennis-club-membership|child-onboarding]'
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      })
     ])
 
     const event = await testClient.event.create(generator.event.create())
@@ -307,7 +317,17 @@ test('multi-scope combinations', async () => {
           ]
         }
       }),
-      'record.declare[event=birth|death|tennis-club-membership|child-onboarding]'
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: [
+            'birth',
+            'death',
+            'tennis-club-membership',
+            'child-onboarding'
+          ]
+        }
+      })
     ])
 
     const event = await testClient.event.create(generator.event.create())
@@ -697,8 +717,12 @@ test('placeOfEvent scope filters out results between locations and administrativ
         event: [eventType]
       }
     }),
-
-    `record.declare[event=${eventType}]`
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: [eventType]
+      }
+    })
   ])
 
   // 1. Create event without placeOfEvent filled (defaults to user's location)
