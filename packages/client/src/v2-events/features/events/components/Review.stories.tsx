@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { fireEvent, within } from '@storybook/test'
+import { fireEvent, within, expect } from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'
