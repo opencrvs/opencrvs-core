@@ -19,7 +19,7 @@ import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
 import { pipe } from 'fp-ts/lib/function'
 import { verifyToken } from '@config/utils/verifyToken'
-import { findScope } from '@opencrvs/commons/authentication'
+import { getAcceptedScopesFromToken } from '@opencrvs/commons/authentication'
 
 export default async function configHandler(
   request: Hapi.Request,
@@ -54,16 +54,14 @@ async function getCertificatesConfig(
   if (decodedOrError._tag === 'Left') {
     return []
   }
-  const { scope } = decodedOrError.right
-  const printCertifiedCopiesScope = findScope(
-    scope,
-    'record.registered.print-certified-copies'
-  )
-  if (!printCertifiedCopiesScope) {
+
+  const printCertifiedCopiesScope = getAcceptedScopesFromToken(authToken, [
+    'record.print-certified-copies'
+  ])
+  if (printCertifiedCopiesScope.length === 0) {
     return []
   }
 
-  const templateIds = printCertifiedCopiesScope.options.templates ?? []
   const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
   const res = await fetch(url, {
@@ -79,17 +77,18 @@ async function getCertificatesConfig(
 
   const certificateConfigs = await res.json()
 
+  // @TODO: new 1.9.11 will be ported when working on this task: https://github.com/opencrvs/opencrvs-core/issues/12039
   // If there are no templateIds specified in the scope, all the certificates configuration will be fetched
-  if (!templateIds.length) {
-    return certificateConfigs
-  }
+  // if (!templateIds.length) {
+  return certificateConfigs
+  // }
 
   // If there are templateIds specified in the scope, only the certificates configuration matching those templateIds will be fetched
-  if (templateIds.length > 0) {
-    return certificateConfigs.filter((config: { id: string }) =>
-      templateIds.includes(config.id)
-    )
-  }
+  // if (templateIds.length > 0) {
+  //   return certificateConfigs.filter((config: { id: string }) =>
+  //     templateIds.includes(config.id)
+  //   )
+  // }
 }
 
 async function getConfigFromCountry(authToken?: string) {
