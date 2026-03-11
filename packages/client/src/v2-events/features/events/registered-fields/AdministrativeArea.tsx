@@ -85,6 +85,8 @@ function useAvailableAdministrativeAreas(
     })
   }, [administrativeAreas, parentId])
 
+  // When jurisdictionFilter is not "all", restrict options to the user's own area hierarchy.
+  // e.g. a LOCAL_REGISTRAR sees only their province/district; a COMMUNITY_LEADER sees only their province/district/village.
   const hierarchyOptions = options.filter((o) =>
     userAdministrativeAreaHierarchy.some(({ id }) => id === o.id)
   )
