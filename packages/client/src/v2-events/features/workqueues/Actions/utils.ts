@@ -102,7 +102,7 @@ export const actionIcons: Record<
   [ActionType.ASSIGN]: 'PushPin',
   [ActionType.UNASSIGN]: 'ArrowCircleDown',
   [ActionType.ARCHIVE]: 'Archive',
-  [ActionType.MARK_AS_DUPLICATE]: 'PencilLine',
+  [ActionType.MARK_AS_DUPLICATE]: 'Files',
   [ActionType.DELETE]: 'Trash',
   [ActionType.DECLARE]: 'PaperPlaneTilt',
   [ActionType.EDIT]: 'PencilLine',
