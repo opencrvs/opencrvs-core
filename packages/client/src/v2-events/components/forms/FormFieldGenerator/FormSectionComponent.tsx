@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import React, { useCallback, useEffect, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
 import {
