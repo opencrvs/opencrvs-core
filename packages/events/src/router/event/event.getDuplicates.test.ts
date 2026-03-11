@@ -18,7 +18,8 @@ import {
   generateActionDuplicateDeclarationInput,
   EventDocument,
   generateUuid,
-  UUID
+  UUID,
+  encodeScope
 } from '@opencrvs/commons'
 import { tennisClubMembershipEventWithDedupCheck } from '@opencrvs/commons/fixtures'
 import {
@@ -26,6 +27,7 @@ import {
   setupTestCase,
   TEST_USER_DEFAULT_SCOPES
 } from '@events/tests/utils'
+import { EventNotFoundError } from '@events/service/events/events'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 import AppSchema from '../../storage/postgres/events/schema/app/AppSchema'
@@ -44,7 +46,12 @@ test('prevents forbidden access if the scope doesnt allow the event type', async
   const someOtherClient = createTestClient(users[0])
 
   const myClient = createTestClient(users[1], [
-    'record.declared.review-duplicates[event=death]'
+    encodeScope({
+      type: 'record.review-duplicates',
+      options: {
+        event: ['death']
+      }
+    })
   ])
 
   const event = await someOtherClient.event.create(generator.event.create())
@@ -54,7 +61,7 @@ test('prevents forbidden access if the scope doesnt allow the event type', async
 
   await expect(
     myClient.event.getDuplicates({ eventId: event.id })
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+  ).rejects.toMatchObject(new EventNotFoundError(event.id))
 })
 
 test('prevents forbidden access without assignment but with right scope', async () => {
@@ -62,7 +69,12 @@ test('prevents forbidden access without assignment but with right scope', async 
   const someOtherClient = createTestClient(users[0])
 
   const myClient = createTestClient(users[1], [
-    'record.declared.review-duplicates[event=tennis-club-membership]'
+    encodeScope({
+      type: 'record.review-duplicates',
+      options: {
+        event: ['tennis-club-membership']
+      }
+    })
   ])
 
   const event = await someOtherClient.event.create(generator.event.create())
@@ -79,7 +91,12 @@ test('Allows access with assignment and right scope', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.review-duplicates',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -120,7 +137,12 @@ test('Returns single duplicate when found', async () => {
 
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.review-duplicates',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const prng = createPrng(73)
@@ -206,7 +228,12 @@ test('Returns multiple duplicates when found', async () => {
 
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.review-duplicates',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const prng = createPrng(73)

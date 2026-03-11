@@ -145,19 +145,48 @@ export const TEST_USER_DEFAULT_SCOPES = [
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
     }
   }),
-  'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.edit',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.reject',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.archive',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
   encodeScope({
     type: 'record.register',
     options: {
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
     }
   }),
-
-  'record.registered.print-certified-copies[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.registered.request-correction[event=birth|death|tennis-club-membership|child-onboarding]',
-  'record.registered.correct[event=birth|death|tennis-club-membership|child-onboarding]',
+  encodeScope({
+    type: 'record.print-certified-copies',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.request-correction',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
+  encodeScope({
+    type: 'record.correct',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  }),
   'record.unassign-others[event=birth|death|tennis-club-membership|child-onboarding]'
 ]
 
@@ -467,7 +496,11 @@ export async function seedEvent(
     administrativeHierarchy
   }: {
     eventConfig: EventConfig
-    actions: (DeclarationActionType | typeof ActionType.UNASSIGN)[]
+    actions: (
+      | DeclarationActionType
+      | typeof ActionType.UNASSIGN
+      | typeof ActionType.REQUEST_CORRECTION
+    )[]
     user: Omit<UserContext, 'type'>
     rng: () => number
     administrativeHierarchy?: {
@@ -544,6 +577,18 @@ export async function seedEvent(
         // Without setting the originalActionId, the accepted action will not be linked to the requested action and will not update the event state, which is important for testing scopes based on event state.
         const originalActionId = getUUID()
 
+        // correction, partial declaration which changes a value without uncorrectable: true is enough.
+        const declaration =
+          actionType === ActionType.REQUEST_CORRECTION
+            ? { ' applicant.age': 16 }
+            : generateActionDeclarationInput(
+                eventConfig,
+                actionType,
+                rng,
+                undefined,
+                administrativeHierarchy
+              )
+
         return [
           {
             ...baseAction,
@@ -552,13 +597,7 @@ export async function seedEvent(
             transactionId: generateUuid(rng),
             status: ActionStatus.Requested,
             createdAt: new Date(baseTime + ++offset).toISOString(),
-            declaration: generateActionDeclarationInput(
-              eventConfig,
-              actionType,
-              rng,
-              undefined,
-              administrativeHierarchy
-            )
+            declaration
           },
           {
             ...baseAction,
@@ -718,8 +757,18 @@ function eventMatchesScope({
 export async function setupScopeTestFixture(
   rngSeed: number,
   seedActions:
-    | (DeclarationActionType | typeof ActionType.UNASSIGN)[]
-    | fc.Arbitrary<(DeclarationActionType | typeof ActionType.UNASSIGN)[]>
+    | (
+        | DeclarationActionType
+        | typeof ActionType.REQUEST_CORRECTION
+        | typeof ActionType.UNASSIGN
+      )[]
+    | fc.Arbitrary<
+        (
+          | DeclarationActionType
+          | typeof ActionType.REQUEST_CORRECTION
+          | typeof ActionType.UNASSIGN
+        )[]
+      >
 ) {
   const sampleSize = 200
 

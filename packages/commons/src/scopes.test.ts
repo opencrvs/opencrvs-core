@@ -304,7 +304,7 @@ describe('2.0 scopes', () => {
 
     expect(declaredEventOptions.map(decodeScope)).toEqual([
       {
-        type: 'record.validate',
+        type: 'record.edit',
         options: {
           event: ['birth', 'death'],
           placeOfEvent: 'location',
