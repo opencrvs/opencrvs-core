@@ -8,26 +8,25 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  savedAdministrativeLocation,
-  savedLocation
-} from '@opencrvs/commons/fixtures'
 import { resolvers } from '@gateway/features/location/root-resolvers'
-import * as fetchAny from 'jest-fetch-mock'
-import { UUID } from '@opencrvs/commons'
+import { fetchAllLocations } from '@gateway/location'
 
-const fetch = fetchAny as any
+jest.mock('@gateway/location', () => ({
+  fetchAllLocations: jest.fn()
+}))
 
 describe('Location root resolvers', () => {
   describe('isLeafLevelLocation', () => {
     it('returns false if a location has administrative locations as its children', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify([
-          savedAdministrativeLocation({
-            partOf: { reference: 'Location/1' as `Location/${UUID}` }
-          })
-        ])
-      )
+      ;(fetchAllLocations as jest.Mock).mockResolvedValueOnce([
+        {
+          id: 'child-location-id',
+          name: 'Child Location',
+          locationType: 'ADMIN_STRUCTURE',
+          administrativeAreaId: '1',
+          validUntil: null
+        }
+      ])
       // @ts-ignore
       const isLeafLevelLocation = await resolvers.Query!.isLeafLevelLocation(
         {},
@@ -38,16 +37,15 @@ describe('Location root resolvers', () => {
     })
 
     it('returns true if a location has no administrative locations as its children', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify([
-          savedLocation({
-            partOf: { reference: 'Location/1' as `Location/${UUID}` }
-          }),
-          savedAdministrativeLocation({
-            partOf: { reference: 'Location/2' as `Location/${UUID}` }
-          })
-        ])
-      )
+      ;(fetchAllLocations as jest.Mock).mockResolvedValueOnce([
+        {
+          id: 'other-location-id',
+          name: 'Other Location',
+          locationType: 'ADMIN_STRUCTURE',
+          administrativeAreaId: '2',
+          validUntil: null
+        }
+      ])
       // @ts-ignore
       const isLeafLevelLocation = await resolvers.Query!.isLeafLevelLocation(
         {},

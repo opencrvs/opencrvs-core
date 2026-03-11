@@ -9,41 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  resourceIdentifierToUUID,
-  SavedLocation
-} from '@opencrvs/commons/types'
 import { GQLResolver } from '@gateway/graphql/schema'
-import { fetchAllLocations, fetchLocationChildren } from '@gateway/location'
+import { fetchAllLocations } from '@gateway/location'
 import { UUID } from '@opencrvs/commons'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async isLeafLevelLocation(_, { locationId }) {
-      let children: SavedLocation[]
+    async isLeafLevelLocation(_, { locationId }, { headers: authHeader }) {
+      const allAdminLocations = await fetchAllLocations(authHeader)
+
       /*
-       * This is because of a tech debt we have that
-       * there is no location resource created for the
-       * country so we have a bunch of places where we
-       * need to manually check if the id equals '0'
+       * The country has no location record in the database, so '0' is used
+       * as a virtual ID to represent it. Top-level administrative areas
+       * (direct children of the country) have no parent admin area, which
+       * is represented as administrativeAreaId === null.
        */
-      if (locationId === '0') {
-        children = await fetchAllLocations()
-      } else {
-        children = await fetchLocationChildren(locationId as UUID)
-      }
-      /*
-       * We want to consider only the admin structure locations
-       * here & not the offices or addresses that might have the
-       * given location as a parent
-       */
-      const administrativeChildLocation = children.filter(
-        (child) =>
-          child.type?.coding?.some(({ code }) => code === 'ADMIN_STRUCTURE') &&
-          child.partOf &&
-          resourceIdentifierToUUID(child.partOf.reference) === locationId
+      const administrativeChildLocation = allAdminLocations.filter((child) =>
+        locationId === '0'
+          ? child.administrativeAreaId === null
+          : child.administrativeAreaId === (locationId as UUID)
       )
-      return administrativeChildLocation.length == 0
+
+      return administrativeChildLocation.length === 0
     }
   }
 }
