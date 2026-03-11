@@ -662,7 +662,10 @@ describe('Declare action - hidden field nullification', () => {
     test('accepts hidden field with null value (intentional clearing)', async () => {
       const client = createTestClient(user, [
         ...TEST_USER_DEFAULT_SCOPES,
-        'search[event=tennis-club-membership,access=my-jurisdiction]'
+        encodeScope({
+          type: 'record.search',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
       ])
 
       const payload = generator.event.actions.declare(eventId, {

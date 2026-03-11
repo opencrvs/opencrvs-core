@@ -297,10 +297,10 @@ describe('Search index should reflect corrected null informant fields', () => {
     ]
   })
 
-  const modifiedV2BirthEvent = defineConfig({
-    ...v2BirthEvent,
+  const modifiedChildOnboardingEvent = defineConfig({
+    ...ChildOnboardingEvent,
     actions: [
-      ...v2BirthEvent.actions,
+      ...ChildOnboardingEvent.actions,
       {
         type: ActionType.REQUEST_CORRECTION,
         label: generateTranslationConfig('Correct record'),
@@ -311,17 +311,17 @@ describe('Search index should reflect corrected null informant fields', () => {
       }
     ],
     declaration: defineDeclarationForm({
-      ...v2BirthEvent.declaration,
-      pages: [...v2BirthEvent.declaration.pages, informant]
+      ...ChildOnboardingEvent.declaration,
+      pages: [...ChildOnboardingEvent.declaration.pages, informant]
     })
   })
   it('should not return record when searching by informant.name after correction sets it to null', async () => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
-        return HttpResponse.json([modifiedV2BirthEvent])
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
+        return HttpResponse.json([modifiedChildOnboardingEvent])
       }),
       http.post(
-        `${env.COUNTRY_CONFIG_URL}/trigger/events/v2-birth/actions/:action`,
+        `${env.COUNTRY_CONFIG_URL}/trigger/events/child-onboarding/actions/:action`,
         (ctx) => {
           const payload =
             ctx.params.action === ActionType.REGISTER
@@ -344,23 +344,27 @@ describe('Search index should reflect corrected null informant fields', () => {
       'mother.idType': 'NID',
       'mother.nid': 'ID123456789',
       'informant.relation': 'FATHER',
-      'informant.name': { firstname: 'Rok', surname: 'Doe' }
+      'informant.name': { firstname: 'Rok', surname: 'Doe' },
+      'child.placeOfBirth': 'PRIVATE_HOME',
+      'child.birthLocation.privateHome': {
+        country: 'FAR',
+        addressType: 'DOMESTIC' as const,
+        administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+      }
     } satisfies EventState
 
-    // 1) Create -> Declare -> Validate -> Register
+    // 1) Create -> Declare -> Register
     let event = await client.event.create(
-      generator.event.create({ type: BIRTH_EVENT })
+      generator.event.create({ type: CHILD_ONBOARDING_EVENT })
+    )
+
+    await createIndex(
+      getEventIndexName(CHILD_ONBOARDING_EVENT),
+      getDeclarationFields(modifiedChildOnboardingEvent)
     )
 
     event = await client.event.actions.declare.request(
       generator.event.actions.declare(event.id, {
-        declaration,
-        keepAssignment: true
-      })
-    )
-
-    await client.event.actions.validate.request(
-      generator.event.actions.validate(event.id, {
         declaration,
         keepAssignment: true
       })
@@ -374,7 +378,7 @@ describe('Search index should reflect corrected null informant fields', () => {
     )
 
     // sanity
-    let eventState = getCurrentEventState(event, modifiedV2BirthEvent)
+    let eventState = getCurrentEventState(event, modifiedChildOnboardingEvent)
     expect(eventState.declaration['informant.name']).toEqual({
       firstname: 'Rok',
       surname: 'Doe'
@@ -390,7 +394,7 @@ describe('Search index should reflect corrected null informant fields', () => {
           type: 'and',
           clauses: [
             {
-              eventType: BIRTH_EVENT,
+              eventType: CHILD_ONBOARDING_EVENT,
               data: {
                 'informant.name': { type: 'fuzzy', term: 'Rok' }
               }
@@ -422,7 +426,7 @@ describe('Search index should reflect corrected null informant fields', () => {
       })
     )
 
-    eventState = getCurrentEventState(event, modifiedV2BirthEvent)
+    eventState = getCurrentEventState(event, modifiedChildOnboardingEvent)
     expect(eventState.declaration['informant.name']).toBeUndefined()
 
     // 5) Now searching by informant.name should NOT return the record
@@ -432,7 +436,7 @@ describe('Search index should reflect corrected null informant fields', () => {
           type: 'and',
           clauses: [
             {
-              eventType: BIRTH_EVENT,
+              eventType: CHILD_ONBOARDING_EVENT,
               data: {
                 'informant.name': { type: 'fuzzy', term: 'Rok' }
               }
@@ -450,7 +454,7 @@ describe('Search index should reflect corrected null informant fields', () => {
           type: 'and',
           clauses: [
             {
-              eventType: BIRTH_EVENT,
+              eventType: CHILD_ONBOARDING_EVENT,
               data: {
                 'child.dob': { type: 'exact', term: '2020-05-15' }
               }

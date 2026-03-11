@@ -2,7 +2,7 @@
 
 exports[`Prevents adding birth date in future 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2040-02-01"}]]`;
 
-exports[`Register action - hidden field nullification > Invalid keys scenarios > rejects hidden field from conditional page during registration 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"applicant.age","value":19},{"message":"Hidden or disabled field should not receive a value","id":"senior-pass.id","value":"1234567890"}]]`;
+exports[`Register action - hidden field nullification > Invalid keys scenarios > rejects hidden field from conditional page during registration 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"senior-pass.id","value":"1234567890"}]]`;
 
 exports[`Register action - hidden field nullification > Invalid keys scenarios > rejects hidden field with non-null value during registration 1`] = `[TRPCError: [{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.firstname","value":"Jane"},{"message":"Hidden or disabled field should not receive a value","id":"recommender.name.surname","value":"Smith"}]]`;
 

@@ -174,9 +174,14 @@ function validateDeclarationUpdateAction({
     context
   )
 
-  // 4. When completeDeclaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // 4. When the submitted declaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // Only check keys from declarationUpdate (the client's input), not fields inherited from the previous state
+  // that may have become hidden due to changes in the current update.
+  const declarationUpdateOnlyComplete = Object.fromEntries(
+    Object.entries(completeDeclaration).filter(([key]) => key in declarationUpdate)
+  )
   const invalidKeys = getInvalidUpdateKeys({
-    update: completeDeclaration,
+    update: declarationUpdateOnlyComplete,
     cleaned: cleanedDeclaration
   })
 

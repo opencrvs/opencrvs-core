@@ -108,4 +108,4 @@ test('Check scopes against event.actions.register', async () => {
     }),
     { numRuns: 20 }
   )
-})
+}, 120000)

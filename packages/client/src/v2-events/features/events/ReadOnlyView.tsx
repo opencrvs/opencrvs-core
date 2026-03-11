@@ -82,7 +82,10 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       .reduce<EventState>(
         (acc, actionConfig) => ({
           ...acc,
-          ...getAnnotationForActionType({ event, actionType: actionConfig.type })
+          ...getAnnotationForActionType({
+            event,
+            actionType: actionConfig.type
+          })
         }),
         {}
       )
