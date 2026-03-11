@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 
-import { within, userEvent, expect, waitFor } from '@storybook/test'
+import { within, userEvent, expect, waitFor, fireEvent } from '@storybook/test'
 import { Outlet } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
 import {
@@ -115,24 +115,25 @@ export const NoTemplateAvailable: Story = {
         ]
       }
     }
-  }
-  // play: async ({ canvasElement, step }) => {
-  //   const canvas = within(canvasElement)
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
 
-  //   await step(
-  //     'Click Certification Type and find no options message',
-  //     async () => {
-  //       await userEvent.click(
-  //         await canvas.findByTestId('select__certificateTemplateId')
-  //       )
-  //       await expect(
-  //         await canvas.findByText(
-  //           'No template available for this event, contact Admin'
-  //         )
-  //       ).toBeVisible()
-  //     }
-  //   )
-  // }
+    await step(
+      'Click Certification Type and find no options message',
+      async () => {
+        const selectControl = await canvas.findByTestId(
+          'select__certificateTemplateId'
+        )
+        await fireEvent.mouseDown(selectControl)
+        await expect(
+          await canvas.findByText(
+            'No template available for this event, contact Admin'
+          )
+        ).toBeInTheDocument()
+      }
+    )
+  }
 }
 
 export const ContinuingAndGoingBack: Story = {
