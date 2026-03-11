@@ -17,6 +17,7 @@ import {
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
   encodeScope,
+  getUUID,
   getDeclarationFields
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -39,8 +40,12 @@ test('Check scopes against event.getDuplicates', async () => {
     await setupScopeTestFixture(
       1243453343,
       fc.constantFrom(
-        [ActionTypes.enum.DECLARE],
-        [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
+        [ActionTypes.enum.DECLARE, ActionTypes.enum.UNASSIGN],
+        [
+          ActionTypes.enum.DECLARE,
+          ActionTypes.enum.REGISTER,
+          ActionTypes.enum.UNASSIGN
+        ]
       )
     )
 
@@ -92,12 +97,22 @@ test('Check scopes against event.getDuplicates', async () => {
 
       let result: { success: boolean; event: EventDocument }
       try {
-        // 1. Perform the action with the given test client.
+        // 1. assign to user
+        await expect(
+          testClient.event.actions.assignment.assign({
+            eventId,
+            transactionId: getUUID(),
+            assignedTo: user.id,
+            type: ActionTypes.enum.ASSIGN
+          })
+        ).resolves.not.toThrow()
+
+        // 2. Perform the action with the given test client.
         await testClient.event.getDuplicates({
           eventId
         })
 
-        // 1.1. getDuplicates does not return the event itself, so we need to fetch it with a client that has access to all events to verify the results later.
+        // 2.1. getDuplicates does not return the event itself, so we need to fetch it with a client that has access to all events to verify the results later.
         const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
           eventId
         })
@@ -120,7 +135,6 @@ test('Check scopes against event.getDuplicates', async () => {
         isUnderAdministrativeArea,
         ...options
       })
-    }),
-    { numRuns: 40 }
+    })
   )
 })
