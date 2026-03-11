@@ -120,16 +120,6 @@ vi.mock('@client/forms/conditionals', async () => {
   }
 })
 
-vi.mock('@client/forms/validators', async () => {
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const actual = (await vi.importActual('@client/forms/validators')) as any
-  return {
-    ...actual,
-    validators: await vi.importActual('@client/utils/validate'),
-    initValidators: () => Promise.resolve()
-  }
-})
-
 vi.mock('@client/forms/handlebarHelpers', async () => {
   const actual = (await vi.importActual(
     '@client/forms/handlebarHelpers'
@@ -214,7 +204,6 @@ vi.doMock(
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
       loadForms: () => Promise.resolve({ forms: mockOfflineData.forms }),
       importConditionals: () => Promise.resolve({}),
-      importValidators: () => Promise.resolve({}),
       importHandlebarHelpers: () => Promise.resolve({})
     }
   })
