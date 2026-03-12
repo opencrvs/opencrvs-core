@@ -63,29 +63,14 @@ export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
 export function configurableEventScopeAllowed(
   scopes: Scope[],
   allowedConfigurableScopes: ConfigurableScopeType[],
-  eventType: string,
-  customActionType?: string
+  eventType: string
 ) {
   // Find the scopes that are authorized for the given action
   const parsedScopes = allowedConfigurableScopes.flatMap((scope) =>
     findScopes(scopes, scope)
   )
 
-  if (!customActionType) {
-    const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-    return authorizedEvents.includes(eventType)
-  }
-
-  const scopesWithCorrectCustomActionType = parsedScopes.filter(
-    ({ options }) =>
-      'customActionType' in options &&
-      options.customActionType.includes(customActionType as string)
-  )
-
-  const authorizedEvents = getAuthorizedEventsFromScopes(
-    scopesWithCorrectCustomActionType
-  )
-
+  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
   return authorizedEvents.includes(eventType)
 }
 
@@ -108,14 +93,12 @@ export function isActionInScope({
   scopes,
   action,
   event,
-  currentUser,
-  customActionType
+  currentUser
 }: {
   scopes: Scope[]
   action: DisplayableAction
   event: EventIndexWithAdministrativeHierarchy
   currentUser: UserContext
-  customActionType?: string
 }): boolean {
   const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
 
@@ -133,8 +116,7 @@ export function isActionInScope({
     scopes,
     // @ts-expect-error - TODO: remove legacy scopes once evrything is migrated to V2
     allowedConfigurableScopes,
-    event.type,
-    customActionType
+    event.type
   )
 
   // @TODO

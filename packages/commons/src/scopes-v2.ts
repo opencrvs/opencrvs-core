@@ -391,15 +391,9 @@ function isCustomActionScope(
 /**
  * Checks if a custom action is allowed based on the provided scopes, event type, and custom action type.
  *
- * This function evaluates whether at least one of the user's scopes permits the specified custom action
- * for the given event type. It considers scopes of type 'record.custom-action', and checks that:
- *   - If the scope has an event filter, the event type must match one of its allowed events.
- *   - If the scope has a customActionTypes filter, the custom action type must be included.
- *   - If filters are not present, it is considered unrestricted in that respect.
- *
- * @param {string[]} scopes - The scope strings (typically from JWT or user context).
- * @param {string} eventType - The type of the event to check permission against.
- * @param {string} customActionType - The custom action type for which authorization is checked.
+ * @param {string[]} scopes - The plain scope strings
+ * @param {string} eventType - The type of the event to check permission against
+ * @param {string} customActionType - The custom action type for which authorization is checked
  * @returns {boolean} True if the action is allowed by any matching 'record.custom-action' scope, otherwise false.
  */
 export function customActionIsAllowed(
