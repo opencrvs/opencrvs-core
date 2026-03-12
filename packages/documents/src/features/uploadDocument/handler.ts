@@ -88,11 +88,12 @@ export async function fileExistsHandler(
 ) {
   // Ensure file is still in the desired format. forwarding url from gateway,
   // '/files/{filePath*}' --> files//filename.jpg and the double slash is removed.
-  const filePath = DocumentPath.parse(request.params.filePath)
+  const documentPath = request.params.filePath
+    ?.replace(/^\/?ocrvs\//, '')
+    .replace(/^\/+/, '')
 
   let stat
 
-  const documentPath = filePath
   try {
     stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
   } catch (error) {

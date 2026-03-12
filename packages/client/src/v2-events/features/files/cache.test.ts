@@ -10,6 +10,7 @@
  */
 import {
   ActionType,
+  DocumentPath,
   generateActionDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -26,7 +27,7 @@ describe('getFilepathsFromActionDocument', () => {
         },
         declarationOverrides: {
           'applicant.image': {
-            path: 'image.jpg',
+            path: 'image.jpg' as DocumentPath,
             originalFilename: 'dp.jpg',
             type: 'jpg'
           }

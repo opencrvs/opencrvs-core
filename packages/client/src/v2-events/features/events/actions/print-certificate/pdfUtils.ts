@@ -35,7 +35,8 @@ import {
   AdministrativeArea,
   getActionAnnotationFields,
   FieldUpdateValue,
-  FieldConfig
+  FieldConfig,
+  DocumentPath
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -216,7 +217,8 @@ export const stringifyEventMetadata = ({
             createdBySignature: metadata.legalStatuses.REGISTERED
               .createdBySignature
               ? getUnsignedFileUrl(
-                  metadata.legalStatuses.REGISTERED.createdBySignature
+                  metadata.legalStatuses.REGISTERED
+                    .createdBySignature as DocumentPath
                 )
               : undefined
           }

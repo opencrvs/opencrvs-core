@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid'
 import { useParams } from 'react-router-dom'
 import {
   DocumentPath,
+  FullDocumentPath,
   joinUrlPaths,
   joinValues
 } from '@opencrvs/commons/client'
@@ -101,7 +102,7 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(filePath: DocumentPath) {
+async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
   const url = joinUrlPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {
@@ -115,7 +116,7 @@ async function getPresignedUrl(filePath: DocumentPath) {
   return res
 }
 
-export async function precacheFile(path: DocumentPath) {
+export async function precacheFile(path: DocumentPath | FullDocumentPath) {
   const presignedUrl = (await getPresignedUrl(path)).presignedURL
 
   const file = await fetchFileFromUrl(presignedUrl, path)
@@ -196,7 +197,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     mutationFn: deleteFile,
     mutationKey: [DELETE_MUTATION_KEY, fieldId],
     onSuccess: (data, { filename }) => {
-      void removeCached(filename)
+      void removeCached(filename as DocumentPath)
     }
   })
 

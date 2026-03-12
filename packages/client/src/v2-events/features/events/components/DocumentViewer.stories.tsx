@@ -46,38 +46,38 @@ export const EmptyDocumentViewer: StoryObj<typeof DocumentViewer> = {
 
 const form = {
   'documents.one': {
-    path: 'tree.svg' as DocumentPath,
+    path: 'files/tree.svg' as DocumentPath,
     originalFilename: 'tree.svg',
     type: 'image/svg+xml'
   },
   'documents.two': [
     {
-      path: 'fish.svg' as DocumentPath,
+      path: 'files/fish.svg' as DocumentPath,
       originalFilename: 'fish.svg',
       type: 'image/svg+xml',
       option: 'NATIONAL_ID'
     },
     {
-      path: 'mountain.svg' as DocumentPath,
+      path: 'files/mountain.svg' as DocumentPath,
       originalFilename: 'mountain.svg',
       type: 'image/svg+xml',
       option: 'PASSPORT'
     },
     {
-      path: 'tree.svg' as DocumentPath,
+      path: 'files/tree.svg' as DocumentPath,
       originalFilename: 'tree.svg',
       type: 'image/svg+xml',
       option: 'BIRTH_REGISTRATION_NUMBER'
     },
     {
-      path: 'fish.svg' as DocumentPath,
+      path: 'files/fish.svg' as DocumentPath,
       originalFilename: 'fish.svg',
       type: 'image/svg+xml',
       option: 'NONE'
     }
   ],
   'documents.three': {
-    path: 'tree.svg' as DocumentPath,
+    path: 'files/tree.svg' as DocumentPath,
     originalFilename: 'tree.svg',
     type: 'image/svg+xml'
   }
@@ -167,25 +167,25 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
 
     const duplicateDocuments = [
       {
-        path: 'fish.svg' as DocumentPath,
+        path: 'files/fish.svg' as DocumentPath,
         originalFilename: 'fish.svg',
         type: 'image/svg+xml',
         option: 'NATIONAL_ID'
       },
       {
-        path: 'mountain.svg' as DocumentPath,
+        path: 'files/mountain.svg' as DocumentPath,
         originalFilename: 'mountain.svg',
         type: 'image/svg+xml',
         option: 'PASSPORT'
       },
       {
-        path: 'tree.svg' as DocumentPath,
+        path: 'files/tree.svg' as DocumentPath,
         originalFilename: 'tree.svg',
         type: 'image/svg+xml',
         option: 'BIRTH_REGISTRATION_NUMBER'
       },
       {
-        path: 'fish.svg' as DocumentPath,
+        path: 'files/fish.svg' as DocumentPath,
         originalFilename: 'fish.svg',
         type: 'image/svg+xml',
         option: 'NONE'
@@ -196,7 +196,7 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
       'documents.one': duplicateDocuments,
       'documents.two': duplicateDocuments,
       'documents.three': {
-        path: 'tree.svg' as DocumentPath,
+        path: 'files/tree.svg' as DocumentPath,
         originalFilename: 'tree.svg',
         type: 'image/svg+xml'
       }

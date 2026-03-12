@@ -17,27 +17,32 @@ import {
   FileFieldWithOptionValue
 } from '@opencrvs/commons'
 
-/**
- * Normalizes all file paths in an EventDocument to use DocumentPath format
- * (without bucket prefix). This handles old data stored with FullDocumentPath.
- */
-export function normalizeEventDocumentPaths(
-  event: EventDocument
-): EventDocument {
-  return {
-    ...event,
-    actions: event.actions.map(normalizeActionPaths)
-  }
-}
+function normalizeFieldPaths(
+  fields: Record<string, unknown>
+): Record<string, unknown> {
+  const normalized: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(fields)) {
+    const fileParsed = FileFieldValue.safeParse(value)
+    if (fileParsed.success) {
+      normalized[key] = {
+        ...fileParsed.data,
+        path: ensureDocumentPath(fileParsed.data.path)
+      }
+      continue
+    }
 
-/**
- * Normalizes all file paths in a Draft to use DocumentPath format.
- */
-export function normalizeDraftPaths(draft: Draft): Draft {
-  return {
-    ...draft,
-    action: normalizeActionPaths(draft.action)
+    const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
+    if (fileOptionParsed.success) {
+      normalized[key] = fileOptionParsed.data.map((v) => ({
+        ...v,
+        path: ensureDocumentPath(v.path)
+      }))
+      continue
+    }
+
+    normalized[key] = value
   }
+  return normalized
 }
 
 function normalizeActionPaths<T extends Record<string, unknown>>(action: T): T {
@@ -67,30 +72,25 @@ function normalizeActionPaths<T extends Record<string, unknown>>(action: T): T {
   return result as T
 }
 
-function normalizeFieldPaths(
-  fields: Record<string, unknown>
-): Record<string, unknown> {
-  const normalized: Record<string, unknown> = {}
-  for (const [key, value] of Object.entries(fields)) {
-    const fileParsed = FileFieldValue.safeParse(value)
-    if (fileParsed.success) {
-      normalized[key] = {
-        ...fileParsed.data,
-        path: ensureDocumentPath(fileParsed.data.path)
-      }
-      continue
-    }
-
-    const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
-    if (fileOptionParsed.success) {
-      normalized[key] = fileOptionParsed.data.map((v) => ({
-        ...v,
-        path: ensureDocumentPath(v.path)
-      }))
-      continue
-    }
-
-    normalized[key] = value
+/**
+ * Normalizes all file paths in an EventDocument to use DocumentPath format
+ * (without bucket prefix). This handles old data stored with FullDocumentPath.
+ */
+export function normalizeEventDocumentPaths(
+  event: EventDocument
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.map(normalizeActionPaths)
   }
-  return normalized
+}
+
+/**
+ * Normalizes all file paths in a Draft to use DocumentPath format.
+ */
+export function normalizeDraftPaths(draft: Draft): Draft {
+  return {
+    ...draft,
+    action: normalizeActionPaths(draft.action)
+  }
 }

@@ -45,7 +45,7 @@ export const DocumentViewerSingleOption: StoryObj<typeof DocumentViewer> = {
       {
         value: {
           filename: 'fish.svg',
-          url: getUnsignedFileUrl('fish.svg' as DocumentPath),
+          url: getUnsignedFileUrl('files/fish.svg' as DocumentPath),
           id: '1'
         },
         label: 'Option 1'

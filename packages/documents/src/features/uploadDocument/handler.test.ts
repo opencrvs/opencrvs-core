@@ -101,6 +101,64 @@ describe('fileExistsHandler', () => {
 
     expect(res.statusCode).toBe(200)
   })
+
+  it('Handles missing bucket from file paths with multiple directories', async () => {
+    const path = 'event-12345'
+    const transactionId = 'transaction-12345'
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url: `/files/${path}/${transactionId}.txt`,
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    const [bucket, filename] = minioStatMock.mock.calls[0]
+    expect(bucket).toBe(MINIO_BUCKET)
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('Handles missing bucket from file', async () => {
+    const path = 'event-12345'
+    const transactionId = 'transaction-12345'
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url: `/files/${path}/${transactionId}.txt`,
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    const [bucket, filename] = minioStatMock.mock.calls[0]
+    expect(bucket).toBe(MINIO_BUCKET)
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('handles explicit "/" without bucket as start of of file path', async () => {
+    const path = 'event-12345'
+    const transactionId = 'transaction-12345'
+
+    const res = await server.server.inject({
+      method: 'GET',
+      // double slash is handled
+      url: `/files//${path}/${transactionId}.txt`,
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    const [bucket, filename] = minioStatMock.mock.calls[0]
+    expect(bucket).toBe(MINIO_BUCKET)
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
+    expect(res.statusCode).toBe(200)
+  })
 })
 
 describe('fileUploadHandler', () => {

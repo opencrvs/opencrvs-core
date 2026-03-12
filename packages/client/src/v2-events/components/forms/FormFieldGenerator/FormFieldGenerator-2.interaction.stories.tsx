@@ -24,7 +24,8 @@ import {
   EventState,
   generateTranslationConfig,
   user,
-  UUID
+  UUID,
+  DocumentPath
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -127,7 +128,7 @@ const fields = [
     type: FieldType.FILE,
     label: generateTranslationConfig('Applicant Photo'),
     defaultValue: {
-      path: '/uploads/photo.png',
+      path: '/uploads/photo.png' as DocumentPath,
       type: 'image/png',
       originalFilename: 'profile.png'
     },
@@ -240,7 +241,7 @@ const fields = [
     ],
     defaultValue: [
       {
-        path: '/uploads/nid.png',
+        path: '/uploads/nid.png' as DocumentPath,
         type: 'image/png',
         originalFilename: 'nid.png',
         option: 'nidCopy'
@@ -405,7 +406,7 @@ const declaration = {
   'applicant.age': 30,
   'applicant.bio': 'Short biography about the applicant...',
   'applicant.photo': {
-    path: '/uploads/photo.png',
+    path: '/uploads/photo.png' as DocumentPath,
     type: 'image/png',
     originalFilename: 'profile.png'
   },
@@ -423,7 +424,7 @@ const declaration = {
   },
   'applicant.documents': [
     {
-      path: '/uploads/nid.png',
+      path: '/uploads/nid.png' as DocumentPath,
       type: 'image/png',
       originalFilename: 'nid.png',
       option: 'nidCopy'

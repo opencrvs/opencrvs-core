@@ -15,7 +15,8 @@ import {
   FileFieldValue,
   MimeType,
   File as FileConfig,
-  SignatureField as SignatureFieldConfig
+  SignatureField as SignatureFieldConfig,
+  DocumentPath
 } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
@@ -94,7 +95,7 @@ function FileInput({
     }
 
     setFile({
-      path: processedFile.name,
+      path: processedFile.name as DocumentPath,
       originalFilename: processedFile.name,
       type: processedFile.type
     })
