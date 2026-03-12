@@ -459,7 +459,7 @@ function AddressOutput({
 }: {
   value?: AddressFieldValue
   lineSeparator?: React.ReactNode
-  configuration?: AddressField
+  configuration: AddressField
 }) {
   const validatorContext = useValidatorContext()
   const { getLocations } = useLocations()
@@ -469,7 +469,7 @@ function AddressOutput({
   const { config } = useSelector(getOfflineData)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
 
-  if (!value || !configuration) {
+  if (!value) {
     return ''
   }
 
