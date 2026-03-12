@@ -88,7 +88,7 @@ export const eventRouter = router({
           tags: ['events']
         }
       })
-      .mutation(({ ctx }) => {
+      .mutation(async ({ ctx }) => {
         void reindex(ctx.token).catch((err) => {
           logger.error(`Reindex failed ${err.message}`)
         })
