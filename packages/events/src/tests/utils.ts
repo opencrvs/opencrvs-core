@@ -119,7 +119,6 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  SCOPES.SEARCH_BIRTH,
   'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
   encodeScope({
     type: 'record.read',
@@ -187,7 +186,12 @@ export const TEST_USER_DEFAULT_SCOPES = [
       event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
     }
   }),
-  'record.unassign-others[event=birth|death|tennis-club-membership|child-onboarding]'
+  encodeScope({
+    type: 'record.unassign-others',
+    options: {
+      event: ['birth', 'death', 'tennis-club-membership', 'child-onboarding']
+    }
+  })
 ]
 
 export function createTestToken({

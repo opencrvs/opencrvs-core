@@ -458,7 +458,17 @@ export function testDataGenerator(rngSeed?: number) {
             ]
           }
         }),
-        'record.unassign-others[event=birth|death|tennis-club-membership|child-onboarding]',
+        encodeScope({
+          type: 'record.unassign-others',
+          options: {
+            event: [
+              'birth',
+              'death',
+              'tennis-club-membership',
+              'child-onboarding'
+            ]
+          }
+        }),
         encodeScope({
           type: 'record.review-duplicates',
           options: {
