@@ -16,13 +16,6 @@ export const fetchLocation = async (id: UUID, authHeader: IAuthHeader) => {
   return api.locations.get.query({ id }, { context: { headers: authHeader } })
 }
 
-export const fetchAllLocations = async (authHeader: IAuthHeader) => {
-  return api.locations.list.query(
-    { locationType: 'ADMIN_STRUCTURE' },
-    { context: { headers: authHeader } }
-  )
-}
-
 export const fetchLocationHierarchy = async (
   id: UUID,
   authHeader: IAuthHeader

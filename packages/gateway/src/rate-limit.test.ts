@@ -22,10 +22,6 @@ const resolvers = rootResolvers as any
 
 let container: StartedTestContainer
 
-jest.mock('@gateway/location', () => ({
-  fetchAllLocations: jest.fn().mockResolvedValue([])
-}))
-
 jest.mock('./constants', () => {
   const originalModule = jest.requireActual('./constants')
   return {
