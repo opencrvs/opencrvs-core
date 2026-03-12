@@ -6340,10 +6340,10 @@ components:
               type: object
               properties:
                 path:
-                  effectType: input
+                  description: A full identifier starting from the root of the S3 bucket, e.g.
+                    /document-id.jpg or /directory/document-id.jpg but never
+                    /bucket-name/document-id.jpg
                   type: string
-                  description: A full absolute path with bucket name, starting from the root of
-                    the S3 server, /bucket-name/document-id.jpg
                 originalFilename:
                   type: string
                 type:
@@ -8137,10 +8137,10 @@ components:
                 type: object
                 properties:
                   path:
-                    effectType: input
+                    description: A full identifier starting from the root of the S3 bucket, e.g.
+                      /document-id.jpg or /directory/document-id.jpg but never
+                      /bucket-name/document-id.jpg
                     type: string
-                    description: A full absolute path with bucket name, starting from the root of
-                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -15053,10 +15053,10 @@ components:
                   - type: object
                     properties:
                       path:
-                        effectType: input
+                        description: A full identifier starting from the root of the S3 bucket, e.g.
+                          /document-id.jpg or /directory/document-id.jpg but
+                          never /bucket-name/document-id.jpg
                         type: string
-                        description: A full absolute path with bucket name, starting from the root of
-                          the S3 server, /bucket-name/document-id.jpg
                       originalFilename:
                         type: string
                       type:
@@ -15071,10 +15071,10 @@ components:
                       type: object
                       properties:
                         path:
-                          effectType: input
+                          description: A full identifier starting from the root of the S3 bucket, e.g.
+                            /document-id.jpg or /directory/document-id.jpg but
+                            never /bucket-name/document-id.jpg
                           type: string
-                          description: A full absolute path with bucket name, starting from the root of
-                            the S3 server, /bucket-name/document-id.jpg
                         originalFilename:
                           type: string
                         type:
@@ -15296,10 +15296,11 @@ components:
                             - type: object
                               properties:
                                 path:
-                                  effectType: input
+                                  description: A full identifier starting from the root of the S3 bucket, e.g.
+                                    /document-id.jpg or
+                                    /directory/document-id.jpg but never
+                                    /bucket-name/document-id.jpg
                                   type: string
-                                  description: A full absolute path with bucket name, starting from the root of
-                                    the S3 server, /bucket-name/document-id.jpg
                                 originalFilename:
                                   type: string
                                 type:
@@ -15314,11 +15315,11 @@ components:
                                 type: object
                                 properties:
                                   path:
-                                    effectType: input
-                                    type: string
-                                    description: A full absolute path with bucket name, starting from the root of
-                                      the S3 server,
+                                    description: A full identifier starting from the root of the S3 bucket, e.g.
+                                      /document-id.jpg or
+                                      /directory/document-id.jpg but never
                                       /bucket-name/document-id.jpg
+                                    type: string
                                   originalFilename:
                                     type: string
                                   type:
