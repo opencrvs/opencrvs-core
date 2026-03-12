@@ -148,10 +148,9 @@ export const DraftAnnotationEmptyHidesSection: Story = {
     reviewFields: [annotationTextField],
     annotation: undefined
   },
-  play: async ({ canvasElement }) => {
+  play: ({ canvasElement }) => {
     const canvas = within(canvasElement)
-
     const annotationHeadings = canvas.queryAllByText('Comment')
-    expect(annotationHeadings).toHaveLength(0)
+    void expect(annotationHeadings).toHaveLength(0)
   }
 }
