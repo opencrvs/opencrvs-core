@@ -41,6 +41,8 @@ async function reindexBatchToCountryConfig(
   token: TokenWithBearer,
   batch: EventDocument[]
 ): Promise<void> {
+  const start = new Date()
+
   const response = await fetch(new URL('/reindex', env.COUNTRY_CONFIG_URL), {
     method: 'POST',
     headers: {
@@ -49,7 +51,7 @@ async function reindexBatchToCountryConfig(
     },
     body: JSON.stringify(batch)
   })
-
+  logger.info(`Batch ${batch[0].id}: Reindex batch to country config took ${new Date().valueOf() - start.valueOf()} ms`)
   if (!response.ok) {
     throw new Error(
       `Failed to reindex country config batch: ${response.status} ${response.statusText}`
@@ -76,9 +78,10 @@ async function reindexSearch(
     if (buffer.length === 0) {
       return
     }
+    const start = new Date()
     const batch = buffer
     buffer = []
-    logger.info(`Reindexing ${batch.length} events`)
+    logger.info(`Batch ${batch[0].id}: ${batch.length} events to index`)
 
     await Promise.all([
       indexEventsInBulk(batch, configurations, indexNameOverrides),
@@ -86,6 +89,8 @@ async function reindexSearch(
     ])
 
     await onBatchProcessed?.(batch.length)
+    const id = batch[0].id
+    logger.info(`Batch ${id}: Processing batch took ${new Date().valueOf() - start.valueOf()} ms`)
   }
 
   return new Transform({
@@ -146,6 +151,7 @@ export async function runReindex(token: TokenWithBearer) {
     async (batchSize) => {
       processedCount += batchSize
       await updateReindexingProgress(runId, processedCount)
+      logger.info(`Reindex total records processed: ${processedCount}. Per second: ${Math.round(processedCount / ((new Date().valueOf() - start.valueOf()) / 1000))}`)
     }
   )
 

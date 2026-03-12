@@ -11,6 +11,7 @@
 
 import * as z from 'zod/v4'
 import { getScopes, getUUID, SCOPES } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -87,7 +88,11 @@ export const eventRouter = router({
           tags: ['events']
         }
       })
-      .mutation(({ ctx }) => reindex(ctx.token)),
+      .mutation(({ ctx }) => {
+        void reindex(ctx.token).catch((err) => {
+          logger.error(`Reindex failed ${err.message}`)
+        })
+      }),
     status: userAndSystemProcedure
       .meta({
         openapi: {

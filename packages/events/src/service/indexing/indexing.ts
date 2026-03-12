@@ -382,6 +382,8 @@ export async function indexEventsInBulk(
   const esClient = getOrCreateClient()
 
   const locationHierarchyCache = new Map<string, string[]>()
+  const hiearchyResolutionStarted = new Date()
+
   const indexedDocs = await Promise.all(
     batch.map(async (doc) => {
       const config = getEventConfigById(configs, doc.type)
@@ -405,11 +407,16 @@ export async function indexEventsInBulk(
       ]
     })
   )
+  logger.info(
+    `Batch ${batch[0].id}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms`
+  )
 
   const body = indexedDocs.flat()
-
+  const start = new Date()
   const response = await esClient.bulk({ refresh: false, body })
-
+  logger.info(
+    `Batch ${batch[0].id}: Bulk indexing took ${new Date().valueOf() - start.valueOf()} ms`
+  )
   if (response.errors) {
     const failures = response.items
       .filter((item) => item.index?.error)
