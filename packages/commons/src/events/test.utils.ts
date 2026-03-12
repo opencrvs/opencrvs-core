@@ -263,7 +263,7 @@ function mapFieldTypeToMockValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: 'files/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue

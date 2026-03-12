@@ -488,6 +488,20 @@ export const handlers = {
           'Cache-Control': 'no-cache'
         }
       })
+      u
+    }),
+    http.get('/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+      const response = await cache.match(request.request)
+      if (response) {
+        return response
+      }
+      return new HttpResponse(TestImage.Box, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'no-cache'
+        }
+      })
     })
   ],
   registrationHome: [
