@@ -102,15 +102,15 @@ export const actionIcons: Record<
   [ActionType.ASSIGN]: 'PushPin',
   [ActionType.UNASSIGN]: 'ArrowCircleDown',
   [ActionType.ARCHIVE]: 'Archive',
-  [ActionType.MARK_AS_DUPLICATE]: 'PencilLine',
+  [ActionType.MARK_AS_DUPLICATE]: 'Files',
   [ActionType.DELETE]: 'Trash',
-  [ActionType.DECLARE]: 'PencilLine',
+  [ActionType.DECLARE]: 'PaperPlaneTilt',
   [ActionType.EDIT]: 'PencilLine',
   [ActionType.REJECT]: 'FileX',
-  [ActionType.REGISTER]: 'PencilLine',
+  [ActionType.REGISTER]: 'PenNib',
   [ActionType.PRINT_CERTIFICATE]: 'Printer',
-  [ActionType.REQUEST_CORRECTION]: 'NotePencil',
-  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: 'NotePencil',
+  [ActionType.REQUEST_CORRECTION]: 'PencilCircle',
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: 'FileSearch',
   [ActionType.READ]: 'Eye'
 }
 
