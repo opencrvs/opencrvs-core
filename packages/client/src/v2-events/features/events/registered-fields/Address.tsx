@@ -31,7 +31,8 @@ import {
   LocationType,
   ValidatorContext,
   IndexMap,
-  FormState
+  FormState,
+  FieldConfig
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -129,9 +130,26 @@ function isDomesticAddress() {
   )
 }
 
+function withDisabledConditional<T extends FieldConfig>(
+  field: T,
+  disabled?: boolean
+): T {
+  if (!disabled) {
+    return field
+  }
+  return {
+    ...field,
+    conditionals: [
+      ...(field.conditionals ?? []).filter((cond) => cond.type !== 'ENABLE'),
+      { type: 'ENABLE', conditional: not(alwaysTrue()) }
+    ]
+  }
+}
+
 function generateAddressFields(
   config: AddressField,
-  adminStructure: AdminStructureItem[]
+  adminStructure: AdminStructureItem[],
+  disabled?: boolean
 ): {
   countryField: CountryField
   domesticFields: AdministrativeAreaField[]
@@ -210,15 +228,17 @@ function generateAddressFields(
       configuration
     }
 
-    return field
+    return withDisabledConditional(field, disabled)
   })
 
   const streetAddressFields = config.configuration?.streetAddressForm ?? []
 
   return {
-    countryField,
+    countryField: withDisabledConditional(countryField),
     domesticFields,
-    streetAddressFields
+    streetAddressFields: streetAddressFields.map((f) =>
+      withDisabledConditional(f)
+    )
   }
 }
 
