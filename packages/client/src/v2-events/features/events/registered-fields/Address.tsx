@@ -130,13 +130,7 @@ function isDomesticAddress() {
   )
 }
 
-function withDisabledConditional<T extends FieldConfig>(
-  field: T,
-  disabled?: boolean
-): T {
-  if (!disabled) {
-    return field
-  }
+function withDisabledConditional<T extends FieldConfig>(field: T): T {
   return {
     ...field,
     conditionals: [
@@ -228,16 +222,18 @@ function generateAddressFields(
       configuration
     }
 
-    return withDisabledConditional(field, disabled)
+    return disabled ? withDisabledConditional(field) : field
   })
 
   const streetAddressFields = config.configuration?.streetAddressForm ?? []
 
   return {
-    countryField: withDisabledConditional(countryField),
+    countryField: disabled
+      ? withDisabledConditional(countryField)
+      : countryField,
     domesticFields,
     streetAddressFields: streetAddressFields.map((f) =>
-      withDisabledConditional(f)
+      disabled ? withDisabledConditional(f) : f
     )
   }
 }
@@ -430,7 +426,7 @@ function AddressInput(props: Props) {
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
   const { countryField, domesticFields, streetAddressFields } =
-    generateAddressFields(addressConfig, appConfigAdminLevels)
+    generateAddressFields(addressConfig, appConfigAdminLevels, disabled)
 
   const streetAddressFieldIds = streetAddressFields.map((f) => f.id)
 
