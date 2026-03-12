@@ -27,13 +27,6 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
--- Name: EXTENSION tablefunc; Type: COMMENT; Schema: -; Owner:
---
-
-COMMENT ON EXTENSION tablefunc IS 'functions that manipulate whole tables, including crosstab';
-
-
---
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
 --
 
