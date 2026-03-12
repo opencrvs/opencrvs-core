@@ -13,13 +13,14 @@ import React, { useMemo } from 'react'
 import {
   ActionType,
   EventIndex,
-  configurableEventScopeAllowed,
+  customActionIsAllowed,
   CustomActionConfig,
   getOrThrow,
   isActionEnabled,
   isActionVisible,
   filterActionsByFlags,
-  isValidIcon
+  isValidIcon,
+  getAcceptedScopesByType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
@@ -53,6 +54,18 @@ export function useCustomActionConfigs(event: EventIndex): {
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
+  const hasAnyCustomActionScope = getAcceptedScopesByType({
+    acceptedScopes: ['record.custom-action'],
+    scopes: scopes ?? []
+  })
+
+  if (!hasAnyCustomActionScope) {
+    return {
+      customActionModal: null,
+      customActionConfigs: []
+    }
+  }
+
   const customActionConfigs = useMemo(() => {
     return eventConfiguration.actions
       .filter(
@@ -63,12 +76,7 @@ export function useCustomActionConfigs(event: EventIndex): {
         (action) => filterActionsByFlags([action.type], event.flags).length > 0
       )
       .filter((action) =>
-        configurableEventScopeAllowed(
-          scopes ?? [],
-          ['record.custom-action'],
-          event.type,
-          action.customActionType
-        )
+        customActionIsAllowed(scopes ?? [], event.type, action.customActionType)
       )
       .map((action) => ({
         label: action.label,
@@ -90,19 +98,6 @@ export function useCustomActionConfigs(event: EventIndex): {
     event,
     onCustomAction
   ])
-
-  const hasCustomActionScope = configurableEventScopeAllowed(
-    scopes ?? [],
-    ['record.custom-action'],
-    event.type
-  )
-
-  if (!hasCustomActionScope) {
-    return {
-      customActionModal: null,
-      customActionConfigs: []
-    }
-  }
 
   return { customActionModal, customActionConfigs }
 }
