@@ -47,7 +47,7 @@ export const RecordScopeTypeV2 = z.enum([
   'record.read',
   'record.declare',
   'record.notify',
-  'record.validate',
+  'record.edit',
   'record.reject',
   'record.archive',
   'record.review-duplicates',
@@ -124,7 +124,7 @@ export const ScopesWithPlaceEventOptions = RecordScopeTypeV2.extract([
 ])
 
 export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
-  'record.validate',
+  'record.edit',
   'record.reject',
   'record.archive',
   'record.review-duplicates',

@@ -2153,14 +2153,6 @@ export const handlers = {
     }),
     http.get('/api/countryconfig/handlebars.js', () => {
       return HttpResponse.text('', { status: 404 })
-    }),
-    http.get('/api/countryconfig/validators.js', () => {
-      return HttpResponse.text('export function noop() {}', {
-        status: 200,
-        headers: {
-          'content-type': 'application/javascript'
-        }
-      })
     })
   ],
   config: [

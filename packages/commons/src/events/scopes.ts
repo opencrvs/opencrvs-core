@@ -13,8 +13,6 @@ import {
   ConfigurableScopeType,
   getAuthorizedEventsFromScopes,
   Scope,
-  PrintCertifiedCopiesScope,
-  RecordScopeType,
   findScopes
 } from '../scopes'
 import {
@@ -37,31 +35,26 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.CREATE]: ['record.create'],
   [ActionType.NOTIFY]: ['record.notify'],
   [ActionType.DECLARE]: ['record.declare', 'record.register'],
-  [ActionType.EDIT]: ['record.declared.edit'],
+  [ActionType.EDIT]: ['record.edit'],
   [ActionType.DELETE]: ['record.declare'],
   [ActionType.REGISTER]: ['record.register'],
-  [ActionType.PRINT_CERTIFICATE]: ['record.registered.print-certified-copies'],
+  [ActionType.PRINT_CERTIFICATE]: ['record.print-certified-copies'],
   [ActionType.REQUEST_CORRECTION]: [
-    'record.registered.request-correction',
-    'record.registered.correct'
+    'record.request-correction',
+    'record.correct'
   ],
-  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [
-    'record.registered.correct'
-  ],
-  [ActionType.REJECT_CORRECTION]: ['record.registered.correct'],
-  [ActionType.APPROVE_CORRECTION]: ['record.registered.correct'],
-  [ActionType.MARK_AS_DUPLICATE]: ['record.declared.review-duplicates'],
-  [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.declared.review-duplicates'],
-  [ActionType.ARCHIVE]: ['record.declared.archive'],
-  [ActionType.REJECT]: ['record.declared.reject'],
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: ['record.correct'],
+  [ActionType.REJECT_CORRECTION]: ['record.correct'],
+  [ActionType.APPROVE_CORRECTION]: ['record.correct'],
+  [ActionType.MARK_AS_DUPLICATE]: ['record.review-duplicates'],
+  [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.review-duplicates'],
+  [ActionType.ARCHIVE]: ['record.archive'],
+  [ActionType.REJECT]: ['record.reject'],
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
   [ActionType.DUPLICATE_DETECTED]: [],
   [ActionType.CUSTOM]: []
-} satisfies Record<
-  DisplayableAction,
-  (RecordScopeType | PrintCertifiedCopiesScope['type'])[] | AlwaysAllowed
->
+} satisfies Record<DisplayableAction, RecordScopeTypeV2[] | AlwaysAllowed>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
@@ -138,6 +131,7 @@ export function isActionInScope({
 
   const isAllowedByLegacyScope = configurableEventScopeAllowed(
     scopes,
+    // @ts-expect-error - TODO: remove legacy scopes once evrything is migrated to V2
     allowedConfigurableScopes,
     event.type,
     customActionType

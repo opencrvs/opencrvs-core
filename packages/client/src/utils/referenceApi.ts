@@ -210,15 +210,6 @@ async function loadForms(): Promise<LoadFormsResponse> {
 export type LoadValidatorsResponse = Record<string, Validator>
 const countryconfigBase: string = '/api/countryconfig'
 
-async function importValidators(): Promise<LoadValidatorsResponse> {
-  // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  const validators = await import(
-    /* @vite-ignore */ `${countryconfigBase}/validators.js`
-  )
-
-  return validators
-}
-
 export type LoadConditionalsResponse = Record<string, Conditional>
 async function importConditionals(): Promise<LoadConditionalsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
@@ -320,7 +311,6 @@ export const referenceApi = {
   loadContent,
   loadConfig,
   loadForms,
-  importValidators,
   importConditionals,
   importHandlebarHelpers,
   loadConfigAnonymousUser

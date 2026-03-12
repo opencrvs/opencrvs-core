@@ -19,7 +19,7 @@ import {
   PageTypes,
   getPrintCertificatePages,
   getCurrentEventState,
-  isFieldVisible,
+  isFieldDisplayedOnReview,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment } from '@opencrvs/components'
@@ -71,7 +71,7 @@ export function PrintCertificate({
 
   const content = formPages.flatMap((page) => {
     const fields = page.fields
-      .filter((f) => isFieldVisible(f, annotation, validatorContext))
+      .filter((f) => isFieldDisplayedOnReview(f, annotation, validatorContext))
       .filter((f) => !isEmptyValue(f, annotation[f.id]))
       .map((field) => {
         const valueDisplay = (
