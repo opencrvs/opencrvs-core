@@ -147,14 +147,7 @@ export const resolvers: GQLResolver = {
             ...authHeader
           }
         })
-        const data = await res.json()
-        // do not need to send super admin user details to resolvers
-        return {
-          ...data,
-          results: data.results?.filter(
-            (user: IUserModelData) => user.role !== 'SUPER_ADMIN'
-          )
-        }
+        return res.json()
       }
     ),
 
