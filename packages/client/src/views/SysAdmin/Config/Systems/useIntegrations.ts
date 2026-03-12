@@ -13,7 +13,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTRPC, trpcClient } from '@client/v2-events/trpc'
 import { SCOPES, encodeScope, RecordScopeTypeV2 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { UUID } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons/client'
 
 /** Data shape returned by integrations.list */
 export interface IntegrationItem {
@@ -21,6 +21,8 @@ export interface IntegrationItem {
   name: string
   scopes: string[]
   status: string
+  createdAt: string
+  createdByName: string | null
 }
 
 /** Data shape returned by integrations.create */

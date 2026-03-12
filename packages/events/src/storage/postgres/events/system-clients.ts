@@ -43,7 +43,7 @@ export async function listSystemClients(
   const db = trx ?? getClient()
   let query = db
     .selectFrom('systemClients')
-    .select(['id', 'name', 'scopes', 'status', 'legacyId'])
+    .select(['id', 'name', 'scopes', 'status', 'legacyId', 'createdAt', 'createdBy'])
 
   if (filter?.status) {
     query = query.where('status', '=', filter.status)

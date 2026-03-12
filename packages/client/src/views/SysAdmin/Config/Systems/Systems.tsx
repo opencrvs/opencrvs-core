@@ -79,27 +79,6 @@ const SystemRole = z.enum(['HEALTH', 'RECORD_SEARCH'])
 
 /** Map raw scope strings to human-readable labels */
 function scopeToLabel(scope: string): string {
-  const labels: Record<string, string> = {
-    'notification-api': 'Notification API',
-    recordsearch: 'Record Search',
-    'record.import': 'Record Import',
-    'record.export': 'Record Export',
-    'record.reindex': 'Record Reindex',
-    webhook: 'Webhook',
-    nationalId: 'National ID'
-  }
-  if (labels[scope]) return labels[scope]
-  // Handle encoded v2 scopes like "record.create:event=birth,death"
-  if (scope.startsWith('record.')) {
-    const [action, params] = scope.split(':')
-    const actionLabel = action.replace('record.', '').replace(/-/g, ' ')
-    const capitalized =
-      actionLabel.charAt(0).toUpperCase() + actionLabel.slice(1)
-    if (params) {
-      return `Record ${capitalized} (${params})`
-    }
-    return `Record ${capitalized}`
-  }
   return scope
 }
 
@@ -392,11 +371,24 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               }
               label={integration.name}
               value={
-                <ScopeList>
-                  {integration.scopes.map((scope) => (
-                    <ScopeTag key={scope}>{scopeToLabel(scope)}</ScopeTag>
-                  ))}
-                </ScopeList>
+                <Text variant="reg14" element="p" color="grey500">
+                  {integration.createdByName
+                    ? intl.formatMessage(integrationMessages.createdOnBy, {
+                        date: intl.formatDate(new Date(integration.createdAt), {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }),
+                        user: integration.createdByName
+                      })
+                    : intl.formatMessage(integrationMessages.createdOn, {
+                        date: intl.formatDate(new Date(integration.createdAt), {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })
+                      })}
+                </Text>
               }
             />
           ))}
@@ -470,19 +462,16 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           handleClose={() => setDeleteConfirm({ integration: null })}
         >
           <FormattedMessage
-              {...integrationMessages.deleteSystemText}
-              values={{ b: (chunks: React.ReactNode) => <b>{chunks}</b> }}
-            />
+            {...integrationMessages.deleteSystemText}
+            values={{ b: (chunks: React.ReactNode) => <b>{chunks}</b> }}
+          />
         </ResponsiveModal>
       )}
 
       {/* Reveal Keys Modal */}
       <ResponsiveModal
         actions={[
-          <Link
-            key="cancel-link"
-            onClick={closeRevealKeys}
-          >
+          <Link key="cancel-link" onClick={closeRevealKeys}>
             {intl.formatMessage(buttonMessages.cancel)}
           </Link>
         ]}

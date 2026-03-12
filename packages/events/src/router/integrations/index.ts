@@ -25,6 +25,20 @@ import {
   refreshSystemClientSecret
 } from '@events/storage/postgres/events/system-clients'
 import { compare, generateSaltedHash } from '@events/service/auth/hash'
+import { getUsersById } from '@events/service/users/users'
+import { UserOrSystem } from '@opencrvs/commons'
+
+function getDisplayName(user: UserOrSystem): string {
+  if (user.type === 'system') {
+    return user.name
+  }
+  if (user.fullHonorificName) {
+    return user.fullHonorificName
+  }
+  const namePart = user.name.find((n) => n.use === 'en') ?? user.name[0]
+  if (!namePart) return ''
+  return [...namePart.given, namePart.family].filter(Boolean).join(' ')
+}
 
 const CreateIntegrationInput = z.object({
   name: z.string().min(1, 'Integration name is required'),
@@ -48,7 +62,9 @@ const ListIntegrationsOutput = z.array(
     id: z.string(),
     name: z.string(),
     scopes: z.array(z.string()),
-    status: z.string()
+    status: z.string(),
+    createdAt: z.string(),
+    createdByName: z.string().nullable()
   })
 )
 
@@ -169,13 +185,26 @@ export const integrationsRouter = router({
     .input(ListIntegrationsInput)
     .output(ListIntegrationsOutput)
     .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const rows = await listSystemClients(input ?? undefined)
+
+      const creatorIds = [
+        ...new Set(rows.map((r) => r.createdBy).filter((id): id is string => id != null))
+      ]
+      const creators = creatorIds.length
+        ? await getUsersById(creatorIds, ctx.token)
+        : []
+      const creatorNameById = new Map(
+        creators.map((u) => [u.id, getDisplayName(u)])
+      )
+
       return rows.map((row) => ({
         id: row.id,
         name: row.name,
         scopes: row.scopes as string[],
-        status: row.status
+        status: row.status,
+        createdAt: row.createdAt,
+        createdByName: row.createdBy != null ? (creatorNameById.get(row.createdBy) ?? null) : null
       }))
     }),
 

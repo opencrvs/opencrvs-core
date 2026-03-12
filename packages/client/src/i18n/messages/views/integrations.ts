@@ -328,6 +328,17 @@ const messagesToDefine = {
       '{type, select, HEALTH {Health integration} NATIONAL_ID {National ID} RECORD_SEARCH {Record search} IMPORT_EXPORT {Import/Export} other {Custom}}',
     description:
       'Label for integration type using ICU MessageFormat select for all types'
+  },
+  createdOnBy: {
+    id: 'integrations.createdOnBy',
+    defaultMessage: 'Created {date} by {user}',
+    description: 'Label showing when an integration was created and by whom'
+  },
+  createdOn: {
+    id: 'integrations.createdOn',
+    defaultMessage: 'Created {date}',
+    description:
+      'Label showing when an integration was created (no user info)'
   }
 }
 
