@@ -177,8 +177,6 @@ export const RecordScopeV2 = z
     "Scopes used to check user's permission to perform actions on a record."
   )
 
-export type RecordScopeV2WithCustomActionOptions = z.infer<typeof RecordScopeV2>
-
 export function scopeUsesDeclaredOptions(
   scope: RecordScopeV2
 ): scope is Extract<
