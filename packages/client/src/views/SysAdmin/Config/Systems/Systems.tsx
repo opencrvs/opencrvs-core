@@ -69,9 +69,9 @@ const ScopeTag = styled.span`
   display: inline-block;
   padding: 2px 8px;
   border-radius: 12px;
-  background-color: ${({ theme }) => theme.colors.grey200};
-  color: ${({ theme }) => theme.colors.grey600};
-  font-size: 12px;
+  background-color: ${({ theme }) => theme.colors.grey100};
+  color: ${({ theme }) => theme.colors.grey500};
+  font-size: 14px;
   line-height: 18px;
 `
 
@@ -159,6 +159,10 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmState>({
     integration: null
   })
+
+  const [clientDetails, setClientDetails] = useState<IntegrationItem | null>(
+    null
+  )
 
   const [toastMessage, setToastMessage] = useState<{
     message: string
@@ -296,6 +300,10 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   const getMenuItems = (integration: IntegrationItem) => {
     const menuItems: { handler: () => void; label: string }[] = [
       {
+        handler: () => setClientDetails(integration),
+        label: intl.formatMessage(integrationMessages.clientDetails)
+      },
+      {
         handler: () => handleRevealKeys(integration),
         label: intl.formatMessage(integrationMessages.revealKeys)
       },
@@ -394,6 +402,49 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           ))}
         </ListViewSimplified>
       </Content>
+
+      {/* Client Details Modal */}
+      {clientDetails && (
+        <ResponsiveModal
+          title={intl.formatMessage(integrationMessages.clientDetails)}
+          autoHeight={true}
+          width={512}
+          titleHeightAuto={true}
+          show={true}
+          handleClose={() => setClientDetails(null)}
+          actions={[
+            <Button
+              type="tertiary"
+              key="close"
+              id="closeClientDetails"
+              onClick={() => setClientDetails(null)}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </Button>
+          ]}
+        >
+          <Stack direction="column" alignItems="stretch" gap={16}>
+            <Stack direction="column" alignItems="stretch" gap={4}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.clientName)}
+              </Text>
+              <Text variant="reg16" element="span">
+                {clientDetails.name}
+              </Text>
+            </Stack>
+            <Stack direction="column" alignItems="stretch" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.scopes)}
+              </Text>
+              <ScopeList>
+                {clientDetails.scopes.map((scope) => (
+                  <ScopeTag key={scope}>{scopeToLabel(scope)}</ScopeTag>
+                ))}
+              </ScopeList>
+            </Stack>
+          </Stack>
+        </ResponsiveModal>
+      )}
 
       {/* Toggle Activation Modal */}
       {toggleActivation.integration && (
