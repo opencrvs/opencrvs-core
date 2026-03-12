@@ -73,7 +73,7 @@ const ScopeTag = styled.span`
   border-radius: 12px;
   background-color: ${({ theme }) => theme.colors.grey100};
   color: ${({ theme }) => theme.colors.grey500};
-  font-size: ${({ theme }) => theme.fonts.reg12};
+  ${({ theme }) => theme.fonts.reg12};
 `
 
 const SystemRole = z.enum(['HEALTH', 'RECORD_SEARCH'])
