@@ -82,7 +82,11 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
       .reduce<EventState>(
         (acc, actionConfig) => ({
           ...acc,
-          ...getAnnotationForActionType({ event, actionType: actionConfig.type })
+          ...getAnnotationForActionType({
+            event,
+            actionType: actionConfig.type,
+            draft
+          })
         }),
         {}
       )
@@ -90,7 +94,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     return Object.keys(pastActionsWithAnnotation).length > 0
       ? pastActionsWithAnnotation
       : undefined
-  }, [configuration.actions, event])
+  }, [configuration.actions, event, draft])
 
   useEffect(() => {
     return () => {
