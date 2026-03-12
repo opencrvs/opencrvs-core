@@ -284,7 +284,7 @@ export const getHiddenActions = () =>
   Object.values(ActionTypes.enum).reduce(
     (acc, action) => {
       const label = actionLabels[action as keyof typeof actionLabels]
-
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!label) {
         return acc
       }
