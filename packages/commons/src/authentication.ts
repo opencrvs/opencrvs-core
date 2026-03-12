@@ -31,8 +31,16 @@ export * from './scopes'
  */
 export function getAcceptedScopesFromToken(
   token: string,
+  acceptedScopes: ['record.print-certified-copies']
+): Array<Extract<RecordScopeV2, { type: 'record.print-certified-copies' }>>
+export function getAcceptedScopesFromToken(
+  token: string,
   acceptedScopes: RecordScopeTypeV2[]
-) {
+): RecordScopeV2[]
+export function getAcceptedScopesFromToken(
+  token: string,
+  acceptedScopes: RecordScopeTypeV2[]
+): RecordScopeV2[] {
   const tokenScopes = getScopes(token)
 
   return tokenScopes

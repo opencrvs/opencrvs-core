@@ -134,11 +134,22 @@ export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
 export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.search',
   'record.read',
-  'record.print-certified-copies',
   'record.request-correction',
   'record.correct',
   'record.unassign-others'
 ])
+
+const ScopeOptionsPrintCertifiedCopies = ScopeOptionsFull.extend({
+  templates: z
+    // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
+    .preprocess(
+      (val) => (val === undefined ? undefined : [val].flat()),
+      z.array(z.string()).optional()
+    )
+    .describe(
+      'Template IDs for certified copies. If not provided, all templates will be used.'
+    )
+})
 
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
@@ -153,6 +164,10 @@ export const RecordScopeV2 = z
     z.object({
       type: ScopesWithFullOptions,
       options: ScopeOptionsFull.optional()
+    }),
+    z.object({
+      type: z.literal('record.print-certified-copies'),
+      options: ScopeOptionsPrintCertifiedCopies.optional()
     })
   ])
   .describe(
@@ -173,9 +188,12 @@ export function scopeUsesFullOptions(
   scope: RecordScopeV2
 ): scope is Extract<
   RecordScopeV2,
-  { type: z.infer<typeof ScopesWithFullOptions> }
+  { type: z.infer<typeof ScopesWithFullOptions> | 'record.print-certified-copies' }
 > {
-  return ScopesWithFullOptions.options.some((opt) => opt === scope.type)
+  return (
+    ScopesWithFullOptions.options.some((opt) => opt === scope.type) ||
+    scope.type === 'record.print-certified-copies'
+  )
 }
 
 export const ResolvedRecordScopeV2 = z
@@ -191,6 +209,12 @@ export const ResolvedRecordScopeV2 = z
     z.object({
       type: ScopesWithFullOptions,
       options: ResolvedScopeOptionsFull.optional()
+    }),
+    z.object({
+      type: z.literal('record.print-certified-copies'),
+      options: ResolvedScopeOptionsFull.extend({
+        templates: z.array(z.string()).optional()
+      }).optional()
     })
   ])
   .describe('Resolved scope with location/user IDs instead of filters.')
