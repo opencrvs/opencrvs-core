@@ -87,7 +87,7 @@ export function Pages() {
       <PagesComponent
         actionType={ActionType.REQUEST_CORRECTION}
         eventConfig={configuration}
-        form={form}
+        formData={form}
         formPages={correctablePages}
         isCorrection={true}
         pageId={currentPageId}

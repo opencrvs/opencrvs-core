@@ -9,35 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import {
-  FieldPropsWithoutReferenceValue,
-  SelectField,
-  SelectOption,
-  TranslationConfig
-} from '@opencrvs/commons/client'
+import { SelectField, SelectOption } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { StringifierContext } from './RegisteredField'
 
-export type SelectInputProps = Omit<
-  FieldPropsWithoutReferenceValue<'SELECT'>,
-  'label'
-> & {
+export interface SelectInputProps
+  extends Omit<React.InputHTMLAttributes<HTMLSelectElement>, 'onChange'> {
   onChange: (newValue: string) => void
   value?: string
-  label?: TranslationConfig
-  disabled?: boolean
-  noOptionsMessage?: TranslationConfig
-} & { 'data-testid'?: string }
+  noOptionsMessage?: SelectField['noOptionsMessage']
+  options: SelectField['options']
+  'data-testid'?: string
+}
 
 function SelectInput({
-  onChange,
   noOptionsMessage,
+  options,
   value,
+  // forwarding name to the underlying Select component results in
+  // an extra input[type=hidden] element being rendered
+  name,
   ...props
 }: SelectInputProps) {
   const intl = useIntlWithFormData()
-  const { options } = props
   const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
@@ -61,7 +56,6 @@ function SelectInput({
       noOptionsMessage={formattedNoOptionsMessage}
       options={formattedOptions}
       value={inputValue}
-      onChange={onChange}
     />
   )
 }

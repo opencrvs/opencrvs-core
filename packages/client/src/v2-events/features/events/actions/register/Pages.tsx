@@ -81,7 +81,7 @@ export function Pages() {
       <PagesComponent
         actionType={ActionType.REGISTER}
         eventConfig={configuration}
-        form={form}
+        formData={form}
         formPages={declarationPages}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}

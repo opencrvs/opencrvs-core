@@ -13,9 +13,9 @@ import {
   FieldReference,
   FieldValue,
   HttpField,
+  IndexMap,
   isFieldReference
 } from '@opencrvs/commons/client'
-import { IndexMap } from '@client/utils'
 import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible

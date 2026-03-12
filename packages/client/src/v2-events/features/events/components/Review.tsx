@@ -37,7 +37,10 @@ import {
   isPageVisible,
   runFieldValidations,
   FieldTypesToHideInReview,
-  ValidatorContext
+  ValidatorContext,
+  flattenFormState,
+  IndexMap,
+  FormState
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
@@ -326,11 +329,14 @@ function FormReview({
                 />
               )
 
-              const errors = runFieldValidations({
-                field,
-                values: form,
-                context: validatorContext
-              })
+              const errors = flattenFormState(
+                runFieldValidations({
+                  field,
+                  value: form[field.id],
+                  form,
+                  context: validatorContext
+                })
+              ).flatMap(([, errs]) => errs)
 
               const errorDisplay =
                 errors.length > 0 ? (
@@ -492,6 +498,8 @@ function ReviewComponent({
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
   const previousForm = previousFormValues ?? {}
 
+  const [touched, setTouched] = useState<IndexMap<FormState<boolean>>>({})
+
   const pageIdsWithFile = formConfig.pages
     .filter(({ fields }) =>
       fields.some(
@@ -529,11 +537,16 @@ function ReviewComponent({
               <ReviewContainter>
                 <FormFieldGenerator
                   fields={reviewFields}
+                  // This makes the declaration form available in the validations/conditionals
+                  // of the annotation form without bleeding into the current annotation values
+                  formContext={form}
+                  formTouched={touched}
+                  formValues={annotation}
                   id={'review'}
-                  initialValues={annotation}
                   readonlyMode={readonlyMode}
                   validatorContext={validatorContext}
-                  onChange={onAnnotationChange}
+                  onFormChange={onAnnotationChange}
+                  onTouchedChange={setTouched}
                 />
               </ReviewContainter>
             </FormData>
