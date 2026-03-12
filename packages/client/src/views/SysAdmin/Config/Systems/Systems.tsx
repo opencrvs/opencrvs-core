@@ -500,7 +500,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
               {intl.formatMessage(buttonMessages.cancel)}
             </Button>,
             <Button
-              type="primary_destructive"
+              type="primary"
               key="confirmDelete"
               id="confirmDelete"
               loading={isDeleting}
@@ -512,10 +512,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
           show={true}
           handleClose={() => setDeleteConfirm({ integration: null })}
         >
-          <FormattedMessage
-            {...integrationMessages.deleteSystemText}
-            values={{ b: (chunks: React.ReactNode) => <b>{chunks}</b> }}
-          />
+          <FormattedMessage {...integrationMessages.deleteSystemText} />
         </ResponsiveModal>
       )}
 

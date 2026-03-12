@@ -115,7 +115,6 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-  systems: System[]
   config: ApplicationConfig
   anonymousConfig: IApplicationConfigAnonymous
 }
