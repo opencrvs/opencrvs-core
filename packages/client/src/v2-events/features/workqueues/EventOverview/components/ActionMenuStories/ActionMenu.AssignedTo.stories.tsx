@@ -17,10 +17,12 @@ import { Meta, StoryObj } from '@storybook/react'
 import {
   ActionType,
   getCurrentEventState,
+  AssignmentStatus,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
+
 import { AppRouter } from '@client/v2-events/trpc'
-import { AssignmentStatus } from '@client/v2-events/utils'
+
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import {
   addLocalEventConfig,

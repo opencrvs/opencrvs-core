@@ -26,6 +26,7 @@ import {
   userCanAccessEventWithScopes
 } from './locations'
 import { UserContext } from '../users/User'
+import { EventIndex } from './EventIndex'
 
 type AlwaysAllowed = null
 
@@ -89,6 +90,28 @@ export function configurableEventScopeAllowed(
   return authorizedEvents.includes(eventType)
 }
 
+export const AssignmentStatus = {
+  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
+  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
+  UNASSIGNED: 'UNASSIGNED'
+} as const
+
+export type AssignmentStatus =
+  (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
+
+export function getAssignmentStatus(
+  eventState: EventIndex | EventIndexWithAdministrativeHierarchy,
+  userId: string
+): AssignmentStatus {
+  if (!eventState.assignedTo) {
+    return AssignmentStatus.UNASSIGNED
+  }
+
+  return eventState.assignedTo == userId
+    ? AssignmentStatus.ASSIGNED_TO_SELF
+    : AssignmentStatus.ASSIGNED_TO_OTHERS
+}
+
 /**
  * Checks if a given action is allowed for the provided scopes, event, and user context.
  *
@@ -117,7 +140,19 @@ export function isActionInScope({
   currentUser: UserContext
   customActionType?: string
 }): boolean {
-  const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
+  const assignmentStatus = getAssignmentStatus(event, currentUser.id)
+  /**
+   * Anyone can unassign themselves. However, to unassign others, the user must have the 'record.unassign-others' scope.
+   * This is a special case that deviates from the general pattern of scope checks defined in ACTION_SCOPE_MAP.
+   * Therefore, we check for this condition explicitly here.
+   */
+  const isUnassigningOthers =
+    action === ActionType.UNASSIGN &&
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS
+
+  const allowedConfigurableScopes = isUnassigningOthers
+    ? ['record.unassign-others']
+    : ACTION_SCOPE_MAP[action]
 
   // 'null' means that the action is always allowed
   if (allowedConfigurableScopes === null) {

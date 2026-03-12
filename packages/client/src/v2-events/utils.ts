@@ -255,28 +255,6 @@ export function replacePlaceholders({
   )
 }
 
-export const AssignmentStatus = {
-  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
-  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
-  UNASSIGNED: 'UNASSIGNED'
-} as const
-
-export type AssignmentStatus =
-  (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
-
-export function getAssignmentStatus(
-  eventState: EventIndex,
-  userId: string
-): AssignmentStatus {
-  if (!eventState.assignedTo) {
-    return AssignmentStatus.UNASSIGNED
-  }
-
-  return eventState.assignedTo == userId
-    ? AssignmentStatus.ASSIGNED_TO_SELF
-    : AssignmentStatus.ASSIGNED_TO_OTHERS
-}
-
 export function filterEmptyValues(
   obj: Record<string, unknown>
 ): Record<string, unknown> {
