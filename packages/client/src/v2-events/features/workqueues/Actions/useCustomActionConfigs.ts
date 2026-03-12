@@ -54,12 +54,12 @@ export function useCustomActionConfigs(event: EventIndex): {
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
-  const hasAnyCustomActionScope = getAcceptedScopesByType({
+  const customActionScopes = getAcceptedScopesByType({
     acceptedScopes: ['record.custom-action'],
     scopes: scopes ?? []
   })
 
-  if (!hasAnyCustomActionScope) {
+  if (customActionScopes.length === 0) {
     return {
       customActionModal: null,
       customActionConfigs: []
