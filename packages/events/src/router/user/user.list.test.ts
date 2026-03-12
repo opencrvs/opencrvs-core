@@ -16,8 +16,8 @@ import {
   sanitizeForSnapshot,
   setupTestCase
 } from '@events/tests/utils'
-import { mswServer } from '../../tests/msw'
 import { createSystemClient } from '@events/storage/postgres/events/system-clients'
+import { mswServer } from '../../tests/msw'
 
 test('Returns empty list when no ids provided', async () => {
   const { user } = await setupTestCase()
@@ -105,7 +105,11 @@ test('Returns both normal users and system users', async () => {
 
   await createSystemClient({
     name: 'My health system integration',
-    legacyId: systemUserId
+    legacyId: systemUserId,
+    createdBy: user.id,
+    salt: 'RANDOM_STRING',
+    secretHash: 'RANDOM_STRING',
+    shaSecret: 'RANDOM_STRING'
   })
 
   const fetchedUsers = await client.user.list([...userIds, systemUserId])

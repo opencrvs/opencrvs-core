@@ -396,7 +396,7 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
                               day: 'numeric'
                             }
                           ),
-                          user: getUsersFullName(user.name)
+                          user: getUsersFullName(user.name, intl.locale)
                         })
                       : intl.formatMessage(integrationMessages.createdOn, {
                           date: intl.formatDate(

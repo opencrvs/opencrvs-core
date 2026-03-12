@@ -22,7 +22,7 @@ export interface IntegrationItem {
   scopes: string[]
   status: string
   createdAt: string
-  createdByName: string | null
+  createdBy: string
 }
 
 /** Data shape returned by integrations.create */
