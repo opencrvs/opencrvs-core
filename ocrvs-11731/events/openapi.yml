@@ -2518,7 +2518,7 @@ components:
                                 - record.read
                                 - record.declare
                                 - record.notify
-                                - record.validate
+                                - record.edit
                                 - record.reject
                                 - record.archive
                                 - record.review-duplicates
@@ -6771,7 +6771,7 @@ components:
                                 - record.read
                                 - record.declare
                                 - record.notify
-                                - record.validate
+                                - record.edit
                                 - record.reject
                                 - record.archive
                                 - record.review-duplicates
@@ -7149,7 +7149,7 @@ components:
                                 - record.read
                                 - record.declare
                                 - record.notify
-                                - record.validate
+                                - record.edit
                                 - record.reject
                                 - record.archive
                                 - record.review-duplicates
@@ -7364,7 +7364,7 @@ components:
                                 - record.read
                                 - record.declare
                                 - record.notify
-                                - record.validate
+                                - record.edit
                                 - record.reject
                                 - record.archive
                                 - record.review-duplicates
@@ -7576,7 +7576,7 @@ components:
                                 - record.read
                                 - record.declare
                                 - record.notify
-                                - record.validate
+                                - record.edit
                                 - record.reject
                                 - record.archive
                                 - record.review-duplicates
