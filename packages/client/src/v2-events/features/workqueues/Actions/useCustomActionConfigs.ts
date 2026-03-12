@@ -18,7 +18,8 @@ import {
   getOrThrow,
   isActionEnabled,
   isActionVisible,
-  filterActionsByFlags
+  filterActionsByFlags,
+  isValidIcon
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
@@ -71,7 +72,7 @@ export function useCustomActionConfigs(event: EventIndex): {
       )
       .map((action) => ({
         label: action.label,
-        icon: action.icon ?? ('PencilLine' as const),
+        icon: isValidIcon(action.icon) ? action.icon : ('PencilLine' as const),
         onClick: async (workqueue?: string) =>
           onCustomAction(action, workqueue),
         disabled:

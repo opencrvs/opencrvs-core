@@ -32,7 +32,7 @@ import {
   EventConfig,
   omitHiddenFields,
   EventIndex,
-  AvailableIcons
+  isValidIcon
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
@@ -212,13 +212,16 @@ export function useQuickActionModal(
     const label = actionLabels[actionType]
     const actionConfig = getActionConfig({ actionType, eventConfiguration })
     const supportingCopy = actionConfig?.supportingCopy
+
     const { result } = await openModal<ModalResult>((close) => (
       <QuickActionModal
         close={close}
         config={{
           label,
           actionType,
-          icon: actionConfig?.icon as AvailableIcons,
+          icon: isValidIcon(actionConfig?.icon)
+            ? actionConfig?.icon
+            : undefined,
           supportingCopy,
           ...config.modal
         }}
@@ -278,7 +281,7 @@ export function useCustomActionModal(
           label: actionConfig.label,
           supportingCopy: actionConfig.supportingCopy,
           fields: actionConfig.form,
-          icon: actionConfig.icon
+          icon: isValidIcon(actionConfig.icon) ? actionConfig.icon : undefined
         }}
         eventConfiguration={eventConfiguration}
         eventId={eventId}
