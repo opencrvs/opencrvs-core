@@ -964,7 +964,7 @@ export const mockOfflineDataDispatch = {
 export async function createTestStore() {
   const { store } = createStore()
   store.dispatch(offlineDataReady(mockOfflineDataDispatch))
-  await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
+  await flushPromises()
   return { store }
 }
 
@@ -998,7 +998,7 @@ export async function createTestComponent(
   options?: MountRendererProps
 ) {
   store.dispatch(offlineDataReady(mockOfflineDataDispatch))
-  await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
+  await flushPromises()
 
   const withGraphQL = (node: JSX.Element) => {
     if (apolloClient) {

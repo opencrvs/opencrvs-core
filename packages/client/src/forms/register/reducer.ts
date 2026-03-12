@@ -11,7 +11,6 @@
 import { LoopReducer, Loop, Cmd, loop } from 'redux-loop'
 import { IForm } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
-import { initValidators } from '@client/forms/validators'
 
 export type IRegisterFormState =
   | {
@@ -45,21 +44,6 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
   switch (action.type) {
     case offlineActions.READY:
     case offlineActions.FORMS_LOADED:
-      return loop(
-        state,
-        Cmd.run(
-          async () => {
-            await initValidators()
-            return action.payload
-          },
-          {
-            successActionCreator: offlineActions.CustomValidatorsSuccess
-          }
-        )
-      )
-    case offlineActions.CUSTOM_VALIDATORS_LOADED:
-      const { forms } = action.payload
-
       return state
     default:
       return state
