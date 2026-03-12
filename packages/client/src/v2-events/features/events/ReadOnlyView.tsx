@@ -84,7 +84,9 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
           ...acc,
           ...getAnnotationForActionType({
             event,
-            actionType: actionConfig.type
+
+            actionType: actionConfig.type,
+            draft
           })
         }),
         {}
@@ -93,7 +95,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
     return Object.keys(pastActionsWithAnnotation).length > 0
       ? pastActionsWithAnnotation
       : undefined
-  }, [configuration.actions, event])
+  }, [configuration.actions, event, draft])
 
   useEffect(() => {
     return () => {
