@@ -766,11 +766,19 @@ paths:
                         type: string
                     status:
                       type: string
+                    createdAt:
+                      type: string
+                    createdByName:
+                      anyOf:
+                        - type: string
+                        - type: "null"
                   required:
                     - id
                     - name
                     - scopes
                     - status
+                    - createdAt
+                    - createdByName
                   additionalProperties: false
         "400": *a4
         "401": *a1
