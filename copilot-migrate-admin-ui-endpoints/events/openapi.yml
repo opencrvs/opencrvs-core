@@ -768,17 +768,15 @@ paths:
                       type: string
                     createdAt:
                       type: string
-                    createdByName:
-                      anyOf:
-                        - type: string
-                        - type: "null"
+                    createdBy:
+                      type: string
                   required:
                     - id
                     - name
                     - scopes
                     - status
                     - createdAt
-                    - createdByName
+                    - createdBy
                   additionalProperties: false
         "400": *a4
         "401": *a1
