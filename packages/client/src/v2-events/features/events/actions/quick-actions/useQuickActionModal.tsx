@@ -219,9 +219,7 @@ export function useQuickActionModal(
         config={{
           label,
           actionType,
-          icon: isValidIcon(actionConfig?.icon)
-            ? actionConfig?.icon
-            : undefined,
+          icon: isValidIcon(actionConfig?.icon) ? actionConfig.icon : undefined,
           supportingCopy,
           ...config.modal
         }}

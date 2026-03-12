@@ -89,7 +89,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
           : actionLabels[actionType],
         type: actionType,
         icon: isValidIcon(actionConfig?.icon)
-          ? actionConfig?.icon
+          ? actionConfig.icon
           : actionIcons[actionType],
         onClick: async (workqueue?: string) => onClick(actionType, workqueue),
         disabled: !enabled,
@@ -213,7 +213,7 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
         label: actionLabels[actionType],
         type: actionType,
         icon: isValidIcon(actionConfig?.icon)
-          ? actionConfig?.icon
+          ? actionConfig.icon
           : actionIcons[actionType],
         onClick:
           actionType === ActionType.ASSIGN

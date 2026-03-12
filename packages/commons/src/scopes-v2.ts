@@ -62,7 +62,6 @@ export const RecordScopeTypeV2 = z.enum([
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
 const scopeByEvent = z
-  // TODO CIHAN: do we need this for custom action
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
   .preprocess(
     (val) => (val === undefined ? undefined : [val].flat()),
@@ -95,8 +94,11 @@ const ScopeOptionsFull = scopeOptionsDeclared
 
 const CustomActionScopeOptions = ScopeOptionsFull.extend({
   customActionTypes: z
-    .array(z.string())
-    .optional()
+    .preprocess(
+      (val) => (val === undefined ? undefined : [val].flat()),
+      // TODO CIHAN: remove optionality?
+      z.array(z.string()).optional()
+    )
     .describe('Allowed custom action types')
 })
 
