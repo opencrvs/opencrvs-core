@@ -12,6 +12,7 @@ import {
   Action,
   ActionType,
   DeclarationUpdateActionType,
+  Draft,
   EventDocument,
   EventState,
   getActionAnnotation
@@ -94,25 +95,28 @@ export function getPreviousDeclarationActionType(
  */
 export function getAnnotationForActionType({
   event,
-  actionType
+  actionType,
+  draft
 }: {
   event: EventDocument
   actionType: ActionType
+  draft?: Draft
 }): EventState {
-  const annotation = getActionAnnotation({ event, actionType })
+  const annotation = getActionAnnotation({ event, actionType, draft })
 
   if (actionType === ActionType.DECLARE) {
     // NOTIFY shares the DECLARE action config — merge both
     const notifyAnnotation = getActionAnnotation({
       event,
-      actionType: ActionType.NOTIFY
+      actionType: ActionType.NOTIFY,
+      draft
     })
     return { ...annotation, ...notifyAnnotation }
   }
 
   if (Object.keys(annotation).length === 0) {
     // Fall back to NOTIFY as the earliest annotation source
-    return getActionAnnotation({ event, actionType: ActionType.NOTIFY })
+    return getActionAnnotation({ event, actionType: ActionType.NOTIFY, draft })
   }
 
   return annotation
