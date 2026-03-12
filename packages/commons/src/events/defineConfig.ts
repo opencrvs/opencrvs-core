@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventConfig } from './EventConfig'
-import { EventConfigInput } from './EventConfigInput'
+import { EventConfig, EventConfigInput } from './EventConfig'
 
 /**
  * Builds a validated configuration for an event
