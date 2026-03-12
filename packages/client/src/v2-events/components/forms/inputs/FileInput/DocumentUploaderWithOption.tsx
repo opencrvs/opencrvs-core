@@ -26,6 +26,7 @@ import { Select } from '@client/v2-events/features/events/registered-fields/Sele
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { useImageProcessing } from '@client/utils/imageUtils'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
@@ -33,7 +34,6 @@ import { DocumentPreview } from './DocumentPreview'
 import { File } from './FileInput'
 import { useOnFileChange } from './useOnFileChange'
 import { SingleDocumentPreview } from './SingleDocumentPreview'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 
 const UploadWrapper = styled.div`
   width: 100%;
