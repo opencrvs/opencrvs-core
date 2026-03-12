@@ -43,6 +43,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { actionIcons } from '@client/v2-events/features/workqueues/Actions/utils'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { useActionAnnotation } from '../../useActionAnnotation'
 import { useEventFormData } from '../../useEventFormData'
@@ -220,7 +221,7 @@ function useEditActions(event: EventDocument) {
     modals: [modal],
     actions: [
       {
-        icon: 'PaperPlaneTilt' as const,
+        icon: actionIcons[ActionType.EDIT],
         label: messages.editAndRegisterLabel,
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
@@ -252,7 +253,7 @@ function useEditActions(event: EventDocument) {
         hidden: !isActionAllowed(ActionType.REGISTER)
       },
       {
-        icon: 'PaperPlaneTilt' as const,
+        icon: actionIcons[ActionType.EDIT],
         label: messages.editAndDeclareLabel,
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
@@ -283,7 +284,7 @@ function useEditActions(event: EventDocument) {
         hidden: !isActionAllowed(ActionType.DECLARE)
       },
       {
-        icon: 'PaperPlaneTilt' as const,
+        icon: actionIcons[ActionType.EDIT],
         label: messages.editAndNotifyLabel,
         onClick: async () => {
           const { confirmed, comment } = await openModal<EditActionModalResult>(
