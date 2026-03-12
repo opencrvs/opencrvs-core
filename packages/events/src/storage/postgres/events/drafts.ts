@@ -23,26 +23,29 @@ import {
   EventActionDrafts,
   NewEventActionDrafts
 } from './schema/app/EventActionDrafts'
+import { normalizeDraftPaths } from './normalize-paths'
 
 function toDraftDocument(draft: EventActionDrafts): Draft {
-  return Draft.parse({
-    id: draft.id,
-    transactionId: draft.transactionId,
-    createdAt: draft.createdAt,
-    eventId: draft.eventId,
-    action: {
+  return normalizeDraftPaths(
+    Draft.parse({
+      id: draft.id,
       transactionId: draft.transactionId,
       createdAt: draft.createdAt,
-      createdBy: draft.createdBy,
-      createdByRole: draft.createdByRole ?? undefined,
-      createdByUserType: draft.createdByUserType as TokenUserType,
-      createdAtLocation: draft.createdAtLocation,
-      declaration: draft.declaration,
-      annotation: draft.annotation,
-      type: draft.actionType,
-      status: ActionStatus.Accepted
-    }
-  })
+      eventId: draft.eventId,
+      action: {
+        transactionId: draft.transactionId,
+        createdAt: draft.createdAt,
+        createdBy: draft.createdBy,
+        createdByRole: draft.createdByRole ?? undefined,
+        createdByUserType: draft.createdByUserType as TokenUserType,
+        createdAtLocation: draft.createdAtLocation,
+        declaration: draft.declaration,
+        annotation: draft.annotation,
+        type: draft.actionType,
+        status: ActionStatus.Accepted
+      }
+    })
+  )
 }
 
 export async function createDraft(draft: NewEventActionDrafts) {

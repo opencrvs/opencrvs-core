@@ -590,7 +590,7 @@ const newFullEvent = {
       annotation: {
         'review.comment': 'dfsdfdsf',
         'review.signature': {
-          path: '/ocrvs/7774a11b-ad7b-4cf2-8433-79ab72f25cc3/c9dfff3c-394e-4095-a5b6-2429d7492436.png',
+          path: '7774a11b-ad7b-4cf2-8433-79ab72f25cc3/c9dfff3c-394e-4095-a5b6-2429d7492436.png',
           type: 'image/png',
           originalFilename: 'signature-review____signature-1758869981775.png'
         }

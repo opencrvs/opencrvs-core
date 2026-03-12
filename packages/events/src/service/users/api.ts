@@ -21,7 +21,10 @@ import {
   isUUID
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { getSystemByLegacyId, getSystemClientById } from '@events/storage/postgres/events/system-clients'
+import {
+  getSystemByLegacyId,
+  getSystemClientById
+} from '@events/storage/postgres/events/system-clients'
 
 type UserAPIResult = {
   id: string
@@ -82,8 +85,8 @@ export async function getUserOrSystem(
       primaryOfficeId: user.primaryOfficeId,
       device: user.device ? user.device : undefined,
       fullHonorificName: user.fullHonorificName
-      ? user.fullHonorificName
-      : undefined
+        ? user.fullHonorificName
+        : undefined
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
@@ -91,9 +94,9 @@ export async function getUserOrSystem(
   }
 
   try {
-    const system = isUUID(id) ?
-    await getSystemClientById(id) :
-    await getSystemByLegacyId(id)
+    const system = isUUID(id)
+      ? await getSystemClientById(id)
+      : await getSystemByLegacyId(id)
 
     return {
       type: TokenUserType.enum.system,

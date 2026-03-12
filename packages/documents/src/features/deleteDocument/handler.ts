@@ -12,7 +12,12 @@
 import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
-import { DocumentPath, getUserId } from '@opencrvs/commons'
+import {
+  DocumentPath,
+  FullDocumentPath,
+  getUserId,
+  toDocumentPath
+} from '@opencrvs/commons'
 
 export async function deleteDocument(
   request: Hapi.Request,
@@ -20,7 +25,11 @@ export async function deleteDocument(
 ) {
   // Ensure file is still in the desired format. forwarding url from gateway,
   // '/files/{filePath*}' --> files//filename.jpg and the double slash is removed.
-  const filePath = DocumentPath.parse(request.params.filePath)
+  let documentPath = DocumentPath.safeParse(request.params.filePath).data
+  if (!documentPath) {
+    const filePath = FullDocumentPath.parse(request.params.filePath)
+    documentPath = toDocumentPath(filePath)
+  }
 
   const userId = getUserId(request.headers.authorization)
 
@@ -34,12 +43,12 @@ export async function deleteDocument(
   let stat
 
   try {
-    stat = await minioClient.statObject(MINIO_BUCKET, filePath)
+    stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
   } catch (error) {
     if (error.code === 'NotFound') {
       return h
         .response(
-          `request failed: document ${filePath} does not exist in bucket ${MINIO_BUCKET}`
+          `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
         )
         .code(404)
     }
@@ -57,7 +66,7 @@ export async function deleteDocument(
       .code(403)
   }
 
-  await minioClient.removeObject(MINIO_BUCKET, filePath)
+  await minioClient.removeObject(MINIO_BUCKET, documentPath)
 
   return h.response().code(204)
 }

@@ -22,11 +22,11 @@ describe('getFilepathsFromActionDocument', () => {
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: {
-          createdBySignature: '/ocrvs/signature.png'
+          createdBySignature: 'signature.png'
         },
         declarationOverrides: {
           'applicant.image': {
-            path: '/ocrvs/image.jpg',
+            path: 'image.jpg',
             originalFilename: 'dp.jpg',
             type: 'jpg'
           }
@@ -34,7 +34,7 @@ describe('getFilepathsFromActionDocument', () => {
       })
     ])
 
-    expect(filepaths).toContain('/ocrvs/signature.png')
-    expect(filepaths).toContain('/ocrvs/image.jpg')
+    expect(filepaths).toContain('signature.png')
+    expect(filepaths).toContain('image.jpg')
   })
 })

@@ -15,7 +15,7 @@ import { useField } from 'formik'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
-  FullDocumentPath,
+  DocumentPath,
   FileUploadWithOptions,
   MimeType,
   SelectOption
@@ -171,7 +171,7 @@ function DocumentUploaderWithOption({
     maxFileSize
   })
 
-  const onDeleteFile = (path: FullDocumentPath) => {
+  const onDeleteFile = (path: DocumentPath) => {
     setFiles((prevFiles) => {
       const updatedFiles = prevFiles.filter((file) => file.path !== path)
       onChange(updatedFiles)

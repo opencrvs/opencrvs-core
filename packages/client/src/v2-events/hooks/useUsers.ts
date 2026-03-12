@@ -11,7 +11,6 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import {
-  FullDocumentUrl,
   System,
   TokenUserType,
   User,
@@ -22,14 +21,14 @@ import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
 
-type UserWithFullUrlFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
-  signature?: FullDocumentUrl
-  avatar?: FullDocumentUrl
+type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
+  signature?: string
+  avatar?: string
 }
 
 setQueryDefaults<
   typeof trpcOptionsProxy.user.get,
-  Promise<UserWithFullUrlFiles>
+  Promise<UserWithResolvedFiles>
 >(trpcOptionsProxy.user.get, {
   queryFn: async (...params) => {
     const {

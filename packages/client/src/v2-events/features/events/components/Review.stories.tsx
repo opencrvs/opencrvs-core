@@ -22,7 +22,7 @@ import {
   field,
   FieldConfig,
   FieldType,
-  FullDocumentPath,
+  DocumentPath,
   generateTranslationConfig,
   TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
@@ -526,7 +526,7 @@ export const ReadonlyAnnotationWithSignature: Story = {
     annotation: {
       'review.comment': 'commentsssdsdsds',
       'review.signature': {
-        path: '/ocrvs/55c7b677-bf65-490b-83af-2606cd95259b/f6477c7d-7aac-4bfe-969a-ee27056792fc.png' as FullDocumentPath,
+        path: '55c7b677-bf65-490b-83af-2606cd95259b/f6477c7d-7aac-4bfe-969a-ee27056792fc.png' as DocumentPath,
         type: 'image/png',
         originalFilename: 'signature-review____signature-1773128010978.png'
       }

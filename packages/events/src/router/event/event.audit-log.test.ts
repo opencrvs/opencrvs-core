@@ -259,7 +259,7 @@ describe('audit log', () => {
   describe('attachments.upload', () => {
     test('writes an audit log entry when a system client uploads an attachment', async () => {
       const systemId = 'test-system'
-      const expectedFileUrl = '/ocrvs/test-event/abc123.jpg'
+      const expectedFileUrl = 'test-event/abc123.jpg'
 
       mswServer.use(
         http.post(`${env.DOCUMENTS_URL}/files`, () => {

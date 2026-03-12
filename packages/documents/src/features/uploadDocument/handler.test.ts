@@ -158,7 +158,7 @@ describe('fileUploadHandler', () => {
       }
     })
 
-    expect(res.payload).toEqual(`/${MINIO_BUCKET}/${path}/${transactionId}.txt`)
+    expect(res.payload).toEqual(`${path}/${transactionId}.txt`)
 
     const [bucket, filename] = minioPutMock.mock.calls[0]
     expect(bucket).toBe(MINIO_BUCKET)
@@ -167,7 +167,7 @@ describe('fileUploadHandler', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('adds bucket to file path', async () => {
+  it('returns file path without bucket prefix', async () => {
     const transactionId = 'transaction-2'
     const body =
       `--${boundary}${CRLF}` +
@@ -186,7 +186,7 @@ describe('fileUploadHandler', () => {
       }
     })
 
-    expect(res.payload).toEqual(`/${MINIO_BUCKET}/${transactionId}.txt`)
+    expect(res.payload).toEqual(`${transactionId}.txt`)
 
     const [bucket, filename] = minioPutMock.mock.calls[0]
     expect(bucket).toBe(MINIO_BUCKET)

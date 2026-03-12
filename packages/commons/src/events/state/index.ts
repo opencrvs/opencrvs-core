@@ -38,11 +38,7 @@ import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getEventFlags } from './flags'
 import { getUUID, UUID } from '../../uuid'
-import {
-  DocumentPath,
-  FullDocumentPath,
-  FullDocumentUrl
-} from '../../documents'
+import { DocumentPath } from '../../documents'
 import { AddressFieldValue, AddressType } from '../CompositeFieldValue'
 import { isFieldReference } from '../../conditionals/conditionals'
 
@@ -112,17 +108,13 @@ type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny chan
   ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
   : T extends UUID
     ? T
-    : T extends FullDocumentPath
+    : T extends DocumentPath
       ? T
-      : T extends DocumentPath
-        ? T
-        : T extends FullDocumentUrl
-          ? T
-          : T extends (infer U)[]
-            ? NonNullableDeep<U>[]
-            : T extends object
-              ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-              : NonNullable<T>
+      : T extends (infer U)[]
+        ? NonNullableDeep<U>[]
+        : T extends object
+          ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+          : NonNullable<T>
 
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values

@@ -163,7 +163,7 @@ describe('Action drafts', () => {
         'applicant.image': {
           type: 'image/png',
           originalFilename: 'abcd.png',
-          path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
         }
       },
       transactionId: getUUID(),
@@ -197,7 +197,7 @@ describe('Action drafts', () => {
         'applicant.image': {
           type: 'image/png',
           originalFilename: 'abcd.png',
-          path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
         }
       },
       transactionId: getUUID(),
@@ -304,19 +304,19 @@ describe('Action updates', () => {
     'documents.singleFile': {
       type: 'image/svg+xml',
       originalFilename: 'tree.svg',
-      path: '/ocrvs/tree.svg'
+      path: 'tree.svg'
     },
     'documents.multiFile': [
       {
         type: 'image/svg+xml',
         originalFilename: 'multi-file-1.svg',
-        path: '/ocrvs/fish.svg',
+        path: 'fish.svg',
         option: 'multifile1'
       },
       {
         type: 'image/svg+xml',
         originalFilename: 'multi-file-2.svg',
-        path: '/ocrvs/mountain.svg',
+        path: 'mountain.svg',
         option: 'multifile2'
       }
     ]

@@ -79,7 +79,7 @@ export async function fileUploadHandler(
     ...(filename.endsWith('.pdf') && { 'content-type': 'application/pdf' })
   })
 
-  return `/${MINIO_BUCKET}/${filePath}` as DocumentPath
+  return filePath as DocumentPath
 }
 
 export async function fileExistsHandler(
