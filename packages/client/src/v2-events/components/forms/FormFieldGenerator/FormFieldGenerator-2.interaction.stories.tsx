@@ -204,7 +204,6 @@ const fields = [
     label: generateTranslationConfig('Applicant Address'),
     configuration: {
       lineSeparator: ', ',
-      fields: ['country', 'administrativeArea'],
       streetAddressForm: [
         {
           id: 'street',

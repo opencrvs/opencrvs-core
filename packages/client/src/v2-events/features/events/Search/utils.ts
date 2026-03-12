@@ -430,9 +430,13 @@ function applySearchFieldOverridesToFieldConfig(
     }
   }
   if (field.type === FieldType.ADDRESS) {
+    const fields = field.configuration?.fields?.map((subfield) => ({
+      ...subfield,
+      required: false
+    }))
     const streetAddressForm = field.configuration?.streetAddressForm?.map(
-      (subField) => ({
-        ...subField,
+      (subfield) => ({
+        ...subfield,
         required: false
       })
     )
@@ -442,7 +446,7 @@ function applySearchFieldOverridesToFieldConfig(
       ...commonConfig,
       configuration: {
         ...field.configuration,
-        fields: ['country'],
+        fields,
         streetAddressForm
       }
     }
