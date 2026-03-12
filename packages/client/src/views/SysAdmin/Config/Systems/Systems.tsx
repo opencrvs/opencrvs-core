@@ -13,6 +13,8 @@ import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { getUsersFullName } from '@client/v2-events/utils'
 import { z } from 'zod'
 import {
   Alert,
@@ -71,8 +73,7 @@ const ScopeTag = styled.span`
   border-radius: 12px;
   background-color: ${({ theme }) => theme.colors.grey100};
   color: ${({ theme }) => theme.colors.grey500};
-  font-size: 14px;
-  line-height: 18px;
+  font-size: ${({ theme }) => theme.fonts.reg12};
 `
 
 const SystemRole = z.enum(['HEALTH', 'RECORD_SEARCH'])
@@ -193,6 +194,9 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     isRefreshingSecret,
     resetRefreshSecret
   } = useIntegrations()
+
+  const { getUser } = useUsers()
+  const users = getUser.getAllCached()
 
   const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewClientName(String(event.target.value))
@@ -347,59 +351,68 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
         {isLoading && <Spinner id="system-list-spinner" size={24} />}
 
         <ListViewSimplified>
-          {integrations.map((integration: IntegrationItem) => (
-            <ListViewItemSimplified
-              key={integration.id}
-              actions={
-                <>
-                  {integration.status === 'active' ? (
-                    <Pill
-                      label={intl.formatMessage(integrationMessages.active)}
-                      type="active"
-                    />
-                  ) : (
-                    <Pill
-                      label={intl.formatMessage(integrationMessages.inactive)}
-                      type="inactive"
-                    />
-                  )}
-
-                  <ToggleMenu
-                    id={`toggleMenu-${integration.id}`}
-                    menuItems={getMenuItems(integration)}
-                    toggleButton={
-                      <Icon
-                        name="DotsThreeVertical"
-                        color="primary"
-                        size="large"
+          {integrations.map((integration: IntegrationItem) => {
+            const user = users.find((user) => user.id === integration.createdBy)
+            return (
+              <ListViewItemSimplified
+                key={integration.id}
+                actions={
+                  <>
+                    {integration.status === 'active' ? (
+                      <Pill
+                        label={intl.formatMessage(integrationMessages.active)}
+                        type="active"
                       />
-                    }
-                  />
-                </>
-              }
-              label={integration.name}
-              value={
-                <Text variant="reg14" element="p" color="grey500">
-                  {integration.createdByName
-                    ? intl.formatMessage(integrationMessages.createdOnBy, {
-                        date: intl.formatDate(new Date(integration.createdAt), {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        }),
-                        user: integration.createdByName
-                      })
-                    : intl.formatMessage(integrationMessages.createdOn, {
-                        date: intl.formatDate(new Date(integration.createdAt), {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
+                    ) : (
+                      <Pill
+                        label={intl.formatMessage(integrationMessages.inactive)}
+                        type="inactive"
+                      />
+                    )}
+
+                    <ToggleMenu
+                      id={`toggleMenu-${integration.id}`}
+                      menuItems={getMenuItems(integration)}
+                      toggleButton={
+                        <Icon
+                          name="DotsThreeVertical"
+                          color="primary"
+                          size="large"
+                        />
+                      }
+                    />
+                  </>
+                }
+                label={integration.name}
+                value={
+                  <Text variant="reg14" element="p" color="grey500">
+                    {user
+                      ? intl.formatMessage(integrationMessages.createdOnBy, {
+                          date: intl.formatDate(
+                            new Date(integration.createdAt),
+                            {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            }
+                          ),
+                          user: getUsersFullName(user.name)
                         })
-                      })}
-                </Text>
-              }
-            />
-          ))}
+                      : intl.formatMessage(integrationMessages.createdOn, {
+                          date: intl.formatDate(
+                            new Date(integration.createdAt),
+                            {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            }
+                          )
+                        })}
+                  </Text>
+                }
+              />
+            )
+          })}
         </ListViewSimplified>
       </Content>
 
