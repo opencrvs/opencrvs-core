@@ -2,8 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict MuHC5sacqz0gaR5CJrTrKan5AfxCHfH5fSXYVpseubdJe8cfpqbUItjG0rQSZyt
-
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
 -- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
@@ -29,28 +27,7 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
--- Name: mongo_fdw; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS mongo_fdw WITH SCHEMA app;
-
-
---
--- Name: EXTENSION mongo_fdw; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION mongo_fdw IS 'foreign data wrapper for MongoDB access';
-
-
---
--- Name: tablefunc; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS tablefunc WITH SCHEMA public;
-
-
---
--- Name: EXTENSION tablefunc; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION tablefunc; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION tablefunc IS 'functions that manipulate whole tables, including crosstab';
@@ -80,25 +57,6 @@ CREATE TYPE app.user_type AS ENUM (
 
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
-
---
--- Name: mongo; Type: SERVER; Schema: -; Owner: postgres
---
-
-CREATE SERVER mongo FOREIGN DATA WRAPPER mongo_fdw OPTIONS (
-    address 'mongo1',
-    authentication_database 'admin',
-    port '27017'
-);
-
-
-ALTER SERVER mongo OWNER TO postgres;
-
---
--- Name: USER MAPPING postgres SERVER mongo; Type: USER MAPPING; Schema: -; Owner: postgres
---
-
-CREATE USER MAPPING FOR postgres SERVER mongo;
 
 
 SET default_tablespace = '';
@@ -780,6 +738,3 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict MuHC5sacqz0gaR5CJrTrKan5AfxCHfH5fSXYVpseubdJe8cfpqbUItjG0rQSZyt
-
