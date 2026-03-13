@@ -43,7 +43,7 @@
     "csv-stringify": "^5.3.4",
     "dotenv": "^6.1.0",
     "envalid": "^8.0.0",
-    "file-type": "^16.5.3",
+    "file-type": "^21.0.0",
     "flat": "^5.0.0",
     "fp-ts": "^2.12.3",
     "glob": "^7.1.2",
