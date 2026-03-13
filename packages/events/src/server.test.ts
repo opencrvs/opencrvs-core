@@ -95,7 +95,7 @@ test('Server starts up and returns an event based on context dependency values',
   const mockUserResponse = {
     primaryOfficeId: locations[0].id,
     role: TestUserRole.enum.LOCAL_REGISTRAR,
-    signature: 'my-signature.png'
+    signature: '/ocrvs/my-signature.png'
   }
 
   mswServer.use(
@@ -125,7 +125,7 @@ test('Server starts up and returns an event based on context dependency values',
 
   expect(createAction.type).toEqual(ActionType.CREATE)
   expect(createAction.createdBy).toEqual(userId)
-  expect(createAction.createdBySignature).toEqual(mockUserResponse.signature)
+  expect(createAction.createdBySignature).toEqual('my-signature.png')
   expect(createAction.createdAtLocation).toEqual(
     mockUserResponse.primaryOfficeId
   )

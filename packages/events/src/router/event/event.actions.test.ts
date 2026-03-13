@@ -126,8 +126,7 @@ describe('Adding actions', () => {
     updatedEvent.actions.forEach((action) => {
       expect(action.createdAtLocation).toBe(user.primaryOfficeId)
       expect(action.createdByRole).toBe(user.role)
-      expect(action.createdBySignature).toBe(user.signature)
-
+      expect(action.createdBySignature).toMatchSnapshot()
       const actionsWithoutAnnotatation = [
         ActionType.CREATE,
         ActionType.READ,
@@ -529,7 +528,7 @@ describe('Action updates', () => {
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
 
-    expect(fileExistsMock.mock.calls[0]).toEqual(['ocrvs/tree.svg'])
+    expect(fileExistsMock.mock.calls[0]).toEqual(['tree.svg'])
 
     await client.event.actions.register.request({
       eventId: originalEvent.id,

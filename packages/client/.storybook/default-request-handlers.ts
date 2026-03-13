@@ -488,7 +488,6 @@ export const handlers = {
           'Cache-Control': 'no-cache'
         }
       })
-      u
     }),
     http.get('/:id', async (request) => {
       const cache = await caches.open(FAKE_CACHE_NAME)

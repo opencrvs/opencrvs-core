@@ -57,13 +57,21 @@ function normalizeActionPaths<T extends Record<string, unknown>>(action: T): T {
     )
   }
 
-  if ('declaration' in result && typeof result.declaration === 'object') {
+  if (
+    'declaration' in result &&
+    result.declaration &&
+    typeof result.declaration === 'object'
+  ) {
     result.declaration = normalizeFieldPaths(
       result.declaration as Record<string, unknown>
     )
   }
 
-  if ('annotation' in result && typeof result.annotation === 'object') {
+  if (
+    'annotation' in result &&
+    result.annotation &&
+    typeof result.annotation === 'object'
+  ) {
     result.annotation = normalizeFieldPaths(
       result.annotation as Record<string, unknown>
     )

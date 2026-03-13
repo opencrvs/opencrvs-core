@@ -32,7 +32,27 @@ exports[`Action updates > partial declaration update accounts for conditional fi
 }
 `;
 
-exports[`Adding actions > Event document contains all created actions 1`] = `
+exports[`Adding actions > Event document contains all created actions 1`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 2`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 3`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 4`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 5`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 6`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 7`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 8`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 9`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 10`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 11`] = `
 {
   "actions": [
     {
