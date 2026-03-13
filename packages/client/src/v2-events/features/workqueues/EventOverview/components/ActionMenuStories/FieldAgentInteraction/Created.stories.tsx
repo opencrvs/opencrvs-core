@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { ActionType, AssignmentStatus } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  AssignmentStatus,
+  TestUserRole
+} from '@opencrvs/commons/client'
 
 import { ActionMenu } from '../../ActionMenu'
 import {
@@ -18,7 +22,6 @@ import {
   createStoriesFromScenarios,
   AssertType,
   Scenario,
-  UserRoles,
   getMockEvent,
   createdByOtherUserScenario
 } from '../ActionMenu.common'
@@ -43,17 +46,20 @@ const createdScenariosForFieldAgent: Scenario[] = [
 
 const stories = createStoriesFromScenarios(
   createdScenariosForFieldAgent,
-  UserRoles.FIELD_AGENT
+  TestUserRole.enum.FIELD_AGENT
 )
 
 export const AssignedToSelf = stories['AssignedToSelf']
 
 // Created by some other user
-const event = getMockEvent([ActionType.CREATE], UserRoles.REGISTRATION_AGENT)
+const event = getMockEvent(
+  [ActionType.CREATE],
+  TestUserRole.enum.REGISTRATION_AGENT
+)
 
 export const CreatedByOtherUser = createdByOtherUserScenario({
   event,
-  role: UserRoles.FIELD_AGENT,
+  role: TestUserRole.enum.FIELD_AGENT,
   expected: {
     ...getHiddenActions(),
     ['Declare']: AssertType.DISABLED,

@@ -27,7 +27,8 @@ import {
   ClientSpecificAction,
   generateUuid,
   createPrng,
-  AssignmentStatus
+  AssignmentStatus,
+  TestUserRole
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -201,24 +202,18 @@ function getMockActions(createdBy: string) {
   }
 }
 
-export const enum UserRoles {
-  LOCAL_REGISTRAR = 'LocalRegistrar',
-  FIELD_AGENT = 'FieldAgent',
-  REGISTRATION_AGENT = 'RegistrationAgent'
-}
-
-function getUserIdByRole(role: UserRoles) {
+function getUserIdByRole(role: TestUserRole) {
   // eslint-disable-next-line no-nested-ternary
-  return role === UserRoles.LOCAL_REGISTRAR
+  return role === TestUserRole.enum.LOCAL_REGISTRAR
     ? generator.user.id.localRegistrar
-    : role === UserRoles.FIELD_AGENT
+    : role === TestUserRole.enum.FIELD_AGENT
       ? generator.user.id.fieldAgent
       : generator.user.id.registrationAgent
 }
 
 export function getMockEvent(
   actions: (keyof ReturnType<typeof getMockActions>)[],
-  role: UserRoles,
+  role: TestUserRole,
   requested?: ActionType
 ): EventDocument {
   const userId = getUserIdByRole(role)
@@ -284,7 +279,7 @@ export const getHiddenActions = () =>
   Object.values(ActionTypes.enum).reduce(
     (acc, action) => {
       const label = actionLabels[action as keyof typeof actionLabels]
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
       if (!label) {
         return acc
       }
@@ -323,7 +318,7 @@ async function checkMenuItems(
 
 export function createStoriesFromScenarios(
   scenarios: Scenario[],
-  role: UserRoles
+  role: TestUserRole
 ): Record<string, StoryObj<typeof ActionMenu>> {
   return scenarios.reduce(
     (acc, { name, actions, expected, recordDownloaded, requested }) => {
@@ -334,9 +329,9 @@ export function createStoriesFromScenarios(
             window.localStorage.setItem(
               'opencrvs',
               // eslint-disable-next-line no-nested-ternary
-              role === UserRoles.LOCAL_REGISTRAR
+              role === TestUserRole.enum.LOCAL_REGISTRAR
                 ? generator.user.token.localRegistrar
-                : role === UserRoles.FIELD_AGENT
+                : role === TestUserRole.enum.FIELD_AGENT
                   ? generator.user.token.fieldAgent
                   : generator.user.token.registrationAgent
             )
@@ -350,6 +345,7 @@ export function createStoriesFromScenarios(
         ],
         name,
         parameters: {
+          userRole: role,
           layout: 'centered',
           chromatic: { disableSnapshot: true },
           msw: {
@@ -410,7 +406,7 @@ export function createdByOtherUserScenario({
   expected
 }: {
   event: EventDocument
-  role: UserRoles
+  role: TestUserRole
   expected: Partial<Record<ActionLabel, AssertType>>
 }) {
   return {
@@ -419,9 +415,9 @@ export function createdByOtherUserScenario({
         window.localStorage.setItem(
           'opencrvs',
           // eslint-disable-next-line no-nested-ternary
-          role === UserRoles.LOCAL_REGISTRAR
+          role === TestUserRole.enum.LOCAL_REGISTRAR
             ? generator.user.token.localRegistrar
-            : role === UserRoles.FIELD_AGENT
+            : role === TestUserRole.enum.FIELD_AGENT
               ? generator.user.token.fieldAgent
               : generator.user.token.registrationAgent
         )
@@ -432,6 +428,7 @@ export function createdByOtherUserScenario({
     name: 'CreatedByOther',
     parameters: {
       layout: 'centered',
+      userRole: role,
       chromatic: { disableSnapshot: true },
       msw: {
         handlers: {

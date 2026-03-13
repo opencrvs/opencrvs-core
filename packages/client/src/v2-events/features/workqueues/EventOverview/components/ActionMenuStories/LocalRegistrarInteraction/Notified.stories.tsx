@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { ActionType, AssignmentStatus } from '@opencrvs/commons/client'
+import {
+  TestUserRole,
+  ActionType,
+  AssignmentStatus
+} from '@opencrvs/commons/client'
 
 import { ActionMenu } from '../../ActionMenu'
 import {
@@ -17,8 +21,7 @@ import {
   getHiddenActions,
   createStoriesFromScenarios,
   AssertType,
-  Scenario,
-  UserRoles
+  Scenario
 } from '../ActionMenu.common'
 
 export default {
@@ -84,7 +87,7 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
 
 const stories = createStoriesFromScenarios(
   notifiedScenariosForLocalRegistrar,
-  UserRoles.LOCAL_REGISTRAR
+  TestUserRole.enum.LOCAL_REGISTRAR
 )
 
 export const Unassigned = stories['Unassigned']

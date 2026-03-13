@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { ActionType, AssignmentStatus } from '@opencrvs/commons/client'
+import {
+  TestUserRole,
+  ActionType,
+  AssignmentStatus
+} from '@opencrvs/commons/client'
 
 import { ActionMenu } from '../../ActionMenu'
 import {
@@ -17,8 +21,7 @@ import {
   getHiddenActions,
   createStoriesFromScenarios,
   AssertType,
-  Scenario,
-  UserRoles
+  Scenario
 } from '../ActionMenu.common'
 
 export default {
@@ -82,7 +85,7 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
 
 const stories = createStoriesFromScenarios(
   correctionRequestedScenariosForRegistrationAgent,
-  UserRoles.REGISTRATION_AGENT
+  TestUserRole.enum.REGISTRATION_AGENT
 )
 
 export const Unassigned = stories['Unassigned']
