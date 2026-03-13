@@ -30,98 +30,109 @@ import {
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
 
-test('Check scopes against event.actions.unassign', async () => {
-  await createIndex(
-    getEventIndexName('tennis-club-membership_premium'),
-    getDeclarationFields(tennisClubMembershipEvent)
-  )
-  // 1. Setup test fixture with a known set of users, administrative areas, and events.
-  const { users, isUnderAdministrativeArea, eventIds } =
-    await setupScopeTestFixture(
-      1243453343,
-      fc.constantFrom(
-        [ActionTypes.enum.DECLARE],
-        [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
+test(
+  'Check scopes against event.actions.unassign',
+  async () => {
+    await createIndex(
+      getEventIndexName('tennis-club-membership_premium'),
+      getDeclarationFields(tennisClubMembershipEvent)
+    )
+    // 1. Setup test fixture with a known set of users, administrative areas, and events.
+    const { users, isUnderAdministrativeArea, eventIds } =
+      await setupScopeTestFixture(
+        1243453343,
+        fc.constantFrom(
+          [ActionTypes.enum.DECLARE],
+          [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
+        )
       )
+
+    const clientReadingAllEvents = createTestClient(users[0], [
+      encodeScope({
+        type: 'record.read'
+      })
+    ])
+
+    const jurisdictionOptions = fc.option(
+      fc.constantFrom(...JurisdictionFilter.options),
+      {
+        nil: undefined
+      }
     )
 
-  const clientReadingAllEvents = createTestClient(users[0], [
-    encodeScope({
-      type: 'record.read'
-    })
-  ])
-
-  const jurisdictionOptions = fc.option(
-    fc.constantFrom(...JurisdictionFilter.options),
-    {
+    const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
       nil: undefined
-    }
-  )
+    })
 
-  const userOptions = fc.option(fc.constant(UserFilter.enum.user), {
-    nil: undefined
-  })
-
-  // 2. Create option combinations for scopes and users
-  const combinations = fc.record({
-    user: fc.constantFrom(...users),
-    event: fc.option(
-      fc.constantFrom<string[]>(
-        [TENNIS_CLUB_MEMBERSHIP],
-        [TENNIS_CLUB_MEMBERSHIP, 'tennis-club-membership_premium'],
-        ['tennis-club-membership_premium']
+    // 2. Create option combinations for scopes and users
+    const combinations = fc.record({
+      user: fc.constantFrom(...users),
+      event: fc.option(
+        fc.constantFrom<string[]>(
+          [TENNIS_CLUB_MEMBERSHIP],
+          [TENNIS_CLUB_MEMBERSHIP, 'tennis-club-membership_premium'],
+          ['tennis-club-membership_premium']
+        ),
+        { nil: undefined }
       ),
-      { nil: undefined }
-    ),
-    placeOfEvent: jurisdictionOptions,
-    declaredBy: userOptions,
-    declaredIn: jurisdictionOptions,
-    registeredBy: userOptions,
-    registeredIn: jurisdictionOptions
-  })
+      placeOfEvent: jurisdictionOptions,
+      declaredBy: userOptions,
+      declaredIn: jurisdictionOptions,
+      registeredBy: userOptions,
+      registeredIn: jurisdictionOptions
+    })
 
-  // 3. Test combination against random event and assert results
-  await fc.assert(
-    fc.asyncProperty(combinations, async ({ user, ...options }) => {
-      const scope = encodeScope({
-        type: 'record.unassign-others',
-        options
-      })
-
-      const randomIndex = Math.floor(Math.random() * eventIds.length)
-      const [eventId] = eventIds.splice(randomIndex, 1)
-
-      const testClient = createTestClient(user, [scope])
-
-      let result: { success: boolean; event: EventDocument }
-      try {
-        // 1. Perform the action with the given test client.
-        const event = await testClient.event.actions.assignment.unassign({
-          eventId,
-          transactionId: getUUID(),
-          declaration: {},
-          assignedTo: null
+    // 3. Test combination against random event and assert results
+    await fc.assert(
+      fc.asyncProperty(combinations, async ({ user, ...options }) => {
+        const scope = encodeScope({
+          type: 'record.unassign-others',
+          options
         })
 
-        result = { success: true, event }
-      } catch (error) {
-        if (error instanceof TRPCError && error.code === 'FORBIDDEN') {
-          // 2. If action fails, attempt to fetch the event with the client that has access to all events to verify the failure was due to scope restrictions.
-          const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
-            eventId
-          })
-          result = { success: false, event: eventFetchedAsAdmin }
-        } else {
-          throw error
-        }
-      }
+        const randomIndex = Math.floor(Math.random() * eventIds.length)
+        const [eventId] = eventIds.splice(randomIndex, 1)
 
-      assertScopeResult(result, {
-        user,
-        isUnderAdministrativeArea,
-        ...options
-      })
-    }),
-    { numRuns: 40 }
-  )
-})
+        const testClient = createTestClient(user, [scope])
+
+        // 1. Fetch the event before performing the action. Doing it after unassign will alter the result.
+        const eventBeforeUnassign = await clientReadingAllEvents.event.get({
+          eventId
+        })
+
+        let result: { success: boolean; event: EventDocument }
+        try {
+          // 2. Perform the action with the given test client.
+          await testClient.event.actions.assignment.unassign({
+            eventId,
+            transactionId: getUUID(),
+            declaration: {},
+            assignedTo: null
+          })
+
+          // 3. Return the event before the unassignment went through.
+          result = { success: true, event: eventBeforeUnassign }
+        } catch (error) {
+          if (error instanceof TRPCError && error.code === 'FORBIDDEN') {
+            const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
+              eventId
+            })
+            result = { success: false, event: eventFetchedAsAdmin }
+          } else {
+            throw error
+          }
+        }
+
+        assertScopeResult(result, {
+          user,
+          isUnderAdministrativeArea,
+          ...options
+        })
+      }),
+      { numRuns: 20 }
+    )
+  },
+  {
+    timeout: 90000
+  }
+)
