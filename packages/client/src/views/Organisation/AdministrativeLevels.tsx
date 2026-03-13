@@ -161,6 +161,10 @@ export function AdministrativeLevels({
   const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
 
+  React.useEffect(() => {
+    setCurrentPageNumber(1)
+  }, [locationId])
+
   const changeLevelAction = (
     e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
     id: string
