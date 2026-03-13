@@ -1260,10 +1260,21 @@ export const handlers = {
 
       return [generator.user.localRegistrar().v2]
     }),
-    tRPCMsw.user.get.query(() => {
+    tRPCMsw.user.get.query((userId) => {
       const generator = testDataGenerator()
+      let response
 
-      return generator.user.localRegistrar().v2
+      if (userId == generator.user.id.fieldAgent) {
+        response = generator.user.fieldAgent().v2
+      } else if (userId == generator.user.id.registrationAgent) {
+        response = generator.user.registrationAgent().v2
+      } else if (userId == generator.user.id.nationalSystemAdmin) {
+        response = generator.user.nationalSystemAdmin().v2
+      } else {
+        response = generator.user.localRegistrar().v2
+      }
+
+      return response
     })
   ],
   event: [

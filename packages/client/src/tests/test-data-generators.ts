@@ -69,7 +69,7 @@ export function testDataGenerator(rngSeed?: number) {
     id: userIds,
     fieldAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
-        id: '67bda93bfc07dee78ae558cf',
+        id: userIds.fieldAgent,
         name: [
           {
             use: 'en',
