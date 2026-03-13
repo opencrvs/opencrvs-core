@@ -11,6 +11,7 @@
 
 import * as z from 'zod/v4'
 import { getScopes, getUUID, SCOPES } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
   ActionType,
@@ -75,7 +76,13 @@ export const eventRouter = router({
    */
   reindex: router({
     trigger: userAndSystemProcedure
-      .input(z.void())
+      .input(
+        z
+          .object({
+            waitForCompletion: z.boolean().default(true)
+          })
+          .optional()
+      )
       .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
       .output(z.void())
       .meta({
@@ -87,7 +94,15 @@ export const eventRouter = router({
           tags: ['events']
         }
       })
-      .mutation(({ ctx }) => reindex(ctx.token)),
+      .mutation(({ ctx, input }) => {
+        if (input?.waitForCompletion === false) {
+          void reindex(ctx.token).catch((err) => {
+            logger.error(`Reindex failed ${err.message}`)
+          })
+          return Promise.resolve()
+        }
+        return reindex(ctx.token)
+      }),
     status: userAndSystemProcedure
       .meta({
         openapi: {
