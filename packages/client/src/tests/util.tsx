@@ -943,8 +943,7 @@ const mockFetchCertificatesTemplatesDefinition = [
 export const mockConfigResponse = {
   config: mockOfflineData.config,
   anonymousConfig: mockOfflineData.anonymousConfig,
-  certificates: mockFetchCertificatesTemplatesDefinition,
-  systems: mockOfflineData.systems
+  certificates: mockFetchCertificatesTemplatesDefinition
 }
 
 export const mockOfflineDataDispatch = {
@@ -959,8 +958,7 @@ export const mockOfflineDataDispatch = {
   config: mockOfflineData.config,
   anonymousConfig: mockOfflineData.anonymousConfig,
   forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString())
-    .forms,
-  systems: mockOfflineData.systems
+    .forms
 }
 
 export async function createTestStore() {

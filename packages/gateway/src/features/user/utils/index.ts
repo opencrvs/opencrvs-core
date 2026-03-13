@@ -18,6 +18,7 @@ import decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
 import { Scope } from '@opencrvs/commons/authentication'
 import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
+import { api as eventsApi } from '@gateway/v2-events/events/service'
 
 export interface ITokenPayload {
   sub: string
@@ -47,15 +48,26 @@ export async function getSystem(
   body: { [key: string]: string | undefined },
   authHeader: IAuthHeader
 ): Promise<ISystemModelData> {
-  const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-  return await res.json()
+  const systemId = body.systemId || body.clientId
+  if (!systemId) {
+    throw new Error('getSystem: systemId or clientId is required')
+  }
+  const result = await eventsApi.integrations.get.query(
+    { id: systemId as UUID },
+    { context: { headers: authHeader } }
+  )
+  return {
+    scope: result.scopes as Scope[],
+    name: result.name,
+    createdBy: result.createdBy,
+    client_id: result.id,
+    username: '',
+    status: result.status,
+    sha_secret: result.shaSecret ?? '',
+    type: 'HEALTH',
+    practitionerId: '',
+    settings: { dailyQuota: 0 }
+  }
 }
 
 export async function getUserMobile(userId: string, authHeader: IAuthHeader) {

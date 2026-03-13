@@ -29,7 +29,6 @@ import { resolvers as roleRootResolvers } from '@gateway/features/role/root-reso
 import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
 import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
-import { resolvers as integrationResolver } from '@gateway/features/systems/root-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import {
   ISystemModelData,
@@ -63,7 +62,6 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   userRootResolvers as IResolvers,
   userTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
-  integrationResolver as IResolvers,
   metricsTypeResolvers as IResolvers,
   typeResolvers as IResolvers,
   searchRootResolvers as IResolvers,
@@ -71,7 +69,6 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   roleRootResolvers as IResolvers,
   roleTypeResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
-  integrationResolver as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
   {
     FieldValue: new GraphQLScalarType({

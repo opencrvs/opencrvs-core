@@ -46,7 +46,6 @@ export interface GQLQuery {
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getUserRoles: Array<GQLUserRole>
-  fetchSystem?: GQLSystem
 }
 
 export interface GQLMutation {
@@ -96,12 +95,6 @@ export interface GQLMutation {
   resendInvite?: string
   usernameReminder?: string
   resetPasswordInvite?: string
-  reactivateSystem?: GQLSystem
-  deactivateSystem?: GQLSystem
-  registerSystem?: GQLSystemSecret
-  refreshSystemSecret?: GQLSystemSecret
-  updatePermissions?: GQLSystem
-  deleteSystem?: GQLSystem
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
 }
@@ -466,17 +459,6 @@ export interface GQLUserRole {
   scopes: Array<string>
 }
 
-export interface GQLSystem {
-  _id: string
-  clientId: string
-  shaSecret: string
-  status: GQLSystemStatus
-  name: string
-  type: GQLSystemType
-  integratingSystemType?: GQLIntegratingSystemType
-  settings?: GQLSystemSettings
-}
-
 export interface GQLCorrectionInput {
   requester: string
   requesterOther?: string
@@ -610,23 +592,6 @@ export interface GQLAvatar {
 export interface GQLAvatarInput {
   type: string
   data: string
-}
-
-export interface GQLSystemSecret {
-  system: GQLSystem
-  clientSecret: string
-}
-
-export interface GQLSystemInput {
-  name: string
-  type: GQLSystemType
-  settings?: GQLSystemSettingsInput
-  integratingSystemType?: GQLIntegratingSystemType
-}
-
-export interface GQLUpdatePermissionsInput {
-  clientId: string
-  webhook: Array<GQLWebhookInput>
 }
 
 export interface GQLBookMarkedSearches {
@@ -971,31 +936,6 @@ export interface GQLI18nMessage {
   description: string
 }
 
-export const enum GQLSystemStatus {
-  active = 'active',
-  deactivated = 'deactivated'
-}
-
-export const enum GQLSystemType {
-  NATIONAL_ID = 'NATIONAL_ID',
-  HEALTH = 'HEALTH',
-  RECORD_SEARCH = 'RECORD_SEARCH',
-  IMPORT_EXPORT = 'IMPORT_EXPORT',
-  CUSTOM = 'CUSTOM'
-}
-
-export const enum GQLIntegratingSystemType {
-  OTHER = 'OTHER'
-}
-
-export interface GQLSystemSettings {
-  dailyQuota?: number
-  webhook?: Array<GQLWebhookPermission>
-  openIdProviderClientId?: string
-  openIdProviderBaseUrl?: string
-  openIdProviderClaims?: string
-}
-
 export interface GQLAttachmentInput {
   _fhirID?: string
   contentType?: string
@@ -1175,16 +1115,6 @@ export interface GQLUserIdentifierInput {
 export interface GQLSignatureInput {
   data: string
   type?: string
-}
-
-export interface GQLSystemSettingsInput {
-  dailyQuota?: number
-  webhook?: Array<GQLWebhookInput | null>
-}
-
-export interface GQLWebhookInput {
-  event: string
-  permissions: Array<string | null>
 }
 
 export interface GQLAssignmentData {
@@ -1463,11 +1393,6 @@ export interface GQLEventProgressData {
   timeInReadyToPrint?: number
 }
 
-export interface GQLWebhookPermission {
-  event: string
-  permissions: Array<string>
-}
-
 export const enum GQLAttachmentInputStatus {
   approved = 'approved',
   validated = 'validated',
@@ -1684,11 +1609,9 @@ export interface GQLResolver {
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   UserRole?: GQLUserRoleTypeResolver
-  System?: GQLSystemTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
-  SystemSecret?: GQLSystemSecretTypeResolver
   BookMarkedSearches?: GQLBookMarkedSearchesTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
@@ -1726,7 +1649,6 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   I18nMessage?: GQLI18nMessageTypeResolver
-  SystemSettings?: GQLSystemSettingsTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -1748,7 +1670,6 @@ export interface GQLResolver {
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   MarriageEventSearchSet?: GQLMarriageEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
-  WebhookPermission?: GQLWebhookPermissionTypeResolver
   FieldValue?: GraphQLScalarType
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
@@ -1790,7 +1711,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getUserRoles?: QueryToGetUserRolesResolver<TParent>
-  fetchSystem?: QueryToFetchSystemResolver<TParent>
 }
 
 export interface QueryToSendNotificationToAllUsersArgs {
@@ -2324,18 +2244,6 @@ export interface QueryToGetUserRolesResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface QueryToFetchSystemArgs {
-  clientId: string
-}
-export interface QueryToFetchSystemResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: QueryToFetchSystemArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLMutationTypeResolver<TParent = any> {
   requestRegistrationCorrection?: MutationToRequestRegistrationCorrectionResolver<TParent>
   rejectRegistrationCorrection?: MutationToRejectRegistrationCorrectionResolver<TParent>
@@ -2383,12 +2291,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendInvite?: MutationToResendInviteResolver<TParent>
   usernameReminder?: MutationToUsernameReminderResolver<TParent>
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
-  reactivateSystem?: MutationToReactivateSystemResolver<TParent>
-  deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
-  registerSystem?: MutationToRegisterSystemResolver<TParent>
-  refreshSystemSecret?: MutationToRefreshSystemSecretResolver<TParent>
-  updatePermissions?: MutationToUpdatePermissionsResolver<TParent>
-  deleteSystem?: MutationToDeleteSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
 }
@@ -3107,93 +3009,6 @@ export interface MutationToResetPasswordInviteResolver<
   (
     parent: TParent,
     args: MutationToResetPasswordInviteArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToReactivateSystemArgs {
-  clientId: string
-}
-export interface MutationToReactivateSystemResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToReactivateSystemArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToDeactivateSystemArgs {
-  clientId: string
-}
-export interface MutationToDeactivateSystemResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToDeactivateSystemArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToRegisterSystemArgs {
-  system?: GQLSystemInput
-}
-export interface MutationToRegisterSystemResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRegisterSystemArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToRefreshSystemSecretArgs {
-  clientId: string
-}
-export interface MutationToRefreshSystemSecretResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRefreshSystemSecretArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToUpdatePermissionsArgs {
-  setting: GQLUpdatePermissionsInput
-}
-export interface MutationToUpdatePermissionsResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToUpdatePermissionsArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToDeleteSystemArgs {
-  clientId: string
-}
-export interface MutationToDeleteSystemResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: MutationToDeleteSystemArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -5121,92 +4936,6 @@ export interface UserRoleToScopesResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface GQLSystemTypeResolver<TParent = any> {
-  _id?: SystemTo_idResolver<TParent>
-  clientId?: SystemToClientIdResolver<TParent>
-  shaSecret?: SystemToShaSecretResolver<TParent>
-  status?: SystemToStatusResolver<TParent>
-  name?: SystemToNameResolver<TParent>
-  type?: SystemToTypeResolver<TParent>
-  integratingSystemType?: SystemToIntegratingSystemTypeResolver<TParent>
-  settings?: SystemToSettingsResolver<TParent>
-}
-
-export interface SystemTo_idResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemToClientIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemToShaSecretResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemToStatusResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemToNameResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemToTypeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemToIntegratingSystemTypeResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemToSettingsResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -5290,32 +5019,6 @@ export interface AvatarToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface AvatarToDataResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLSystemSecretTypeResolver<TParent = any> {
-  system?: SystemSecretToSystemResolver<TParent>
-  clientSecret?: SystemSecretToClientSecretResolver<TParent>
-}
-
-export interface SystemSecretToSystemResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemSecretToClientSecretResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},
@@ -7655,71 +7358,6 @@ export interface I18nMessageToDefaultMessageResolver<
 }
 
 export interface I18nMessageToDescriptionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLSystemSettingsTypeResolver<TParent = any> {
-  dailyQuota?: SystemSettingsToDailyQuotaResolver<TParent>
-  webhook?: SystemSettingsToWebhookResolver<TParent>
-  openIdProviderClientId?: SystemSettingsToOpenIdProviderClientIdResolver<TParent>
-  openIdProviderBaseUrl?: SystemSettingsToOpenIdProviderBaseUrlResolver<TParent>
-  openIdProviderClaims?: SystemSettingsToOpenIdProviderClaimsResolver<TParent>
-}
-
-export interface SystemSettingsToDailyQuotaResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemSettingsToWebhookResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemSettingsToOpenIdProviderClientIdResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemSettingsToOpenIdProviderBaseUrlResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemSettingsToOpenIdProviderClaimsResolver<
   TParent = any,
   TResult = any
 > {
@@ -10157,35 +9795,6 @@ export interface EventProgressDataToTimeInWaitingForBRISResolver<
 }
 
 export interface EventProgressDataToTimeInReadyToPrintResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLWebhookPermissionTypeResolver<TParent = any> {
-  event?: WebhookPermissionToEventResolver<TParent>
-  permissions?: WebhookPermissionToPermissionsResolver<TParent>
-}
-
-export interface WebhookPermissionToEventResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface WebhookPermissionToPermissionsResolver<
   TParent = any,
   TResult = any
 > {
