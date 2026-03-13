@@ -13,25 +13,42 @@ paths:
         - events
       security:
         - Authorization: []
+      parameters: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                waitForCompletion:
+                  default: true
+                  type: boolean
       responses:
         "200":
           description: Successful response
           content:
             application/json:
               schema: {}
-        "401": &a1
+        "400": &a1
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401": &a2
           description: Authorization not provided
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.UNAUTHORIZED"
-        "403": &a2
+        "403": &a3
           description: Insufficient access
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.FORBIDDEN"
-        "500": &a3
+        "500": &a4
           description: Internal server error
           content:
             application/json:
@@ -103,21 +120,16 @@ paths:
                     - error_message
                     - completed_at
                   additionalProperties: false
-        "400": &a4
-          description: Invalid input data
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error.BAD_REQUEST"
-        "401": *a1
-        "403": *a2
+        "400": *a1
+        "401": *a2
+        "403": *a3
         "404": &a5
           description: Not found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.NOT_FOUND"
-        "500": *a3
+        "500": *a4
   /config:
     get:
       operationId: event-config-get
@@ -136,9 +148,9 @@ paths:
                 items:
                   description: Configuration defining an event type.
                   $ref: "#/components/schemas/EventConfig"
-        "401": *a1
-        "403": *a2
-        "500": *a3
+        "401": *a2
+        "403": *a3
+        "500": *a4
   /events:
     post:
       operationId: event-create
@@ -176,10 +188,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventDocument"
-        "400": *a4
-        "401": *a1
-        "403": *a2
-        "500": *a3
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
   /events/{eventId}:
     get:
       operationId: event-get
@@ -203,11 +215,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventDocument"
-        "400": *a4
-        "401": *a1
-        "403": *a2
+        "400": *a1
+        "401": *a2
+        "403": *a3
         "404": *a5
-        "500": *a3
+        "500": *a4
   /events/{eventId}/notify:
     post:
       operationId: event-actions-notify-request
@@ -283,10 +295,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventDocument"
-        "400": *a4
-        "401": *a1
-        "403": *a2
-        "500": *a3
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
   /events/{eventId}/correction/request:
     post:
       operationId: event-actions-correction-request-request
@@ -362,10 +374,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventDocument"
-        "400": *a4
-        "401": *a1
-        "403": *a2
-        "500": *a3
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
   /events/{eventId}/correction/approve:
     post:
       operationId: event-actions-correction-approve-request
@@ -444,10 +456,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventDocument"
-        "400": *a4
-        "401": *a1
-        "403": *a2
-        "500": *a3
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
   /events/{eventId}/correction/reject:
     post:
       operationId: event-actions-correction-reject-request
@@ -536,10 +548,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventDocument"
-        "400": *a4
-        "401": *a1
-        "403": *a2
-        "500": *a3
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
   /events/search:
     post:
       operationId: event-search
@@ -599,10 +611,10 @@ paths:
                   - results
                   - total
                 additionalProperties: false
-        "400": *a4
-        "401": *a1
-        "403": *a2
-        "500": *a3
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
   /locations:
     get:
       operationId: locations-list
@@ -676,11 +688,11 @@ paths:
                     - validUntil
                     - locationType
                   additionalProperties: false
-        "400": *a4
-        "401": *a1
-        "403": *a2
+        "400": *a1
+        "401": *a2
+        "403": *a3
         "404": *a5
-        "500": *a3
+        "500": *a4
   /integrations:
     post:
       operationId: integrations-create
@@ -727,10 +739,10 @@ paths:
                   - shaSecret
                   - clientSecret
                 additionalProperties: false
-        "400": *a4
-        "401": *a1
-        "403": *a2
-        "500": *a3
+        "400": *a1
+        "401": *a2
+        "403": *a3
+        "500": *a4
     get:
       operationId: integrations-list
       summary: List integration clients
@@ -772,11 +784,11 @@ paths:
                     - scopes
                     - status
                   additionalProperties: false
-        "400": *a4
-        "401": *a1
-        "403": *a2
+        "400": *a1
+        "401": *a2
+        "403": *a3
         "404": *a5
-        "500": *a3
+        "500": *a4
   /attachments:
     post:
       summary: Upload a file attachment
@@ -1135,6 +1147,39 @@ components:
       required:
         - type
         - terms
+    error.BAD_REQUEST:
+      title: Invalid input data error (400)
+      description: The error information
+      example:
+        code: BAD_REQUEST
+        message: Invalid input data
+        issues: []
+      type: object
+      properties:
+        message:
+          description: The error message
+          example: Invalid input data
+          type: string
+        code:
+          description: The error code
+          example: BAD_REQUEST
+          type: string
+        issues:
+          description: An array of issues that were responsible for the error
+          example: []
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+            additionalProperties: false
+      required:
+        - message
+        - code
+      additionalProperties: false
     error.UNAUTHORIZED:
       title: Authorization not provided error (401)
       description: The error information
@@ -1217,39 +1262,6 @@ components:
         code:
           description: The error code
           example: INTERNAL_SERVER_ERROR
-          type: string
-        issues:
-          description: An array of issues that were responsible for the error
-          example: []
-          type: array
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-            additionalProperties: false
-      required:
-        - message
-        - code
-      additionalProperties: false
-    error.BAD_REQUEST:
-      title: Invalid input data error (400)
-      description: The error information
-      example:
-        code: BAD_REQUEST
-        message: Invalid input data
-        issues: []
-      type: object
-      properties:
-        message:
-          description: The error message
-          example: Invalid input data
-          type: string
-        code:
-          description: The error code
-          example: BAD_REQUEST
           type: string
         issues:
           description: An array of issues that were responsible for the error
