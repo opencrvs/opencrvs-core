@@ -126,7 +126,7 @@ describe('event.actions.custom', () => {
 
     test('prevents forbidden access if user has custom action scope but for wrong event type', async () => {
       const { client, payload } = await initialiseTest([
-        `record.custom-action[event=foobar,customActionType=${CUSTOM_ACTION_TYPE}]`
+        `type=record.custom-action&event=foobar&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
       await expect(
@@ -136,7 +136,7 @@ describe('event.actions.custom', () => {
 
     test('prevents forbidden access if user has custom action scope but for wrong custom action type', async () => {
       const { client, payload } = await initialiseTest([
-        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=foobar]`
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=foobar`
       ])
 
       await expect(
@@ -146,8 +146,8 @@ describe('event.actions.custom', () => {
 
     test('prevents forbidden access if user has two custom action scopes, but neither of them for correct event and action combination', async () => {
       const { client, payload } = await initialiseTest([
-        `record.custom-action[event=random-event,customActionType=${CUSTOM_ACTION_TYPE}]`,
-        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=random-action]`
+        `type=record.custom-action&event=random-event&customActionTypes=${CUSTOM_ACTION_TYPE}`,
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=random-action`
       ])
 
       await expect(
@@ -157,7 +157,7 @@ describe('event.actions.custom', () => {
 
     test('allows access if user has custom action scope for correct event type and custom action type', async () => {
       const { client, payload } = await initialiseTest([
-        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
       await expect(
@@ -168,7 +168,7 @@ describe('event.actions.custom', () => {
 
   test('returns HTTP409 if trying to execute an action not defined in countryconfig', async () => {
     const { client, payload } = await initialiseTest([
-      `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=INVALID_ACTION]`
+      `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=INVALID_ACTION`
     ])
 
     await expect(
@@ -182,7 +182,7 @@ describe('event.actions.custom', () => {
   test('returns HTTP409 if trying to execute an action where the condition is not met', async () => {
     const { client, payload } = await initialiseTest(
       [
-        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ],
       false
     )
@@ -198,7 +198,7 @@ describe('event.actions.custom', () => {
 
   test('successfully executes action', async () => {
     const { client, payload } = await initialiseTest([
-      `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+      `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
     ])
 
     await expect(
@@ -212,7 +212,7 @@ describe('event.actions.custom', () => {
 
   test('test non required field', async () => {
     const { client, payload } = await initialiseTest([
-      `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+      `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
     ])
 
     const customPayload = {
@@ -235,7 +235,7 @@ describe('event.actions.custom', () => {
   // @todo - un-skip after implementing validation for error field input
   test.skip('test with an error field', async () => {
     const { client, payload } = await initialiseTest([
-      `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+      `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
     ])
 
     const customPayload = {
@@ -266,7 +266,7 @@ describe('event.actions.custom', () => {
 
     test('should save action in requested state if notify API returns HTTP 202', async () => {
       const { client, payload } = await initialiseTest([
-        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
       mockNotifyApi(202)
@@ -284,7 +284,7 @@ describe('event.actions.custom', () => {
 
     test('should successfully accept a previously requested action', async () => {
       const { client, payload, generator, user } = await initialiseTest([
-        `record.custom-action[event=${TENNIS_CLUB_MEMBERSHIP},customActionType=${CUSTOM_ACTION_TYPE}]`
+        `type=record.custom-action&event=${TENNIS_CLUB_MEMBERSHIP}&customActionTypes=${CUSTOM_ACTION_TYPE}`
       ])
 
       const eventId = payload.eventId

@@ -374,6 +374,13 @@ export function getAcceptedScopesByType({
     .filter((scope): scope is RecordScopeV2 => scope !== null)
 }
 
+/**
+ * Checks if the given event type is allowed by the scope. If no specific event types are defined, it returns true.
+ *
+ * @param {RecordScopeV2} scope - The scope object which may include permitted event types in its options.
+ * @param {string} eventType - The event type to check for permission.
+ * @returns {boolean} Returns true if the event type is allowed by the scope.
+ */
 function isEventTypeAllowed(scope: RecordScopeV2, eventType: string): boolean {
   if (scope.options?.event === undefined) {
     return true

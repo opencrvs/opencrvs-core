@@ -470,7 +470,7 @@ export function testDataGenerator(rngSeed?: number) {
             ]
           }
         }),
-        'record.custom-action[event=tennis-club-membership,customActionType=Approve]'
+        'type=record.custom-action&event=tennis-club-membership&customActionTypes=Approve'
       ],
       registrationAgent: [
         SCOPES.RECORD_DECLARATION_EDIT,
