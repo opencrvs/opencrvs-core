@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { TRPCError } from '@trpc/server'
 import { HttpResponse, http } from 'msw'
 import {
@@ -30,6 +29,7 @@ import {
 } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { EventNotFoundError } from '../../service/events/events'
 
 const CUSTOM_ACTION_TYPE = 'CONFIRM_SENIOR_MEMBERSHIP'
 
@@ -131,7 +131,7 @@ describe('event.actions.custom', () => {
 
       await expect(
         client.event.actions.custom.request(payload)
-      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+      ).rejects.toMatchObject(new EventNotFoundError(payload.eventId))
     })
 
     test('prevents forbidden access if user has custom action scope but for wrong custom action type', async () => {
@@ -141,7 +141,7 @@ describe('event.actions.custom', () => {
 
       await expect(
         client.event.actions.custom.request(payload)
-      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+      ).rejects.toMatchObject(new EventNotFoundError(payload.eventId))
     })
 
     test('prevents forbidden access if user has two custom action scopes, but neither of them for correct event and action combination', async () => {
@@ -152,7 +152,7 @@ describe('event.actions.custom', () => {
 
       await expect(
         client.event.actions.custom.request(payload)
-      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+      ).rejects.toMatchObject(new EventNotFoundError(payload.eventId))
     })
 
     test('allows access if user has custom action scope for correct event type and custom action type', async () => {

@@ -387,45 +387,15 @@ function isEventTypeAllowed(scope: RecordScopeV2, eventType: string): boolean {
   return scope.options?.event?.includes(eventType)
 }
 
-function isCustomActionScope(
-  scope: RecordScopeV2
-): scope is Extract<RecordScopeV2, { type: 'record.custom-action' }> {
-  return scope.type === 'record.custom-action'
-}
-
-/**
- * Checks if a custom action is allowed based on the provided scopes, event type, and custom action type.
- *
- * @param {string[]} scopes - The plain scope strings
- * @param {string} eventType - The type of the event to check permission against
- * @param {string} customActionType - The custom action type for which authorization is checked
- * @returns {boolean} True if the action is allowed by any matching 'record.custom-action' scope, otherwise false.
- */
-export function customActionIsAllowed(
-  scopes: string[],
-  eventType: string,
-  customActionType: string
-): boolean {
-  const acceptedScopes = getAcceptedScopesByType({
-    acceptedScopes: ['record.custom-action'],
-    scopes
-  })
-
-  return acceptedScopes
-    .filter(isCustomActionScope)
-    .filter((scope) => isEventTypeAllowed(scope, eventType))
-    .some((scope) => {
-      if (scope.options?.customActionTypes === undefined) {
-        return false
-      }
-
-      return scope.options?.customActionTypes.includes(customActionType)
-    })
-}
-
 export function canUserCreateEvent(
   acceptedScopes: RecordScopeV2[],
   eventType: string
 ) {
   return acceptedScopes.some((scope) => isEventTypeAllowed(scope, eventType))
+}
+
+export function isCustomActionScope(
+  scope: RecordScopeV2
+): scope is Extract<RecordScopeV2, { type: 'record.custom-action' }> {
+  return scope.type === 'record.custom-action'
 }

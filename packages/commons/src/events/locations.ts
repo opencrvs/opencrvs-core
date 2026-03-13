@@ -21,7 +21,8 @@ import {
   RecordScopeV2,
   scopeUsesDeclaredOptions,
   scopeUsesFullOptions,
-  UserFilter
+  UserFilter,
+  isCustomActionScope
 } from '../scopes-v2'
 import { SystemContext, UserContext } from '../users/User'
 
@@ -121,6 +122,10 @@ function matchesJurisdictionFilter(
   return true
 }
 
+export type AccessOptions = {
+  customActionType?: string
+}
+
 /**
  * Given indexed event and resolved scope, determine if the scope allows access to the event.
  *
@@ -131,7 +136,8 @@ function matchesJurisdictionFilter(
 export function canAccessEventWithScope(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
   scope: RecordScopeV2,
-  user: UserContext | SystemContext
+  user: UserContext | SystemContext,
+  accessOptions?: AccessOptions
 ): boolean {
   const opts = scope.options
 
@@ -227,6 +233,18 @@ export function canAccessEventWithScope(
     }
   }
 
+  if (isCustomActionScope(scope)) {
+    const { options } = scope
+
+    if (
+      !accessOptions?.customActionType ||
+      !options?.customActionTypes ||
+      !options?.customActionTypes.includes(accessOptions.customActionType)
+    ) {
+      return false
+    }
+  }
+
   return true
 }
 
@@ -238,7 +256,10 @@ export function canAccessEventWithScope(
 export function userCanAccessEventWithScopes(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
   scopes: RecordScopeV2[],
-  user: UserContext | SystemContext
+  user: UserContext | SystemContext,
+  accessOptions?: AccessOptions
 ) {
-  return scopes.some((scope) => canAccessEventWithScope(event, scope, user))
+  return scopes.some((scope) =>
+    canAccessEventWithScope(event, scope, user, accessOptions)
+  )
 }

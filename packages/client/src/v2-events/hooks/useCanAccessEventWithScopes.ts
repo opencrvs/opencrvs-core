@@ -11,6 +11,7 @@
 
 import { useSelector } from 'react-redux'
 import {
+  AccessOptions,
   getAcceptedScopesByType,
   RecordScopeTypeV2,
   userCanAccessEventWithScopes
@@ -23,7 +24,7 @@ import { useCurrentUser } from './useCurrentUser'
 import { useLocations } from './useLocations'
 
 /**
- * Checks whether the current user's scopes allow access to a given event.
+ * Returns a function for checking whether the current user's scopes allow access to a given event.
  *
  * Resolves the event's location fields into administrative hierarchies and
  * evaluates each matching scope against the event and user context.
@@ -32,7 +33,7 @@ import { useLocations } from './useLocations'
 export function useCanAccessEventWithScopes(
   eventId: string,
   scopeTypes: RecordScopeTypeV2[]
-): boolean {
+) {
   const scopes = useSelector(getScope)
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
@@ -54,12 +55,20 @@ export function useCanAccessEventWithScopes(
     locations
   })
 
-  return userCanAccessEventWithScopes(eventWithHierarchy, matchingScopes, {
-    id: currentUser.id,
-    primaryOfficeId: currentUser.primaryOfficeId,
-    administrativeAreaId: currentUser.administrativeAreaId ?? null,
-    role: currentUser.role,
-    signature: currentUser.signature,
-    type: currentUser.type
-  })
+  return {
+    canAccessEventWithScopes: (accessOptions?: AccessOptions) =>
+      userCanAccessEventWithScopes(
+        eventWithHierarchy,
+        matchingScopes,
+        {
+          id: currentUser.id,
+          primaryOfficeId: currentUser.primaryOfficeId,
+          administrativeAreaId: currentUser.administrativeAreaId ?? null,
+          role: currentUser.role,
+          signature: currentUser.signature,
+          type: currentUser.type
+        },
+        accessOptions
+      )
+  }
 }

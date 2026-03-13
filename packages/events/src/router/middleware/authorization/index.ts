@@ -41,7 +41,8 @@ import {
   canUserCreateEvent,
   getEventConfigById,
   userCanAccessEventWithScopes,
-  getAcceptedScopesFromToken
+  getAcceptedScopesFromToken,
+  AccessOptions
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -349,7 +350,10 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
  * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
  *
  */
-export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
+export const canAccessEventWithScopes = (
+  scopes: RecordScopeTypeV2[],
+  accessOptions?: AccessOptions
+) => {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
@@ -383,7 +387,8 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     const hasAccess = userCanAccessEventWithScopes(
       eventIndexWithLocationHierarchy,
       acceptedScopes,
-      ctx.user
+      ctx.user,
+      accessOptions
     )
 
     if (!hasAccess) {

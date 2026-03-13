@@ -13,7 +13,6 @@ import React, { useMemo } from 'react'
 import {
   ActionType,
   EventIndex,
-  customActionIsAllowed,
   CustomActionConfig,
   getOrThrow,
   isActionEnabled,
@@ -28,6 +27,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { getScope } from '@client/profile/profileSelectors'
 import { useCustomActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import { ActionMenuItem } from './utils'
 
 export function useCustomActionConfigs(event: EventIndex): {
@@ -36,6 +36,9 @@ export function useCustomActionConfigs(event: EventIndex): {
 } {
   const scopes = useSelector(getScope)
   const validatorContext = useValidatorContext()
+  const { canAccessEventWithScopes } = useCanAccessEventWithScopes(event.id, [
+    'record.custom-action'
+  ])
 
   const userId = getOrThrow(
     validatorContext.user?.sub,
@@ -76,8 +79,8 @@ export function useCustomActionConfigs(event: EventIndex): {
       .filter(
         (action) => filterActionsByFlags([action.type], event.flags).length > 0
       )
-      .filter((action) =>
-        customActionIsAllowed(scopes ?? [], event.type, action.customActionType)
+      .filter(({ customActionType }) =>
+        canAccessEventWithScopes({ customActionType })
       )
       .map((action) => ({
         label: action.label,
@@ -93,11 +96,11 @@ export function useCustomActionConfigs(event: EventIndex): {
       }))
   }, [
     eventConfiguration.actions,
-    scopes,
     isDownloadedAndAssignedToUser,
     validatorContext,
     event,
-    onCustomAction
+    onCustomAction,
+    canAccessEventWithScopes
   ])
 
   return { customActionModal, customActionConfigs }

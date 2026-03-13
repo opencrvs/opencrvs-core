@@ -15,7 +15,6 @@ import {
   EventDocument,
   CustomActionInput
 } from '@opencrvs/commons/events'
-import { getScopes, customActionIsAllowed } from '@opencrvs/commons'
 import * as middleware from '@events/router/middleware'
 import { userAndSystemProcedure } from '@events/router/trpc'
 import { getEventById } from '@events/service/events/events'
@@ -30,23 +29,11 @@ export function customActionProcedures() {
     ...getDefaultActionProcedures(ActionType.CUSTOM),
     request: userAndSystemProcedure
       .input(CustomActionInput)
-      .use(async ({ ctx, input, next }) => {
-        try {
-          const event = await getEventById(input.eventId)
-          const scopes = getScopes(ctx.token)
-
-          if (
-            !customActionIsAllowed(scopes, event.type, input.customActionType)
-          ) {
-            throw new TRPCError({ code: 'FORBIDDEN' })
-          }
-
-          return await next()
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (_e) {
-          throw new TRPCError({ code: 'FORBIDDEN' })
-        }
-      })
+      .use((opts) =>
+        middleware.canAccessEventWithScopes(['record.custom-action'], {
+          customActionType: opts.input.customActionType
+        })(opts)
+      )
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
       .output(EventDocument)
