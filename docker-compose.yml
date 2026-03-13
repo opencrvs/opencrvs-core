@@ -238,7 +238,7 @@ services:
       - MONGO_URL=mongodb://mongo1/application-config
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
-      - USER_MANAGEMENT_URL=http://user-
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - GATEWAY_URL=http://gateway:7070/
       - DOCUMENTS_URL=http://documents:9050
       - CHECK_INVALID_TOKEN=true
