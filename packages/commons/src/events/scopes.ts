@@ -86,7 +86,6 @@ export function configurableEventScopeAllowed(
  * @param {DisplayableAction} action - The action to check authorization for.
  * @param {EventIndexWithAdministrativeHierarchy} event - The event with resolved administrative hierarchy.
  * @param {UserContext} currentUser - The current user's context used for V2 scope validation.
- * @param {string} [customActionType] - Optional custom action type for CUSTOM actions.
  * @returns {boolean} True if the action is in scope for the user, otherwise false.
  */
 export function isActionInScope({
