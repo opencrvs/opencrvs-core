@@ -270,6 +270,19 @@ export const getUserId = (token: TokenWithBearer): string => {
   return z.string().parse(tokenPayload.sub)
 }
 
+/**
+ * Extracts the subject (user ID) from a raw JWT string (without Bearer prefix).
+ * Returns null if the token cannot be decoded.
+ */
+export const getUserIdFromToken = (token: string): string | null => {
+  try {
+    const payload = decode(token) as { sub?: string }
+    return payload.sub ?? null
+  } catch {
+    return null
+  }
+}
+
 export const getUserTypeFromToken = (token: TokenWithBearer): TokenUserType => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
 

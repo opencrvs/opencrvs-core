@@ -12,11 +12,63 @@
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import { UserOrSystem } from '@opencrvs/commons'
-import { router, userOnlyProcedure } from '@events/router/trpc'
+import { UserAuditRecordInput } from '@opencrvs/commons/events'
+import {
+  router,
+  userAndSystemProcedure,
+  userOnlyProcedure
+} from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
+import {
+  queryUserAuditLog,
+  writeAuditLog
+} from '@events/storage/postgres/events/auditLog'
 import { userCanReadOtherUser } from '../middleware'
+
+const UserAuditListQuery = z.object({
+  userId: z.string(),
+  skip: z.number().optional().default(0),
+  count: z.number().optional().default(10),
+  timeStart: z.string().optional(),
+  timeEnd: z.string().optional()
+})
+
+const AuditLogEntry = z.object({
+  id: z.string(),
+  clientId: z.string(),
+  clientType: z.string(),
+  operation: z.string(),
+  requestData: z.record(z.string(), z.unknown()).nullable(),
+  responseSummary: z.record(z.string(), z.unknown()).nullable(),
+  createdAt: z.string()
+})
+
+const auditRouter = router({
+  record: userAndSystemProcedure
+    .input(UserAuditRecordInput)
+    .mutation(async ({ input, ctx }) => {
+      await writeAuditLog({
+        ...input,
+        clientId: ctx.user.id,
+        clientType: ctx.user.type
+      })
+    }),
+  list: userOnlyProcedure
+    .input(UserAuditListQuery)
+    .output(z.object({ results: z.array(AuditLogEntry), total: z.number() }))
+    .use(userCanReadOtherUser)
+    .query(async ({ input }) => {
+      return queryUserAuditLog({
+        subjectId: input.userId,
+        skip: input.skip,
+        count: input.count,
+        timeStart: input.timeStart,
+        timeEnd: input.timeEnd
+      })
+    })
+})
 
 export const userRouter = router({
   get: userOnlyProcedure
@@ -40,5 +92,6 @@ export const userRouter = router({
     .use(userCanReadOtherUser)
     .query(async ({ input }) => {
       return getUserActions(input)
-    })
+    }),
+  audit: auditRouter
 })
