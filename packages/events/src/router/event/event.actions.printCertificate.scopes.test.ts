@@ -158,6 +158,8 @@ test('templates option in scope does not affect printCertificate action authoriz
         eventId,
         transactionId: getUUID(),
         declaration: {},
+        // Deliberately use a templateId that does not match the scope's allowed templates                                                                                                 │
+        content: { templateId: 'a-template-id-not-in-scope' },
         annotation: {
           'collector.requesterId': 'INFORMANT',
           'collector.identity.verify': true
