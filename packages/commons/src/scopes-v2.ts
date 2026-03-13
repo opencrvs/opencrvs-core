@@ -96,7 +96,6 @@ const CustomActionScopeOptions = ScopeOptionsFull.extend({
   customActionTypes: z
     .preprocess(
       (val) => (val === undefined ? undefined : [val].flat()),
-      // TODO CIHAN: remove optionality?
       z.array(z.string()).optional()
     )
     .describe('Allowed custom action types')
