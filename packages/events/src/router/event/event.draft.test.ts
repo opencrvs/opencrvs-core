@@ -220,7 +220,7 @@ describe('Delete document references in drafts as side-effect', () => {
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as DocumentPath
+            path: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as DocumentPath
           }
         },
         transactionId: generateUuid(rng),

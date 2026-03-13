@@ -86,11 +86,7 @@ export async function fileExistsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  // Ensure file is still in the desired format. forwarding url from gateway,
-  // '/files/{filePath*}' --> files//filename.jpg and the double slash is removed.
-  const documentPath = request.params.filePath
-    ?.replace(/^\/?ocrvs\//, '')
-    .replace(/^\/+/, '')
+  const documentPath = DocumentPath.parse(request.params.filePath)
 
   let stat
 

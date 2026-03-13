@@ -17,7 +17,6 @@ import {
   EventDocument,
   FileFieldValue,
   FileFieldWithOptionValue,
-  ensureDocumentPath,
   getAcceptedActions
 } from '@opencrvs/commons/client'
 import { removeCached } from '@client/v2-events/cache'
@@ -37,7 +36,7 @@ export function getFilepathsFromActionDocument(
     const metadataSignatureFilepaths = signatureKeys
       .map((key) => metadata[key])
       .filter((value): value is string => !!value)
-      .map(ensureDocumentPath)
+      .map((value) => value as DocumentPath)
 
     const actionFilePaths = [...declarationValues, ...annotationValues].flatMap(
       (value) => {

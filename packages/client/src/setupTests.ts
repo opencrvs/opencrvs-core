@@ -29,7 +29,6 @@ import createFetchMock from 'vitest-fetch-mock'
  */
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 const config = {
-  MINIO_BUCKET: 'ocrvs',
   MINIO_BASE_URL: 'http://localhost:3535',
   APPLICATION_NAME: 'Farajaland CRVS',
   COUNTRY: 'BGD',

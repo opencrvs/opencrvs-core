@@ -12,24 +12,13 @@
 import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
-import {
-  DocumentPath,
-  FullDocumentPath,
-  getUserId,
-  toDocumentPath
-} from '@opencrvs/commons'
+import { DocumentPath, getUserId } from '@opencrvs/commons'
 
 export async function deleteDocument(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  // Ensure file is still in the desired format. forwarding url from gateway,
-  // '/files/{filePath*}' --> files//filename.jpg and the double slash is removed.
-  let documentPath = DocumentPath.safeParse(request.params.filePath).data
-  if (!documentPath) {
-    const filePath = FullDocumentPath.parse(request.params.filePath)
-    documentPath = toDocumentPath(filePath)
-  }
+  const documentPath = DocumentPath.parse(request.params.filePath)
 
   const userId = getUserId(request.headers.authorization)
 

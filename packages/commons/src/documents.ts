@@ -57,15 +57,3 @@ export const toDocumentPath = (path: FullDocumentPath): DocumentPath => {
   return path.split('/').slice(2).join('/') as DocumentPath
 }
 
-/**
- * Converts any file path format to DocumentPath.
- * If the path starts with '/' (i.e., FullDocumentPath like /bucket/event-id/file.png),
- * strips the leading slash and bucket name segment.
- * If already a DocumentPath (no leading slash), returns as-is.
- */
-export function ensureDocumentPath(path: string): DocumentPath {
-  if (path.startsWith('/')) {
-    return path.split('/').slice(2).join('/') as DocumentPath
-  }
-  return path as DocumentPath
-}

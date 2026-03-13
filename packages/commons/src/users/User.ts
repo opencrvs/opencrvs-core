@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import * as z from 'zod/v4'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
@@ -32,9 +32,9 @@ export const User = z.object({
     })
   ),
   role: z.string(),
-  avatar: FullDocumentPath.optional(),
-  signature: FullDocumentPath.optional().describe(
-    'Storage key for the user signature. e.g. /ocrvs/signature.png'
+  avatar: DocumentPath.optional(),
+  signature: DocumentPath.optional().describe(
+    'Storage key for the user signature. e.g. signature.png'
   ),
   primaryOfficeId: UUID,
   administrativeAreaId: UUID.nullish(),

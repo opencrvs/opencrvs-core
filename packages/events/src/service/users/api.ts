@@ -12,7 +12,7 @@
 import fetch from 'node-fetch'
 import {
   joinUrl,
-  FullDocumentPath,
+  DocumentPath,
   UUID,
   IUserName,
   UserOrSystem,
@@ -29,10 +29,10 @@ import {
 type UserAPIResult = {
   id: string
   avatar?: {
-    data: FullDocumentPath
+    data: string
     type: string
   }
-  signature?: FullDocumentPath
+  signature?: string
   device?: string
   name: IUserName[]
   username: string
@@ -80,8 +80,12 @@ export async function getUserOrSystem(
       id: user.id,
       name: user.name,
       role: user.role,
-      signature: user.signature ? user.signature : undefined,
-      avatar: user.avatar?.data ? user.avatar.data : undefined,
+      signature: user.signature
+        ? (user.signature as DocumentPath)
+        : undefined,
+      avatar: user.avatar?.data
+        ? (user.avatar.data as DocumentPath)
+        : undefined,
       primaryOfficeId: user.primaryOfficeId,
       device: user.device ? user.device : undefined,
       fullHonorificName: user.fullHonorificName

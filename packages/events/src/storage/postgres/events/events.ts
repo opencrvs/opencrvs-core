@@ -28,7 +28,6 @@ import { TrpcUserContext } from '../../../context'
 import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
-import { normalizeEventDocumentPaths } from './normalize-paths'
 
 export const STREAM_BATCH_SIZE = 100
 
@@ -43,13 +42,11 @@ function toEventDocument(
     })
   )
 
-  return normalizeEventDocumentPaths(
-    EventDocument.parse({
-      ...event,
-      type: eventType,
-      actions: notNullActions
-    })
-  )
+  return EventDocument.parse({
+    ...event,
+    type: eventType,
+    actions: notNullActions
+  })
 }
 
 /**
@@ -79,20 +76,18 @@ async function getEventsByIdsInTrx(
     .execute()) as (Events & { actions: EventActions[] })[]
 
   return events.map((event) =>
-    normalizeEventDocumentPaths(
-      EventDocument.parse({
-        ...event,
-        type: event.eventType,
-        actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
-          return {
-            ...rest,
-            type: actionType,
-            // turns db format +00 to Z format
-            createdAt: DateTime.fromISO(createdAt).toISO()
-          }
-        })
+    EventDocument.parse({
+      ...event,
+      type: event.eventType,
+      actions: event.actions.map(({ actionType, createdAt, ...rest }) => {
+        return {
+          ...rest,
+          type: actionType,
+          // turns db format +00 to Z format
+          createdAt: DateTime.fromISO(createdAt).toISO()
+        }
       })
-    )
+    })
   )
 }
 
