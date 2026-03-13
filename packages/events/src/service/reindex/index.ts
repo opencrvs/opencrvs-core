@@ -184,7 +184,7 @@ export async function runReindex(token: TokenWithBearer) {
     throw err
   }
   await Promise.all(
-    configurations.map((config) =>
+    configurations.map(async (config) =>
       finaliseReindexIndex(
         config.id,
         getTemporaryIndexName(config.id, timestamp)
@@ -196,7 +196,7 @@ export async function runReindex(token: TokenWithBearer) {
   await pruneOldReindexingStatusEntries()
 }
 
-export function reindex(token: TokenWithBearer) {
+export async function reindex(token: TokenWithBearer) {
   logger.info('Reindex started in background')
   return runReindex(token)
 }

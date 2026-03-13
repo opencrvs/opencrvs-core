@@ -32,10 +32,7 @@ import { useCountryConfigWorkqueueConfigurations } from '@client/v2-events/featu
 import { ROUTES } from '@client/v2-events/routes'
 import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
-import {
-  getIndividualNameObj,
-  removeUserDetails
-} from '@client/utils/userUtils'
+import { removeUserDetails } from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -63,6 +60,7 @@ function Workqueues({
   const intl = useIntl()
   const navigate = useNavigate()
   const { getCount } = useWorkqueue(currentWorkqueueSlug ?? '')
+
   const counts = getCount.useSuspenseQuery()
 
   return workqueues.map(({ name: label, slug, icon }) => (
@@ -113,15 +111,25 @@ export function SidebarComponent({
 
   let name = ''
   if (userDetails?.name) {
-    const nameObj = getIndividualNameObj(userDetails.name, language)
+    const nameObj =
+      userDetails.name.find((n) => n.use === language) ?? userDetails.name[0]
     if (nameObj) {
-      const { firstNames, familyName } = nameObj
-      name = joinValues([firstNames, familyName], ' ')
+      name = joinValues([...nameObj.given, nameObj.family], ' ')
     }
   }
 
   const role =
-    (userDetails?.role && intl.formatMessage(userDetails.role.label)) ?? ''
+    (userDetails?.role &&
+      intl.formatMessage(
+        {
+          id: 'event.history.role',
+          defaultMessage: 'Unknown'
+        },
+        {
+          role: userDetails.role
+        }
+      )) ??
+    ''
 
   const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
 
@@ -195,7 +203,7 @@ export function SidebarComponent({
       </NavigationGroup>
       <OrganisationNavigationGroup
         currentWorkqueueSlug={workqueueSlug}
-        primaryOfficeId={userDetails?.primaryOffice.id}
+        primaryOfficeId={userDetails?.primaryOfficeId}
       />
       <PerformanceNavigationGroup currentWorkqueueSlug={workqueueSlug} />
       {isMobileView && (

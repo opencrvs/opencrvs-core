@@ -59,7 +59,6 @@ type IUserProps = {
   formData: IFormSectionData
   submitting: boolean
   userDetailsStored?: boolean
-  loadingRoles?: boolean
 }
 
 interface IDispatchProps {
@@ -99,8 +98,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
     fetchAndStoreUserData,
     client,
     section,
-    userDetailsStored,
-    loadingRoles
+    userDetailsStored
   } = props
 
   useEffect(() => {
@@ -155,7 +153,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
     </ActionPageLight>
   )
 
-  if (submitting || loadingRoles || (userId && !userDetailsStored)) {
+  if (submitting || (userId && !userDetailsStored)) {
     return renderLoadingPage()
   }
 
@@ -272,7 +270,7 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
     throw new Error(`No section found ${sectionId}`)
   }
 
-  if (!user?.primaryOffice.id) {
+  if (!user?.primaryOfficeId) {
     throw new Error(`No primary office found for user`)
   }
 
@@ -286,7 +284,7 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
   )
     ? addJurisdictionFilterToLocationSearchInput(
         section,
-        user.primaryOffice.id as UUID
+        user.primaryOfficeId as UUID
       )
     : section
 
@@ -338,7 +336,6 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
     formData,
     submitting: state.userForm.submitting,
     userDetailsStored: state.userForm.userDetailsStored,
-    loadingRoles: state.userForm.loadingRoles,
     activeGroup: {
       ...group,
       fields

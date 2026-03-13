@@ -201,14 +201,7 @@ export function DownloadButton({
         ) : (
           <AvatarSmall
             key={user?.avatar || 'default'}
-            avatar={
-              user?.avatar
-                ? {
-                    data: user.avatar,
-                    type: 'image/jpeg' // This is never used internally
-                  }
-                : undefined
-            }
+            avatar={user?.avatar || undefined}
             name={user && getUsersFullName(user.name, intl.locale)}
           />
         )}

@@ -11,78 +11,11 @@
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
 import { ADVANCED_SEARCH_PARAM_FIELDS } from './mutations'
-
-/*
- * id and userMgntUserID return the same value
- * we should refactor this to just keep one of them
- */
-const FETCH_USER = gql`
-  ${ADVANCED_SEARCH_PARAM_FIELDS}
-  query fetchUser($userId: String!) {
-    getUser(userId: $userId) {
-      id
-      userMgntUserID
-      creationDate
-      username
-      practitionerId
-      mobile
-      email
-      fullHonorificName
-      role {
-        id
-        label {
-          id
-          defaultMessage
-          description
-        }
-      }
-      status
-      name {
-        use
-        firstNames
-        familyName
-      }
-      primaryOffice {
-        id
-        name
-        alias
-        status
-      }
-      localRegistrar {
-        name {
-          use
-          firstNames
-          familyName
-        }
-        role
-        signature {
-          data
-          type
-        }
-      }
-      avatar {
-        type
-        data
-      }
-      searches {
-        searchId
-        name
-        parameters {
-          ...AdvancedSeachParameters
-        }
-      }
-    }
-  }
-`
+import { trpcClient } from '../v2-events/trpc'
 
 async function fetchUserDetails(userId: string) {
-  return (
-    client &&
-    client.query({
-      query: FETCH_USER,
-      variables: { userId }
-    })
-  )
+  const user = await trpcClient.user.get.query(userId)
+  return user
 }
 
 export const queries = {

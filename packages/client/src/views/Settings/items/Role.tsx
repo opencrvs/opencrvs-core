@@ -20,12 +20,13 @@ import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplif
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
+import { formatUserRole } from '@client/v2-events/hooks/useUserDetails'
 
 export function Role() {
   const intl = useIntl()
   const role = useSelector<IStoreState, string>((state) => {
     const userDetails = getUserDetails(state)
-    return (userDetails && intl.formatMessage(userDetails.role.label)) || ''
+    return formatUserRole(userDetails?.role, intl)
   })
   return (
     <ListViewItemSimplified

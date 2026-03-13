@@ -61,7 +61,6 @@ services:
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
       - EVENTS_URL=http://events:5555/
-      - FHIR_URL=http://hearth:3447/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
@@ -107,8 +106,7 @@ services:
       - DOCUMENTS_URL=http://documents:9050
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - FHIR_URL=http://hearth:3447/fhir
+      - COUNTRY_CONFIG_URL=http://countr
       - WEBHOOKS_URL=http://webhooks:2525/
       - APPLICATION_CONFIG_URL=http://config:2021/
       - AUTH_URL=http://auth:4040
@@ -123,11 +121,9 @@ services:
     depends_on:
       - base
     environment:
-      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - NODE_ENV=development
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
-      - FHIR_URL=http://hearth:3447/fhir
       - APPLICATION_CONFIG_URL=http://config:2021/
   metrics:
     image: ghcr.io/opencrvs/ocrvs-metrics:${VERSION}
@@ -145,12 +141,10 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - CONFIG_API_URL=http://config:2021
       - MONGO_URL=mongodb://mongo1/metrics
-      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
-      - DOCUMENTS_URL=http://documents:9050
-      - FHIR_URL=http://hearth:3447/fhir
+      - DOCUMENTS_URL=http://documents:9
   # END User facing services
   scheduler:
     image: ghcr.io/opencrvs/ocrvs-scheduler:${VERSION}
@@ -194,7 +188,6 @@ services:
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - HOST=0.0.0.0
       - METRICS_URL=http://metrics:1050
-      - FHIR_URL=http://hearth:3447/fhir
       - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
@@ -214,7 +207,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
-      - FHIR_URL=http://hearth:3447/fhir
   notification:
     image: ghcr.io/opencrvs/ocrvs-notification:${VERSION}
     #platform: linux/amd64
@@ -246,12 +238,10 @@ services:
       - MONGO_URL=mongodb://mongo1/application-config
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - FHIR_URL=http://hearth:3447/fhir
+      - USER_MANAGEMENT_URL=http://user-
       - GATEWAY_URL=http://gateway:7070/
       - DOCUMENTS_URL=http://documents:9050
       - CHECK_INVALID_TOKEN=true
-      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
   migration:
     image: ghcr.io/opencrvs/ocrvs-migration:${VERSION}
     #platform: linux/amd64

@@ -23,7 +23,7 @@ import {
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
-import { UserDetails, getIndividualNameObj } from '@client/utils/userUtils'
+import { UserDetails } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -81,10 +81,11 @@ const ProfileMenuComponent = ({
     let userName = ''
 
     if (userDetails && userDetails.name) {
-      const nameObj = getIndividualNameObj(userDetails.name, language)
+      const nameObj =
+        userDetails.name.find((n) => n.use === language) || userDetails.name[0]
 
       if (nameObj) {
-        userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+        userName = `${nameObj.given.join(' ')} ${nameObj.family}`.trim()
       }
     }
 
@@ -101,7 +102,16 @@ const ProfileMenuComponent = ({
       <>
         <UserName>{userName}</UserName>
         <UserRole>
-          {userDetails && intl.formatMessage(userDetails.role.label)}
+          {userDetails &&
+            intl.formatMessage(
+              {
+                id: 'event.history.role',
+                defaultMessage: 'Unknown'
+              },
+              {
+                role: userDetails.role
+              }
+            )}
         </UserRole>
       </>
     )

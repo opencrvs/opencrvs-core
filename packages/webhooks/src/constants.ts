@@ -25,7 +25,6 @@ export const PRODUCTION = env.isProd
 export const QA_ENV = env.QA_ENV
 
 export const AUTH_URL = env.AUTH_URL
-export const FHIR_URL = env.FHIR_URL
 
 export const CHECK_INVALID_TOKEN = env.CHECK_INVALID_TOKEN
 export const REDIS_HOST = env.REDIS_HOST

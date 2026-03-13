@@ -262,7 +262,7 @@ const multiFileConfig = {
   advancedSearch: []
 } satisfies EventConfig
 
-beforeEach(() => {
+beforeEach(async () => {
   return createIndex(
     getEventIndexName(multiFileConfig.id),
     getDeclarationFields(tennisClubMembershipEvent)

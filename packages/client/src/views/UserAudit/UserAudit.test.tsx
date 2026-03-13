@@ -26,6 +26,7 @@ import { GetUserQuery, Status } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { vi } from 'vitest'
+import { UUID } from '@opencrvs/commons/client'
 
 import { formatUrl } from '@client/navigation'
 import { USER_PROFILE } from '@client/navigation/routes'
@@ -148,12 +149,7 @@ describe('User audit list tests for sys admin', () => {
     const { store: testStore } = await createTestStore()
     store = testStore
 
-    userDetails.primaryOffice = {
-      id: '895cc945-94a9-4195-9a29-22e9310f3385',
-      status: 'active',
-      name: 'Narsingdi Paurasabha',
-      alias: ['নরসিংদী পৌরসভা']
-    }
+    userDetails.primaryOfficeId = '895cc945-94a9-4195-9a29-22e9310f3385' as UUID
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
     setScopes(SYSTEM_ADMIN_DEFAULT_SCOPES, store)
 

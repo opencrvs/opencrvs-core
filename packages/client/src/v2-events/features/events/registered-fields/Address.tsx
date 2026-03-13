@@ -270,7 +270,7 @@ function AddressInput(props: Props) {
       return adminArea
     }
     if (adminArea.$location) {
-      const locationId = UUID.safeParse(userDetails?.primaryOffice.id).data
+      const locationId = UUID.safeParse(userDetails?.primaryOfficeId).data
       const officeAdminAreaId = locationId
         ? locations.get(locationId)?.administrativeAreaId
         : undefined

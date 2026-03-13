@@ -654,7 +654,7 @@ export async function getCurrentUserID(): Promise<string> {
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as UserDetails).userMgntUserID || ''
+  return (JSON.parse(userDetails) as UserDetails).id || ''
 }
 
 async function getUserData(userId: string) {

@@ -237,7 +237,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
             key="change-password-mutation"
             mutation={changePasswordMutation}
             variables={{
-              userId: get(this.props, 'userDetails.userMgntUserID'),
+              userId: this.props.userDetails!.id,
               existingPassword: this.state.currentPassword,
               password: this.state.newPassword
             }}

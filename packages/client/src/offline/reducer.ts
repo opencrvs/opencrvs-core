@@ -573,7 +573,7 @@ function reducer(
             ? undefined
             : state.userDetails &&
               state.userDetails.primaryOffice &&
-              state.userDetails.primaryOffice.id
+              state.userDetails.primaryOfficeId
         }*/
       )
       const activeOffices = Object.fromEntries(

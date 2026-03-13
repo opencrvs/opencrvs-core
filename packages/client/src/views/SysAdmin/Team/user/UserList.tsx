@@ -515,7 +515,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
                 }
                 disabled={!canReadUser(user)}
               >
-                <AvatarSmall name={name} avatar={avatar || undefined} />
+                <AvatarSmall name={name} avatar={avatar?.data || undefined} />
               </Link>
             ),
             label: (

@@ -42,7 +42,7 @@ input UserInput {
   role: String
   email: String
   fullHonorificName: String
-  primaryOffice: String
+  primaryOfficeId: String
   device: String
   signature: SignatureInput
 }
@@ -73,24 +73,16 @@ type System {
 # are optional when a Local System Admin creates new user.
 type User {
   id: ID!
-  userMgntUserID: ID!
-  practitionerId: String!
   name: [HumanName!]! # -> .name
   username: String
   mobile: String
-  role: UserRole!
+  role: String!
   email: String
   fullHonorificName: String
   status: Status!
-  underInvestigation: Boolean
-  primaryOffice: Location!
-  localRegistrar: LocalRegistrar
-  identifier: Identifier
+  primaryOfficeId: String!
   signature: Signature
-  creationDate: String!
-  avatar: Avatar
-  device: String
-  searches: [BookmarkedSeachItem!]
+  avatar: String
 }
 
 type SearchUserResult {
@@ -101,25 +93,6 @@ type SearchUserResult {
 input SecurityQuestionAnswer {
   questionKey: String
   answer: String
-}
-
-type SearchFieldAgentResult {
-  results: [SearchFieldAgentResponse]
-  totalItems: Int
-}
-
-type SearchFieldAgentResponse {
-  practitionerId: String
-  fullName: String
-  role: UserRole
-  status: Status
-  avatar: Avatar
-  primaryOfficeId: String
-  creationDate: String
-  totalNumberOfDeclarationStarted: Int
-  totalNumberOfInProgressAppStarted: Int
-  totalNumberOfRejectedDeclarations: Int
-  averageTimeForDeclaredDeclarations: Int
 }
 
 type VerifyPasswordResult {
@@ -150,18 +123,6 @@ type Query {
     skip: Int
     sort: String
   ): SearchUserResult
-  searchFieldAgents(
-    locationId: String
-    primaryOfficeId: String
-    status: String
-    language: String
-    timeStart: String!
-    timeEnd: String!
-    event: String
-    count: Int
-    skip: Int
-    sort: String
-  ): SearchFieldAgentResult
   verifyPasswordById(id: String!, password: String!): VerifyPasswordResult
 }
 
