@@ -43,7 +43,7 @@ export const ActionConfigBase = z.object({
    *
    * This could reference AvailableIcons, but it was causing TS7056 error:
    * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
-   * for ActionConfig.d.ts.
+   * for EventConfig.d.ts.
    */
   icon: z.string().describe('Icon representing the action').optional(),
   conditionals: z

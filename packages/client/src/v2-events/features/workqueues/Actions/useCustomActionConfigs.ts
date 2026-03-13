@@ -59,6 +59,7 @@ export function useCustomActionConfigs(event: EventIndex): {
     scopes: scopes ?? []
   })
 
+  // If no custom action scopes are found, we can return early.
   if (customActionScopes.length === 0) {
     return {
       customActionModal: null,
