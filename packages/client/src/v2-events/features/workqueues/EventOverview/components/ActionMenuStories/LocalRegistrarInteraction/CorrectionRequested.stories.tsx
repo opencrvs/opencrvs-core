@@ -12,7 +12,8 @@ import type { Meta } from '@storybook/react'
 import {
   ActionType,
   ClientSpecificAction,
-  AssignmentStatus
+  AssignmentStatus,
+  TestUserRole
 } from '@opencrvs/commons/client'
 
 import { ActionMenu } from '../../ActionMenu'
