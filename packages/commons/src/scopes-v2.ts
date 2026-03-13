@@ -416,7 +416,7 @@ export function customActionIsAllowed(
     .filter((scope) => isEventTypeAllowed(scope, eventType))
     .some((scope) => {
       if (scope.options?.customActionTypes === undefined) {
-        return true
+        return false
       }
 
       return scope.options?.customActionTypes.includes(customActionType)
