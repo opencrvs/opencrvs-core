@@ -35,7 +35,8 @@ import {
   AdministrativeArea,
   getActionAnnotationFields,
   FieldUpdateValue,
-  FieldConfig
+  FieldConfig,
+  DocumentPath
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -44,6 +45,7 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
 import { AdminStructureItem } from '@client/utils/referenceApi'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 
 interface FontFamilyTypes {
   normal: string
@@ -214,10 +216,10 @@ export const stringifyEventMetadata = ({
               metadata.legalStatuses.REGISTERED.registrationNumber,
             createdBySignature: metadata.legalStatuses.REGISTERED
               .createdBySignature
-              ? new URL(
-                  metadata.legalStatuses.REGISTERED.createdBySignature,
-                  window.config.MINIO_BASE_URL
-                ).href
+              ? getUnsignedFileUrl(
+                  metadata.legalStatuses.REGISTERED
+                    .createdBySignature as DocumentPath
+                )
               : undefined
           }
         : null

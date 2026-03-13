@@ -13,9 +13,9 @@ import { expect, within } from '@storybook/test'
 import React from 'react'
 import { noop } from 'lodash'
 import {
+  DocumentPath,
   FieldConfig,
   FieldType,
-  FullDocumentPath,
   TENNIS_CLUB_DECLARATION_FORM
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
@@ -120,7 +120,7 @@ export const DraftAnnotationWithMultipleFields: Story = {
     annotation: {
       'review.comment': 'Draft comment before submission',
       'review.signature': {
-        path: '/ocrvs/55c7b677-bf65-490b-83af-2606cd95259b/f6477c7d-7aac-4bfe-969a-ee27056792fc.png' as FullDocumentPath,
+        path: 'files/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
         type: 'image/png',
         originalFilename: 'signature-review____signature-draft.png'
       }

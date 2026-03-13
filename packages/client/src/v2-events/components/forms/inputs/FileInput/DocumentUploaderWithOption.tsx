@@ -15,7 +15,7 @@ import { useField } from 'formik'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
-  FullDocumentPath,
+  DocumentPath,
   FileUploadWithOptions,
   MimeType,
   SelectOption
@@ -26,6 +26,7 @@ import { Select } from '@client/v2-events/features/events/registered-fields/Sele
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { useImageProcessing } from '@client/utils/imageUtils'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
@@ -170,7 +171,7 @@ function DocumentUploaderWithOption({
     maxFileSize
   })
 
-  const onDeleteFile = (path: FullDocumentPath) => {
+  const onDeleteFile = (path: DocumentPath) => {
     setFiles((prevFiles) => {
       const updatedFiles = prevFiles.filter((file) => file.path !== path)
       onChange(updatedFiles)
@@ -344,7 +345,7 @@ function toCertificateVariables(value: FileFieldWithOptionValue | undefined) {
     return parsed.data.reduce(
       (acc, file) => ({
         ...acc,
-        [file.option]: new URL(file.path, window.config.MINIO_BASE_URL).href
+        [file.option]: getUnsignedFileUrl(file.path)
       }),
       {}
     )

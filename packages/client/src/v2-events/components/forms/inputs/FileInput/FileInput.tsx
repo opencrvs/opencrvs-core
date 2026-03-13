@@ -15,10 +15,11 @@ import {
   FileFieldValue,
   MimeType,
   File as FileConfig,
-  SignatureField as SignatureFieldConfig
+  SignatureField as SignatureFieldConfig,
+  DocumentPath
 } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { getFullDocumentPath } from '@client/v2-events/cache'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { buttonMessages } from '@client/i18n/messages'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
 import { useImageProcessing } from '@client/utils/imageUtils'
@@ -94,7 +95,7 @@ function FileInput({
     }
 
     setFile({
-      path: getFullDocumentPath(processedFile.name),
+      path: processedFile.name as DocumentPath,
       originalFilename: processedFile.name,
       type: processedFile.type
     })
@@ -165,7 +166,7 @@ function stringify(value: FileFieldValue | undefined) {
   const parsed = FileFieldValue.safeParse(value)
 
   if (parsed.success) {
-    return new URL(parsed.data.path, window.config.MINIO_BASE_URL).href
+    return getUnsignedFileUrl(parsed.data.path)
   }
 
   return ''

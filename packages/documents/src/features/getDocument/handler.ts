@@ -19,16 +19,12 @@ export function createPreSignedUrl(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const filePath = request.params.filePath?.replace(`${MINIO_BUCKET}/`, '')
-
-  const payload = (
-    filePath ? { filePath: `/${MINIO_BUCKET}/${filePath}` } : request.payload
-  ) as {
-    filePath: string
-  }
+  const filePath = request.params.filePath
+    ? request.params.filePath
+    : (request.payload as { filePath: string }).filePath
 
   try {
-    const presignedURL = signFileUrl(payload.filePath)
+    const presignedURL = signFileUrl(`/${MINIO_BUCKET}/${filePath}`)
     return h.response({ presignedURL }).code(200)
   } catch (error) {
     return h.response(error).code(400)
@@ -53,6 +49,7 @@ export function createPresignedUrlsInBulk(
     signFileUrl(`/${MINIO_BUCKET}/${filename}`)
   )
 
+
   return h.response(response).code(200)
 }
 
@@ -69,7 +66,7 @@ export async function listFiles(
     true
   )) {
     if (obj.name) {
-      urls.push(`/${MINIO_BUCKET}/${obj.name}`)
+      urls.push(obj.name)
     }
   }
 

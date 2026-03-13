@@ -56,3 +56,4 @@ export type DocumentPath = z.infer<typeof DocumentPath>
 export const toDocumentPath = (path: FullDocumentPath): DocumentPath => {
   return path.split('/').slice(2).join('/') as DocumentPath
 }
+

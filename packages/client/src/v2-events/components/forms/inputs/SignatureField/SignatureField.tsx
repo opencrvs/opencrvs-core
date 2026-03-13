@@ -17,15 +17,15 @@ import { ImageUploader, InputError } from '@opencrvs/components'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
+import {
+  DocumentPath,
+  FileFieldValue,
+  MimeType
+} from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import {
-  cacheFile,
-  getFullDocumentPath,
-  getUnsignedFileUrl
-} from '@client/v2-events/cache'
+import { cacheFile, getUnsignedFileUrl } from '@client/v2-events/cache'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
 
@@ -181,7 +181,7 @@ function SignatureFieldInput({
               signatureBase64,
               `signature-${name}-${Date.now()}.png`
             )
-            const path = getFullDocumentPath(signatureFile.name)
+            const path = signatureFile.name as DocumentPath
 
             // When we are in offline mode, the actual upload might not happen immediately.
             // Cache the "temporary" file to allow using same functionality for all files.

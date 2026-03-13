@@ -22,7 +22,6 @@ import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
 import {
   cacheFile,
-  getFullDocumentPath,
   getUnsignedFileUrl,
   removeCached
 } from '@client/v2-events/cache'
@@ -103,7 +102,7 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(filePath: FullDocumentPath) {
+async function getPresignedUrl(filePath: DocumentPath | FullDocumentPath) {
   const url = joinUrlPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {
@@ -117,7 +116,7 @@ async function getPresignedUrl(filePath: FullDocumentPath) {
   return res
 }
 
-export async function precacheFile(path: FullDocumentPath) {
+export async function precacheFile(path: DocumentPath | FullDocumentPath) {
   const presignedUrl = (await getPresignedUrl(path)).presignedURL
 
   const file = await fetchFileFromUrl(presignedUrl, path)
@@ -155,7 +154,7 @@ interface Options {
   onSuccess?: (data: {
     originalFilename: string
     type: string
-    path: FullDocumentPath
+    path: DocumentPath
     id: string
   }) => void
 }
@@ -178,8 +177,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     onMutate: async ({ file, meta, eventId: dir }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
-      const filePathWithDirectory = joinValues([dir, temporaryFilename], '/')
-      const path = getFullDocumentPath(filePathWithDirectory)
+      const path = joinValues([dir, temporaryFilename], '/') as DocumentPath
       const url = getUnsignedFileUrl(path)
       await cacheFile({ url, file })
 
@@ -199,7 +197,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     mutationFn: deleteFile,
     mutationKey: [DELETE_MUTATION_KEY, fieldId],
     onSuccess: (data, { filename }) => {
-      void removeCached(filename)
+      void removeCached(filename as DocumentPath)
     }
   })
 

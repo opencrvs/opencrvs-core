@@ -9,33 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  FullDocumentPath,
-  FullDocumentUrl,
-  joinValues
-} from '@opencrvs/commons/client'
+import { DocumentPath, FullDocumentPath } from '@opencrvs/commons/client'
 
 /* Must match the one defined src-sw.ts */
 export const CACHE_NAME = 'workbox-runtime'
 
-export function getFullDocumentPath(filename: string): FullDocumentPath {
-  if (filename.startsWith('/' + window.config.MINIO_BUCKET)) {
-    // already a full path
-    return filename as FullDocumentPath
-  }
-
-  return ('/' +
-    joinValues([window.config.MINIO_BUCKET, filename], '/')) as FullDocumentPath
-}
 /**
  * Files are stored in MinIO. Files should be accessed via unsigned URLs, utilizing browser cache and aggressively precaching them.
  * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
  */
-export function getUnsignedFileUrl(path: FullDocumentPath): FullDocumentUrl {
-  return new URL(
-    path,
-    window.config.MINIO_BASE_URL
-  ).toString() as FullDocumentUrl
+export function getUnsignedFileUrl(
+  path: DocumentPath | FullDocumentPath
+): string {
+  return `/${path}`
 }
 
 /**
@@ -68,7 +54,7 @@ export async function cacheFile({ url, file }: { url: string; file: File }) {
  * Removes given file from the **BROWSER** cache.
  * @see CACHE_NAME
  */
-export async function removeCached(filename: string) {
+export async function removeCached(filename: DocumentPath) {
   const cacheKeys = await caches.keys()
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
@@ -81,7 +67,7 @@ export async function removeCached(filename: string) {
   }
 
   const cache = await caches.open(cacheKey)
-  return cache.delete(getUnsignedFileUrl(getFullDocumentPath(filename)), {
+  return cache.delete(getUnsignedFileUrl(filename), {
     ignoreSearch: true
   })
 }

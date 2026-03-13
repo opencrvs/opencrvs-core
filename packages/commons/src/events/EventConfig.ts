@@ -13,7 +13,7 @@ import { ActionConfig } from './ActionConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { AdvancedSearchConfig } from './AdvancedSearchConfig'
-import { DeclarationFormConfig } from './FormConfig'
+import { DeclarationFormConfig, DeclarationFormConfigInput } from './FormConfig'
 import { FieldReference } from './FieldConfig'
 import { EventMetadataDateFieldIdInput } from './EventMetadata'
 import { FlagConfig } from './Flag'
@@ -31,12 +31,46 @@ export const EventFieldReference = z
     'Reference to a field defined in the event metadata, using the field id.'
   )
 
+export type EventConfig = {
+  id: string
+  dateOfEvent?: FieldReference | z.infer<typeof EventFieldReference>
+  placeOfEvent?: FieldReference
+  title: TranslationConfig
+  fallbackTitle?: TranslationConfig
+  summary: SummaryConfig
+  label: TranslationConfig
+  actions: ActionConfig[]
+  actionOrder?: string[]
+  declaration: DeclarationFormConfig
+  advancedSearch: AdvancedSearchConfig[]
+  flags: FlagConfig[]
+}
+
+export type EventConfigInput = Omit<
+  EventConfig,
+  | 'advancedSearch'
+  | 'flags'
+  | 'declaration'
+  | 'actions'
+  | 'dateOfEvent'
+  | 'placeOfEvent'
+> & {
+  dateOfEvent?:
+    | z.input<typeof FieldReference>
+    | z.infer<typeof EventFieldReference>
+  placeOfEvent?: z.input<typeof FieldReference>
+  advancedSearch?: AdvancedSearchConfig[]
+  flags?: FlagConfig[]
+  declaration: DeclarationFormConfigInput
+  actions: z.input<typeof ActionConfig>[]
+}
+
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
  *
  * `Event.parse(config)` will throw an error if the configuration is invalid.
  */
-export const EventConfig = z
+export const EventConfig: z.ZodType<EventConfig, EventConfigInput> = z
   .object({
     id: z
       .string()
@@ -103,5 +137,3 @@ export const EventConfig = z
     id: 'EventConfig'
   })
   .describe('Configuration defining an event type.')
-
-export type EventConfig = z.infer<typeof EventConfig>

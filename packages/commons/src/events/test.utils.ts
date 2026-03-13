@@ -68,7 +68,7 @@ import {
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import * as z from 'zod/v4'
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
 
 /**
@@ -263,7 +263,7 @@ function mapFieldTypeToMockValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as FullDocumentPath,
+        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
@@ -457,7 +457,7 @@ export function eventPayloadGenerator(
             },
             'applicant.dob': '2020-01-02',
             'applicant.image': {
-              path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+              path: '/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png' as DocumentPath,
               originalFilename: 'Screenshot.png',
               type: 'image/png'
             }

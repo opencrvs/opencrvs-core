@@ -13,13 +13,7 @@ import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 import { fromBuffer } from 'file-type'
-import {
-  FullDocumentPath,
-  getUserId,
-  joinValues,
-  logger,
-  toDocumentPath
-} from '@opencrvs/commons'
+import { DocumentPath, getUserId, joinValues, logger } from '@opencrvs/commons'
 
 import { z } from 'zod'
 import { Readable } from 'stream'
@@ -85,20 +79,17 @@ export async function fileUploadHandler(
     ...(filename.endsWith('.pdf') && { 'content-type': 'application/pdf' })
   })
 
-  return `/${MINIO_BUCKET}/${filePath}` as FullDocumentPath
+  return filePath as DocumentPath
 }
 
 export async function fileExistsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  // Ensure file is still in the desired format. forwarding url from gateway,
-  // '/files/{filePath*}' --> files//ocrvs/filename.jpg and the double slash is removed.
-  const filePath = FullDocumentPath.parse(request.params.filePath)
+  const documentPath = DocumentPath.parse(request.params.filePath)
 
   let stat
 
-  const documentPath = toDocumentPath(filePath)
   try {
     stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
   } catch (error) {
