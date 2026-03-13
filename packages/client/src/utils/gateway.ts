@@ -1402,7 +1402,6 @@ type Query = {
   getUserByMobile?: Maybe<User>
   getUserRoles: Array<UserRole>
   getVSExports?: Maybe<TotalVsExport>
-  isLeafLevelLocation: Scalars['Boolean']
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   queryPersonByIdentifier?: Maybe<Person>
   queryPersonByNidIdentifier?: Maybe<Person>
@@ -7275,15 +7274,6 @@ type GetLocationStatisticsQuery = {
       count: number
     } | null>
   } | null
-}
-
-type IsLeafLevelLocationQueryVariables = Exact<{
-  locationId: Scalars['String']
-}>
-
-type IsLeafLevelLocationQuery = {
-  __typename?: 'Query'
-  isLeafLevelLocation: boolean
 }
 
 type FetchMonthWiseEventMetricsQueryVariables = Exact<{
