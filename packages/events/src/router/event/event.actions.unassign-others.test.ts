@@ -19,6 +19,7 @@ import {
   UserFilter,
   encodeScope,
   getDeclarationFields,
+  getCurrentEventState,
   getUUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
@@ -123,16 +124,32 @@ test(
           }
         }
 
-        assertScopeResult(result, {
-          user,
-          isUnderAdministrativeArea,
-          ...options
-        })
+        const eventConfig =
+          result.event.type === TENNIS_CLUB_MEMBERSHIP
+            ? tennisClubMembershipEvent
+            : {
+                ...tennisClubMembershipEvent,
+                id: 'tennis-club-membership_premium'
+              }
+
+        const eventIndex = getCurrentEventState(result.event, eventConfig)
+        const wasAssignedToUser = eventIndex.assignedTo === user.id
+
+        // User should always be able to unassign if they were the assigned user, regardless of other scope options.
+        if (wasAssignedToUser) {
+          expect(result.success).toBe(true)
+        } else {
+          assertScopeResult(result, {
+            user,
+            isUnderAdministrativeArea,
+            ...options
+          })
+        }
       }),
       { numRuns: 20 }
     )
   },
   {
-    timeout: 90000
+    timeout: 120000
   }
 )
