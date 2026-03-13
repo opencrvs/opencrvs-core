@@ -29,11 +29,7 @@ export function customActionProcedures() {
     ...getDefaultActionProcedures(ActionType.CUSTOM),
     request: userAndSystemProcedure
       .input(CustomActionInput)
-      .use((opts) =>
-        middleware.canAccessEventWithScopes(['record.custom-action'], {
-          customActionType: opts.input.customActionType
-        })(opts)
-      )
+      .use(middleware.canAccessEventWithScopes(['record.custom-action']))
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
       .output(EventDocument)

@@ -11,7 +11,6 @@
 
 import { useSelector } from 'react-redux'
 import {
-  AccessOptions,
   getAcceptedScopesByType,
   RecordScopeTypeV2,
   userCanAccessEventWithScopes
@@ -56,7 +55,7 @@ export function useCanAccessEventWithScopes(
   })
 
   return {
-    canAccessEventWithScopes: (accessOptions?: AccessOptions) =>
+    canAccessEventWithScopes: (customActionType?: string) =>
       userCanAccessEventWithScopes(
         eventWithHierarchy,
         matchingScopes,
@@ -68,7 +67,7 @@ export function useCanAccessEventWithScopes(
           signature: currentUser.signature,
           type: currentUser.type
         },
-        accessOptions
+        customActionType
       )
   }
 }
