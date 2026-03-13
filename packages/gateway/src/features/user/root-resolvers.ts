@@ -329,7 +329,8 @@ export const resolvers: GQLResolver = {
         const requestingUser = await getUserFromHeader(authHeader)
         const isUnderJurisdiction = await isOfficeUnderJurisdiction(
           requestingUser.primaryOfficeId as UUID,
-          user.primaryOffice as UUID
+          user.primaryOffice as UUID,
+          authHeader
         )
         if (!isUnderJurisdiction) {
           throw new Error(
