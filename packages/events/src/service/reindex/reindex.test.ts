@@ -48,7 +48,7 @@ vi.mock('@events/service/reindex', async (importOriginal) => {
     await importOriginal<typeof import('@events/service/reindex')>()
   return {
     ...actual,
-    reindex: vi.fn()
+    reindex: vi.fn().mockResolvedValue(undefined)
   }
 })
 
