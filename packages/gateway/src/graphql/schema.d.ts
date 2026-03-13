@@ -26,7 +26,6 @@ export interface GQLQuery {
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   fetchMarriageRegistration?: GQLMarriageRegistration
   fetchRecordDetailsForVerification?: GQLRecordDetails
-  isLeafLevelLocation: boolean
   getUser?: GQLUser
   getUserByMobile?: GQLUser
   getUserByEmail?: GQLUser
@@ -1692,7 +1691,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   fetchMarriageRegistration?: QueryToFetchMarriageRegistrationResolver<TParent>
   fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
-  isLeafLevelLocation?: QueryToIsLeafLevelLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   getUserByMobile?: QueryToGetUserByMobileResolver<TParent>
   getUserByEmail?: QueryToGetUserByEmailResolver<TParent>
@@ -1918,21 +1916,6 @@ export interface QueryToFetchRecordDetailsForVerificationResolver<
   (
     parent: TParent,
     args: QueryToFetchRecordDetailsForVerificationArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface QueryToIsLeafLevelLocationArgs {
-  locationId: string
-}
-export interface QueryToIsLeafLevelLocationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: QueryToIsLeafLevelLocationArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

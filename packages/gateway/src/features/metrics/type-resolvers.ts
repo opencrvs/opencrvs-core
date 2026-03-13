@@ -40,7 +40,7 @@ export const typeResolvers: GQLResolver = {
   EventMetricsByLocation: {
     async location({ location }, _, { headers: authHeader }) {
       // @TODO: For simplicity, metrics shouldn't pass the `Location/` prefix here.
-      return await fetchLocation(resourceIdentifierToUUID(location))
+      return await fetchLocation(resourceIdentifierToUUID(location), authHeader)
     }
   },
   VSExport: {

@@ -18,7 +18,6 @@ import decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
 import { Scope } from '@opencrvs/commons/authentication'
 import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
-import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 import { api as eventsApi } from '@gateway/v2-events/events/service'
 
 export interface ITokenPayload {
@@ -60,7 +59,7 @@ export async function getSystem(
   return {
     scope: result.scopes as Scope[],
     name: result.name,
-    createdBy: '',
+    createdBy: result.createdBy,
     client_id: result.id,
     username: '',
     status: result.status,
@@ -160,15 +159,17 @@ export function getFullName(user: IUserModelData, language: string) {
 
 export async function isOfficeUnderJurisdiction(
   officeId: UUID,
-  otherOfficeId: UUID
+  otherOfficeId: UUID,
+  authHeader: IAuthHeader
 ) {
-  const officeLocation = await fetchLocation(officeId)
-  const parentLocationId =
-    officeLocation.partOf &&
-    resourceIdentifierToUUID(officeLocation.partOf.reference)
+  const officeLocation = await fetchLocation(officeId, authHeader)
+  const parentLocationId = officeLocation.administrativeAreaId
   if (!parentLocationId) {
     return false
   }
-  const otherOfficeHierarchy = await fetchLocationHierarchy(otherOfficeId)
-  return otherOfficeHierarchy.map(({ id }) => id).includes(parentLocationId)
+  const otherOfficeHierarchy = await fetchLocationHierarchy(
+    otherOfficeId,
+    authHeader
+  )
+  return otherOfficeHierarchy.includes(parentLocationId)
 }

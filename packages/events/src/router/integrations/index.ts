@@ -49,7 +49,7 @@ const ListIntegrationsOutput = z.array(
     name: z.string(),
     scopes: z.array(z.string()),
     status: z.string(),
-    createdAt: z.string(),
+    createdAt: z.iso.datetime(),
     createdBy: z.string()
   })
 )
@@ -74,7 +74,9 @@ const GetIntegrationOutput = z.object({
   name: z.string(),
   scopes: z.array(z.string()),
   status: z.string(),
-  shaSecret: z.string().nullable()
+  shaSecret: z.string().nullable(),
+  createdAt: z.string(),
+  createdBy: z.string()
 })
 
 const ToggleStatusOutput = z.object({
@@ -195,7 +197,9 @@ export const integrationsRouter = router({
         name: row.name,
         scopes: row.scopes as string[],
         status: row.status,
-        shaSecret: row.shaSecret
+        shaSecret: row.shaSecret,
+        createdAt: row.createdAt,
+        createdBy: row.createdBy
       }
     }),
 
