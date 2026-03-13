@@ -84,6 +84,7 @@ function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
           ...acc,
           ...getAnnotationForActionType({
             event,
+
             actionType: actionConfig.type,
             draft
           })

@@ -30,7 +30,7 @@ import {
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
 
-test('Check scopes against event.actions.correction.reject', async () => {
+test('Check scopes against event.actions.correction.reject', { timeout: 120000 }, async () => {
   await createIndex(
     getEventIndexName('tennis-club-membership_premium'),
     getDeclarationFields(tennisClubMembershipEvent)

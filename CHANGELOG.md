@@ -46,6 +46,33 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
 
+## 1.9.11
+
+### New features
+
+- Added support of `updatedByUserRole` for workqueue configuration.
+  Workqueues can now be filtered by a specific role or `user('role')`. [#11848](https://github.com/opencrvs/opencrvs-core/issues/11848)
+
+**Usage example**
+
+```ts
+query: {
+  updatedByUserRole: { type: 'exact', term: user('role') }
+}
+```
+
+### Bug fixes
+
+- Fix newly created drafts in offline mode are not accessible [#11820](https://github.com/opencrvs/opencrvs-core/issues/11820)
+- Fix the rendered date on the review page and the certificate display issue in negative UTC offset time zones. [#11955](https://github.com/opencrvs/opencrvs-core/issues/11955)
+
+### Improvements
+
+- Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
+
+- Explicitly nullify hidden field values to prevent stale data in database and fix incorrect search results [#11695](https://github.com/opencrvs/opencrvs-core/pull/11849)
+- Update accordion behavior on the review page so that only sections containing required or completed fields are expanded by default. [#10133](https://github.com/opencrvs/opencrvs-core/issues/10133)
+
 ## 1.9.10
 
 ### New features
