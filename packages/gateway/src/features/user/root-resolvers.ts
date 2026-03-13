@@ -37,6 +37,7 @@ import {
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
+import { api } from '@gateway/v2-events/events/service'
 
 import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
@@ -406,7 +407,28 @@ export const resolvers: GQLResolver = {
           `Something went wrong on user-mgnt service. Couldn't perform ${action}`
         )
       }
-      return await res.json()
+      const responseBody = await res.json()
+      api.user.audit.record
+        .mutate(
+          action === 'createUser'
+            ? {
+                operation: 'user.CREATE_USER',
+                requestData: {
+                  subjectId: responseBody._id,
+                  role: userPayload.role,
+                  primaryOfficeId: userPayload.primaryOfficeId
+                },
+                responseSummary: {}
+              }
+            : {
+                operation: 'user.EDIT_USER',
+                requestData: { subjectId: responseBody._id },
+                responseSummary: {}
+              },
+          { context: { headers: authHeader } }
+        )
+        .catch((err) => logger.error('Failed to record user audit', err))
+      return responseBody
     },
     async activateUser(
       _,
@@ -471,6 +493,16 @@ export const resolvers: GQLResolver = {
           "Something went wrong on user-mgnt service. Couldn't change user password"
         )
       }
+      api.user.audit.record
+        .mutate(
+          {
+            operation: 'user.PASSWORD_CHANGED',
+            requestData: { subjectId: userId },
+            responseSummary: {}
+          },
+          { context: { headers: authHeader } }
+        )
+        .catch((err) => logger.error('Failed to record user audit', err))
       return true
     },
     async changePhone(
@@ -503,6 +535,16 @@ export const resolvers: GQLResolver = {
           "Something went wrong on user-mgnt service. Couldn't change user phone number"
         )
       }
+      api.user.audit.record
+        .mutate(
+          {
+            operation: 'user.PHONE_NUMBER_CHANGED',
+            requestData: { subjectId: userId },
+            responseSummary: { phoneNumber }
+          },
+          { context: { headers: authHeader } }
+        )
+        .catch((err) => logger.error('Failed to record user audit', err))
       return true
     },
     async changeEmail(
@@ -535,6 +577,18 @@ export const resolvers: GQLResolver = {
           "Something went wrong on user-mgnt service. Couldn't change user email"
         )
       }
+      api.user.audit.record
+        .mutate(
+          {
+            operation: 'user.EMAIL_ADDRESS_CHANGED',
+            requestData: {
+              subjectId: userId
+            },
+            responseSummary: { email }
+          },
+          { context: { headers: authHeader } }
+        )
+        .catch((err) => logger.error('Failed to record user audit', err))
       return true
     },
     async changeAvatar(_, { userId, avatar }, { headers: authHeader }) {
@@ -614,6 +668,30 @@ export const resolvers: GQLResolver = {
           `Something went wrong on user-mgnt service. Couldn't audit user ${userId}`
         )
       }
+      api.user.audit.record
+        .mutate(
+          action === 'DEACTIVATE'
+            ? {
+                operation: 'user.DEACTIVATE',
+                requestData: {
+                  subjectId: userId,
+                  reason: reason!,
+                  comment: comment ?? undefined
+                },
+                responseSummary: {}
+              }
+            : {
+                operation: 'user.REACTIVATE',
+                requestData: {
+                  subjectId: userId,
+                  reason: reason!,
+                  comment: comment ?? undefined
+                },
+                responseSummary: {}
+              },
+          { context: { headers: authHeader } }
+        )
+        .catch((err) => logger.error('Failed to record user audit', err))
       return true
     },
     async resendInvite(_, { userId }, { headers: authHeader }) {
@@ -669,6 +747,16 @@ export const resolvers: GQLResolver = {
           `Something went wrong on user-mgnt service. Couldn't send sms to ${userId}`
         )
       }
+      api.user.audit.record
+        .mutate(
+          {
+            operation: 'user.USERNAME_REMINDER_BY_ADMIN',
+            requestData: { subjectId: userId },
+            responseSummary: {}
+          },
+          { context: { headers: authHeader } }
+        )
+        .catch((err) => logger.error('Failed to record user audit', err))
       return true
     },
     async resetPasswordInvite(_, { userId }, { headers: authHeader }) {
@@ -696,6 +784,16 @@ export const resolvers: GQLResolver = {
           `Something went wrong on user-mgnt service. Couldn't reset password and send sms to ${userId}`
         )
       }
+      api.user.audit.record
+        .mutate(
+          {
+            operation: 'user.PASSWORD_RESET_BY_ADMIN',
+            requestData: { subjectId: userId },
+            responseSummary: {}
+          },
+          { context: { headers: authHeader } }
+        )
+        .catch((err) => logger.error('Failed to record user audit', err))
       return true
     }
   }

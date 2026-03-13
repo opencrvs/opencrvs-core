@@ -12,7 +12,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 
 import { getUser, inScope } from '@gateway/features/user/utils'
 import { getMetrics } from './service'
-import { getEventActions } from './events-service'
+import { getEventActions, getUserAuditEvents } from './events-service'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { ActionType, ActionTypes } from '@opencrvs/commons'
 
@@ -304,6 +304,16 @@ export const resolvers: GQLResolver = {
         },
         { ...authHeader }
       )
+      const userAuditData = await getUserAuditEvents(
+        {
+          userId: user._id,
+          skip: params.skip,
+          count: params.count,
+          timeStart: params.timeStart,
+          timeEnd: params.timeEnd
+        },
+        { ...authHeader }
+      )
 
       const cleanedEventActions = eventActionsData.results.map((action) => ({
         isV2: true,
@@ -318,10 +328,21 @@ export const resolvers: GQLResolver = {
         }
       }))
 
+      const cleanedUserAuditEvents = userAuditData.results.map((entry) => ({
+        isV2: true,
+        // Strip 'user.' prefix to get the V1-compatible action string
+        action: entry.operation.replace(/^user\./, ''),
+        ipAddress: '',
+        practitionerId: entry.clientId,
+        time: entry.createdAt,
+        userAgent: ''
+      }))
+
       // 3. Combine and sort the results by time.
       const combinedResults = [
         ...(metricsData.results || []),
-        ...cleanedEventActions
+        ...cleanedEventActions,
+        ...cleanedUserAuditEvents
       ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
 
       // 4. Paginate the combined results. Ensure slicing stays within the bounds of the array.
@@ -335,7 +356,10 @@ export const resolvers: GQLResolver = {
 
       return {
         results: paginatedResults,
-        total: (metricsData.total || 0) + (eventActionsData.total || 0)
+        total:
+          (metricsData.total || 0) +
+          (eventActionsData.total || 0) +
+          userAuditData.total
       }
     },
     async getLocationStatistics(

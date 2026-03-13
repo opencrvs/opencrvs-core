@@ -22,3 +22,14 @@ export async function getEventActions(
   })
   return actions
 }
+
+export async function getUserAuditEvents(
+  query: Parameters<typeof api.user.audit.list.query>[0],
+  authHeader: Record<string, string>
+) {
+  return api.user.audit.list.query(query, {
+    context: {
+      headers: authHeader
+    }
+  })
+}

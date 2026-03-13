@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import * as z from 'zod/v4'
 import { TokenUserType } from '../authentication'
 
 /**
@@ -118,6 +119,88 @@ export type AttachmentUploadAuditLog = {
   }
 }
 
+export const UserAuditRecordInput = z.discriminatedUnion('operation', [
+  z.object({
+    operation: z.literal('user.CREATE_USER'),
+    requestData: z.object({
+      subjectId: z.string(),
+      role: z.string(),
+      primaryOfficeId: z.string()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.DEACTIVATE'),
+    requestData: z.object({
+      subjectId: z.string(),
+      reason: z.string(),
+      comment: z.string().optional()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.REACTIVATE'),
+    requestData: z.object({
+      subjectId: z.string(),
+      reason: z.string(),
+      comment: z.string().optional()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.EDIT_USER'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.EMAIL_ADDRESS_CHANGED'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({ email: z.string() })
+  }),
+  z.object({
+    operation: z.literal('user.LOGGED_IN'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.LOGGED_OUT'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.PASSWORD_CHANGED'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.PASSWORD_RESET'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.PASSWORD_RESET_BY_ADMIN'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.PHONE_NUMBER_CHANGED'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({ phoneNumber: z.string() })
+  }),
+  z.object({
+    operation: z.literal('user.USERNAME_REMINDER'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.USERNAME_REMINDER_BY_ADMIN'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  })
+])
+
+export type UserAuditLog = z.infer<typeof UserAuditRecordInput>
+
 /**
  * Union of all audit log entry variants.
  * Each variant narrows the `operation`, `requestData`, and `responseSummary` fields together.
@@ -131,6 +214,7 @@ export type AuditLogOperation =
   | EventActionAuditLog
   | IntegrationCreateAuditLog
   | AttachmentUploadAuditLog
+  | UserAuditLog
 
 /**
  * Parameters for writing an audit log entry.

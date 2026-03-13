@@ -12,8 +12,8 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
 import { invalidateToken } from '@auth/features/invalidateToken/service'
-import { postUserActionToMetrics } from '@auth/metrics'
-import { logger } from '@opencrvs/commons'
+import { recordUserAuditEvent } from '@auth/features/authenticate/service'
+import { getUserIdFromToken } from '@opencrvs/commons'
 
 interface IInvalidateTokenPayload {
   token: string
@@ -24,15 +24,13 @@ export default async function invalidateTokenHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { token } = request.payload as IInvalidateTokenPayload
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
-
-  try {
-    await postUserActionToMetrics('LOGGED_OUT', token, remoteAddress, userAgent)
-  } catch (err) {
-    logger.error(err.message)
+  const userId = getUserIdFromToken(token)
+  if (userId) {
+    recordUserAuditEvent(token, {
+      operation: 'user.LOGGED_OUT',
+      requestData: { subjectId: userId },
+      responseSummary: {}
+    })
   }
 
   try {
