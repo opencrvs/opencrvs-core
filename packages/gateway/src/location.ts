@@ -9,69 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UUID } from '@opencrvs/commons'
-import { Location, SavedBundle, SavedLocation } from '@opencrvs/commons/types'
-import { APPLICATION_CONFIG_URL } from './constants'
-import fetch from 'node-fetch'
+import { IAuthHeader, UUID } from '@opencrvs/commons'
+import { api } from '@gateway/v2-events/events/service'
 
-export const fetchLocation = async (id: UUID) => {
-  const response = await fetch(
-    new URL(`/locations/${id}`, APPLICATION_CONFIG_URL)
+export const fetchLocation = async (id: UUID, authHeader: IAuthHeader) => {
+  return api.locations.get.query({ id }, { context: { headers: authHeader } })
+}
+
+export const fetchLocationHierarchy = async (
+  id: UUID,
+  authHeader: IAuthHeader
+) => {
+  return api.locations.getLocationHierarchy.query(
+    { locationId: id },
+    { context: { headers: authHeader } }
   )
-
-  if (!response.ok) {
-    throw new Error(
-      `Couldn't fetch a location from config: ${await response.text()}`
-    )
-  }
-
-  return response.json() as Promise<Location>
-}
-
-const FETCH_ALL_LOCATIONS = new URL(
-  '/locations?type=ADMIN_STRUCTURE&_count=0',
-  APPLICATION_CONFIG_URL
-)
-
-export const fetchAllLocations = async () => {
-  const response = await fetch(FETCH_ALL_LOCATIONS)
-
-  if (!response.ok) {
-    throw new Error(
-      `Couldn't fetch the locations from config: ${await response.text()}`
-    )
-  }
-  const locationsBundle: SavedBundle<SavedLocation> = await response.json()
-
-  return locationsBundle.entry.map(({ resource }) => resource)
-}
-
-const FETCH_ALL_LOCATION_CHILDREN = (id: UUID) =>
-  new URL(`/locations/${id}/children`, APPLICATION_CONFIG_URL)
-
-export const fetchLocationChildren = async (id: UUID) => {
-  const response = await fetch(FETCH_ALL_LOCATION_CHILDREN(id))
-
-  if (!response.ok) {
-    throw new Error(
-      `Couldn't fetch the children of a location from config: ${await response.text()}`
-    )
-  }
-
-  return response.json() as Promise<SavedLocation[]>
-}
-
-const FETCH_ALL_LOCATION_HIERARCHY = (id: UUID) =>
-  new URL(`/locations/${id}/hierarchy`, APPLICATION_CONFIG_URL)
-
-export const fetchLocationHierarchy = async (id: UUID) => {
-  const response = await fetch(FETCH_ALL_LOCATION_HIERARCHY(id))
-
-  if (!response.ok) {
-    throw new Error(
-      `Couldn't fetch the hierarchy of a location from config: ${await response.text()}`
-    )
-  }
-
-  return response.json() as Promise<SavedLocation[]>
 }
