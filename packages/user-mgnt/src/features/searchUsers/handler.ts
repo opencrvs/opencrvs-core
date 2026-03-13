@@ -41,7 +41,10 @@ export default async function searchUsers(
     skip,
     sortOrder
   } = request.payload as IVerifyPayload
-  let criteria: FilterQuery<IUserModel> = {}
+  // Exclude super admin users who are not assigned to any office
+  let criteria: FilterQuery<IUserModel> = {
+    primaryOfficeId: { $exists: true }
+  }
   if (username) {
     criteria = { ...criteria, username }
   }
