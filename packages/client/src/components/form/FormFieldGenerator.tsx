@@ -102,7 +102,7 @@ import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
-import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
+import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { DocumentUploaderWithOption } from './DocumentUploadField/DocumentUploaderWithOption'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -795,7 +795,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-export const mapFieldsToValues = (
+const mapFieldsToValues = (
   fields: IFormField[],
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
 ) =>
@@ -869,7 +869,7 @@ interface IQueryData {
   [key: string]: any
 }
 
-export interface ITouchedNestedFields {
+interface ITouchedNestedFields {
   value: boolean
   nestedFields: {
     [fieldName: string]: boolean

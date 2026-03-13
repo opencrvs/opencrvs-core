@@ -14,6 +14,7 @@ import { HttpResponse, http } from 'msw'
 import {
   ActionType,
   AddressType,
+  encodeScope,
   getOrThrow,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP
@@ -35,8 +36,24 @@ const CUSTOM_ACTION_TYPE = 'CONFIRM_SENIOR_MEMBERSHIP'
 async function initialiseTest(scopes: string[] = [], useSeniorDob = true) {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-    `record.declare[event=${TENNIS_CLUB_MEMBERSHIP}]`,
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.read',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
     ...scopes
   ])
 
@@ -174,7 +191,7 @@ describe('event.actions.custom', () => {
       client.event.actions.custom.request(payload)
     ).rejects.toMatchSnapshot()
 
-    const event = await client.event.get({eventId: payload.eventId})
+    const event = await client.event.get({ eventId: payload.eventId })
 
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
@@ -188,7 +205,7 @@ describe('event.actions.custom', () => {
       client.event.actions.custom.request(payload)
     ).resolves.not.toThrow()
 
-    const event = await client.event.get({eventId: payload.eventId})
+    const event = await client.event.get({ eventId: payload.eventId })
 
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
@@ -210,7 +227,7 @@ describe('event.actions.custom', () => {
       client.event.actions.custom.request(customPayload)
     ).resolves.not.toThrow()
 
-    const event = await client.event.get({eventId: customPayload.eventId})
+    const event = await client.event.get({ eventId: customPayload.eventId })
 
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
@@ -258,7 +275,7 @@ describe('event.actions.custom', () => {
         client.event.actions.custom.request(payload)
       ).resolves.not.toThrow()
 
-      const event = await client.event.get({eventId: payload.eventId})
+      const event = await client.event.get({ eventId: payload.eventId })
 
       expect(
         sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)

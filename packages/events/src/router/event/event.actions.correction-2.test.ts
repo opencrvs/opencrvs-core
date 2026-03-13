@@ -26,12 +26,15 @@ import {
   PageTypes,
   generateTranslationConfig,
   EventState,
-  UUID
+  UUID,
+  getDeclarationFields
 } from '@opencrvs/commons'
 import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { getEventIndexName } from '@events/storage/elasticsearch'
+import { createIndex } from '@events/service/indexing/indexing'
 
 const informantOtherThanMother = and(
   not(field('informant.relation').inArray(['MOTHER'])),
@@ -165,7 +168,7 @@ const modiedchildOnboardingEvent = defineConfig({
 describe('Overwriting parent field', () => {
   it('should overwrite informant.relation via REQUEST_CORRECTION action', async () => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([modiedchildOnboardingEvent])
       }),
       http.post(
@@ -204,6 +207,10 @@ describe('Overwriting parent field', () => {
 
     let event = await client.event.create(
       generator.event.create({ type: CHILD_ONBOARDING_EVENT })
+    )
+    await createIndex(
+      getEventIndexName(CHILD_ONBOARDING_EVENT),
+      getDeclarationFields(modiedchildOnboardingEvent)
     )
 
     event = await client.event.actions.declare.request(

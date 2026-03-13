@@ -10,14 +10,14 @@
  */
 
 import {
-  ConfigurableScopeType,
+  encodeScope,
   EventConfig,
   IAuthHeader,
   joinUrl,
   logger,
+  RecordScopeTypeV2,
   Scope,
-  SCOPES,
-  stringifyScope
+  SCOPES
 } from '@opencrvs/commons'
 import fetch from '@gateway/fetch'
 import { COUNTRY_CONFIG_URL, PRODUCTION } from '@gateway/constants'
@@ -47,7 +47,7 @@ const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, Scope[]> = {
  */
 const CONFIGURABLE_SCOPES_BY_TYPE: Record<
   SystemIntegrationType,
-  ConfigurableScopeType[]
+  RecordScopeTypeV2[]
 > = {
   HEALTH: ['record.create', 'record.notify'],
   RECORD_SEARCH: []
@@ -64,7 +64,7 @@ let inMemoryEventConfigurations: EventConfig[] | null = null
 async function getEventConfigurations(
   authHeader: IAuthHeader
 ): Promise<EventConfig[]> {
-  const url = joinUrl(COUNTRY_CONFIG_URL, '/events')
+  const url = joinUrl(COUNTRY_CONFIG_URL, '/config/events')
 
   const res = await fetch(url, {
     headers: {
@@ -121,15 +121,15 @@ export function getSystemScopesFromType(
   }
 
   const literalScopes = DEFAULT_SCOPES_BY_TYPE[type]
-  const configurableScopes = CONFIGURABLE_SCOPES_BY_TYPE[type].map(
-    (scope: ConfigurableScopeType) =>
-      stringifyScope({
-        type: scope as 'record.create' | 'record.notify',
+  const v2Scopes = CONFIGURABLE_SCOPES_BY_TYPE[type].map(
+    (scope: RecordScopeTypeV2) =>
+      encodeScope({
+        type: scope,
         options: { event: eventIds }
       })
   )
 
-  return [...literalScopes, ...configurableScopes]
+  return [...literalScopes, ...v2Scopes]
 }
 
 /**

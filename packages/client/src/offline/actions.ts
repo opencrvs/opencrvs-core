@@ -18,7 +18,6 @@ import {
 } from '@client/offline/reducer'
 import { System } from '@client/utils/gateway'
 import {
-  IApplicationConfig,
   IApplicationConfigAnonymous,
   IApplicationConfigResponse,
   IContentResponse,
@@ -31,6 +30,7 @@ import {
   LoadValidatorsResponse
 } from '@client/utils/referenceApi'
 import { UserDetails } from '@client/utils/userUtils'
+import { ApplicationConfig } from '@opencrvs/commons/client'
 
 const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -63,19 +63,13 @@ type LocationsFailedAction = {
 }
 
 export const FORMS_LOADED = 'OFFLINE/FORMS_LOADED'
-export type FormsLoadedAction = {
+type FormsLoadedAction = {
   type: typeof FORMS_LOADED
   payload: LoadFormsResponse
 }
 
-export const CUSTOM_VALIDATORS_LOADED = 'OFFLINE/CUSTOM_VALIDATORS_LOADED'
-export type CustomValidatorsLoadedLoadedAction = {
-  type: typeof CUSTOM_VALIDATORS_LOADED
-  payload: LoadFormsResponse
-}
-
 export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
-export type FormsFailedAction = {
+type FormsFailedAction = {
   type: typeof FORMS_FAILED
   payload: Error
 }
@@ -116,7 +110,7 @@ type CertificatesLoadedAction = {
   payload: ICertificateData[]
 }
 
-export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
+const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
 type CertificatesLoadFailedAction = {
   type: typeof CERTIFICATES_LOAD_FAILED
   payload: Error
@@ -125,7 +119,7 @@ type CertificatesLoadFailedAction = {
 export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
 type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
-  payload: { config: IApplicationConfig }
+  payload: { config: ApplicationConfig }
 }
 
 export const ANONYMOUS_USER_OFFLINE_CONFIG =
@@ -186,14 +180,6 @@ export const formsLoaded = (payload: LoadFormsResponse): FormsLoadedAction => ({
   payload: payload
 })
 
-export const CustomValidatorsSuccess = (
-  forms: LoadFormsResponse
-): CustomValidatorsLoadedLoadedAction => {
-  return {
-    type: CUSTOM_VALIDATORS_LOADED,
-    payload: forms
-  }
-}
 export const formsFailed = (error: Error): FormsFailedAction => ({
   type: FORMS_FAILED,
   payload: error
@@ -319,7 +305,6 @@ export type Action =
   | LocationsLoadedAction
   | FormsFailedAction
   | FormsLoadedAction
-  | CustomValidatorsLoadedLoadedAction
   | SetOfflineData
   | IGetOfflineDataSuccessAction
   | IGetOfflineDataFailedAction

@@ -99,6 +99,7 @@ exports[`Returns both normal users and system users 1`] = `
   },
   {
     "id": "[sanitized]",
+    "legacyId": "67bda93bfc07dee78ae55114",
     "name": "My health system integration",
     "type": "system",
   },

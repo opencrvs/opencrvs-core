@@ -15,7 +15,7 @@ import {
   ConfigurableScopeType,
   parseConfigurableScope,
   parseLiteralScope
-} from './authentication'
+} from './scopes'
 import { UUID } from './uuid'
 
 /*
@@ -35,13 +35,19 @@ export const UserFilter = z
   .describe('Filters based on the user. Limits to self.')
 export type UserFilter = z.infer<typeof UserFilter>
 
-export const RecordAction = z.enum([
+/**
+ * The different types of scopes that can be used to control access to records. Each type has different options that can be used to further filter the records that the scope applies to.
+ * When adding new scope types, they should be added to the appropriate section based on the options they require.
+ *
+ * @see scopeOptionsPlaceEvent @see scopeOptionsDeclared @see scopeOptionsFull
+ */
+export const RecordScopeTypeV2 = z.enum([
   'record.search',
   'record.create',
   'record.read',
   'record.declare',
   'record.notify',
-  'record.validate',
+  'record.edit',
   'record.reject',
   'record.archive',
   'record.review-duplicates',
@@ -51,66 +57,148 @@ export const RecordAction = z.enum([
   'record.correct',
   'record.unassign-others'
 ])
-type RecordAction = z.infer<typeof RecordAction>
+export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
-export const ResolvedRecordScopeV2 = z
+const scopeByEvent = z
+  // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
+  .preprocess(
+    (val) => (val === undefined ? undefined : [val].flat()),
+    z.array(z.string()).optional()
+  )
+  .describe('Event type, e.g. birth, death')
+
+const scopeOptionsPlaceEvent = z
   .object({
-    type: RecordAction,
-    options: z.object({
-      event: z
-        .array(z.string())
-        .describe('Event type, e.g. birth, death')
-        .optional(),
-      placeOfEvent: UUID.nullish(),
-      declaredIn: UUID.nullish(),
-      declaredBy: z.string().or(z.undefined()).optional(),
-      registeredIn: UUID.nullish(),
-      registeredBy: z.string().or(z.undefined()).optional()
-    })
+    event: scopeByEvent,
+    placeOfEvent: JurisdictionFilter.optional()
   })
-  .describe('Resolved scope with location/user IDs instead of filters.')
+  .describe('Options applicable to all record scopes.')
 
-export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
+const scopeOptionsDeclared = scopeOptionsPlaceEvent
+  .extend({
+    declaredIn: JurisdictionFilter.optional(),
+    declaredBy: UserFilter.optional()
+  })
+  .describe('Options applicable to actions that may take place after DECLARE')
+
+const ScopeOptionsFull = scopeOptionsDeclared
+  .extend({
+    registeredIn: JurisdictionFilter.optional(),
+    registeredBy: UserFilter.optional()
+  })
+  .describe(
+    'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
+  )
+
+export type ScopeOptionsFull = z.infer<typeof ScopeOptionsFull>
+export const ScopeOptionKey = ScopeOptionsFull.keyof()
+export type ScopeOptionKey = z.infer<typeof ScopeOptionKey>
+
+const ResolvedScopeOptionsPlaceEvent = z
+  .object({
+    event: scopeByEvent,
+    placeOfEvent: UUID.nullish()
+  })
+  .describe(
+    'Resolved options applicable to all record scopes, with location ID instead of jurisdiction filter.'
+  )
+
+const ResolvedScopeOptionsDeclared = ResolvedScopeOptionsPlaceEvent.extend({
+  declaredIn: UUID.nullish(),
+  declaredBy: z.string().optional()
+}).describe(
+  'Resolved options applicable to actions that may take place after DECLARE, with location ID and user ID instead of filters.'
+)
+
+const ResolvedScopeOptionsFull = ResolvedScopeOptionsDeclared.extend({
+  registeredIn: UUID.nullish(),
+  registeredBy: z.string().optional()
+}).describe(
+  'Resolved options applicable to actions that may take place after REGISTER, with full filtering capabilities and location/user IDs instead of filters.'
+)
+
+export const ScopesWithPlaceEventOptions = RecordScopeTypeV2.extract([
+  'record.create',
+  'record.declare',
+  'record.notify'
+])
+
+export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
+  'record.edit',
+  'record.reject',
+  'record.archive',
+  'record.review-duplicates',
+  'record.register'
+])
+
+export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
+  'record.search',
+  'record.read',
+  'record.print-certified-copies',
+  'record.request-correction',
+  'record.correct',
+  'record.unassign-others'
+])
 
 export const RecordScopeV2 = z
-  .object({
-    type: RecordAction,
-    options: z
-      .object({
-        event: z
-          .array(z.string())
-          .optional()
-          .describe('Event type, e.g. birth, death'),
-        placeOfEvent: JurisdictionFilter.optional(),
-        declaredIn: JurisdictionFilter.optional(),
-        declaredBy: UserFilter.optional(),
-        registeredIn: JurisdictionFilter.optional(),
-        registeredBy: UserFilter.optional()
-      })
-      .describe(
-        'Limits access to records using provided filters. Combined as "AND". Use multiple scopes for "OR" behavior.'
-      )
-  })
+  .discriminatedUnion('type', [
+    z.object({
+      type: ScopesWithPlaceEventOptions,
+      options: scopeOptionsPlaceEvent.optional()
+    }),
+    z.object({
+      type: ScopesWithDeclaredOptions,
+      options: scopeOptionsDeclared.optional()
+    }),
+    z.object({
+      type: ScopesWithFullOptions,
+      options: ScopeOptionsFull.optional()
+    })
+  ])
   .describe(
     "Scopes used to check user's permission to perform actions on a record."
   )
 
+export function scopeUsesDeclaredOptions(
+  scope: RecordScopeV2
+): scope is Extract<
+  RecordScopeV2,
+  { type: z.infer<typeof ScopesWithDeclaredOptions> }
+> {
+  // If the scope has less, it is found here. Otherwise in other categories.
+  return !ScopesWithPlaceEventOptions.options.some((opt) => opt === scope.type)
+}
+
+export function scopeUsesFullOptions(
+  scope: RecordScopeV2
+): scope is Extract<
+  RecordScopeV2,
+  { type: z.infer<typeof ScopesWithFullOptions> }
+> {
+  return ScopesWithFullOptions.options.some((opt) => opt === scope.type)
+}
+
+export const ResolvedRecordScopeV2 = z
+  .discriminatedUnion('type', [
+    z.object({
+      type: ScopesWithPlaceEventOptions,
+      options: ResolvedScopeOptionsPlaceEvent.optional()
+    }),
+    z.object({
+      type: ScopesWithDeclaredOptions,
+      options: ResolvedScopeOptionsDeclared.optional()
+    }),
+    z.object({
+      type: ScopesWithFullOptions,
+      options: ResolvedScopeOptionsFull.optional()
+    })
+  ])
+  .describe('Resolved scope with location/user IDs instead of filters.')
+
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
+export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
-/**
- * Generic scope structure that can represent any scope.
- * Used for encoding/decoding scopes to/from strings.
- * We can then later refine to more specific scope types as needed.
- */
-export const AnyScope = z.object({
-  type: z.string(),
-  options: z
-    .record(z.string(), z.string().or(z.array(z.string()).or(z.undefined())))
-    .optional()
-})
-export type AnyScope = z.infer<typeof AnyScope>
-
-const flattenScope = (scope: AnyScope) => ({
+const flattenScope = (scope: RecordScopeV2) => ({
   type: scope.type,
   ...scope.options
 })
@@ -120,7 +208,7 @@ const unflattenScope = (input: Record<string, unknown>) => {
   return { type, options }
 }
 
-export const encodeScope = (scope: AnyScope): string => {
+export const encodeScope = (scope: RecordScopeV2): string => {
   const flattened = flattenScope(scope)
 
   return qs.stringify(flattened, {
@@ -139,7 +227,33 @@ export const decodeScope = (query: string) => {
   })
 
   const unflattenedScope = unflattenScope(scope)
-  return AnyScope.safeParse(unflattenedScope)?.data
+
+  return RecordScopeV2.safeParse(unflattenedScope)?.data
+}
+
+/** If a certain scope option is not set, we use the default value. */
+const DEFAULT_SCOPE_OPTIONS: ScopeOptionsFull = {
+  placeOfEvent: JurisdictionFilter.enum.all
+}
+
+/**
+ * Function to get the value of a scope option (aka. scope attribute)
+ *
+ * @param scope - The scope to get the value of the option from.
+ * @param option - The option to get the value of.
+ * @returns The value of the scope option. Will return the default value if the option is not set.
+ */
+export function getScopeOptionValue<T extends ScopeOptionKey>(
+  scope: RecordScopeV2,
+  option: T
+): ScopeOptionsFull[T] | undefined {
+  const options = scope.options as Partial<ScopeOptionsFull> | undefined
+  const value = options?.[option]
+
+  const defaultValue =
+    option in DEFAULT_SCOPE_OPTIONS ? DEFAULT_SCOPE_OPTIONS[option] : undefined
+
+  return value ?? defaultValue
 }
 
 type LegacyScopeType = ConfigurableScopeType
@@ -173,6 +287,9 @@ const v1ToV2ConfigScopeTypeMap: Record<LegacyScopeType, string> = {
 
 /**
  * Converts a V1 scope string to a V2 compatible scope string. Used to migrate between 1.9 and 2.0 scopes.
+ * @deprecated - This will be removed after migration to V2 scopes is complete. Do not use for new development.
+ *
+ * NOTE: We are casting intentionally broad with the input and output types to allow for flexibility during migration, without forcing loose types on the rest of the codebase.
  *
  * @param v1Scope e.g. 'record.declared.reject[event=birth|death|tennis-club-membership]',
  * @returns corresponding V2 compatible scope string based on v1 input.
@@ -186,7 +303,7 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
   }
 
   if (literalV1Scope) {
-    return encodeScope(literalV1Scope)
+    return encodeScope(literalV1Scope as RecordScopeV2) // Literal scopes have same structure in V2, just encode to string.
   }
 
   if (configurableV1Scope) {
@@ -198,10 +315,10 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
 
     if (configurableV1Scope.type === 'search') {
       return encodeScope({
-        type,
+        type: type as RecordScopeTypeV2,
         options: {
-          event: configurableV1Scope.options.event[0] || [],
-          access:
+          event: configurableV1Scope.options.event || [],
+          placeOfEvent:
             configurableV1Scope.options.access[0] === 'my-jurisdiction'
               ? 'administrativeArea'
               : 'all'
@@ -210,10 +327,11 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
     }
 
     return encodeScope({
-      type,
-      options: configurableV1Scope.options
+      type: type as RecordScopeTypeV2,
+      options: configurableV1Scope.options as RecordScopeV2['options']
     })
   }
+
   throw new Error(`Unsupported V1 scope type: ${v1Scope}`)
 }
 
@@ -221,9 +339,9 @@ export function getAcceptedScopesByType({
   acceptedScopes,
   scopes
 }: {
-  acceptedScopes: RecordAction[]
+  acceptedScopes: RecordScopeTypeV2[]
   scopes: (LegacyScopeType | string)[]
-}): z.infer<typeof AnyScope>[] {
+}): RecordScopeV2[] {
   return scopes
     .map((scope) => {
       const parsedScope = decodeScope(scope)
@@ -234,5 +352,22 @@ export function getAcceptedScopesByType({
         ? parsedScope
         : null
     })
-    .filter((scope): scope is z.infer<typeof AnyScope> => scope !== null)
+    .filter((scope): scope is RecordScopeV2 => scope !== null)
+}
+
+export function canUserCreateEvent(
+  acceptedScopes: RecordScopeV2[],
+  eventType: string
+) {
+  return acceptedScopes.some((scope) => {
+    if (scope.options?.event === undefined) {
+      return true
+    }
+
+    if (scope.options.event.includes(eventType)) {
+      return true
+    }
+
+    return false
+  })
 }

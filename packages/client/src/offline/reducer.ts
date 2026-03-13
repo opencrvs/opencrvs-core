@@ -21,7 +21,6 @@ import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import {
-  IApplicationConfig,
   IApplicationConfigAnonymous,
   ILocationDataResponse,
   referenceApi,
@@ -40,12 +39,12 @@ import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
 import { initConditionals } from '@client/forms/conditionals'
 import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
-import { initValidators } from '@client/forms/validators'
 import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
 import { getToken } from '@client/utils/authUtils'
+import { ApplicationConfig } from '@opencrvs/commons/client'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -117,7 +116,7 @@ export interface IOfflineData {
     logo: string
   }
   systems: System[]
-  config: IApplicationConfig
+  config: ApplicationConfig
   anonymousConfig: IApplicationConfigAnonymous
 }
 
@@ -249,11 +248,6 @@ const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
   failActionCreator: actions.conditionalsFailed
 })
 
-const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
-  successActionCreator: actions.validatorsLoaded,
-  failActionCreator: actions.validatorsFailed
-})
-
 const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
   successActionCreator: actions.handlebarsLoaded,
   failActionCreator: actions.handlebarsFailed
@@ -271,8 +265,6 @@ function delay(cmd: RunCmd<any>, time: number) {
 function getDataLoadingCommands() {
   return Cmd.list<actions.Action>([
     CONFIG_CMD,
-    CONDITIONALS_CMD,
-    VALIDATORS_CMD,
     HANDLEBARS_CMD,
     ...(import.meta.env.MODE === 'test' || import.meta.env.STORYBOOK
       ? [FORMS_CMD]

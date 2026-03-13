@@ -34,6 +34,7 @@ import {
   CustomActionInput,
   EditActionInput
 } from '@opencrvs/commons/events'
+import { EventActionAuditLog } from '@opencrvs/commons/events'
 import {
   TokenUserType,
   TokenWithBearer
@@ -43,7 +44,7 @@ import {
   requiresAnyOfScopes,
   setBearerForToken
 } from '@events/router/middleware'
-import { userAndSystemProcedure } from '@events/router/trpc'
+import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
@@ -56,6 +57,7 @@ import {
 import { getEventConfigurationById } from '@events/service/config/config'
 import { TrpcUserContext } from '@events/context'
 import { getActionConfirmationToken } from '@events/service/auth'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -163,6 +165,19 @@ const ACTION_PROCEDURE_CONFIG = {
     }
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
+
+/**
+ * Maps action types to their corresponding audit log operation names (tRPC paths).
+ * Only includes action types that should be audit-logged.
+ */
+const AUDIT_LOG_OPERATION_MAP: Partial<
+  Record<keyof typeof ACTION_PROCEDURE_CONFIG, EventActionAuditLog['operation']>
+> = {
+  [ActionType.NOTIFY]: 'event.actions.notify.request',
+  [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request.request',
+  [ActionType.APPROVE_CORRECTION]: 'event.actions.correction.approve.request',
+  [ActionType.REJECT_CORRECTION]: 'event.actions.correction.reject.request'
+}
 
 type ActionProcedure = {
   request: MutationProcedure<{
@@ -312,6 +327,16 @@ export type AsyncActionConfirmationResponseSchema = z.infer<
 >
 
 /**
+ * To prevent accidental access granting, we want to make sure that system users can only access events with scopes that explicitly allow system user access, even if the scope options would match the system user's context.
+ */
+const SYSTEM_USER_ALLOWED_ACTIONS = [
+  ActionType.NOTIFY,
+  ActionType.REJECT_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REQUEST_CORRECTION
+] as const
+
+/**
  * Most actions share a similar model, where the action is first requested, and then either synchronously or asynchronously
  * accepted or rejected, via the notify API. The notify APIs are HTTP APIs served by the countryconfig.
  *
@@ -335,18 +360,42 @@ export function getDefaultActionProcedures(
     )
   }
 
-  const requireScopesForRequestMiddleware = requiresAnyOfScopes(
-    [],
-    ACTION_SCOPE_MAP[actionType]
+  const actionsMigratedToV2Scopes = [
+    ActionType.NOTIFY,
+    ActionType.DECLARE,
+    ActionType.REGISTER,
+    ActionType.ARCHIVE,
+    ActionType.REJECT,
+    ActionType.EDIT,
+    ActionType.REJECT_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REQUEST_CORRECTION,
+    ActionType.PRINT_CERTIFICATE
+  ] as const
+
+  const canAccessEventMiddleware = actionsMigratedToV2Scopes.some(
+    (act) => act === actionType
   )
+    ? middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType])
+    : // @TODO
+      // @ts-expect-error - All scopes do not overlap between 2.0 and 1.9. Since scopes are migrated one by one, we can ignore this error until all scopes for the action are migrated as long as @see actionsMigratedToV2Scopes is updated accordingly.
+      requiresAnyOfScopes([], ACTION_SCOPE_MAP[actionType])
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
+  const userTypeBasedProcedure = SYSTEM_USER_ALLOWED_ACTIONS.some(
+    (act) => act === actionType
+  )
+    ? userAndSystemProcedure
+    : userOnlyProcedure
+
   return {
-    request: userAndSystemProcedure
+    request: userTypeBasedProcedure
       .meta(meta)
-      .use(requireScopesForRequestMiddleware)
+      .use(canAccessEventMiddleware)
       .input(actionConfig.inputSchema.strict())
+      // @TODO:
+      // @ts-expect-error - deprecated by the end of 2.0
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
@@ -370,7 +419,7 @@ export function getDefaultActionProcedures(
           return duplicates.event
         }
 
-        return defaultRequestHandler(
+        const result = await defaultRequestHandler(
           input,
           user,
           token,
@@ -379,6 +428,27 @@ export function getDefaultActionProcedures(
           actionConfig.inputSchema,
           actionConfig.actionConfirmationResponseSchema
         )
+
+        const auditOperation = AUDIT_LOG_OPERATION_MAP[actionType]
+        if (auditOperation) {
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: auditOperation,
+            requestData: {
+              eventId,
+              actionType,
+              transactionId: input.transactionId
+            },
+            responseSummary: {
+              eventId: result.id,
+              eventType: result.type,
+              trackingId: result.trackingId
+            }
+          })
+        }
+
+        return result
       }),
 
     accept: userAndSystemProcedure

@@ -30,7 +30,8 @@ import {
   UUID,
   getCurrentEventState,
   EventConfig,
-  omitHiddenFields
+  omitHiddenFields,
+  EventIndex
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
@@ -194,14 +195,13 @@ function QuickActionModal({
 }
 
 export function useQuickActionModal(
-  eventId: UUID,
   eventConfiguration: EventConfig,
-  eventType: string
+  eventIndex: EventIndex
 ) {
   const [quickActionModal, openModal] = useModal()
   const navigate = useNavigate()
   const { actions, customActions } = useEvents()
-  const { isActionAllowed } = useUserAllowedActions(eventType)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
 
   const onQuickAction = async (
     actionType: keyof typeof quickActions,
@@ -222,7 +222,7 @@ export function useQuickActionModal(
           ...config.modal
         }}
         eventConfiguration={eventConfiguration}
-        eventId={eventId}
+        eventId={eventIndex.id}
       />
     ))
 
@@ -231,7 +231,7 @@ export function useQuickActionModal(
     // - Redirect the user to the workqueue they arrived from if provided, or the home page if not
     if (result) {
       void config.onConfirm({
-        eventId,
+        eventId: eventIndex.id,
         actions,
         customActions,
         isActionAllowed

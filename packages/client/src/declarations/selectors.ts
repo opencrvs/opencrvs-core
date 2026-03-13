@@ -22,11 +22,6 @@ function getKey<K extends keyof IDeclarationsState>(
   return getDraftsState(store)[key]
 }
 
-export const getInitialDeclarationsLoaded = (
-  store: IStoreState
-): IDeclarationsState['initialDeclarationsLoaded'] =>
-  getKey(store, 'initialDeclarationsLoaded')
-
 const selectDeclaration =
   <T extends IDeclaration | undefined>(declarationId?: string) =>
   (store: IStoreState) =>

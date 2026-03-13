@@ -42,7 +42,7 @@ export const createClient = (
   restoredCache?: InMemoryCache
 ) => {
   const httpLink = createHttpLink({
-    uri: new URL('graphql', window.config.API_GATEWAY_URL).toString()
+    uri: '/api/graphql'
   })
 
   const authLink = setContext((_, { headers }) => {

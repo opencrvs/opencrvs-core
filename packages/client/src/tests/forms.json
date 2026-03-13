@@ -969,7 +969,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -1050,10 +1050,6 @@
                   "required": false,
                   "initialValue": "",
                   "validator": [
-                    {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
                     {
                       "operation": "duplicateIDNumber",
                       "parameters": ["deceased.deceasedID"]
@@ -2225,10 +2221,6 @@
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
-                    {
                       "operation": "duplicateIDNumber",
                       "parameters": ["father.iD"]
                     }
@@ -2320,7 +2312,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist)"
+                      "expression": "(!values.detailsExist)"
                     }
                   ],
                   "mapping": {
@@ -2755,10 +2747,6 @@
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
-                    {
                       "operation": "duplicateIDNumber",
                       "parameters": ["mother.iD"]
                     }
@@ -2850,7 +2838,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist)"
+                      "expression": "(!values.detailsExist)"
                     }
                   ],
                   "mapping": {
@@ -3650,10 +3638,6 @@
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
-                    {
                       "operation": "duplicateIDNumber",
                       "parameters": ["informant.informantID"]
                     }
@@ -3720,12 +3704,7 @@
                   "hideHeader": true,
                   "initialValue": false,
                   "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN"
-                    }
-                  ],
+                  "conditionals": [],
                   "mapping": {
                     "query": {
                       "operation": "booleanTransformer"
@@ -4699,7 +4678,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -4771,10 +4750,6 @@
                   "required": false,
                   "initialValue": "",
                   "validator": [
-                    {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
                     {
                       "operation": "duplicateIDNumber",
                       "parameters": ["deceased.deceasedID"]
@@ -6612,7 +6587,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -6693,10 +6668,6 @@
                   "required": false,
                   "initialValue": "",
                   "validator": [
-                    {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
                     {
                       "operation": "duplicateIDNumber",
                       "parameters": ["deceased.deceasedID"]
@@ -7981,7 +7952,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -8069,10 +8040,6 @@
                   "required": false,
                   "initialValue": "",
                   "validator": [
-                    {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
                     {
                       "operation": "duplicateIDNumber",
                       "parameters": ["bride.iD"]
@@ -9233,7 +9200,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.FEATURES.DATE_OF_BIRTH_UNKNOWN || !values.detailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -9321,10 +9288,6 @@
                   "required": false,
                   "initialValue": "",
                   "validator": [
-                    {
-                      "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
-                    },
                     {
                       "operation": "duplicateIDNumber",
                       "parameters": ["groom.iD"]

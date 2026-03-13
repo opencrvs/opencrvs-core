@@ -329,7 +329,8 @@ export const resolvers: GQLResolver = {
         const requestingUser = await getUserFromHeader(authHeader)
         const isUnderJurisdiction = await isOfficeUnderJurisdiction(
           requestingUser.primaryOfficeId as UUID,
-          user.primaryOffice as UUID
+          user.primaryOffice as UUID,
+          authHeader
         )
         if (!isUnderJurisdiction) {
           throw new Error(
@@ -365,7 +366,7 @@ export const resolvers: GQLResolver = {
       }
 
       const roles = await fetchJSON<Roles>(
-        joinUrl(COUNTRY_CONFIG_URL, '/roles')
+        joinUrl(COUNTRY_CONFIG_URL, '/config/roles')
       )
       const userPayload: IUserPayload = createOrUpdateUserPayload(user, roles)
       const action = userPayload.id ? 'updateUser' : 'createUser'

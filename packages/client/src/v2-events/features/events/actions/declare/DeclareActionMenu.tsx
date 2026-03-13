@@ -33,7 +33,10 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { messages as formHeaderMessages } from '@client/v2-events/layouts/form/FormHeader'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
-import { actionLabels } from '@client/v2-events/features/workqueues/Actions/utils'
+import {
+  actionIcons,
+  actionLabels
+} from '@client/v2-events/features/workqueues/Actions/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { Review } from '@client/v2-events/features/events/components/Review'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
@@ -135,7 +138,8 @@ function useDeclarationActions(event: EventDocument) {
     reviewFields: reviewConfig.fields
   })
 
-  const { isActionAllowed } = useUserAllowedActions(eventType)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const eventId = event.id
 
   const onDelete = useCallback(async () => {
@@ -171,28 +175,27 @@ function useDeclarationActions(event: EventDocument) {
     }
   }
 
-  const eventIndex = getCurrentEventState(event, eventConfiguration)
   const availableActions = getAvailableActionsForEvent(eventIndex)
 
   return {
     modals: [modal, saveAndExitModal, deleteDeclarationModal],
     actions: [
       {
-        icon: 'Check' as const,
+        icon: actionIcons[ActionType.REGISTER],
         label: actionLabels[ActionType.REGISTER],
         onClick: async () => handleDeclaration(ActionType.REGISTER),
         hidden: !isActionAllowed(ActionType.REGISTER),
         disabled: hasValidationErrors || !canDirectlyRegister
       },
       {
-        icon: 'UploadSimple' as const,
+        icon: actionIcons[ActionType.DECLARE],
         label: actionLabels[ActionType.DECLARE],
         onClick: async () => handleDeclaration(ActionType.DECLARE),
         hidden: !isActionAllowed(ActionType.DECLARE),
         disabled: hasValidationErrors
       },
       {
-        icon: 'UploadSimple' as const,
+        icon: actionIcons[ActionType.DECLARE],
         label: actionLabels[ActionType.NOTIFY],
         onClick: async () => handleDeclaration(ActionType.NOTIFY),
         hidden:

@@ -9,23 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Validation } from '@client/utils/validate'
-import { referenceApi } from '@client/utils/referenceApi'
 import { AnyFn } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
 
 export type Validator = Validation | AnyFn<Validation>
-export let validators: Record<string, Validator> = builtInValidators as Record<
-  string,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  any
->
-
-export async function initValidators() {
-  const countryConfigValidators = await referenceApi.importValidators()
-  validators = {
-    // Needs to be casted as any as there are non-validator functions in the import
+export const validators: Record<string, Validator> =
+  builtInValidators as Record<
+    string,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    ...(builtInValidators as Record<string, any>),
-    ...countryConfigValidators
-  }
-}
+    any
+  >

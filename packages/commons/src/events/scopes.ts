@@ -13,7 +13,6 @@ import {
   ConfigurableScopeType,
   getAuthorizedEventsFromScopes,
   Scope,
-  RecordScopeType,
   findScopes
 } from '../scopes'
 import {
@@ -21,7 +20,12 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { EventIndex } from './EventIndex'
+import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes-v2'
+import {
+  EventIndexWithAdministrativeHierarchy,
+  userCanAccessEventWithScopes
+} from './locations'
+import { UserContext } from '../users/User'
 
 type AlwaysAllowed = null
 
@@ -31,28 +35,26 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.CREATE]: ['record.create'],
   [ActionType.NOTIFY]: ['record.notify'],
   [ActionType.DECLARE]: ['record.declare', 'record.register'],
-  [ActionType.EDIT]: ['record.declared.edit'],
+  [ActionType.EDIT]: ['record.edit'],
   [ActionType.DELETE]: ['record.declare'],
   [ActionType.REGISTER]: ['record.register'],
-  [ActionType.PRINT_CERTIFICATE]: ['record.registered.print-certified-copies'],
+  [ActionType.PRINT_CERTIFICATE]: ['record.print-certified-copies'],
   [ActionType.REQUEST_CORRECTION]: [
-    'record.registered.request-correction',
-    'record.registered.correct'
+    'record.request-correction',
+    'record.correct'
   ],
-  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [
-    'record.registered.correct'
-  ],
-  [ActionType.REJECT_CORRECTION]: ['record.registered.correct'],
-  [ActionType.APPROVE_CORRECTION]: ['record.registered.correct'],
-  [ActionType.MARK_AS_DUPLICATE]: ['record.declared.review-duplicates'],
-  [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.declared.review-duplicates'],
-  [ActionType.ARCHIVE]: ['record.declared.archive'],
-  [ActionType.REJECT]: ['record.declared.reject'],
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: ['record.correct'],
+  [ActionType.REJECT_CORRECTION]: ['record.correct'],
+  [ActionType.APPROVE_CORRECTION]: ['record.correct'],
+  [ActionType.MARK_AS_DUPLICATE]: ['record.review-duplicates'],
+  [ActionType.MARK_AS_NOT_DUPLICATE]: ['record.review-duplicates'],
+  [ActionType.ARCHIVE]: ['record.archive'],
+  [ActionType.REJECT]: ['record.reject'],
   [ActionType.ASSIGN]: null,
   [ActionType.UNASSIGN]: null,
   [ActionType.DUPLICATE_DETECTED]: [],
   [ActionType.CUSTOM]: []
-} satisfies Record<DisplayableAction, RecordScopeType[] | AlwaysAllowed>
+} satisfies Record<DisplayableAction, RecordScopeTypeV2[] | AlwaysAllowed>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
@@ -88,23 +90,33 @@ export function configurableEventScopeAllowed(
 }
 
 /**
- * Checks if a given action is allowed for the provided scopes and event type.
+ * Checks if a given action is allowed for the provided scopes, event, and user context.
  *
  * This function determines whether the user, with the given set of scopes, is authorized
- * to perform the specified action on an event of the given type. It checks both "plain" scopes
- * (hardcoded, non-configurable) and "configurable" scopes (which may be tied to specific event types).
+ * to perform the specified action on the given event. It checks both legacy V1 scopes
+ * (hardcoded, non-configurable) and V2 scopes, which validate event type, jurisdiction,
+ * and user context via {@link userCanAccessEventWithScopes}.
  *
- * @param {Scope[]} scopes - The list of scopes the user possesses.
+ * @param {Scope[]} scopes - The raw encoded scope strings the user possesses (from JWT).
  * @param {DisplayableAction} action - The action to check authorization for.
- * @param {string} eventType - The type of event for which the action is being checked.
+ * @param {EventIndexWithAdministrativeHierarchy} event - The event with resolved administrative hierarchy.
+ * @param {UserContext} currentUser - The current user's context used for V2 scope validation.
+ * @param {string} [customActionType] - Optional custom action type for CUSTOM actions.
  * @returns {boolean} True if the action is in scope for the user, otherwise false.
  */
-export function isActionInScope(
-  scopes: Scope[],
-  action: DisplayableAction,
-  eventType: string,
+export function isActionInScope({
+  scopes,
+  action,
+  event,
+  currentUser,
+  customActionType
+}: {
+  scopes: Scope[]
+  action: DisplayableAction
+  event: EventIndexWithAdministrativeHierarchy
+  currentUser: UserContext
   customActionType?: string
-) {
+}): boolean {
   const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
 
   // 'null' means that the action is always allowed
@@ -117,37 +129,34 @@ export function isActionInScope(
     return false
   }
 
-  return configurableEventScopeAllowed(
+  const isAllowedByLegacyScope = configurableEventScopeAllowed(
     scopes,
+    // @ts-expect-error - TODO: remove legacy scopes once evrything is migrated to V2
     allowedConfigurableScopes,
-    eventType,
+    event.type,
     customActionType
   )
-}
 
-/**
- * A shared utility to check if the user can read a record.
- * This will be removed in 1.10 and implemented by scopes.
- *
- * In order for us to limit the usage of 'record.read' scope, we allow users to view records they have created on system-level.
- *
- * @deprecated - Will be removed in 1.10
- */
-export function canUserReadEvent(
-  event: EventIndex | { createdBy: string; type: string },
-  {
-    userId,
+  // @TODO
+  // NOTE: This is a temporary measure to allow for the transition to V2 scopes.
+  // This will be unified to single check once the V1 scopes are fully deprecated and removed.
+  const matchingScopes = getAcceptedScopesByType({
+    acceptedScopes: allowedConfigurableScopes as RecordScopeTypeV2[],
     scopes
-  }: {
-    userId: string
-    scopes: string[]
-  }
-) {
-  const createdByUser = event.createdBy === userId
+  })
 
-  if (createdByUser) {
-    return true
-  }
+  const isAllowedByV2Scope = userCanAccessEventWithScopes(
+    event,
+    matchingScopes,
+    {
+      id: currentUser.id,
+      primaryOfficeId: currentUser.primaryOfficeId,
+      administrativeAreaId: currentUser.administrativeAreaId ?? null,
+      role: currentUser.role,
+      signature: currentUser.signature,
+      type: currentUser.type
+    }
+  )
 
-  return isActionInScope(scopes, ActionType.READ, event.type)
+  return isAllowedByLegacyScope || isAllowedByV2Scope
 }

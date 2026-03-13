@@ -59,6 +59,19 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 export const handlers = {
+  ping: [
+    http.get('/api/ping', () => {
+      return HttpResponse.json({
+        auth: true,
+        search: true,
+        'user-mgnt': true,
+        metrics: true,
+        notification: true,
+        countryconfig: true,
+        workflow: true
+      })
+    })
+  ],
   drafts: [
     tRPCMsw.event.draft.list.query(() => {
       return []
@@ -1283,7 +1296,7 @@ export const handlers = {
           {
             fullUrl:
               // @NOTE: Addresss component uses both V1 and V2. It should use only V2 api in the long run. Meanwhile, ensure ids match.
-              'http://localhost:2021/location/62a0ccb4-880d-4f30-8882-f256007dfff9/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
+              '/api/config/location/62a0ccb4-880d-4f30-8882-f256007dfff9/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -1992,7 +2005,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://localhost:2021/location/465c448a-2c85-45f5-80f0-967e91f51de9/_history/b7990a30-5093-409e-9a61-8cba9906687f',
+              '/api/config/location/465c448a-2c85-45f5-80f0-967e91f51de9/_history/b7990a30-5093-409e-9a61-8cba9906687f',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2037,7 +2050,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://localhost:2021/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf',
+              '/api/config/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2119,7 +2132,7 @@ export const handlers = {
     })
   ],
   modules: [
-    http.get('http://localhost:3040/conditionals.js', () => {
+    http.get('/api/countryconfig/conditionals.js', () => {
       const fileContent = `
       const conditionals = {
         isDefaultCountry: {
@@ -2138,16 +2151,8 @@ export const handlers = {
         }
       })
     }),
-    http.get('http://localhost:3040/handlebars.js', () => {
+    http.get('/api/countryconfig/handlebars.js', () => {
       return HttpResponse.text('', { status: 404 })
-    }),
-    http.get('http://localhost:3040/validators.js', () => {
-      return HttpResponse.text('export function noop() {}', {
-        status: 200,
-        headers: {
-          'content-type': 'application/javascript'
-        }
-      })
     })
   ],
   config: [
@@ -2185,7 +2190,7 @@ export const handlers = {
       })
     }),
 
-    http.get('http://localhost:2021/config', () => {
+    http.get('/api/config/config', () => {
       return HttpResponse.json({
         systems: [],
 
@@ -2274,7 +2279,7 @@ export const handlers = {
     })
   ],
   localisations: [
-    http.get('http://localhost:3040/content/client', () => {
+    http.get('/api/countryconfig/content/client', () => {
       return HttpResponse.json({
         languages: [
           {
@@ -2292,7 +2297,7 @@ export const handlers = {
     })
   ],
   forms: [
-    http.get('http://localhost:2021/forms', () => {
+    http.get('/api/config/forms', () => {
       return HttpResponse.json(forms.forms)
     })
   ],

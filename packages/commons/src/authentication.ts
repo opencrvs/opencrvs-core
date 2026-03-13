@@ -14,7 +14,36 @@ import * as z from 'zod/v4'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
 import { UUID } from './uuid'
+import {
+  encodeScope,
+  RecordScopeTypeV2,
+  RecordScopeV2,
+  decodeScope
+} from './scopes-v2'
 export * from './scopes'
+
+/**
+ * Returns an array of accepted scopes from a JWT token, filtered by the given accepted scope types.
+ *
+ * @param token - The JWT token containing scope definitions.
+ * @param acceptedScopes - An array of acceptable scope types to filter by.
+ * @returns An array of parsed RecordScopeV2 objects that are found in the token and match the accepted scope types.
+ */
+export function getAcceptedScopesFromToken(
+  token: string,
+  acceptedScopes: RecordScopeTypeV2[]
+) {
+  const tokenScopes = getScopes(token)
+
+  return tokenScopes
+    .map((scope) => {
+      const parsedScope = decodeScope(scope)
+      return parsedScope && acceptedScopes.includes(parsedScope.type)
+        ? parsedScope
+        : null
+    })
+    .filter((scope): scope is RecordScopeV2 => scope !== null)
+}
 
 export const DEFAULT_ROLES_DEFINITION = [
   {
@@ -25,8 +54,18 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.fieldAgent'
     },
     scopes: [
-      `record.create[event=birth|death|tennis-club-membership]`,
-      'record.declare[event=birth|death|tennis-club-membership]',
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -45,8 +84,18 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.registrationAgent'
     },
     scopes: [
-      `record.create[event=birth|death|tennis-club-membership]`,
-      'record.declare[event=birth|death|tennis-club-membership]',
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -73,14 +122,29 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localRegistrar'
     },
     scopes: [
-      `record.create[event=birth|death|tennis-club-membership]`,
-      'record.declare[event=birth|death|tennis-club-membership]',
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
       SCOPES.RECORD_DECLARE_BIRTH,
       SCOPES.RECORD_DECLARE_DEATH,
       SCOPES.RECORD_DECLARE_MARRIAGE,
       SCOPES.RECORD_SUBMIT_FOR_UPDATES,
       SCOPES.RECORD_REVIEW_DUPLICATES,
-      'record.declared.review-duplicates[event=birth|death|tennis-club-membership]',
+      encodeScope({
+        type: 'record.review-duplicates',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
       SCOPES.RECORD_DECLARATION_ARCHIVE,
       SCOPES.RECORD_DECLARATION_REINSTATE,
       SCOPES.RECORD_REGISTER,

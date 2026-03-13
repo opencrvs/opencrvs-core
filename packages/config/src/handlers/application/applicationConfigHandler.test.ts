@@ -34,11 +34,6 @@ export const validImageB64String =
 
 const mockConfig = {
   APPLICATION_NAME: 'Farajaland CRVS',
-  BIRTH: {
-    REGISTRATION_TARGET: 45,
-    LATE_REGISTRATION_TARGET: 365,
-    PRINT_IN_ADVANCE: true
-  },
   COUNTRY_LOGO: {
     fileName: 'logo.png',
     file: `data:image;base64,${validImageB64String}`
@@ -47,21 +42,7 @@ const mockConfig = {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
   },
-  DEATH: {
-    REGISTRATION_TARGET: 45,
-    PRINT_IN_ADVANCE: true
-  },
-  MARRIAGE: {
-    REGISTRATION_TARGET: 45,
-    PRINT_IN_ADVANCE: true
-  },
   PHONE_NUMBER_PATTERN: '^0(7|9)[0-9]{8}$',
-  NID_NUMBER_PATTERN: '^[0-9]{10}$',
-  LOGIN_BACKGROUND: {
-    backgroundColor: '36304E'
-  },
-  MARRIAGE_REGISTRATION: false,
-  DATE_OF_BIRTH_UNKNOWN: false,
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
@@ -69,10 +50,6 @@ const mockConfig = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040',
-  FIELD_AGENT_AUDIT_LOCATIONS:
-    'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
-  DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION,MUNICIPALITY',
-  EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
   USER_NOTIFICATION_DELIVERY_METHOD: 'email',
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: 'email'
 } as unknown as IApplicationConfigurationModel

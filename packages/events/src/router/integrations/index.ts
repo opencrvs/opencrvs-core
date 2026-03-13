@@ -9,11 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { randomUUID } from 'crypto'
 import * as z from 'zod/v4'
-import { SCOPES } from '@opencrvs/commons'
-import { router, userAndSystemProcedure } from '@events/router/trpc'
+import { TRPCError } from '@trpc/server'
+import { SCOPES, UUID } from '@opencrvs/commons'
+import { publicProcedure, router, userAndSystemProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware'
-import { registerSystem } from '@events/service/integrations/api'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
+import { createSystemClient, getSystemClientById, listSystemClients } from '@events/storage/postgres/events/system-clients'
+import { compare, generateSaltedHash } from '@events/service/auth/hash'
 
 const CreateIntegrationInput = z.object({
   name: z.string().min(1, 'Integration name is required'),
@@ -24,6 +28,32 @@ const CreateIntegrationOutput = z.object({
   clientId: z.string(),
   shaSecret: z.string(),
   clientSecret: z.string()
+})
+
+const ListIntegrationsInput = z
+  .object({
+    status: z.optional(z.enum(['active', 'disabled']))
+  })
+  .optional()
+
+const ListIntegrationsOutput = z.array(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    scopes: z.array(z.string()),
+    status: z.string()
+  })
+)
+
+const AuthenticateSystemInput = z.object({
+  client_id: UUID,
+  client_secret: z.string()
+})
+
+const AuthenticateSystemOutput = z.object({
+  id: UUID,
+  status: z.string(),
+  scope: z.array(z.string())
 })
 
 export const integrationsRouter = router({
@@ -40,15 +70,77 @@ export const integrationsRouter = router({
     .output(CreateIntegrationOutput)
     .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
     .mutation(async ({ input, ctx }) => {
-      const result = await registerSystem(
-        {
-          name: input.name,
-          type: 'CUSTOM',
-          scope: input.scopes
-        },
-        ctx.token
-      )
+      const clientSecret = randomUUID()
+      const shaSecret = randomUUID()
+      const { hash: secretHash, salt } = await generateSaltedHash(clientSecret)
+
+      const row = await createSystemClient({
+        name: input.name,
+        scopes: input.scopes,
+        createdBy: ctx.user.id,
+        secretHash,
+        salt,
+        shaSecret,
+        status: 'active'
+      })
+
+      const result = {
+        clientId: row.id,
+        shaSecret,
+        clientSecret
+      }
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.create',
+        requestData: { name: input.name, scopes: input.scopes },
+        responseSummary: { clientId: result.clientId }
+      })
 
       return result
+    }),
+
+  authenticate: publicProcedure
+    .input(AuthenticateSystemInput)
+    .output(AuthenticateSystemOutput)
+    .mutation(async ({ input }) => {
+      const systemClient = await getSystemClientById(input.client_id)
+
+      if (!systemClient.secretHash || !systemClient.salt) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      if (!(await compare(input.client_secret, systemClient.secretHash))) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      return {
+        id: systemClient.id as UUID,
+        status: systemClient.status,
+        scope: systemClient.scopes as string[]
+      }
+    }),
+
+  list: userAndSystemProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/integrations',
+        summary: 'List integration clients',
+        tags: ['Integrations']
+      }
+    })
+    .input(ListIntegrationsInput)
+    .output(ListIntegrationsOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .query(async ({ input }) => {
+      const rows = await listSystemClients(input ?? undefined)
+      return rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        scopes: row.scopes as string[],
+        status: row.status
+      }))
     })
 })

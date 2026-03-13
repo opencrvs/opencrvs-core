@@ -50,7 +50,8 @@ import {
   EventConfig,
   isAgeFieldType,
   FieldUpdateValue,
-  isCustomFieldType
+  isCustomFieldType,
+  isImageViewFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -71,9 +72,11 @@ import {
   TimeField,
   getRegisteredFieldByFieldConfig,
   VerificationStatus,
-  AgeField
+  AgeField,
+  ImageView
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { SignatureField } from '@client/v2-events/components/forms/inputs/SignatureField/SignatureField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
@@ -138,6 +141,10 @@ export function ValueOutput({
     return PageHeader.Output
   }
 
+  if (isImageViewFieldType(field)) {
+    return ImageView.Output
+  }
+
   if (isParagraphFieldType(field)) {
     return Paragraph.Output
   }
@@ -150,7 +157,11 @@ export function ValueOutput({
     return <NumberWithUnit.Output {...field} />
   }
 
-  if (isFileFieldType(field) || isSignatureFieldType(field)) {
+  if (isSignatureFieldType(field)) {
+    return <SignatureField.Output value={field.value} />
+  }
+
+  if (isFileFieldType(field)) {
     return <File.Output {...field} />
   }
 
