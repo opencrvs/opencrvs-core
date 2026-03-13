@@ -147,7 +147,7 @@ const ScopeOptionsPrintCertifiedCopies = ScopeOptionsFull.extend({
       z.array(z.string()).optional()
     )
     .describe(
-      'Template IDs for certified copies. If not provided, all templates will be used.'
+      'Template IDs for certified copies. Controls which certificate templates are returned to the client via the config service. Certificate printing is a client-side operation — this option is not validated when the printCertificate action is submitted.'
     )
 })
 
