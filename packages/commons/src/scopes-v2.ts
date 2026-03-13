@@ -188,12 +188,15 @@ export function scopeUsesFullOptions(
   scope: RecordScopeV2
 ): scope is Extract<
   RecordScopeV2,
-  { type: z.infer<typeof ScopesWithFullOptions> | 'record.print-certified-copies' }
+  { type: z.infer<typeof ScopesWithFullOptions> }
 > {
-  return (
-    ScopesWithFullOptions.options.some((opt) => opt === scope.type) ||
-    scope.type === 'record.print-certified-copies'
-  )
+  return ScopesWithFullOptions.options.some((opt) => opt === scope.type)
+}
+
+export function scopeUsesPrintCertifiedCopiesOptions(
+  scope: RecordScopeV2
+): scope is Extract<RecordScopeV2, { type: 'record.print-certified-copies' }> {
+  return scope.type === 'record.print-certified-copies'
 }
 
 export const ResolvedRecordScopeV2 = z
