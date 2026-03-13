@@ -584,7 +584,7 @@ export async function seedEvent(
         // correction, partial declaration which changes a value without uncorrectable: true is enough.
         const declaration =
           actionType === ActionType.REQUEST_CORRECTION
-            ? { ' applicant.age': 16 }
+            ? { 'applicant.age': 16 }
             : generateActionDeclarationInput(
                 eventConfig,
                 actionType,
