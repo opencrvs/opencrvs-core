@@ -117,3 +117,13 @@ export const AvailableIcons = z.enum([
   'PushPin',
   'Timer'
 ])
+
+export type AvailableIcons = z.infer<typeof AvailableIcons>
+
+export function isValidIcon(icon: string | undefined): icon is AvailableIcons {
+  if (!icon) {
+    return false
+  }
+
+  return AvailableIcons.options.includes(icon as AvailableIcons)
+}

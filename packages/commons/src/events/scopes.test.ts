@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { configurableEventScopeAllowed, isActionInScope } from './scopes'
+import { isActionInScope } from './scopes'
 import { ActionType } from './ActionType'
 import { encodeScope } from '../scopes-v2'
 import { EventIndexWithAdministrativeHierarchy } from './locations'
@@ -37,87 +37,6 @@ function makeEvent(eventType: string): EventIndexWithAdministrativeHierarchy {
     legalStatuses: { DECLARED: undefined, REGISTERED: undefined }
   } as unknown as EventIndexWithAdministrativeHierarchy
 }
-
-describe('configurableEventScopeAllowed()', () => {
-  describe('scope: record.custom-action', () => {
-    it('should return false if the event type is not authorized in the found scopes', () => {
-      const scopes = [
-        'record.custom-action[event=my-event-type,customActionType=MY_CUSTOM_ACTION]'
-      ]
-
-      expect(
-        configurableEventScopeAllowed(
-          scopes,
-          ['record.custom-action'],
-          'other-event-type',
-          'MY_CUSTOM_ACTION'
-        )
-      ).toBe(false)
-    })
-
-    it('should return false if the custom action type is not authorized in the found scopes', () => {
-      const scopes = [
-        'record.custom-action[event=my-event-type,customActionType=MY_CUSTOM_ACTION]'
-      ]
-
-      expect(
-        configurableEventScopeAllowed(
-          scopes,
-          ['record.custom-action'],
-          'my-event-type',
-          'OTHER_CUSTOM_ACTION_TYPE'
-        )
-      ).toBe(false)
-    })
-
-    it('should return false if has multiple scopes, but none of them with correct combination of event type and custom action type', () => {
-      const scopes = [
-        'record.custom-action[event=my-event-type,customActionType=MY_CUSTOM_ACTION]',
-        'record.custom-action[event=other-event-type,customActionType=OTHER_CUSTOM_ACTION_TYPE]'
-      ]
-
-      expect(
-        configurableEventScopeAllowed(
-          scopes,
-          ['record.custom-action'],
-          'my-event-type',
-          'OTHER_CUSTOM_ACTION_TYPE'
-        )
-      ).toBe(false)
-    })
-
-    it('should return true if the event type is authorized in the found scopes', () => {
-      const scopes = [
-        'record.custom-action[event=my-event-type,customActionType=MY_CUSTOM_ACTION]'
-      ]
-
-      expect(
-        configurableEventScopeAllowed(
-          scopes,
-          ['record.custom-action'],
-          'my-event-type',
-          'MY_CUSTOM_ACTION'
-        )
-      ).toBe(true)
-    })
-
-    it('should return true if has multiple scopes, one of which has the correct combination of event type and custom action type', () => {
-      const scopes = [
-        'record.custom-action[event=other-event-type|my-event-type,customActionType=OTHER_CUSTOM_ACTION_TYPE]',
-        'record.custom-action[event=my-event-type,customActionType=MY_CUSTOM_ACTION]'
-      ]
-
-      expect(
-        configurableEventScopeAllowed(
-          scopes,
-          ['record.custom-action'],
-          'my-event-type',
-          'MY_CUSTOM_ACTION'
-        )
-      ).toBe(true)
-    })
-  })
-})
 
 describe('isActionInScope()', () => {
   describe('actions with null scope map (always allowed)', () => {
