@@ -19,6 +19,8 @@ ENV LOGIN_URL="{{LOGIN_URL}}"
 ENV AUTH_URL_INTERNAL="{{AUTH_URL_INTERNAL}}"
 ENV CONFIG_API_URL_INTERNAL="{{CONFIG_API_URL_INTERNAL}}"
 ENV GATEWAY_URL_INTERNAL="{{GATEWAY_URL_INTERNAL}}"
+ENV MINIO_BUCKET="{{MINIO_BUCKET}}"
+ENV MINIO_BASE_URL="{{MINIO_BASE_URL}}"
 WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client
 RUN yarn install --frozen-lockfile && yarn build

@@ -25,3 +25,8 @@ sed -e s~{{COUNTRY_CONFIG_URL_INTERNAL}}~$COUNTRY_CONFIG_URL_INTERNAL~g \
     /usr/share/nginx/html/index.html > /tmp/index.html
 cat /tmp/index.html > /usr/share/nginx/html/index.html
 
+cat > /usr/share/nginx/html/core-config.js <<EOF
+window.config.MINIO_BUCKET = '$MINIO_BUCKET';
+window.config.MINIO_BASE_URL = '$MINIO_BASE_URL';
+EOF
+
