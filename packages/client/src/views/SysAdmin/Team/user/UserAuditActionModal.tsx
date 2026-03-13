@@ -43,6 +43,7 @@ import {
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
 import { getOfflineData } from '@client/offline/selectors'
 import { GetUserQuery, GetUserQueryVariables } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 const { useState, useEffect } = React
 
@@ -129,7 +130,7 @@ function UserAuditActionModalComponent(
     if (!props.form?.fields) return
 
     if (
-      hasFormError(props.form.fields, formValues, config, { formValues }, user)
+      hasFormError(props.form.fields, formValues, config, { formValues }, user as unknown as UserDetails | null)
     ) {
       if (user && user.status === 'active') {
         const auditAction = 'deactivating'

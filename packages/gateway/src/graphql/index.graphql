@@ -6,19 +6,11 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-# import Query.* from '../features/notification/schema.graphql'
-# import Query.* from '../features/registration/schema.graphql'
-# import Mutation.* from '../features/registration/schema.graphql'
-# import * from '../features/location/schema.graphql'
+
+# import * from 'common.graphql'
+
 # import Query.* from '../features/user/schema.graphql'
 # import Mutation.* from '../features/user/schema.graphql'
-# import Query.* from '../features/metrics/schema.graphql'
-# import Query.* from '../features/search/schema.graphql'
-# import Query.* from '../features/role/schema.graphql'
-# import Mutation.* from '../features/systems/schema.graphql'
-# import Query.* from '../features/systems/schema.graphql'
-# import Mutation from '../features/bookmarkAdvancedSearch/schema.graphql'
-# import * from 'common.graphql'
 
 # TODO
 # https://github.com/prismagraphql/graphql-import/issues/180

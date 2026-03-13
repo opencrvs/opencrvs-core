@@ -20,7 +20,6 @@ export const env = cleanEnv(process.env, {
   NODE_ENV: str({ devDefault: 'development' }),
   QA_ENV: bool({ default: false }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
-  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
   CHECK_INVALID_TOKEN: bool({
     devDefault: false,
     desc: 'Check if the token has been invalidated in the auth service before it has expired'

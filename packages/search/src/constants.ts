@@ -14,7 +14,6 @@ import { env } from '@search/environment'
 export const HOST = env.HOST
 export const PORT = env.PORT
 export const ES_HOST = env.ES_HOST
-export const FHIR_URL = env.FHIR_URL
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
 export const MATCH_SCORE_THRESHOLD = env.MATCH_SCORE_THRESHOLD
@@ -23,5 +22,3 @@ export const OPENCRVS_INDEX_NAME = env.OPENCRVS_INDEX_NAME
 export const DEFAULT_TIMEOUT = 600000
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const APPLICATION_CONFIG_URL = env.APPLICATION_CONFIG_URL
-
-export const HEARTH_MONGO_URL = env.HEARTH_MONGO_URL

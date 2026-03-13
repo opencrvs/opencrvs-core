@@ -16,8 +16,8 @@ import {
   sanitizeForSnapshot,
   setupTestCase
 } from '@events/tests/utils'
-import { mswServer } from '../../tests/msw'
 import { createSystemClient } from '@events/storage/postgres/events/system-clients'
+import { mswServer } from '../../tests/msw'
 
 test('Returns empty list when no ids provided', async () => {
   const { user } = await setupTestCase()

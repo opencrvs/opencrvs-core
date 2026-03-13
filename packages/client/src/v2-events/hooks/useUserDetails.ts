@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useIntl, defineMessages } from 'react-intl'
+import { useIntl, defineMessages, IntlShape } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { personNameFromV1ToV2 } from '@opencrvs/commons/client'
 import { ActionType, TokenUserType } from '@opencrvs/commons/client'
@@ -100,4 +100,10 @@ export function useUserDetails() {
   }
 
   return { getUserDetails }
+}
+
+export function formatUserRole(role: string | undefined, intl: IntlShape) {
+  return intl.formatMessage(messages.role, {
+    role: role ?? ''
+  })
 }

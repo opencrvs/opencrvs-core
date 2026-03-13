@@ -123,7 +123,7 @@ export function ForgotPIN(props: IForgotPINProps) {
 
       setVerifyingPassword(true)
 
-      const id = (userDetails && userDetails.userMgntUserID) || ''
+      const id = (userDetails && userDetails.id) || ''
       try {
         const { data } = await userQueries.verifyPasswordById(id, password)
 

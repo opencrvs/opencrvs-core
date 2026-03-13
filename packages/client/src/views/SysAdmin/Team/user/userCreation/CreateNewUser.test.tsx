@@ -10,7 +10,6 @@
  */
 import { FormFieldGenerator } from '@client/components/form'
 import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
-import { roleQueries } from '@client/forms/user/query/queries'
 import { formatUrl } from '@client/navigation'
 import {
   CREATE_USER_ON_LOCATION,
@@ -54,7 +53,6 @@ describe('create new user tests', () => {
     store = s.store
 
     setScopes([SCOPES.USER_CREATE], store)
-    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -238,7 +236,6 @@ describe('edit user tests', () => {
       ],
       store
     )
-    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })

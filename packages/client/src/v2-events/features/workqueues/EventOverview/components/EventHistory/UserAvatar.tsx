@@ -41,7 +41,7 @@ export function UserAvatar({
 
   return (
     <NameAvatar>
-      <AvatarSmall avatar={avatar} name={name} />
+      <AvatarSmall avatar={avatar?.data} name={name} />
       <span>{name}</span>
     </NameAvatar>
   )

@@ -78,7 +78,7 @@ test('Check scopes against event.actions.notify', async () => {
         user,
         scope,
         clientReadingAllEvents,
-        (client) =>
+        async (client) =>
           client.event.actions.notify.request({
             eventId,
             transactionId: getUUID(),

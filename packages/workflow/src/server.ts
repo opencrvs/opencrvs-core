@@ -17,7 +17,6 @@ import {
   DEFAULT_TIMEOUT
 } from '@workflow/constants'
 import getPlugins from '@workflow/config/plugins'
-import { getRoutes } from '@workflow/config/routes'
 import { readFileSync } from 'fs'
 import { logger } from '@opencrvs/commons'
 import { Boom } from '@hapi/boom'
@@ -50,8 +49,7 @@ export async function createServer() {
 
   server.auth.default('jwt')
 
-  const routes = getRoutes()
-  server.route(routes)
+  server.route([])
 
   server.ext({
     type: 'onRequest',

@@ -12,17 +12,12 @@
 import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
-  AdministrativeArea,
   EventConfig,
   getOrThrow,
-  Location,
-  LocationType,
-  LocationTypeV1,
   logger,
   TokenWithBearer,
   WorkqueueConfig
 } from '@opencrvs/commons'
-import { Bundle, SavedLocation } from '@opencrvs/commons/types'
 import { env } from '@events/environment'
 
 /**
@@ -136,75 +131,4 @@ export async function getInMemoryWorkqueueConfigurations(
 
   inMemoryWorkqueueConfigurations = await getWorkqueueConfigurations(token)
   return inMemoryWorkqueueConfigurations
-}
-
-function parsePartOf(partOf: string | undefined): string | null {
-  if (!partOf) {
-    return null
-  }
-  return partOf === 'Location/0' ? null : partOf.split('/')[1]
-}
-
-async function fetchLocationV1(type: LocationTypeV1) {
-  const url = new URL('/locations', env.CONFIG_URL)
-  url.searchParams.set('type', type)
-  url.searchParams.set('_count', '0')
-
-  return fetch(url, {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-}
-
-export async function fetchAdministrativeAreas() {
-  const res = await fetchLocationV1(LocationTypeV1.enum.ADMIN_STRUCTURE)
-  if (!res.ok) {
-    throw new Error('Failed to fetch administrative areas')
-  }
-
-  const result = (await res.json()) as Bundle<SavedLocation>
-  const administrativeAreas = result.entry.map(({ resource }) => ({
-    id: resource.id,
-    name: resource.name,
-    parentId: parsePartOf(resource.partOf?.reference),
-    validUntil: resource.status === 'inactive' ? new Date().toISOString() : null
-  }))
-
-  return array(AdministrativeArea).parse(administrativeAreas)
-}
-
-export async function getLocations() {
-  const locationRequests = [
-    LocationType.enum.CRVS_OFFICE,
-    LocationType.enum.HEALTH_FACILITY
-  ].map(fetchLocationV1)
-
-  const locationResponses = await Promise.all(locationRequests)
-  for (const res of locationResponses) {
-    if (!res.ok) {
-      throw new Error('Failed to fetch locations')
-    }
-  }
-
-  const results = await Promise.all(
-    locationResponses.map(
-      async (res) => res.json() as Promise<Bundle<SavedLocation>>
-    )
-  )
-
-  const locations = results
-    .flatMap((result) => result.entry.map(({ resource }) => resource))
-    .map((entry) => {
-      return {
-        id: entry.id,
-        name: entry.name,
-        administrativeAreaId: parsePartOf(entry.partOf?.reference),
-        validUntil:
-          entry.status === 'inactive' ? new Date().toISOString() : null,
-        locationType: entry.type?.coding ? entry.type.coding[0]?.code : null
-      }
-    })
-
-  return array(Location).parse(locations)
 }

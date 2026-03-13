@@ -8,37 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getDirective, MapperKind, mapSchema } from '@graphql-tools/utils'
-import {
-  defaultFieldResolver,
-  GraphQLError,
-  GraphQLScalarType,
-  GraphQLSchema,
-  Kind
-} from 'graphql'
+import { GraphQLSchema } from 'graphql'
 
 import { ApolloServerOptions } from '@apollo/server'
-import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
-import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
-import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
-import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
-import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
-import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
-import { typeResolvers } from '@gateway/features/registration/type-resolvers'
-import { resolvers as roleRootResolvers } from '@gateway/features/role/root-resolvers'
-import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
-import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
-import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
-import { resolvers as integrationResolver } from '@gateway/features/systems/root-resolvers'
-import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
-import {
-  ISystemModelData,
-  IUserModelData,
-  userTypeResolvers
-} from '@gateway/features/user/type-resolvers'
-import { getSystem, getUser } from '@gateway/features/user/utils'
+import { userTypeResolvers } from '@gateway/features/user/type-resolvers'
 import { Context } from '@gateway/graphql/context'
-import { AuthenticationError } from '@gateway/utils/graphql-errors'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 import { loadSchemaSync } from '@graphql-tools/load'
 import {
@@ -58,101 +32,9 @@ interface IStringIndexSignatureInterface {
 type StringIndexed<T> = T & IStringIndexSignatureInterface
 
 export const resolvers: StringIndexed<IResolvers> = merge(
-  notificationRootResolvers as IResolvers,
-  registrationRootResolvers as IResolvers,
-  userRootResolvers as IResolvers,
+
   userTypeResolvers as IResolvers,
-  metricsRootResolvers as IResolvers,
-  integrationResolver as IResolvers,
-  metricsTypeResolvers as IResolvers,
-  typeResolvers as IResolvers,
-  searchRootResolvers as IResolvers,
-  searchTypeResolvers as IResolvers,
-  roleRootResolvers as IResolvers,
-  roleTypeResolvers as IResolvers,
-  correctionRootResolvers as IResolvers,
-  integrationResolver as IResolvers,
-  bookmarkAdvancedSearchResolvers as IResolvers,
   {
-    FieldValue: new GraphQLScalarType({
-      name: 'FieldValue',
-      description: 'String, Number or Boolean',
-      serialize(value) {
-        if (!['string', 'number', 'boolean'].includes(typeof value)) {
-          throw new Error('Value must be either a String, Boolean or an number')
-        }
-
-        return value
-      },
-      parseValue(value) {
-        if (!['string', 'number', 'boolean'].includes(typeof value)) {
-          throw new Error('Value must be either a String, Boolean or an number')
-        }
-
-        return value
-      },
-      parseLiteral(ast) {
-        switch (ast.kind) {
-          case Kind.INT:
-            return parseInt(ast.value, 10)
-          case Kind.FLOAT:
-            return parseFloat(ast.value)
-          case Kind.BOOLEAN:
-            return ast.value
-          case Kind.STRING:
-            return ast.value
-          default:
-            throw new Error(
-              'Value must be either a String, Boolean or an number'
-            )
-        }
-      }
-    }),
-    PlainDate: new GraphQLScalarType({
-      name: 'PlainDate',
-      description: 'A date string such as 2024-04-15',
-      serialize(value: unknown) {
-        if (typeof value !== 'string') {
-          throw new GraphQLError(
-            `PlainDate must be of type string, found: ${typeof value}`
-          )
-        }
-
-        return value
-      },
-      parseValue(value: unknown) {
-        if (typeof value !== 'string') {
-          throw new GraphQLError(
-            `PlainDate must be of type string, found: ${typeof value}`
-          )
-        }
-
-        if (!validateDate(value)) {
-          throw new GraphQLError(
-            `PlainDate cannot be represented by an invalid date-string: ${value}`
-          )
-        }
-
-        return value
-      },
-      parseLiteral(ast) {
-        if (ast.kind !== Kind.STRING) {
-          throw new GraphQLError(
-            `PlainDate must be of type string, found: ${ast.kind}`,
-            ast
-          )
-        }
-        const { value } = ast
-
-        if (!validateDate(value)) {
-          throw new GraphQLError(
-            `PlainDate cannot be represented by an invalid date-string: ${value}`
-          )
-        }
-
-        return value
-      }
-    })
   }
 )
 
@@ -167,78 +49,12 @@ export const getExecutableSchema = (): GraphQLSchema => {
   })
 }
 
-export function authSchemaTransformer(schema: GraphQLSchema) {
-  const directiveName = 'auth'
-
-  return mapSchema(schema, {
-    [MapperKind.OBJECT_FIELD]: (fieldConfig, _fieldName, fieldType) => {
-      if (!['Mutation', 'Query'].includes(fieldType)) {
-        return undefined
-      }
-
-      const authDirective = getDirective(
-        schema,
-        fieldConfig,
-        directiveName
-      )?.[0]
-
-      const { resolve = defaultFieldResolver } = fieldConfig
-      fieldConfig.resolve = async function (source, args, context, info) {
-        if (authDirective && authDirective.requires === 'ANONYMOUS') {
-          return resolve(source, args, context, info)
-        }
-
-        if (!context.request.auth.isAuthenticated) {
-          throw new AuthenticationError('Unauthorized')
-        }
-
-        const credentials = context.request.auth.credentials
-
-        try {
-          const userId = credentials.sub
-          let user: IUserModelData | ISystemModelData
-          const isSystemUser = credentials.scope.indexOf('recordsearch') > -1
-          if (isSystemUser) {
-            user = await getSystem(
-              { systemId: userId },
-              { Authorization: context.request.headers.authorization }
-            )
-          } else {
-            user = await getUser(
-              { userId },
-              { Authorization: context.request.headers.authorization }
-            )
-          }
-
-          if (!user || !['active', 'pending'].includes(user.status)) {
-            throw new AuthenticationError('Authentication failed')
-          }
-
-          // @TODO: When scope work is done, this check should stay.
-          // For now, the registrar might not have 'record.confirm-registration' token, but the per-record issued token will have it
-
-          // if (credentials && !isEqual(credentials.scope, user.scope)) {
-          //   throw new AuthenticationError('Authentication failed')
-          // }
-        } catch (err) {
-          throw new AuthenticationError(err)
-        }
-
-        return resolve(source, args, context, info)
-      }
-      return fieldConfig
-    }
-  })
-}
-
 export const getApolloConfig = (): ApolloServerOptions<Context> => {
   const typeDefs = readFileSync(graphQLSchemaPath, 'utf8')
-  const schema = authSchemaTransformer(
-    makeExecutableSchema({
-      typeDefs,
-      resolvers
-    })
-  )
+  const schema = makeExecutableSchema({
+    typeDefs,
+    resolvers
+  })
 
   return {
     schema,

@@ -314,7 +314,7 @@ const UserReviewFormComponent = ({
 
   const userRole = userRoles.find(({ id }) => id === formData.role)
 
-  const parsedPrimaryOfficeId = UUID.safeParse(userDetails?.primaryOffice.id)
+  const parsedPrimaryOfficeId = UUID.safeParse(userDetails?.primaryOfficeId)
   const administrativeAreaId = parsedPrimaryOfficeId.success
     ? (locations.get(parsedPrimaryOfficeId.data)?.administrativeAreaId ?? null)
     : null
@@ -396,11 +396,11 @@ const UserReviewFormComponent = ({
               locationId
             })
           })
-        } else if (userDetails?.primaryOffice?.id) {
+        } else if (userDetails?.primaryOfficeId) {
           navigate({
             pathname: routes.TEAM_USER_LIST,
             search: stringify({
-              locationId: userDetails.primaryOffice.id
+              locationId: userDetails.primaryOfficeId
             })
           })
         }

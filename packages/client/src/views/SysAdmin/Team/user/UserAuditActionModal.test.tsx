@@ -17,10 +17,9 @@ import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { GET_USER, USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
 import { vi } from 'vitest'
-import { Status } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
+import { Status, GetUserQuery } from '@client/utils/gateway'
 
-const users: UserDetails[] = [
+const users: Array<NonNullable<GetUserQuery['getUser']>> = [
   {
     id: '5d08e102542c7a19fc55b790',
     name: [
@@ -31,17 +30,6 @@ const users: UserDetails[] = [
       }
     ],
     username: 'r.tagore',
-    localRegistrar: {
-      name: [
-        {
-          use: 'en',
-          firstNames: 'Nasreen Pervin',
-          familyName: 'Huq'
-        }
-      ],
-      role: 'LOCAL_REGISTRAR',
-      signature: undefined
-    },
     role: {
       id: 'ENTREPRENEUR',
       label: {
@@ -58,7 +46,6 @@ const users: UserDetails[] = [
     primaryOffice: {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
       name: 'Kaliganj Union Sub Center',
-      status: 'active',
       alias: ['Central']
     }
   },
@@ -81,17 +68,6 @@ const users: UserDetails[] = [
       }
     },
     status: Status.Deactivated,
-    localRegistrar: {
-      name: [
-        {
-          use: 'en',
-          firstNames: 'Kazi Nazrul',
-          familyName: 'Islam'
-        }
-      ],
-      role: 'LOCAL_REGISTRAR',
-      signature: undefined
-    },
     creationDate: '2022-10-03T10:42:46.920Z',
     userMgntUserID: '5eba726866458970cf2e23c2',
     practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
@@ -99,7 +75,6 @@ const users: UserDetails[] = [
     primaryOffice: {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
       name: 'Kaliganj Union Sub Center',
-      status: 'active',
       alias: ['Central']
     }
   }

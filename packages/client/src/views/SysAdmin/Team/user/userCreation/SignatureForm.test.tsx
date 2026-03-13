@@ -28,7 +28,6 @@ import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { roleQueries } from '@client/forms/user/query/queries'
 import { Mock, describe, expect } from 'vitest'
 import { SCOPES } from '@opencrvs/commons/client'
 import { formatUrl } from '@client/navigation'
@@ -41,7 +40,6 @@ describe('signature upload tests', () => {
   let router: ReturnType<typeof createMemoryRouter>
 
   beforeEach(async () => {
-    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     setScopes([SCOPES.USER_CREATE], store)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
@@ -49,7 +47,6 @@ describe('signature upload tests', () => {
 
   describe('when user is in signature upload form page', () => {
     beforeEach(async () => {
-      ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
       ;({ component: testComponent, router } = await createTestComponent(
         <CreateNewUser />,
         {

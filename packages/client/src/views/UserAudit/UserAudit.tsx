@@ -70,7 +70,7 @@ const transformUserQueryResult = (
   return {
     id: userData.id,
     primaryOffice: {
-      id: (userData.primaryOffice && userData.primaryOffice.id) || '',
+      id: userData.primaryOffice?.id || '',
       searchableText: '',
       displayLabel:
         (userData.primaryOffice &&
@@ -93,7 +93,7 @@ const transformUserQueryResult = (
         ? userData.identifier.value
         : EMPTY_STRING,
     practitionerId: userData.practitionerId,
-    avatar: userData.avatar || undefined,
+    avatar: userData.avatar?.data || undefined,
     device: userData.device
   }
 }

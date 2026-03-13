@@ -9,24 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { storage } from '@opencrvs/client/src/storage'
-import { FetchUserQuery, HumanName } from '@client/utils/gateway'
-import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { ITokenPayload } from '@opencrvs/commons/client'
+import { ITokenPayload, User } from '@opencrvs/commons/client'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
-export type UserDetails = NonNullable<FetchUserQuery['getUser']>
-
-function getUserLocation(userDetails: UserDetails) {
-  if (!userDetails.primaryOffice) {
-    throw Error('The user has no primary office')
-  }
-
-  return userDetails.primaryOffice
-}
+export type UserDetails = User
 
 export async function storeUserDetails(userDetails: UserDetails) {
   storage.setItem(USER_DETAILS, JSON.stringify(userDetails))
@@ -35,24 +25,11 @@ export async function removeUserDetails() {
   return storage.removeItem(USER_DETAILS)
 }
 
-export function getIndividualNameObj(
-  individualNameArr: Array<HumanName | null>,
-  language: string
-) {
-  return (
-    individualNameArr.find((name: HumanName | null) => {
-      return name && name.use === language ? true : false
-    }) || individualNameArr[0]
-  )
-}
-
 export function getUserName(userDetails: UserDetails | null) {
-  return (
-    (userDetails &&
-      userDetails.name &&
-      createNamesMap(userDetails.name)[LANG_EN]) ||
-    ''
-  )
+  if (!userDetails?.name?.length) return ''
+  const englishName =
+    userDetails.name.find((n) => n.use === LANG_EN) ?? userDetails.name[0]
+  return [...englishName.given, englishName.family].filter(Boolean).join(' ')
 }
 
 export function useAuthentication() {

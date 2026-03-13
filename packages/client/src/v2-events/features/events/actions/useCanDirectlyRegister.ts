@@ -48,7 +48,7 @@ export function useCanDirectlyRegister(event: EventDocument) {
       id: 'placeholder' as UUID,
       transactionId: 'placeholder' as UUID,
       createdByUserType: TokenUserType.enum.user,
-      createdByRole: userDetails.role.id,
+      createdByRole: userDetails.role,
       declaration,
       annotation,
       createdAt: new Date().toISOString(),
@@ -56,7 +56,7 @@ export function useCanDirectlyRegister(event: EventDocument) {
       originalActionId: null,
       status: 'Accepted',
       createdBySignature: undefined,
-      createdAtLocation: userDetails.primaryOffice.id as UUID
+      createdAtLocation: userDetails.primaryOfficeId as UUID
     })
   }
 
