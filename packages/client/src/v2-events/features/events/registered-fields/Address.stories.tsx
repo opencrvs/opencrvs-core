@@ -69,8 +69,82 @@ type FormStory = StoryObj<typeof FormFieldGenerator>
 const leafAdminStructureLocationId =
   '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
 
-export const EmptyAddressField: FormStory = {
+export const DefaultAddressField: FormStory = {
   name: 'Empty address input'
+}
+
+export const AddressFieldWithRequiredError: FormStory = {
+  name: 'Address field with lowest admin level required error',
+  args: {
+    formValues: {
+      'storybook.address': {
+        country: 'BGD',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+      }
+    },
+    formTouched: {
+      'storybook.address': {
+        country: true,
+        administrativeArea: true
+      }
+    },
+    fields: [
+      {
+        ...addressField,
+        required: true
+      }
+    ]
+  }
+}
+
+export const AddressFieldWithRequiredInternationalFields: FormStory = {
+  name: 'Address field with required international field errors',
+  args: {
+    formValues: {
+      'storybook.address': {
+        country: 'ALB'
+      }
+    },
+    formTouched: {
+      'storybook.address': {
+        country: true,
+        streetLevelDetails: {
+          state: true,
+          district: true
+        }
+      }
+    },
+    fields: [
+      {
+        ...addressField,
+        configuration: {
+          streetAddressForm: [
+            {
+              id: 'state',
+              required: true,
+              label: {
+                id: 'field.address.state.label',
+                defaultMessage: 'State',
+                description: 'This is the label for the field'
+              },
+              type: FieldType.TEXT
+            },
+            {
+              id: 'district',
+              required: true,
+              label: {
+                id: 'field.address.district.label',
+                defaultMessage: 'District',
+                description: 'This is the label for the field'
+              },
+              type: FieldType.TEXT
+            }
+          ]
+        }
+      }
+    ]
+  }
 }
 
 export const AddressFieldWithUserPrimaryOfficeAddress: FormStory = {

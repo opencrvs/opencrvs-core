@@ -545,9 +545,9 @@ export const GeneratedInputField = <T extends FieldConfig>(
       // We are showing errors to underlying inputs, so we need to ignore them here
       <InputField {...omit(field.inputFieldProps, 'error')}>
         <Address.Input
-          {...field.config}
-          configuration={field.config.configuration}
+          config={field.config}
           disabled={disabled}
+          id={field.config.id}
           name={name}
           touched={groupTouched}
           validatorContext={validatorContext}
