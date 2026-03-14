@@ -354,7 +354,7 @@ function withHierarchyExpanded(
  *    level via `withHierarchyExpanded` (e.g. `province`, `district`).
  * 2. The `streetLevelDetails` record is spread into top-level keys so each
  *    street-level field is addressed directly by its id.
- * 3. addressType is left out.
+ * 3. `addressType` is left out.
  *
  * @example
  * const parent: AddressFieldValue = {
@@ -393,7 +393,7 @@ function transformParentValueToNestedValue(
  * 2. For domestic addresses, the deepest non-empty admin-level id value is
  *    stored as `administrativeArea` (the single canonical reference used for
  *    persistence and searching).
- * 3. Based on the selected country, addressType is added in.
+ * 3. Based on the selected country, `addressType` is added in.
  *
  * @example
  * const nested: EventState = {

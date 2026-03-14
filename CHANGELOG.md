@@ -52,6 +52,7 @@ Previously only a fixed set of string values (`'country'` / `'administrativeArea
   ]
 }
 ```
+N.B. Support for `DISPLAY_ON_REVIEW` conditionals in nested fields has not been implemented yet.
 
 ## 1.9.11
 
