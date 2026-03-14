@@ -44,6 +44,8 @@ import { getAdminLevelHierarchy } from '@client/v2-events/utils'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 
+/* eslint-disable max-lines */
+
 interface Props {
   id: string
   name: string
@@ -56,7 +58,7 @@ interface Props {
   validatorContext: ValidatorContext
 }
 
-const COUNTRY_FIELD = {
+const DEFAULT_COUNTRY_FIELD = {
   id: 'country',
   conditionals: [],
   required: true,
@@ -117,7 +119,7 @@ const STREET_LEVEL_DETAILS_FIELD = {
 } satisfies TextField
 
 const ALL_ADDRESS_FIELDS = [
-  COUNTRY_FIELD,
+  DEFAULT_COUNTRY_FIELD,
   ADDRESS_TYPE_FIELD,
   ADMINISTRATIVE_AREA_FIELD,
   STREET_LEVEL_DETAILS_FIELD
@@ -130,6 +132,10 @@ function isDomesticAddress() {
   )
 }
 
+/**
+ * Wraps a field config so it is permanently disabled by replacing any existing
+ * `ENABLE` conditional with one that never resolves to true.
+ */
 function withDisabledConditional<T extends FieldConfig>(field: T): T {
   return {
     ...field,
@@ -140,8 +146,42 @@ function withDisabledConditional<T extends FieldConfig>(field: T): T {
   }
 }
 
+/**
+ * Builds the three groups of sub-fields that make up an address form:
+ * a country picker, a list of administrative-area dropdowns, and any
+ * free-text street-level fields.
+ *
+ * The admin-area dropdowns are derived from `adminStructure` (the country's
+ * configured hierarchy, e.g. Province → District → Sub-district).  Each
+ * dropdown is only shown once the one above it has a value selected, and all
+ * domestic dropdowns are hidden when the selected country is international.
+ *
+ * Field-level overrides in `addressConfig.configuration.fields` take
+ * precedence over the defaults derived from `adminStructure`, allowing
+ * individual levels to customise label, required flag, or show/hide
+ * conditionals.
+ *
+ * When `disabled` is `true` every generated field is wrapped with
+ * `withDisabledConditional` so the whole address block becomes read-only
+ * regardless of the individual field's own `ENABLE` conditional.
+ *
+ * @example
+ * // No field overrides – fields are generated 1-to-1 from the admin structure:
+ * const { countryField, domesticFields, streetAddressFields } =
+ *   generateAddressFields(addressConfig, [
+ *     { id: 'province', label: { id: 'province', defaultMessage: 'Province', description: '' } },
+ *     { id: 'district', label: { id: 'district', defaultMessage: 'District', description: '' } }
+ *   ])
+ * // domesticFields => [provinceField, districtField]
+ * // districtField has a SHOW conditional that requires provinceField to be non-empty
+ *
+ * @example
+ * // Render the entire address as disabled (e.g. in a read-only review panel):
+ * const fields = generateAddressFields(addressConfig, adminStructure, true)
+ * // All fields in fields.domesticFields have { type: 'ENABLE', conditional: not(alwaysTrue()) }
+ */
 function generateAddressFields(
-  config: AddressField,
+  addressConfig: AddressField,
   adminStructure: AdminStructureItem[],
   disabled?: boolean
 ): {
@@ -149,14 +189,14 @@ function generateAddressFields(
   domesticFields: AdministrativeAreaField[]
   streetAddressFields: TextField[]
 } {
-  const configFields = config.configuration?.fields
+  const configFields = addressConfig.configuration?.fields
   const countryFieldConfig = configFields?.find(
     (f) => f.type === FieldType.COUNTRY
   )
   const countryField: CountryField = {
-    ...COUNTRY_FIELD,
+    ...DEFAULT_COUNTRY_FIELD,
     ...countryFieldConfig,
-    required: countryFieldConfig?.required ?? config.required,
+    required: countryFieldConfig?.required ?? addressConfig.required,
     type: FieldType.COUNTRY
   }
 
@@ -165,7 +205,7 @@ function generateAddressFields(
     adminStructure.map((admin) => ({
       ...admin,
       type: FieldType.ADMINISTRATIVE_AREA,
-      required: config.required,
+      required: addressConfig.required,
       conditionals: []
     }))
 
@@ -175,7 +215,7 @@ function generateAddressFields(
     const adminItem = adminStructure.find((s) => s.id === id)
     if (!adminItem) {
       throw new Error(
-        `Invalid field ${id} in address configuration ${config.id}`
+        `Invalid field ${id} in address configuration ${addressConfig.id}`
       )
     }
     const label = adminItem.label
@@ -217,7 +257,7 @@ function generateAddressFields(
       type: FieldType.ADMINISTRATIVE_AREA,
       conditionals,
       parent: !isFirst ? fieldHelper(parentId) : undefined,
-      required: adminConfig.required ?? config.required,
+      required: adminConfig.required ?? addressConfig.required,
       label,
       configuration
     }
@@ -225,7 +265,8 @@ function generateAddressFields(
     return disabled ? withDisabledConditional(field) : field
   })
 
-  const streetAddressFields = config.configuration?.streetAddressForm ?? []
+  const streetAddressFields =
+    addressConfig.configuration?.streetAddressForm ?? []
 
   return {
     countryField: disabled
@@ -242,13 +283,7 @@ function extractAddressLines(
   obj: Partial<AddressFieldValue>,
   adminLevelIds: string[]
 ) {
-  const keysToIgnore = [
-    'country',
-    'addressType',
-    'administrativeArea',
-    'streetLevelDetails',
-    ...adminLevelIds
-  ]
+  const keysToIgnore = ['country', ...adminLevelIds]
   return Object.fromEntries(
     Object.entries(obj).filter(
       ([key, value]) => !keysToIgnore.includes(key) && value
@@ -279,6 +314,20 @@ function getAdministrativeArea(value?: AddressFieldValue) {
     : undefined
 }
 
+/**
+ * Resolves a compact `AddressFieldValue` (which stores only the leaf
+ * administrative-area id in `administrativeArea`) into a value where every
+ * level in the admin hierarchy has its own key populated.
+ *
+ * The expansion is performed by walking up the location tree stored in
+ * `adminStructureLocations` until all `adminLevelIds` are filled.
+ *
+ * @example
+ * // Given: adminLevelIds = ['province', 'district']
+ * //        administrativeArea = 'district-123' (a district whose parent is 'province-456')
+ * const expanded = withHierarchyExpanded(value, adminLevelIds, locations)
+ * // expanded => { ...value, province: 'province-456', district: 'district-123' }
+ */
 function withHierarchyExpanded(
   value: AddressFieldValue,
   adminLevelIds: string[],
@@ -296,12 +345,37 @@ function withHierarchyExpanded(
   }
 }
 
+/**
+ * Converts the compact parent `AddressFieldValue` into a flat `EventState`
+ * object suitable for driving the nested `FormFieldGenerator`.
+ *
+ * Three transformations are applied:
+ * 1. The single `administrativeArea` id is expanded into one key per admin
+ *    level via `withHierarchyExpanded` (e.g. `province`, `district`).
+ * 2. The `streetLevelDetails` record is spread into top-level keys so each
+ *    street-level field is addressed directly by its id.
+ * 3. addressType is left out.
+ *
+ * @example
+ * const parent: AddressFieldValue = {
+ *   country: 'FAR',
+ *   addressType: AddressType.DOMESTIC,
+ *   administrativeArea: 'district-123',
+ *   streetLevelDetails: { addressLine1: '42 Main St' }
+ * }
+ * const nested = transformParentValueToNestedValue(parent, ['province', 'district'], locations)
+ * // nested => {
+ * //   country: 'FAR', addressType: 'DOMESTIC',
+ * //   province: 'province-456', district: 'district-123',
+ * //   addressLine1: '42 Main St'
+ * // }
+ */
 function transformParentValueToNestedValue(
   value: AddressFieldValue,
   adminLevelIds: string[],
   adminStructureLocations: Location[]
 ): EventState {
-  const { streetLevelDetails, ...valueWithoutStreetLevelDetails } =
+  const { streetLevelDetails, addressType, ...valueWithoutStreetLevelDetails } =
     withHierarchyExpanded(value, adminLevelIds, adminStructureLocations)
   return {
     ...valueWithoutStreetLevelDetails,
@@ -309,6 +383,33 @@ function transformParentValueToNestedValue(
   }
 }
 
+/**
+ * Converts the flat `EventState` produced by `FormFieldGenerator` back into
+ * the compact `AddressFieldValue` stored in the parent form.
+ *
+ * Three transformations are applied (inverse of `transformParentValueToNestedValue`):
+ * 1. All keys that are not admin-level ids or reserved address keys are
+ *    collected into `streetLevelDetails`.
+ * 2. For domestic addresses, the deepest non-empty admin-level id value is
+ *    stored as `administrativeArea` (the single canonical reference used for
+ *    persistence and searching).
+ * 3. Based on the selected country, addressType is added in.
+ *
+ * @example
+ * const nested: EventState = {
+ *   country: 'FAR',
+ *   province: 'province-456',
+ *   district: 'district-123',
+ *   addressLine1: '42 Main St'
+ * }
+ * const parent = transformNestedValueToParentValue(nested, ['province', 'district'])
+ * // parent => {
+ * //   country: 'FAR',
+ * //   addressType: AddressType.DOMESTIC,
+ * //   administrativeArea: 'district-123',
+ * //   streetLevelDetails: { addressLine1: '42 Main St' }
+ * // }
+ */
 function transformNestedValueToParentValue(
   nestedValue: EventState,
   adminLevelIds: string[]
@@ -335,6 +436,26 @@ function transformNestedValueToParentValue(
   }
 }
 
+/**
+ * Converts the parent-level `touched` map (keyed by `AddressFieldValue` keys)
+ * into the flat touched map expected by the nested `FormFieldGenerator`.
+ *
+ * - `administrativeArea: true` in the parent is broadcast to every admin-level
+ *   field id so all dropdowns show their validation errors together.
+ * - `country` is passed through unchanged.
+ * - `streetLevelDetails` (an object keyed by street field id) is spread into
+ *   top-level entries so each street field knows whether it has been touched.
+ *
+ * @example
+ * const parentTouched = {
+ *   administrativeArea: true,
+ *   streetLevelDetails: { addressLine1: true }
+ * }
+ * const nested = transformParentTouchedToNestedTouched(
+ *   parentTouched, ['province', 'district'], ['addressLine1']
+ * )
+ * // nested => { province: true, district: true, addressLine1: true }
+ */
 function transformParentTouchedToNestedTouched(
   parentTouched: IndexMap<FormState<boolean>>,
   adminLevelIds: string[],
@@ -366,6 +487,26 @@ function transformParentTouchedToNestedTouched(
   return result
 }
 
+/**
+ * Converts the flat nested touched map (produced by `FormFieldGenerator`) back
+ * into the parent-level touched map stored on the outer form.
+ * Inverse of `transformParentTouchedToNestedTouched`.
+ *
+ * - If *any* admin-level field was touched, `administrativeArea: true` is set
+ *   so the parent field is marked touched.
+ * - `country` is passed through unchanged.
+ * - Street field touched entries are collected under `streetLevelDetails`.
+ *
+ * @example
+ * const nestedTouched = { province: true, district: true, addressLine1: true }
+ * const parent = transformNestedTouchedToParentTouched(
+ *   nestedTouched, ['province', 'district'], ['addressLine1']
+ * )
+ * // parent => {
+ * //   administrativeArea: true,
+ * //   streetLevelDetails: { addressLine1: true }
+ * // }
+ */
 function transformNestedTouchedToParentTouched(
   nestedTouched: IndexMap<FormState<boolean>>,
   adminLevelIds: string[],
@@ -393,13 +534,23 @@ function transformNestedTouchedToParentTouched(
 }
 
 /**
- * AddressInput is a form component for capturing address details based on administrative structure.
+ * Form component for capturing a structured address.
  *
- * - The form dynamically adjusts the fields displayed based on user input.
- * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
- * - All admin structure fields are hidden until the previous field is selected.
- * - Address details fields are only shown when district is selected (it being the last admin structure field).
- * - In search mode, only displays admin structure and town/village fields.
+ * Renders a `FormFieldGenerator` whose fields are built dynamically from the
+ * country's administrative structure (e.g. Province → District) plus any
+ * optional free-text street-level fields defined in the field configuration.
+ *
+ * Key behaviours:
+ * - Administrative-area dropdowns are shown one level at a time; each level is
+ *   hidden until the level above it has a value selected.
+ * - Switching the country to a non-domestic value hides all domestic fields.
+ * - When `disabled` is `true` all sub-fields are rendered as read-only,
+ *   regardless of their own `ENABLE` conditional.
+ *
+ * Internally the component works with a *flat* `EventState` (one key per
+ * sub-field) while the parent form stores a compact `AddressFieldValue`.
+ * The `transform*` helpers convert between the two representations on every
+ * change / blur event.
  */
 function AddressInput(props: Props) {
   const {
@@ -447,6 +598,8 @@ function AddressInput(props: Props) {
     <FormFieldGenerator
       {...otherProps}
       fields={fields}
+      // addressType is passed as context to the nested form due to the value
+      // being refererred in conditionals but not having any associated field
       formContext={{ addressType: value.addressType }}
       formTouched={nestedTouched}
       formValues={nestedValue}
