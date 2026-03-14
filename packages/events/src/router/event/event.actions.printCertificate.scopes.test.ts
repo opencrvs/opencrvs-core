@@ -118,3 +118,54 @@ test('Check scopes against event.actions.printCertificate', async () => {
     }
   )
 })
+
+test('templates option in scope does not affect printCertificate action authorization', async () => {
+  await createIndex(
+    getEventIndexName('tennis-club-membership_premium'),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
+
+  const { users, eventIds } = await setupScopeTestFixture(8844, [
+    ActionType.DECLARE,
+    ActionType.REGISTER,
+    ActionType.UNASSIGN
+  ])
+
+  const clientReadingAllEvents = createTestClient(users[0], [
+    encodeScope({ type: 'record.read' })
+  ])
+
+  const [eventId] = eventIds
+
+  // Scope with a specific template restriction that does not match anything
+  const scopeWithTemplateRestriction = encodeScope({
+    type: 'record.print-certified-copies',
+    options: {
+      templates: ['some-template-id-that-does-not-match']
+    }
+  })
+
+  // Certificate printing is a client-side operation. The templates option controls
+  // which templates the config service returns to the client — it is not validated
+  // when the printCertificate action is submitted. Access should be granted regardless.
+  const result = await attemptScopedAction(
+    eventId,
+    users[0],
+    scopeWithTemplateRestriction,
+    clientReadingAllEvents,
+    (client) =>
+      client.event.actions.printCertificate.request({
+        eventId,
+        transactionId: getUUID(),
+        declaration: {},
+        // Deliberately use a templateId that does not match the scope's allowed templates                                                                                                 │
+        content: { templateId: 'a-template-id-not-in-scope' },
+        annotation: {
+          'collector.requesterId': 'INFORMANT',
+          'collector.identity.verify': true
+        }
+      })
+  )
+
+  expect(result.success).toBe(true)
+})

@@ -390,17 +390,6 @@ describe('2.0 scopes', () => {
         }
       },
       {
-        type: 'record.print-certified-copies',
-        options: {
-          event: ['birth', 'death'],
-          placeOfEvent: 'location',
-          declaredIn: 'administrativeArea',
-          declaredBy: 'user',
-          registeredIn: 'administrativeArea',
-          registeredBy: 'user'
-        }
-      },
-      {
         type: 'record.request-correction',
         options: {
           event: ['birth', 'death'],
@@ -434,6 +423,56 @@ describe('2.0 scopes', () => {
         }
       }
     ])
+  })
+
+  it('Supports templates option for record.print-certified-copies', () => {
+    const scopeWithTemplates = encodeScope({
+      type: 'record.print-certified-copies',
+      options: {
+        event: ['birth', 'death'],
+        placeOfEvent: 'location' as const,
+        declaredBy: 'user' as const,
+        declaredIn: 'administrativeArea' as const,
+        registeredBy: 'user' as const,
+        registeredIn: 'administrativeArea' as const,
+        templates: ['cert-1', 'cert-2']
+      }
+    })
+
+    expect(decodeScope(scopeWithTemplates)).toEqual({
+      type: 'record.print-certified-copies',
+      options: {
+        event: ['birth', 'death'],
+        placeOfEvent: 'location',
+        declaredIn: 'administrativeArea',
+        declaredBy: 'user',
+        registeredIn: 'administrativeArea',
+        registeredBy: 'user',
+        templates: ['cert-1', 'cert-2']
+      }
+    })
+  })
+
+  it('V1 record.registered.print-certified-copies with templates migrates to V2 with templates preserved', () => {
+    const v1Scope =
+      'record.registered.print-certified-copies[event=birth|death,templates=cert-1|cert-2]'
+
+    expect(v1ScopeToV2Scope(v1Scope)).toEqual(
+      'type=record.print-certified-copies&event=birth,death&templates=cert-1,cert-2'
+    )
+  })
+
+  it('Should decode scope with single event & template', () => {
+    const scope =
+      'type=record.print-certified-copies&event=tennis-club-membership&templates=v2.tennis-club-membership-certificate-alpha'
+    const decodedScope = decodeScope(scope)
+    expect(decodedScope).toEqual({
+      type: 'record.print-certified-copies',
+      options: {
+        event: ['tennis-club-membership'],
+        templates: ['v2.tennis-club-membership-certificate-alpha']
+      }
+    })
   })
 })
 
