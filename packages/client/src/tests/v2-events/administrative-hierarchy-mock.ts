@@ -32,10 +32,29 @@ import {
  *    | -- Kabangalala Rural Health Centre
  *    | -- Ibombo District Office
  *    | -- Isamba District Office
+ *    | --- Klow
+ *       | -- Klow Village Office
+ *    | --- Mbondo
+ *    | --- Ndara
+ *    | --- Olani
+ *    | --- Pemba
+ *    | --- Quanza
+ *    | --- Rivka
  * | --- Isango
  *    | -- Isango District Office
  * | --- Isamba
+ *    | --- Mbula
+ *    | --- Ndoki
+ *    | --- Tsanga
+ *    | --- Waziri
+ *    | --- Zimbi
  * | --- Itambo
+ *    | --- Felani
+ *    | --- Goroma
+ *    | --- Halifu
+ *    | --- Jabari
+ *    | --- Kifani
+ *    | --- Lumela
  * | --- Ezhi
  * Sulaka
  * | -- Sulaka Provincial Office
@@ -115,6 +134,135 @@ export const V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS: AdministrativeArea[] = [
     parentId: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
     validUntil: null,
     externalId: 'Cq4Jm1XvN8Ls'
+  },
+  // Villages under Ibombo (62a0ccb4-880d-4f30-8882-f256007dfff9)
+  {
+    id: '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID,
+    name: 'Klow',
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null,
+    externalId: 'IkYcYBUcyY2'
+  },
+  {
+    id: '2e5f6a7b-8c9d-4a23-8fab-456789012345' as UUID,
+    name: 'Mbondo',
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null,
+    externalId: 'Qhvv5hvo3mY'
+  },
+  {
+    id: '3f6a7b8c-9d0e-4b34-8abc-567890123456' as UUID,
+    name: 'Ndara',
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null,
+    externalId: 'crXh068O9TR'
+  },
+  {
+    id: '4a7b8c9d-0e1f-4c45-abcd-678901234567' as UUID,
+    name: 'Olani',
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null,
+    externalId: 'r00It8Tvvp7'
+  },
+  {
+    id: '5b8c9d0e-1f2a-4d56-bcde-789012345678' as UUID,
+    name: 'Pemba',
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null,
+    externalId: 'ZnUWsbONIaH'
+  },
+  {
+    id: '6c9d0e1f-2a3b-4e67-8def-890123456789' as UUID,
+    name: 'Quanza',
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null,
+    externalId: 'fDZycvQTa7l'
+  },
+  {
+    id: '7d0e1f2a-3b4c-4f78-8efa-901234567890' as UUID,
+    name: 'Rivka',
+    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+    validUntil: null,
+    externalId: 'KqswxCGTELa'
+  },
+  // Villages under Isamba (967032fd-3f81-478a-826c-30cb8fe121bd)
+  {
+    id: '8e1f2a3b-4c5d-4089-8fab-012345678901' as UUID,
+    name: 'Mbula',
+    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    validUntil: null,
+    externalId: 'osEbKjRc9Kg'
+  },
+  {
+    id: '9f2a3b4c-5d6e-4190-8abf-123456789012' as UUID,
+    name: 'Ndoki',
+    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    validUntil: null,
+    externalId: 'aq4daBUAGr3'
+  },
+  {
+    id: '0a3b4c5d-6e7f-4201-abcd-234567890123' as UUID,
+    name: 'Tsanga',
+    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    validUntil: null,
+    externalId: 'cqis6Y8trbJ'
+  },
+  {
+    id: '1b4c5d6e-7f8a-4312-bcde-345678901234' as UUID,
+    name: 'Waziri',
+    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    validUntil: null,
+    externalId: 'LMijHPyyx6d'
+  },
+  {
+    id: '2c5d6e7f-8a9b-4423-8def-456789012345' as UUID,
+    name: 'Zimbi',
+    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
+    validUntil: null,
+    externalId: 'pcQYbPuKGZ7'
+  },
+  // Villages under Itambo (89a33893-b17d-481d-a26d-6461e7ac1651)
+  {
+    id: '3d6e7f8a-9b0c-4534-8efa-567890123456' as UUID,
+    name: 'Felani',
+    parentId: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
+    validUntil: null,
+    externalId: 'gSqpoCGdMXp'
+  },
+  {
+    id: '4e7f8a9b-0c1d-4645-8fab-678901234567' as UUID,
+    name: 'Goroma',
+    parentId: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
+    validUntil: null,
+    externalId: 'KvAAIaNqVrp'
+  },
+  {
+    id: '5f8a9b0c-1d2e-4756-8abc-789012345678' as UUID,
+    name: 'Halifu',
+    parentId: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
+    validUntil: null,
+    externalId: 'qe4UnEVt1hv'
+  },
+  {
+    id: '6a9b0c1d-2e3f-4867-abcd-890123456789' as UUID,
+    name: 'Jabari',
+    parentId: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
+    validUntil: null,
+    externalId: 'yHH9Nz4rLOt'
+  },
+  {
+    id: '7b0c1d2e-3f4a-4978-bcde-901234567890' as UUID,
+    name: 'Kifani',
+    parentId: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
+    validUntil: null,
+    externalId: 'eSWmXIGeu1I'
+  },
+  {
+    id: '8c1d2e3f-4a5b-4089-8def-012345678901' as UUID,
+    name: 'Lumela',
+    parentId: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
+    validUntil: null,
+    externalId: 'bh0b3aI1uP3'
   }
 ]
 export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
@@ -253,6 +401,15 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
     administrativeAreaId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
     validUntil: null,
     externalId: 'Pz8Kc1TqH6Jn'
+  },
+  // Village offices
+  {
+    id: '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID,
+    name: 'Klow Village Office',
+    locationType: LocationType.enum.CRVS_OFFICE,
+    administrativeAreaId: '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID,
+    validUntil: null,
+    externalId: 'PmAyxAJkxiJ'
   }
 ]
 

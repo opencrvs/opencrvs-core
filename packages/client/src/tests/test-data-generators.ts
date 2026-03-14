@@ -31,7 +31,9 @@ const userIds = {
   registrationAgent: '67ef7f83d6a9cb92e9edaaa1',
   fieldAgent: '67ef7f83d6a9cb92e9edaa99',
   localSystemAdmin: '68cbd26fc64761565469591d',
-  nationalSystemAdmin: '68df9529f8f3a73007a4427c'
+  nationalSystemAdmin: '68df9529f8f3a73007a4427c',
+  communityLeader: '69abc123def4567890abcdef',
+  provincialRegistrar: '69def456abc7890123abcdef'
 }
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
@@ -64,7 +66,11 @@ export function testDataGenerator(rngSeed?: number) {
       localSystemAdmin:
         'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ1c2VyLnJlYWQ6bXktb2ZmaWNlIiwidXNlci5yZWFkOm15LWp1cmlzZGljdGlvbiIsInVzZXIudXBkYXRlOm15LWp1cmlzZGljdGlvbiIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczpteS1qdXJpc2RpY3Rpb24iLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwicGVyZm9ybWFuY2Uudml0YWwtc3RhdGlzdGljcy1leHBvcnQiLCJvcmdhbmlzYXRpb24ucmVhZC1sb2NhdGlvbnM6bXktb2ZmaWNlIiwidXNlci5jcmVhdGVbcm9sZT1GSUVMRF9BR0VOVHxQT0xJQ0VfT0ZGSUNFUnxTT0NJQUxfV09SS0VSfEhFQUxUSENBUkVfV09SS0VSfExPQ0FMX0xFQURFUnxSRUdJU1RSQVRJT05fQUdFTlR8TE9DQUxfUkVHSVNUUkFSXSIsInVzZXIuZWRpdFtyb2xlPUZJRUxEX0FHRU5UfFBPTElDRV9PRkZJQ0VSfFNPQ0lBTF9XT1JLRVJ8SEVBTFRIQ0FSRV9XT1JLRVJ8TE9DQUxfTEVBREVSfFJFR0lTVFJBVElPTl9BR0VOVHxMT0NBTF9SRUdJU1RSQVJdIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJMT0NBTF9TWVNURU1fQURNSU4iLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY4Y2JkMjZmYzY0NzYxNTY1NDY5NTkxZCJ9.O-wogl0fSIAJJ1wd1o8fqo-NfucnEKr1dKbYgSdhnCljZk-0K0bYIQOpz6TqKOinAxFhRcy2hRpf2MS7Q-mBlW43pF_Rzcm7piz3Q14V8ZKgeY7XEdvtcbPvf004PnSd7gGqLLwmYM7WX4X9ok1_d5AS2p70z7oYb0XsrrJ1cE_hv5teNWZyjnUn3JIN2o4BBZYSCQ0IlNwC5uCL1givHiHGq3j6rmses-4QAhCPHXPLjWSoa272OEzQdIqEgZj4sZcNeAxMgFfU0BxUR5huviaXP-e7iPk_zbogCKFHG6wmr__FUTGL0QR4sOBXy52Rf1bExdu44CNXmagSofwsvkUYD5QPfxTtp6nJ3VXNUrhz_Ga66fV_m8EMcd_Hpqytfb1lo_5kkhuQRwgfiBRXcXXCEDkeYWPLnZtsrnSHmIl-LHHKpNEiIGP4phAo9uwM6cGEGAt9ewFTyHWvJ22PETyBocIXiGh0kCjZKI9tpV8QcGDKt7y4b_CQHI0Zd-A7ST3xZUsztavF_zH77DnU-vweEBp-EhEQ1zRwtEr3neWXeKbZBQz0gqbeq6zGl87S1ZflPTMOdbkYd7NlR0NiGy4CCysBlLxeo9Dgv_4uXXJcFgJOvGD5RDhKo-CA4Fcq64D_YXjhWmuC-5-pmxf5TpAb323upY4NqWlZ3cxh_6Y',
       nationalSystemAdmin:
-        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJjb25maWcudXBkYXRlOmFsbCIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczphbGwiLCJ1c2VyLmNyZWF0ZTphbGwiLCJ1c2VyLnVwZGF0ZTphbGwiLCJ1c2VyLnJlYWQ6YWxsIiwicGVyZm9ybWFuY2UucmVhZCIsInBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInBlcmZvcm1hbmNlLnZpdGFsLXN0YXRpc3RpY3MtZXhwb3J0IiwicmVjb3JkLnJlaW5kZXgiLCJ1c2VyLmNyZWF0ZVtyb2xlPUZJRUxEX0FHRU5UfEhPU1BJVEFMX0NMRVJLfENPTU1VTklUWV9MRUFERVJ8UkVHSVNUUkFUSU9OX0FHRU5UfExPQ0FMX1JFR0lTVFJBUnxOQVRJT05BTF9SRUdJU1RSQVJ8TE9DQUxfU1lTVEVNX0FETUlOfE5BVElPTkFMX1NZU1RFTV9BRE1JTnxQRVJGT1JNQU5DRV9NQU5BR0VSXSIsInVzZXIuZWRpdFtyb2xlPUZJRUxEX0FHRU5UfEhPU1BJVEFMX0NMRVJLfENPTU1VTklUWV9MRUFERVJ8UkVHSVNUUkFUSU9OX0FHRU5UfExPQ0FMX1JFR0lTVFJBUnxOQVRJT05BTF9SRUdJU1RSQVJ8TE9DQUxfU1lTVEVNX0FETUlOfE5BVElPTkFMX1NZU1RFTV9BRE1JTnxQRVJGT1JNQU5DRV9NQU5BR0VSXSJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiTkFUSU9OQUxfU1lTVEVNX0FETUlOIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2OGRmOTUyOWY4ZjNhNzMwMDdhNDQyN2MifQ.WGLo5JF0PlPhZoYFhn8lg1dt-iaDSUQFGUDolQsQHwuY_AEZpFIKjaKL-GYJMLpuHPahk8wK7OTjQJZ54lH5EUvL8jqRfIMvQTRK6IHi_jvMHJQbXIvS434za-rY99_vsBnWIhTvqawIbKkOG89FBwdF6OVI5SxNV39ltjPChrN4-Ke-8QjZjJyUfxLanh4NMfsd3ohnpH5q3QtJMfDTl8iJ7-cJ3lwpI29gVtiXyULfbCWGXMPjwutCKNyNGA-hIMzvFHsFFw23EzdwnIqLBNzjMwFjeB3RwWBPexC6dctKuHY8ooRL-oWSxran0rOUwNr3Y0VKIl5C1EoMkBkkwHgy7awLPYstZGP6aC-B4pdQp9t5dx8omB6OozG0WD2oJJx7uH8pbghTsLdnQr1STF0gpL4qGWIE5RQ-eFCVQAQlXDPrVCDBEkK5ip8_OEag7uoPdJEybmTUVitMpTcYEdXQzJ2GFIkShXH4nkHeF60JHyviPFM2ClWD_DLLCr1v6fWLSFgMjfakK_YtOzLRSIAnwcGRk1RwR_H9-YSI-fVxM39suMZ78o5iXQiifuFjZWLF9FBwwVDuM0XAf7gD_zGx9uHSOw2I88CUtZpmPfvsesUW7TmHWX_VkSztH1XQt9BkUrPZvS6sarFZeswYQiT7EgZ5KqMcsXhlk9tVQo8'
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJjb25maWcudXBkYXRlOmFsbCIsIm9yZ2FuaXNhdGlvbi5yZWFkLWxvY2F0aW9uczphbGwiLCJ1c2VyLmNyZWF0ZTphbGwiLCJ1c2VyLnVwZGF0ZTphbGwiLCJ1c2VyLnJlYWQ6YWxsIiwicGVyZm9ybWFuY2UucmVhZCIsInBlcmZvcm1hbmNlLnJlYWQtZGFzaGJvYXJkcyIsInBlcmZvcm1hbmNlLnZpdGFsLXN0YXRpc3RpY3MtZXhwb3J0IiwicmVjb3JkLnJlaW5kZXgiLCJ1c2VyLmNyZWF0ZVtyb2xlPUZJRUxEX0FHRU5UfEhPU1BJVEFMX0NMRVJLfENPTU1VTklUWV9MRUFERVJ8UkVHSVNUUkFUSU9OX0FHRU5UfExPQ0FMX1JFR0lTVFJBUnxOQVRJT05BTF9SRUdJU1RSQVJ8TE9DQUxfU1lTVEVNX0FETUlOfE5BVElPTkFMX1NZU1RFTV9BRE1JTnxQRVJGT1JNQU5DRV9NQU5BR0VSXSIsInVzZXIuZWRpdFtyb2xlPUZJRUxEX0FHRU5UfEhPU1BJVEFMX0NMRVJLfENPTU1VTklUWV9MRUFERVJ8UkVHSVNUUkFUSU9OX0FHRU5UfExPQ0FMX1JFR0lTVFJBUnxOQVRJT05BTF9SRUdJU1RSQVJ8TE9DQUxfU1lTVEVNX0FETUlOfE5BVElPTkFMX1NZU1RFTV9BRE1JTnxQRVJGT1JNQU5DRV9NQU5BR0VSXSJdLCJ1c2VyVHlwZSI6InVzZXIiLCJyb2xlIjoiTkFUSU9OQUxfU1lTVEVNX0FETUlOIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2OGRmOTUyOWY4ZjNhNzMwMDdhNDQyN2MifQ.WGLo5JF0PlPhZoYFhn8lg1dt-iaDSUQFGUDolQsQHwuY_AEZpFIKjaKL-GYJMLpuHPahk8wK7OTjQJZ54lH5EUvL8jqRfIMvQTRK6IHi_jvMHJQbXIvS434za-rY99_vsBnWIhTvqawIbKkOG89FBwdF6OVI5SxNV39ltjPChrN4-Ke-8QjZjJyUfxLanh4NMfsd3ohnpH5q3QtJMfDTl8iJ7-cJ3lwpI29gVtiXyULfbCWGXMPjwutCKNyNGA-hIMzvFHsFFw23EzdwnIqLBNzjMwFjeB3RwWBPexC6dctKuHY8ooRL-oWSxran0rOUwNr3Y0VKIl5C1EoMkBkkwHgy7awLPYstZGP6aC-B4pdQp9t5dx8omB6OozG0WD2oJJx7uH8pbghTsLdnQr1STF0gpL4qGWIE5RQ-eFCVQAQlXDPrVCDBEkK5ip8_OEag7uoPdJEybmTUVitMpTcYEdXQzJ2GFIkShXH4nkHeF60JHyviPFM2ClWD_DLLCr1v6fWLSFgMjfakK_YtOzLRSIAnwcGRk1RwR_H9-YSI-fVxM39suMZ78o5iXQiifuFjZWLF9FBwwVDuM0XAf7gD_zGx9uHSOw2I88CUtZpmPfvsesUW7TmHWX_VkSztH1XQt9BkUrPZvS6sarFZeswYQiT7EgZ5KqMcsXhlk9tVQo8',
+      communityLeader:
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLXVwZGF0ZXN8c2VudC1mb3ItcmV2aWV3XSIsInR5cGU9cmVjb3JkLnNlYXJjaCZldmVudD1iaXJ0aCxkZWF0aCx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGNoaWxkLW9uYm9hcmRpbmcsRk9PVEJBTExfQ0xVQl9NRU1CRVJTSElQIiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9bG9jYXRpb24iLCJ0eXBlPXJlY29yZC5yZWFkJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyIsInJlY29yZC5kZWNsYXJlW2V2ZW50PWJpcnRofGRlYXRofHRlbm5pcy1jbHViLW1lbWJlcnNoaXB8Y2hpbGQtb25ib2FyZGluZ10iLCJyZWNvcmQuZGVjbGFyZWQuZWRpdFtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwfGNoaWxkLW9uYm9hcmRpbmddIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJDT01NVU5JVFlfTEVBREVSIiwiaWF0IjoxNDg3MDc2NzA4LCJhdWQiOiJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2OWFiYzEyM2RlZjQ1Njc4OTBhYmNkZWYifQ.XqRXwi8kqnKIGe6s8r80EjKZTaB5-5yTr8QKygoV5ty6wuXrSxavhAPrL5jCxADieiZIwRJ-ZufpYpvclgmZiq1ksq6btoqwSdSWEuDUyR0aZrz7_Ub-vPaZlKhT0CRDrbVcXlWv2pJGEYszNlva-kkDUgXA3KQw_0oSt_nGj6e5RkAmP1QmgLjRk6WN1dWNsU65h8hsGTP4iRxFl8Knsq59VerUW3De5dU5Z4TLLeXQdjc0TM0ua1ww6_TqUmXP0_UhgUBl-NSmvj9grg3hsJiKVrFlM2LcK-JZnNRvwkooHj3putziVH6aIZdI2gdZYBUl5Zk7v0lyR3Ayvo5Uhc02yMqVUzhCBr8vrZmuyls91OrVjdmO_M81tYKK2a0sq5bAqk2wGuQWXrkd8cQOnx33B1cDSgpekWoPaJ2WBel0J5nQBrDbjiS1B5EKL8PdEctPXk88nTU53TCfA7O9YF-5-aM95pa1XfrlLW3p56MxkHs090dR3gq0lCKe5I6mlZ6o7896xQxmlG6e2Yd6FU5NZW5qscYlNVbOm9OY8dPdZsBHhjKzRVHrl9YJQAegUhRPVhsnfV1MxHTkWidy8Q7rpd5_eNjlQZ4hJg29nvL56eGCWqebMu7XWbGD5Cv5_-KOplM0LC9DY27CDxBqzHxd_OvghASTQB5uICbLU1I',
+      provincialRegistrar:
+        'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyYXRpb24tZWRpdCIsInJlY29yZC5yZXZpZXctZHVwbGljYXRlcyIsInJlY29yZC5kZWNsYXJhdGlvbi1yZWluc3RhdGUiLCJyZWNvcmQuY29uZmlybS1yZWdpc3RyYXRpb24iLCJyZWNvcmQucmVqZWN0LXJlZ2lzdHJhdGlvbiIsInBlcmZvcm1hbmNlLnJlYWQiLCJwZXJmb3JtYW5jZS5yZWFkLWRhc2hib2FyZHMiLCJwcm9maWxlLmVsZWN0cm9uaWMtc2lnbmF0dXJlIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInNlYXJjaC5iaXJ0aCIsInNlYXJjaC5kZWF0aCIsInNlYXJjaC5tYXJyaWFnZSIsIndvcmtxdWV1ZVtpZD1hbGwtZXZlbnRzfGFzc2lnbmVkLXRvLXlvdXxyZWNlbnR8cmVxdWlyZXMtY29tcGxldGlvbnxyZXF1aXJlcy11cGRhdGVzfGluLXJldmlldy1hbGx8aW4tZXh0ZXJuYWwtdmFsaWRhdGlvbnxyZWFkeS10by1wcmludHxyZWFkeS10by1pc3N1ZV0iLCJ0eXBlPXJlY29yZC5zZWFyY2gmZXZlbnQ9YmlydGgsZGVhdGgsdGVubmlzLWNsdWItbWVtYmVyc2hpcCxjaGlsZC1vbmJvYXJkaW5nLEZPT1RCQUxMX0NMVUJfTUVNQkVSU0hJUCIsInVzZXIucmVhZDpvbmx5LW15LWF1ZGl0IiwidHlwZT1yZWNvcmQuY3JlYXRlJmV2ZW50PWJpcnRoLGRlYXRoLHRlbm5pcy1jbHViLW1lbWJlcnNoaXAsY2hpbGQtb25ib2FyZGluZyZwbGFjZU9mRXZlbnQ9YWRtaW5pc3RyYXRpdmVBcmVhIiwidHlwZT1yZWNvcmQucmVhZCZldmVudD1iaXJ0aCxkZWF0aCx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwLGNoaWxkLW9uYm9hcmRpbmciLCJyZWNvcmQuZGVjbGFyZVtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwfGNoaWxkLW9uYm9hcmRpbmddIiwicmVjb3JkLmRlY2xhcmVkLnJlamVjdFtldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwfGNoaWxkLW9uYm9hcmRpbmddIiwicmVjb3JkLmRlY2xhcmVkLmFyY2hpdmVbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5yZWdpc3RlcltldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwfGNoaWxkLW9uYm9hcmRpbmddIiwicmVjb3JkLmRlY2xhcmVkLmVkaXRbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5yZWdpc3RlcmVkLnByaW50LWNlcnRpZmllZC1jb3BpZXNbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5yZWdpc3RlcmVkLmNvcnJlY3RbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC51bmFzc2lnbi1vdGhlcnNbZXZlbnQ9YmlydGh8ZGVhdGh8dGVubmlzLWNsdWItbWVtYmVyc2hpcHxjaGlsZC1vbmJvYXJkaW5nXSIsInJlY29yZC5kZWNsYXJlZC5yZXZpZXctZHVwbGljYXRlc1tldmVudD1iaXJ0aHxkZWF0aHx0ZW5uaXMtY2x1Yi1tZW1iZXJzaGlwfGNoaWxkLW9uYm9hcmRpbmddIl0sInVzZXJUeXBlIjoidXNlciIsInJvbGUiOiJQUk9WSU5DSUFMX1JFR0lTVFJBUiIsImlhdCI6MTQ4NzA3NjcwOCwiYXVkIjoib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjlkZWY0NTZhYmM3ODkwMTIzYWJjZGVmIn0.Sj4XWDjPGzt2QifWQIkcIlOj9jjxyEknnJ-I1Bs2AzEZilME5XxR5M3GkneHI53_c-5g_YeeAipya2MF2yNlddGp3RIhMp8sgsS5rsfxbIBlb6C_WRvwf64tFYlCSBu7MB3efRAmanzTcNMZl9RzBeT6FzWpzpgGY7S4q9AOryiacvjjV0B39A1cUBkVaZVl28_kDVCjg73MYKrR4BAnJsH0W3dQRn3nZkrLO_tbtQMrIwyonR0OiafCU-6YZepcVKoJNtA2aNqyNCx05rh6Z0Mk03nc_ksHSQB932NWUb6MHSPuoxED4irlQUrf6L5WP35efMZEUNkgQaBPFL8ngMUe1ULJ9lB78hc-V-rmBPfGqucW4Tb6XHw6-JYjmMPnlhQnZRlazPeCyi66yWU7IFoik0oFEaaObiHeYDXgbmUTKWQ-exYGY_49lVoJstWRWI_w919zeUm5z5--57SrWtDqQeBKnmjOkgh5AwHHCwb-2GA-plFVUkF7dBTtptjyi2mBPwUavKjA36ajQyMTlBOnz9lYXnK_2I-uvaZLoQCrbCNF1ypJjpKxK4tPTCQ5LEJVU9Fb-M_A9P0wodcfegXWRTmQFnnqthehy8x6_BfGhkeZTwJRzlavqRGCStvlQOITooqnuccv1QDGGA8fJDRAo75_0Ca5K37roMP1Xdo'
     },
     id: userIds,
     fieldAgent: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
@@ -236,6 +242,116 @@ export function testDataGenerator(rngSeed?: number) {
           signature: null,
           __typename: 'LocalRegistrar'
         },
+        avatar: null,
+        searches: [],
+        __typename: 'User'
+      } satisfies FetchUserQuery['getUser']
+    }),
+    /**
+     * Gift Phiri — COMMUNITY_LEADER at Klow Village Office (village level).
+     */
+    communityLeader: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+      v2: {
+        id: userIds.communityLeader,
+        name: [{ use: 'en', given: ['Gift'], family: 'Phiri' }],
+        role: TestUserRole.enum.COMMUNITY_LEADER,
+        fullHonorificName: undefined,
+        signature: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID
+      } satisfies User,
+      v1: {
+        id: userIds.communityLeader,
+        userMgntUserID: generateUuid(),
+        creationDate: '1736421510057',
+        username: 'g.phiri',
+        practitionerId: generateUuid(),
+        mobile: '+260717456139',
+        email: 'g.phiri@gmail.com',
+        fullHonorificName: null,
+        role: {
+          id: TestUserRole.enum.COMMUNITY_LEADER,
+          label: {
+            id: 'userRole.communityLeader',
+            defaultMessage: 'Community Leader',
+            description: 'Name for user role Community Leader',
+            __typename: 'I18nMessage'
+          },
+          __typename: 'UserRole'
+        },
+        status: Status.Active,
+        name: [
+          {
+            use: 'en',
+            firstNames: 'Gift',
+            familyName: 'Phiri',
+            __typename: 'HumanName'
+          }
+        ],
+        primaryOffice: {
+          id: '1f4a5b6c-7d8e-4312-8abc-345678901234',
+          name: 'Klow Village Office',
+          alias: ['Klow Village Office'],
+          status: 'active',
+          __typename: 'Location'
+        },
+        localRegistrar: null,
+        avatar: null,
+        searches: [],
+        __typename: 'User'
+      } satisfies FetchUserQuery['getUser']
+    }),
+    /**
+     * Mitchel Owen — PROVINCIAL_REGISTRAR at Central Province Office (province level).
+     */
+    provincialRegistrar: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+      v2: {
+        id: userIds.provincialRegistrar,
+        name: [{ use: 'en', given: ['Mitchel'], family: 'Owen' }],
+        role: TestUserRole.enum.PROVINCIAL_REGISTRAR,
+        fullHonorificName: undefined,
+        signature: undefined,
+        avatar: undefined,
+        type: TokenUserType.enum.user,
+        primaryOfficeId: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID
+      } satisfies User,
+      v1: {
+        id: userIds.provincialRegistrar,
+        userMgntUserID: generateUuid(),
+        creationDate: '1736421510058',
+        username: 'm.owen',
+        practitionerId: generateUuid(),
+        mobile: '+260988085085',
+        email: 'm.owen@gmail.com',
+        fullHonorificName: null,
+        role: {
+          id: TestUserRole.enum.PROVINCIAL_REGISTRAR,
+          label: {
+            id: 'userRole.provincialRegistrar',
+            defaultMessage: 'Provincial Registrar',
+            description: 'Name for user role Provincial Registrar',
+            __typename: 'I18nMessage'
+          },
+          __typename: 'UserRole'
+        },
+        status: Status.Active,
+        name: [
+          {
+            use: 'en',
+            firstNames: 'Mitchel',
+            familyName: 'Owen',
+            __typename: 'HumanName'
+          }
+        ],
+        primaryOffice: {
+          id: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12',
+          name: 'Central Province Office',
+          alias: ['Central Province Office'],
+          status: 'active',
+          __typename: 'Location'
+        },
+        localRegistrar: null,
         avatar: null,
         searches: [],
         __typename: 'User'
@@ -647,6 +763,95 @@ export function testDataGenerator(rngSeed?: number) {
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
         'user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]',
         'user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]'
+      ],
+      /**
+       * COMMUNITY_LEADER: jurisdiction locked to their specific office location.
+       * record.create has placeOfEvent: 'location' so the field is fully locked.
+       */
+      communityLeader: [
+        SCOPES.SEARCH_BIRTH,
+        SCOPES.SEARCH_DEATH,
+        SCOPES.SEARCH_MARRIAGE,
+        'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
+        'type=record.search&event=birth,death,tennis-club-membership,child-onboarding,FOOTBALL_CLUB_MEMBERSHIP',
+        encodeScope({
+          type: 'record.create',
+          options: {
+            event: [
+              'birth',
+              'death',
+              'tennis-club-membership',
+              'child-onboarding'
+            ],
+            placeOfEvent: 'location' as const
+          }
+        }),
+        encodeScope({
+          type: 'record.read',
+          options: {
+            event: [
+              'birth',
+              'death',
+              'tennis-club-membership',
+              'child-onboarding'
+            ]
+          }
+        }),
+        'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]'
+      ],
+      /**
+       * PROVINCIAL_REGISTRAR: jurisdiction locked to their administrative area (province).
+       * record.create has placeOfEvent: 'administrativeArea' so province is locked but districts are selectable.
+       */
+      provincialRegistrar: [
+        SCOPES.RECORD_DECLARATION_EDIT,
+        SCOPES.RECORD_REVIEW_DUPLICATES,
+        SCOPES.RECORD_DECLARATION_REINSTATE,
+        SCOPES.RECORD_CONFIRM_REGISTRATION,
+        SCOPES.RECORD_REJECT_REGISTRATION,
+        SCOPES.PERFORMANCE_READ,
+        SCOPES.PERFORMANCE_READ_DASHBOARDS,
+        SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
+        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+        SCOPES.SEARCH_BIRTH,
+        SCOPES.SEARCH_DEATH,
+        SCOPES.SEARCH_MARRIAGE,
+        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
+        'type=record.search&event=birth,death,tennis-club-membership,child-onboarding,FOOTBALL_CLUB_MEMBERSHIP',
+        SCOPES.USER_READ_ONLY_MY_AUDIT,
+        encodeScope({
+          type: 'record.create',
+          options: {
+            event: [
+              'birth',
+              'death',
+              'tennis-club-membership',
+              'child-onboarding'
+            ],
+            placeOfEvent: 'administrativeArea' as const
+          }
+        }),
+        encodeScope({
+          type: 'record.read',
+          options: {
+            event: [
+              'birth',
+              'death',
+              'tennis-club-membership',
+              'child-onboarding'
+            ]
+          }
+        }),
+        'record.declare[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.declared.reject[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.declared.archive[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.register[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.declared.edit[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.registered.print-certified-copies[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.registered.correct[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.unassign-others[event=birth|death|tennis-club-membership|child-onboarding]',
+        'record.declared.review-duplicates[event=birth|death|tennis-club-membership|child-onboarding]'
       ],
       nationalSystemAdmin: [
         SCOPES.CONFIG_UPDATE_ALL,
