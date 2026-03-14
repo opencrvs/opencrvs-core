@@ -315,46 +315,14 @@ function getAdministrativeArea(value?: AddressFieldValue) {
 }
 
 /**
- * Resolves a compact `AddressFieldValue` (which stores only the leaf
- * administrative-area id in `administrativeArea`) into a value where every
- * level in the admin hierarchy has its own key populated.
- *
- * The expansion is performed by walking up the location tree stored in
- * `adminStructureLocations` until all `adminLevelIds` are filled.
- *
- * @example
- * // Given: adminLevelIds = ['province', 'district']
- * //        administrativeArea = 'district-123' (a district whose parent is 'province-456')
- * const expanded = withHierarchyExpanded(value, adminLevelIds, locations)
- * // expanded => { ...value, province: 'province-456', district: 'district-123' }
- */
-function withHierarchyExpanded(
-  value: AddressFieldValue,
-  adminLevelIds: string[],
-  adminStructureLocations: Location[]
-): AddressFieldValue {
-  const administrativeArea = getAdministrativeArea(value)
-  const derivedAdminLevels = getAdminLevelHierarchy(
-    administrativeArea,
-    adminStructureLocations,
-    adminLevelIds
-  )
-  return {
-    ...value,
-    ...derivedAdminLevels
-  }
-}
-
-/**
  * Converts the compact parent `AddressFieldValue` into a flat `EventState`
  * object suitable for driving the nested `FormFieldGenerator`.
  *
- * Three transformations are applied:
+ * Two transformations are applied:
  * 1. The single `administrativeArea` id is expanded into one key per admin
- *    level via `withHierarchyExpanded` (e.g. `province`, `district`).
+ *    level via `getAdminLevelHierarchy` (e.g. `province`, `district`).
  * 2. The `streetLevelDetails` record is spread into top-level keys so each
  *    street-level field is addressed directly by its id.
- * 3. `addressType` is left out.
  *
  * @example
  * const parent: AddressFieldValue = {
@@ -365,8 +333,9 @@ function withHierarchyExpanded(
  * }
  * const nested = transformParentValueToNestedValue(parent, ['province', 'district'], locations)
  * // nested => {
- * //   country: 'FAR', addressType: 'DOMESTIC',
- * //   province: 'province-456', district: 'district-123',
+ * //   country: 'FAR',
+ * //   province: 'province-456',
+ * //   district: 'district-123',
  * //   addressLine1: '42 Main St'
  * // }
  */
@@ -375,10 +344,17 @@ function transformParentValueToNestedValue(
   adminLevelIds: string[],
   adminStructureLocations: Location[]
 ): EventState {
-  const { streetLevelDetails, addressType, ...valueWithoutStreetLevelDetails } =
-    withHierarchyExpanded(value, adminLevelIds, adminStructureLocations)
+  const fullAdminHierarchy = getAdminLevelHierarchy(
+    getAdministrativeArea(value),
+    adminStructureLocations,
+    adminLevelIds
+  )
+
+  const { country, streetLevelDetails } = value
+
   return {
-    ...valueWithoutStreetLevelDetails,
+    country,
+    ...fullAdminHierarchy,
     ...streetLevelDetails
   }
 }
@@ -644,11 +620,14 @@ function AddressOutput({
 
   const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
-  const addressValueWithHierarchyExpanded = withHierarchyExpanded(
-    value,
-    adminLevelIds,
-    adminStructureLocations
-  )
+  const addressValueWithHierarchyExpanded = {
+    ...value,
+    ...getAdminLevelHierarchy(
+      getAdministrativeArea(value),
+      adminStructureLocations,
+      adminLevelIds
+    )
+  }
 
   const flattenedAddressValues = transformParentValueToNestedValue(
     value,
