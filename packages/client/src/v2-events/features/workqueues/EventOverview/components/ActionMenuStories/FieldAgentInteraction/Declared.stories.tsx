@@ -9,15 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { ActionType } from '@opencrvs/commons/client'
-import { AssignmentStatus } from '@client/v2-events/utils'
+import {
+  ActionType,
+  AssignmentStatus,
+  TestUserRole
+} from '@opencrvs/commons/client'
+
 import { ActionMenu } from '../../ActionMenu'
 import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
   Scenario,
-  UserRoles,
   AssertType
 } from '../ActionMenu.common'
 
@@ -77,7 +80,7 @@ const declaredScenariosForFieldAgent: Scenario[] = [
 
 const stories = createStoriesFromScenarios(
   declaredScenariosForFieldAgent,
-  UserRoles.FIELD_AGENT
+  TestUserRole.enum.FIELD_AGENT
 )
 
 export const Unassigned = stories['Unassigned']
