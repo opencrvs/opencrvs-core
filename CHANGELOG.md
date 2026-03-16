@@ -6,9 +6,9 @@
 
 - More expressive `ADDRESS` field configuration
 
-The `fields` array in `ADDRESS` field configuration now accepts either a plain admin-level id string (shorthand) or a full field-override object, giving you per-level control over `required` and `conditionals`.
+The `fields` array in `ADDRESS` field configuration now accepts a field-override object, giving you per-level control over `required` and `conditionals`.
 
-Previously only a fixed set of string values (`'country'` / `'administrativeArea'`) were accepted. The separate `administrativeLevels` array has been removed in favour of this unified `fields` array.
+Previously only a fixed set of string values (`'country'` / `'administrativeArea'`) were accepted. The separate `administrativeLevels` array has been removed in favor of this unified `fields` array.
 
 ```ts
 {
@@ -16,16 +16,14 @@ Previously only a fixed set of string values (`'country'` / `'administrativeArea
   type: FieldType.ADDRESS,
   configuration: {
     fields: [
-      'country',           // shorthand – uses defaults
+      { id: 'country' },           // shorthand – uses defaults
       {
         id: 'province',
-        type: FieldType.ADMINISTRATIVE_AREA,
         required: true,
         conditionals: []
       },
       {
         id: 'district',
-        type: FieldType.ADMINISTRATIVE_AREA,
         required: false,   // override required per level
         conditionals: [{ type: ConditionalType.SHOW, conditional: ... }]
       }
@@ -33,6 +31,8 @@ Previously only a fixed set of string values (`'country'` / `'administrativeArea
   }
 }
 ```
+> [!IMPORTANT]
+> The `id` of the object must match the administrative hierarchy id defined in `applicationConfig`.
 
 - The `ADMINISTRATIVE_AREA` field's `configuration.partOf` now uses the standard typed `FieldReference` (produced by `field(...)`) instead of the previous ad-hoc `{ $declaration: string }` shape, and its `defaultValue` now accepts `user(...)` references in addition to plain strings.
 
