@@ -45,7 +45,6 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
       key.replace(/\./g, INTERNAL_SEPARATOR)
     if (Array.isArray(value)) {
       value.forEach((val, id) => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (typeof val === 'object' && val !== null) {
           Object.assign(
             result,
@@ -181,9 +180,21 @@ export function useIntlFormatMessageWithFlattenedParams() {
     const variablesWithEmptyValues = Object.fromEntries(
       variablesInMessage.map((variable) => [variable, EMPTY_TOKEN])
     )
+    const mergedVariables = { ...variablesWithEmptyValues, ...variables }
+
+    // Date-element variables cannot accept EMPTY_TOKEN — IntlMessageFormat throws RangeError
+    // when it tries to format a non-date string as a date. Return '' if any date field is absent.
+    const dateVariableNames = parse(defaultMessage)
+      .filter(isDateElement)
+      .map((el) => el.value)
+    if (
+      dateVariableNames.some((name) => mergedVariables[name] === EMPTY_TOKEN)
+    ) {
+      return ''
+    }
 
     const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
-      { ...variablesWithEmptyValues, ...variables }
+      mergedVariables
     )
     if (!formatted || typeof formatted !== 'string') {
       return ''
