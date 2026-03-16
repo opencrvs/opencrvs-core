@@ -145,15 +145,22 @@ export const ScopesWithDeclaredOptions = RecordScopeTypeV2.extract([
 export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.search',
   'record.read',
-  'record.print-certified-copies',
   'record.request-correction',
   'record.correct',
   'record.unassign-others'
 ])
 
-export const ScopesWithCustomActionOptions = RecordScopeTypeV2.extract([
-  'record.custom-action'
-])
+const ScopeOptionsPrintCertifiedCopies = ScopeOptionsFull.extend({
+  templates: z
+    // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
+    .preprocess(
+      (val) => (val === undefined ? undefined : [val].flat()),
+      z.array(z.string()).optional()
+    )
+    .describe(
+      'Template IDs for certified copies. Controls which certificate templates are returned to the client via the config service. Certificate printing is a client-side operation — this option is not validated when the printCertificate action is submitted.'
+    )
+})
 
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
@@ -170,8 +177,12 @@ export const RecordScopeV2 = z
       options: ScopeOptionsFull.optional()
     }),
     z.object({
-      type: ScopesWithCustomActionOptions,
+      type: z.literal('record.custom-action'),
       options: CustomActionScopeOptions.optional()
+    }),
+    z.object({
+      type: z.literal('record.print-certified-copies'),
+      options: ScopeOptionsPrintCertifiedCopies.optional()
     })
   ])
   .describe(
@@ -197,6 +208,18 @@ export function scopeUsesFullOptions(
   return ScopesWithFullOptions.options.some((opt) => opt === scope.type)
 }
 
+export function scopeUsesPrintCertifiedCopiesOptions(
+  scope: RecordScopeV2
+): scope is Extract<RecordScopeV2, { type: 'record.print-certified-copies' }> {
+  return scope.type === 'record.print-certified-copies'
+}
+
+export function isCustomActionScope(
+  scope: RecordScopeV2
+): scope is Extract<RecordScopeV2, { type: 'record.custom-action' }> {
+  return scope.type === 'record.custom-action'
+}
+
 export const ResolvedRecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
@@ -210,6 +233,12 @@ export const ResolvedRecordScopeV2 = z
     z.object({
       type: ScopesWithFullOptions,
       options: ResolvedScopeOptionsFull.optional()
+    }),
+    z.object({
+      type: z.literal('record.print-certified-copies'),
+      options: ResolvedScopeOptionsFull.extend({
+        templates: z.array(z.string()).optional()
+      }).optional()
     })
   ])
   .describe('Resolved scope with location/user IDs instead of filters.')
@@ -392,10 +421,4 @@ export function canUserCreateEvent(
   eventType: string
 ) {
   return acceptedScopes.some((scope) => isEventTypeAllowed(scope, eventType))
-}
-
-export function isCustomActionScope(
-  scope: RecordScopeV2
-): scope is Extract<RecordScopeV2, { type: 'record.custom-action' }> {
-  return scope.type === 'record.custom-action'
 }

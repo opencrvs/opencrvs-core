@@ -22,7 +22,8 @@ import {
   scopeUsesDeclaredOptions,
   scopeUsesFullOptions,
   UserFilter,
-  isCustomActionScope
+  isCustomActionScope,
+  scopeUsesPrintCertifiedCopiesOptions
 } from '../scopes-v2'
 import { SystemContext, UserContext } from '../users/User'
 
@@ -197,7 +198,10 @@ export function canAccessEventWithScope(
     }
   }
 
-  if (scopeUsesFullOptions(scope)) {
+  if (
+    scopeUsesFullOptions(scope) ||
+    scopeUsesPrintCertifiedCopiesOptions(scope)
+  ) {
     const { options } = scope
 
     if (options?.registeredBy === UserFilter.enum.user) {
