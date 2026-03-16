@@ -226,8 +226,12 @@ export const eventTypeAuthorization: MiddlewareFunction<
   return next()
 }
 
-export const EventIdParam = z.object({ eventId: UUID })
+export const EventIdParam = z.object({
+  eventId: UUID,
+  customActionType: z.string().optional()
+})
 export type EventIdParam = z.infer<typeof EventIdParam>
+
 export const requireAssignment: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
@@ -383,7 +387,8 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     const hasAccess = userCanAccessEventWithScopes(
       eventIndexWithLocationHierarchy,
       acceptedScopes,
-      ctx.user
+      ctx.user,
+      input?.customActionType
     )
 
     if (!hasAccess) {

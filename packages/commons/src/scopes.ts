@@ -336,34 +336,18 @@ export const RecordScope = z
   )
 export type RecordScope = z.infer<typeof RecordScope>
 
-export const CustomActionScope = z.object({
-  type: z.literal('record.custom-action'),
-  options: z.object({
-    event: z
-      .array(z.string())
-      .describe('Allowed event type, e.g. birth, death'),
-    customActionType: z
-      .array(z.string())
-      .describe('Allowed custom action types')
-  })
-})
-
-export type CustomActionScope = z.infer<typeof CustomActionScope>
-
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
   PrintCertifiedCopiesScope,
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  RecordScope,
-  CustomActionScope
+  RecordScope
 ])
 
 export const ConfigurableActionScopes = z.discriminatedUnion('type', [
   // @TODO - Record scope holds non-action scopes as well e.g., `record.read`
-  RecordScope,
-  CustomActionScope
+  RecordScope
 ])
 
 export type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
