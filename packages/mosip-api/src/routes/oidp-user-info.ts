@@ -19,24 +19,41 @@ export const OIDPUserInfoHandler = async (
   const { clientId, redirectUri } = request.body;
   const code = request.query.code;
 
-  console.log("OIDPUserInfoHandler", {
+  request.log.info({
+    event: "esignet.userinfo.request.received",
     clientId,
-    redirectUri,
-    code,
+    redirectUri: redirectUri.split("?")[0],
+    hasCode: Boolean(code),
   });
 
   const tokenResponse = await fetchToken({
     code,
     clientId,
     redirectUri,
+    logger: request.log,
   });
 
   if (!tokenResponse.access_token) {
+    request.log.warn(
+      {
+        event: "esignet.token.request.missing-access-token",
+      },
+      "E-Signet token response did not include access token",
+    );
+
     throw new Error(
-      "Something went wrong with the OIDP token request. No access token was returned. Response from OIDP: " +
-        JSON.stringify(tokenResponse),
+      "Something went wrong with the OIDP token request. No access token was returned.",
     );
   }
 
-  return fetchUserInfo(tokenResponse.access_token);
+  const userInfo = await fetchUserInfo(tokenResponse.access_token, request.log);
+
+  request.log.info(
+    {
+      event: "esignet.userinfo.request.succeeded",
+    },
+    "Successfully fetched OIDP user info",
+  );
+
+  return userInfo;
 };

@@ -1,9 +1,20 @@
 import * as nodemailer from "nodemailer";
 import { EMAIL_ENABLED, env } from "./constants";
+import type { FastifyBaseLogger } from "fastify";
 
-export const sendEmail = async (subject: string, text: string) => {
+export const sendEmail = async (
+  subject: string,
+  text: string,
+  logger?: FastifyBaseLogger,
+) => {
   if (!EMAIL_ENABLED) {
-    console.log(`Interrupted email sending`, { subject, text });
+    logger?.info(
+      {
+        event: "mailer.skipped",
+      },
+      "Skipping email send because SMTP is disabled",
+    );
+
     return;
   }
 

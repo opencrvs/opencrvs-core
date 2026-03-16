@@ -61,6 +61,14 @@ const sendVerifiableCredential = async (
   return response.text();
 };
 
+const maskIdentifier = (value: string) => {
+  if (value.length <= 4) {
+    return "*".repeat(value.length);
+  }
+
+  return `${"*".repeat(value.length - 4)}${value.slice(-4)}`;
+};
+
 type CrvsNewRequest = {
   request: {
     process: "CRVS_NEW";
@@ -105,11 +113,21 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
     const birthCertificateNumber =
       payload.request.fields.birthCertificateNumber;
 
-    console.log(
-      `${JSON.stringify({ id, birthCertificateNumber }, null, 4)}, ..."${VID}" created.`,
+    request.log.info(
+      {
+        event: "packet-manager.create.birth",
+        requestId: id,
+        birthCertificateNumber: maskIdentifier(birthCertificateNumber),
+        vidSuffix: VID.slice(-4),
+      },
+      "Created mock identity",
     );
 
-    await sendEmail(`NID created for request id ${id}`, `NID: ${VID}`);
+    await sendEmail(
+      `NID created for request id ${id}`,
+      `NID: ${VID}`,
+      request.log,
+    );
 
     sendVerifiableCredential(id, {
       birthCertificateNumber,
@@ -117,7 +135,14 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
       id: `http://credential.idrepo/credentials/${id}`,
       vcVer: "VC-V1",
     }).catch((e) => {
-      console.error(e);
+      request.log.error(
+        {
+          event: "packet-manager.websub-callback.failed",
+          err: e,
+          requestId: id,
+        },
+        "Failed to send verifiable credential callback",
+      );
     });
   }
 
@@ -129,7 +154,14 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
       id: `http://credential.idrepo/credentials/${id}`,
       vcVer: "VC-V1",
     }).catch((e) => {
-      console.error(e);
+      request.log.error(
+        {
+          event: "packet-manager.websub-callback.failed",
+          err: e,
+          requestId: id,
+        },
+        "Failed to send verifiable credential callback",
+      );
     });
 
     nationalIdNumber && deactivateNid(nationalIdNumber);

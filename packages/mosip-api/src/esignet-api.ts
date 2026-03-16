@@ -17,6 +17,7 @@ import { isValid, format, Locale, parse } from "date-fns";
 import { enGB } from "date-fns/locale/en-GB";
 import { fr } from "date-fns/locale/fr";
 import fs from "node:fs";
+import type { FastifyBaseLogger } from "fastify";
 
 const OIDP_CLIENT_PRIVATE_KEY = fs
   .readFileSync(env.OIDP_CLIENT_PRIVATE_KEY_PATH)
@@ -74,6 +75,7 @@ type FetchTokenProps = {
   clientId: string;
   redirectUri: string;
   grantType?: string;
+  logger: FastifyBaseLogger;
 };
 
 const generateSignedJwt = async (clientId: string) => {
@@ -88,8 +90,6 @@ const generateSignedJwt = async (clientId: string) => {
     // aud: env.OPENID_PROVIDER_CLAIMS,
     aud: env.ESIGNET_TOKEN_URL,
   };
-
-  console.log("JWT payload", payload);
 
   const decodeKey = Buffer.from(OIDP_CLIENT_PRIVATE_KEY, "base64")?.toString();
   const jwkObject = JSON.parse(decodeKey);
@@ -106,21 +106,29 @@ export const fetchToken = async ({
   code,
   clientId,
   redirectUri,
+  logger,
 }: FetchTokenProps) => {
   const clientAssertion = await generateSignedJwt(clientId);
-  console.log("client assertion: ", clientAssertion);
+
+  const redirectUriWithoutQuery = redirectUri?.split("?")[0] ?? redirectUri;
   const body = new URLSearchParams({
     code: code,
     client_id: clientId,
-    redirect_uri: redirectUri?.split("?")[0] ?? redirectUri,
+    redirect_uri: redirectUriWithoutQuery,
     grant_type: "authorization_code",
     client_assertion_type:
       "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
     client_assertion: clientAssertion,
   });
 
-  console.log("fetch token request body", body.toString());
-  console.log("fetch token request url", env.ESIGNET_TOKEN_URL);
+  logger.debug(
+    {
+      event: "esignet.token.request",
+      tokenUrl: env.ESIGNET_TOKEN_URL,
+      redirectUri: redirectUriWithoutQuery,
+    },
+    "Requesting E-Signet token",
+  );
 
   const request = await fetch(env.ESIGNET_TOKEN_URL!, {
     method: "POST",
@@ -130,8 +138,18 @@ export const fetchToken = async ({
     body,
   });
 
+  if (!request.ok) {
+    logger.warn(
+      {
+        event: "esignet.token.request.failed",
+        statusCode: request.status,
+      },
+      "E-Signet token request failed",
+    );
+    throw new Error(`OIDP token request failed with status ${request.status}`);
+  }
+
   const response = await request.json();
-  console.log("fetch token response", response);
   return response as { access_token?: string };
 };
 
@@ -194,7 +212,10 @@ const decodeUserInfoResponse = (response: string) => {
   return jwt.decode(response) as OIDPUserInfo;
 };
 
-export const fetchUserInfo = async (accessToken: string) => {
+export const fetchUserInfo = async (
+  accessToken: string,
+  logger: FastifyBaseLogger,
+) => {
   const request = await fetch(env.ESIGNET_USERINFO_URL, {
     method: "GET",
     headers: {
@@ -202,13 +223,25 @@ export const fetchUserInfo = async (accessToken: string) => {
     },
   });
 
+  if (!request.ok) {
+    logger.warn(
+      {
+        event: "esignet.userinfo.request.failed",
+        statusCode: request.status,
+      },
+      "E-Signet user info request failed",
+    );
+    throw new Error(
+      `OIDP user info request failed with status ${request.status}`,
+    );
+  }
+
   const response = await request.text();
   const decodedResponse = decodeUserInfoResponse(response);
-  console.log("Decoded response", JSON.stringify(decodedResponse));
+
   if (!decodedResponse) {
     throw new Error(
-      "Something went wrong with the OIDP user info request. No user info was returned. Response from OIDP: " +
-        JSON.stringify(response),
+      "Something went wrong with the OIDP user info request. No user info was returned.",
     );
   }
   return pickUserInfo(decodedResponse);

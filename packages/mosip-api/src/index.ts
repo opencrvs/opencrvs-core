@@ -25,8 +25,30 @@ import {
 } from "./routes/debug-sqlite";
 import { verifyHandler, VerifySchema } from "./routes/verify";
 
+const loggerRedactPaths = [
+  "req.headers.authorization",
+  "req.headers.cookie",
+  "authorization",
+  "cookie",
+  "token",
+  "access_token",
+  "refresh_token",
+  "client_assertion",
+  "body.client_assertion",
+  "body.code",
+  "body.credential",
+  "body.event.data.credential",
+  "headers.authorization",
+  "headers.cookie",
+];
+
 const envToLogger = {
   development: {
+    level: process.env.LOG_LEVEL ?? "debug",
+    redact: {
+      paths: loggerRedactPaths,
+      censor: "[REDACTED]",
+    },
     transport: {
       target: "pino-pretty",
       options: {
@@ -34,7 +56,13 @@ const envToLogger = {
       },
     },
   },
-  production: true,
+  production: {
+    level: process.env.LOG_LEVEL ?? "info",
+    redact: {
+      paths: loggerRedactPaths,
+      censor: "[REDACTED]",
+    },
+  },
 };
 
 const initRoutes = (app: FastifyInstance) => {
@@ -106,9 +134,11 @@ const initRoutes = (app: FastifyInstance) => {
 
 let corePublicKey: string;
 let publicKeyUpdatedAt = Date.now();
+let publicKeyLogger: FastifyInstance["log"];
+
 const getCorePublicKey = async () => {
   if (!corePublicKey) {
-    corePublicKey = await getPublicKey();
+    corePublicKey = await getPublicKey(publicKeyLogger);
   }
 
   return corePublicKey;
@@ -122,6 +152,7 @@ export const buildFastify = async () => {
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
+  publicKeyLogger = app.log;
   app.register(formbody);
   app.register(cors, {
     origin: [env.CLIENT_APP_URL],
@@ -159,17 +190,26 @@ export const buildFastify = async () => {
         error.code === "FST_JWT_AUTHORIZATION_TOKEN_INVALID" &&
         moreThanAMinuteSinceLastUpdate
       ) {
-        app.log.info("🔁 JWT failed, refreshing public key...");
+        app.log.info(
+          { event: "jwt.verify.failed.refreshing-public-key" },
+          "JWT verification failed, refreshing public key",
+        );
         try {
-          corePublicKey = await getPublicKey();
+          corePublicKey = await getPublicKey(app.log);
           publicKeyUpdatedAt = Date.now();
           await request.jwtVerify();
           return;
         } catch (retryErr) {
-          app.log.error("🔐 JWT retry failed:", retryErr);
+          app.log.error(
+            { event: "jwt.verify.retry.failed", err: retryErr },
+            "JWT verification failed after public key refresh",
+          );
         }
       } else {
-        app.log.error("🔐 JWT verify failed:", err);
+        app.log.error(
+          { event: "jwt.verify.failed", err },
+          "JWT verification failed",
+        );
       }
 
       return reply.code(401).send({ error: "Unauthorized" });
@@ -188,22 +228,22 @@ async function run() {
     env.SQLITE_DATABASE_PATH,
   );
 
-  wasCreated && app.log.info("SQLite token storage created 🚀✅ ");
-  wasConnected && app.log.info("SQLite token storage connected ✅");
+  wasCreated && app.log.info("SQLite token storage created");
+  wasConnected && app.log.info("SQLite token storage connected");
 
   await app.ready();
   await app.listen({
     port: env.PORT,
     host: env.HOST,
     listenTextResolver: () =>
-      `OpenCRVS-MOSIP interoperability API running at http://${env.HOST}:${env.PORT} ✅`,
+      `OpenCRVS-MOSIP interoperability API running at http://${env.HOST}:${env.PORT}`,
   });
   app.log.info(
-    `Swagger UI running at http://${env.HOST}:${env.PORT}/documentation ✅`,
+    `Swagger UI running at http://${env.HOST}:${env.PORT}/documentation`,
   );
 
   const { topic } = await initWebSub();
-  app.log.info(`WebSub subscription initialized for topic '${topic}' ✅`);
+  app.log.info(`WebSub subscription initialized for topic '${topic}'`);
 
   process.on("exit", () => {
     database.close();

@@ -94,7 +94,16 @@ export const credentialIssuedHandler = async (
       })
       .status(200);
   } catch (error) {
-    console.error("error: ", error);
+    request.log.error(
+      {
+        event: "websub.credential-issued.failed",
+        err: error,
+        topic: request.body.topic,
+        eventId: request.body.event.id,
+      },
+      "Failed to process WebSub credential-issued event",
+    );
+
     return reply
       .send({
         publisher: request.body.publisher,

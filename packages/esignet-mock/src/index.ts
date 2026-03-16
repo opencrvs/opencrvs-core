@@ -232,7 +232,9 @@ async function run() {
     host: env.HOST,
   });
 
-  console.log(`E-Signet mock server running at http://${env.HOST}:${env.PORT}`);
+  app.log.info(
+    `E-Signet mock server running at http://${env.HOST}:${env.PORT}`,
+  );
 }
 
 void run();

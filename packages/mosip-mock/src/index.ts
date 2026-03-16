@@ -9,7 +9,7 @@ import { packetManagerAuthHandler } from "./routes/packet-manager-auth";
 import { createPrivateKey, createPublicKey } from "node:crypto";
 import { PUBLIC_KEY_URL } from "./verifiable-credentials/issue";
 
-const app = Fastify();
+const app = Fastify({ logger: true });
 
 app.register(formbody);
 
@@ -50,8 +50,8 @@ app.post("/registrationprocessor/v1/workflowmanager/workflowinstance", {
 
 async function run() {
   if (env.isProd) {
-    console.error(
-      "⚠️ You are running MOCK national ID server in production. All identifiers will be logged. ⚠️",
+    app.log.warn(
+      "You are running MOCK national ID server in production. Identifiers can be logged.",
     );
   }
 
@@ -61,12 +61,10 @@ async function run() {
     host: env.HOST,
   });
 
-  const emailStatus = EMAIL_ENABLED
-    ? "✅ Emails enabled"
-    : "❌ Emails disabled";
+  const emailStatus = EMAIL_ENABLED ? "Emails enabled" : "Emails disabled";
 
-  console.log(`MOSIP mock server running at http://${env.HOST}:${env.PORT}`);
-  console.log(emailStatus);
+  app.log.info(`MOSIP mock server running at http://${env.HOST}:${env.PORT}`);
+  app.log.info(emailStatus);
 }
 
 void run();
