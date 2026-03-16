@@ -18,10 +18,12 @@ import {
   getOrThrow,
   isActionEnabled,
   isActionVisible,
-  filterActionsByFlags
+  filterActionsByFlags,
+  getAssignmentStatus,
+  AssignmentStatus
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useCustomActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'

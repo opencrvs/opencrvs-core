@@ -24,7 +24,9 @@ import {
   getDeclaration,
   getOrThrow,
   getCurrentEventState,
-  UUID
+  UUID,
+  getAssignmentStatus,
+  AssignmentStatus
 } from '@opencrvs/commons/client'
 import { getAnnotationForActionType } from '@client/v2-events/features/events/components/Action/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -36,7 +38,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useAuthentication } from '@client/utils/userUtils'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+
 import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import { removeCachedFiles } from '../files/cache'
 
