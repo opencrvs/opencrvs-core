@@ -4,7 +4,21 @@ SELECT
   gen_random_uuid(),
   ls._id,
   ls.name,
-  ls.scope::jsonb,
+  -- Migrate legacy scopes to new scopes and deduplicate:
+  -- 'notification-api' -> 'record.notify'
+  -- 'recordsearch' -> 'record.search'
+  (
+    SELECT jsonb_agg(DISTINCT replaced_scope)
+    FROM (
+      SELECT
+        CASE elem::text
+          WHEN '"notification-api"' THEN '"record.notify"'::jsonb
+          WHEN '"recordsearch"' THEN '"record.search"'::jsonb
+          ELSE elem
+        END AS replaced_scope
+      FROM jsonb_array_elements(ls.scope::jsonb) AS elem
+    ) sub
+  ),
   u.id,
   ls."secretHash",
   ls.salt,

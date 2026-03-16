@@ -31,8 +31,8 @@ export const SCOPES = {
   // systems / integrations
   WEBHOOK: 'webhook',
   NATIONALID: 'nationalId',
-  NOTIFICATION_API: 'notification-api',
-  RECORDSEARCH: 'recordsearch',
+  NOTIFICATION_API: 'record.notify',
+  RECORDSEARCH: 'record.search',
   RECORD_IMPORT: 'record.import',
   RECORD_EXPORT: 'record.export',
   RECORD_REINDEX: 'record.reindex',

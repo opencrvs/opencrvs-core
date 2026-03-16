@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getTokenPayload, Scope } from '@opencrvs/commons/authentication'
+import { getTokenPayload, Scope, SCOPES } from '@opencrvs/commons/authentication'
 import {
   getSystem,
   getSystemByCriteria,
@@ -76,8 +76,8 @@ export async function getUserOrSystem(
   token: string
 ): Promise<IUserModelData | ISystemModelData> {
   const tokenPayload = getTokenPayload(token)
-  const isNotificationAPIUser = tokenPayload.scope.includes('notification-api')
-  const isRecordSearchAPIUser = tokenPayload.scope.includes('recordsearch')
+  const isNotificationAPIUser = tokenPayload.scope.includes(SCOPES.NOTIFICATION_API)
+  const isRecordSearchAPIUser = tokenPayload.scope.includes(SCOPES.RECORDSEARCH)
 
   if (isNotificationAPIUser || isRecordSearchAPIUser) {
     return await getSystem(tokenPayload.sub, {
