@@ -1898,7 +1898,7 @@ components:
                 fields:
                   type: array
                   items:
-                    type: string
+                    type: object
                 streetAddressForm:
                   type: array
                   items:

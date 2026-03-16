@@ -776,7 +776,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 04340d5c-60c6-454f-81b2-44af19aa7d68
+                transactionId: 05430a92-9e02-4a38-97f3-00e63f436bc9
                 type: birth
       responses:
         "200":
@@ -862,7 +862,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: a2c16868-4d34-4f59-b7d7-67af644714fc
+                transactionId: ec7f4c4e-3b79-4706-ab4a-4fb086717bf2
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2605,7 +2605,7 @@ components:
                 fields:
                   type: array
                   items:
-                    type: string
+                    type: object
                 streetAddressForm:
                   type: array
                   items:
