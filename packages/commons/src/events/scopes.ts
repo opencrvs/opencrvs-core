@@ -26,6 +26,7 @@ import {
   userCanAccessEventWithScopes
 } from './locations'
 import { UserContext } from '../users/User'
+import { EventIndex } from './EventIndex'
 
 type AlwaysAllowed = null
 
@@ -63,30 +64,37 @@ export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
 export function configurableEventScopeAllowed(
   scopes: Scope[],
   allowedConfigurableScopes: ConfigurableScopeType[],
-  eventType: string,
-  customActionType?: string
+  eventType: string
 ) {
   // Find the scopes that are authorized for the given action
   const parsedScopes = allowedConfigurableScopes.flatMap((scope) =>
     findScopes(scopes, scope)
   )
 
-  if (!customActionType) {
-    const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-    return authorizedEvents.includes(eventType)
+  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
+  return authorizedEvents.includes(eventType)
+}
+
+export const AssignmentStatus = {
+  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
+  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
+  UNASSIGNED: 'UNASSIGNED'
+} as const
+
+export type AssignmentStatus =
+  (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
+
+export function getAssignmentStatus(
+  eventState: EventIndex | EventIndexWithAdministrativeHierarchy,
+  userId: string
+): AssignmentStatus {
+  if (!eventState.assignedTo) {
+    return AssignmentStatus.UNASSIGNED
   }
 
-  const scopesWithCorrectCustomActionType = parsedScopes.filter(
-    ({ options }) =>
-      'customActionType' in options &&
-      options.customActionType.includes(customActionType as string)
-  )
-
-  const authorizedEvents = getAuthorizedEventsFromScopes(
-    scopesWithCorrectCustomActionType
-  )
-
-  return authorizedEvents.includes(eventType)
+  return eventState.assignedTo == userId
+    ? AssignmentStatus.ASSIGNED_TO_SELF
+    : AssignmentStatus.ASSIGNED_TO_OTHERS
 }
 
 /**
@@ -101,23 +109,32 @@ export function configurableEventScopeAllowed(
  * @param {DisplayableAction} action - The action to check authorization for.
  * @param {EventIndexWithAdministrativeHierarchy} event - The event with resolved administrative hierarchy.
  * @param {UserContext} currentUser - The current user's context used for V2 scope validation.
- * @param {string} [customActionType] - Optional custom action type for CUSTOM actions.
  * @returns {boolean} True if the action is in scope for the user, otherwise false.
  */
 export function isActionInScope({
   scopes,
   action,
   event,
-  currentUser,
-  customActionType
+  currentUser
 }: {
   scopes: Scope[]
   action: DisplayableAction
   event: EventIndexWithAdministrativeHierarchy
   currentUser: UserContext
-  customActionType?: string
 }): boolean {
-  const allowedConfigurableScopes = ACTION_SCOPE_MAP[action]
+  const assignmentStatus = getAssignmentStatus(event, currentUser.id)
+  /**
+   * Anyone can unassign themselves. However, to unassign others, the user must have the 'record.unassign-others' scope.
+   * This is a special case that deviates from the general pattern of scope checks defined in ACTION_SCOPE_MAP.
+   * Therefore, we check for this condition explicitly here.
+   */
+  const isUnassigningOthers =
+    action === ActionType.UNASSIGN &&
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS
+
+  const allowedConfigurableScopes = isUnassigningOthers
+    ? ['record.unassign-others']
+    : ACTION_SCOPE_MAP[action]
 
   // 'null' means that the action is always allowed
   if (allowedConfigurableScopes === null) {
@@ -133,8 +150,7 @@ export function isActionInScope({
     scopes,
     // @ts-expect-error - TODO: remove legacy scopes once evrything is migrated to V2
     allowedConfigurableScopes,
-    event.type,
-    customActionType
+    event.type
   )
 
   // @TODO

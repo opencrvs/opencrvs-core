@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import fc from 'fast-check'
 import {
   ActionType,
@@ -29,7 +28,7 @@ import {
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
 
-test('Check scopes against event.actions.printCertificate', async () => {
+test('Check scopes against event.actions.custom', async () => {
   await createIndex(
     getEventIndexName('tennis-club-membership_premium'),
     getDeclarationFields(tennisClubMembershipEvent)
@@ -79,12 +78,14 @@ test('Check scopes against event.actions.printCertificate', async () => {
   })
 
   // 3. Test combination against random event and assert results
-
   await fc.assert(
     fc.asyncProperty(combinations, async ({ user, ...options }) => {
       const scope = encodeScope({
-        type: 'record.print-certified-copies',
-        options
+        type: 'record.custom-action',
+        options: {
+          ...options,
+          customActionTypes: ['ESCALATE']
+        }
       })
 
       const randomIndex = Math.floor(Math.random() * eventIds.length)
@@ -95,15 +96,13 @@ test('Check scopes against event.actions.printCertificate', async () => {
         user,
         scope,
         clientReadingAllEvents,
-        async (client) =>
-          client.event.actions.printCertificate.request({
+        (client) =>
+          client.event.actions.custom.request({
             eventId,
             transactionId: getUUID(),
             declaration: {},
-            annotation: {
-              'collector.requesterId': 'INFORMANT',
-              'collector.identity.verify': true
-            }
+            annotation: {},
+            customActionType: 'ESCALATE'
           })
       )
 
@@ -117,55 +116,4 @@ test('Check scopes against event.actions.printCertificate', async () => {
       numRuns: 20
     }
   )
-})
-
-test('templates option in scope does not affect printCertificate action authorization', async () => {
-  await createIndex(
-    getEventIndexName('tennis-club-membership_premium'),
-    getDeclarationFields(tennisClubMembershipEvent)
-  )
-
-  const { users, eventIds } = await setupScopeTestFixture(8844, [
-    ActionType.DECLARE,
-    ActionType.REGISTER,
-    ActionType.UNASSIGN
-  ])
-
-  const clientReadingAllEvents = createTestClient(users[0], [
-    encodeScope({ type: 'record.read' })
-  ])
-
-  const [eventId] = eventIds
-
-  // Scope with a specific template restriction that does not match anything
-  const scopeWithTemplateRestriction = encodeScope({
-    type: 'record.print-certified-copies',
-    options: {
-      templates: ['some-template-id-that-does-not-match']
-    }
-  })
-
-  // Certificate printing is a client-side operation. The templates option controls
-  // which templates the config service returns to the client — it is not validated
-  // when the printCertificate action is submitted. Access should be granted regardless.
-  const result = await attemptScopedAction(
-    eventId,
-    users[0],
-    scopeWithTemplateRestriction,
-    clientReadingAllEvents,
-    (client) =>
-      client.event.actions.printCertificate.request({
-        eventId,
-        transactionId: getUUID(),
-        declaration: {},
-        // Deliberately use a templateId that does not match the scope's allowed templates                                                                                                 │
-        content: { templateId: 'a-template-id-not-in-scope' },
-        annotation: {
-          'collector.requesterId': 'INFORMANT',
-          'collector.identity.verify': true
-        }
-      })
-  )
-
-  expect(result.success).toBe(true)
 })

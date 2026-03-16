@@ -10,20 +10,21 @@
  */
 
 import fc from 'fast-check'
+import { TRPCError } from '@trpc/server'
 import {
-  ActionStatus,
-  ActionType,
+  ActionTypes,
+  EventDocument,
   JurisdictionFilter,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
   encodeScope,
   getDeclarationFields,
+  getCurrentEventState,
   getUUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   assertScopeResult,
-  attemptScopedAction,
   createTestClient,
   setupScopeTestFixture
 } from '@events/tests/utils'
@@ -31,21 +32,21 @@ import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
 
 test(
-  'Check scopes against event.actions.correction.reject',
+  'Check scopes against event.actions.unassign',
   async () => {
     await createIndex(
       getEventIndexName('tennis-club-membership_premium'),
       getDeclarationFields(tennisClubMembershipEvent)
     )
-
     // 1. Setup test fixture with a known set of users, administrative areas, and events.
     const { users, isUnderAdministrativeArea, eventIds } =
-      await setupScopeTestFixture(8843, [
-        ActionType.DECLARE,
-        ActionType.REGISTER,
-        ActionType.REQUEST_CORRECTION,
-        ActionType.UNASSIGN
-      ])
+      await setupScopeTestFixture(
+        1243453343,
+        fc.constantFrom(
+          [ActionTypes.enum.DECLARE],
+          [ActionTypes.enum.DECLARE, ActionTypes.enum.REGISTER]
+        )
+      )
 
     const clientReadingAllEvents = createTestClient(users[0], [
       encodeScope({
@@ -83,49 +84,72 @@ test(
     })
 
     // 3. Test combination against random event and assert results
-
     await fc.assert(
       fc.asyncProperty(combinations, async ({ user, ...options }) => {
         const scope = encodeScope({
-          type: 'record.correct',
+          type: 'record.unassign-others',
           options
         })
 
         const randomIndex = Math.floor(Math.random() * eventIds.length)
         const [eventId] = eventIds.splice(randomIndex, 1)
 
-        const event = await clientReadingAllEvents.event.get({ eventId })
+        const testClient = createTestClient(user, [scope])
 
-        const correctionRequestId = event.actions.find(
-          (a) =>
-            a.type === ActionType.REQUEST_CORRECTION &&
-            a.status === ActionStatus.Accepted
-        )?.id
-
-        const result = await attemptScopedAction(
-          eventId,
-          user,
-          scope,
-          clientReadingAllEvents,
-          (client) =>
-            client.event.actions.correction.reject.request({
-              eventId,
-              transactionId: getUUID(),
-              requestId: correctionRequestId,
-              content: {
-                reason: 'reject test'
-              }
-            })
-        )
-
-        assertScopeResult(result, {
-          user,
-          isUnderAdministrativeArea,
-          ...options
+        // 1. Fetch the event before performing the action. Doing it after unassign will alter the result.
+        const eventBeforeUnassign = await clientReadingAllEvents.event.get({
+          eventId
         })
+
+        let result: { success: boolean; event: EventDocument }
+        try {
+          // 2. Perform the action with the given test client.
+          await testClient.event.actions.assignment.unassign({
+            eventId,
+            transactionId: getUUID(),
+            declaration: {},
+            assignedTo: null
+          })
+
+          // 3. Return the event before the unassignment went through.
+          result = { success: true, event: eventBeforeUnassign }
+        } catch (error) {
+          if (error instanceof TRPCError && error.code === 'FORBIDDEN') {
+            const eventFetchedAsAdmin = await clientReadingAllEvents.event.get({
+              eventId
+            })
+            result = { success: false, event: eventFetchedAsAdmin }
+          } else {
+            throw error
+          }
+        }
+
+        const eventConfig =
+          result.event.type === TENNIS_CLUB_MEMBERSHIP
+            ? tennisClubMembershipEvent
+            : {
+                ...tennisClubMembershipEvent,
+                id: 'tennis-club-membership_premium'
+              }
+
+        const eventIndex = getCurrentEventState(result.event, eventConfig)
+        const wasAssignedToUser = eventIndex.assignedTo === user.id
+
+        // User should always be able to unassign if they were the assigned user, regardless of other scope options.
+        if (wasAssignedToUser) {
+          expect(result.success).toBe(true)
+        } else {
+          assertScopeResult(result, {
+            user,
+            isUnderAdministrativeArea,
+            ...options
+          })
+        }
       }),
       { numRuns: 20 }
     )
   },
-  { timeout: 90000 }
+  {
+    timeout: 120000
+  }
 )
