@@ -19,10 +19,11 @@ import {
 import {
   JurisdictionFilter,
   RecordScopeV2,
+  scopeUsesDeclaredOptions,
+  scopeUsesFullOptions,
   UserFilter,
-  scopeIsOfType,
-  ScopesWithFullOptions,
-  ScopesWithDeclaredOptions
+  isCustomActionScope,
+  scopeUsesPrintCertifiedCopiesOptions
 } from '../scopes-v2'
 import { SystemContext, UserContext } from '../users/User'
 
@@ -165,7 +166,7 @@ export function canAccessEventWithScope(
     return false
   }
 
-  if (scopeIsOfType(scope, ScopesWithDeclaredOptions.options)) {
+  if (scopeUsesDeclaredOptions(scope)) {
     const { options } = scope
 
     if (options?.declaredBy === UserFilter.enum.user) {
@@ -198,9 +199,9 @@ export function canAccessEventWithScope(
   }
 
   if (
-    scopeIsOfType(scope, ScopesWithFullOptions.options) ||
-    scopeIsOfType(scope, ['record.print-certified-copies']) ||
-    scopeIsOfType(scope, ['record.custom-action'])
+    scopeUsesFullOptions(scope) ||
+    scopeUsesPrintCertifiedCopiesOptions(scope) ||
+    isCustomActionScope(scope)
   ) {
     const { options } = scope
 
@@ -233,7 +234,7 @@ export function canAccessEventWithScope(
     }
   }
 
-  if (scopeIsOfType(scope, ['record.custom-action'])) {
+  if (isCustomActionScope(scope)) {
     const { options } = scope
 
     if (
