@@ -92,15 +92,6 @@ const ScopeOptionsFull = scopeOptionsDeclared
     'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
   )
 
-const CustomActionScopeOptions = ScopeOptionsFull.extend({
-  customActionTypes: z
-    .preprocess(
-      (val) => (val === undefined ? undefined : [val].flat()),
-      z.array(z.string()).optional()
-    )
-    .describe('Allowed custom action types')
-})
-
 export type ScopeOptionsFull = z.infer<typeof ScopeOptionsFull>
 export const ScopeOptionKey = ScopeOptionsFull.keyof()
 export type ScopeOptionKey = z.infer<typeof ScopeOptionKey>
@@ -162,6 +153,15 @@ const ScopeOptionsPrintCertifiedCopies = ScopeOptionsFull.extend({
     )
 })
 
+const CustomActionScopeOptions = ScopeOptionsFull.extend({
+  customActionTypes: z
+    .preprocess(
+      (val) => (val === undefined ? undefined : [val].flat()),
+      z.array(z.string()).optional()
+    )
+    .describe('Allowed custom action types')
+})
+
 export const RecordScopeV2 = z
   .discriminatedUnion('type', [
     z.object({
@@ -189,35 +189,11 @@ export const RecordScopeV2 = z
     "Scopes used to check user's permission to perform actions on a record."
   )
 
-export function scopeUsesDeclaredOptions(
-  scope: RecordScopeV2
-): scope is Extract<
-  RecordScopeV2,
-  { type: z.infer<typeof ScopesWithDeclaredOptions> }
-> {
-  // If the scope has less, it is found here. Otherwise in other categories.
-  return !ScopesWithPlaceEventOptions.options.some((opt) => opt === scope.type)
-}
-
-export function scopeUsesFullOptions(
-  scope: RecordScopeV2
-): scope is Extract<
-  RecordScopeV2,
-  { type: z.infer<typeof ScopesWithFullOptions> }
-> {
-  return ScopesWithFullOptions.options.some((opt) => opt === scope.type)
-}
-
-export function scopeUsesPrintCertifiedCopiesOptions(
-  scope: RecordScopeV2
-): scope is Extract<RecordScopeV2, { type: 'record.print-certified-copies' }> {
-  return scope.type === 'record.print-certified-copies'
-}
-
-export function isCustomActionScope(
-  scope: RecordScopeV2
-): scope is Extract<RecordScopeV2, { type: 'record.custom-action' }> {
-  return scope.type === 'record.custom-action'
+export function scopeIsOfType<T extends RecordScopeTypeV2>(
+  scope: RecordScopeV2,
+  types: readonly T[]
+): scope is Extract<RecordScopeV2, { type: T }> {
+  return types.includes(scope.type as T)
 }
 
 export const ResolvedRecordScopeV2 = z
