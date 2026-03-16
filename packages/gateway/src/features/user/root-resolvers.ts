@@ -18,29 +18,22 @@ import {
   UUID
 } from '@opencrvs/commons'
 import {
-  IUserModelData,
-  IUserPayload,
-  IUserSearchPayload
-} from '@gateway/features/user/type-resolvers'
-import {
-  getFullName,
   inScope,
   isTokenOwner,
   getUserId,
   isOfficeUnderJurisdiction,
-  getUserFromHeader
+  getUserFromHeader,
+  getUser
 } from '@gateway/features/user/utils'
 import {
   GQLHumanNameInput,
   GQLResolver,
-  GQLSearchFieldAgentResponse,
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 
 import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
-import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
 import { rateLimitedResolver } from '@gateway/rate-limit'
 import {
@@ -51,11 +44,42 @@ import {
 } from '@opencrvs/commons/authentication'
 import { UserInputError } from '@gateway/utils/graphql-errors'
 
+interface IUserSearchPayload {
+  count: number
+  skip: number
+  sortOrder: string
+  username?: string | null
+  mobile?: string | null
+  locationId?: string | null
+  primaryOfficeId?: string | null
+  status?: string | null
+}
+
+interface IUserPayload {
+  id?: string
+  name: Array<{
+    use: string
+    family: string
+    given: string[]
+  }>
+  role: string
+  password?: string
+  status?: string
+  primaryOfficeId: string
+  email: string
+  emailForNotification?: string
+  mobile?: string
+  device?: string
+  signature?: { data: string; type?: string } | null
+  username?: string
+  fullHonorificName?: string
+}
+
 export const resolvers: GQLResolver = {
   Query: {
     getUser: rateLimitedResolver(
       { requestsPerMinute: 20 },
-      async (_, { userId }, { headers: authHeader, dataSources }) => {
+      async (_, { userId }, { headers: authHeader }) => {
         if (
           !inScope(authHeader, [
             SCOPES.USER_READ,
@@ -72,21 +96,20 @@ export const resolvers: GQLResolver = {
             )
           )
         }
-        const user = await dataSources.usersAPI.getUserById(userId!)
-        return user
+        return getUser({ userId: userId! }, authHeader)
       }
     ),
     getUserByMobile: rateLimitedResolver(
       { requestsPerMinute: 20 },
-      async (_, { mobile }, { dataSources }) => {
-        return dataSources.usersAPI.getUserByMobile(mobile)
+      async (_, { mobile }, { headers: authHeader }) => {
+        return getUser({ mobile }, authHeader)
       }
     ),
 
     getUserByEmail: rateLimitedResolver(
       { requestsPerMinute: 20 },
-      (_, { email }, { dataSources }) => {
-        return dataSources.usersAPI.getUserByEmail(email)
+      (_, { email }, { headers: authHeader }) => {
+        return getUser({ email }, authHeader)
       }
     ),
 
@@ -151,140 +174,6 @@ export const resolvers: GQLResolver = {
       }
     ),
 
-    searchFieldAgents: rateLimitedResolver(
-      { requestsPerMinute: 20 },
-      async (
-        _,
-        {
-          locationId,
-          primaryOfficeId,
-          language = 'en',
-          status = null,
-          timeStart,
-          timeEnd,
-          event,
-          count = 10,
-          skip = 0,
-          sort = 'desc'
-        },
-        { headers: authHeader, dataSources }
-      ) => {
-        // Only sysadmin or registrar or registration agent should be able to search field agents
-        if (
-          !inScope(authHeader, [
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE,
-            SCOPES.PERFORMANCE_READ
-          ])
-        ) {
-          throw new Error('Search field agents is not allowed for this user')
-        }
-
-        if (!locationId && !primaryOfficeId) {
-          logger.error('No location provided')
-          return {
-            totalItems: 0,
-            results: []
-          }
-        }
-
-        let payload: IUserSearchPayload = {
-          count,
-          skip,
-          sortOrder: sort
-        }
-        if (locationId) {
-          payload = { ...payload, locationId }
-        }
-        if (primaryOfficeId) {
-          payload = { ...payload, primaryOfficeId }
-        }
-        if (status) {
-          payload = { ...payload, status }
-        }
-        const res = await fetch(`${USER_MANAGEMENT_URL}searchUsers`, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader
-          }
-        })
-        const userResponse = await res.json()
-        if (
-          !userResponse ||
-          !userResponse.results ||
-          !userResponse.totalItems
-        ) {
-          logger.error('Invalid result found from search user endpoint')
-          return {
-            totalItems: 0,
-            results: []
-          }
-        }
-        // Loading metrics data by practitioner ids
-        const metricsForPractitioners = await postMetrics(
-          '/declarationStartedMetricsByPractitioners',
-          {
-            timeStart,
-            timeEnd,
-            locationId: locationId ? locationId : (primaryOfficeId as string),
-            event,
-            practitionerIds: userResponse.results.map(
-              (user: IUserModelData) => user.practitionerId
-            )
-          },
-          authHeader
-        )
-
-        const roles = await dataSources.countryConfigAPI.getRoles()
-
-        const fieldAgentRoles = roles
-          .filter((role) =>
-            role.scopes.includes(SCOPES.RECORD_SUBMIT_FOR_REVIEW)
-          )
-          .map((role) => role.id)
-
-        const fieldAgentList: GQLSearchFieldAgentResponse[] =
-          userResponse.results
-            .filter((user: IUserModelData) => {
-              const role = roles.find((role) => role.id === user.role)
-              return role && fieldAgentRoles.includes(role.id)
-            })
-            .map((user: IUserModelData) => {
-              const role = roles.find((role) => role.id === user.role)
-
-              const metricsData = metricsForPractitioners.find(
-                (metricsForPractitioner: { practitionerId: string }) =>
-                  metricsForPractitioner.practitionerId === user.practitionerId
-              )
-              return {
-                practitionerId: user.practitionerId,
-                fullName: getFullName(user, language),
-                role: role,
-                status: user.status,
-                avatar: user.avatar,
-                primaryOfficeId: user.primaryOfficeId,
-                creationDate: user?.creationDate,
-                totalNumberOfDeclarationStarted:
-                  metricsData?.totalNumberOfDeclarationStarted ?? 0,
-                totalNumberOfInProgressAppStarted:
-                  metricsData?.totalNumberOfInProgressAppStarted ?? 0,
-                totalNumberOfRejectedDeclarations:
-                  metricsData?.totalNumberOfRejectedDeclarations ?? 0,
-                averageTimeForDeclaredDeclarations:
-                  metricsData?.averageTimeForDeclaredDeclarations ?? 0
-              }
-            })
-
-        return {
-          results: fieldAgentList,
-          totalItems: userResponse.totalItems
-        }
-      }
-    ),
-
     verifyPasswordById: rateLimitedResolver(
       { requestsPerMinute: 10 },
       async (_, { id, password }, { headers: authHeader }) => {
@@ -324,12 +213,12 @@ export const resolvers: GQLResolver = {
           SCOPES.USER_CREATE_MY_JURISDICTION,
           SCOPES.USER_UPDATE_MY_JURISDICTION
         ]) &&
-        user.primaryOffice
+        user.primaryOfficeId
       ) {
         const requestingUser = await getUserFromHeader(authHeader)
         const isUnderJurisdiction = await isOfficeUnderJurisdiction(
           requestingUser.primaryOfficeId as UUID,
-          user.primaryOffice as UUID,
+          user.primaryOfficeId as UUID,
           authHeader
         )
         if (!isUnderJurisdiction) {
@@ -714,7 +603,7 @@ function createOrUpdateUserPayload(
     role: user.role as string,
     ...(user.password && { password: user.password }),
     ...(user.status && { status: user.status }),
-    primaryOfficeId: user.primaryOffice as string,
+    primaryOfficeId: user.primaryOfficeId as string,
     email: '',
     ...(user.email && { emailForNotification: user.email }), //instead of saving data in email, we want to store it in emailForNotification property
     ...(user.mobile && { mobile: user.mobile as string }),

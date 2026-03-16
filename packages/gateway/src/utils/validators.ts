@@ -9,12 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MINIO_BUCKET } from '@gateway/constants'
-import {
-  GQLAttachmentInput,
-  GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput
-} from '@gateway/graphql/schema'
 import { fromBuffer } from 'file-type'
 
 const isMinioUrl = (url: string | undefined) => {
@@ -59,51 +53,4 @@ export async function validateAttachments(
       throw new Error(`File type doesn't match image/*`)
     }
   }
-}
-
-export function validateBirthDeclarationAttachments(
-  details: GQLBirthRegistrationInput
-) {
-  const attachments = [
-    details.registration?.attachments,
-    details.informant?.affidavit,
-    details.mother?.photo,
-    details.father?.photo,
-    details.child?.photo
-  ]
-    .flat()
-    .filter((x): x is GQLAttachmentInput => x !== undefined)
-
-  return validateAttachments(attachments)
-}
-
-export function validateDeathDeclarationAttachments(
-  details: GQLDeathRegistrationInput
-) {
-  const attachments = [
-    details.registration?.attachments,
-    details.informant?.affidavit,
-    details.mother?.photo,
-    details.father?.photo,
-    details.deceased?.photo,
-    details.spouse?.photo
-  ]
-    .flat()
-    .filter((x): x is GQLAttachmentInput => x !== undefined)
-
-  return validateAttachments(attachments)
-}
-
-export function validateMarriageDeclarationAttachments(
-  details: GQLMarriageRegistrationInput
-) {
-  const attachments = [
-    details.registration?.attachments,
-    details.bride?.photo,
-    details.groom?.photo
-  ]
-    .flat()
-    .filter((x): x is GQLAttachmentInput => x !== undefined)
-
-  return validateAttachments(attachments)
 }

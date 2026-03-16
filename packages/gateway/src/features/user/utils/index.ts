@@ -8,12 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader, logger, UUID } from '@opencrvs/commons'
+import { IAuthHeader, logger, UUID, User } from '@opencrvs/commons'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import {
-  ISystemModelData,
-  IUserModelData
-} from '@gateway/features/user/type-resolvers'
 import decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
 import { Scope } from '@opencrvs/commons/authentication'
@@ -28,10 +24,13 @@ export interface ITokenPayload {
   recordId?: UUID
 }
 
+/** Response from user-mgnt getUser endpoint includes additional fields beyond the commons User type */
+type UserMgntResponse = User & { practitionerId?: string }
+
 export async function getUser(
   body: { [key: string]: string | undefined },
   authHeader: IAuthHeader
-): Promise<IUserModelData> {
+): Promise<UserMgntResponse> {
   const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
     method: 'POST',
     body: JSON.stringify(body),
@@ -46,7 +45,7 @@ export async function getUser(
 export async function getSystem(
   body: { [key: string]: string | undefined },
   authHeader: IAuthHeader
-): Promise<ISystemModelData> {
+) {
   const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
     method: 'POST',
     body: JSON.stringify(body),
@@ -140,7 +139,7 @@ export function getUserFromHeader(header: IAuthHeader) {
   return getUser({ userId }, header)
 }
 
-export function getFullName(user: IUserModelData, language: string) {
+export function getFullName(user: UserMgntResponse, language: string) {
   const localName = user.name.find((name) => name.use === language)
   return `${localName?.given.join(' ') || ''} ${localName?.family || ''}`.trim()
 }

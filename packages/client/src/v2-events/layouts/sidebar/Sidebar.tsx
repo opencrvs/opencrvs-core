@@ -113,9 +113,7 @@ export function SidebarComponent({
   if (userDetails?.name) {
     const nameObj =
       userDetails.name.find((n) => n.use === language) ?? userDetails.name[0]
-    if (nameObj) {
-      name = joinValues([...nameObj.given, nameObj.family], ' ')
-    }
+    name = joinValues([...nameObj.given, nameObj.family], ' ')
   }
 
   const role =
