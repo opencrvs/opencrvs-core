@@ -56,6 +56,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
+  const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
 
   const resolveAction = useCallback(
     <T extends WorkqueueActionType | ClientSpecificAction>(
@@ -75,7 +76,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         eventConfiguration,
         isOnline,
         isDownloaded,
-        isAssigning: events.actions.assignment.assign.isAssigning(event.id)
+        isAssigning
       })
 
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
@@ -101,7 +102,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       eventConfiguration,
       isOnline,
       isDownloaded,
-      events.actions.assignment.assign,
+      isAssigning,
       onClick
     ]
   )
@@ -157,6 +158,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
+  const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
 
   const resolveConditionals = useCallback(
     (actionType: typeof ActionType.ASSIGN | typeof ActionType.UNASSIGN) => {
@@ -169,7 +171,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
         eventConfiguration,
         isOnline,
         isDownloaded,
-        isAssigning: events.actions.assignment.assign.isAssigning(event.id)
+        isAssigning
       })
 
       return { enabled, visible }
@@ -181,7 +183,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
       eventConfiguration,
       isOnline,
       isDownloaded,
-      events
+      isAssigning
     ]
   )
 
