@@ -342,7 +342,6 @@ export function withJurisdictionFilters({
           case 'event':
             must.push({
               terms: {
-                // @TODO: Clarify why V1 had 1-tuple.
                 type: Array.isArray(value) ? value : [value]
               }
             })
