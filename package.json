@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/mosip",
-  "version": "1.9.2-mock.1",
+  "version": "2.0.0-rc.1",
   "license": "MPL-2.0",
   "private": true,
   "packageManager": "yarn@1.22.13",

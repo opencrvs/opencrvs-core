@@ -5,7 +5,7 @@ name: "🧪 E-Signet mock: Build and publish Docker image"
 on:
   push:
     branches:
-      - main
+      - develop
   workflow_dispatch:
 
 env:

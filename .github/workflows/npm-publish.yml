@@ -3,7 +3,7 @@ name: "🌐 Country-config toolkit: Publish to npm"
 on:
   push:
     branches:
-      - main
+      - develop
   workflow_dispatch:
 
 jobs:
