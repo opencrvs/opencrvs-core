@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { IAuthHeader } from '@metrics/features/registration'
+import { IAuthHeader } from '@opencrvs/commons'
 import {
   USER_MANAGEMENT_URL,
   DOCUMENTS_URL
