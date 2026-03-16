@@ -20,11 +20,7 @@ import {
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
-import {
-  cacheFile,
-  getUnsignedFileUrl,
-  removeCached
-} from '@client/v2-events/cache'
+import { cacheFile, removeCached } from '@client/v2-events/cache'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import { waitUntilEventIsCreated } from '../events/useEvents/procedures/utils'
 
@@ -122,9 +118,7 @@ export async function precacheFile(path: DocumentPath | FullDocumentPath) {
   const file = await fetchFileFromUrl(presignedUrl, path)
 
   if (file) {
-    const url = getUnsignedFileUrl(path)
-
-    await cacheFile({ url, file })
+    await cacheFile({ url: path, file })
   }
 }
 
@@ -178,8 +172,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
       const path = joinValues([dir, temporaryFilename], '/') as DocumentPath
-      const url = getUnsignedFileUrl(path)
-      await cacheFile({ url, file })
+      await cacheFile({ url: path, file })
 
       // NOTE: In the long run, client should not reverse-engineer the file path.
       // It should be read from the server response.

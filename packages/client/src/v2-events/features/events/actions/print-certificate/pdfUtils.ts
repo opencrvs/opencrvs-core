@@ -45,7 +45,6 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
 import { AdminStructureItem } from '@client/utils/referenceApi'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 
 interface FontFamilyTypes {
   normal: string
@@ -214,13 +213,8 @@ export const stringifyEventMetadata = ({
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
               metadata.legalStatuses.REGISTERED.registrationNumber,
-            createdBySignature: metadata.legalStatuses.REGISTERED
-              .createdBySignature
-              ? getUnsignedFileUrl(
-                  metadata.legalStatuses.REGISTERED
-                    .createdBySignature as DocumentPath
-                )
-              : undefined
+            createdBySignature:
+              metadata.legalStatuses.REGISTERED.createdBySignature
           }
         : null
     },

@@ -13,7 +13,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { DocumentPath } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { DocumentViewer } from './DocumentViewer'
 
 const meta: Meta<typeof DocumentViewer> = {
@@ -45,7 +44,7 @@ export const DocumentViewerSingleOption: StoryObj<typeof DocumentViewer> = {
       {
         value: {
           filename: 'fish.svg',
-          url: getUnsignedFileUrl('files/fish.svg' as DocumentPath),
+          url: 'fish.svg' as DocumentPath,
           id: '1'
         },
         label: 'Option 1'

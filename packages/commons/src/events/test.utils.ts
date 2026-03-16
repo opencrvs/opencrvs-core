@@ -157,8 +157,8 @@ export function generateRegistrationNumber(rng: () => number): string {
   return registrationNumber
 }
 
-export function generateRandomSignature(rng: () => number): string {
-  return `/random-bucket/${generateUuid(rng)}.png`
+export function generateRandomSignature(rng: () => number): DocumentPath {
+  return `${generateUuid(rng)}.png` as DocumentPath
 }
 
 /**

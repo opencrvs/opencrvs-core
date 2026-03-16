@@ -25,7 +25,7 @@ import {
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { cacheFile, getUnsignedFileUrl } from '@client/v2-events/cache'
+import { cacheFile } from '@client/v2-events/cache'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
 
@@ -148,12 +148,7 @@ function SignatureFieldInput({
           </Stack>
         </>
       )}
-      {signature && (
-        <SignaturePreview
-          alt={modalTitle}
-          src={getUnsignedFileUrl(signature.path)}
-        />
-      )}
+      {signature && <SignaturePreview alt={modalTitle} src={signature.path} />}
       {signature && !disabled && (
         <Button
           size="medium"
@@ -186,7 +181,7 @@ function SignatureFieldInput({
             // When we are in offline mode, the actual upload might not happen immediately.
             // Cache the "temporary" file to allow using same functionality for all files.
             await cacheFile({
-              url: getUnsignedFileUrl(path),
+              url: path,
               file: signatureFile
             })
 
@@ -213,12 +208,7 @@ function SignatureOutput({ value }: { value?: FileFieldValue }) {
   if (!value) {
     return null
   }
-  return (
-    <SignatureOutputPreview
-      alt="Signature preview"
-      src={getUnsignedFileUrl(value.path)}
-    />
-  )
+  return <SignatureOutputPreview alt="Signature preview" src={value.path} />
 }
 
 export const SignatureField = {

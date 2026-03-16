@@ -120,7 +120,7 @@ export const DraftAnnotationWithMultipleFields: Story = {
     annotation: {
       'review.comment': 'Draft comment before submission',
       'review.signature': {
-        path: 'files/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
         type: 'image/png',
         originalFilename: 'signature-review____signature-draft.png'
       }

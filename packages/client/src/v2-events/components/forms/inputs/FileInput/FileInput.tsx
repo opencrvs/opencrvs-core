@@ -19,7 +19,6 @@ import {
   DocumentPath
 } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { buttonMessages } from '@client/i18n/messages'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
 import { useImageProcessing } from '@client/utils/imageUtils'
@@ -166,7 +165,7 @@ function stringify(value: FileFieldValue | undefined) {
   const parsed = FileFieldValue.safeParse(value)
 
   if (parsed.success) {
-    return getUnsignedFileUrl(parsed.data.path)
+    return parsed.data.path
   }
 
   return ''

@@ -17,7 +17,6 @@ import {
   UserOrSystem
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
 
@@ -56,10 +55,8 @@ setQueryDefaults<
 
     return {
       ...user,
-      signature: user.signature
-        ? getUnsignedFileUrl(user.signature)
-        : undefined,
-      avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
+      signature: user.signature,
+      avatar: user.avatar
     }
   }
 })
@@ -97,10 +94,8 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
 
     return users.map((user) => ({
       ...user,
-      signature: user.signature
-        ? getUnsignedFileUrl(user.signature)
-        : undefined,
-      avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
+      signature: user.signature,
+      avatar: user.avatar
     }))
   }
 })

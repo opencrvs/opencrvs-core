@@ -26,7 +26,6 @@ import { Select } from '@client/v2-events/features/events/registered-fields/Sele
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { useIntlWithFormData } from '@client/v2-events/messages/utils'
 import { useImageEditorModal } from '@client/v2-events/components/ImageEditorModal'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { useImageProcessing } from '@client/utils/imageUtils'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
@@ -345,7 +344,7 @@ function toCertificateVariables(value: FileFieldWithOptionValue | undefined) {
     return parsed.data.reduce(
       (acc, file) => ({
         ...acc,
-        [file.option]: getUnsignedFileUrl(file.path)
+        [file.option]: file.path
       }),
       {}
     )

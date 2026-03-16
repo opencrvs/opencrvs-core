@@ -9,20 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DocumentPath, FullDocumentPath } from '@opencrvs/commons/client'
+import { DocumentPath } from '@opencrvs/commons/client'
 
 /* Must match the one defined src-sw.ts */
 export const CACHE_NAME = 'workbox-runtime'
-
-/**
- * Files are stored in MinIO. Files should be accessed via unsigned URLs, utilizing browser cache and aggressively precaching them.
- * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
- */
-export function getUnsignedFileUrl(
-  path: DocumentPath | FullDocumentPath
-): string {
-  return `/${path}`
-}
 
 /**
  * Sets file to **BROWSER** cache with given filename
@@ -67,7 +57,7 @@ export async function removeCached(filename: DocumentPath) {
   }
 
   const cache = await caches.open(cacheKey)
-  return cache.delete(getUnsignedFileUrl(filename), {
+  return cache.delete(filename, {
     ignoreSearch: true
   })
 }
