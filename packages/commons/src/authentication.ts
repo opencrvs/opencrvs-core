@@ -11,15 +11,9 @@
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
-
 import { RawScopes, Scope, SCOPES } from './scopes'
 import { UUID } from './uuid'
-import {
-  encodeScope,
-  RecordScopeTypeV2,
-  RecordScopeV2,
-  decodeScope
-} from './scopes-v2'
+import { encodeScope, RecordScopeV2, decodeScope } from './scopes-v2'
 export * from './scopes'
 
 /**
@@ -29,20 +23,25 @@ export * from './scopes'
  * @param acceptedScopes - An array of acceptable scope types to filter by.
  * @returns An array of parsed RecordScopeV2 objects that are found in the token and match the accepted scope types.
  */
-export function getAcceptedScopesFromToken(
+export function getAcceptedScopesFromToken<T extends RecordScopeV2['type']>(
   token: string,
-  acceptedScopes: RecordScopeTypeV2[]
-) {
+  acceptedScopes: T[]
+): Array<Extract<RecordScopeV2, { type: T }>> {
   const tokenScopes = getScopes(token)
 
   return tokenScopes
     .map((scope) => {
       const parsedScope = decodeScope(scope)
-      return parsedScope && acceptedScopes.includes(parsedScope.type)
+      return parsedScope &&
+        // Cast to string[] because Array<T>.includes requires exactly T, but
+        // parsedScope.type is the full RecordScopeV2['type'] union (wider than T).
+        (acceptedScopes as string[]).includes(parsedScope.type)
         ? parsedScope
         : null
     })
-    .filter((scope): scope is RecordScopeV2 => scope !== null)
+    .filter(
+      (scope): scope is Extract<RecordScopeV2, { type: T }> => scope !== null
+    )
 }
 
 export const DEFAULT_ROLES_DEFINITION = [
