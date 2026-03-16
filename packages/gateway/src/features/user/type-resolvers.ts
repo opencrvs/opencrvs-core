@@ -33,7 +33,7 @@ import {
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { getTokenPayload, scopesInclude } from './utils'
-import { Scope, SCOPES } from '@opencrvs/commons/authentication'
+import { SCOPES } from '@opencrvs/commons/authentication'
 import { createTRPCClient, httpLink } from '@trpc/client'
 import superjson from 'superjson'
 
@@ -58,7 +58,7 @@ export interface IUserModelData {
     family: string
     given: string[]
   }[]
-  scope?: Scope[]
+  scope?: string[]
   email: string
   emailForNotification?: string
   mobile?: string

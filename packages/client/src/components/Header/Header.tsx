@@ -124,14 +124,9 @@ const HeaderComponent = (props: IFullProps) => {
     changeTeamLocation
   } = props
 
-  const {
-    canCreateUser,
-    canSearchRecords,
-    canSearchBirthRecords,
-    canSearchDeathRecords
-  } = usePermissions()
+  const { canCreateUser, canSearchRecords } = usePermissions()
 
-  const canDoAdvanceSearch = canSearchBirthRecords || canSearchDeathRecords
+  const canDoAdvanceSearch = canSearchRecords
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
     const locationId = parse(router.location.search, {

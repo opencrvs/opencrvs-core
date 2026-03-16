@@ -16,14 +16,13 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
-import { Scope } from '@opencrvs/commons/authentication'
 import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
 
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: Scope[]
+  scope: string[]
   /** The record ID that the token has access to */
   recordId?: UUID
 }
@@ -78,9 +77,9 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
 
 export function scopesInclude(
   scopes:
-    | Scope[]
+    | string[]
     | undefined /* @todo remove undefined variant and make scope a required field for users */,
-  scope: Scope
+  scope: string
 ) {
   if (!scopes) {
     return false
@@ -88,7 +87,7 @@ export function scopesInclude(
   return scopes.includes(scope)
 }
 
-export function hasScope(authHeader: IAuthHeader, scope: Scope) {
+export function hasScope(authHeader: IAuthHeader, scope: string) {
   if (!authHeader || !authHeader.Authorization) {
     return false
   }
@@ -97,7 +96,7 @@ export function hasScope(authHeader: IAuthHeader, scope: Scope) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
-export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
+export function inScope(authHeader: IAuthHeader, scopes: string[]) {
   const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
   return !!matchedScope
 }

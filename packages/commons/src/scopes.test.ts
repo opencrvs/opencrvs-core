@@ -66,10 +66,10 @@ describe('findScope()', () => {
   })
 
   it('successfully finds a configurable scope, even if config value includes special characters', () => {
-    const result = findScope(userScopes, 'record.notify')
+    const result = findScope(userScopes, 'user.create')
     expect(result).toEqual({
-      type: 'record.notify',
-      options: { event: ['birth'] }
+      type: 'user.create',
+      options: { event: ['first-role', 'second-role'] }
     })
   })
 
@@ -123,97 +123,6 @@ describe('parseConfigurableScope()', () => {
     const scope = 'user.create[]'
     const result = parseConfigurableScope(scope)
     expect(result).toEqual(undefined)
-  })
-
-  it('should return undefined for an invalid scope with search', () => {
-    const scope = 'search[event=]'
-    const result = parseConfigurableScope(scope)
-    expect(result).toEqual(undefined)
-  })
-
-  it('should return scope for a valid scope with search', () => {
-    const tennisScope = 'search[event=tennis-club-membership,access=all]'
-    const birthScope = 'search[event=birth,access=all]'
-
-    expect(parseConfigurableScope(tennisScope)).toEqual({
-      type: 'search',
-      options: {
-        event: ['tennis-club-membership'],
-        access: ['all']
-      }
-    })
-
-    expect(parseConfigurableScope(birthScope)).toEqual({
-      type: 'search',
-      options: {
-        event: ['birth'],
-        access: ['all']
-      }
-    })
-
-    const mergedScopes = findScope([tennisScope, birthScope], 'search')
-    expect(mergedScopes).toEqual({
-      type: 'search',
-      options: { 'tennis-club-membership': 'all', birth: 'all' }
-    })
-  })
-
-  it('should return scope for a valid scope with search for different jurisdiction', () => {
-    const tennisScope =
-      'search[event=tennis-club-membership,access=my-jurisdiction]'
-    const birthScope = 'search[event=birth,access=all]'
-
-    expect(parseConfigurableScope(tennisScope)).toEqual({
-      type: 'search',
-      options: {
-        event: ['tennis-club-membership'],
-        access: ['my-jurisdiction']
-      }
-    })
-
-    expect(parseConfigurableScope(birthScope)).toEqual({
-      type: 'search',
-      options: {
-        event: ['birth'],
-        access: ['all']
-      }
-    })
-    const mergedScopes = findScope([tennisScope, birthScope], 'search')
-    expect(mergedScopes).toEqual({
-      type: 'search',
-      options: { 'tennis-club-membership': 'my-jurisdiction', birth: 'all' }
-    })
-  })
-
-  it('should return scope for a valid scope with search for a single event', () => {
-    const scope = 'search[event=tennis-club-membership,access=all]'
-    expect(parseConfigurableScope(scope)).toEqual({
-      type: 'search',
-      options: {
-        event: ['tennis-club-membership'],
-        access: ['all']
-      }
-    })
-    const foundScopes = findScope([scope], 'search')
-    expect(foundScopes).toEqual({
-      type: 'search',
-      options: { 'tennis-club-membership': 'all' }
-    })
-  })
-
-  it('should return undefined for odd jurisdiction id', () => {
-    const scope1 = 'search[event=tennis-club-membership,access=random]'
-    expect(parseConfigurableScope(scope1)).toEqual(undefined)
-
-    const scope2 = 'search[event=tennis-club-membership,access=alls]'
-    expect(parseConfigurableScope(scope2)).toEqual(undefined)
-
-    const scope3 =
-      'search[event=tennis-club-membership,access=my-jurisdictions]'
-    expect(parseConfigurableScope(scope3)).toEqual(undefined)
-
-    const mergedScopes = findScope([scope1, scope2, scope3], 'search')
-    expect(mergedScopes).toEqual(undefined)
   })
 
   it('should return scope for a valid scope with print-certified-copies', () => {
@@ -483,18 +392,10 @@ it('transform v1 scope to v2', () => {
      * except for workque scope that has an extra workqueue: all-events
      */
     localRegistrar: [
-      SCOPES.RECORD_DECLARATION_EDIT,
-      SCOPES.RECORD_REVIEW_DUPLICATES,
-      SCOPES.RECORD_DECLARATION_REINSTATE,
-      SCOPES.RECORD_CONFIRM_REGISTRATION,
-      SCOPES.RECORD_REJECT_REGISTRATION,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE,
       'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
       'search[event=birth,access=all]',
       'search[event=death,access=all]',
@@ -513,15 +414,10 @@ it('transform v1 scope to v2', () => {
       'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
     ],
     registrationAgent: [
-      SCOPES.RECORD_DECLARATION_EDIT,
-      SCOPES.RECORD_DECLARATION_REINSTATE,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
       SCOPES.USER_READ_ONLY_MY_AUDIT,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE,
       'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
       'search[event=birth,access=all]',
       'search[event=death,access=all]',
@@ -536,10 +432,6 @@ it('transform v1 scope to v2', () => {
       'record.registered.request-correction[event=birth|death|tennis-club-membership]'
     ],
     fieldAgent: [
-      SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE,
       'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
       'search[event=birth,access=all]',
       'search[event=death,access=all]',

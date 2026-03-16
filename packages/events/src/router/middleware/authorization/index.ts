@@ -22,14 +22,10 @@ import {
   findScope,
   getAssignedUserFromActions,
   getScopes,
-  Scope,
   TokenUserType,
   WorkqueueCountInput,
-  ConfigurableScopeType,
   UUID,
   EventDocument,
-  ConfigurableScopes,
-  getAuthorizedEventsFromScopes,
   getTokenPayload,
   hasScope,
   SCOPES,
@@ -60,51 +56,7 @@ export function setBearerForToken(token: string) {
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
-/**
- * Extracts authorized entities from the provided configurable scopes.
- * Currently supports event types, but more options can be added in the future.
- *
- * @param scopes - Array of configurable scopes with options
- * @returns Object containing authorized entities (currently events)
- */
-function getAuthorizedEntitiesFromScopes(scopes: ConfigurableScopes[]) {
-  const authorizedEvents = getAuthorizedEventsFromScopes(scopes)
-
-  return {
-    ...(authorizedEvents.length > 0 && { events: authorizedEvents })
-  }
-}
-
-/**
- * Checks if the auth header contains any of the configurable scopes and returns authorized entities.
- *
- * @param authHeader - Authorization header containing the token
- * @param configurableScopes - Array of configurable scope types to check against
- * @returns Object containing authorized entities (e.g. events) based on found scopes
- * @throws {TRPCError} If no matching configurable scopes are found
- */
-function getAuthorizedEntities(
-  token: string,
-  configurableScopes: ConfigurableScopeType[]
-) {
-  const userScopes = getScopes(token)
-  const foundScopes = configurableScopes
-    .map((scope) => findScope(userScopes, scope))
-    .filter((scope) => scope !== undefined)
-
-  if (!foundScopes.length) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  return getAuthorizedEntitiesFromScopes(foundScopes)
-}
-
-type CtxWithAuthorizedEntities = TrpcContext & {
-  authorizedEntities?: { events?: string[] }
-  acceptedScopes?: RecordScopeV2[]
-}
-
-function inScope(token: string, scopes: Scope[]) {
+function inScope(token: string, scopes: string[]) {
   const tokenScopes = getScopes(token)
   return scopes.some((scope) => tokenScopes.includes(scope))
 }
@@ -115,19 +67,15 @@ function inScope(token: string, scopes: Scope[]) {
  *
  * Middleware which checks that one of the required scopes (either basic scopes or configurable scopes) are present in the token.
  *
- * @param scopes scopes that are required to access the resource
- * @param configurableScopes scopes that are configurable
+ * @param scopes deprecated literal scopes that are required to access the resource
  * @returns TRPC compatible middleware function
  */
-export function requiresAnyOfScopes(
-  scopes: Scope[],
-  configurableScopes?: ConfigurableScopeType[]
-) {
+export function requiresAnyOfScopes(scopes: string[]) {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
     TrpcContext,
-    CtxWithAuthorizedEntities,
+    TrpcContext,
     unknown
   > = async (opts) => {
     const { token } = opts.ctx
@@ -135,23 +83,6 @@ export function requiresAnyOfScopes(
     // If the user has any of the allowed plain scopes, allow access
     if (inScope(token, scopes)) {
       return opts.next()
-    }
-
-    // If the user has any of the allowed configurable scopes, allow the user to continue
-    // and add the authorized entities to the TrpcContext which are checked in later middleware
-    if (configurableScopes) {
-      const authorizedEntities = getAuthorizedEntities(
-        token,
-        configurableScopes
-      )
-
-      return opts.next({
-        ...opts,
-        ctx: {
-          ...opts.ctx,
-          authorizedEntities
-        }
-      })
     }
 
     throw new TRPCError({ code: 'FORBIDDEN' })

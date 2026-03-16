@@ -16,7 +16,6 @@ import {
   joinUrl,
   logger,
   RecordScopeTypeV2,
-  Scope,
   SCOPES
 } from '@opencrvs/commons'
 import fetch from '@gateway/fetch'
@@ -35,7 +34,7 @@ export type SystemIntegrationType = 'HEALTH' | 'RECORD_SEARCH'
  * These are the base scopes that each type gets.
  * Note: REINDEX is hidden from UI - it's managed internally.
  */
-const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, Scope[]> = {
+const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, string[]> = {
   HEALTH: [SCOPES.NOTIFICATION_API],
   RECORD_SEARCH: [SCOPES.RECORDSEARCH]
 }

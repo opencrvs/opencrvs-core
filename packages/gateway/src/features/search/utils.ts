@@ -16,7 +16,7 @@ import {
 } from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
 import fetch from '@gateway/fetch'
-import { Scope, SCOPES } from '@opencrvs/commons/authentication'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export interface ISearchCriteria {
   parameters: AdvancedSearchParams
@@ -54,7 +54,7 @@ type AdvancedSearchParams = Omit<GQLAdvancedSearchParametersInput, 'event'> & {
 }
 
 function scopeToEventParams(
-  userScopes: Scope[],
+  userScopes: string[],
   officeLocationId: string
 ): NonNullable<AdvancedSearchParams['event']> {
   const eventParams: NonNullable<AdvancedSearchParams['event']> = []
@@ -109,7 +109,7 @@ function scopeToEventParams(
 }
 
 export const transformSearchParams = (
-  userScopes: Scope[],
+  userScopes: string[],
   inputParams: GQLAdvancedSearchParametersInput,
   officeLocationId: string
 ): AdvancedSearchParams => {

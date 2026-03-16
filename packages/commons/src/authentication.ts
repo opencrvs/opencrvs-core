@@ -11,7 +11,7 @@
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
-import { RawScopes, Scope, SCOPES } from './scopes'
+import { SCOPES } from './scopes'
 import { UUID } from './uuid'
 import { encodeScope, RecordScopeV2, decodeScope } from './scopes-v2'
 export * from './scopes'
@@ -64,15 +64,7 @@ export const DEFAULT_ROLES_DEFINITION = [
         options: {
           event: ['birth', 'death', 'tennis-club-membership']
         }
-      }),
-      SCOPES.RECORD_DECLARE_BIRTH,
-      SCOPES.RECORD_DECLARE_DEATH,
-      SCOPES.RECORD_DECLARE_MARRIAGE,
-      SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE
+      })
     ]
   },
   {
@@ -95,22 +87,10 @@ export const DEFAULT_ROLES_DEFINITION = [
           event: ['birth', 'death', 'tennis-club-membership']
         }
       }),
-      SCOPES.RECORD_DECLARE_BIRTH,
-      SCOPES.RECORD_DECLARE_DEATH,
-      SCOPES.RECORD_DECLARE_MARRIAGE,
-      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-      SCOPES.RECORD_DECLARATION_ARCHIVE,
-      SCOPES.RECORD_DECLARATION_REINSTATE,
-      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
     ]
   },
   {
@@ -133,30 +113,17 @@ export const DEFAULT_ROLES_DEFINITION = [
           event: ['birth', 'death', 'tennis-club-membership']
         }
       }),
-      SCOPES.RECORD_DECLARE_BIRTH,
-      SCOPES.RECORD_DECLARE_DEATH,
-      SCOPES.RECORD_DECLARE_MARRIAGE,
-      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-      SCOPES.RECORD_REVIEW_DUPLICATES,
       encodeScope({
         type: 'record.review-duplicates',
         options: {
           event: ['birth', 'death', 'tennis-club-membership']
         }
       }),
-      SCOPES.RECORD_DECLARATION_ARCHIVE,
-      SCOPES.RECORD_DECLARATION_REINSTATE,
-      SCOPES.RECORD_REGISTER,
-      SCOPES.RECORD_REGISTRATION_CORRECT,
-      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
       SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
     ]
   },
   {
@@ -174,7 +141,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-      // 'organisation.read-users' ?
     ]
   },
   {
@@ -210,7 +176,7 @@ export const DEFAULT_ROLES_DEFINITION = [
 ] satisfies Array<{
   id: string
   label: { defaultMessage: string; description: string; id: string }
-  scopes: Scope[]
+  scopes: string[]
 }>
 
 /*
@@ -225,7 +191,7 @@ export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: Scope[]
+  scope: string[]
   role?: string
   userType: TokenUserType
   eventId?: UUID
@@ -241,14 +207,14 @@ export function setBearerForToken(token: string) {
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
-export function getScopes(token: string): RawScopes[] {
+export function getScopes(token: string): string[] {
   const authHeader = { Authorization: setBearerForToken(token) }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
 
   return tokenPayload.scope || []
 }
 
-export function hasScope(token: string, scope: Scope) {
+export function hasScope(token: string, scope: string) {
   return getScopes(token).includes(scope)
 }
 

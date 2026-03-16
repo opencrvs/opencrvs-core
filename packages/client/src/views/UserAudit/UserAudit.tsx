@@ -54,7 +54,6 @@ import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
 import { stringify } from 'qs'
 import { ProfileState } from '../../profile/profileReducer'
-import { RawScopes } from '@opencrvs/commons/client'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -117,7 +116,7 @@ function WithFrame({
   isHidden: boolean
   userDetails: ProfileState['userDetails']
   user: ReturnType<typeof transformUserQueryResult> | null | undefined
-  scope: RawScopes[] | null
+  scope: string[] | null
   getMenuItems: (
     userId: string,
     status: string

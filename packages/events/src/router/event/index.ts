@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { getScopes, getUUID, SCOPES } from '@opencrvs/commons'
+import { getUUID, SCOPES } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,

@@ -8,10 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Scope } from './scopes'
 
 export type Roles = Array<{
   id: string
   labels: Array<{ language: string; label: string }>
-  scopes: Scope[]
+  scopes: string[]
 }>

@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
-import { createAdvancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
-import { createAdvancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
 import { IDateRangePickerValue } from '@client/forms'
 import { IAdvancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
 import { constantsMessages, formMessages } from '@client/i18n/messages'
@@ -33,7 +31,6 @@ import {
   isInvalidDate,
   TIME_PERIOD
 } from '@client/forms/advancedSearch/fieldDefinitions/utils'
-import { UUID } from '@opencrvs/commons/client'
 
 type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
@@ -392,104 +389,6 @@ export const transformStoreDataToAdvancedSearchLocalState = (
   }
 
   return localState
-}
-
-const getAccordionActiveStateMap = (
-  storeState: IAdvancedSearchParamState,
-  hasBirthSearchJurisdictionScope?: boolean,
-  hasDeathSearchJurisdictionScope?: boolean,
-  officeId?: UUID
-): Record<string, boolean> => {
-  const advancedSearchBirthSections = createAdvancedSearchBirthSections(
-    hasBirthSearchJurisdictionScope,
-    officeId
-  )
-  const advancedSearchDeathSections = createAdvancedSearchDeathSections(
-    hasDeathSearchJurisdictionScope,
-    officeId
-  )
-  const {
-    birthSearchRegistrationSection,
-    birthSearchChildSection,
-    birthSearchMotherSection,
-    birthSearchFatherSection,
-    birthSearchEventSection,
-    birthSearchInformantSection
-  } = advancedSearchBirthSections
-
-  const {
-    deathSearchRegistrationSection,
-    deathSearchDeceasedSection,
-    deathSearchEventSection,
-    deathSearchInformantSection
-  } = advancedSearchDeathSections
-
-  return {
-    [birthSearchRegistrationSection.id]: Boolean(
-      storeState.declarationLocationId ||
-        storeState.declarationJurisdictionId ||
-        storeState.dateOfRegistration ||
-        (storeState.dateOfRegistrationStart &&
-          storeState.dateOfRegistrationStart)
-    ),
-    [birthSearchChildSection.id]: Boolean(
-      storeState.childGender ||
-        storeState.childFirstNames ||
-        storeState.childLastName ||
-        storeState.childDoB ||
-        (storeState.childDoBStart && storeState.childDoBEnd)
-    ),
-    [birthSearchEventSection.id]: Boolean(
-      storeState.eventLocationId ||
-        storeState.eventCountry ||
-        storeState.eventLocationLevel1 ||
-        storeState.eventLocationLevel1
-    ),
-    [birthSearchMotherSection.id]: Boolean(
-      storeState.motherFirstNames ||
-        storeState.motherFamilyName ||
-        storeState.motherDoB ||
-        (storeState.motherDoBStart && storeState.motherDoBEnd)
-    ),
-    [birthSearchFatherSection.id]: Boolean(
-      storeState.fatherFirstNames ||
-        storeState.fatherFamilyName ||
-        storeState.fatherDoB ||
-        (storeState.fatherDoBStart && storeState.fatherDoBEnd)
-    ),
-    [birthSearchInformantSection.id]: Boolean(
-      storeState.informantFirstNames ||
-        storeState.informantFamilyName ||
-        storeState.informantDoB ||
-        (storeState.informantDoBStart && storeState.informantDoBEnd)
-    ),
-    [deathSearchRegistrationSection.id]: Boolean(
-      storeState.declarationLocationId ||
-        storeState.declarationJurisdictionId ||
-        storeState.dateOfRegistration ||
-        (storeState.dateOfRegistrationStart &&
-          storeState.dateOfRegistrationStart)
-    ),
-    [deathSearchDeceasedSection.id]: Boolean(
-      storeState.childGender ||
-        storeState.childFirstNames ||
-        storeState.childLastName ||
-        storeState.childDoB ||
-        (storeState.childDoBStart && storeState.childDoBEnd)
-    ),
-    [deathSearchEventSection.id]: Boolean(
-      storeState.eventLocationId ||
-        storeState.eventCountry ||
-        storeState.eventLocationLevel1 ||
-        storeState.eventLocationLevel1
-    ),
-    [deathSearchInformantSection.id]: Boolean(
-      storeState.informantFirstNames ||
-        storeState.informantFamilyName ||
-        storeState.informantDoB ||
-        (storeState.informantDoBStart && storeState.informantDoBEnd)
-    )
-  }
 }
 
 const getFromDateFomTimePeriod = (timePeriod: TIME_PERIOD) => {

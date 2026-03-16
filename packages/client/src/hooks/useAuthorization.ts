@@ -10,46 +10,16 @@
  */
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { findScope, Scope, SCOPES } from '@opencrvs/commons/client'
-import { User, Location } from '@client/utils/gateway'
-import { SUBMISSION_STATUS } from '@client/declarations'
 import {
-  canBeCorrected,
-  canBeReinstated,
-  isArchivable,
-  isIssuable,
-  isPendingCorrection,
-  isPrintable,
-  isReviewableDeclaration,
-  isUpdatableDeclaration
-} from '@client/declarations/utils'
+  findScope,
+  getAcceptedScopesByType,
+  SCOPES
+} from '@opencrvs/commons/client'
+import { User, Location } from '@client/utils/gateway'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
-
-const RECORD_ALLOWED_SCOPES = {
-  UPDATE: [
-    SCOPES.RECORD_REGISTER,
-    SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-    SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-  ],
-  REVIEW: [
-    SCOPES.RECORD_REGISTER,
-    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-    SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-    SCOPES.RECORD_REVIEW_DUPLICATES
-  ],
-  PRINT: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
-  ISSUE: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
-  CORRECT: [
-    SCOPES.RECORD_REGISTRATION_CORRECT,
-    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
-  ],
-  ARCHIVE: [SCOPES.RECORD_DECLARATION_ARCHIVE],
-  REINSTATE: [SCOPES.RECORD_DECLARATION_REINSTATE],
-  REVIEW_CORRECTION: [SCOPES.RECORD_REGISTRATION_CORRECT]
-}
 
 export const RECORD_DECLARE_SCOPES = [
   SCOPES.RECORD_DECLARE_BIRTH,
@@ -58,15 +28,6 @@ export const RECORD_DECLARE_SCOPES = [
   SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
   SCOPES.RECORD_DECLARE_MARRIAGE,
   SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
-]
-
-const RECORD_SEARCH_SCOPES = [
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-  SCOPES.SEARCH_MARRIAGE,
-  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
 ]
 
 export function usePermissions() {
@@ -84,26 +45,20 @@ export function usePermissions() {
   const roleScopes = (role: string) =>
     roles.find(({ id }) => id === role)?.scopes ?? []
 
-  const hasScopes = (neededScopes: Scope[]) =>
+  const hasScopes = (neededScopes: string[]) =>
     neededScopes.every((scope) => userScopes?.includes(scope))
 
-  const hasAnyScope = (neededScopes: Scope[]) =>
+  const hasAnyScope = (neededScopes: string[]) =>
     neededScopes.length === 0 ||
     neededScopes.some((scope) => userScopes?.includes(scope))
 
-  const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
+  const hasScope = (neededScope: string) => hasAnyScope([neededScope])
 
-  const canSearchRecords = hasAnyScope(RECORD_SEARCH_SCOPES)
-
-  const hasBirthSearchJurisdictionScope = hasScope(
-    SCOPES.SEARCH_BIRTH_MY_JURISDICTION
-  )
-
-  const hasDeathSearchJurisdictionScope = hasScope(
-    SCOPES.SEARCH_DEATH_MY_JURISDICTION
-  )
-
-  const canDeclareRecords = hasAnyScope(RECORD_DECLARE_SCOPES)
+  const canSearchRecords =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.search'],
+      scopes: userScopes ?? []
+    }).length > 0
 
   const canReadUser = (user: Pick<User, 'id' | 'primaryOffice'>) => {
     if (!userPrimaryOffice?.id) {
@@ -206,69 +161,15 @@ export function usePermissions() {
     return false
   }
 
-  const canUpdateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.UPDATE)
-
-  const canReviewRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW)
-
-  const canPrintRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.PRINT)
-
-  const canIssueRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.ISSUE)
-
-  const canCorrectRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.CORRECT)
-
-  const canArchiveRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.ARCHIVE)
-
-  const canReinstateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REINSTATE)
-
-  const canReviewCorrection = () =>
-    hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION)
-
-  const canSearchBirthRecords = hasAnyScope([
-    SCOPES.SEARCH_BIRTH,
-    SCOPES.SEARCH_BIRTH_MY_JURISDICTION
-  ])
-
-  const canSearchDeathRecords = hasAnyScope([
-    SCOPES.SEARCH_DEATH,
-    SCOPES.SEARCH_DEATH_MY_JURISDICTION
-  ])
-
-  const isRecordActionable = (status: SUBMISSION_STATUS) =>
-    [
-      canUpdateRecord() && isUpdatableDeclaration(status),
-      canReviewRecord() && isReviewableDeclaration(status),
-      canPrintRecord() && isPrintable(status),
-      canIssueRecord() && isIssuable(status),
-      canCorrectRecord() && canBeCorrected(status),
-      canReviewCorrection() && isPendingCorrection(status),
-      canArchiveRecord() && isArchivable(status),
-      canReinstateRecord() && canBeReinstated(status)
-    ]
-      .map((p) => Boolean(p))
-      .some((p) => p)
-
   return {
     hasScopes,
     hasScope,
     hasAnyScope,
-    isRecordActionable,
     canSearchRecords,
-    canSearchBirthRecords,
-    canSearchDeathRecords,
-    canDeclareRecords,
-    canPrintRecord,
-    canIssueRecord,
     canReadUser,
     canEditUser,
     canCreateUser,
     canAccessOffice,
-    hasBirthSearchJurisdictionScope,
-    hasDeathSearchJurisdictionScope,
-    canAddOfficeUsers,
-    canUpdateRecord,
-    canReviewRecord,
-    canCorrectRecord,
-    canArchiveRecord,
-    canReinstateRecord
+    canAddOfficeUsers
   }
 }

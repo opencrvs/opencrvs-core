@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getTokenPayload, Scope } from '@opencrvs/commons/authentication'
+import { getTokenPayload } from '@opencrvs/commons/authentication'
 import {
   getSystem,
   getSystemByCriteria,
@@ -52,7 +52,7 @@ interface IUserModelData {
 }
 
 interface ISystemModelData {
-  scope?: Scope[]
+  scope?: string[]
   name: string
   createdBy: string
   client_id: string

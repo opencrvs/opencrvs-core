@@ -11,20 +11,10 @@
 
 import * as z from 'zod/v4'
 
-const SearchScopeAccessLevels = {
-  MY_JURISDICTION: 'my-jurisdiction',
-  ALL: 'all'
-} as const
-
-type SearchScopeAccessLevels =
-  (typeof SearchScopeAccessLevels)[keyof typeof SearchScopeAccessLevels]
-
 export const SCOPES = {
   // TODO v1.8 legacy scopes
   BYPASSRATELIMIT: 'bypassratelimit',
-
   REGISTER: 'register',
-
   DEMO: 'demo',
   CONFIG: 'config',
 
@@ -145,54 +135,6 @@ const InternalOperationsScopes = z.union([
   z.literal(SCOPES.RECORD_IMPORT)
 ])
 
-// Declare
-const DeclareScopes = z.union([
-  z.literal(SCOPES.RECORD_DECLARE_BIRTH),
-  z.literal(SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION),
-  z.literal(SCOPES.RECORD_DECLARE_DEATH),
-  z.literal(SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION),
-  z.literal(SCOPES.RECORD_DECLARE_MARRIAGE),
-  z.literal(SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION),
-  z.literal(SCOPES.RECORD_SUBMIT_INCOMPLETE),
-  z.literal(SCOPES.RECORD_SUBMIT_FOR_REVIEW)
-])
-
-const UnassignScope = z.literal(SCOPES.RECORD_UNASSIGN_OTHERS)
-
-// Validate
-const ValidateScopes = z.union([
-  z.literal(SCOPES.RECORD_SUBMIT_FOR_APPROVAL),
-  z.literal(SCOPES.RECORD_SUBMIT_FOR_UPDATES),
-  z.literal(SCOPES.RECORD_DECLARATION_EDIT),
-  z.literal(SCOPES.RECORD_REVIEW_DUPLICATES),
-  z.literal(SCOPES.RECORD_DECLARATION_ARCHIVE),
-  z.literal(SCOPES.RECORD_DECLARATION_REINSTATE)
-])
-
-// Register
-const RegisterScope = z.literal(SCOPES.RECORD_REGISTER)
-
-// Correct
-const CorrectionScopes = z.union([
-  z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION),
-  z.literal(SCOPES.RECORD_REGISTRATION_CORRECT),
-  z.literal(SCOPES.RECORD_CONFIRM_REGISTRATION),
-  z.literal(SCOPES.RECORD_REJECT_REGISTRATION)
-])
-
-// Search
-export const SearchScopes = z.union([
-  z.literal(SCOPES.SEARCH_BIRTH_MY_JURISDICTION),
-  z.literal(SCOPES.SEARCH_BIRTH),
-  z.literal(SCOPES.SEARCH_DEATH_MY_JURISDICTION),
-  z.literal(SCOPES.SEARCH_DEATH),
-  z.literal(SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION),
-  z.literal(SCOPES.SEARCH_MARRIAGE)
-])
-
-// Audit
-const AuditScopes = z.literal(SCOPES.RECORD_READ)
-
 // Performance
 const PerformanceScopes = z.union([
   z.literal(SCOPES.PERFORMANCE_READ),
@@ -229,17 +171,12 @@ const DataSeedingScope = z.literal(SCOPES.USER_DATA_SEEDING)
 const AttachmentScope = z.literal(SCOPES.ATTACHMENT_UPLOAD)
 
 // Combine all
+/**
+ * @deprecated - will be removed in v2.1.
+ */
 const LiteralScopes = z.union([
   LegacyScopes,
   IntegrationScopes,
-  UnassignScope,
-  DeclareScopes,
-  ValidateScopes,
-  RegisterScope,
-  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
-  CorrectionScopes,
-  SearchScopes,
-  AuditScopes,
   z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
   PerformanceScopes,
   OrganisationScopes,
@@ -250,15 +187,24 @@ const LiteralScopes = z.union([
   AttachmentScope
 ])
 
-// Configurable scopes are for example:
-// - user.create[role=first-role|second-role]
-// - record.notify[event=birth]
-// - record.registered.print-certified-copies[event=birth|tennis-club-membership]
+/**
+ * @deprecated - will be removed in v2.1.
+ * Configurable scopes are for example:
+ * user.create[role=first-role|second-role]
+ * record.notify[event=birth]
+ * record.registered.print-certified-copies[event=birth|tennis-club-membership]
+ */
 const rawConfigurableScopeRegex =
   /^([a-zA-Z][a-zA-Z0-9.-]*(?:\.[a-zA-Z0-9.-]+)*)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
+/**
+ * @deprecated - will be removed in v2.1.
+ */
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
+/**
+ * @deprecated - will be removed in v2.1.
+ */
 const CreateUserScope = z.object({
   type: z.literal('user.create'),
   options: z.object({
@@ -266,6 +212,9 @@ const CreateUserScope = z.object({
   })
 })
 
+/**
+ * @deprecated - will be removed in v2.1.
+ */
 const EditUserScope = z.object({
   type: z.literal('user.edit'),
   options: z.object({
@@ -273,6 +222,9 @@ const EditUserScope = z.object({
   })
 })
 
+/**
+ * @deprecated - will be removed in v2.1.
+ */
 const WorkqueueScope = z.object({
   type: z.literal('workqueue'),
   options: z.object({
@@ -280,148 +232,41 @@ const WorkqueueScope = z.object({
   })
 })
 
-const SearchScope = z.object({
-  type: z.literal('search'),
-  options: z.object({
-    event: z.array(z.string()).length(1),
-    access: z.array(z.enum(['my-jurisdiction', 'all'])).length(1)
-  })
-})
-
-const PrintCertifiedCopiesScope = z.object({
-  type: z.literal('record.registered.print-certified-copies'),
-  options: z.object({
-    event: z.array(z.string()).describe('Event type, e.g. birth, death'),
-    templates: z
-      .array(z.string())
-      .optional()
-      .describe(
-        'Template IDs for certified copies. If not provided, all templates will be used.'
-      )
-  })
-})
-
-export type SearchScope = z.infer<typeof SearchScope>
-
-export type PrintCertifiedCopiesScope = z.infer<
-  typeof PrintCertifiedCopiesScope
->
-
-export const RecordScopeType = z.enum([
-  'record.create',
-  'record.read',
-  'record.declare',
-  'record.notify',
-  'record.declared.edit',
-  'record.declared.reject',
-  'record.declared.archive',
-  'record.declared.review-duplicates',
-  'record.register',
-  'record.registered.request-correction',
-  'record.registered.correct',
-  'record.unassign-others'
-])
-
-export type RecordScopeType = z.infer<typeof RecordScopeType>
-
-export const RecordScope = z
-  .object({
-    type: RecordScopeType,
-    options: z.object({
-      event: z.array(z.string()).describe('Event type, e.g. birth, death')
-    })
-  })
-  .describe(
-    "Scopes used to check user's permission to perform actions on a record."
-  )
-export type RecordScope = z.infer<typeof RecordScope>
-
+/**
+ * @deprecated - will be removed in v2.1.
+ */
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
-  SearchScope,
-  PrintCertifiedCopiesScope,
   CreateUserScope,
   EditUserScope,
-  WorkqueueScope,
-  RecordScope
-])
-
-export const ConfigurableActionScopes = z.discriminatedUnion('type', [
-  // @TODO - Record scope holds non-action scopes as well e.g., `record.read`
-  RecordScope
+  WorkqueueScope
 ])
 
 export type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
 export type ConfigurableScopeType = ConfigurableRawScopes['type']
 
-type FlattenedSearchScope = {
-  type: 'search'
-  options: Record<string, SearchScopeAccessLevels>
-}
+export type ConfigurableScopes = Exclude<
+  ConfigurableRawScopes,
+  { type: 'search' }
+>
 
-export type ConfigurableScopes =
-  | Exclude<ConfigurableRawScopes, { type: 'search' }>
-  | FlattenedSearchScope
-
-function flattenAndMergeScopes(
-  scopes: Extract<ConfigurableRawScopes, { type: 'search' }>[]
-): FlattenedSearchScope | null {
-  if (scopes.length === 0) return null
-
-  const type = scopes[0].type // all scopes have same `type`
-  const mergedOptions: Record<string, SearchScopeAccessLevels> = {}
-
-  for (const scope of scopes) {
-    const entries = Object.entries(scope.options)
-
-    if (entries.length < 2) continue
-
-    // Assumes the first key (e.g., 'event') holds source values like ['birth', 'death']
-    const sourceValues = entries[0][1]
-
-    // Assumes the second key (e.g., 'access') holds corresponding target values like ['my-jurisdiction', 'all']
-    const targetValues = entries[1][1]
-
-    for (let i = 0; i < sourceValues.length; i++) {
-      mergedOptions[sourceValues[i]] = targetValues[
-        i
-      ] as SearchScopeAccessLevels
-    }
-  }
-
-  return { type, options: mergedOptions }
-}
-
+/**
+ * @deprecated will be removed in v2.1.
+ *
+ */
 export function findScope<T extends ConfigurableScopeType>(
   scopes: string[],
   scopeType: T
 ) {
   const parsedScopes = scopes.map(parseConfigurableScope)
-  const searchScopes = parsedScopes.filter((scope) => scope?.type === 'search')
-  const otherScopes = parsedScopes.filter((scope) => scope?.type !== 'search')
-  const mergedSearchScope = flattenAndMergeScopes(searchScopes)
 
-  return [...otherScopes, mergedSearchScope].find(
-    (scope): scope is Extract<ConfigurableScopes, { type: T }> =>
-      scope?.type === scopeType
-  )
-}
-
-export function findScopes<T extends ConfigurableScopeType>(
-  scopes: string[],
-  scopeType: T
-) {
-  const parsedScopes = scopes.map(parseConfigurableScope)
-  const searchScopes = parsedScopes.filter((scope) => scope?.type === 'search')
-  const otherScopes = parsedScopes.filter((scope) => scope?.type !== 'search')
-  const mergedSearchScope = flattenAndMergeScopes(searchScopes)
-
-  return [...otherScopes, mergedSearchScope].filter(
+  return parsedScopes.find(
     (scope): scope is Extract<ConfigurableScopes, { type: T }> =>
       scope?.type === scopeType
   )
 }
 
 /**
+ * @deprecated will be removed in v2.1.
  * Parses a raw options string for non-search scopes (e.g., workqueues).
  * @param rawOptions - The raw string, e.g. "event=birth|club-reg,all"
  * @returns An object like: { event: ['birth', 'club-reg'], access: ['all'] }
@@ -437,6 +282,7 @@ function getScopeOptions(rawOptions: string) {
 }
 
 /**
+ * @deprecated - Remove on 2.1.
  * Parses a configurable scope string into a ConfigurableRawScopes object.
  * @param {string} scope - The scope string to parse
  * @returns {ConfigurableRawScopes | undefined} The parsed scope object if valid, undefined otherwise
@@ -467,6 +313,9 @@ export function parseConfigurableScope(scope: string) {
   return result.success ? result.data : undefined
 }
 
+/**
+ * @deprecated - will be removed in v2.1.
+ */
 export function parseLiteralScope(scope: string) {
   const maybeLiteralScope = LiteralScopes.safeParse(scope)
 
@@ -478,51 +327,3 @@ export function parseLiteralScope(scope: string) {
 
   return
 }
-
-/**
- * Extracts authorized event identifiers (e.g. birth, death) from the provided configurable scopes.
- *
- * @param scopes - Array of configurable scopes with options
- * @returns Array of authorized event identifiers
- */
-export function getAuthorizedEventsFromScopes(scopes: ConfigurableScopes[]) {
-  return (
-    scopes
-      .flatMap(({ options }) => {
-        if (options && 'event' in options) {
-          return options.event
-        }
-
-        return undefined
-      })
-      .filter((event) => event !== undefined)
-      // remove duplicates
-      .filter((event, index, self) => self.indexOf(event) === index)
-  )
-}
-
-/*
- * @deprecated
- * scopes are configurable so all possible
- * values can't be retrieved anymore
- */
-export const scopes: Scope[] = Object.values(SCOPES)
-
-export type ParsedScopes = NonNullable<
-  ReturnType<typeof parseConfigurableScope>
->
-
-export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
-
-// for backwards compatibility
-export type Scope = RawScopes
-
-export const ActionScopes = z.union([
-  DeclareScopes,
-  ValidateScopes,
-  RegisterScope,
-  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
-  CorrectionScopes
-])
-
-export type ActionScopes = z.infer<typeof ActionScopes>

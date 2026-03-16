@@ -11,11 +11,7 @@
 
 import * as z from 'zod/v4'
 import * as qs from 'qs'
-import {
-  ConfigurableScopeType,
-  parseConfigurableScope,
-  parseLiteralScope
-} from './scopes'
+import { parseConfigurableScope, parseLiteralScope } from './scopes'
 import { UUID } from './uuid'
 
 /*
@@ -303,15 +299,13 @@ export function getScopeOptionValue<T extends ScopeOptionKey>(
   return value ?? defaultValue
 }
 
-type LegacyScopeType = ConfigurableScopeType
-
 /**
  * Mapping of V1 scope types to V2 scope types.
  *
  * Unifies the naming structure by dropping the status from the string.
  * This is done in order to more easily represent the scopes in human-readable formant, and to match better with the system actions.
  */
-const v1ToV2ConfigScopeTypeMap: Record<LegacyScopeType, string> = {
+const v1ToV2ConfigScopeTypeMap: Record<string, string> = {
   search: 'record.search',
   workqueue: 'workqueue',
   'user.create': 'user.create',
@@ -349,7 +343,7 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
   }
 
   if (literalV1Scope) {
-    return encodeScope(literalV1Scope as RecordScopeV2) // Literal scopes have same structure in V2, just encode to string.
+    return encodeScope(literalV1Scope as any) // Literal scopes have same structure in V2, just encode to string.
   }
 
   if (configurableV1Scope) {
@@ -359,12 +353,15 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
       throw new Error(`Unsupported V1 scope type: ${configurableV1Scope.type}`)
     }
 
+    // @ts-expect-error -- deprecated type. Ignoring the error to localise the "issue".
     if (configurableV1Scope.type === 'search') {
       return encodeScope({
         type: type as RecordScopeTypeV2,
         options: {
+          // @ts-expect-error -- deprecated type. Ignoring the error to localise the "issue".
           event: configurableV1Scope.options.event || [],
           placeOfEvent:
+            // @ts-expect-error -- deprecated type. Ignoring the error to localise the "issue".
             configurableV1Scope.options.access[0] === 'my-jurisdiction'
               ? 'administrativeArea'
               : 'all'
@@ -386,7 +383,7 @@ export function getAcceptedScopesByType({
   scopes
 }: {
   acceptedScopes: RecordScopeTypeV2[]
-  scopes: (LegacyScopeType | string)[]
+  scopes: string[]
 }): RecordScopeV2[] {
   return scopes
     .map((scope) => {

@@ -343,18 +343,10 @@ export function testDataGenerator(rngSeed?: number) {
        * except for workque scope that has an extra workqueue: all-events
        */
       localRegistrar: [
-        SCOPES.RECORD_DECLARATION_EDIT,
-        SCOPES.RECORD_REVIEW_DUPLICATES,
-        SCOPES.RECORD_DECLARATION_REINSTATE,
-        SCOPES.RECORD_CONFIRM_REGISTRATION,
-        SCOPES.RECORD_REJECT_REGISTRATION,
         SCOPES.PERFORMANCE_READ,
         SCOPES.PERFORMANCE_READ_DASHBOARDS,
         SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-        SCOPES.SEARCH_BIRTH,
-        SCOPES.SEARCH_DEATH,
-        SCOPES.SEARCH_MARRIAGE,
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
         'type=record.search&event=birth,death,tennis-club-membership,child-onboarding,FOOTBALL_CLUB_MEMBERSHIP',
         SCOPES.USER_READ_ONLY_MY_AUDIT,
@@ -483,15 +475,10 @@ export function testDataGenerator(rngSeed?: number) {
         'type=record.custom-action&event=tennis-club-membership&customActionTypes=Approve'
       ],
       registrationAgent: [
-        SCOPES.RECORD_DECLARATION_EDIT,
-        SCOPES.RECORD_DECLARATION_REINSTATE,
         SCOPES.PERFORMANCE_READ,
         SCOPES.PERFORMANCE_READ_DASHBOARDS,
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
         SCOPES.USER_READ_ONLY_MY_AUDIT,
-        SCOPES.SEARCH_BIRTH,
-        SCOPES.SEARCH_DEATH,
-        SCOPES.SEARCH_MARRIAGE,
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
         'type=record.search&event=birth,death,tennis-club-membership,child-onboarding,FOOTBALL_CLUB_MEMBERSHIP',
         encodeScope({
@@ -584,10 +571,6 @@ export function testDataGenerator(rngSeed?: number) {
         })
       ],
       fieldAgent: [
-        SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-        SCOPES.SEARCH_BIRTH,
-        SCOPES.SEARCH_DEATH,
-        SCOPES.SEARCH_MARRIAGE,
         'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
         'type=record.search&event=birth,death,tennis-club-membership,child-onboarding,FOOTBALL_CLUB_MEMBERSHIP',
         encodeScope({

@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  Scope,
   SCOPES,
   DEFAULT_ROLES_DEFINITION,
   TestUserRole,
@@ -68,8 +67,6 @@ import { mockOfflineData, validImageB64String } from './mock-offline-data'
 
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
-const inValidImageB64String =
-  'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
 export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   SCOPES.CONFIG_UPDATE_ALL,
@@ -80,27 +77,14 @@ export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
   SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-] satisfies Scope[]
+]
 
 export const REGISTRAR_DEFAULT_SCOPES = [
-  SCOPES.RECORD_DECLARE_BIRTH,
-  SCOPES.RECORD_DECLARE_DEATH,
-  SCOPES.RECORD_DECLARE_MARRIAGE,
-  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-  SCOPES.RECORD_REVIEW_DUPLICATES,
-  SCOPES.RECORD_DECLARATION_ARCHIVE,
-  SCOPES.RECORD_DECLARATION_REINSTATE,
-  SCOPES.RECORD_REGISTER,
-  SCOPES.RECORD_REGISTRATION_CORRECT,
-  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
   SCOPES.ORGANISATION_READ_LOCATIONS,
-  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_MARRIAGE
-] satisfies Scope[]
+  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+]
 
 const ACTION_STATUS_MAP = {
   [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -1710,7 +1694,7 @@ export function generateToken({
   role,
   subject
 }: {
-  scope: Scope[]
+  scope: string[]
   subject?: string
   userType?: TokenUserType
   role?: TestUserRole
@@ -1735,7 +1719,7 @@ export function generateToken({
   })
 }
 
-export function setScopes(scope: Scope[], store: AppStore) {
+export function setScopes(scope: string[], store: AppStore) {
   const token = generateToken({ scope })
 
   window.history.replaceState({}, '', '?token=' + token)
