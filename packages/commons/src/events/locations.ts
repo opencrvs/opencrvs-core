@@ -21,8 +21,9 @@ import {
   RecordScopeV2,
   scopeUsesDeclaredOptions,
   scopeUsesFullOptions,
-  scopeUsesPrintCertifiedCopiesOptions,
-  UserFilter
+  UserFilter,
+  isCustomActionScope,
+  scopeUsesPrintCertifiedCopiesOptions
 } from '../scopes-v2'
 import { SystemContext, UserContext } from '../users/User'
 
@@ -132,7 +133,8 @@ function matchesJurisdictionFilter(
 export function canAccessEventWithScope(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
   scope: RecordScopeV2,
-  user: UserContext | SystemContext
+  user: UserContext | SystemContext,
+  customActionType?: string
 ): boolean {
   const opts = scope.options
 
@@ -196,7 +198,11 @@ export function canAccessEventWithScope(
     }
   }
 
-  if (scopeUsesFullOptions(scope) || scopeUsesPrintCertifiedCopiesOptions(scope)) {
+  if (
+    scopeUsesFullOptions(scope) ||
+    scopeUsesPrintCertifiedCopiesOptions(scope) ||
+    isCustomActionScope(scope)
+  ) {
     const { options } = scope
 
     if (options?.registeredBy === UserFilter.enum.user) {
@@ -228,6 +234,18 @@ export function canAccessEventWithScope(
     }
   }
 
+  if (isCustomActionScope(scope)) {
+    const { options } = scope
+
+    if (
+      !customActionType ||
+      !options?.customActionTypes ||
+      !options?.customActionTypes.includes(customActionType)
+    ) {
+      return false
+    }
+  }
+
   return true
 }
 
@@ -239,7 +257,10 @@ export function canAccessEventWithScope(
 export function userCanAccessEventWithScopes(
   event: Partial<EventIndexWithAdministrativeHierarchy>,
   scopes: RecordScopeV2[],
-  user: UserContext | SystemContext
+  user: UserContext | SystemContext,
+  customActionType?: string
 ) {
-  return scopes.some((scope) => canAccessEventWithScope(event, scope, user))
+  return scopes.some((scope) =>
+    canAccessEventWithScope(event, scope, user, customActionType)
+  )
 }
