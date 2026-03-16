@@ -12,10 +12,6 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import {
   AUTH_URL,
-  SEARCH_URL,
-  USER_MANAGEMENT_URL,
-  METRICS_URL,
-  NOTIFICATION_URL,
   COUNTRY_CONFIG_URL
 } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -46,10 +42,6 @@ enum Services {
 
 const SERVICES = {
   [Services.AUTH]: `${AUTH_URL}/ping`,
-  [Services.SEARCH]: `${SEARCH_URL}ping`,
-  [Services.USER_MGNT]: `${USER_MANAGEMENT_URL}ping`,
-  [Services.METRICS]: `${METRICS_URL}/ping`,
-  [Services.NOTIFICATION]: `${NOTIFICATION_URL}ping`,
   [Services.COUNTRY_CONFIG]: `${COUNTRY_CONFIG_URL}/ping`
 }
 
@@ -75,11 +67,7 @@ export const querySchema = Joi.object({
     .items(
       Joi.string().valid(
         Services.AUTH,
-        Services.USER_MGNT,
-        Services.METRICS,
-        Services.NOTIFICATION,
         Services.COUNTRY_CONFIG,
-        Services.SEARCH,
         Services.GATEWAY
       )
     )
