@@ -26,7 +26,6 @@ import * as Hapi from '@hapi/hapi'
 import { logger, validateFunc } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 
-import * as database from '@gateway/utils/redis'
 import { badRequest, Boom, isBoom } from '@hapi/boom'
 import { RateLimitError } from './rate-limit'
 
@@ -123,17 +122,12 @@ export async function createServer() {
   }
 
   async function start() {
-    // Start database before application server.
-    // We have had issues where the database was not ready when the server started which resulted in redis instance being undefined.
-
-    await database.start()
     await app.start()
     app.log('info', `server started on port ${PORT}`)
   }
 
   async function stop() {
     await app.stop()
-    await database.stop()
     app.log('info', 'server stopped')
   }
 
