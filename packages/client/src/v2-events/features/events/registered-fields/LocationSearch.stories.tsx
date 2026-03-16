@@ -39,7 +39,7 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
   },
   args: {
     id: 'location-search',
-    searchableResource: ['locations', 'facilities', 'offices'],
+    searchableResource: ['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'],
     value: ''
   }
 }
@@ -52,7 +52,7 @@ export const LocationSearchInputWithAdministrativeAreaId: StoryObj<
   },
   args: {
     id: 'location-search',
-    searchableResource: ['locations', 'facilities', 'offices'],
+    searchableResource: ['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'],
     value: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS[0].id
   }
 }
@@ -69,7 +69,7 @@ export const LocationSearchInputWithActiveLocations: StoryObj<
   },
   args: {
     id: 'location-search',
-    searchableResource: ['facilities'],
+    searchableResource: ['HEALTH_FACILITY'],
     value: 'abc',
     onChange: fn()
   },
@@ -113,7 +113,7 @@ export const LocationSearchInputInvalid: StoryObj<typeof LocationSearch.Input> =
     },
     args: {
       id: 'location-search',
-      searchableResource: ['locations', 'facilities', 'offices'],
+      searchableResource: ['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'],
       value: 'abc',
       onChange: fn()
     },
