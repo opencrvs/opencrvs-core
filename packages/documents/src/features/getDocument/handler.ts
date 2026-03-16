@@ -19,9 +19,17 @@ export function createPreSignedUrl(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const filePath = request.params.filePath
+  let filePath = request.params.filePath
     ? request.params.filePath
     : (request.payload as { filePath: string }).filePath
+
+  if (filePath.startsWith('/')) {
+    filePath = filePath.slice(1)
+  }
+
+  if (filePath.startsWith(MINIO_BUCKET)) {
+    filePath = filePath.slice(MINIO_BUCKET.length + 1)
+  }
 
   try {
     const presignedURL = signFileUrl(`/${MINIO_BUCKET}/${filePath}`)
@@ -48,7 +56,6 @@ export function createPresignedUrlsInBulk(
   const response = payload.data.filenames.map((filename) =>
     signFileUrl(`/${MINIO_BUCKET}/${filename}`)
   )
-
 
   return h.response(response).code(200)
 }

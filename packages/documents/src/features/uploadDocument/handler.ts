@@ -86,7 +86,16 @@ export async function fileExistsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const documentPath = DocumentPath.parse(request.params.filePath)
+  let filePath = request.params.filePath
+  if (filePath.startsWith('/')) {
+    filePath = filePath.slice(1)
+  }
+
+  if (filePath.startsWith(MINIO_BUCKET)) {
+    filePath = filePath.slice(MINIO_BUCKET.length + 1)
+  }
+
+  let documentPath = DocumentPath.parse(filePath)
 
   let stat
 
