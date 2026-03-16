@@ -14,11 +14,6 @@ import {
   personNameFromV1ToV2,
   IUserName
 } from '@opencrvs/commons'
-import {
-  Extension,
-  findExtension,
-  OPENCRVS_SPECIFICATION_URL
-} from '@opencrvs/commons/types'
 import { COUNTRY_CONFIG_URL, DOCUMENTS_URL } from '@user-mgnt/constants'
 import User, { ISignature } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
@@ -37,13 +32,6 @@ export const uploadSignatureToMinio = async (
   })
   const res = await result.json()
   return res.refUrl
-}
-
-export const getSignatureExtension = (extensions: Extension[] | undefined) => {
-  return findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
-    extensions || []
-  )
 }
 
 export async function generateUsername(
