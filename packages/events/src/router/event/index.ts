@@ -395,10 +395,7 @@ export const eventRouter = router({
         path: '/events/search'
       }
     })
-    // @todo: remove legacy scopes once all users are configured with new search scopes
-    .use(
-      requiresAnyOfScopes([SCOPES.RECORDSEARCH], undefined, ['record.search'])
-    )
+    .use(middleware.canSearchEvents)
     .input(SearchQuery)
     .output(
       z.object({
@@ -408,34 +405,13 @@ export const eventRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-      const scopes = getScopes(ctx.token)
 
-      const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
-
-      let result
-
-      if (isRecordSearchSystemClient) {
-        result = await findRecordsByQuery({
-          search: input,
-          eventConfigs,
-          user: ctx.user,
-          acceptedScopes: [
-            {
-              type: 'record.search',
-              options: {}
-            }
-          ]
-        })
-      } else if (ctx.acceptedScopes) {
-        result = await findRecordsByQuery({
-          search: input,
-          eventConfigs,
-          user: ctx.user,
-          acceptedScopes: ctx.acceptedScopes
-        })
-      } else {
-        throw new Error('No search scope provided')
-      }
+      const result = await findRecordsByQuery({
+        search: input,
+        eventConfigs,
+        user: ctx.user,
+        acceptedScopes: ctx.acceptedScopes
+      })
 
       await writeAuditLog({
         clientId: ctx.user.id,

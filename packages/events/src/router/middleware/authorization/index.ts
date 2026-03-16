@@ -110,6 +110,9 @@ function inScope(token: string, scopes: Scope[]) {
 }
 
 /**
+ *
+ * @deprecated only v2 scopes should be used going forward. This parameter will be removed once all scopes have been migrated to v2. For new features, please use @see canAccessEventWithScopes or similar.
+ *
  * Middleware which checks that one of the required scopes (either basic scopes or configurable scopes) are present in the token.
  *
  * @param scopes scopes that are required to access the resource
@@ -117,18 +120,8 @@ function inScope(token: string, scopes: Scope[]) {
  * @returns TRPC compatible middleware function
  */
 export function requiresAnyOfScopes(
-  /**
-   * @deprecated only v2 scopes should be used going forward. This parameter will be removed once all scopes have been migrated to v2. For new features, please use `v2ScopeTypes` instead of this parameter.
-   */
   scopes: Scope[],
-  /**
-   * @deprecated only v2 scopes should be used going forward. This parameter will be removed once all scopes have been migrated to v2. For new features, please use `v2ScopeTypes` instead of this parameter.
-   */
-  configurableScopes?: ConfigurableScopeType[],
-  /**
-   * Truly transient property. After complete migration to V2 scopes we should have a single parameter instead of 2-3.
-   */
-  v2ScopeTypes?: RecordScopeTypeV2[]
+  configurableScopes?: ConfigurableScopeType[]
 ) {
   const fn: MiddlewareFunction<
     TrpcContext,
@@ -142,20 +135,6 @@ export function requiresAnyOfScopes(
     // If the user has any of the allowed plain scopes, allow access
     if (inScope(token, scopes)) {
       return opts.next()
-    }
-
-    if (v2ScopeTypes && v2ScopeTypes.length > 0) {
-      const acceptedScopes = getAcceptedScopesFromToken(token, v2ScopeTypes)
-
-      if (acceptedScopes.length > 0) {
-        return opts.next({
-          ...opts,
-          ctx: {
-            ...opts.ctx,
-            acceptedScopes
-          }
-        })
-      }
     }
 
     // If the user has any of the allowed configurable scopes, allow the user to continue
@@ -179,51 +158,6 @@ export function requiresAnyOfScopes(
   }
 
   return fn
-}
-
-/**
- * Middleware function that checks if the event type is authorized for the user.
- *
- * @deprecated in 2.0. @see canAccessEventWithScopes checks event access based on scope options, including event types.
- *
- * The function accepts either an eventId or event type directly in the input.
- * If an eventId is provided, it fetches the event to determine its type.
- *
- * Authorization is checked against authorized entities in the TrpcContext:
- * - If no authorized entities or events are present, access is allowed
- * - Otherwise, verifies the event type is included in authorized events
- *
- * @param input - Object containing either eventId or type
- * @param next - Next middleware function to be called
- * @param ctx - TrpcContext object containing authorizedEntities
- * @returns Next middleware result
- * @throws {TRPCError} With code 'FORBIDDEN' if event type is not authorized
- */
-export const eventTypeAuthorization: MiddlewareFunction<
-  CtxWithAuthorizedEntities,
-  OpenApiMeta,
-  CtxWithAuthorizedEntities,
-  CtxWithAuthorizedEntities,
-  { eventId: UUID } | { type: string }
-> = async ({ input, next, ctx }) => {
-  let eventType = 'type' in input ? input.type : undefined
-
-  if ('eventId' in input) {
-    const event = await getEventById(input.eventId)
-    eventType = event.type
-  }
-
-  const { authorizedEntities } = ctx
-
-  if (!authorizedEntities || !authorizedEntities.events) {
-    return next()
-  }
-
-  if (!eventType || !authorizedEntities.events.includes(eventType)) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  return next()
 }
 
 export const EventIdParam = z.object({
@@ -406,6 +340,34 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
   }
 
   return fn
+}
+
+/**
+ * Middleware to check that the user has search scopes and adds them to context.
+ * Search differs from other endpoints, since it targets multiple events. Accepted scopes are later used to filter the search result query.
+ */
+export const canSearchEvents: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { acceptedScopes: RecordScopeV2[] },
+  unknown
+> = async (opts) => {
+  const acceptedScopes = getAcceptedScopesFromToken(opts.ctx.token, [
+    'record.search'
+  ])
+
+  if (acceptedScopes.length === 0) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  return opts.next({
+    ...opts,
+    ctx: {
+      ...opts.ctx,
+      acceptedScopes
+    }
+  })
 }
 
 export const userCanCreateEvent: MiddlewareFunction<

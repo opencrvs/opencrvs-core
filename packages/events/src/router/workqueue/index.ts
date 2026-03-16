@@ -22,10 +22,7 @@ import {
   getInMemoryWorkqueueConfigurations
 } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
-import {
-  requiresAnyOfScopes,
-  requireScopeForWorkqueues
-} from '@events/router/middleware'
+import * as middleware from '@events/router/middleware'
 
 export const workqueueRouter = router({
   config: router({
@@ -38,14 +35,10 @@ export const workqueueRouter = router({
   }),
   count: userOnlyProcedure
     .input(WorkqueueCountInput)
-    .use(requireScopeForWorkqueues)
-    .use(requiresAnyOfScopes([], undefined, ['record.search']))
+    .use(middleware.requireScopeForWorkqueues)
+    .use(middleware.canSearchEvents)
     .output(WorkqueueCountOutput)
     .query(async ({ ctx, input }) => {
-      if (!ctx.acceptedScopes) {
-        throw new TRPCError({ code: 'FORBIDDEN' })
-      }
-
       return getEventCount({
         queries: input,
         user: ctx.user,
