@@ -80,7 +80,7 @@ export function useCustomActionConfigs(event: EventIndex): {
         (action) => filterActionsByFlags([action.type], event.flags).length > 0
       )
       .filter(({ customActionType }) =>
-        canAccessEventWithScopes({ customActionType })
+        canAccessEventWithScopes(customActionType)
       )
       .map((action) => ({
         label: action.label,
