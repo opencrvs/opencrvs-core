@@ -132,7 +132,10 @@ components:
                   createdBySignature:
                     description: Reference to the signature of the user who created the action.
                     anyOf:
-                      - type: string
+                      - description: A full identifier starting from the root of the S3 bucket, e.g.
+                          /document-id.jpg or /directory/document-id.jpg but
+                          never /bucket-name/document-id.jpg
+                        type: string
                       - type: "null"
                   createdAtLocation:
                     description: Reference to the location of the user who created the action.
@@ -258,7 +261,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -350,7 +356,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -452,7 +461,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -564,7 +576,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -656,7 +671,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -757,7 +775,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -859,7 +880,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -951,7 +975,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1047,7 +1074,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1139,7 +1169,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1235,7 +1268,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1327,7 +1363,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1422,7 +1461,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1527,7 +1569,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1619,7 +1664,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1718,7 +1766,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1810,7 +1861,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -1909,7 +1963,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -13889,7 +13946,10 @@ components:
                   createdBySignature:
                     description: Reference to the signature of the user who created the action.
                     anyOf:
-                      - type: string
+                      - description: A full identifier starting from the root of the S3 bucket, e.g.
+                          /document-id.jpg or /directory/document-id.jpg but
+                          never /bucket-name/document-id.jpg
+                        type: string
                       - type: "null"
                   createdAtLocation:
                     description: Reference to the location of the user who created the action.
@@ -14017,7 +14077,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -14110,7 +14173,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -14214,7 +14280,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -14329,7 +14398,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -14422,7 +14494,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -14525,7 +14600,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -14629,7 +14707,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -14722,7 +14803,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -14819,7 +14903,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -14912,7 +14999,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -15009,7 +15099,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -15102,7 +15195,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -15198,7 +15294,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -15305,7 +15404,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -15398,7 +15500,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -15499,7 +15604,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -15592,7 +15700,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
@@ -15693,7 +15804,10 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - type: string
+            - description: A full identifier starting from the root of the S3 bucket, e.g.
+                /document-id.jpg or /directory/document-id.jpg but never
+                /bucket-name/document-id.jpg
+              type: string
             - type: "null"
         createdAtLocation:
           description: Reference to the location of the user who created the action.
