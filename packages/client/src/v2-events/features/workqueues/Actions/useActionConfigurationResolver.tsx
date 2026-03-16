@@ -14,7 +14,8 @@ import {
   ClientSpecificAction,
   EventIndex,
   getActionConfig,
-  WorkqueueActionType
+  WorkqueueActionType,
+  isValidIcon
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -87,7 +88,9 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
           ? buttonMessages.update
           : actionLabels[actionType],
         type: actionType,
-        icon: actionConfig?.icon || actionIcons[actionType],
+        icon: isValidIcon(actionConfig?.icon)
+          ? actionConfig.icon
+          : actionIcons[actionType],
         onClick: async (workqueue?: string) => onClick(actionType, workqueue),
         disabled: !enabled,
         hidden: !visible
@@ -209,7 +212,9 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
       return {
         label: actionLabels[actionType],
         type: actionType,
-        icon: actionConfig?.icon || actionIcons[actionType],
+        icon: isValidIcon(actionConfig?.icon)
+          ? actionConfig.icon
+          : actionIcons[actionType],
         onClick:
           actionType === ActionType.ASSIGN
             ? async () => onAssign()

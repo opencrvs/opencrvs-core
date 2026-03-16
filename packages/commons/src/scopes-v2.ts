@@ -55,8 +55,10 @@ export const RecordScopeTypeV2 = z.enum([
   'record.print-certified-copies',
   'record.request-correction',
   'record.correct',
-  'record.unassign-others'
+  'record.unassign-others',
+  'record.custom-action'
 ])
+
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
 const scopeByEvent = z
@@ -89,6 +91,15 @@ const ScopeOptionsFull = scopeOptionsDeclared
   .describe(
     'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
   )
+
+const CustomActionScopeOptions = ScopeOptionsFull.extend({
+  customActionTypes: z
+    .preprocess(
+      (val) => (val === undefined ? undefined : [val].flat()),
+      z.array(z.string()).optional()
+    )
+    .describe('Allowed custom action types')
+})
 
 export type ScopeOptionsFull = z.infer<typeof ScopeOptionsFull>
 export const ScopeOptionKey = ScopeOptionsFull.keyof()
@@ -166,6 +177,10 @@ export const RecordScopeV2 = z
       options: ScopeOptionsFull.optional()
     }),
     z.object({
+      type: z.literal('record.custom-action'),
+      options: CustomActionScopeOptions.optional()
+    }),
+    z.object({
       type: z.literal('record.print-certified-copies'),
       options: ScopeOptionsPrintCertifiedCopies.optional()
     })
@@ -197,6 +212,12 @@ export function scopeUsesPrintCertifiedCopiesOptions(
   scope: RecordScopeV2
 ): scope is Extract<RecordScopeV2, { type: 'record.print-certified-copies' }> {
   return scope.type === 'record.print-certified-copies'
+}
+
+export function isCustomActionScope(
+  scope: RecordScopeV2
+): scope is Extract<RecordScopeV2, { type: 'record.custom-action' }> {
+  return scope.type === 'record.custom-action'
 }
 
 export const ResolvedRecordScopeV2 = z
@@ -254,7 +275,6 @@ export const decodeScope = (query: string) => {
   })
 
   const unflattenedScope = unflattenScope(scope)
-
   return RecordScopeV2.safeParse(unflattenedScope)?.data
 }
 
@@ -308,7 +328,6 @@ const v1ToV2ConfigScopeTypeMap: Record<LegacyScopeType, string> = {
   'record.registered.print-certified-copies': 'record.print-certified-copies',
   'record.registered.request-correction': 'record.request-correction',
   'record.registered.correct': 'record.correct',
-  'record.custom-action': 'record.custom-action',
   'record.declared.edit': 'record.edit'
 }
 
@@ -382,19 +401,24 @@ export function getAcceptedScopesByType({
     .filter((scope): scope is RecordScopeV2 => scope !== null)
 }
 
+/**
+ * Checks if the given event type is allowed by the scope. If no specific event types are defined, it returns true.
+ *
+ * @param {RecordScopeV2} scope - The scope object which may include permitted event types in its options.
+ * @param {string} eventType - The event type to check for permission.
+ * @returns {boolean} Returns true if the event type is allowed by the scope.
+ */
+function isEventTypeAllowed(scope: RecordScopeV2, eventType: string): boolean {
+  if (scope.options?.event === undefined) {
+    return true
+  }
+
+  return scope.options?.event?.includes(eventType)
+}
+
 export function canUserCreateEvent(
   acceptedScopes: RecordScopeV2[],
   eventType: string
 ) {
-  return acceptedScopes.some((scope) => {
-    if (scope.options?.event === undefined) {
-      return true
-    }
-
-    if (scope.options.event.includes(eventType)) {
-      return true
-    }
-
-    return false
-  })
+  return acceptedScopes.some((scope) => isEventTypeAllowed(scope, eventType))
 }

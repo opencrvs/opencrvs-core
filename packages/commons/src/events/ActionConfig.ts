@@ -16,7 +16,6 @@ import { ActionFormConfig } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 import { ActionFlagConfig } from './Flag'
 import { ActionConditional } from './Conditional'
-import { AvailableIcons } from '../icons'
 
 export const DeclarationReviewConfig = z
   .object({
@@ -39,7 +38,14 @@ export const ActionConfigBase = z.object({
   supportingCopy: TranslationConfig.optional().describe(
     'Text displayed on the confirmation dialog'
   ),
-  icon: AvailableIcons.describe('Icon representing the action').optional(),
+  /**
+   * Icon representing the action.
+   *
+   * This could reference AvailableIcons, but it was causing TS7056 error:
+   * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+   * for EventConfig.d.ts.
+   */
+  icon: z.string().describe('Icon representing the action').optional(),
   conditionals: z
     .array(ActionConditional)
     .optional()

@@ -13,12 +13,13 @@ import React, { useMemo } from 'react'
 import {
   ActionType,
   EventIndex,
-  configurableEventScopeAllowed,
   CustomActionConfig,
   getOrThrow,
   isActionEnabled,
   isActionVisible,
   filterActionsByFlags,
+  isValidIcon,
+  getAcceptedScopesByType,
   getAssignmentStatus,
   AssignmentStatus
 } from '@opencrvs/commons/client'
@@ -28,6 +29,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { getScope } from '@client/profile/profileSelectors'
 import { useCustomActionModal } from '@client/v2-events/features/events/actions/quick-actions/useQuickActionModal'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import { ActionMenuItem } from './utils'
 
 export function useCustomActionConfigs(event: EventIndex): {
@@ -36,6 +38,9 @@ export function useCustomActionConfigs(event: EventIndex): {
 } {
   const scopes = useSelector(getScope)
   const validatorContext = useValidatorContext()
+  const { canAccessEventWithScopes } = useCanAccessEventWithScopes(event.id, [
+    'record.custom-action'
+  ])
 
   const userId = getOrThrow(
     validatorContext.user?.sub,
@@ -54,6 +59,19 @@ export function useCustomActionConfigs(event: EventIndex): {
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
+  const customActionScopes = getAcceptedScopesByType({
+    acceptedScopes: ['record.custom-action'],
+    scopes: scopes ?? []
+  })
+
+  // If no custom action scopes are found, we can return early.
+  if (customActionScopes.length === 0) {
+    return {
+      customActionModal: null,
+      customActionConfigs: []
+    }
+  }
+
   const customActionConfigs = useMemo(() => {
     return eventConfiguration.actions
       .filter(
@@ -63,17 +81,12 @@ export function useCustomActionConfigs(event: EventIndex): {
       .filter(
         (action) => filterActionsByFlags([action.type], event.flags).length > 0
       )
-      .filter((action) =>
-        configurableEventScopeAllowed(
-          scopes ?? [],
-          ['record.custom-action'],
-          event.type,
-          action.customActionType
-        )
+      .filter(({ customActionType }) =>
+        canAccessEventWithScopes(customActionType)
       )
       .map((action) => ({
         label: action.label,
-        icon: action.icon ?? ('PencilLine' as const),
+        icon: isValidIcon(action.icon) ? action.icon : ('PencilLine' as const),
         onClick: async (workqueue?: string) =>
           onCustomAction(action, workqueue),
         disabled:
@@ -85,25 +98,12 @@ export function useCustomActionConfigs(event: EventIndex): {
       }))
   }, [
     eventConfiguration.actions,
-    scopes,
     isDownloadedAndAssignedToUser,
     validatorContext,
     event,
-    onCustomAction
+    onCustomAction,
+    canAccessEventWithScopes
   ])
-
-  const hasCustomActionScope = configurableEventScopeAllowed(
-    scopes ?? [],
-    ['record.custom-action'],
-    event.type
-  )
-
-  if (!hasCustomActionScope) {
-    return {
-      customActionModal: null,
-      customActionConfigs: []
-    }
-  }
 
   return { customActionModal, customActionConfigs }
 }
