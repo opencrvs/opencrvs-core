@@ -20,6 +20,7 @@ import { CHILD_ONBOARDING_EVENT } from '../events/Constants'
 import { ActionType } from '../events/ActionType'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { createFieldConditionals, not } from '../conditionals/conditionals'
+import { LocationSearchResource } from '../events/locations'
 
 function generateTranslationConfig(message: string): TranslationConfig {
   return {
@@ -76,7 +77,10 @@ const child = defineFormPage({
     {
       id: 'child.birthLocation',
       analytics: true,
-      type: 'FACILITY',
+      type: FieldType.LOCATION,
+      configuration: {
+        searchableResource: [LocationSearchResource.enum.HEALTH_FACILITY]
+      },
       required: true,
       secured: true,
       label: generateTranslationConfig('Health Institution'),

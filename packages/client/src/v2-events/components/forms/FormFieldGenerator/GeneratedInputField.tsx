@@ -67,7 +67,8 @@ import {
   isCustomFieldType,
   isHiddenFieldType,
   EventConfig,
-  isImageViewFieldType
+  isImageViewFieldType,
+  LocationSearchResource
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -632,11 +633,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             eventType={eventConfig?.id}
-            searchableResource={
-              field.config.configuration.searchableResource.length > 0
-                ? field.config.configuration.searchableResource
-                : ['locations']
-            }
+            searchableResource={field.config.configuration.searchableResource}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -652,7 +649,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             eventType={eventConfig?.id}
-            searchableResource={['offices']}
+            searchableResource={[LocationSearchResource.enum.CRVS_OFFICE]}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -668,7 +665,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             eventType={eventConfig?.id}
-            searchableResource={['facilities']}
+            searchableResource={[LocationSearchResource.enum.HEALTH_FACILITY]}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -689,7 +686,7 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+             
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />

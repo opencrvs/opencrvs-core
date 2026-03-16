@@ -26,6 +26,7 @@ import {
   ButtonFieldValue,
   VerificationStatusValue
 } from './FieldValue'
+import { LocationSearchResource } from './locations'
 import {
   CustomFieldValue,
   DomesticAddressFieldValue,
@@ -630,10 +631,24 @@ export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
 const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: z.object({
-    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices'])),
-    allowedLocations: AllowedLocations
-  })
+  configuration: z
+    .object({
+      searchableResource: z
+        .array(LocationSearchResource)
+        .default([
+          LocationSearchResource.enum.ADMIN_STRUCTURE,
+          LocationSearchResource.enum.HEALTH_FACILITY,
+          LocationSearchResource.enum.CRVS_OFFICE
+        ]),
+      allowedLocations: AllowedLocations
+    })
+    .default({
+      searchableResource: [
+        LocationSearchResource.enum.ADMIN_STRUCTURE,
+        LocationSearchResource.enum.HEALTH_FACILITY,
+        LocationSearchResource.enum.CRVS_OFFICE
+      ]
+    })
 }).describe('Input field for a location')
 
 export type LocationInput = z.infer<typeof LocationInput>
@@ -664,6 +679,9 @@ const FileUploadWithOptions = BaseField.extend({
 
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
+/**
+ * @deprecated Use FieldType.LOCATION with searchableResource: ['HEALTH_FACILITY']
+ */
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
   defaultValue: NonEmptyTextValue.optional(),
@@ -672,6 +690,9 @@ const Facility = BaseField.extend({
 
 export type Facility = z.infer<typeof Facility>
 
+/**
+ * @deprecated Use FieldType.LOCATION with searchableResource: ['CRVS_OFFICE']
+ */
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
   defaultValue: NonEmptyTextValue.optional(),
