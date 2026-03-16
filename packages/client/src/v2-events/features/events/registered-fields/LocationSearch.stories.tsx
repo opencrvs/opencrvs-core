@@ -13,7 +13,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { within, expect, fn } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
-import { LocationSearchResource } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS } from '../../../../tests/v2-events/administrative-hierarchy-mock'
 // NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization
@@ -40,11 +39,7 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
   },
   args: {
     id: 'location-search',
-    searchableResource: [
-      LocationSearchResource.enum.ADMIN_STRUCTURE,
-      LocationSearchResource.enum.HEALTH_FACILITY,
-      LocationSearchResource.enum.CRVS_OFFICE
-    ],
+    searchableResource: ['locations', 'facilities', 'offices'],
     value: ''
   }
 }
@@ -57,11 +52,7 @@ export const LocationSearchInputWithAdministrativeAreaId: StoryObj<
   },
   args: {
     id: 'location-search',
-    searchableResource: [
-      LocationSearchResource.enum.ADMIN_STRUCTURE,
-      LocationSearchResource.enum.HEALTH_FACILITY,
-      LocationSearchResource.enum.CRVS_OFFICE
-    ],
+    searchableResource: ['locations', 'facilities', 'offices'],
     value: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS[0].id
   }
 }
@@ -78,7 +69,7 @@ export const LocationSearchInputWithActiveLocations: StoryObj<
   },
   args: {
     id: 'location-search',
-    searchableResource: [LocationSearchResource.enum.HEALTH_FACILITY],
+    searchableResource: ['facilities'],
     value: 'abc',
     onChange: fn()
   },
@@ -122,11 +113,7 @@ export const LocationSearchInputInvalid: StoryObj<typeof LocationSearch.Input> =
     },
     args: {
       id: 'location-search',
-      searchableResource: [
-        LocationSearchResource.enum.ADMIN_STRUCTURE,
-        LocationSearchResource.enum.HEALTH_FACILITY,
-        LocationSearchResource.enum.CRVS_OFFICE
-      ],
+      searchableResource: ['locations', 'facilities', 'offices'],
       value: 'abc',
       onChange: fn()
     },

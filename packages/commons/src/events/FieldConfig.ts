@@ -633,13 +633,13 @@ const LocationInput = BaseField.extend({
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z
     .object({
-      searchableResource: z
-        .array(LocationSearchResource)
-        .default([
-          LocationSearchResource.enum.ADMIN_STRUCTURE,
-          LocationSearchResource.enum.HEALTH_FACILITY,
-          LocationSearchResource.enum.CRVS_OFFICE
-        ]),
+      // Any string: use LocationSearchResource constants for well-known types,
+      // or any locationType string for custom location categories.
+      searchableResource: z.array(z.string()).default([
+        LocationSearchResource.enum.ADMIN_STRUCTURE,
+        LocationSearchResource.enum.HEALTH_FACILITY,
+        LocationSearchResource.enum.CRVS_OFFICE
+      ]),
       allowedLocations: AllowedLocations
     })
     .default({
