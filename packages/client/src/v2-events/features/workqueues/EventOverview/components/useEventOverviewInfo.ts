@@ -8,10 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getOrThrow, EventIndex, EventDocument } from '@opencrvs/commons/client'
+import {
+  getOrThrow,
+  EventIndex,
+  EventDocument,
+  getAssignmentStatus,
+  AssignmentStatus
+} from '@opencrvs/commons/client'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 
 type EventOverviewInfo =
   | {
