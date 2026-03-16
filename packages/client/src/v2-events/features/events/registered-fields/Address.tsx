@@ -575,7 +575,7 @@ function AddressInput(props: Props) {
       {...otherProps}
       fields={fields}
       // addressType is passed as context to the nested form due to the value
-      // being refererred in conditionals but not having any associated field
+      // being referred in conditionals but not having any associated field
       formContext={{ addressType: value.addressType }}
       formTouched={nestedTouched}
       formValues={nestedValue}
