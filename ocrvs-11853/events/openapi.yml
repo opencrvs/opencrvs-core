@@ -7044,10 +7044,6 @@ components:
                   type: array
                   items:
                     type: string
-                    enum:
-                      - ADMIN_STRUCTURE
-                      - CRVS_OFFICE
-                      - HEALTH_FACILITY
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
