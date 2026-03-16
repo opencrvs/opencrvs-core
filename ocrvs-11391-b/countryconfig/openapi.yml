@@ -1981,20 +1981,40 @@ components:
         dateOfEvent:
           description: Reference to the field capturing the date of the event (e.g. date
             of birth). Defaults to the event creation date if unspecified.
-          type: object
-          properties:
-            $$field:
-              description: Unique identifier for the field
-              type: string
-            $$subfield:
-              description: 'If the FieldValue is an object, subfield can be used to refer to
-                e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
-              type: array
-              items:
-                type: string
-          required:
-            - $$field
-          additionalProperties: false
+          anyOf:
+            - description: Reference to a field by its ID
+              type: object
+              properties:
+                $$field:
+                  description: Unique identifier for the field
+                  type: string
+                $$subfield:
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  default: []
+                  type: array
+                  items:
+                    type: string
+              required:
+                - $$field
+                - $$subfield
+              additionalProperties: false
+            - description: Reference to a field defined in the event metadata, using the field
+                id.
+              type: object
+              properties:
+                $$event:
+                  type: string
+                  enum:
+                    - createdAt
+                    - updatedAt
+                    - legalStatuses.DECLARED.createdAt
+                    - legalStatuses.DECLARED.acceptedAt
+                    - legalStatuses.REGISTERED.createdAt
+                    - legalStatuses.REGISTERED.acceptedAt
+              required:
+                - $$event
+              additionalProperties: false
         placeOfEvent:
           description: Reference to the field capturing the place of the event (e.g. place
             of birth). Defaults to the meta.createdAtLocation if unspecified.
@@ -2006,11 +2026,13 @@ components:
             $$subfield:
               description: 'If the FieldValue is an object, subfield can be used to refer to
                 e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              default: []
               type: array
               items:
                 type: string
           required:
             - $$field
+            - $$subfield
           additionalProperties: false
         title:
           description: Title template for the singular event, supporting variables (e.g.
@@ -2250,6 +2272,7 @@ components:
                             - DATE_RANGE
                             - SELECT_DATE_RANGE
                             - TIME
+                            - IMAGE_VIEW
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
@@ -2503,6 +2526,7 @@ components:
                             - DATE_RANGE
                             - SELECT_DATE_RANGE
                             - TIME
+                            - IMAGE_VIEW
                             - PARAGRAPH
                             - PAGE_HEADER
                             - RADIO_GROUP
@@ -2822,110 +2846,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Read-action can not be disabled or hidden with conditionals.
           not: {}
@@ -2979,11 +2899,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -2996,11 +2918,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -3069,11 +2993,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3086,11 +3012,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -3155,17 +3083,69 @@ components:
                           $$subfield:
                             description: 'If the FieldValue is an object, subfield can be used to refer to
                               e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            default: []
                             type: array
                             items:
                               type: string
                         required:
                           - $$field
+                          - $$subfield
                         additionalProperties: false
                     required:
                       - id
                       - label
                       - type
                     additionalProperties: false
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               additionalProperties: false
             defaultValue:
               type: object
@@ -3239,11 +3219,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3256,11 +3238,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -3329,11 +3313,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3346,11 +3332,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -3431,11 +3419,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3448,11 +3438,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -3521,11 +3513,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3538,11 +3532,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -3595,11 +3591,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3612,11 +3610,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -3685,11 +3685,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3702,11 +3704,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -3786,11 +3790,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3803,11 +3809,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -3876,11 +3884,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3893,11 +3903,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -3956,11 +3968,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -3973,11 +3987,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -4046,11 +4062,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4063,11 +4081,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -4092,11 +4112,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 prefix:
                   $ref: "#/components/schemas/TranslationConfig"
@@ -4133,11 +4155,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4150,11 +4174,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -4223,11 +4249,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4240,11 +4268,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -4303,11 +4333,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4320,11 +4352,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -4393,11 +4427,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4410,11 +4446,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -4474,11 +4512,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4491,11 +4531,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -4564,11 +4606,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4581,11 +4625,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -4653,11 +4699,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4670,11 +4718,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -4743,11 +4793,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4760,11 +4812,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -4808,7 +4862,7 @@ components:
             - type
             - options
           additionalProperties: false
-        - description: A read-only HTML <p> paragraph
+        - description: A read-only image component for form pages
           type: object
           properties:
             id:
@@ -4830,11 +4884,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4847,11 +4903,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -4920,11 +4978,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -4937,11 +4997,204 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
+                    additionalProperties: false
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
+              const: IMAGE_VIEW
+            defaultValue:
+              type: string
+              minLength: 1
+            configuration:
+              type: object
+              properties:
+                alt:
+                  description: Alternative text for the image
+                  type: string
+                width:
+                  description: CSS width value for the image
+                  type: string
+                height:
+                  description: CSS height value for the image
+                  type: string
+                textAlign:
+                  description: Text alignment for positioning the image in its container
+                  type: string
+                  enum:
+                    - left
+                    - center
+                    - right
+                    - start
+                    - end
+                objectFit:
+                  description: How the image should be resized to fit the container
+                  type: string
+                  enum:
+                    - contain
+                    - cover
+                    - fill
+                    - none
+                    - scale-down
+              additionalProperties: false
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          additionalProperties: false
+        - description: A read-only HTML <p> paragraph
+          type: object
+          properties:
+            id:
+              description: Unique identifier of the field.
+              type: string
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+            required:
+              description: Indicates whether the field is mandatory.
+              default: false
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+                  additionalProperties: false
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -5015,11 +5268,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5032,11 +5287,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -5105,11 +5362,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5122,11 +5381,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -5197,11 +5458,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5214,11 +5477,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -5287,11 +5552,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5304,11 +5571,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -5374,11 +5643,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5391,11 +5662,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -5464,11 +5737,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5481,11 +5756,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -5525,11 +5802,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5542,11 +5821,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -5615,11 +5896,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5632,11 +5915,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -5717,11 +6002,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5734,11 +6021,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -5807,11 +6096,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -5824,11 +6115,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -6039,11 +6332,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6056,11 +6351,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -6129,11 +6426,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6146,11 +6445,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -6190,11 +6491,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6207,11 +6510,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -6280,11 +6585,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6297,11 +6604,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -6341,11 +6650,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6358,11 +6669,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -6431,11 +6744,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6448,11 +6763,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -6493,11 +6810,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6510,11 +6829,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -6583,11 +6904,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6600,11 +6923,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -6715,11 +7040,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6732,11 +7059,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -6805,11 +7134,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6822,11 +7153,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -6866,11 +7199,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6883,11 +7218,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -6956,11 +7293,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -6973,11 +7312,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -7009,6 +7350,56 @@ components:
                     - ADMIN_STRUCTURE
                     - HEALTH_FACILITY
                     - CRVS_OFFICE
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               required:
                 - type
               additionalProperties: false
@@ -7039,11 +7430,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7056,11 +7449,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -7129,11 +7524,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7146,11 +7543,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -7187,11 +7586,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7204,11 +7605,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -7277,11 +7680,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7294,11 +7699,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -7322,6 +7729,56 @@ components:
                       - locations
                       - facilities
                       - offices
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
               required:
                 - searchableResource
               additionalProperties: false
@@ -7353,11 +7810,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7370,11 +7829,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -7443,11 +7904,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7460,11 +7923,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -7477,6 +7942,60 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            configuration:
+              type: object
+              properties:
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
+              additionalProperties: false
           required:
             - id
             - label
@@ -7504,11 +8023,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7521,11 +8042,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -7594,11 +8117,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7611,11 +8136,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -7628,6 +8155,60 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            configuration:
+              type: object
+              properties:
+                allowedLocations:
+                  description: Limits which location options are selectable depending on user
+                    jurisdiction and location.
+                  type: object
+                  properties:
+                    $jurisdiction:
+                      anyOf:
+                        - description: Filters based on user jurisdiction relative to their office
+                            location in hierarchy.
+                          type: string
+                          enum:
+                            - administrativeArea
+                            - location
+                            - all
+                        - type: object
+                          properties:
+                            $scope:
+                              type: string
+                              enum:
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
+                            $option:
+                              type: string
+                              enum:
+                                - event
+                                - placeOfEvent
+                                - declaredIn
+                                - declaredBy
+                                - registeredIn
+                                - registeredBy
+                          required:
+                            - $scope
+                            - $option
+                          additionalProperties: false
+                  required:
+                    - $jurisdiction
+                  additionalProperties: false
+              additionalProperties: false
           required:
             - id
             - label
@@ -7655,11 +8236,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7672,11 +8255,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -7745,11 +8330,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7762,11 +8349,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -7835,11 +8424,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7852,11 +8443,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -7925,11 +8518,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -7942,11 +8537,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -7994,11 +8591,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8011,11 +8610,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -8084,11 +8685,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8101,11 +8704,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -8227,11 +8832,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8244,11 +8851,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -8317,11 +8926,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8334,11 +8945,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -8382,11 +8995,13 @@ components:
                                     description: 'If the FieldValue is an object, subfield can be used to refer to
                                       e.g. `["foo", "bar"]` in `{ foo: { bar: 3
                                       } }`'
+                                    default: []
                                     type: array
                                     items:
                                       type: string
                                 required:
                                   - $$field
+                                  - $$subfield
                                 additionalProperties: false
                         required:
                           - id
@@ -8431,11 +9046,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8448,11 +9065,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -8521,11 +9140,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8538,11 +9159,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -8597,11 +9220,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8614,11 +9239,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -8687,11 +9314,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8704,11 +9333,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -8758,11 +9389,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8775,11 +9408,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -8848,11 +9483,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -8865,11 +9502,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -8906,7 +9545,9 @@ components:
               type: object
               properties:
                 trigger:
-                  description: Reference to a field by its ID
+                  description: Reference to the field that triggers the HTTP request when its
+                    value changes. If not provided, the HTTP request is
+                    triggered once on component mount.
                   type: object
                   properties:
                     $$field:
@@ -8915,11 +9556,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 url:
                   description: URL to send the HTTP request to
@@ -8960,18 +9603,19 @@ components:
                           $$subfield:
                             description: 'If the FieldValue is an object, subfield can be used to refer to
                               e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                            default: []
                             type: array
                             items:
                               type: string
                         required:
                           - $$field
+                          - $$subfield
                         additionalProperties: false
                 timeout:
                   description: Request timeout in milliseconds
                   default: 15000
                   type: number
               required:
-                - trigger
                 - url
                 - method
                 - timeout
@@ -9004,11 +9648,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9021,11 +9667,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -9094,11 +9742,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9111,11 +9761,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -9168,11 +9820,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9185,11 +9839,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -9258,11 +9914,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9275,11 +9933,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -9337,11 +9997,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9354,11 +10016,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -9427,11 +10091,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9444,11 +10110,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -9494,11 +10162,13 @@ components:
                                 description: 'If the FieldValue is an object, subfield can be used to refer to
                                   e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                   }`'
+                                default: []
                                 type: array
                                 items:
                                   type: string
                             required:
                               - $$field
+                              - $$subfield
                             additionalProperties: false
                           - type: array
                             items:
@@ -9512,11 +10182,13 @@ components:
                                   description: 'If the FieldValue is an object, subfield can be used to refer to
                                     e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                     }`'
+                                  default: []
                                   type: array
                                   items:
                                     type: string
                               required:
                                 - $$field
+                                - $$subfield
                               additionalProperties: false
                       required:
                         description: Indicates whether the field is mandatory.
@@ -9587,11 +10259,13 @@ components:
                                 description: 'If the FieldValue is an object, subfield can be used to refer to
                                   e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                   }`'
+                                default: []
                                 type: array
                                 items:
                                   type: string
                             required:
                               - $$field
+                              - $$subfield
                             additionalProperties: false
                           - type: array
                             items:
@@ -9605,11 +10279,13 @@ components:
                                   description: 'If the FieldValue is an object, subfield can be used to refer to
                                     e.g. `["foo", "bar"]` in `{ foo: { bar: 3 }
                                     }`'
+                                  default: []
                                   type: array
                                   items:
                                     type: string
                               required:
                                 - $$field
+                                - $$subfield
                               additionalProperties: false
                       analytics:
                         description: Indicates whether the field is included in analytics. When enabled,
@@ -9671,11 +10347,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9688,11 +10366,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -9761,11 +10441,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9778,11 +10460,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -9832,11 +10516,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9849,11 +10535,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -9922,11 +10610,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -9939,11 +10629,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -9989,11 +10681,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -10006,11 +10700,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -10079,11 +10775,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -10096,11 +10794,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -10239,11 +10939,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -10256,11 +10958,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               description: Indicates whether the field is mandatory.
@@ -10329,11 +11033,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -10346,11 +11052,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -10393,11 +11101,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -10410,11 +11120,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             required:
               default: false
@@ -10473,11 +11185,13 @@ components:
                     $$subfield:
                       description: 'If the FieldValue is an object, subfield can be used to refer to
                         e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
                       type: array
                       items:
                         type: string
                   required:
                     - $$field
+                    - $$subfield
                   additionalProperties: false
                 - type: array
                   items:
@@ -10490,11 +11204,13 @@ components:
                       $$subfield:
                         description: 'If the FieldValue is an object, subfield can be used to refer to
                           e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
                         type: array
                         items:
                           type: string
                     required:
                       - $$field
+                      - $$subfield
                     additionalProperties: false
             analytics:
               description: Indicates whether the field is included in analytics. When enabled,
@@ -10582,11 +11298,13 @@ components:
                 $$subfield:
                   description: 'If the FieldValue is an object, subfield can be used to refer to
                     e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  default: []
                   type: array
                   items:
                     type: string
               required:
                 - $$field
+                - $$subfield
               additionalProperties: false
             - type: array
               items:
@@ -10599,11 +11317,13 @@ components:
                   $$subfield:
                     description: 'If the FieldValue is an object, subfield can be used to refer to
                       e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    default: []
                     type: array
                     items:
                       type: string
                 required:
                   - $$field
+                  - $$subfield
                 additionalProperties: false
         required:
           description: Indicates whether the field is mandatory.
@@ -10670,11 +11390,13 @@ components:
                 $$subfield:
                   description: 'If the FieldValue is an object, subfield can be used to refer to
                     e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  default: []
                   type: array
                   items:
                     type: string
               required:
                 - $$field
+                - $$subfield
               additionalProperties: false
             - type: array
               items:
@@ -10687,11 +11409,13 @@ components:
                   $$subfield:
                     description: 'If the FieldValue is an object, subfield can be used to refer to
                       e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                    default: []
                     type: array
                     items:
                       type: string
                 required:
                   - $$field
+                  - $$subfield
                 additionalProperties: false
         analytics:
           description: Indicates whether the field is included in analytics. When enabled,
@@ -11096,110 +11820,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -11462,110 +12082,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -11653,110 +12169,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -11858,110 +12270,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -12171,110 +12479,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -12448,110 +12652,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -12657,110 +12757,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -12848,110 +12844,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
