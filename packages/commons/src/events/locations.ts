@@ -200,7 +200,8 @@ export function canAccessEventWithScope(
 
   if (
     scopeUsesFullOptions(scope) ||
-    scopeUsesPrintCertifiedCopiesOptions(scope)
+    scopeUsesPrintCertifiedCopiesOptions(scope) ||
+    isCustomActionScope(scope)
   ) {
     const { options } = scope
 
