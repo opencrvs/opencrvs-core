@@ -30,7 +30,8 @@ import {
   UUID,
   PrintCertificateAction,
   TokenUserType,
-  User
+  User,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -58,7 +59,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useAdministrativeAreas } from '../../../../hooks/useAdministrativeAreas'
 
@@ -164,6 +165,8 @@ export function Review() {
 
   const { getEvent, onlineActions } = useEvents()
   const fullEvent = getEvent.getFromCache(eventId)
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
   const validatorContext = useValidatorContext(fullEvent)
   const actions = getAcceptedActions(fullEvent)
 
@@ -182,9 +185,8 @@ export function Review() {
     (template) => template.id === templateId
   )
 
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
-  const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
+  const { isActionAllowed } = useUserAllowedActions(fullEventIndex)
   const userDetails = useSelector(getUserDetails)
   const { isPending } = onlineActions.printCertificate
 

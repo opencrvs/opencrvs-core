@@ -51,7 +51,7 @@ const fields = [
       description: 'The title for the age input'
     },
     configuration: {
-      asOfDate: { $$field: 'storybook.dateOfBirth' }
+      asOfDate: { $$field: 'storybook.dateOfBirth', $$subfield: [] }
     },
     validation: [
       {

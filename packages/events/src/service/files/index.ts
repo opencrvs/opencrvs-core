@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Readable } from 'stream'
 import fetch from 'node-fetch'
+import { zfd } from 'zod-form-data'
+import * as z from 'zod/v4'
+import FormData from 'form-data'
 import {
   FullDocumentPath,
   getFilePathsFromEvent,
@@ -84,4 +88,40 @@ export async function cleanupUnreferencedFiles(
   return Promise.all(
     filesToDelete.map(async (file: string) => deleteFile(file, token))
   )
+}
+
+export const AttachmentInput = zfd.formData({
+  file: zfd.file(),
+  transactionId: zfd.text(),
+  path: zfd.text(z.string().min(1).optional())
+})
+
+export async function uploadFile(
+  input: z.infer<typeof AttachmentInput>,
+  token: string
+): Promise<string> {
+  const form = new FormData()
+  form.append('file', Readable.from(Buffer.from(await input.file.arrayBuffer())), {
+    filename: input.file.name,
+    contentType: input.file.type
+  })
+  form.append('transactionId', input.transactionId)
+  if (input.path) {
+    form.append('path', input.path)
+  }
+
+  const res = await fetch(new URL('/files', env.DOCUMENTS_URL).toString(), {
+    method: 'POST',
+    headers: {
+      ...form.getHeaders(),
+      Authorization: token
+    },
+    body: form
+  })
+
+  if (!res.ok) {
+    throw new Error(`File upload failed: ${res.status} ${res.statusText}`)
+  }
+
+  return res.text()
 }

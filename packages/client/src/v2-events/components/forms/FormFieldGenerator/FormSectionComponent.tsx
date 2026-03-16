@@ -11,7 +11,7 @@
 
 import React, { useCallback, useEffect, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, omit, get, compact } from 'lodash'
+import { cloneDeep, isEqual, set, omit, get, compact, uniqBy } from 'lodash'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -121,7 +121,7 @@ function resolveFieldReferenceValue(
 ): FieldValue | undefined {
   const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible($$field)
 
-  return $$subfield && $$subfield.length > 0
+  return $$subfield.length > 0
     ? get(fieldValues[referenceKeyInFormikFormat], $$subfield)
     : fieldValues[referenceKeyInFormikFormat]
 }
@@ -185,9 +185,14 @@ export function FormSectionComponent({
     id: makeFormFieldIdFormikCompatible(field.id)
   }))
 
-  const allFieldsWithDotSeparator = eventConfig
-    ? findAllFields(eventConfig)
-    : fieldsWithDotSeparator
+  // We want to include both the fields from event config and the fields passed as 'fieldsWithFormikSeparator' prop
+  // Since the 'fieldsWithFormikSeparator' can contain 'child' fields not defined in the event config, such as Address or Name sub fields
+  const allEventConfigFields = eventConfig ? findAllFields(eventConfig) : []
+  const allFieldsWithDotSeparator = uniqBy(
+    fieldsWithDotSeparator.concat(allEventConfigFields),
+    'id'
+  )
+
   const listenerFieldsByParentId = getParentsOfListenerFields(
     allFieldsWithDotSeparator
   )

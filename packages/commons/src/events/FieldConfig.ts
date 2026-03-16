@@ -36,11 +36,11 @@ import {
   NumberWithUnitFieldValue,
   QrReaderFieldValue
 } from './CompositeFieldValue'
-
 import { UUID } from '../uuid'
 import { SerializedUserField } from './serializers/user/serializer'
 import { SearchQuery } from './EventIndex'
 import { SerializedNowDateTime } from './serializers/date/serializer'
+import { JurisdictionReference } from '../users/userReferences'
 
 const FieldId = z
   .string()
@@ -67,6 +67,7 @@ export const FieldReference = z
     $$subfield: z
       .array(z.string())
       .optional()
+      .default([])
       .describe(
         'If the FieldValue is an object, subfield can be used to refer to e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
       )
@@ -359,6 +360,29 @@ const ParagraphConfiguration = z
 
 export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
 
+const ImageConfiguration = z.object({
+  alt: z.string().optional().describe('Alternative text for the image'),
+  width: z.string().optional().describe('CSS width value for the image'),
+  height: z.string().optional().describe('CSS height value for the image'),
+  textAlign: ParagraphTextAlign.optional().describe(
+    'Text alignment for positioning the image in its container'
+  ),
+  objectFit: z
+    .enum(['contain', 'cover', 'fill', 'none', 'scale-down'])
+    .optional()
+    .describe('How the image should be resized to fit the container')
+})
+
+export type ImageConfiguration = z.infer<typeof ImageConfiguration>
+
+const ImageViewField = BaseField.extend({
+  type: z.literal(FieldType.IMAGE_VIEW),
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: ImageConfiguration
+}).describe('A read-only image component for form pages')
+
+export type ImageViewField = z.infer<typeof ImageViewField>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   defaultValue: NonEmptyTextValue.optional(),
@@ -576,28 +600,29 @@ const Country = BaseField.extend({
 
 export type Country = z.infer<typeof Country>
 
+const AllowedLocations = JurisdictionReference.optional().describe(
+  'Limits which location options are selectable depending on user jurisdiction and location.'
+)
+
 export const AdministrativeAreas = z.enum([
   'ADMIN_STRUCTURE',
   'HEALTH_FACILITY',
   'CRVS_OFFICE'
 ])
 
-const AdministrativeAreaConfiguration = z
-  .object({
-    partOf: z
-      .object({
-        $declaration: z.string()
-      })
-      .optional()
-      .describe('Parent location'),
-    type: AdministrativeAreas
-  })
-  .describe('Administrative area options')
-
 const AdministrativeAreaField = BaseField.extend({
   type: z.literal(FieldType.ADMINISTRATIVE_AREA),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: AdministrativeAreaConfiguration
+  configuration: z
+    .object({
+      partOf: z
+        .object({ $declaration: z.string() })
+        .optional()
+        .describe('Parent location'),
+      type: AdministrativeAreas,
+      allowedLocations: AllowedLocations
+    })
+    .describe('Administrative area options')
 }).describe('Administrative area input field e.g. facility, office')
 
 export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
@@ -606,7 +631,8 @@ const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
-    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices']))
+    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices'])),
+    allowedLocations: AllowedLocations
   })
 }).describe('Input field for a location')
 
@@ -640,14 +666,16 @@ export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for a facility')
 
 export type Facility = z.infer<typeof Facility>
 
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: z.object({ allowedLocations: AllowedLocations }).optional()
 }).describe('Input field for an office')
 
 export type Office = z.infer<typeof Office>
@@ -676,7 +704,8 @@ const Address = BaseField.extend({
             parent: FieldReference.optional()
           })
         )
-        .optional()
+        .optional(),
+      allowedLocations: AllowedLocations
     })
     .optional(),
   defaultValue: DefaultAddressFieldValue.optional()
@@ -748,7 +777,9 @@ const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
   defaultValue: HttpFieldValue.optional(),
   configuration: z.object({
-    trigger: FieldReference,
+    trigger: FieldReference.optional().describe(
+      'Reference to the field that triggers the HTTP request when its value changes. If not provided, the HTTP request is triggered once on component mount.'
+    ),
     url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string(), z.string()).optional(),
@@ -923,6 +954,7 @@ export const FieldConfig = z
     TimeField,
     DateRangeField,
     SelectDateRangeField,
+    ImageViewField,
     Paragraph,
     RadioGroup,
     BulletList,
@@ -979,10 +1011,6 @@ export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
 >
 
 export type SelectOption = z.infer<typeof SelectOption>
-
-export type AdministrativeAreaConfiguration = z.infer<
-  typeof AdministrativeAreaConfiguration
->
 
 /**
  * Union of file-related fields. Using common type should help with compiler to know where to add new cases.

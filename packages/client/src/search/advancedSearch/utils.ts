@@ -35,7 +35,7 @@ import {
 } from '@client/forms/advancedSearch/fieldDefinitions/utils'
 import { UUID } from '@opencrvs/commons/client'
 
-export type advancedSearchPillKey = Exclude<
+type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
   'searchResult' | 'noResult'
 >
@@ -71,7 +71,7 @@ const baseKeysSameAsStore = [
   'informantFamilyName'
 ] as const
 
-export const dateFieldTypes = [
+const dateFieldTypes = [
   'dateOfRegistration',
   'dateOfEvent',
   'childDoB',
@@ -394,7 +394,7 @@ export const transformStoreDataToAdvancedSearchLocalState = (
   return localState
 }
 
-export const getAccordionActiveStateMap = (
+const getAccordionActiveStateMap = (
   storeState: IAdvancedSearchParamState,
   hasBirthSearchJurisdictionScope?: boolean,
   hasDeathSearchJurisdictionScope?: boolean,
@@ -516,7 +516,7 @@ const timePeriodToFromDate = (timePeriod: TIME_PERIOD) => {
   }
 }
 
-export const replacePeriodWithDate = (
+const replacePeriodWithDate = (
   advancedSearchParamState: IAdvancedSearchParamState
 ) => {
   if (
@@ -574,7 +574,7 @@ const convertDateValuesToDateRangePicker = (
   return value
 }
 
-export const isValidDateRangePickerValue = (
+const isValidDateRangePickerValue = (
   dateRangePickerValue: IDateRangePickerValue
 ): boolean => {
   let isValid = false
@@ -735,7 +735,7 @@ const getFormattedResidentialAddressForPill = (
     .join(',')
 }
 
-export const getFormattedAdvanceSearchParamPills = (
+const getFormattedAdvanceSearchParamPills = (
   advancedSearchParamsState: IAdvancedSearchParamState,
   intl: IntlShape,
   offlineData: IOfflineData
@@ -906,7 +906,7 @@ const eventDateMapping: Record<string, string> = {
   marriage: 'marriageDate'
 }
 
-export const getSortColumn = (sortCol: COLUMNS, event: string) => {
+const getSortColumn = (sortCol: COLUMNS, event: string) => {
   return sortCol === 'dateOfEvent'
     ? eventDateMapping[event] || sortCol
     : sortCol

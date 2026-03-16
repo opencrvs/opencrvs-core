@@ -20,30 +20,12 @@ import {
   REINDEX_USER_ID,
   TokenUserType,
   TokenWithBearer,
-  User,
-  System
+  SystemContext,
+  UserContext
 } from '@opencrvs/commons'
+export { SystemContext, UserContext }
 import { getUser } from './service/users/api'
 import { getLocationById } from './service/locations/locations'
-
-export const UserContext = User.pick({
-  id: true,
-  primaryOfficeId: true,
-  administrativeAreaId: true,
-  role: true,
-  signature: true,
-  type: true
-})
-export type UserContext = z.infer<typeof UserContext>
-
-export const SystemContext = System.pick({
-  id: true,
-  type: true,
-  primaryOfficeId: true,
-  administrativeAreaId: true,
-  signature: true
-})
-type SystemContext = z.infer<typeof SystemContext>
 
 export const TrpcContext = z.object({
   token: TokenWithBearer,

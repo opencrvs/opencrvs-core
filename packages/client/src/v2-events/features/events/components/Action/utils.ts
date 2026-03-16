@@ -13,35 +13,10 @@ import {
   ActionType,
   DeclarationUpdateActionType,
   Draft,
-  UUID
+  EventDocument,
+  EventState,
+  getActionAnnotation
 } from '@opencrvs/commons/client'
-
-export function getEventDrafts(
-  eventId: UUID,
-  localDraft: Draft,
-  drafts: Draft[]
-) {
-  return drafts
-    .filter((d) => d.eventId === eventId)
-    .concat({
-      ...localDraft,
-      /*
-       * Force the local draft always to be the latest
-       * This is to prevent a situation where the local draft gets created,
-       * then a CREATE action request finishes in the background and is stored with a later
-       * timestamp
-       */
-      createdAt: new Date().toISOString(),
-      /*
-       * If params.eventId changes (from tmp id to concrete id) then change the local draft id
-       */
-      eventId,
-      action: {
-        ...localDraft.action,
-        createdAt: new Date().toISOString()
-      }
-    })
-}
 
 export type AvailableActionTypes = Extract<
   ActionType,
@@ -108,4 +83,41 @@ export function getPreviousDeclarationActionType(
   }
 
   return
+}
+
+/**
+ * Returns the annotation for a given action type from an event.
+ *
+ * NOTIFY shares the DECLARE action config, so when resolving DECLARE annotation
+ * both DECLARE and NOTIFY annotations are merged together.
+ * For all other action types, if no annotation exists the NOTIFY annotation is
+ * returned as a fallback (NOTIFY is the earliest action that can capture annotation).
+ */
+export function getAnnotationForActionType({
+  event,
+  actionType,
+  draft
+}: {
+  event: EventDocument
+  actionType: ActionType
+  draft?: Draft
+}): EventState {
+  const annotation = getActionAnnotation({ event, actionType, draft })
+
+  if (actionType === ActionType.DECLARE) {
+    // NOTIFY shares the DECLARE action config — merge both
+    const notifyAnnotation = getActionAnnotation({
+      event,
+      actionType: ActionType.NOTIFY,
+      draft
+    })
+    return { ...annotation, ...notifyAnnotation }
+  }
+
+  if (Object.keys(annotation).length === 0) {
+    // Fall back to NOTIFY as the earliest annotation source
+    return getActionAnnotation({ event, actionType: ActionType.NOTIFY, draft })
+  }
+
+  return annotation
 }

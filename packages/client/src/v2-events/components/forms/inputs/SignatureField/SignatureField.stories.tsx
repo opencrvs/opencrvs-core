@@ -11,7 +11,6 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { FileFieldValue } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { noop } from '@client/v2-events'
 import { SignatureField } from './SignatureField'

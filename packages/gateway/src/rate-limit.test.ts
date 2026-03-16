@@ -9,20 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers as rootResolvers } from '@gateway/features/user/root-resolvers'
-import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { startContainer, stopContainer } from './utils/redis-test-utils'
 import { StartedTestContainer } from 'testcontainers'
-import { savedAdministrativeLocation } from '@opencrvs/commons/fixtures'
 import { createServer } from '@gateway/server'
-import { UUID } from '@opencrvs/commons'
 import { redis } from './utils/redis'
 
 const fetch = fetchAny as any
 const resolvers = rootResolvers as any
-const locationResolvers = locationRootResolvers as any
 
 let container: StartedTestContainer
 
@@ -220,26 +216,6 @@ describe('Rate limit', () => {
         { fieldName: 'verifyPasswordById' }
       )
     ).resolves.not.toThrowError()
-  })
-
-  it('does not throw RateLimitError when a non-rate-limited route is being called 20 times', async () => {
-    const resolverCalls = Array.from({ length: 20 }, async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify([
-          savedAdministrativeLocation({
-            partOf: { reference: 'Location/1' as `Location/${UUID}` }
-          })
-        ])
-      )
-      await locationResolvers.Query!.isLeafLevelLocation(
-        {},
-        { locationId: '1' },
-        { headers: authHeaderRegAgent },
-        { fieldName: 'isLeafLevelLocation' }
-      )
-    })
-
-    return expect(() => Promise.all(resolverCalls)).not.toThrowError()
   })
 
   it('handles multiple users authenticating with different usernames', async () => {

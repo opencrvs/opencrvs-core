@@ -29,7 +29,6 @@ import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
@@ -48,7 +47,6 @@ import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 
 type IStateProps = {
-  fieldNames: string[]
   language: string
   offlineData: IOfflineData
 }
@@ -259,7 +257,7 @@ const HeaderComponent = (props: IFullProps) => {
   }
 
   function renderSearchInput(props: IFullProps, isMobile?: boolean) {
-    const { intl, searchText, selectedSearchType, language, fieldNames } = props
+    const { intl, searchText, selectedSearchType, language } = props
 
     const searchTypeList: ISearchType[] = [
       {
@@ -281,36 +279,6 @@ const HeaderComponent = (props: IFullProps) => {
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
-
-    if (fieldNames.includes('registrationPhone')) {
-      searchTypeList.splice(3, 0, {
-        name: SearchCriteria.PHONE_NUMBER,
-        label: intl.formatMessage(messages.typePhone),
-        icon: <Icon name="Phone" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderPhone)
-      })
-    }
-    if (
-      fieldNames.includes('iD') ||
-      fieldNames.includes('deceasedID') ||
-      fieldNames.includes('informantID') ||
-      fieldNames.some((name) => name.endsWith('NationalId'))
-    ) {
-      searchTypeList.splice(2, 0, {
-        name: SearchCriteria.NATIONAL_ID,
-        label: intl.formatMessage(constantsMessages.id),
-        icon: <Icon name="IdentificationCard" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeholderId)
-      })
-    }
-    if (fieldNames.includes('registrationEmail')) {
-      searchTypeList.push({
-        name: SearchCriteria.EMAIL,
-        label: intl.formatMessage(messages.email),
-        icon: <Icon name="Envelope" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderEmail)
-      })
-    }
 
     const advancedSearchNavigationList: INavigationType[] = [
       {
@@ -454,12 +422,7 @@ export const Header = withRouter(
                       ? ACTIVE_MENU_ITEM.VSEXPORTS
                       : ACTIVE_MENU_ITEM.DECLARATIONS,
       language: store.i18n.language,
-      offlineData: getOfflineData(store),
-      fieldNames: Object.values(getRegisterForm(store))
-        .flatMap((form) => form.sections)
-        .flatMap((section) => section.groups)
-        .flatMap((group) => group.fields)
-        .map((field) => field.name)
+      offlineData: getOfflineData(store)
     }),
     {
       setAdvancedSearchParam: setAdvancedSearchParam

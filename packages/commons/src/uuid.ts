@@ -17,3 +17,7 @@ export type UUID = z.infer<typeof UUID>
 export function getUUID() {
   return uuidv4() as UUID
 }
+
+export function isUUID(id: string | UUID): id is UUID {
+  return UUID.safeParse(id).success
+}

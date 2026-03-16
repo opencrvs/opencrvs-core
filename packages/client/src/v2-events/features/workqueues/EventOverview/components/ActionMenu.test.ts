@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ActionType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { ActionMenuItem } from '../../Actions/utils'
 import { sortActions } from './ActionMenu'
-import { ActionMenuItem } from './useAllowedActionConfigurations'
 
 describe('sortActions()', () => {
   it('should sort actions according to default action order if no action order is configured', () => {

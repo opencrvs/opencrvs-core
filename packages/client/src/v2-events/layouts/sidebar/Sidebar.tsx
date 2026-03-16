@@ -82,7 +82,7 @@ function Workqueues({
   ))
 }
 
-export const SidebarComponent = ({
+export function SidebarComponent({
   menuCollapse,
   navigationWidth,
   isMobileView = false
@@ -90,7 +90,7 @@ export const SidebarComponent = ({
   menuCollapse?: () => void // Only relevant for mobile view
   navigationWidth?: number
   isMobileView?: boolean
-}) => {
+}) {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
   const scopes = useSelector(getScope)
@@ -132,7 +132,7 @@ export const SidebarComponent = ({
     await removeToken()
     await removeUserDetails()
     window.location.assign(
-      `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
+      `/login?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
     )
   }
 

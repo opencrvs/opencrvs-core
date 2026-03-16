@@ -27,18 +27,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting()
 })
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          return caches.delete(cacheName)
-        })
-      )
-    })
-  )
-})
-
 self.addEventListener('message', async (event) => {
   if (!event.data) {
     return
@@ -91,7 +79,7 @@ registerRoute(MINIO_REGEX, new CacheFirst())
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('/index.html'), {
     ...(import.meta.env.DEV && { allowlist: [/^\/$/] }),
-    denylist: [/^\/__.*$/]
+    denylist: [/^\/__.*$/, /^\/login/]
   })
 )
 

@@ -24,7 +24,12 @@ import {
   orderBy,
   isEqual
 } from 'lodash'
-import { ActionType, DeclarationActionType, writeActions } from './ActionType'
+import {
+  ActionType,
+  DeclarationActionType,
+  DisplayableAction,
+  writeActions
+} from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import {
@@ -87,7 +92,7 @@ export function getActionConfig({
   customActionType
 }: {
   eventConfiguration: EventConfig
-  actionType: ActionType
+  actionType: DisplayableAction
   customActionType?: string
 }): ActionConfig | undefined {
   return eventConfiguration.actions.find((a) => {

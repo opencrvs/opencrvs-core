@@ -18,13 +18,14 @@ import {
   getOrThrow,
   mandatoryColumns,
   getCurrentEventState,
-  applyDraftToEventIndex
+  applyDraftToEventIndex,
+  getEventConfigById
 } from '@opencrvs/commons/client'
 
 import { ROUTES } from '@client/v2-events/routes'
 import { CoreWorkqueues, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
 import { useEventConfigurations } from '../events/useEventConfiguration'
-import { SearchResultComponent } from '../events/Search/SearchResult'
+import { SearchResultComponent } from '../events/Search/SearchResult/SearchResult'
 import { useDrafts } from '../drafts/useDrafts'
 import { useOutbox } from '../events/useEvents/outbox'
 import { findLocalEventDocument } from '../events/useEvents/api'
@@ -33,6 +34,7 @@ export function Draft() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const eventConfigs = useEventConfigurations()
+
   const intl = useIntl()
 
   const outboxIds = useOutbox().map(({ id }) => id)
@@ -50,10 +52,7 @@ export function Draft() {
     .filter((event): event is EventDocument => !!event)
     .map((event) => {
       const draft = first(drafts.filter((d) => d.eventId === event.id))
-      const configuration = getOrThrow(
-        eventConfigs.find(({ id }) => id === event.type),
-        `Event configuration not found for ${event.type}`
-      )
+      const configuration = getEventConfigById(eventConfigs, event.type)
 
       const currentEventState = getCurrentEventState(event, configuration)
       return draft
@@ -69,7 +68,7 @@ export function Draft() {
   return (
     <SearchResultComponent
       key={`${CoreWorkqueues.DRAFT}-${outboxIds.length}`}
-      actions={WORKQUEUE_DRAFT.actions.map(({ type }) => type)}
+      action={WORKQUEUE_DRAFT.action}
       columns={mandatoryColumns}
       eventConfigs={eventConfigs}
       queryData={currentPageDrafts}

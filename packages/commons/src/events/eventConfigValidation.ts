@@ -10,11 +10,13 @@
  */
 import * as z from 'zod/v4'
 import { EventConfig } from './EventConfig'
-import { ActionType, workqueueActions } from './ActionType'
+import { ActionType, WorkqueueActionType } from './ActionType'
 import { InherentFlags } from './Flag'
 import { findAllFields, getDeclarationFields } from './utils'
 import { FieldType } from './FieldType'
 import { EventFieldId } from './AdvancedSearchConfig'
+import { isFieldReference } from '../conditionals/conditionals'
+import { EventMetadataDateFieldIdInput } from './EventMetadata'
 
 export function validateAdvancedSearchConfig(
   event: EventConfig,
@@ -68,9 +70,10 @@ export function validateDateOfEvent(
   event: EventConfig,
   ctx: z.RefinementCtx<EventConfig>
 ) {
-  if (event.dateOfEvent) {
+  if (event.dateOfEvent && isFieldReference(event.dateOfEvent)) {
+    const dateOfEvent = event.dateOfEvent
     const eventDateFieldId = getDeclarationFields(event).find(
-      ({ id }) => id === event.dateOfEvent?.$$field
+      ({ id }) => id === dateOfEvent.$$field
     )
     if (!eventDateFieldId) {
       ctx.addIssue({
@@ -84,6 +87,16 @@ export function validateDateOfEvent(
         code: 'custom',
         message: `Field specified for date of event is of type: ${eventDateFieldId.type}, but it needs to be of type: ${FieldType.DATE}`,
         path: ['dateOfEvent.fieldType']
+      })
+    }
+  } else if (event.dateOfEvent) {
+    const dateOfEvent = event.dateOfEvent
+    if (!EventMetadataDateFieldIdInput.options.includes(dateOfEvent.$$event)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Date of event field id must be a valid metadata field id.
+        Invalid date of event metadata field ID for event ${event.id}: ${dateOfEvent.$$event}`,
+        path: ['dateOfEvent']
       })
     }
   }
@@ -145,7 +158,9 @@ export function validateActionOrder(
       .map((action) => action.customActionType)
 
     const validActionTypes: string[] = [
-      ...workqueueActions.options,
+      ...WorkqueueActionType.options,
+      ActionType.ASSIGN,
+      ActionType.UNASSIGN,
       ...customActionTypes
     ]
 

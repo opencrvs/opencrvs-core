@@ -66,7 +66,8 @@ import {
   isNumberWithUnitFieldType,
   isCustomFieldType,
   isHiddenFieldType,
-  EventConfig
+  EventConfig,
+  isImageViewFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -91,7 +92,8 @@ import {
   AlphaPrintButton,
   Http,
   LinkButton,
-  VerificationStatus
+  VerificationStatus,
+  ImageView
 } from '@client/v2-events/features/events/registered-fields'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
@@ -366,6 +368,15 @@ export const GeneratedInputField = React.memo(
       )
     }
 
+    if (isImageViewFieldType(field)) {
+      return (
+        <ImageView.Input
+          configuration={field.config.configuration}
+          value={field.value}
+        />
+      )
+    }
+
     if (isParagraphFieldType(field)) {
       // @todo: is this even needed?
       const message = intl.formatMessage(fieldDefinition.label, {
@@ -518,6 +529,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             configuration={field.config.configuration}
             disabled={disabled}
+            eventConfig={eventConfig}
             validatorContext={validatorContext}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
@@ -604,6 +616,7 @@ export const GeneratedInputField = React.memo(
           <AdministrativeArea.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             partOf={typeof partOf === 'string' ? partOf : null}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -618,6 +631,7 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             searchableResource={
               field.config.configuration.searchableResource.length > 0
                 ? field.config.configuration.searchableResource
@@ -637,6 +651,7 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             searchableResource={['offices']}
             value={field.value}
             onBlur={onBlur}
@@ -652,6 +667,7 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             searchableResource={['facilities']}
             value={field.value}
             onBlur={onBlur}
@@ -732,18 +748,33 @@ export const GeneratedInputField = React.memo(
             form
           )}
           form={form}
-          parentValue={form[field.config.configuration.trigger.$$field]}
+          trigger={
+            field.config.configuration.trigger
+              ? {
+                  mode: 'onChange',
+                  value: form[field.config.configuration.trigger.$$field]
+                }
+              : { mode: 'onMount' }
+          }
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }
     if (isSearchFieldType(field)) {
+      const {
+        label: inputLabel,
+        helperText,
+        ...restInputFieldProps
+      } = inputFieldProps
+
       return (
-        <InputField {...inputFieldProps}>
+        <InputField {...restInputFieldProps}>
           <Search.Input
             key={fieldDefinition.id}
             configuration={field.config.configuration}
             form={form}
+            helperText={fieldDefinition.helperText}
+            label={inputLabel}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />

@@ -71,7 +71,7 @@ export const ADVANCED_SEARCH_PARAM_FIELDS = gql`
   }
 `
 
-export const BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION = gql`
+const BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION = gql`
   ${ADVANCED_SEARCH_PARAM_FIELDS}
   mutation bookmarkAdvancedSearch($bookmarkSearchInput: BookmarkSearchInput!) {
     bookmarkAdvancedSearch(bookmarkSearchInput: $bookmarkSearchInput) {
@@ -85,7 +85,7 @@ export const BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION = gql`
     }
   }
 `
-export const REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION = gql`
+const REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION = gql`
   ${ADVANCED_SEARCH_PARAM_FIELDS}
   mutation removeBookmarkedAdvancedSearch(
     $removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!

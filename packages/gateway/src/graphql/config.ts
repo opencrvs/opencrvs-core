@@ -20,7 +20,6 @@ import {
 import { ApolloServerOptions } from '@apollo/server'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
-import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
 import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
@@ -61,7 +60,6 @@ type StringIndexed<T> = T & IStringIndexSignatureInterface
 export const resolvers: StringIndexed<IResolvers> = merge(
   notificationRootResolvers as IResolvers,
   registrationRootResolvers as IResolvers,
-  locationRootResolvers as IResolvers,
   userRootResolvers as IResolvers,
   userTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,

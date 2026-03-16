@@ -34,7 +34,7 @@ export const isPrintable = (status: SUBMISSION_STATUS | undefined) =>
 export const isIssuable = (status: SUBMISSION_STATUS | undefined) =>
   status === SUBMISSION_STATUS.CERTIFIED
 
-export const isRecordOrDeclaration = (status: SUBMISSION_STATUS | undefined) =>
+const isRecordOrDeclaration = (status: SUBMISSION_STATUS | undefined) =>
   status
     ? [
         SUBMISSION_STATUS.REGISTERED,
@@ -65,5 +65,5 @@ export const isArchivable = (status: SUBMISSION_STATUS | undefined) =>
 export const canBeReinstated = (status: SUBMISSION_STATUS | undefined) =>
   status === SUBMISSION_STATUS.ARCHIVED
 
-export const isViewable = (status: SUBMISSION_STATUS | undefined) =>
+const isViewable = (status: SUBMISSION_STATUS | undefined) =>
   status !== SUBMISSION_STATUS.DRAFT

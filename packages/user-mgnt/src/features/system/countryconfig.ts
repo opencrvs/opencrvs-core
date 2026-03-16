@@ -42,7 +42,7 @@ export async function getInMemoryEventConfigurations(token: string) {
 }
 
 async function getEventConfigurations(authorization: string) {
-  const url = joinUrl(env.COUNTRY_CONFIG_URL, '/events')
+  const url = joinUrl(env.COUNTRY_CONFIG_URL, '/config/events')
 
   const res = await fetch(url, {
     headers: {

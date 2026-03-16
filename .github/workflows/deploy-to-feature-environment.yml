@@ -42,7 +42,7 @@ jobs:
         id: validate
         uses: ./.github/actions/validate-branch
         with:
-          pattern: '^[a-z][a-z0-9\/\-]{1,29}$'
+          pattern: '^[a-z][a-z0-9\/\-]{1,44}$'
 
       - name: Check for skip-e2e label
         id: set_skip_flag
@@ -153,7 +153,7 @@ jobs:
         id: get_chart_branch
         # ls-remote should provide list of branches. When none are found, it should be empty string.
         run: |
-          chart_repo_url="https://github.com/opencrvs/infrastructure.git"
+          chart_repo_url="https://github.com/opencrvs/opencrvs-helm-charts.git"
           if [ -n "$(git ls-remote --heads "$chart_repo_url" "refs/heads/${{ github.head_ref }}")" ]; then
             branch=${{ github.head_ref }}
           elif [ -n "$(git ls-remote --heads "$chart_repo_url" "refs/heads/${{ github.base_ref }}")" ]; then

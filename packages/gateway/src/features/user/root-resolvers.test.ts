@@ -23,6 +23,7 @@ import {
   SCOPES
 } from '@opencrvs/commons/authentication'
 import { fetchJSON } from '@opencrvs/commons'
+import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
 
 let container: StartedTestContainer
 
@@ -33,6 +34,11 @@ jest.mock('@opencrvs/commons', () => {
     fetchJSON: jest.fn()
   }
 })
+
+jest.mock('@gateway/location', () => ({
+  fetchLocation: jest.fn(),
+  fetchLocationHierarchy: jest.fn()
+}))
 
 const fetchJSONMock = fetchJSON as jest.MockedFunction<typeof fetchJSON>
 
@@ -328,8 +334,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.create[event=birth|death|tennis-club-membership]',
-              'record.declare[event=birth|death|tennis-club-membership]',
+              'type=record.create&event=birth,death,tennis-club-membership',
+              'type=record.declare&event=birth,death,tennis-club-membership',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -359,8 +365,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.create[event=birth|death|tennis-club-membership]',
-              'record.declare[event=birth|death|tennis-club-membership]',
+              'type=record.create&event=birth,death,tennis-club-membership',
+              'type=record.declare&event=birth,death,tennis-club-membership',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -429,8 +435,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.create[event=birth|death|tennis-club-membership]',
-              'record.declare[event=birth|death|tennis-club-membership]',
+              'type=record.create&event=birth,death,tennis-club-membership',
+              'type=record.declare&event=birth,death,tennis-club-membership',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -460,8 +466,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.create[event=birth|death|tennis-club-membership]',
-              'record.declare[event=birth|death|tennis-club-membership]',
+              'type=record.create&event=birth,death,tennis-club-membership',
+              'type=record.declare&event=birth,death,tennis-club-membership',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -552,8 +558,8 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'record.create[event=birth|death|tennis-club-membership]',
-              'record.declare[event=birth|death|tennis-club-membership]',
+              'type=record.create&event=birth,death,tennis-club-membership',
+              'type=record.declare&event=birth,death,tennis-club-membership',
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -1231,30 +1237,16 @@ describe('User root resolvers', () => {
             primaryOfficeId: 'requesting-user-primary-office-id'
           })
         ],
-        [
-          JSON.stringify({
-            partOf: {
-              reference: 'Location/primary-office-parent-id'
-            }
-          })
-        ],
-        [
-          JSON.stringify([
-            {
-              id: '79776844-b606-40e9-8358-7d82147f702a'
-            },
-            {
-              id: 'primary-office-parent-id'
-            }
-          ])
-        ],
-        [
-          JSON.stringify({
-            username: 'someUser123'
-          }),
-          { status: 201 }
-        ]
+        [JSON.stringify({ username: 'someUser123' }), { status: 201 }]
       )
+      ;(fetchLocation as jest.Mock).mockResolvedValueOnce({
+        administrativeAreaId: 'primary-office-parent-id'
+      })
+      ;(fetchLocationHierarchy as jest.Mock).mockResolvedValueOnce([
+        '79776844-b606-40e9-8358-7d82147f702a',
+        'primary-office-parent-id'
+      ])
+
       const response = await resolvers.Mutation!.createOrUpdateUser(
         {},
         { user: { id: '123', ...user } },
@@ -1270,37 +1262,18 @@ describe('User root resolvers', () => {
       fetchJSONMock.mockReturnValueOnce(
         Promise.resolve(DEFAULT_ROLES_DEFINITION)
       )
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            primaryOfficeId: 'requesting-user-primary-office-id'
-          })
-        ],
-        [
-          JSON.stringify({
-            partOf: {
-              reference: 'Location/primary-office-parent-id'
-            }
-          })
-        ],
-        [
-          JSON.stringify([
-            {
-              id: '79776844-b606-40e9-8358-7d82147f702a'
-            },
-            {
-              id: 'some-other-primary-office-parent-id'
-            }
-          ])
-        ],
-        [
-          JSON.stringify({
-            username: 'someUser123'
-          }),
-          { status: 201 }
-        ]
+      fetch.mockResponseOnce(
+        JSON.stringify({ primaryOfficeId: 'requesting-user-primary-office-id' })
       )
-      expect(
+      ;(fetchLocation as jest.Mock).mockResolvedValueOnce({
+        administrativeAreaId: 'primary-office-parent-id'
+      })
+      ;(fetchLocationHierarchy as jest.Mock).mockResolvedValueOnce([
+        '79776844-b606-40e9-8358-7d82147f702a',
+        'some-other-primary-office-parent-id'
+      ])
+
+      await expect(
         resolvers.Mutation!.createOrUpdateUser(
           {},
           { user: { id: '123', ...user } },
