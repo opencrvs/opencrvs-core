@@ -61,6 +61,7 @@ export function payloadGenerator(
       role: input.role ?? TestUserRole.enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId,
+      status: 'active',
       administrativeAreaId: input.administrativeAreaId,
       fullHonorificName: input.fullHonorificName
     })
@@ -147,6 +148,7 @@ export function seeder() {
       primaryOfficeId: user.primaryOfficeId,
       administrativeAreaId: user.administrativeAreaId ?? null,
       name: user.name,
+      status: 'active',
       fullHonorificName: user.fullHonorificName,
       role: user.role as TestUserRole,
       id: user.id ?? getUUID()

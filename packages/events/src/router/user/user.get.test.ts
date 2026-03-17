@@ -44,6 +44,11 @@ test('Returns user in correct format if found', async () => {
     name: user.name,
     role: user.role,
     signature: user.signature,
+    avatar: user.avatar,
+    email: user.email,
+    device: user.device,
+    mobile: user.mobile,
+    status: user.status,
     primaryOfficeId: user.primaryOfficeId,
     type: TokenUserType.enum.user
   })
@@ -69,6 +74,11 @@ test('Returns user with full honorific name when defined', async () => {
     id: user.id,
     name: user.name,
     role: user.role,
+    avatar: user.avatar,
+    email: user.email,
+    device: user.device,
+    mobile: user.mobile,
+    status: user.status,
     signature: user.signature,
     primaryOfficeId: user.primaryOfficeId,
     fullHonorificName: userWithHonorific.fullHonorificName,

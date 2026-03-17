@@ -13,6 +13,7 @@ import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { ITokenPayload, User } from '@opencrvs/commons/client'
+import { getUsersFullName } from '@client/v2-events/utils'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -27,9 +28,7 @@ export async function removeUserDetails() {
 
 export function getUserName(userDetails: UserDetails | null) {
   if (!userDetails?.name?.length) return ''
-  const englishName =
-    userDetails.name.find((n) => n.use === LANG_EN) ?? userDetails.name[0]
-  return [...englishName.given, englishName.family].filter(Boolean).join(' ')
+  return getUsersFullName(userDetails.name, LANG_EN)
 }
 
 export function useAuthentication() {

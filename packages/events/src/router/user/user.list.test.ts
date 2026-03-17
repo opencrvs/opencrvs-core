@@ -60,7 +60,12 @@ test('Returns user in correct format', async () => {
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user
+      type: TokenUserType.enum.user,
+      avatar: user.avatar,
+      email: user.email,
+      device: user.device,
+      mobile: user.mobile,
+      status: user.status,
     }
   ])
 })
@@ -140,7 +145,12 @@ test('Does not return users or systems which are not found', async () => {
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user
+      type: TokenUserType.enum.user,
+      avatar: user.avatar,
+      email: user.email,
+      device: user.device,
+      mobile: user.mobile,
+      status: user.status
     }
   ])
 })

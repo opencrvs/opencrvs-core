@@ -562,19 +562,6 @@ function reducer(
       const offices = filterLocations(
         action.payload,
         'CRVS_OFFICE'
-        /*
-
-        // This is used to filter office locations available offline
-        // It was important in an older design and may become important again
-
-        {
-          locationLevel: 'id',
-          locationId: isNationalSystemAdmin(state.userDetails)
-            ? undefined
-            : state.userDetails &&
-              state.userDetails.primaryOffice &&
-              state.userDetails.primaryOfficeId
-        }*/
       )
       const activeOffices = Object.fromEntries(
         Object.entries(offices).filter(
