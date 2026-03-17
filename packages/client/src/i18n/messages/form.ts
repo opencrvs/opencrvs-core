@@ -10,6 +10,7 @@
  */
 import { defineMessages } from 'react-intl'
 
+/** @knipignore */
 export const formMessageDescriptors = {
   addFile: {
     defaultMessage: 'Add file',
