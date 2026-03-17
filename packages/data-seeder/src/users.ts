@@ -194,7 +194,7 @@ async function userAlreadyExists(
 async function createUser(token: string, userPayload: unknown) {
   const url = new URL('events', env.GATEWAY_HOST).toString()
   const client = createClient(url, `Bearer ${token}`)
-  return client.user.create(userPayload)
+  return client.user.create.mutate(userPayload)
 }
 
 export async function seedUsers(token: string) {
