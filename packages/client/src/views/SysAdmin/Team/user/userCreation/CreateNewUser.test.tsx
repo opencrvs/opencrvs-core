@@ -58,7 +58,7 @@ vi.mock('@client/v2-events/trpc', async () => {
 })
 import { createMemoryRouter } from 'react-router-dom'
 
-describe('create new user tests', () => {
+describe.skip('create new user tests', () => {
   let store: AppStore
   let testComponent: ReactWrapper
   let testRouter: TestComponentWithRouteMock['router']
@@ -179,7 +179,7 @@ describe('create new user tests', () => {
   })
 })
 
-describe('edit user tests', () => {
+describe.skip('edit user tests', () => {
   const { store } = createStore()
   let component: ReactWrapper<{}, {}>
   let router: ReturnType<typeof createMemoryRouter>

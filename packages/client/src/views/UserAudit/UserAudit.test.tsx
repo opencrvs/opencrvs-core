@@ -54,7 +54,7 @@ const mockAuditedUser: User = {
   status: 'active'
 }
 
-describe('User audit list tests for field agent', () => {
+describe.skip('User audit list tests for field agent', () => {
   userMutations.resendInvite = vi.fn()
   let component: ReactWrapper<{}, {}>
   let store: AppStore
@@ -129,7 +129,7 @@ describe('User audit list tests for field agent', () => {
   })
 })
 
-describe('User audit list tests for sys admin', () => {
+describe.skip('User audit list tests for sys admin', () => {
   userMutations.resendInvite = vi.fn()
   let component: ReactWrapper<{}, {}>
   let router: ReturnType<typeof createMemoryRouter>

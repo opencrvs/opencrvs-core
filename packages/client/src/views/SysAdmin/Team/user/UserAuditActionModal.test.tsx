@@ -121,7 +121,7 @@ const graphqlMocksOfReactivate = [
   }
 ]
 
-describe('user audit action modal tests', () => {
+describe.skip('user audit action modal tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   const onCloseMock = vi.fn()

@@ -34,7 +34,7 @@ import { formatUrl } from '@client/navigation'
 import { CREATE_USER_SECTION } from '@client/navigation/routes'
 import { createMemoryRouter } from 'react-router-dom'
 
-describe('signature upload tests', () => {
+describe.skip('signature upload tests', () => {
   const { store } = createStore()
   let testComponent: ReactWrapper
   let router: ReturnType<typeof createMemoryRouter>

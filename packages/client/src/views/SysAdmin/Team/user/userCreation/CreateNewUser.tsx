@@ -305,6 +305,10 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
     throw new Error(`No section found ${sectionId}`)
   }
 
+  if (!user) {
+    throw new Error('User details not found in store')
+  }
+
   section = scopes.some((scope) =>
     (
       [
