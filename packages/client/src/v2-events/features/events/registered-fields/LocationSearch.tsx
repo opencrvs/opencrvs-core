@@ -36,7 +36,7 @@ import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
  * Return the available location options. The options will be filtered based on the jurisdiction filter.
  */
 function useAvailableLocations(
-  searchableResource: string[],
+  searchableResource?: string[],
   jurisdictionFilter?: JurisdictionFilter
 ) {
   const { getLocations } = useLocations()
@@ -59,7 +59,9 @@ function useAvailableLocations(
     return Array.from(locations.values()).filter(
       (location) =>
         location.locationType &&
-        searchableResource.includes(location.locationType)
+        (searchableResource
+          ? searchableResource.includes(location.locationType)
+          : true)
     )
   }, [searchableResource, locations])
 
@@ -95,7 +97,7 @@ function LocationSearchInput({
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
-  searchableResource: string[]
+  searchableResource?: string[]
   value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean

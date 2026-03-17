@@ -631,24 +631,13 @@ export type AdministrativeAreaField = z.infer<typeof AdministrativeAreaField>
 const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: z
-    .object({
-      // Any string: use LocationSearchResource constants for well-known types,
-      // or any locationType string for custom location categories.
-      searchableResource: z.array(z.string()).default([
-        LocationSearchResource.enum.ADMIN_STRUCTURE,
-        LocationSearchResource.enum.HEALTH_FACILITY,
-        LocationSearchResource.enum.CRVS_OFFICE
-      ]),
-      allowedLocations: AllowedLocations
-    })
-    .default({
-      searchableResource: [
-        LocationSearchResource.enum.ADMIN_STRUCTURE,
-        LocationSearchResource.enum.HEALTH_FACILITY,
-        LocationSearchResource.enum.CRVS_OFFICE
-      ]
-    })
+  configuration: z.object({
+    searchableResource: z
+      .array(z.string())
+      .optional()
+      .describe('Types of the locations that are available for selection.'),
+    allowedLocations: AllowedLocations
+  })
 }).describe('Input field for a location')
 
 export type LocationInput = z.infer<typeof LocationInput>
