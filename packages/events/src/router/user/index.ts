@@ -47,7 +47,7 @@ export const userRouter = router({
   create: userOnlyProcedure
     .input(UserInput)
     .output(User)
-    .query(async ({ input, ctx }) => createUser(input, ctx.token)),
+    .mutation(async ({ input, ctx }) => createUser(input, ctx.token)),
   list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
