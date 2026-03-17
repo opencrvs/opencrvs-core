@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './buttons'
+export * from './form'
 export * from './constants'
 export * from './errors'
 export * from './validations'
