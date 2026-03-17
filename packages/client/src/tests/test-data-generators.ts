@@ -81,6 +81,7 @@ export function testDataGenerator(rngSeed?: number) {
         fullHonorificName: undefined,
         signature: undefined,
         avatar: undefined,
+        status: 'active',
         type: TokenUserType.enum.user,
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       } satisfies User,
@@ -133,6 +134,7 @@ export function testDataGenerator(rngSeed?: number) {
         avatar: undefined,
         signature: undefined,
         fullHonorificName: undefined,
+        status: 'active',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
         type: TokenUserType.enum.user
       } satisfies User,
@@ -186,6 +188,7 @@ export function testDataGenerator(rngSeed?: number) {
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
         avatar: undefined,
         signature: undefined,
+        status: 'active',
         type: TokenUserType.enum.user
       } satisfies User,
       v1: {
@@ -293,6 +296,7 @@ export function testDataGenerator(rngSeed?: number) {
           }
         ],
         role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
+        status: 'active',
         primaryOfficeId: '8788d17c-b639-4aa0-89f0-ebc64263d81c' as UUID,
         type: TokenUserType.enum.user
       },

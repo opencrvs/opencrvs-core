@@ -111,10 +111,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
         clearUserFormData()
       }
       if (userId) {
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        fetchAndStoreUserData(client as ApolloClient<any>, {
-          userId
-        })
+        fetchAndStoreUserData({ userId })
       }
     }
 

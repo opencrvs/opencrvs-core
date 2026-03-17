@@ -440,11 +440,6 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
       index: number
       status?: string
     }) {
-      const userForPermissions = {
-        id: user.id,
-        primaryOffice: { id: user.primaryOfficeId },
-        role: { id: user.role }
-      }
       return (
         <Stack
           alignItems="center"
@@ -453,7 +448,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
           justifyContent="flex-start"
         >
           <Status status={status || 'pending'} />
-          {canEditUser(userForPermissions) && (
+          {canEditUser(user) && (
             <ToggleMenu
               id={`user-item-${index}-menu`}
               toggleButton={
@@ -482,7 +477,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
         const avatar = user.avatar
         const userForPermissions = {
           id: user.id,
-          primaryOffice: { id: user.primaryOfficeId }
+          primaryOfficeId: user.primaryOfficeId
         }
 
         return {
@@ -528,7 +523,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
         }
       })
     },
-    [StatusMenu, intl, navigate, canReadUser, userRoles]
+    [StatusMenu, intl, navigate, canReadUser]
   )
 
   const onClickAddUser = useCallback(
@@ -640,7 +635,6 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
               show={toggleActivation.modalVisible}
               userId={toggleActivation.selectedUser.id}
               onClose={() => toggleUserActivationModal()}
-              onConfirmRefetchQueries={[]}
             />
           ) : null}
 

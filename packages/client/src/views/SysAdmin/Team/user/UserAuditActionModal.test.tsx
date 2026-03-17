@@ -14,86 +14,48 @@ import { UserAuditActionModal, AUDIT_ACTION } from './UserAuditActionModal'
 import { createTestComponent } from '@client/tests/util'
 import { AppStore, createStore } from '@client/store'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
-import { GET_USER, USER_AUDIT_ACTION } from '@client/user/queries'
+import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
 import { vi } from 'vitest'
-import { Status, GetUserQuery } from '@client/utils/gateway'
+import { User, UUID } from '@opencrvs/commons/client'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 
-const users: Array<NonNullable<GetUserQuery['getUser']>> = [
+vi.mock('@client/v2-events/hooks/useUsers')
+
+const users: User[] = [
   {
+    type: 'user',
     id: '5d08e102542c7a19fc55b790',
     name: [
       {
         use: 'en',
-        firstNames: 'Rabindranath',
-        familyName: 'Tagore'
+        given: ['Rabindranath'],
+        family: 'Tagore'
       }
     ],
-    username: 'r.tagore',
-    role: {
-      id: 'ENTREPRENEUR',
-      label: {
-        id: 'userRoles.entrepreneur',
-        defaultMessage: 'Entrepreneur',
-        description: 'Entrepreneur'
-      }
-    },
-    status: Status.Active,
-    creationDate: '2022-10-03T10:42:46.920Z',
-    userMgntUserID: '5eba726866458970cf2e23c2',
-    practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    role: 'ENTREPRENEUR',
+    primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a' as UUID,
     mobile: '+8801711111111',
-    primaryOffice: {
-      id: '0d8474da-0361-4d32-979e-af91f012340a',
-      name: 'Kaliganj Union Sub Center',
-      alias: ['Central']
-    }
+    status: 'active'
   },
   {
+    type: 'user',
     id: '5d08e102542c7a19fc55b793',
     name: [
       {
         use: 'en',
-        firstNames: 'Nasreen Pervin',
-        familyName: 'Huq'
+        given: ['Nasreen Pervin'],
+        family: 'Huq'
       }
     ],
-    username: 'np.huq',
-    role: {
-      id: 'MAYOR',
-      label: {
-        id: 'userRoles.mayor',
-        defaultMessage: 'Mayor',
-        description: 'Mayor'
-      }
-    },
-    status: Status.Deactivated,
-    creationDate: '2022-10-03T10:42:46.920Z',
-    userMgntUserID: '5eba726866458970cf2e23c2',
-    practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    role: 'MAYOR',
+    primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a' as UUID,
     mobile: '+8801711111111',
-    primaryOffice: {
-      id: '0d8474da-0361-4d32-979e-af91f012340a',
-      name: 'Kaliganj Union Sub Center',
-      alias: ['Central']
-    }
+    status: 'deactivated'
   }
 ]
 
 const graphqlMocksOfDeactivate = [
-  {
-    request: {
-      query: GET_USER,
-      variables: {
-        userId: users[0].id
-      }
-    },
-    result: {
-      data: {
-        getUser: users[0]
-      }
-    }
-  },
   {
     request: {
       query: USER_AUDIT_ACTION,
@@ -127,19 +89,6 @@ const graphqlMocksOfDeactivate = [
 ]
 
 const graphqlMocksOfReactivate = [
-  {
-    request: {
-      query: GET_USER,
-      variables: {
-        userId: users[1].id
-      }
-    },
-    result: {
-      data: {
-        getUser: users[1]
-      }
-    }
-  },
   {
     request: {
       query: USER_AUDIT_ACTION,
@@ -187,7 +136,20 @@ describe('user audit action modal tests', () => {
 
   describe('in case of successful deactivate audit action', () => {
     beforeEach(async () => {
-      const [userDetails, successMock] = graphqlMocksOfDeactivate
+      const [successMock] = graphqlMocksOfDeactivate
+
+      vi.mocked(useUsers).mockImplementation(
+        () =>
+          ({
+            getUser: {
+              useQuery: () => ({
+                data: users[0],
+                isFetching: false,
+                error: null
+              })
+            }
+          }) as unknown as ReturnType<typeof useUsers>
+      )
 
       const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
@@ -195,7 +157,7 @@ describe('user audit action modal tests', () => {
           userId={users[0].id}
           onClose={onCloseMock}
         />,
-        { store, graphqlMocks: [userDetails, successMock] }
+        { store, graphqlMocks: [successMock] }
       )
       component = testComponent
     })
@@ -250,7 +212,20 @@ describe('user audit action modal tests', () => {
 
   describe('in case of failed deactivate audit action', () => {
     beforeEach(async () => {
-      const [userDetails, , errorMock] = graphqlMocksOfDeactivate
+      const [, errorMock] = graphqlMocksOfDeactivate
+
+      vi.mocked(useUsers).mockImplementation(
+        () =>
+          ({
+            getUser: {
+              useQuery: () => ({
+                data: users[0],
+                isFetching: false,
+                error: null
+              })
+            }
+          }) as unknown as ReturnType<typeof useUsers>
+      )
 
       const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
@@ -258,7 +233,7 @@ describe('user audit action modal tests', () => {
           userId={users[0].id}
           onClose={onCloseMock}
         />,
-        { store, graphqlMocks: [userDetails, errorMock] }
+        { store, graphqlMocks: [errorMock] }
       )
       component = testComponent
     })
@@ -285,7 +260,20 @@ describe('user audit action modal tests', () => {
 
   describe('in case of successful reactivate audit action', () => {
     beforeEach(async () => {
-      const [userDetails, successMock] = graphqlMocksOfReactivate
+      const [successMock] = graphqlMocksOfReactivate
+
+      vi.mocked(useUsers).mockImplementation(
+        () =>
+          ({
+            getUser: {
+              useQuery: () => ({
+                data: users[1],
+                isFetching: false,
+                error: null
+              })
+            }
+          }) as unknown as ReturnType<typeof useUsers>
+      )
 
       const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
@@ -293,7 +281,7 @@ describe('user audit action modal tests', () => {
           userId={users[1].id}
           onClose={onCloseMock}
         />,
-        { store, graphqlMocks: [userDetails, successMock] }
+        { store, graphqlMocks: [successMock] }
       )
       component = testComponent
     })
@@ -335,7 +323,20 @@ describe('user audit action modal tests', () => {
 
   describe('in case of failed reactivate audit action', () => {
     beforeEach(async () => {
-      const [userDetails, , errorMock] = graphqlMocksOfReactivate
+      const [, errorMock] = graphqlMocksOfReactivate
+
+      vi.mocked(useUsers).mockImplementation(
+        () =>
+          ({
+            getUser: {
+              useQuery: () => ({
+                data: users[1],
+                isFetching: false,
+                error: null
+              })
+            }
+          }) as unknown as ReturnType<typeof useUsers>
+      )
 
       const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
@@ -343,7 +344,7 @@ describe('user audit action modal tests', () => {
           userId={users[1].id}
           onClose={onCloseMock}
         />,
-        { store, graphqlMocks: [userDetails, errorMock] }
+        { store, graphqlMocks: [errorMock] }
       )
       component = testComponent
     })

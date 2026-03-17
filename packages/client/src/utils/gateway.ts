@@ -2022,6 +2022,8 @@ type UpdatePermissionsInput = {
   webhook: Array<WebhookInput>
 }
 
+type User = unknown
+
 type UserAuditLogItem = AuditLogItemBase & {
   __typename?: 'UserAuditLogItem'
   action: Scalars['String']

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
+import { ApolloClient, ApolloError } from '@apollo/client'
 import {
   IForm,
   IFormField,
@@ -34,8 +34,10 @@ import { gqlToDraftTransformer } from '@client/transformer'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { UserRole } from '@client/utils/gateway'
+import { SEARCH_USERS } from '@client/user/queries'
+import { trpcClient } from '@client/v2-events/trpc'
+import { User } from '@opencrvs/commons/client'
 
-import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
 import { Action } from 'redux'
 import { ActionCmd, Cmd, Loop, LoopReducer, RunCmd, loop } from 'redux-loop'
 
@@ -169,19 +171,16 @@ function submitFail(errorData: ApolloError): ISubmitFailedAction {
 interface IFetchAndStoreUserData {
   type: typeof FETCH_USER_DATA
   payload: {
-    client: ApolloClient<unknown>
     variables: { userId: string }
   }
 }
 
 export function fetchAndStoreUserData(
-  client: ApolloClient<unknown>,
   variables: { userId: string }
 ): IFetchAndStoreUserData {
   return {
     type: FETCH_USER_DATA,
     payload: {
-      client,
       variables
     }
   }
@@ -190,17 +189,17 @@ export function fetchAndStoreUserData(
 interface IStoreUserFormDataAction {
   type: typeof STORE_USER_FORM_DATA
   payload: {
-    queryData: ApolloQueryResult<GQLQuery>
+    user: User
   }
 }
 
 function storeUserFormData(
-  queryData: ApolloQueryResult<GQLQuery>
+  user: User
 ): IStoreUserFormDataAction {
   return {
     type: STORE_USER_FORM_DATA,
     payload: {
-      queryData
+      user
     }
   }
 }
@@ -365,20 +364,14 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 
     case FETCH_USER_DATA:
       const {
-        client: userClient,
         variables: { userId }
       } = (action as IFetchAndStoreUserData).payload
       return loop(
         state,
         Cmd.run(
-          () =>
-            userClient.query({
-              query: GET_USER,
-              variables: { userId },
-              fetchPolicy: 'no-cache'
-            }),
+          () => trpcClient.user.get.query(userId),
           {
-            successActionCreator: storeUserFormData,
+            successActionCreator: (result) => storeUserFormData(result as User),
             failActionCreator: () =>
               showSubmitFormErrorToast(TOAST_MESSAGES.FAIL)
           }
@@ -386,13 +379,20 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case STORE_USER_FORM_DATA:
-      const { queryData } = action.payload
+      const { user } = (action as IStoreUserFormDataAction).payload
+      const gqlCompatibleUser = {
+        ...user,
+        name: user.name.map((n) => ({
+          use: n.use,
+          firstNames: n.given.join(' '),
+          familyName: n.family
+        })),
+        primaryOffice: { id: user.primaryOfficeId }
+      }
       const formData = gqlToDraftTransformer(
         { sections: state.userForm.sections },
         {
-          [UserSection.User]: {
-            ...queryData.data.getUser
-          }
+          [UserSection.User]: gqlCompatibleUser
         }
       )
 

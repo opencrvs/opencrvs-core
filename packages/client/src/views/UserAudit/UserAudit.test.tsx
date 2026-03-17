@@ -19,71 +19,39 @@ import {
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { userMutations } from '@client/user/mutations'
-import { GET_USER } from '@client/user/queries'
 import { UserAudit } from '@client/views/UserAudit/UserAudit'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
-import { GetUserQuery, Status } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { vi } from 'vitest'
-import { UUID } from '@opencrvs/commons/client'
+import { User, UUID } from '@opencrvs/commons/client'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 
 import { formatUrl } from '@client/navigation'
 import { USER_PROFILE } from '@client/navigation/routes'
 import { createMemoryRouter } from 'react-router-dom'
 
-const mockAuditedUserGqlResponse = {
-  request: {
-    query: GET_USER,
-    variables: {
-      userId: '5d08e102542c7a19fc55b790'
+vi.mock('@client/v2-events/hooks/useUsers')
+
+const mockAuditedUser: User = {
+  type: 'user',
+  id: '5d08e102542c7a19fc55b790',
+  name: [
+    {
+      use: 'bn',
+      given: [''],
+      family: 'মায়ের পারিবারিক নাম'
+    },
+    {
+      use: 'en',
+      given: [''],
+      family: 'Shakib al Hasan'
     }
-  },
-  result: {
-    data: {
-      getUser: {
-        id: '5d08e102542c7a19fc55b790',
-        userMgntUserID: '5d08e102542c7a19fc55b790',
-        name: [
-          {
-            use: 'bn',
-            firstNames: '',
-            familyName: 'মায়ের পারিবারিক নাম'
-          },
-          {
-            use: 'en',
-            firstNames: '',
-            familyName: 'Shakib al Hasan'
-          }
-        ],
-        username: 'shakib.alhasan',
-        mobile: '+8801662132163',
-        identifier: {
-          system: 'NATIONAL_ID',
-          value: '1014881922'
-        },
-        role: {
-          id: 'HOSPITAL_CLERK',
-          label: {
-            id: 'userRole.hospitalClerk',
-            defaultMessage: 'Hospital Clerk',
-            description: 'Name for user role Hospital Clerk',
-            __typename: 'I18nMessage'
-          },
-          __typename: 'UserRole'
-        },
-        status: Status.Active,
-        underInvestigation: true,
-        practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-        primaryOffice: {
-          id: '895cc945-94a9-4195-9a29-22e9310f3385',
-          name: 'Narsingdi Paurasabha',
-          alias: ['নরসিংদী পৌরসভা']
-        },
-        creationDate: '2019-03-31T18:00:00.000Z'
-      } satisfies GetUserQuery['getUser']
-    }
-  }
+  ],
+  role: 'HOSPITAL_CLERK',
+  primaryOfficeId: '895cc945-94a9-4195-9a29-22e9310f3385' as UUID,
+  mobile: '+8801662132163',
+  status: 'active'
 }
 
 describe('User audit list tests for field agent', () => {
@@ -94,6 +62,18 @@ describe('User audit list tests for field agent', () => {
 
   beforeEach(async () => {
     Date.now = vi.fn(() => 1487076708000)
+    vi.mocked(useUsers).mockImplementation(
+      () =>
+        ({
+          getUser: {
+            useQuery: () => ({
+              data: mockAuditedUser,
+              isFetching: false,
+              error: null
+            })
+          }
+        }) as unknown as ReturnType<typeof useUsers>
+    )
 
     const { store: testStore } = await createTestStore()
     store = testStore
@@ -106,15 +86,27 @@ describe('User audit list tests for field agent', () => {
           userId: '5d08e102542c7a19fc55b790'
         })
       ],
-      graphqlMocks: [mockAuditedUserGqlResponse]
+      graphqlMocks: []
     }))
   })
 
   it('renders without crashing', async () => {
-    expect(await waitForElement(component, '#user-audit-list')).toBeDefined()
+    expect(await waitForElement(component, '#office-link')).toBeDefined()
   })
 
   it('renders with a error toast for graphql error', async () => {
+    vi.mocked(useUsers).mockImplementationOnce(
+      () =>
+        ({
+          getUser: {
+            useQuery: () => ({
+              data: undefined,
+              isFetching: false,
+              error: new Error('GraphQL error')
+            })
+          }
+        }) as unknown as ReturnType<typeof useUsers>
+    )
     const { component: testComponent } = await createTestComponent(
       <UserAudit />,
       {
@@ -152,6 +144,18 @@ describe('User audit list tests for sys admin', () => {
     userDetails.primaryOfficeId = '895cc945-94a9-4195-9a29-22e9310f3385' as UUID
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
     setScopes(SYSTEM_ADMIN_DEFAULT_SCOPES, store)
+    vi.mocked(useUsers).mockImplementation(
+      () =>
+        ({
+          getUser: {
+            useQuery: () => ({
+              data: mockAuditedUser,
+              isFetching: false,
+              error: null
+            })
+          }
+        }) as unknown as ReturnType<typeof useUsers>
+    )
 
     const { component: testComponent, router: testRouter } =
       await createTestComponent(<UserAudit />, {
@@ -162,14 +166,14 @@ describe('User audit list tests for sys admin', () => {
             userId: '5d08e102542c7a19fc55b790'
           })
         ],
-        graphqlMocks: [mockAuditedUserGqlResponse]
+        graphqlMocks: []
       })
     component = testComponent
     router = testRouter
   })
 
   it('redirects to edit user view on clicking edit details menu option', async () => {
-    await waitForElement(component, '#user-audit-list')
+    await waitForElement(component, '#office-link')
 
     const menuLink = await waitForElement(
       component,

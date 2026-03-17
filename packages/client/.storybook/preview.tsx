@@ -255,6 +255,7 @@ const preview: Preview = {
           name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
           role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
           primaryOfficeId,
+          status: 'active',
           type: TokenUserType.enum.user
         })
       } else if (

@@ -97,6 +97,7 @@ export async function getUserOrSystem(
       id: user.id,
       name: user.name,
       role: user.role,
+      status: user.status as User['status'],
       signature: user.signature ? user.signature : undefined,
       avatar: user.avatar?.data ? user.avatar.data : undefined,
       primaryOfficeId: user.primaryOfficeId,
@@ -155,7 +156,6 @@ export async function searchUsers(
 
   const { results } = (await res.json()) as SearchUsersResult
 
-console.log(results)
   return results.map((user) => ({
     type: TokenUserType.enum.user,
     id: user.id,
@@ -164,7 +164,7 @@ console.log(results)
     signature: user.signature ? user.signature : undefined,
     avatar: user.avatar?.data ? user.avatar.data : undefined,
     primaryOfficeId: user.primaryOfficeId,
-    status: user.status,
+    status: user.status as User['status'],
     device: user.device ? user.device : undefined,
     fullHonorificName: user.fullHonorificName
       ? user.fullHonorificName

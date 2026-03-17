@@ -43,7 +43,7 @@ export const User = z.object({
   type: TokenUserType.extract(['user']),
   mobile: z.string().optional(),
   email: z.string().optional(),
-  status: z.string().optional()
+  status: z.enum(['active', 'deactivated', 'pending'])
 })
 export type User = z.infer<typeof User>
 

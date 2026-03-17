@@ -19,7 +19,7 @@ import {
 } from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
-import { GET_USER } from '@client/user/queries'
+import { trpcClient } from '@client/v2-events/trpc'
 import {
   createTestComponent,
   flushPromises,
@@ -39,8 +39,23 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { vi, Mock, describe, expect } from 'vitest'
-import { GetUserQuery, Status } from '@client/utils/gateway'
-import { SCOPES } from '@opencrvs/commons/client'
+import { SCOPES, User, UUID } from '@opencrvs/commons/client'
+
+vi.mock('@client/v2-events/trpc', async () => {
+  const actual = await vi.importActual<typeof import('@client/v2-events/trpc')>(
+    '@client/v2-events/trpc'
+  )
+  return {
+    ...actual,
+    trpcClient: {
+      user: {
+        get: {
+          query: vi.fn()
+        }
+      }
+    }
+  }
+})
 import { createMemoryRouter } from 'react-router-dom'
 
 describe('create new user tests', () => {
@@ -170,62 +185,19 @@ describe('edit user tests', () => {
   let router: ReturnType<typeof createMemoryRouter>
   const submitMock: Mock = vi.fn()
 
-  const graphqlMocks = [
-    {
-      request: {
-        query: GET_USER,
-        variables: { userId: '5e835e4d81fbf01e4dc554db' }
-      },
-      result: {
-        data: {
-          getUser: {
-            id: '5e835e4d81fbf01e4dc554db',
-            userMgntUserID: '5e835e4d81fbf01e4dc554db',
-            name: [
-              {
-                use: 'bn',
-                firstNames: 'Jeff',
-                familyName: 'মায়ের পারিবারিক নাম ',
-                __typename: 'HumanName'
-              },
-              {
-                use: 'en',
-                firstNames: 'Jeff',
-                familyName: 'Shakib al Hasan',
-                __typename: 'HumanName'
-              }
-            ],
-            username: 'shakib1',
-            mobile: '+8801662132163',
-            email: 'jeff@gmail.com',
-            role: {
-              id: '63ef9466f708ea080777c27a',
-              label: {
-                defaultMessage: 'State Registrar',
-                description: 'Name for user role State Registrar',
-                id: 'userRole.stateRegistrar'
-              }
-            },
-            status: Status.Active,
-            underInvestigation: false,
-            practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-            primaryOffice: {
-              id: '895cc945-94a9-4195-9a29-22e9310f3385',
-              name: 'Narsingdi Paurasabha',
-              alias: ['নরসিংদী পৌরসভা'],
-              __typename: 'Location'
-            },
-            // without signature confirm button stays disabled
-            signature: new File(['(⌐□_□)'], 'chucknorris.png', {
-              type: 'image/png'
-            }),
-            creationDate: '2019-03-31T18:00:00.000Z',
-            __typename: 'User'
-          } satisfies GetUserQuery['getUser']
-        }
-      }
-    }
-  ]
+  const mockEditUser: User = {
+    type: 'user',
+    id: '5e835e4d81fbf01e4dc554db',
+    name: [
+      { use: 'bn', given: ['Jeff'], family: 'মায়ের পারিবারিক নাম' },
+      { use: 'en', given: ['Jeff'], family: 'Shakib al Hasan' }
+    ],
+    role: 'STATE_REGISTRAR',
+    primaryOfficeId: '895cc945-94a9-4195-9a29-22e9310f3385' as UUID,
+    mobile: '+8801662132163',
+    email: 'jeff@gmail.com',
+    status: 'active'
+  }
 
   beforeEach(async () => {
     setScopes(
@@ -259,10 +231,13 @@ describe('edit user tests', () => {
 
   describe('when user is in update form page', () => {
     beforeEach(async () => {
+      vi.mocked(trpcClient.user.get.query as Mock).mockResolvedValue(
+        mockEditUser
+      )
       const { component: testComponent, router: testRouter } =
         await createTestComponent(<CreateNewUser />, {
           store,
-          graphqlMocks: graphqlMocks,
+          graphqlMocks: [],
           path: REVIEW_USER_FORM,
           initialEntries: [
             formatUrl(REVIEW_USER_FORM, {
@@ -296,6 +271,9 @@ describe('edit user tests', () => {
 
   describe('when user is in review page', () => {
     beforeEach(async () => {
+      vi.mocked(trpcClient.user.get.query as Mock).mockResolvedValue(
+        mockEditUser
+      )
       ;({ component, router } = await createTestComponent(
         <CreateNewUser
           // @ts-ignore
@@ -303,7 +281,7 @@ describe('edit user tests', () => {
         />,
         {
           store,
-          graphqlMocks,
+          graphqlMocks: [],
           path: REVIEW_USER_DETAILS,
           initialEntries: [
             formatUrl(REVIEW_USER_DETAILS, {
