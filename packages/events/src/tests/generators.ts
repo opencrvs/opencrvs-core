@@ -18,7 +18,6 @@ import {
   generateUuid,
   getUUID,
   Location,
-  LocationType,
   pickRandom,
   TestUserRole,
   TokenUserType,
@@ -79,10 +78,7 @@ export function payloadGenerator(
           administrativeAreaId: null,
           validUntil: null,
           externalId: generateTrackingId(prng) + generateTrackingId(prng),
-          locationType: pickRandom(prng, [
-            LocationType.enum.CRVS_OFFICE,
-            LocationType.enum.HEALTH_FACILITY
-          ])
+          locationType: pickRandom(prng, ['CRVS_OFFICE', 'HEALTH_FACILITY'])
         })) satisfies Location[]
       }
 
@@ -94,7 +90,7 @@ export function payloadGenerator(
         externalId:
           location.externalId ??
           generateTrackingId(prng) + generateTrackingId(prng),
-        locationType: LocationType.enum.CRVS_OFFICE
+        locationType: 'CRVS_OFFICE'
       })) as Location[]
     }
   }
@@ -179,7 +175,7 @@ function generateTestLocations(
     (admin) => {
       const crvs = {
         name: `${admin.name} CRVS Office`,
-        locationType: LocationType.enum.CRVS_OFFICE,
+        locationType: 'CRVS_OFFICE',
         administrativeAreaId: admin.id,
         id: generateUuid(rng),
         validUntil: null,
@@ -188,7 +184,7 @@ function generateTestLocations(
 
       const health = {
         name: `${admin.name} Health Facility`,
-        locationType: LocationType.enum.HEALTH_FACILITY,
+        locationType: 'HEALTH_FACILITY',
         administrativeAreaId: admin.id,
         id: generateUuid(rng),
         validUntil: null,
@@ -202,7 +198,7 @@ function generateTestLocations(
   const locationsUnderCountry = [
     {
       name: `Country-level CRVS Office`,
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
       id: generateUuid(rng),
       validUntil: null,
@@ -210,7 +206,7 @@ function generateTestLocations(
     },
     {
       name: `Country-level Health Facility`,
-      locationType: LocationType.enum.HEALTH_FACILITY,
+      locationType: 'HEALTH_FACILITY',
       administrativeAreaId: null,
       id: generateUuid(rng),
       validUntil: null,

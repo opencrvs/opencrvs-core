@@ -33,21 +33,10 @@ import { getToken } from '@client/utils/authUtils'
 import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 
 /**
- * @deprecated
- *  In v2.0 resource mapping will be dynamic.
- */
-const resourceTypeMap: Record<'locations' | 'facilities' | 'offices', string> =
-  {
-    locations: 'ADMIN_STRUCTURE',
-    facilities: 'HEALTH_FACILITY',
-    offices: 'CRVS_OFFICE'
-  }
-
-/**
  * Return the available location options. The options will be filtered based on the jurisdiction filter.
  */
 function useAvailableLocations(
-  searchableResource: ('locations' | 'facilities' | 'offices')[],
+  searchableResource?: string[],
   jurisdictionFilter?: JurisdictionFilter
 ) {
   const { getLocations } = useLocations()
@@ -67,27 +56,14 @@ function useAvailableLocations(
   }
 
   const options = useMemo(() => {
-    const searchableResources: (Location | AdministrativeArea)[] = []
-
-    if (searchableResource.includes('locations')) {
-      searchableResources.push(...Array.from(administrativeAreas.values()))
-    }
-
-    for (const [, location] of locations) {
-      if (
+    return Array.from(locations.values()).filter(
+      (location) =>
         location.locationType &&
-        searchableResource.some(
-          (r) =>
-            resourceTypeMap[r satisfies keyof typeof resourceTypeMap] ===
-            location.locationType
-        )
-      ) {
-        searchableResources.push(location)
-      }
-    }
-
-    return searchableResources
-  }, [searchableResource, locations, administrativeAreas])
+        (searchableResource
+          ? searchableResource.includes(location.locationType)
+          : true)
+    )
+  }, [searchableResource, locations])
 
   // If jurisdiction filter is administrative area, we filter the options to only include locations that are under the user's admin area jurisdiction.
   if (
@@ -121,7 +97,7 @@ function LocationSearchInput({
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
-  searchableResource: ('locations' | 'facilities' | 'offices')[]
+  searchableResource?: string[]
   value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean

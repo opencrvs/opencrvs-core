@@ -49,12 +49,6 @@ import { ApplicationConfig } from '@opencrvs/commons/client'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
-export type LocationType =
-  | 'HEALTH_FACILITY'
-  | 'CRVS_OFFICE'
-  | 'ADMIN_STRUCTURE'
-  | 'PRIVATE_HOME'
-
 export interface ILocation {
   id: string
   name: string
@@ -75,19 +69,19 @@ type JurisdictionType =
   | 'LOCATION_LEVEL_5'
 
 export interface AdminStructure extends ILocation {
-  type: 'ADMIN_STRUCTURE'
+  type: string
   jurisdictionType: JurisdictionType
-  physicalType: 'Jurisdiction'
+  physicalType: string
 }
 
 export interface Facility extends ILocation {
-  type: 'HEALTH_FACILITY'
-  physicalType: 'Building'
+  type: string
+  physicalType: string
 }
 
 export interface CRVSOffice extends ILocation {
-  type: 'CRVS_OFFICE'
-  physicalType: 'Building'
+  type: string
+  physicalType: string
 }
 
 export interface IForms {

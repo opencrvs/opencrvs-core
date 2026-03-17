@@ -200,7 +200,6 @@ function mapFieldTypeToMockValue(
     case FieldType.PHONE:
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
-    case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
     case FieldType.LOADER:
     case FieldType.ALPHA_HIDDEN:
@@ -208,6 +207,7 @@ function mapFieldTypeToMockValue(
     case FieldType.VERIFICATION_STATUS:
       return 'verified'
     case FieldType.FACILITY:
+    case FieldType.OFFICE:
       return administrativeHierarchy?.locations
         ? pickRandom(rng, administrativeHierarchy.locations)?.id
         : ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID)

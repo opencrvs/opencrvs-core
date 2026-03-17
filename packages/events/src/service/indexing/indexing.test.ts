@@ -27,7 +27,6 @@ import {
   generateActionDeclarationInput,
   generateUuid,
   Location,
-  LocationType,
   QueryType,
   TENNIS_CLUB_MEMBERSHIP,
   TestUserRole,
@@ -104,7 +103,7 @@ test('records are indexed with full location hierarchy', async () => {
     id: user.primaryOfficeId,
     administrativeAreaId: childAdministrativeArea.id,
     name: 'Child location',
-    locationType: LocationType.enum.CRVS_OFFICE
+    locationType: 'CRVS_OFFICE'
   } satisfies Location
 
   await seed.administrativeAreas([
@@ -1075,7 +1074,7 @@ describe('placeOfEvent location hierarchy handling', () => {
       id: user.primaryOfficeId,
       administrativeAreaId: parentAdministrativeAreaId,
       name: 'Child location',
-      locationType: LocationType.enum.CRVS_OFFICE
+      locationType: 'CRVS_OFFICE'
     }
 
     await seed.administrativeAreas([
