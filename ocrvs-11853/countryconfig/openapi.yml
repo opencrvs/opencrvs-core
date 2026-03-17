@@ -7719,18 +7719,10 @@ components:
               type: string
               minLength: 1
             configuration:
-              default:
-                searchableResource:
-                  - ADMIN_STRUCTURE
-                  - HEALTH_FACILITY
-                  - CRVS_OFFICE
               type: object
               properties:
                 searchableResource:
-                  default:
-                    - ADMIN_STRUCTURE
-                    - HEALTH_FACILITY
-                    - CRVS_OFFICE
+                  description: Types of the locations that are available for selection.
                   type: array
                   items:
                     type: string
@@ -7784,8 +7776,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-              required:
-                - searchableResource
               additionalProperties: false
           required:
             - id
