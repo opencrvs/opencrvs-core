@@ -203,39 +203,16 @@ async function userAlreadyExists(
   token: string,
   username: string
 ): Promise<boolean> {
-  const searchResponse = await fetch(`${env.GATEWAY_HOST}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      query: searchUserQuery,
-      variables: {
-        username
-      }
-    })
-  })
-  const parsedSearchResponse = parseGQLResponse<{
-    searchUsers: { totalItems?: number }
-  }>(await searchResponse.json())
-  return Boolean(parsedSearchResponse.searchUsers.totalItems)
+  const url = new URL('events', env.GATEWAY_HOST).toString()
+  const client = createClient(url, `Bearer ${token}`)
+  const res = await client.user.search.query({ username, count: 1, skip: 0, sortOrder: 'asc' })
+  return Boolean(res.length)
 }
 
-async function callCreateUserMutation(token: string, userPayload: unknown) {
-  return fetch(`${env.GATEWAY_HOST}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      query: createUserMutation,
-      variables: {
-        user: userPayload
-      }
-    })
-  })
+async function createUser(token: string, userPayload: unknown) {
+  const url = new URL('events', env.GATEWAY_HOST).toString()
+  const client = createClient(url, `Bearer ${token}`)
+  return client.user.create(userPayload)
 }
 
 export async function seedUsers(token: string) {
@@ -290,7 +267,7 @@ export async function seedUsers(token: string) {
         // eslint-disable-next-line no-console
         console.log('Trying again for time: ', tryNumber)
       }
-      res = await callCreateUserMutation(token, userPayload)
+      res = await createUser(token, userPayload)
       jsonRes = await res.json()
     } while (
       tryNumber < MAX_RETRY &&

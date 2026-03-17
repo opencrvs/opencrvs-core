@@ -44,6 +44,10 @@ export const userRouter = router({
 
       return users[0]
     }),
+  create: userOnlyProcedure
+    .input(z.array(z.string()))
+    .output(z.array(UserOrSystem))
+    .query(async ({ input, ctx }) => createUser(input, ctx.token)),
   list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))

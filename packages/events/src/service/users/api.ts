@@ -10,6 +10,7 @@
  */
 
 import fetch from 'node-fetch'
+import { z } from 'zod'
 import {
   joinUrl,
   FullDocumentPath,
@@ -26,6 +27,25 @@ import {
   getSystemByLegacyId,
   getSystemClientById
 } from '@events/storage/postgres/events/system-clients'
+
+export const UserInput = z.object({
+  name: z.array(
+    z.object({
+      use: z.string(),
+      given: z.array(z.string()),
+      family: z.string()
+    })
+  ),
+  username: z.string(),
+  email: z.string(),
+  mobile: z.string().optional(),
+  fullHonorificName: z.string().optional(),
+  emailForNotification: z.string().optional(),
+  password: z.string(),
+  role: z.string(),
+  primaryOfficeId: z.string(),
+  device: z.string().optional()
+})
 
 type UserAPIResult = {
   id: string
@@ -173,4 +193,27 @@ export async function searchUsers(
       ? user.fullHonorificName
       : undefined
   }))
+}
+
+type CreateUserPayload = z.infer<typeof UserInput>
+
+export async function createUser(input: CreateUserPayload, token: string) {
+  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'createUser').href, {
+    method: 'POST',
+    body: JSON.stringify(input),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to create user. Error: ${res.status} status received`
+    )
+  }
+
+  const user = (await res.json()) as UserAPIResult
+
+  return getUserOrSystem(user.id, token)
 }
