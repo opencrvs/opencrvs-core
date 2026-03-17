@@ -18,7 +18,6 @@ import {
   joinValues,
   AdministrativeArea,
   JurisdictionFilter,
-  LocationSearchResource,
   resolveJurisdictionReference
 } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
@@ -57,23 +56,12 @@ function useAvailableLocations(
   }
 
   const options = useMemo(() => {
-    const searchableResources: (Location | AdministrativeArea)[] = []
-
-    if (searchableResource.includes(LocationSearchResource.enum.ADMIN_STRUCTURE)) {
-      searchableResources.push(...Array.from(administrativeAreas.values()))
-    }
-
-    for (const [, location] of locations) {
-      if (
+    return Array.from(locations.values()).filter(
+      (location) =>
         location.locationType &&
         searchableResource.includes(location.locationType)
-      ) {
-        searchableResources.push(location)
-      }
-    }
-
-    return searchableResources
-  }, [searchableResource, locations, administrativeAreas])
+    )
+  }, [searchableResource, locations])
 
   // If jurisdiction filter is administrative area, we filter the options to only include locations that are under the user's admin area jurisdiction.
   if (

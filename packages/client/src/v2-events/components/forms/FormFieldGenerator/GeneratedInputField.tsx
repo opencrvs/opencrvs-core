@@ -673,9 +673,11 @@ export const GeneratedInputField = React.memo(
         </InputField>
       )
     }
+
     if (isDividerFieldType(field)) {
       return <Divider.Input />
     }
+
     if (isFileFieldWithOptionType(field)) {
       return (
         <InputField {...inputFieldProps}>
