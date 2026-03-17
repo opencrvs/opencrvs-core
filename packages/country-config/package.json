@@ -5,8 +5,6 @@
   "main": "./build/index.js",
   "exports": {
     ".": "./build/index.js",
-    "./forms": "./build/forms.js",
-    "./events": "./build/events.js",
     "./api": "./build/api.js"
   },
   "typings": "build/index.d.ts",
