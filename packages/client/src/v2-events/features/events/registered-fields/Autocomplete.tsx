@@ -342,7 +342,7 @@ export const Autocomplete = {
   Output: ({ value }: { value: AutocompleteUpdateValue }) => {
     return value
       ? value.value === 'OTHER'
-        ? null
+        ? value.label
         : `${value.value}: ${value.label}`
       : null
   }
