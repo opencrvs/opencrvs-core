@@ -14,7 +14,6 @@ import React from 'react'
 import { within, expect, fn } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS } from '../../../../tests/v2-events/administrative-hierarchy-mock'
 // NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization
 import { LocationSearch } from '.'
 
@@ -100,7 +99,7 @@ export const LocationSearchInputInvalid: StoryObj<typeof LocationSearch.Input> =
     },
     args: {
       id: 'location-search',
-      searchableResource: ['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'],
+      searchableResource: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
       value: 'abc',
       onChange: fn()
     },
