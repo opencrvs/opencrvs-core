@@ -23,8 +23,6 @@ import {
   FieldConfig,
   EventState,
   generateTranslationConfig,
-  LocationSearchResource,
-  user,
   UUID
 } from '@opencrvs/commons/client'
 
@@ -326,7 +324,7 @@ const fields = [
     label: generateTranslationConfig('Facility'),
     defaultValue: 'Gym Hall',
     configuration: {
-      searchableResource: [LocationSearchResource.enum.HEALTH_FACILITY]
+      searchableResource: ['HEALTH_FACILITY']
     }
   },
 
@@ -336,7 +334,7 @@ const fields = [
     label: generateTranslationConfig('Membership Office'),
     defaultValue: 'Head Office',
     configuration: {
-      searchableResource: [LocationSearchResource.enum.CRVS_OFFICE]
+      searchableResource: ['CRVS_OFFICE']
     }
   },
 

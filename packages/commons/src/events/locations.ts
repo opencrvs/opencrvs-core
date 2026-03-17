@@ -27,32 +27,13 @@ import {
 } from '../scopes-v2'
 import { SystemContext, UserContext } from '../users/User'
 
-/** @deprecated */
+/** @deprecated Moving on, location types are arbitrary and defined by the country config. */
 export const LocationTypeV1 = z.enum([
   'ADMIN_STRUCTURE',
   'CRVS_OFFICE',
   'HEALTH_FACILITY'
 ])
 export type LocationTypeV1 = z.infer<typeof LocationTypeV1>
-
-export const LocationType = z.enum(['CRVS_OFFICE', 'HEALTH_FACILITY'])
-
-/**
- * @deprecated Moving on, location types are arbitrary and defined by the country config.
- *
- * Known resource types for location search fields.
- * Use these constants in FieldType.LOCATION's searchableResource configuration.
- * Custom locationType strings are also valid for user-defined location categories.
- *
- */
-export const LocationSearchResource = z.enum([
-  'ADMIN_STRUCTURE',
-  'CRVS_OFFICE',
-  'HEALTH_FACILITY'
-])
-export type LocationSearchResource = z.infer<typeof LocationSearchResource>
-
-export type LocationType = z.infer<typeof LocationType>
 
 export const AdministrativeArea = z.object({
   id: UUID,
