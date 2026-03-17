@@ -34,6 +34,30 @@ yarn dev --filter=@opencrvs/mosip-api
 yarn set-version 1.7.0-alpha.16
 ```
 
+## API documentation (Swagger)
+
+When `mosip-api` is running, Swagger UI is available at:
+
+- `http://localhost:2024/documentation`
+
+The OpenAPI JSON spec is available at:
+
+- `http://localhost:2024/documentation/json`
+
+Most API routes require a JWT. In Swagger UI, click **Authorize** and paste your token as:
+
+- `Bearer <your-jwt-token>`
+
+Use an **OpenCRVS Core access token** (RS256 JWT issued by the auth service and verifiable with the Core public key configured in this service).
+
+The token should belong to a user with the scopes needed for the endpoint you are trying in Swagger:
+
+- for `/verify` and `/events/registration`: countryconfig/event-action scopes used by your integration flow
+- for `/debug/transactions`: both `search.birth` and `search.death`
+- for `DELETE /debug/transactions/:id`: `record.reject-registration`
+
+Swagger now persists the token while the page is open, so you can use **Try it out** across endpoints without re-entering it each time.
+
 This project uses a **SQLite** database to store the record-specific tokens that OpenCRVS Core uses to allow editing the records. See [`./packages/mosip-api/src/database.ts`](./packages/mosip-api/src/database.ts) for more information.
 
 The **environment variables** the server uses can be found at [`./packages/mosip-api/src/constants.ts`](./packages/mosip-api/src/constants.ts). Create a `.env` file in the root of the repository, if you want to override the local values.

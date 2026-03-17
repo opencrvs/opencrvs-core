@@ -11,32 +11,28 @@ export const VerifySchema = z.object({
   transactionId: z.string().optional(),
 });
 
-export type OpenCRVSRequest = FastifyRequest<{
-  Body: z.infer<typeof VerifySchema>;
-}>;
-
 /** Handles the calls coming from OpenCRVS countryconfig */
 export const verifyHandler = async (
-  request: OpenCRVSRequest,
+  request: FastifyRequest,
   reply: FastifyReply,
 ) => {
+  const body = VerifySchema.parse(request.body);
+
   const {
     response: { authStatus },
   } = await verifyNid({
-    nid: request.body.nid,
-    dob: request.body.dob.replaceAll("-", "/"),
+    nid: body.nid,
+    dob: body.dob.replaceAll("-", "/"),
     name: [
       {
         language: "eng",
-        value: `${request.body.name.firstname} ${request.body.name.surname}`,
+        value: `${body.name.firstname} ${body.name.surname}`,
       },
     ],
-    gender: request.body.gender
-      ? [{ language: "eng", value: request.body.gender }]
-      : undefined,
+    gender: body.gender ? [{ language: "eng", value: body.gender }] : undefined,
   });
 
-  const transactionId = request.body.transactionId;
+  const transactionId = body.transactionId;
 
   if (transactionId) {
     request.log.info({ transactionId, authStatus });

@@ -13,9 +13,11 @@
   "scripts": {
     "build": "tsc"
   },
-  "dependencies": {},
+  "dependencies": {
+    "zod": "^4.1.12"
+  },
   "devDependencies": {
-    "@opencrvs/toolkit": "1.8.1-rc.62f6aec",
+    "@opencrvs/toolkit": "1.9.10-rc.9afdb31",
     "@types/hapi__hapi": "^20.0.0",
     "@types/node-fetch": "^2.6.11",
     "node-fetch": "2.6.7",

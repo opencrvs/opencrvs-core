@@ -1,35 +1,55 @@
-import type { EventDocument, FieldValue } from "@opencrvs/toolkit/events";
+import type { FieldValue } from "@opencrvs/toolkit/events";
+import { z } from "zod";
 
-export interface BirthRequestFields extends Record<string, unknown> {
-  birthCertificateNumber: string;
-  deathCertificateNumber?: undefined;
-}
+export const BirthRequestFieldsSchema = z.looseObject({
+  birthCertificateNumber: z.string(),
+  deathCertificateNumber: z.undefined().optional(),
+});
 
-export interface DeathRequestFields extends Record<string, unknown> {
-  deathCertificateNumber: string;
-  birthCertificateNumber?: undefined;
-}
+export const DeathRequestFieldsSchema = z.looseObject({
+  deathCertificateNumber: z.string(),
+  birthCertificateNumber: z.undefined().optional(),
+});
 
-export interface MosipInteropPayload {
-  trackingId: string;
-  notification: {
-    recipientFullName: string;
-    recipientEmail: string;
-    recipientPhone: string;
-  };
-  requestFields: BirthRequestFields | DeathRequestFields;
-  metaInfo: Record<string, unknown>;
-  audit: Record<string, unknown>;
-}
+export const MosipNotificationSchema = z.object({
+  recipientFullName: z.string(),
+  recipientEmail: z.string(),
+  recipientPhone: z.string(),
+});
 
-export interface VerifyNidPayload {
-  nid: FieldValue;
-  gender?: FieldValue;
-  dob: FieldValue;
-  name: FieldValue;
-  /** Adds logging of the auth status using this id to mosip-api */
-  transactionId?: string;
-}
+export const MosipInteropPayloadSchema = z.object({
+  trackingId: z.string(),
+  notification: MosipNotificationSchema,
+  requestFields: z.union([BirthRequestFieldsSchema, DeathRequestFieldsSchema]),
+  metaInfo: z.record(z.string(), z.unknown()),
+  audit: z.record(z.string(), z.unknown()),
+});
+
+const FieldValueSchema = z.custom<FieldValue>(() => true);
+
+export const VerifyNidPayloadSchema = z.object({
+  nid: FieldValueSchema,
+  gender: FieldValueSchema.optional(),
+  dob: FieldValueSchema,
+  name: FieldValueSchema,
+  transactionId: z.string().optional(),
+});
+
+export const VerifyNidResponseSchema = z.union([
+  z.literal("verified"),
+  z.literal("failed"),
+]);
+
+export const RegistrationEventResponseSchema = z.record(
+  z.string(),
+  z.unknown(),
+);
+
+export type BirthRequestFields = z.infer<typeof BirthRequestFieldsSchema>;
+export type DeathRequestFields = z.infer<typeof DeathRequestFieldsSchema>;
+export type MosipInteropPayload = z.infer<typeof MosipInteropPayloadSchema>;
+export type VerifyNidPayload = z.infer<typeof VerifyNidPayloadSchema>;
+export type VerifyNidResponse = z.infer<typeof VerifyNidResponseSchema>;
 
 export interface VerificationStatus {
   father: boolean;
@@ -64,6 +84,7 @@ export const createMosipInteropClient = (
 ) => {
   return {
     register: async (payload: MosipInteropPayload) => {
+      const parsedPayload = MosipInteropPayloadSchema.parse(payload);
       const MOSIP_API_REGISTRATION_EVENT_URL = new URL(
         "./events/registration",
         url,
@@ -73,7 +94,7 @@ export const createMosipInteropClient = (
         MOSIP_API_REGISTRATION_EVENT_URL,
         {
           method: "POST",
-          body: JSON.stringify(payload),
+          body: JSON.stringify(parsedPayload),
           headers: {
             Authorization: authorizationHeader,
             "content-type": "application/json",
@@ -85,14 +106,15 @@ export const createMosipInteropClient = (
         throw new Error(`Failed to register event: ${await response.text()}`);
       }
 
-      return response.json();
+      return RegistrationEventResponseSchema.parse(await response.json());
     },
     verifyNid: async (payload: VerifyNidPayload) => {
+      const parsedPayload = VerifyNidPayloadSchema.parse(payload);
       const MOSIP_API_VERIFY_URL = new URL("./verify", url).href;
 
       const response = await fetchWithTimeout(MOSIP_API_VERIFY_URL, {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(parsedPayload),
         headers: {
           Authorization: authorizationHeader,
           "content-type": "application/json",
@@ -103,7 +125,7 @@ export const createMosipInteropClient = (
         throw new Error(`Failed to verify: ${await response.text()}`);
       }
 
-      return response.text() as Promise<"verified" | "failed">;
+      return VerifyNidResponseSchema.parse(await response.text());
     },
   };
 };

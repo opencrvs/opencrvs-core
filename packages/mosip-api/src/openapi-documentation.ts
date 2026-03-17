@@ -11,9 +11,23 @@ export const register = async (app: FastifyInstance) => {
         description: "Serves as a gateway between OpenCRVS and MOSIP",
         version: "1.0.0",
       },
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT",
+          },
+        },
+      },
+      security: [{ bearerAuth: [] }],
       servers: [],
     },
     transform: jsonSchemaTransform,
   });
-  await app.register(fastifySwaggerUI);
+  await app.register(fastifySwaggerUI, {
+    uiConfig: {
+      persistAuthorization: true,
+    },
+  });
 };

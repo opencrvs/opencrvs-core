@@ -24,6 +24,7 @@ import {
   getAllTransactionsHandler,
 } from "./routes/debug-sqlite";
 import { verifyHandler, VerifySchema } from "./routes/verify";
+import { MosipInteropPayloadSchema } from "@opencrvs/mosip/api";
 
 const loggerRedactPaths = [
   "req.headers.authorization",
@@ -67,12 +68,42 @@ const envToLogger = {
 
 const initRoutes = (app: FastifyInstance) => {
   /*
+   * Operations and production debugging
+   */
+  app.withTypeProvider<ZodTypeProvider>().route({
+    method: "GET",
+    url: "/debug/transactions",
+    handler: getAllTransactionsHandler,
+    schema: {
+      tags: ["Operations (Prod Debug)"],
+      summary: "List pending MOSIP transactions",
+      description:
+        "Returns pending OpenCRVS-to-MOSIP transaction mappings for operational troubleshooting. Requires both search scopes (birth and death).",
+    },
+  });
+
+  app.withTypeProvider<ZodTypeProvider>().route({
+    method: "DELETE",
+    url: "/debug/transactions/:id",
+    handler: deleteTransactionHandler,
+    schema: {
+      tags: ["Operations (Prod Debug)"],
+      summary: "Discard a pending transaction",
+      description:
+        "Deletes a stored transaction so a stuck registration can be unblocked. Intended for production support workflows and requires record.reject-registration scope.",
+    },
+  });
+
+  /*
    * OpenCRVS birth / death registration and personal information verification
    */
   app.withTypeProvider<ZodTypeProvider>().route({
     url: "/events/registration",
     method: "POST",
     handler: registrationEventHandler,
+    schema: {
+      body: MosipInteropPayloadSchema,
+    },
   });
   app.withTypeProvider<ZodTypeProvider>().route({
     url: "/verify",
@@ -115,21 +146,6 @@ const initRoutes = (app: FastifyInstance) => {
       body: CredentialIssuedSchema,
     },
   });
-
-  /*
-   * SQLite debug route
-   */
-  app.withTypeProvider<ZodTypeProvider>().route({
-    method: "GET",
-    url: "/debug/transactions",
-    handler: getAllTransactionsHandler,
-  });
-
-  app.withTypeProvider<ZodTypeProvider>().route({
-    method: "DELETE",
-    url: "/debug/transactions/:id",
-    handler: deleteTransactionHandler,
-  });
 };
 
 let corePublicKey: string;
@@ -147,7 +163,9 @@ const getCorePublicKey = async () => {
 export const buildFastify = async () => {
   const app = Fastify({
     logger: envToLogger[env.isProd ? "production" : "development"],
-    ignoreTrailingSlash: true, // MOSIP can call /websub/callback/ with a trailing slash
+    routerOptions: {
+      ignoreTrailingSlash: true, // MOSIP can call /websub/callback/ with a trailing slash
+    },
   });
 
   app.setValidatorCompiler(validatorCompiler);
@@ -176,7 +194,12 @@ export const buildFastify = async () => {
     // @NOTE This disables the JWT authentication for the MOSIP webhook
     // The route is open for requests, but the credential will be verified it's from MOSIP
     // This API should be allowed ONLY from the IP address of MOSIP on network / Traefik level
-    if (request.routeOptions.url === "/websub/callback") return;
+    if (
+      request.routeOptions.url === "/websub/callback" ||
+      request.url.startsWith("/documentation")
+    ) {
+      return;
+    }
 
     try {
       await request.jwtVerify();

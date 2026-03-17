@@ -2,19 +2,16 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import * as mosip from "../mosip-api";
 import { generateTransactionId } from "../registration-number";
 import { insertTransaction } from "../database";
-import { MosipInteropPayload } from "@opencrvs/mosip/api";
-
-export type OpenCRVSRequest = FastifyRequest<{
-  Body: MosipInteropPayload;
-}>;
+import { MosipInteropPayloadSchema } from "@opencrvs/mosip/api";
 
 /** Handles the calls coming from OpenCRVS countryconfig */
 export const registrationEventHandler = async (
-  request: OpenCRVSRequest,
+  request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const { trackingId, requestFields, audit, metaInfo, notification } =
-    request.body;
+  const body = MosipInteropPayloadSchema.parse(request.body);
+
+  const { trackingId, requestFields, audit, metaInfo, notification } = body;
 
   const token = request.headers.authorization!.split(" ")[1];
 
