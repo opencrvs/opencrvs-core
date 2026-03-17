@@ -1,4 +1,3 @@
- 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,22 +10,18 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { waitFor, expect, fn, userEvent, within } from '@storybook/test'
+import { expect, fn, userEvent, within } from '@storybook/test'
 import * as selectEvent from 'react-select-event'
 import React from 'react'
 import styled from 'styled-components'
 import {
-  ConditionalType,
-  field,
   FieldType,
-  not,
-  alwaysTrue,
   FieldConfig,
   EventState,
   generateTranslationConfig,
   user,
-  UUID,
-  AddressType
+  AddressType,
+  TestUserRole
 } from '@opencrvs/commons/client'
 
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -35,7 +30,7 @@ import { noop } from '@client/v2-events'
 import { getTestValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<typeof FormFieldGenerator> = {
-  title: 'FormFieldGenerator/Interaction',
+  title: 'AdministrativeArea/Interaction',
   args: { onChange: fn() },
   decorators: [
     (Story) => (
@@ -61,7 +56,7 @@ const fields = [
       streetAddressForm: [
         {
           id: 'street',
-          type: 'TEXT',
+          type: FieldType.TEXT,
           label: generateTranslationConfig('Street'),
           required: false
         }
@@ -81,7 +76,7 @@ const fields = [
 const declaration = {
   'applicant.address': {
     country: 'FAR',
-    addressType: 'DOMESTIC',
+    addressType: AddressType.DOMESTIC,
     administrativeArea: '1d4e5f6a-7b8c-4912-8efa-345678901234'
   }
 } satisfies EventState
@@ -91,7 +86,7 @@ export const AdministrativeAreaWithCommunityLeader: StoryObj<
 > = {
   parameters: {
     layout: 'centered',
-    userRole: 'COMMUNITY_LEADER',
+    userRole: TestUserRole.enum.COMMUNITY_LEADER,
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: {
@@ -101,7 +96,9 @@ export const AdministrativeAreaWithCommunityLeader: StoryObj<
             fields={fields}
             id="my-form"
             initialValues={declaration}
-            validatorContext={getTestValidatorContext('COMMUNITY_LEADER')}
+            validatorContext={getTestValidatorContext(
+              TestUserRole.enum.COMMUNITY_LEADER
+            )}
             onChange={(data) => {
               meta.args?.onChange?.(data) ?? noop()
             }}
@@ -153,7 +150,7 @@ export const AdministrativeAreaWithLocalRegistrar: StoryObj<
 > = {
   parameters: {
     layout: 'centered',
-    userRole: 'LOCAL_REGISTRAR',
+    userRole: TestUserRole.enum.LOCAL_REGISTRAR,
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: {
@@ -163,7 +160,9 @@ export const AdministrativeAreaWithLocalRegistrar: StoryObj<
             fields={fields}
             id="my-form"
             initialValues={declaration}
-            validatorContext={getTestValidatorContext('LOCAL_REGISTRAR')}
+            validatorContext={getTestValidatorContext(
+              TestUserRole.enum.LOCAL_REGISTRAR
+            )}
             onChange={(data) => {
               meta.args?.onChange?.(data) ?? noop()
             }}
@@ -217,7 +216,7 @@ export const AdministrativeAreaWithProvincialRegistrar: StoryObj<
 > = {
   parameters: {
     layout: 'centered',
-    userRole: 'PROVINCIAL_REGISTRAR',
+    userRole: TestUserRole.enum.PROVINCIAL_REGISTRAR,
     chromatic: { disableSnapshot: true },
     reactRouter: {
       router: {
@@ -227,7 +226,9 @@ export const AdministrativeAreaWithProvincialRegistrar: StoryObj<
             fields={fields}
             id="my-form"
             initialValues={declaration}
-            validatorContext={getTestValidatorContext('PROVINCIAL_REGISTRAR')}
+            validatorContext={getTestValidatorContext(
+              TestUserRole.enum.PROVINCIAL_REGISTRAR
+            )}
             onChange={(data) => {
               meta.args?.onChange?.(data) ?? noop()
             }}
