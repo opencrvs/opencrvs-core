@@ -75,19 +75,19 @@ type JurisdictionType =
   | 'LOCATION_LEVEL_5'
 
 export interface AdminStructure extends ILocation {
-  type: 'ADMIN_STRUCTURE'
+  type: string
   jurisdictionType: JurisdictionType
-  physicalType: 'Jurisdiction'
+  physicalType: string
 }
 
 export interface Facility extends ILocation {
-  type: 'HEALTH_FACILITY'
-  physicalType: 'Building'
+  type: string
+  physicalType: string
 }
 
 export interface CRVSOffice extends ILocation {
-  type: 'CRVS_OFFICE'
-  physicalType: 'Building'
+  type: string
+  physicalType: string
 }
 
 export interface IForms {

@@ -8,14 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  ILocation,
-  LocationType,
-  IOfflineData,
-  Facility,
-  CRVSOffice,
-  AdminStructure
-} from '@client/offline/reducer'
+import { ILocation, AdminStructure } from '@client/offline/reducer'
 import { ISearchLocation as SearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
@@ -27,8 +20,7 @@ import {
   AdministrativeArea,
   joinValues,
   Location,
-  UUID,
-  LocationType as V2LocationType
+  UUID
 } from '@opencrvs/commons/client'
 import { getAdministrativeAreaHierarchy } from '../v2-events/utils'
 
@@ -43,31 +35,7 @@ export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
-  allowedType: 'HEALTH_FACILITY',
-  match?: {
-    locationLevel: keyof ILocation
-    locationId?: string
-  }
-): { [key: string]: Facility }
-export function filterLocations(
-  locations: { [key: string]: ILocation },
-  allowedType: 'CRVS_OFFICE',
-  match?: {
-    locationLevel: keyof ILocation
-    locationId?: string
-  }
-): { [key: string]: CRVSOffice }
-export function filterLocations(
-  locations: { [key: string]: ILocation },
-  allowedType: 'ADMIN_STRUCTURE',
-  match?: {
-    locationLevel: keyof ILocation
-    locationId?: string
-  }
-): { [key: string]: AdminStructure }
-export function filterLocations(
-  locations: { [key: string]: ILocation },
-  allowedType: LocationType,
+  allowedType: string,
   match?: {
     locationLevel: keyof ILocation // ex: 'partOf' or 'id'
     locationId?: string
@@ -121,7 +89,7 @@ export function generateSearchableLocations(
       if (
         location.partOf &&
         location.partOf !== 'Location/0' &&
-        location.type !== V2LocationType.enum.CRVS_OFFICE
+        location.type !== 'CRVS_OFFICE'
       ) {
         const locRef = location.partOf.split('/')[1]
         let parent
@@ -352,9 +320,7 @@ function getAssociatedLocationsAndOffices(
   locations: ILocation[]
 ): ILocation[] {
   const office = locations.find(
-    (location) =>
-      location.id === officeId &&
-      location.type === V2LocationType.enum.CRVS_OFFICE
+    (location) => location.id === officeId && location.type === 'CRVS_OFFICE'
   )
 
   if (!office) {
