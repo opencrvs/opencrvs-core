@@ -7032,13 +7032,10 @@ components:
               type: object
               properties:
                 searchableResource:
+                  description: Types of the locations that are available for selection.
                   type: array
                   items:
                     type: string
-                    enum:
-                      - locations
-                      - facilities
-                      - offices
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
@@ -7089,8 +7086,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-              required:
-                - searchableResource
               additionalProperties: false
           required:
             - id
