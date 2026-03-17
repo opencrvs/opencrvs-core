@@ -10,7 +10,7 @@
  */
 import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
 import superjson from 'superjson'
-import { AppRouter } from '@opencrvs/events/src/router'
+import { AppRouter } from '@opencrvs/events/build/types/router'
 
 /**
  * Creates a tRPC client with the specified base URL and authorization token.
