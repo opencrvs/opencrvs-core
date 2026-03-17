@@ -16,6 +16,8 @@ export const Role = z.object({
   scopes: z.array(z.string())
 })
 
+export type Role = z.infer<typeof Role>
+
 export type Roles = Array<{
   id: string
   /** @deprecated */

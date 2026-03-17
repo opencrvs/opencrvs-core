@@ -233,19 +233,6 @@ export interface IUserFormState {
   userAuditForm: IUserAuditForm
 }
 
-function withScopes<T extends Record<string, unknown>>(
-  values: T,
-  userRoles: UserRole[]
-): T & { scopes?: string[] } {
-  if (!('role' in values)) {
-    return values
-  }
-  return {
-    ...values,
-    scopes: userRoles.find((role) => role.id === values.role)?.scopes
-  }
-}
-
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
   state: IUserFormState = initialState,
   action: UserFormAction | offlineActions.Action
@@ -261,7 +248,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const formData = action.payload.data
       return {
         ...state,
-        userFormData: withScopes(formData, state.userRoles)
+        userFormData: formData
       }
     }
 
@@ -379,7 +366,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case STORE_USER_FORM_DATA:
-      const { user } = (action as IStoreUserFormDataAction).payload
+      const { user } = action.payload
       const gqlCompatibleUser = {
         ...user,
         name: user.name.map((n) => ({
@@ -398,7 +385,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 
       return {
         ...state,
-        userFormData: withScopes(formData.user, state.userRoles),
+        userFormData: formData.user,
         userDetailsStored: true
       }
 

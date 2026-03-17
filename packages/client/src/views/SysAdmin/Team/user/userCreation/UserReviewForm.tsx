@@ -63,7 +63,6 @@ import {
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Link } from '@opencrvs/components'
-import { UserRole } from '@client/utils/gateway'
 import { draftToGqlTransformer } from '@client/transformer'
 import {
   RouteComponentProps,
@@ -78,7 +77,8 @@ import {
 } from '@client/navigation'
 import { getListOfLocations } from '@client/utils/validate'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { UUID } from '@opencrvs/commons/client'
+import { UUID, Role } from '@opencrvs/commons/client'
+import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -90,7 +90,6 @@ interface IUserReviewFormProps {
 interface IStateProps {
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
-  userRoles: UserRole[]
   userDetails: UserDetails | null
 }
 interface IDispatchProps {
@@ -130,7 +129,7 @@ const Value = styled.span`
 interface ICommonProps {
   offlineCountryConfiguration: IOfflineData
   formData: IFormSectionData
-  userRoles: UserRole[]
+  userRoles: Role[]
   userDetails: UserDetails | null
   intl: IntlShape
 }
@@ -264,7 +263,7 @@ const getValue = ({
       ? field.name === 'systemRole'
         ? intl.formatMessage(userMessages[formData.systemRole as string])
         : field.name === 'role' && role
-          ? intl.formatMessage(role.label)
+          ? formatUserRole(role.id, intl)
           : String(formData[field.name])
       : (formData[field.name] as IDynamicValues).label
     : ''
@@ -298,8 +297,7 @@ const UserReviewFormComponent = ({
   formData,
   userDetails,
   offlineCountryConfiguration,
-  submitForm,
-  userRoles
+  submitForm
 }: IFullProps & IDispatchProps & IStateProps) => {
   const navigate = useNavigate()
 
@@ -312,6 +310,8 @@ const UserReviewFormComponent = ({
 
   const parsedLocationId = UUID.safeParse(locationId)
 
+  const { listRoles } = useRoles()
+  const [userRoles] = listRoles.useSuspenseQuery()
   const userRole = userRoles.find(({ id }) => id === formData.role)
 
   const parsedPrimaryOfficeId = UUID.safeParse(userDetails?.primaryOfficeId)
@@ -476,8 +476,7 @@ export const UserReviewForm = withRouter(
     return {
       userFormSection: store.userForm.userForm!.sections[0],
       offlineCountryConfiguration: getOfflineData(store),
-      userDetails: getUserDetails(store),
-      userRoles: store.userForm.userRoles
+      userDetails: getUserDetails(store)
     }
   }, mapDispatchToProps)(injectIntl(UserReviewFormComponent))
 )

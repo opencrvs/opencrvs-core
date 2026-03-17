@@ -194,7 +194,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
   if (section.viewType === 'preview') {
     return (
       <UserReviewForm
-        client={client as ApolloClient<any>}
+        client={client as ApolloClient<unknown>}
         {...props}
         section={formSectionWithRolesSelect}
       />
