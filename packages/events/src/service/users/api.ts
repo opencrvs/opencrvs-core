@@ -84,7 +84,7 @@ export type SearchUsersResult = {
   results: UserAPIResult[]
 }
 
-export async function getUser(
+export async function getLegacyUser(
   userId: string,
   token: string
 ): Promise<UserAPIResult> {
@@ -111,7 +111,7 @@ export async function findUserOrSystem(
   token: string
 ): Promise<UserOrSystem | undefined> {
   try {
-    const user = await getUser(id, token)
+    const user = await getLegacyUser(id, token)
 
     return {
       type: TokenUserType.enum.user,
@@ -155,11 +155,18 @@ export async function findUserOrSystem(
   return
 }
 
-async function getUserOrSystem(id: string, token: string): Promise<UserOrSystem> {
+
+
+async function getUser(id: string, token: string): Promise<User> {
  const userOrSystem = await findUserOrSystem(id, token)
  if (!userOrSystem) {
    throw new Error(`No user or system found for id: ${id}`)
  }
+
+ if (userOrSystem.type === TokenUserType.enum.system) {
+   throw new Error(`The id: ${id} belongs to a system, not a user`)
+ }
+
  return userOrSystem
 }
 
@@ -222,5 +229,5 @@ export async function createUser(input: CreateUserPayload, token: string) {
   }
 
   const user = (await res.json()) as UserAPIResult
-  return getUserOrSystem(user.id, token)
+  return getUser(user.id, token)
 }
