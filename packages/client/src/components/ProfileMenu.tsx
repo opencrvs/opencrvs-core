@@ -30,6 +30,8 @@ import { redirectToAuthentication } from '@client/profile/profileActions'
 import { buttonMessages } from '@client/i18n/messages'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -74,44 +76,24 @@ const ProfileMenuComponent = ({
     return items
   }
 
-  const getUserName = (
-    language: string,
-    userDetails: UserDetails | null
-  ): string => {
+  const getUserName = (userDetails: UserDetails | null): string => {
     let userName = ''
 
     if (userDetails && userDetails.name) {
-      const nameObj =
-        userDetails.name.find((n) => n.use === language) || userDetails.name[0]
-
-      if (nameObj) {
-        userName = `${nameObj.given.join(' ')} ${nameObj.family}`.trim()
-      }
+      userName = getUsersFullName(userDetails.name, intl.locale)
     }
 
     return userName
   }
 
-  const getMenuHeader = (
-    language: string,
-    userDetails: UserDetails | null
-  ): JSX.Element => {
-    const userName = getUserName(language, userDetails)
+  const getMenuHeader = (userDetails: UserDetails | null): JSX.Element => {
+    const userName = getUserName(userDetails)
 
     return (
       <>
         <UserName>{userName}</UserName>
         <UserRole>
-          {userDetails &&
-            intl.formatMessage(
-              {
-                id: 'event.history.role',
-                defaultMessage: 'Unknown'
-              },
-              {
-                role: userDetails.role
-              }
-            )}
+          {userDetails && formatUserRole(userDetails.role, intl)}
         </UserRole>
       </>
     )
@@ -123,11 +105,11 @@ const ProfileMenuComponent = ({
         id="ProfileMenu"
         toggleButton={
           <AvatarSmall
-            name={getUserName(language, userDetails)}
+            name={getUserName(userDetails)}
             avatar={userDetails?.avatar}
           />
         }
-        menuHeader={getMenuHeader(language, userDetails)}
+        menuHeader={getMenuHeader(userDetails)}
         menuItems={getMenuItems(intl)}
       />
     </>

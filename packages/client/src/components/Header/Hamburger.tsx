@@ -19,20 +19,18 @@ import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { useIntl } from 'react-intl'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
+import { getUsersFullName } from '@client/v2-events/utils'
+
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)
   const userDetails = useSelector(getUserDetails)
-  const language = useSelector(getLanguage)
   const intl = useIntl()
   const toggleMenu = () => {
     setShowMenu((prevState) => !prevState)
   }
-  let name = ''
-  if (userDetails && userDetails.name) {
-    const nameObj =
-      userDetails.name.find((n) => n.use === language) || userDetails.name[0]
-    name = nameObj ? `${nameObj.given.join(' ')} ${nameObj.family}`.trim() : ''
-  }
+  const name = userDetails
+    ? getUsersFullName(userDetails.name, intl.locale)
+    : ''
 
   const role = formatUserRole(userDetails?.role, intl)
 
