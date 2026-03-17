@@ -11,13 +11,13 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { UserOrSystem } from '@opencrvs/commons'
+import { UserOrSystem, User } from '@opencrvs/commons'
 import { router, userOnlyProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { getRoles } from '@events/service/config/config'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
-import { searchUsers } from '@events/service/users/api'
+import { UserInput, searchUsers, createUser } from '@events/service/users/api'
 import { userCanReadOtherUser } from '../middleware'
 
 const UserSearch = z.object({
@@ -45,8 +45,8 @@ export const userRouter = router({
       return users[0]
     }),
   create: userOnlyProcedure
-    .input(z.array(z.string()))
-    .output(z.array(UserOrSystem))
+    .input(UserInput)
+    .output(User)
     .query(async ({ input, ctx }) => createUser(input, ctx.token)),
   list: userOnlyProcedure
     .input(z.array(z.string()))

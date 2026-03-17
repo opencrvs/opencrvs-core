@@ -106,7 +106,7 @@ export async function getUser(
   return res.json() as Promise<UserAPIResult>
 }
 
-export async function getUserOrSystem(
+export async function findUserOrSystem(
   id: string,
   token: string
 ): Promise<UserOrSystem | undefined> {
@@ -153,6 +153,14 @@ export async function getUserOrSystem(
   }
 
   return
+}
+
+async function getUserOrSystem(id: string, token: string): Promise<UserOrSystem> {
+ const userOrSystem = await findUserOrSystem(id, token)
+ if (!userOrSystem) {
+   throw new Error(`No user or system found for id: ${id}`)
+ }
+ return userOrSystem
 }
 
 export async function searchUsers(
@@ -214,6 +222,5 @@ export async function createUser(input: CreateUserPayload, token: string) {
   }
 
   const user = (await res.json()) as UserAPIResult
-
   return getUserOrSystem(user.id, token)
 }
