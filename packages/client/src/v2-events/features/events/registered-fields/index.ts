@@ -88,10 +88,10 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
     case FieldType.ALPHA_PRINT_BUTTON:
       return AlphaPrintButton
     case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
-    case FieldType.OFFICE:
       return AdministrativeArea
     case FieldType.LOCATION:
+    case FieldType.FACILITY: // @deprecated
+    case FieldType.OFFICE: // @deprecated
       return LocationSearch
     case FieldType.RADIO_GROUP:
       return RadioGroup
