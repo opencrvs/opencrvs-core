@@ -1,8 +1,0 @@
-{
-  "client": {
-    "service": {
-      "name": "@opencrvs/gateway",
-      "url": "http://localhost:7070/graphql"
-    }
-  }
-}
