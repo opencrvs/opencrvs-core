@@ -70,11 +70,13 @@ function RowComponent<T extends string | number>({
   return (
     <DropDownItem
       key={index}
-      id={`locationOption${index}`}
+      id={`dropdownOption${index}`}
       style={style}
       onClick={option.value ? () => selectOption(option) : undefined}
     >
-      {`${option.value}: ${option.label}`}
+      {option.value === 'OTHER'
+        ? option.label
+        : `${option.value}: ${option.label}`}
     </DropDownItem>
   )
 }
@@ -317,9 +319,13 @@ function AutocompleteInput(props: AutocompleteProps) {
         DropdownIndicator,
         IndicatorSeparator: () => null
       }}
-      defaultOptions={false}
+      defaultOptions={[{ label: 'Other', value: 'OTHER' }]}
       error={error}
-      formatOptionLabel={(option) => `${option.value}: ${option.label}`}
+      formatOptionLabel={(option) =>
+        option.value === 'OTHER'
+          ? option.label
+          : `${option.value}: ${option.label}`
+      }
       id={`autocomplete`}
       inputId={id}
       isClearable={true}
@@ -334,6 +340,10 @@ function AutocompleteInput(props: AutocompleteProps) {
 export const Autocomplete = {
   Input: AutocompleteInput,
   Output: ({ value }: { value: AutocompleteUpdateValue }) => {
-    return value ? `${value.value}: ${value.label}` : null
+    return value
+      ? value.value === 'OTHER'
+        ? null
+        : `${value.value}: ${value.label}`
+      : null
   }
 }
