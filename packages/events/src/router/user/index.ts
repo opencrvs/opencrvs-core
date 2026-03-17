@@ -16,7 +16,20 @@ import { router, userOnlyProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
+import { searchUsers } from '@events/service/users/api'
 import { userCanReadOtherUser } from '../middleware'
+
+const UserSearch = z.object({
+  username: z.string().optional(),
+  mobile: z.string().optional(),
+  status: z.string().optional(),
+  primaryOfficeId: z.string().optional(),
+  locationId: z.string().optional(),
+  count: z.number().min(0),
+  skip: z.number().min(0),
+  sortOrder: z.enum(['asc', 'desc'])
+})
+
 
 export const userRouter = router({
   get: userOnlyProcedure
@@ -24,7 +37,6 @@ export const userRouter = router({
     .output(UserOrSystem)
     .query(async ({ input, ctx }) => {
       const users = await getUsersById([input], ctx.token)
-
       if (users.length === 0) {
         throw new TRPCError({ code: 'NOT_FOUND' })
       }
@@ -35,6 +47,10 @@ export const userRouter = router({
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
+  search: userOnlyProcedure
+    .input(UserSearch)
+    .output(z.array(UserOrSystem))
+    .query(async ({ input, ctx }) => searchUsers(input, ctx.token)),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadOtherUser)
@@ -42,3 +58,4 @@ export const userRouter = router({
       return getUserActions(input)
     })
 })
+

@@ -30,12 +30,9 @@ import {
 import * as offlineActions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { IStoreState } from '@client/store'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { GET_USER, SEARCH_USERS } from '@client/user/queries'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
-import { findScope } from '@opencrvs/commons/client'
 import { UserRole } from '@client/utils/gateway'
 
 import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'

@@ -41,11 +41,8 @@ export const User = z.object({
   device: z.string().optional(),
   fullHonorificName: z.string().optional(),
   type: TokenUserType.extract(['user']),
-  /** Only returned from the user get endpoint, not the list endpoint */
   mobile: z.string().optional(),
-  /** Only returned from the user get endpoint, not the list endpoint */
   email: z.string().optional(),
-  /** Only returned from the user get endpoint, not the list endpoint */
   status: z.string().optional()
 })
 export type User = z.infer<typeof User>

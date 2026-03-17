@@ -10,8 +10,8 @@
  */
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { findScope, Scope, SCOPES } from '@opencrvs/commons/client'
-import { User, Location } from '@client/utils/gateway'
+import { findScope, Scope, SCOPES, User } from '@opencrvs/commons/client'
+import { Location } from '@client/utils/gateway'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import {
   canBeCorrected,
@@ -106,7 +106,7 @@ export function usePermissions() {
 
   const canDeclareRecords = hasAnyScope(RECORD_DECLARE_SCOPES)
 
-  const canReadUser = (user: Pick<User, 'id' | 'primaryOffice'>) => {
+  const canReadUser = (user: Pick<User, 'id' | 'primaryOfficeId'>) => {
     if (!userPrimaryOfficeId) {
       return false
     }
@@ -114,12 +114,12 @@ export function usePermissions() {
       return true
     }
     if (hasScope(SCOPES.USER_READ_MY_OFFICE)) {
-      return user.primaryOffice?.id === userPrimaryOfficeId
+      return user.primaryOfficeId === userPrimaryOfficeId
     }
     if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
-        otherLocationId: user.primaryOffice?.id,
+        otherLocationId: user.primaryOfficeId,
         locations,
         administrativeAreas
       })
@@ -132,13 +132,13 @@ export function usePermissions() {
   }
 
   const canEditUser = (
-    user: Pick<User, 'primaryOffice'> & { role: { id: string } }
+    user: User
   ) => {
     const editableRoleIds = findScope(userScopes ?? [], 'user.edit')?.options
       ?.role
 
     if (Array.isArray(editableRoleIds)) {
-      return editableRoleIds.includes(user.role.id)
+      return editableRoleIds.includes(user.role)
     }
     if (!userPrimaryOfficeId) {
       return false
@@ -147,12 +147,12 @@ export function usePermissions() {
       return true
     }
     if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION)) {
-      if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
+      if (roleScopes(user.role).includes(SCOPES.USER_UPDATE)) {
         return false
       }
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
-        otherLocationId: user.primaryOffice?.id,
+        otherLocationId: user.primaryOfficeId,
         locations,
         administrativeAreas
       })

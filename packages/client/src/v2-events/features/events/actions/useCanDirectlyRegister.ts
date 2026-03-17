@@ -56,7 +56,7 @@ export function useCanDirectlyRegister(event: EventDocument) {
       originalActionId: null,
       status: 'Accepted',
       createdBySignature: undefined,
-      createdAtLocation: userDetails.primaryOfficeId as UUID
+      createdAtLocation: userDetails.primaryOfficeId
     })
   }
 

@@ -214,7 +214,7 @@ export function Review() {
     annotation,
     originalActionId: null,
     createdBySignature: userFromUsersList.signature,
-    createdAtLocation: userDetails.primaryOfficeId as UUID,
+    createdAtLocation: userDetails.primaryOfficeId,
     content: {
       templateId: certificateConfig?.id
     }

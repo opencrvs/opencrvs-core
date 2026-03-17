@@ -16,12 +16,16 @@ import {
   UUID,
   IUserName,
   UserOrSystem,
+  User,
   TokenUserType,
   logger,
   isUUID
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { getSystemByLegacyId, getSystemClientById } from '@events/storage/postgres/events/system-clients'
+import {
+  getSystemByLegacyId,
+  getSystemClientById
+} from '@events/storage/postgres/events/system-clients'
 
 type UserAPIResult = {
   id: string
@@ -41,6 +45,22 @@ type UserAPIResult = {
   scope: string[]
   status: string
   creationDate: number
+}
+
+type SearchUsersPayload = {
+  username?: string
+  mobile?: string
+  status?: string
+  primaryOfficeId?: string
+  locationId?: string
+  count: number
+  skip: number
+  sortOrder: 'asc' | 'desc'
+}
+
+export type SearchUsersResult = {
+  totalItems: number
+  results: UserAPIResult[]
 }
 
 export async function getUser(
@@ -82,8 +102,8 @@ export async function getUserOrSystem(
       primaryOfficeId: user.primaryOfficeId,
       device: user.device ? user.device : undefined,
       fullHonorificName: user.fullHonorificName
-      ? user.fullHonorificName
-      : undefined
+        ? user.fullHonorificName
+        : undefined
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
@@ -91,9 +111,9 @@ export async function getUserOrSystem(
   }
 
   try {
-    const system = isUUID(id) ?
-    await getSystemClientById(id) :
-    await getSystemByLegacyId(id)
+    const system = isUUID(id)
+      ? await getSystemClientById(id)
+      : await getSystemByLegacyId(id)
 
     return {
       type: TokenUserType.enum.system,
@@ -109,4 +129,45 @@ export async function getUserOrSystem(
   }
 
   return
+}
+
+export async function searchUsers(
+  payload: SearchUsersPayload,
+  token: string
+): Promise<User[]> {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'searchUsers').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to search users. Error: ${res.status} status received`
+    )
+  }
+
+  const { results } = (await res.json()) as SearchUsersResult
+
+console.log(results)
+  return results.map((user) => ({
+    type: TokenUserType.enum.user,
+    id: user.id,
+    name: user.name,
+    role: user.role,
+    signature: user.signature ? user.signature : undefined,
+    avatar: user.avatar?.data ? user.avatar.data : undefined,
+    primaryOfficeId: user.primaryOfficeId,
+    status: user.status,
+    device: user.device ? user.device : undefined,
+    fullHonorificName: user.fullHonorificName
+      ? user.fullHonorificName
+      : undefined
+  }))
 }

@@ -105,7 +105,7 @@ export const AlphaPrintButton = {
         annotation: null,
         originalActionId: null,
         createdBySignature: userDetails.signature,
-        createdAtLocation: userDetails.primaryOfficeId as UUID
+        createdAtLocation: userDetails.primaryOfficeId
       }
     ]
 

@@ -10,6 +10,7 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { inferInput } from '@trpc/tanstack-react-query'
 import {
   FullDocumentUrl,
   System,
@@ -19,7 +20,10 @@ import {
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
-import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
+import {
+  QueryOptions,
+  setQueryDefaults
+} from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
 
 type UserWithFullUrlFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
@@ -171,6 +175,30 @@ export function useUsers() {
           useSuspenseQuery({
             ...options,
             queryKey: trpc.user.list.queryKey(ids)
+          }).data
+        ]
+      }
+    },
+    searchUsers: {
+      useQuery: (
+        input: inferInput<typeof trpc.user.search>,
+        additionalOptions: QueryOptions<typeof trpc.user.search> = {}
+      ) => {
+        return useQuery({
+          ...trpc.user.search.queryOptions(input),
+          ...additionalOptions,
+          queryKey: trpc.user.search.queryKey(input)
+        })
+      },
+      useSuspenseQuery: (
+        input: inferInput<typeof trpc.user.search>,
+        additionalOptions: QueryOptions<typeof trpc.user.search> = {}
+      ) => {
+        return [
+          useSuspenseQuery({
+            ...trpc.user.search.queryOptions(input),
+            ...additionalOptions,
+            queryKey: trpc.user.search.queryKey(input)
           }).data
         ]
       }
