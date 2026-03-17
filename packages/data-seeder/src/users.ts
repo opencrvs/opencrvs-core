@@ -12,8 +12,6 @@ import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
-import { print } from 'graphql'
-import gql from 'graphql-tag'
 import { decodeScope, EventConfig, joinUrl } from '@opencrvs/commons'
 import {
   parseLiteralScope,
@@ -93,22 +91,6 @@ const UserSchema = z.array(
     })
   )
 )
-
-const searchUserQuery = print(gql`
-  query searchUsers($username: String) {
-    searchUsers(username: $username) {
-      totalItems
-    }
-  }
-`)
-
-const createUserMutation = print(gql`
-  mutation createOrUpdateUser($user: UserInput!) {
-    createOrUpdateUser(user: $user) {
-      username
-    }
-  }
-`)
 
 async function getUsers(token: string) {
   const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
