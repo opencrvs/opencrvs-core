@@ -79,6 +79,11 @@
     "yaml": "^2.7.1",
     "@types/busboy": "*"
   },
+  "exports": {
+    "./src/router": {
+      "types": "./build/types/router.d.ts"
+    }
+  },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
       "prettier --write",
