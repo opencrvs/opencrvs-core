@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { http, HttpResponse } from 'msw'
-import { LocationType, SCOPES } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { env } from '../../environment'
 import { mswServer } from '../../tests/msw'
@@ -126,7 +126,7 @@ test('Allows syncing administrative hierarchy with USER_DATA_SEEDING scope', asy
         })
       }
 
-      if (request.url.includes(`type=${LocationType.enum.CRVS_OFFICE}`)) {
+      if (request.url.includes(`type=CRVS_OFFICE`)) {
         return HttpResponse.json({
           resourceType: 'Bundle',
           id: '109636d2-09f0-4444-b42c-e22edce0539e',
@@ -188,7 +188,7 @@ test('Allows syncing administrative hierarchy with USER_DATA_SEEDING scope', asy
         })
       }
 
-      if (request.url.includes(`type=${LocationType.enum.HEALTH_FACILITY}`)) {
+      if (request.url.includes(`type=HEALTH_FACILITY`)) {
         return HttpResponse.json({
           resourceType: 'Bundle',
           id: '109636d2-09f0-4444-b42c-e22edce0539e',

@@ -72,7 +72,7 @@ export function generateLocationName(
   return name
 }
 
-export function generateSearchableLocations(
+function generateSearchableLocations(
   locations: ILocation[],
   offlineLocations: { [key: string]: ILocation },
   intl: IntlShape,

@@ -8,13 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  createPrng,
-  generateUuid,
-  Location,
-  LocationType,
-  SCOPES
-} from '@opencrvs/commons'
+import { createPrng, generateUuid, Location, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Returns a single location by id', async () => {
@@ -26,7 +20,7 @@ test('Returns a single location by id', async () => {
     administrativeAreaId: null,
     name: 'Test location',
     validUntil: null,
-    locationType: LocationType.enum.CRVS_OFFICE
+    locationType: 'CRVS_OFFICE'
   }
 
   await client.locations.set([location])
@@ -44,14 +38,14 @@ test('Returns the correct location when multiple exist', async () => {
     administrativeAreaId: null,
     name: 'Location A',
     validUntil: null,
-    locationType: LocationType.enum.CRVS_OFFICE
+    locationType: 'CRVS_OFFICE'
   }
   const locationB: Location = {
     id: generateUuid(createPrng(2)),
     administrativeAreaId: null,
     name: 'Location B',
     validUntil: null,
-    locationType: LocationType.enum.CRVS_OFFICE
+    locationType: 'CRVS_OFFICE'
   }
 
   await client.locations.set([locationA, locationB])
@@ -78,7 +72,7 @@ test('Is accessible without elevated scopes', async () => {
     administrativeAreaId: null,
     name: 'Test location',
     validUntil: null,
-    locationType: LocationType.enum.CRVS_OFFICE
+    locationType: 'CRVS_OFFICE'
   }
 
   await seeder.locations.set([location])

@@ -49,12 +49,6 @@ import { ApplicationConfig } from '@opencrvs/commons/client'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
-export type LocationType =
-  | 'HEALTH_FACILITY'
-  | 'CRVS_OFFICE'
-  | 'ADMIN_STRUCTURE'
-  | 'PRIVATE_HOME'
-
 export interface ILocation {
   id: string
   name: string
