@@ -26,7 +26,6 @@ import {
   ButtonFieldValue,
   VerificationStatusValue
 } from './FieldValue'
-import { LocationSearchResource } from './locations'
 import {
   CustomFieldValue,
   DomesticAddressFieldValue,
