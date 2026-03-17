@@ -90,7 +90,7 @@ jobs:
           format: 'sarif'
           output: './trivy-results-base.sarif'
           exit-code: '0'
-          trivyignores: './branch/.trivyignores.yaml'
+          trivyignores: './branch/.trivyignore.yaml'
 
       - name: Gather Trivy output from PR branch
         uses: aquasecurity/trivy-action@0.35.0
