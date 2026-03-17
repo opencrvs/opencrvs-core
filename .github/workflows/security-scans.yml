@@ -34,7 +34,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
-          ignorefile: .trivyignore.yaml
+          trivyignores: .trivyignore.yaml
 
   security-scan-development:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
@@ -49,7 +49,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
-          ignorefile: .trivyignore.yaml
+          trivyignores: .trivyignore.yaml
 
   security-scan-manual:
     if: github.event_name == 'workflow_dispatch'
@@ -64,7 +64,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           trivy-config: trivy.yaml
-          ignorefile: .trivyignore.yaml
+          trivyignores: .trivyignore.yaml
 
   security-scan-pull-request:
     if: github.event_name == 'pull_request'
@@ -87,7 +87,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: 'base'
           trivy-config: ./branch/trivy.yaml
-          ignorefile: ./branch/.trivyignore.yaml
+          trivyignores: ./branch/.trivyignore.yaml
           format: 'sarif'
           output: './trivy-results-base.sarif'
           exit-code: '0'
@@ -98,7 +98,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: 'branch'
           trivy-config: ./branch/trivy.yaml
-          ignorefile: ./branch/.trivyignore.yaml
+          trivyignores: ./branch/.trivyignore.yaml
           format: 'sarif'
           output: './trivy-results-branch.sarif'
           exit-code: '0'

@@ -266,7 +266,7 @@ jobs:
         with:
           image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}"
           trivy-config: trivy.yaml
-          ignorefile: .trivyignore.yaml
+          trivyignores: .trivyignore.yaml
           format: "sarif"
           output: "./trivy-results-base.sarif"
           exit-code: "0"
@@ -275,7 +275,7 @@ jobs:
         with:
           image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
           trivy-config: trivy.yaml
-          ignorefile: .trivyignore.yaml
+          trivyignores: .trivyignore.yaml
           format: "sarif"
           output: "./trivy-results-branch.sarif"
           exit-code: "0"
@@ -307,4 +307,4 @@ jobs:
         with:
           image-ref: "ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}"
           trivy-config: trivy.yaml
-          ignorefile: .trivyignore.yaml
+          trivyignores: .trivyignore.yaml
