@@ -211,16 +211,16 @@ export function ValueOutput({
     return <AdministrativeArea.Output value={field.value} />
   }
 
-  if (isOfficeFieldType(field) || isLocationFieldType(field)) {
+  if (
+    isOfficeFieldType(field) ||
+    isLocationFieldType(field) ||
+    isFacilityFieldType(field)
+  ) {
     return <LocationSearch.Output value={field.value} />
   }
 
   if (isDividerFieldType(field)) {
     return Divider.Output
-  }
-
-  if (isFacilityFieldType(field)) {
-    return <LocationSearch.Output value={field.value} />
   }
 
   if (isVerificationStatusType(field)) {

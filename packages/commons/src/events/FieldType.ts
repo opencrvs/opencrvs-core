@@ -39,7 +39,9 @@ export const FieldType = {
   LOCATION: 'LOCATION',
   DIVIDER: 'DIVIDER',
   ADMINISTRATIVE_AREA: 'ADMINISTRATIVE_AREA',
+  /** @deprecated Use FieldType.LOCATION with searchableResource: ['HEALTH_FACILITY'] */
   FACILITY: 'FACILITY',
+  /** @deprecated Use FieldType.LOCATION with searchableResource: ['CRVS_OFFICE'] */
   OFFICE: 'OFFICE',
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',

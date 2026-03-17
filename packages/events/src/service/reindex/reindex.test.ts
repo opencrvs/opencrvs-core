@@ -20,7 +20,6 @@ import {
   generateEventDocument,
   generateUuid,
   getUUID,
-  LocationType,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType
@@ -120,7 +119,7 @@ beforeEach(async () => {
       name: 'Location within Admin level 2',
       administrativeAreaId: adminLevel2Id,
       externalId: 'AS0978ASD2C',
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       id: crvsOfficeId,
       validUntil: null
     }
@@ -136,7 +135,6 @@ beforeEach(async () => {
       { type: ActionType.DECLARE, user }
     ]
   })
-
 
   const locations = await getLocations()
 
@@ -222,7 +220,6 @@ beforeEach(async () => {
       transactionId: getUUID()
     })
     .execute()
-
 })
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -299,23 +296,28 @@ test('reindex given original concrete index is replaced by a timestamped index',
 
   const liveIndexName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
 
-  const indicesPointingToAlias = Object.keys(await esClient.indices.getAlias({
-    name: getEventAliasName()
-  }))
+  const indicesPointingToAlias = Object.keys(
+    await esClient.indices.getAlias({
+      name: getEventAliasName()
+    })
+  )
 
   expect(indicesPointingToAlias).toContain(liveIndexName)
 
-  getTemporaryIndexName.mockImplementation((eventType, time) => `${eventType}__new__${time}`)
+  getTemporaryIndexName.mockImplementation(
+    (eventType, time) => `${eventType}__new__${time}`
+  )
 
   await runReindex(reindexToken)
 
-  const indicesPointingToAliasAfter = Object.keys(await esClient.indices.getAlias({
-    name: getEventAliasName()
-  }))
+  const indicesPointingToAliasAfter = Object.keys(
+    await esClient.indices.getAlias({
+      name: getEventAliasName()
+    })
+  )
 
   // Expect original liveIndexName to not be pointing to the alias anymore
   expect(indicesPointingToAliasAfter).not.toContain(liveIndexName)
-
 
   const allConcreteIndexes = (
     (await esClient.cat.indices({ format: 'json' })) as { index: string }[]
@@ -330,8 +332,9 @@ test('reindex given original concrete index is replaced by a timestamped index',
   })
 
   const indexesBehindAlias = Object.keys(aliasInfo)
-  expect(indexesBehindAlias.every((index) => index.includes('__new__'))).toBe(true)
-
+  expect(indexesBehindAlias.every((index) => index.includes('__new__'))).toBe(
+    true
+  )
 })
 
 test('reindex given first-reindex and concrete index conflicts with alias name - write alias created after removing original concrete index to avoid conflicts', async () => {

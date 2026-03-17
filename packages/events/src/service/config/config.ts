@@ -16,7 +16,6 @@ import {
   EventConfig,
   getOrThrow,
   Location,
-  LocationType,
   LocationTypeV1,
   logger,
   TokenWithBearer,
@@ -176,8 +175,8 @@ export async function fetchAdministrativeAreas() {
 
 export async function getLocations() {
   const locationRequests = [
-    LocationType.enum.CRVS_OFFICE,
-    LocationType.enum.HEALTH_FACILITY
+    LocationTypeV1.enum.CRVS_OFFICE,
+    LocationTypeV1.enum.HEALTH_FACILITY
   ].map(fetchLocationV1)
 
   const locationResponses = await Promise.all(locationRequests)
