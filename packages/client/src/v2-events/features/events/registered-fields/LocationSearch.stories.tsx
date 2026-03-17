@@ -39,21 +39,8 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
   },
   args: {
     id: 'location-search',
-    searchableResource: ['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'],
+    searchableResource: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
     value: ''
-  }
-}
-
-export const LocationSearchInputWithAdministrativeAreaId: StoryObj<
-  typeof LocationSearch.Input
-> = {
-  render: (props) => {
-    return <LocationSearch.Input {...props} />
-  },
-  args: {
-    id: 'location-search',
-    searchableResource: ['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'],
-    value: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS[0].id
   }
 }
 
