@@ -10,22 +10,22 @@
  */
 
 import {
-  getUUID,
-  eventPayloadGenerator,
-  UUID,
-  TestUserRole,
+  AdministrativeArea,
+  createPrng,
   EventConfig,
+  eventPayloadGenerator,
+  generateTrackingId,
+  generateUuid,
+  getUUID,
   Location,
   LocationType,
-  generateUuid,
   pickRandom,
-  createPrng,
-  generateTrackingId,
-  AdministrativeArea
+  TestUserRole,
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons'
-import { setLocations } from '../service/locations/locations'
 import { setAdministrativeAreas } from '../service/administrative-areas'
-
+import { setLocations } from '../service/locations/locations'
 interface Name {
   use: string
   given: string[]
@@ -61,7 +61,9 @@ export function payloadGenerator(
       role: input.role ?? TestUserRole.enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId,
+      avatar: 'avatar.jpg',
       status: 'active',
+      type: TokenUserType.enum.user,
       administrativeAreaId: input.administrativeAreaId,
       fullHonorificName: input.fullHonorificName
     })

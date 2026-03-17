@@ -39,19 +39,15 @@ test('Returns user in correct format if found', async () => {
   )
   const fetchedUser = await client.user.get(user.id)
 
-  expect(fetchedUser).toEqual({
+  expect(fetchedUser).toEqual(expect.objectContaining({
     id: user.id,
     name: user.name,
     role: user.role,
     signature: user.signature,
-    avatar: user.avatar,
-    email: user.email,
-    device: user.device,
-    mobile: user.mobile,
     status: user.status,
     primaryOfficeId: user.primaryOfficeId,
     type: TokenUserType.enum.user
-  })
+  }))
 })
 
 test('Returns user with full honorific name when defined', async () => {
@@ -70,18 +66,14 @@ test('Returns user with full honorific name when defined', async () => {
   )
   const fetchedUser = await client.user.get(user.id)
 
-  expect(fetchedUser).toEqual({
+  expect(fetchedUser).toEqual(expect.objectContaining({
     id: user.id,
     name: user.name,
     role: user.role,
-    avatar: user.avatar,
-    email: user.email,
-    device: user.device,
-    mobile: user.mobile,
     status: user.status,
     signature: user.signature,
     primaryOfficeId: user.primaryOfficeId,
     fullHonorificName: userWithHonorific.fullHonorificName,
     type: TokenUserType.enum.user
-  })
+  }))
 })

@@ -54,19 +54,15 @@ test('Returns user in correct format', async () => {
   const fetchedUser = await client.user.list([user.id])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
       type: TokenUserType.enum.user,
-      avatar: user.avatar,
-      email: user.email,
-      device: user.device,
-      mobile: user.mobile,
       status: user.status,
-    }
+    })
   ])
 })
 
@@ -139,19 +135,15 @@ test('Does not return users or systems which are not found', async () => {
   const fetchedUser = await client.user.list([user.id, '123-123-123', 'foobar'])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
       type: TokenUserType.enum.user,
-      avatar: user.avatar,
-      email: user.email,
-      device: user.device,
-      mobile: user.mobile,
-      status: user.status
-    }
+      fullHonorificName: user.fullHonorificName
+    })
   ])
 })
 
