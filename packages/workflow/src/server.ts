@@ -49,7 +49,18 @@ export async function createServer() {
 
   server.auth.default('jwt')
 
-  server.route([])
+  server.route({
+    method: 'GET',
+    path: '/ping',
+    handler: () => ({
+      success: true
+    }),
+    options: {
+      auth: false,
+      tags: ['api'],
+      description: 'Health check endpoint'
+    }
+  })
 
   server.ext({
     type: 'onRequest',
