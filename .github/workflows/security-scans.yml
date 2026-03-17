@@ -8,16 +8,16 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 name: Scan files for vulnerabilities
 
-# on:
-#   push:
-#     branches:
-#       - develop
-#       - release-*
-#   pull_request:
-#   workflow_dispatch:
-#   schedule:
-#     # Run every day at midnight
-#     - cron: '0 0 * * *'
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Run every day at midnight
+    - cron: '0 0 * * *'
 jobs:
   security-scan-scheduled:
     if: github.event_name == 'schedule'
