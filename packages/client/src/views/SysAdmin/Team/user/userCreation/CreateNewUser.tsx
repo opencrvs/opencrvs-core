@@ -13,7 +13,8 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup
+  IFormSectionGroup,
+  ISelectFormFieldWithOptions
 } from '@client/forms'
 import {
   getVisibleSectionGroupsBasedOnConditions,
@@ -49,6 +50,7 @@ import { Scope, SCOPES, UUID } from '@opencrvs/commons/client'
 import { IOfflineData } from '@client/offline/reducer'
 import { UserDetails } from '@client/utils/userUtils'
 import { get, isNull, isUndefined } from 'lodash'
+import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
 
 type IUserProps = {
   userId?: string
@@ -100,6 +102,31 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
     section,
     userDetailsStored
   } = props
+
+  const { listRoles } = useRoles()
+  const [roles] = listRoles.useSuspenseQuery()
+
+  const formSectionWithRolesSelect = {
+    ...props.section,
+    groups: props.section.groups.map((group) => ({
+      ...group,
+      fields: group.fields.map((field) => {
+        if (field.name !== 'role') {
+          return field
+        }
+        return {
+          ...field,
+          options: roles.map((role) => ({
+            label: formatUserRole(role.id, intl),
+            value: role.id
+          }))
+        } as ISelectFormFieldWithOptions
+      })
+    }))
+  }
+  const activeGroupWithRolesSelect = formSectionWithRolesSelect.groups.find(
+    (group) => group.id === props.activeGroup.id
+  )!
 
   useEffect(() => {
     const initialize = async () => {
@@ -155,12 +182,23 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
   }
 
   if (section.viewType === 'form') {
-    return <UserForm {...props} />
+    return (
+      <UserForm
+        {...props}
+        activeGroup={activeGroupWithRolesSelect}
+        section={formSectionWithRolesSelect}
+      />
+    )
   }
 
   if (section.viewType === 'preview') {
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    return <UserReviewForm client={client as ApolloClient<any>} {...props} />
+    return (
+      <UserReviewForm
+        client={client as ApolloClient<any>}
+        {...props}
+        section={formSectionWithRolesSelect}
+      />
+    )
   }
   return null
 }

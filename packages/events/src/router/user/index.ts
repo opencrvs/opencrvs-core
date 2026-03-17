@@ -15,6 +15,7 @@ import { UserOrSystem } from '@opencrvs/commons'
 import { router, userOnlyProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
+import { getRoles } from '@events/service/config/config'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { searchUsers } from '@events/service/users/api'
 import { userCanReadOtherUser } from '../middleware'
@@ -56,6 +57,9 @@ export const userRouter = router({
     .use(userCanReadOtherUser)
     .query(async ({ input }) => {
       return getUserActions(input)
-    })
+    }),
+  roles: router({
+    list: userOnlyProcedure.query(async ({ ctx }) => getRoles(ctx.token))
+  })
 })
 

@@ -28,7 +28,7 @@ import {
   SubmitActivateUserMutationVariables
 } from '@client/utils/gateway'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
-import { formatUserRole } from '@client/v2-events/hooks/useUserDetails'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { getOfflineData } from '@client/offline/selectors'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { ErrorText } from '@opencrvs/components/lib/'

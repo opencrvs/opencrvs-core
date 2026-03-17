@@ -8,10 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { z } from 'zod'
 import { Scope } from './scopes'
+
+export const Role = z.object({
+  id: z.string(),
+  scopes: z.array(z.string())
+})
 
 export type Roles = Array<{
   id: string
+  /** @deprecated */
   labels: Array<{ language: string; label: string }>
   scopes: Scope[]
 }>

@@ -58,10 +58,9 @@ import { Location, UUID, User } from '@opencrvs/commons/client'
 import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
 import { useOnlineStatus } from '../../../../utils'
 import { LoadingIndicator } from '@client/components/LoadingIndicator'
-import { useTRPC } from '@client/v2-events/trpc'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { formatUserRole } from '@client/v2-events/hooks/useUserDetails'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1

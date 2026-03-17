@@ -18,7 +18,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { useIntl } from 'react-intl'
-import { formatUserRole } from '@client/v2-events/hooks/useUserDetails'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)
   const userDetails = useSelector(getUserDetails)

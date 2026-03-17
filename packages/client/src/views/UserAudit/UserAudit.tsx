@@ -25,12 +25,9 @@ import * as routes from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { userMutations } from '@client/user/mutations'
-import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import { getLocalisedName } from '@client/utils/data-formatting'
-import { formatUserRole } from '@client/v2-events/hooks/useUserDetails'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
-import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { RawScopes, User } from '@opencrvs/commons/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
@@ -161,7 +158,6 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
   const { getUser } = useUsers()
   const { isFetching: loading, error, data } = getUser.useQuery(userId!)
-  console.log('3')
 
   const user = data as User | undefined
   const userRole = user && formatUserRole(user.role, intl)
@@ -225,8 +221,6 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
           )
       }
     ]
-
-    console.log(user)
 
     if (status === 'pending' || status === 'active') {
       menuItems.push(

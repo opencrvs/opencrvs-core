@@ -10,12 +10,11 @@
  */
 
 import { useIntl, defineMessages, IntlShape } from 'react-intl'
-import { useSelector } from 'react-redux'
 import { personNameFromV1ToV2 } from '@opencrvs/commons/client'
 import { ActionType, TokenUserType } from '@opencrvs/commons/client'
-import { getOfflineData } from '@client/offline/selectors'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { DECLARATION_ACTION_UPDATE } from '../features/events/actions/correct/useActionForHistory'
 
 const messages = defineMessages({
@@ -28,14 +27,9 @@ const messages = defineMessages({
     id: 'event.history.system',
     defaultMessage: 'System',
     description: 'Name for system initiated actions in the event history'
-  },
-  role: {
-    id: 'event.history.role',
-    defaultMessage:
-      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} other {Unknown}}',
-    description: 'Role of the user in the event history'
   }
 })
+
 
 export function useUserDetails() {
   const intl = useIntl()
@@ -58,9 +52,7 @@ export function useUserDetails() {
     name: string
     role: string | undefined
   } => {
-    const role = intl.formatMessage(messages.role, {
-      role: createdByRole || ''
-    })
+    const role = formatUserRole(createdByRole, intl)
 
     if (type === ActionType.DUPLICATE_DETECTED) {
       return {
@@ -102,8 +94,3 @@ export function useUserDetails() {
   return { getUserDetails }
 }
 
-export function formatUserRole(role: string | undefined, intl: IntlShape) {
-  return intl.formatMessage(messages.role, {
-    role: role ?? ''
-  })
-}

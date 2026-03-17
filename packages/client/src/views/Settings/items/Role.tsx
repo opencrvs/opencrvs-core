@@ -20,7 +20,7 @@ import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplif
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { formatUserRole } from '@client/v2-events/hooks/useUserDetails'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 
 export function Role() {
   const intl = useIntl()

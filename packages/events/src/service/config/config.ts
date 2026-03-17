@@ -15,11 +15,11 @@ import {
   EventConfig,
   getOrThrow,
   logger,
+  Role,
   TokenWithBearer,
   WorkqueueConfig
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
-
 /**
  * During 1.9.0 we support only docker swarm configuration.
  * In docker swarm deployment process updates all the containers.
@@ -131,4 +131,20 @@ export async function getInMemoryWorkqueueConfigurations(
 
   inMemoryWorkqueueConfigurations = await getWorkqueueConfigurations(token)
   return inMemoryWorkqueueConfigurations
+}
+
+
+export async function getRoles(token: TokenWithBearer) {
+  const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch roles config')
+  }
+
+  return array(Role).parse(await res.json())
 }
