@@ -38,7 +38,11 @@ import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { Avatar } from '@client/components/Avatar'
-import { hasDraftWorkqueue, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
+import {
+  getUsersFullName,
+  hasDraftWorkqueue,
+  WORKQUEUE_DRAFT
+} from '@client/v2-events/utils'
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -111,9 +115,7 @@ export function SidebarComponent({
 
   let name = ''
   if (userDetails?.name) {
-    const nameObj =
-      userDetails.name.find((n) => n.use === language) ?? userDetails.name[0]
-    name = joinValues([...nameObj.given, nameObj.family], ' ')
+    name = getUsersFullName(userDetails.name, language)
   }
 
   const role =

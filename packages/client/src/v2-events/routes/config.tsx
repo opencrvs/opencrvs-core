@@ -117,8 +117,25 @@ export const routesConfig = {
             signal: controller.signal
           })
 
+          const status = await res.json()
+          const services = [
+            'auth',
+            'search',
+            'user-mgnt',
+            'metrics',
+            'notification',
+            'countryconfig',
+            'workflow'
+          ]
+
+          const allServicesReady =
+            res.ok &&
+            services.every((service) => {
+              return status[service] === true
+            })
+
           if (!cancelled) {
-            onlineManager.setOnline(res.ok)
+            onlineManager.setOnline(allServicesReady)
           }
         } catch {
           if (!cancelled) {
@@ -145,8 +162,8 @@ export const routesConfig = {
       <NavigationHistoryProvider>
         <TRPCErrorBoundary>
           <TRPCProvider storeIdentifier={currentUser.id}>
-            <Debug />
             <Outlet />
+            <Debug />
             <Toaster />
             <PrefetchQueries />
           </TRPCProvider>

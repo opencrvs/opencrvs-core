@@ -305,10 +305,6 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
     throw new Error(`No section found ${sectionId}`)
   }
 
-  if (!user?.primaryOfficeId) {
-    throw new Error(`No primary office found for user`)
-  }
-
   section = scopes.some((scope) =>
     (
       [
@@ -317,10 +313,7 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
       ] as Scope[]
     ).includes(scope)
   )
-    ? addJurisdictionFilterToLocationSearchInput(
-        section,
-        user.primaryOfficeId as UUID
-      )
+    ? addJurisdictionFilterToLocationSearchInput(section, user.primaryOfficeId)
     : section
 
   let formData = { ...state.userForm.userFormData }
