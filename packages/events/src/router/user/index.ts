@@ -17,7 +17,15 @@ import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { getRoles } from '@events/service/config/config'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
-import { UserInput, searchUsers, createUser } from '@events/service/users/api'
+import {
+  UserInput,
+  searchUsers,
+  createUser,
+  changeUserPassword,
+  changeUserPhone,
+  changeUserEmail,
+  changeUserAvatar
+} from '@events/service/users/api'
 import { userCanReadOtherUser } from '../middleware'
 
 const UserSearch = z.object({
@@ -64,6 +72,50 @@ export const userRouter = router({
     }),
   roles: router({
     list: userOnlyProcedure.query(async ({ ctx }) => getRoles(ctx.token))
-  })
+  }),
+  changePassword: userOnlyProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        existingPassword: z.string(),
+        password: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await changeUserPassword(input, ctx.token)
+    }),
+  changePhone: userOnlyProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        phoneNumber: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await changeUserPhone(input, ctx.token)
+    }),
+  changeEmail: userOnlyProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        email: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await changeUserEmail(input, ctx.token)
+    }),
+  changeAvatar: userOnlyProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        avatar: z.object({
+          type: z.string(),
+          data: z.string()
+        })
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await changeUserAvatar(input, ctx.token)
+    })
 })
 

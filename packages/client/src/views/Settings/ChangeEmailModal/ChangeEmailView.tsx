@@ -17,16 +17,11 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { useDispatch, useSelector } from 'react-redux'
-import { sendVerifyCode } from '@client/profile/profileActions'
+import { useSelector } from 'react-redux'
 import { isAValidEmailAddressFormat } from '@client/utils/validate'
-import { getLanguage } from '@client/i18n/selectors'
-import { convertToMSISDN } from '@client/forms/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
-import { useLazyQuery } from '@apollo/client'
-import { GetUserByEmailQuery } from '@client/utils/gateway'
-import { TriggerEvent } from '@opencrvs/commons/client'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 
 interface IProps {
   show: boolean
@@ -44,9 +39,8 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     showDuplicateEmailErrorNotification,
     setShowDuplicateEmailErrorNotification
   ] = React.useState(false)
-  const dispatch = useDispatch()
   const userDetails = useSelector(getUserDetails)
-  const language = useSelector(getLanguage)
+  const { changeEmail } = useUsers()
 
   const onChangeEmailAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     const emailAddress = event.target.value
@@ -69,7 +63,25 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (emailAddress: string) => {
-    throw new Error('Change email functionality is currently not implemented')
+    if (!userDetails) return
+    changeEmail.mutate(
+      { userId: userDetails.id, email: emailAddress },
+      {
+        onSuccess: () => {
+          onSuccess(emailAddress)
+        },
+        onError: (error) => {
+          if (
+            error.message.includes('409') ||
+            error.message.includes('duplicate')
+          ) {
+            setShowDuplicateEmailErrorNotification(true)
+          } else {
+            setUnknownError(true)
+          }
+        }
+      }
+    )
   }
   React.useEffect(() => {
     if (!show) {

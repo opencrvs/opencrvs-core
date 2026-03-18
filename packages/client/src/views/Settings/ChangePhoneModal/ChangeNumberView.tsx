@@ -18,15 +18,10 @@ import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { isAValidPhoneNumberFormat } from '@client/utils/validate'
-import { convertToMSISDN } from '@client/forms/utils'
-import { useDispatch, useSelector } from 'react-redux'
-import { sendVerifyCode } from '@client/profile/profileActions'
+import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
-import { getLanguage } from '@client/i18n/selectors'
-import { useLazyQuery } from '@apollo/client'
-import { GetUserByMobileQuery } from '@client/utils/gateway'
-import { TriggerEvent } from '@opencrvs/commons/client'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 
 interface IProps {
   show: boolean
@@ -40,12 +35,11 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
   const [unknownError, setUnknownError] = React.useState(false)
   const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = React.useState(false)
   const userDetails = useSelector(getUserDetails)
-  const language = useSelector(getLanguage)
   const [
     showDuplicateMobileErrorNotification,
     setShowDuplicateMobileErrorNotification
   ] = React.useState(false)
-  const dispatch = useDispatch()
+  const { changePhone } = useUsers()
   const onChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
     const phoneNumber = event.target.value
     setPhoneNumber(phoneNumber)
@@ -67,7 +61,25 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (phoneNumber: string) => {
-    throw new Error('Change phone functionality is currently not implemented')
+    if (!userDetails) return
+    changePhone.mutate(
+      { userId: userDetails.id, phoneNumber },
+      {
+        onSuccess: () => {
+          onSuccess(phoneNumber)
+        },
+        onError: (error) => {
+          if (
+            error.message.includes('409') ||
+            error.message.includes('duplicate')
+          ) {
+            setShowDuplicateMobileErrorNotification(true)
+          } else {
+            setUnknownError(true)
+          }
+        }
+      }
+    )
   }
   React.useEffect(() => {
     if (!show) {

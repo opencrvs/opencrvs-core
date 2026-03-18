@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { inferInput } from '@trpc/tanstack-react-query'
 import {
   FullDocumentUrl,
@@ -202,6 +202,18 @@ export function useUsers() {
           }).data
         ]
       }
-    }
+    },
+    changePassword: useMutation(
+      trpcOptionsProxy.user.changePassword.mutationOptions()
+    ),
+    changePhone: useMutation(
+      trpcOptionsProxy.user.changePhone.mutationOptions()
+    ),
+    changeEmail: useMutation(
+      trpcOptionsProxy.user.changeEmail.mutationOptions()
+    ),
+    changeAvatar: useMutation(
+      trpcOptionsProxy.user.changeAvatar.mutationOptions()
+    )
   }
 }

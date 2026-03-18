@@ -232,3 +232,95 @@ export async function createUser(input: CreateUserPayload, token: string) {
   const response = (await res.json()) as UserAPIResult
   return getUser(response.id, token)
 }
+
+export async function changeUserPassword(
+  payload: { userId: string; existingPassword: string; password: string },
+  token: string
+): Promise<void> {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPassword').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to change password. Error: ${res.status} status received`
+    )
+  }
+}
+
+export async function changeUserPhone(
+  payload: { userId: string; phoneNumber: string },
+  token: string
+): Promise<void> {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPhone').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to change phone number. Error: ${res.status} status received`
+    )
+  }
+}
+
+export async function changeUserEmail(
+  payload: { userId: string; email: string },
+  token: string
+): Promise<void> {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserEmail').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to change email. Error: ${res.status} status received`
+    )
+  }
+}
+
+export async function changeUserAvatar(
+  payload: { userId: string; avatar: { type: string; data: string } },
+  token: string
+): Promise<void> {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserAvatar').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to change avatar. Error: ${res.status} status received`
+    )
+  }
+}

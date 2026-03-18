@@ -10,31 +10,25 @@
  */
 import * as React from 'react'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import {
   PrimaryButton,
   TertiaryButton,
   LinkButton
 } from '@opencrvs/components/lib/buttons'
-import { gql } from '@apollo/client'
 import Cropper from 'react-easy-crop'
 import type { Point, Area, Size } from 'react-easy-crop'
-import { Mutation } from '@apollo/client/react/components'
-import styled, { withTheme } from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IStoreState } from '@client/store'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { ImageLoader } from './ImageLoader'
 import { getCroppedImage, IImage } from '@client/utils/imageUtils'
 
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { Square } from '@opencrvs/components/lib/icons'
-import { UserDetails } from '@client/utils/userUtils'
-import {
-  IOnlineStatusProps,
-  withOnlineStatus
-} from '@client/components/LoadingIndicator'
+import { useOnlineStatus } from '@client/utils'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 
 const Container = styled.div`
   align-self: center;
@@ -91,19 +85,16 @@ const Error = styled.div`
   color: ${({ theme }) => theme.colors.negative};
 `
 
-type IProps = IntlShapeProps &
-  IOnlineStatusProps & {
-    theme: ITheme
-    showChangeAvatar: boolean
-    cancelAvatarChangeModal: () => void
-    imgSrc: IImage
-    onImgSrcChanged: (img: IImage) => void
-    error: string
-    onErrorChanged: (error: string) => void
-    onConfirmAvatarChange: () => void
-    onAvatarChanged: (img: string) => void
-    userDetails: UserDetails | null
-  }
+interface IProps {
+  showChangeAvatar: boolean
+  cancelAvatarChangeModal: () => void
+  imgSrc: IImage
+  onImgSrcChanged: (img: IImage) => void
+  error: string
+  onErrorChanged: (error: string) => void
+  onConfirmAvatarChange: () => void
+  onAvatarChanged: (img: string) => void
+}
 
 const DEFAULT_SIZE: Size = {
   height: 0,
@@ -145,18 +136,19 @@ function useCropSize(breakpoint: number) {
 
 function AvatarChangeModalComp({
   showChangeAvatar,
-  intl,
   cancelAvatarChangeModal,
   imgSrc,
   onImgSrcChanged: setImgSrc,
   error,
   onErrorChanged: setError,
   onConfirmAvatarChange,
-  onAvatarChanged,
-  isOnline,
-  theme,
-  userDetails
+  onAvatarChanged
 }: IProps) {
+  const intl = useIntl()
+  const theme = useTheme() as ITheme
+  const isOnline = useOnlineStatus()
+  const userDetails = useSelector(getUserDetails)
+  const { changeAvatar: changeAvatarMutation } = useUsers()
   const [crop, setCrop] = React.useState<Point>(DEFAULT_CROP)
   const [zoom, setZoom] = React.useState<number>(1)
   const [croppedArea, setCroppedArea] = React.useState<Area>(DEFAULT_AREA)
@@ -175,6 +167,25 @@ function AvatarChangeModalComp({
     reset()
   }
 
+  const handleApply = async () => {
+    const croppedImage = await getCroppedImage(imgSrc, croppedArea)
+    if (userDetails && userDetails.id && croppedImage) {
+      changeAvatarMutation.mutate(
+        {
+          userId: userDetails.id,
+          avatar: croppedImage
+        },
+        {
+          onSuccess: () => {
+            onAvatarChanged(croppedImage.data)
+            reset()
+          }
+        }
+      )
+      onConfirmAvatarChange()
+    }
+  }
+
   return (
     <ResponsiveModal
       id="ChangeAvatarModal"
@@ -185,7 +196,15 @@ function AvatarChangeModalComp({
       actions={[
         <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>
+        </TertiaryButton>,
+        <PrimaryButton
+          key="apply"
+          id="apply_change"
+          disabled={!isOnline || !!error}
+          onClick={handleApply}
+        >
+          {intl.formatMessage(buttonMessages.apply)}
+        </PrimaryButton>
       ]}
       handleClose={handleCancel}
     >
@@ -239,12 +258,4 @@ function AvatarChangeModalComp({
   )
 }
 
-const mapStateToProps = (state: IStoreState) => {
-  return {
-    userDetails: getUserDetails(state)
-  }
-}
-
-export const AvatarChangeModal = connect(mapStateToProps)(
-  injectIntl(withTheme(withOnlineStatus(AvatarChangeModalComp)))
-)
+export const AvatarChangeModal = AvatarChangeModalComp
