@@ -1222,6 +1222,10 @@ export const handlers = {
         response = generator.user.localSystemAdmin()
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v1
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v1
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v1
       } else {
         response = generator.user.localRegistrar().v1
       }
@@ -1245,6 +1249,10 @@ export const handlers = {
         response = generator.user.localSystemAdmin()
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v1
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v1
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v1
       } else {
         response = generator.user.localRegistrar().v1
       }

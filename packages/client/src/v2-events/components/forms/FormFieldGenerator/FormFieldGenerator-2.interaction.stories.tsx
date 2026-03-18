@@ -217,8 +217,8 @@ const fields = [
       ]
     },
     defaultValue: {
-      country: 'Bangladesh',
-      administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      country: 'FAR',
+      administrativeArea: '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID,
       addressType: 'DOMESTIC'
     }
   },
@@ -324,7 +324,7 @@ const fields = [
     label: generateTranslationConfig('Facility'),
     defaultValue: 'Gym Hall',
     configuration: {
-      searchableResource: ['HEALTH_FACILITY']
+      locationTypes: ['HEALTH_FACILITY']
     }
   },
 
@@ -334,7 +334,7 @@ const fields = [
     label: generateTranslationConfig('Membership Office'),
     defaultValue: 'Head Office',
     configuration: {
-      searchableResource: ['CRVS_OFFICE']
+      locationTypes: ['CRVS_OFFICE']
     }
   },
 
@@ -422,9 +422,9 @@ const declaration = {
   'applicant.country': 'BGD',
   'applicant.region': 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
   'applicant.address': {
-    country: 'BGD',
+    country: 'FAR',
     addressType: 'DOMESTIC',
-    administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a'
+    administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9'
   },
   'applicant.documents': [
     {
