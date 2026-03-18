@@ -632,7 +632,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             eventType={eventConfig?.id}
-            searchableResource={field.config.configuration.searchableResource}
+            locationTypes={field.config.configuration.locationTypes}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -648,7 +648,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             eventType={eventConfig?.id}
-            searchableResource={['CRVS_OFFICE']}
+            locationTypes={['CRVS_OFFICE']}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -664,7 +664,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             eventType={eventConfig?.id}
-            searchableResource={['HEALTH_FACILITY']}
+            locationTypes={['HEALTH_FACILITY']}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}

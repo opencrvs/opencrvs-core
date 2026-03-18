@@ -76,7 +76,7 @@ const defaultSearchFieldGenerator: Record<
       id: 'advancedSearch.registeredAtLocation.helperText'
     },
     configuration: {
-      searchableResource: ['ADMIN_STRUCTURE', 'CRVS_OFFICE']
+      locationTypes: ['ADMIN_STRUCTURE', 'CRVS_OFFICE']
     }
   }),
   'event.legalStatuses.REGISTERED.acceptedAt': (_) => ({

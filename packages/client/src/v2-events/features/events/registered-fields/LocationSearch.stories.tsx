@@ -38,7 +38,7 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
   },
   args: {
     id: 'location-search',
-    searchableResource: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
+    locationTypes: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
     value: ''
   }
 }
@@ -55,7 +55,7 @@ export const LocationSearchInputWithActiveLocations: StoryObj<
   },
   args: {
     id: 'location-search',
-    searchableResource: ['HEALTH_FACILITY'],
+    locationTypes: ['HEALTH_FACILITY'],
     value: 'abc',
     onChange: fn()
   },
@@ -99,7 +99,7 @@ export const LocationSearchInputInvalid: StoryObj<typeof LocationSearch.Input> =
     },
     args: {
       id: 'location-search',
-      searchableResource: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
+      locationTypes: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
       value: 'abc',
       onChange: fn()
     },

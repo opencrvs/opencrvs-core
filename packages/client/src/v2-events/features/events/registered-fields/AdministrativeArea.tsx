@@ -85,16 +85,16 @@ function useAvailableAdministrativeAreas(
     })
   }, [administrativeAreas, parentId])
 
-  // If jurisdiction is only user's current location, we never show any administrative area options.
-  if (jurisdictionFilter === JurisdictionFilter.enum.location) {
-    return []
-  }
-
-  // If jurisdiction is only administrative area, we show all options which are the parent of the users location (either direct or parent of the parent)
-  if (jurisdictionFilter === JurisdictionFilter.enum.administrativeArea) {
-    return options.filter((o) =>
-      userAdministrativeAreaHierarchy.some(({ id }) => id === o.id)
-    )
+  // When jurisdictionFilter is not "all", restrict options to the user's own area hierarchy.
+  // e.g. a LOCAL_REGISTRAR sees only their province/district; a COMMUNITY_LEADER sees only their province/district/village.
+  const hierarchyOptions = options.filter((o) =>
+    userAdministrativeAreaHierarchy.some(({ id }) => id === o.id)
+  )
+  if (
+    jurisdictionFilter !== JurisdictionFilter.enum.all &&
+    hierarchyOptions.length > 0
+  ) {
+    return hierarchyOptions
   }
 
   // By default or if jurisdiction is all, we show all options
