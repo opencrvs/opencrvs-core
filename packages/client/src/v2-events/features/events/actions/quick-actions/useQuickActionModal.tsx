@@ -29,16 +29,19 @@ import {
   runFieldValidations,
   UUID,
   getCurrentEventState,
-  EventConfig
+  EventConfig,
+  omitHiddenFields,
+  EventIndex,
+  isValidIcon
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { buttonMessages } from '@client/i18n/messages'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
-import { useUserAllowedActions } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useModal } from '../../../../hooks/useModal'
-import { actionLabels } from '../../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { actionLabels } from '../../../workqueues/Actions/utils'
 import { register } from './register'
 import { archive } from './archive'
 
@@ -88,7 +91,7 @@ function QuickActionModal({
   close,
   config,
   eventId,
-  eventConfiguration,
+  eventConfiguration
 }: {
   close: (result: ModalResult) => void
   config: ModalConfig & { label: MessageDescriptor }
@@ -122,6 +125,16 @@ function QuickActionModal({
     })
   )
 
+  const confirm = () => {
+    const visibleFields = omitHiddenFields(
+      config.fields ?? [],
+      modalValues,
+      validatorContext
+    )
+
+    close({ result: true, values: visibleFields })
+  }
+
   return (
     <Dialog
       actions={[
@@ -137,7 +150,7 @@ function QuickActionModal({
           bg={'primaryBlue'}
           disabled={errorsOnField.length > 0}
           id="confirm-btn"
-          onClick={() => close({ result: true, values: modalValues })}
+          onClick={confirm}
         >
           {intl.formatMessage(
             config.confirmButtonLabel || buttonMessages.confirm
@@ -182,11 +195,14 @@ function QuickActionModal({
   )
 }
 
-export function useQuickActionModal(eventId: UUID, eventConfiguration: EventConfig, eventType: string) {
+export function useQuickActionModal(
+  eventConfiguration: EventConfig,
+  eventIndex: EventIndex
+) {
   const [quickActionModal, openModal] = useModal()
   const navigate = useNavigate()
   const { actions, customActions } = useEvents()
-  const { isActionAllowed } = useUserAllowedActions(eventType)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
 
   const onQuickAction = async (
     actionType: keyof typeof quickActions,
@@ -196,18 +212,19 @@ export function useQuickActionModal(eventId: UUID, eventConfiguration: EventConf
     const label = actionLabels[actionType]
     const actionConfig = getActionConfig({ actionType, eventConfiguration })
     const supportingCopy = actionConfig?.supportingCopy
+
     const { result } = await openModal<ModalResult>((close) => (
       <QuickActionModal
         close={close}
         config={{
           label,
           actionType,
-          icon: actionConfig?.icon,
+          icon: isValidIcon(actionConfig?.icon) ? actionConfig.icon : undefined,
           supportingCopy,
           ...config.modal
         }}
         eventConfiguration={eventConfiguration}
-        eventId={eventId}
+        eventId={eventIndex.id}
       />
     ))
 
@@ -216,7 +233,7 @@ export function useQuickActionModal(eventId: UUID, eventConfiguration: EventConf
     // - Redirect the user to the workqueue they arrived from if provided, or the home page if not
     if (result) {
       void config.onConfirm({
-        eventId,
+        eventId: eventIndex.id,
         actions,
         customActions,
         isActionAllowed
@@ -242,7 +259,10 @@ const customActionConfigBase: Partial<ModalConfig> = {
   }
 }
 
-export function useCustomActionModal(eventId: UUID, eventConfiguration: EventConfig) {
+export function useCustomActionModal(
+  eventId: UUID,
+  eventConfiguration: EventConfig
+) {
   const [customActionModal, openModal] = useModal()
   const navigate = useNavigate()
   const { actions } = useEvents()
@@ -259,7 +279,7 @@ export function useCustomActionModal(eventId: UUID, eventConfiguration: EventCon
           label: actionConfig.label,
           supportingCopy: actionConfig.supportingCopy,
           fields: actionConfig.form,
-          icon: actionConfig.icon
+          icon: isValidIcon(actionConfig.icon) ? actionConfig.icon : undefined
         }}
         eventConfiguration={eventConfiguration}
         eventId={eventId}

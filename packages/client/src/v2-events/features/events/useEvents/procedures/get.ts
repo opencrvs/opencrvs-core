@@ -84,7 +84,7 @@ function getViewEventQuery(
     queryKey: [['view-event', id]],
     meta: { eventConfig },
     queryFn: async () => {
-      const eventDocument = await trpcClient.event.get.query(id)
+      const eventDocument = await trpcClient.event.get.query({ eventId: id })
 
       await Promise.all([
         cacheFiles(eventDocument),
@@ -104,7 +104,9 @@ function getViewEventQuery(
 function useGetOrDownloadEvent(id: UUID) {
   const trpc = useTRPC()
   const eventConfig = useEventConfigurations()
-  const cachedAssignedEvent = queryClient.getQueryData(trpc.event.get.queryKey(id))
+  const cachedAssignedEvent = queryClient.getQueryData(
+    trpc.event.get.queryKey({ eventId: id })
+  )
   const cachedViewEvent = queryClient.getQueryData([['view-event', id]])
 
   // Already explicitly downloaded
@@ -114,11 +116,13 @@ function useGetOrDownloadEvent(id: UUID) {
 
   // If assigned & cached, read from cache without network
   if (cachedAssignedEvent) {
-    const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
+    const { queryFn, ...queryOptions } = trpc.event.get.queryOptions({
+      eventId: id
+    })
 
     return useSuspenseQuery({
       ...queryOptions,
-      queryKey: trpc.event.get.queryKey(id),
+      queryKey: trpc.event.get.queryKey({ eventId: id }),
       meta: { eventConfig },
       staleTime: Infinity,
       refetchOnMount: false,
@@ -141,11 +145,11 @@ export function useGetEvent() {
    */
   const useFindEventFromCache = (id: string) => {
     const eventConfig = useEventConfigurations()
-    const { queryFn, ...options } = trpc.event.get.queryOptions(id)
+    const { queryFn, ...options } = trpc.event.get.queryOptions({ eventId: id })
 
     return useQuery({
       ...options,
-      queryKey: trpc.event.get.queryKey(id),
+      queryKey: trpc.event.get.queryKey({ eventId: id }),
       meta: { eventConfig },
       /*
        * We never want to refetch this query automatically
@@ -165,9 +169,15 @@ export function useGetEvent() {
     getFromCache: (id: UUID) => {
       const intl = useIntl()
       const eventConfig = useEventConfigurations()
-      const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
-      const downloaded = queryClient.getQueryData(trpc.event.get.queryKey(id))
-      const downloadedForViewing = queryClient.getQueryData([['view-event', id]])
+      const { queryFn, ...queryOptions } = trpc.event.get.queryOptions({
+        eventId: id
+      })
+      const downloaded = queryClient.getQueryData(
+        trpc.event.get.queryKey({ eventId: id })
+      )
+      const downloadedForViewing = queryClient.getQueryData([
+        ['view-event', id]
+      ])
 
       if (downloadedForViewing) {
         return useSuspenseQuery(getViewEventQuery(id, eventConfig)).data
@@ -185,7 +195,7 @@ export function useGetEvent() {
 
       return useSuspenseQuery({
         ...queryOptions,
-        queryKey: trpc.event.get.queryKey(id),
+        queryKey: trpc.event.get.queryKey({ eventId: id }),
         meta: { eventConfig },
         /*
          * We never want to refetch this query automatically

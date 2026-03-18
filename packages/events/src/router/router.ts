@@ -16,6 +16,8 @@ import { locationRouter } from './locations'
 import { workqueueRouter } from './workqueue'
 import { administrativeAreaRouter } from './administrative-areas'
 import { administrativeHierarchyRouter } from './administrative-hierarchy'
+import { integrationsRouter } from './integrations'
+import { attachmentsRouter } from './attachments'
 
 export const appRouter = router({
   event: eventRouter,
@@ -23,7 +25,9 @@ export const appRouter = router({
   locations: locationRouter,
   workqueue: workqueueRouter,
   administrativeHierarchy: administrativeHierarchyRouter,
-  administrativeAreas: administrativeAreaRouter
+  administrativeAreas: administrativeAreaRouter,
+  integrations: integrationsRouter,
+  attachments: attachmentsRouter
 })
 
 /** @knipignore */

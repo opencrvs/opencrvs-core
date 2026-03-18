@@ -18,34 +18,14 @@ import {
   getUserTypeFromToken,
   logger,
   REINDEX_USER_ID,
-  SystemRole,
   TokenUserType,
   TokenWithBearer,
-  User,
-  System
+  SystemContext,
+  UserContext
 } from '@opencrvs/commons'
-import { getSystem, getUser } from './service/users/api'
+export { SystemContext, UserContext }
+import { getUser } from './service/users/api'
 import { getLocationById } from './service/locations/locations'
-
-export const UserContext = User.pick({
-  id: true,
-  primaryOfficeId: true,
-  administrativeAreaId: true,
-  role: true,
-  signature: true,
-  type: true
-})
-export type UserContext = z.infer<typeof UserContext>
-
-export const SystemContext = System.pick({
-  id: true,
-  role: true,
-  type: true,
-  primaryOfficeId: true,
-  administrativeAreaId: true,
-  signature: true
-})
-type SystemContext = z.infer<typeof SystemContext>
 
 export const TrpcContext = z.object({
   token: TokenWithBearer,
@@ -114,19 +94,15 @@ async function resolveUserDetails(
       return SystemContext.parse({
         type: TokenUserType.enum.system,
         id: userId,
-        primaryOfficeId: undefined,
-        role: SystemRole.enum.REINDEX
+        primaryOfficeId: undefined
       })
     }
 
     if (userType === TokenUserType.enum.system) {
-      const { type } = await getSystem(userId, token)
-
       return SystemContext.parse({
         type: userType,
         id: userId,
-        primaryOfficeId: undefined,
-        role: type
+        primaryOfficeId: undefined
       })
     }
 

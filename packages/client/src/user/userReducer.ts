@@ -43,7 +43,7 @@ import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
 import { Action } from 'redux'
 import { ActionCmd, Cmd, Loop, LoopReducer, RunCmd, loop } from 'redux-loop'
 
-export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
+const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
 const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA' as const
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
@@ -180,7 +180,7 @@ export interface IRoleLoadedAction {
   }
 }
 
-export function rolesLoaded(
+function rolesLoaded(
   loggedInUserScopes: string[],
   userRoles: UserRole[]
 ): IRoleLoadedAction {
@@ -248,7 +248,7 @@ type UserFormAction =
   | ReturnType<typeof showSubmitFormSuccessToast>
   | ReturnType<typeof showSubmitFormErrorToast>
 
-export interface UserRolesMap {
+interface UserRolesMap {
   [key: string]: string
 }
 

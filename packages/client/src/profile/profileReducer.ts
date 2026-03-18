@@ -76,17 +76,14 @@ export const profileReducer: LoopReducer<
                 if (shouldRedirectBack) {
                   const baseUrl = window.location.origin
                   const restUrl = window.location.href.replace(baseUrl, '')
-                  const redirectToURL = new URL(
+                  const params =
                     restUrl === '/'
                       ? `?lang=${getState().i18n.language}`
-                      : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`,
-                    window.config.LOGIN_URL
-                  ).toString()
-
-                  window.location.assign(redirectToURL)
+                      : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`
+                  window.location.assign(`/login${params}`)
                 } else {
                   window.location.assign(
-                    `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
+                    `/login?lang=${getState().i18n.language}`
                   )
                 }
               },

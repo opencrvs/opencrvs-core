@@ -10,6 +10,6 @@
  */
 import { IStoreState } from '@client/store'
 
-export function selectWorkqueuePagination(store: IStoreState) {
+function selectWorkqueuePagination(store: IStoreState) {
   return store.workqueueState.pagination
 }

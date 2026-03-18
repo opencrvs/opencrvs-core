@@ -233,7 +233,7 @@ describe('ForgotPIN tests', () => {
 
     expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
     expect(window.location.assign).toBeCalledWith(
-      'http://localhost:3020/forgotten-item?lang=en'
+      '/login/forgotten-item?lang=en'
     )
     window.location = originalLocation
   })

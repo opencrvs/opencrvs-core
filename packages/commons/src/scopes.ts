@@ -10,7 +10,14 @@
  */
 
 import * as z from 'zod/v4'
-import { SearchScopeAccessLevels } from './events'
+
+const SearchScopeAccessLevels = {
+  MY_JURISDICTION: 'my-jurisdiction',
+  ALL: 'all'
+} as const
+
+type SearchScopeAccessLevels =
+  (typeof SearchScopeAccessLevels)[keyof typeof SearchScopeAccessLevels]
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
@@ -29,6 +36,7 @@ export const SCOPES = {
   RECORD_IMPORT: 'record.import',
   RECORD_EXPORT: 'record.export',
   RECORD_REINDEX: 'record.reindex',
+  INTEGRATION_CREATE: 'integration.create',
 
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
@@ -108,7 +116,10 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding'
+  USER_DATA_SEEDING: 'user.data-seeding',
+
+  // attachment
+  ATTACHMENT_UPLOAD: 'attachment.upload'
 } as const
 
 // Legacy scopes
@@ -124,7 +135,8 @@ const IntegrationScopes = z.union([
   z.literal(SCOPES.WEBHOOK),
   z.literal(SCOPES.NATIONALID),
   z.literal(SCOPES.NOTIFICATION_API),
-  z.literal(SCOPES.RECORDSEARCH)
+  z.literal(SCOPES.RECORDSEARCH),
+  z.literal(SCOPES.INTEGRATION_CREATE)
 ])
 
 // Internal operations
@@ -213,6 +225,9 @@ const ConfigScope = z.literal(SCOPES.CONFIG_UPDATE_ALL)
 // Data seeding
 const DataSeedingScope = z.literal(SCOPES.USER_DATA_SEEDING)
 
+// Attachment
+const AttachmentScope = z.literal(SCOPES.ATTACHMENT_UPLOAD)
+
 // Combine all
 const LiteralScopes = z.union([
   LegacyScopes,
@@ -231,7 +246,8 @@ const LiteralScopes = z.union([
   UserScopes,
   ConfigScope,
   DataSeedingScope,
-  InternalOperationsScopes
+  InternalOperationsScopes,
+  AttachmentScope
 ])
 
 // Configurable scopes are for example:
@@ -278,8 +294,24 @@ export const DashboardScope = z.object({
     id: z.array(z.string())
   })
 })
+const PrintCertifiedCopiesScope = z.object({
+  type: z.literal('record.registered.print-certified-copies'),
+  options: z.object({
+    event: z.array(z.string()).describe('Event type, e.g. birth, death'),
+    templates: z
+      .array(z.string())
+      .optional()
+      .describe(
+        'Template IDs for certified copies. If not provided, all templates will be used.'
+      )
+  })
+})
 
 export type SearchScope = z.infer<typeof SearchScope>
+
+export type PrintCertifiedCopiesScope = z.infer<
+  typeof PrintCertifiedCopiesScope
+>
 
 export const RecordScopeType = z.enum([
   'record.create',
@@ -291,7 +323,6 @@ export const RecordScopeType = z.enum([
   'record.declared.archive',
   'record.declared.review-duplicates',
   'record.register',
-  'record.registered.print-certified-copies',
   'record.registered.request-correction',
   'record.registered.correct',
   'record.unassign-others'
@@ -311,34 +342,19 @@ export const RecordScope = z
   )
 export type RecordScope = z.infer<typeof RecordScope>
 
-export const CustomActionScope = z.object({
-  type: z.literal('record.custom-action'),
-  options: z.object({
-    event: z
-      .array(z.string())
-      .describe('Allowed event type, e.g. birth, death'),
-    customActionType: z
-      .array(z.string())
-      .describe('Allowed custom action types')
-  })
-})
-
-export type CustomActionScope = z.infer<typeof CustomActionScope>
-
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
+  PrintCertifiedCopiesScope,
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  DashboardScope,
   RecordScope,
-  CustomActionScope
+  DashboardScope
 ])
 
 export const ConfigurableActionScopes = z.discriminatedUnion('type', [
   // @TODO - Record scope holds non-action scopes as well e.g., `record.read`
-  RecordScope,
-  CustomActionScope
+  RecordScope
 ])
 
 export type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
@@ -468,25 +484,6 @@ export function parseLiteralScope(scope: string) {
   }
 
   return
-}
-
-/**
- * Stringifies a ConfigurableScopes object into a scope string.
- * @param {ConfigurableScopes} scope - The scope object to stringify
- * @returns {string} The stringified scope in format "type[key1=value1|value2,key2=value3|value4]"
- * @example
- * stringifyScope({
- *   type: "record.notify",
- *   options: { event: ["birth", "tennis-club-membership"] }
- * })
- * // Returns: "record.notify[event=birth|tennis-club-membership]"
- */
-export function stringifyScope(scope: z.infer<typeof ConfigurableRawScopes>) {
-  const options = Object.entries(scope.options)
-    .map(([key, value]) => `${key}=${value.join('|')}`)
-    .join(',')
-
-  return `${scope.type}[${options}]`
 }
 
 /**

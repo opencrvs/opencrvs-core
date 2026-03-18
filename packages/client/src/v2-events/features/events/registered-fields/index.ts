@@ -40,6 +40,7 @@ import { LinkButton } from './LinkButton'
 import { VerificationStatus } from './VerificationStatus'
 import { QueryParamReader } from './QueryParamReader'
 import { Autocomplete } from './Autocomplete'
+import { ImageView } from './ImageView'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -66,6 +67,7 @@ export * from './AlphaPrintButton'
 export * from './LinkButton'
 export * from './VerificationStatus'
 export * from './Autocomplete'
+export * from './ImageView'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -88,10 +90,10 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
     case FieldType.ALPHA_PRINT_BUTTON:
       return AlphaPrintButton
     case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
-    case FieldType.OFFICE:
       return AdministrativeArea
     case FieldType.LOCATION:
+    case FieldType.FACILITY: // @deprecated
+    case FieldType.OFFICE: // @deprecated
       return LocationSearch
     case FieldType.RADIO_GROUP:
       return RadioGroup
@@ -111,6 +113,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return PageHeader
     case FieldType.PARAGRAPH:
       return Paragraph
+    case FieldType.IMAGE_VIEW:
+      return ImageView
     case FieldType.NAME:
       return Name
     case FieldType.SELECT_DATE_RANGE:

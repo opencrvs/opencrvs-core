@@ -20,6 +20,7 @@ import {
   ActionType,
   EventState,
   generateTransactionId,
+  getCurrentEventState,
   RequestedCorrectionAction,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -40,7 +41,8 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { CorrectionDetails } from '@client/v2-events/features/events/actions/correct/request/Summary/CorrectionDetails'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
+import { useEventConfiguration } from '../../../useEventConfiguration'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
@@ -243,7 +245,9 @@ export function ReviewCorrection({
 
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 

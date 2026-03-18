@@ -30,6 +30,7 @@ import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStrin
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Review } from '../components/Review'
+import { Http } from './Http'
 
 interface Args {
   onChange: (val: unknown) => void
@@ -417,6 +418,57 @@ export const FetchNidErrors: StoryObj<typeof FormFieldGenerator> = {
           args.onChange(data)
         }}
       />
+    )
+  }
+}
+
+export const FetchOnMountWithoutTrigger: StoryObj<typeof FormFieldGenerator> = {
+  name: 'Fetch NID on mount without trigger',
+  parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
+    layout: 'centered',
+    msw: {
+      handlers: {
+        nidApi: [http.post('/api/nid', () => HttpResponse.text('1234567890'))]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitFor(async () => {
+      await expect(canvas.getByTestId('http-on-mount-value')).toHaveTextContent(
+        '1234567890'
+      )
+    })
+  },
+  render: function Component(args) {
+    const [httpValue, setHttpValue] = React.useState<unknown>(null)
+
+    return (
+      <>
+        <Http.Input
+          configuration={{
+            url: '/api/nid',
+            timeout: 5000,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/plain'
+            },
+            body: {
+              user: '$user.province'
+            }
+          }}
+          form={{}}
+          onChange={(value) => {
+            setHttpValue(value)
+          }}
+        />
+        <pre data-testid="http-on-mount-value">
+          {JSON.stringify(httpValue, null, 2)}
+        </pre>
+      </>
     )
   }
 }

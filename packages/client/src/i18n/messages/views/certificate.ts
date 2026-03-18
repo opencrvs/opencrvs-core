@@ -466,6 +466,6 @@ const dynamicMessagesToDefine = {
 }
 
 export const messages = defineMessages(messagesToDefine)
-export const dynamicMessages: IDynamicCertificateMessages = defineMessages(
+const dynamicMessages: IDynamicCertificateMessages = defineMessages(
   dynamicMessagesToDefine
 )

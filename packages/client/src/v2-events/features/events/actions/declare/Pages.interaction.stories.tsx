@@ -16,18 +16,13 @@ import * as selectEvent from 'react-select-event'
 import {
   ActionStatus,
   ActionType,
-  AddressType,
   Draft,
-  field,
   FieldConfig,
-  FieldType,
   generateEventDocument,
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  UUID,
-  user,
-  footballClubMembershipEvent
+  UUID
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -35,7 +30,6 @@ import { tennisClubMembershipEventDocument } from '@client/v2-events/features/ev
 import { localDraftStore } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormData } from '../../useEventFormData'
 import { useActionAnnotation } from '../../useActionAnnotation'
-import { addLocalEventConfig, setEventData } from '../../useEvents/api'
 import { Pages } from './index'
 
 // Use an undeclared draft event for tests
@@ -137,7 +131,7 @@ export const SaveAndExit: Story = {
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
           }),
-          tRPCMsw.event.search.query((input) => {
+          tRPCMsw.event.search.query(() => {
             return {
               results: [
                 getCurrentEventState(
@@ -217,8 +211,7 @@ export const SaveAndExit: Story = {
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
     await expect(recordInCreatedState).not.toBeInTheDocument()
 
-    // Draft status should not affect the action.
-    await canvas.findByRole('button', { name: 'Review' })
+    await canvas.findByRole('button', { name: 'Update' })
   }
 }
 
@@ -315,7 +308,7 @@ export const DraftShownInForm: Story = {
 
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
 
-    await userEvent.click(await canvas.findByText(/Declare/))
+    await userEvent.click(await canvas.findByText(/Update/))
   }
 }
 
@@ -408,7 +401,7 @@ const overriddenEventConfig = {
     description: 'This is what this event is referred as in the system',
     id: 'event.tennis-club-membership.label'
   },
-  placeOfEvent: { $$field: 'eventLocationId' },
+  placeOfEvent: { $$field: 'eventLocationId', $$subfield: [] },
   declaration: {
     ...tennisClubMembershipEvent.declaration,
     pages: tennisClubMembershipEvent.declaration.pages.map((page, index) => {
@@ -522,6 +515,10 @@ export const CanSubmitValidlyFilledForm: Story = {
       const district = await canvas.findByLabelText(/District/i)
       await userEvent.click(district)
       await selectEvent.select(district, 'Ibombo')
+
+      const village = await canvas.findByLabelText(/Village/i)
+      await userEvent.click(village)
+      await selectEvent.select(village, 'Pemba')
 
       const continueButton = await canvas.findByText('Continue')
       await userEvent.click(continueButton)

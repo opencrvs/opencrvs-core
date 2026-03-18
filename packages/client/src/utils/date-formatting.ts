@@ -49,7 +49,7 @@ export function isValidPlainDate(rawDate: unknown): rawDate is PlainDate {
   return true
 }
 
-export function plainDateToLocalDate(plainDate: PlainDate) {
+function plainDateToLocalDate(plainDate: PlainDate) {
   const rawDate = plainDate as unknown as `${number}-${number}-${number}`
   const [yyyy, mm, dd] = rawDate.split('-')
   return new Date(Number(yyyy), Number(mm) - 1, Number(dd))

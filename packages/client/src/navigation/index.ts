@@ -27,16 +27,13 @@ import {
   REVIEW_CERTIFICATE,
   REVIEW_USER_FORM,
   VERIFY_COLLECTOR,
-  VERIFY_CORRECTOR,
-  WORKFLOW_STATUS
+  VERIFY_CORRECTOR
 } from '@client/navigation/routes'
 import { EventType } from '@client/utils/gateway'
-import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 
-import { stringify } from 'qs'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
+import { stringify } from 'qs'
 
 export interface IDynamicValues {
   /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -215,36 +212,6 @@ export const generateIssueCertificatePaymentUrl = ({
     eventType: event
   })
 
-export const generateCompletenessRatesUrl = ({
-  eventType,
-  locationId,
-  timeStart,
-  timeEnd,
-  time = CompletenessRateTime.WithinTarget
-}: {
-  eventType: EventType
-  locationId?: string
-  timeStart: Date
-  timeEnd: Date
-  time?: CompletenessRateTime
-}) =>
-  formatUrl(EVENT_COMPLETENESS_RATES, { eventType }) +
-  '?' +
-  stringify(
-    locationId
-      ? {
-          locationId,
-          timeStart: timeStart.toISOString(),
-          timeEnd: timeEnd.toISOString(),
-          time
-        }
-      : {
-          timeStart: timeStart.toISOString(),
-          timeEnd: timeEnd.toISOString(),
-          time
-        }
-  )
-
 export const generateRegistrationsListUrlConfig = ({
   timeStart,
   timeEnd,
@@ -269,31 +236,6 @@ export const generateRegistrationsListUrlConfig = ({
     filterBy,
     currentPageNumber
   })
-})
-
-export const generateWorkflowStatusUrl = ({
-  locationId,
-  timeStart,
-  timeEnd,
-  status,
-  event
-}: {
-  locationId: string
-  timeStart: Date
-  timeEnd: Date
-  status?: keyof IStatusMapping
-  event?: EventType
-}) => ({
-  pathname: WORKFLOW_STATUS,
-  search: stringify({
-    locationId,
-    status,
-    event
-  }),
-  state: {
-    timeStart,
-    timeEnd
-  }
 })
 
 export const generateUserReviewFormUrl = ({

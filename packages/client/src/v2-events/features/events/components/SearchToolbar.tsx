@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux'
 import { ClearText } from '@opencrvs/components/src/icons'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/src/Icon'
+import { getAcceptedScopesByType } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { getScope } from '@client/profile/profileSelectors'
@@ -119,7 +120,12 @@ export const SearchToolbar = () => {
 
   const scopes = useSelector(getScope) ?? []
 
-  const hasSearchScope = scopes.some((scope) => scope.startsWith('search'))
+  const hasSearchScope =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.search'],
+      scopes
+    }).length > 0
+
   if (!hasSearchScope) {
     return null
   }

@@ -10,6 +10,7 @@
  */
 
 import { useSelector } from 'react-redux'
+import { User } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { getAdminLevelHierarchy, getUsersFullName } from '../utils'
@@ -23,7 +24,7 @@ export function useCurrentUser() {
 
   const loggedInUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
-  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
+  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '') as [User]
 
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -32,6 +33,16 @@ export function useCurrentUser() {
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const name = getUsersFullName(user.name, 'en')
+
+  const sharedFields = {
+    id: user.id,
+    name,
+    role: user.role,
+    type: user.type,
+    primaryOfficeId: user.primaryOfficeId,
+    administrativeAreaId: user.administrativeAreaId ?? undefined,
+    signature: user.signature
+  }
 
   if (user.primaryOfficeId) {
     const primaryOfficeLocation = locations.get(user.primaryOfficeId)
@@ -46,16 +57,10 @@ export function useCurrentUser() {
       adminLevelIds
     )
     return {
-      id: user.id,
-      name,
-      role: user.role,
+      ...sharedFields,
       ...adminLevels
     }
   }
 
-  return {
-    id: user.id,
-    name,
-    role: user.role
-  }
+  return sharedFields
 }

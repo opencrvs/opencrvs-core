@@ -32,7 +32,7 @@ export function isMobileDevice() {
   return IS_DESKTOP
 }
 
-export function isBase64FileString(str: string) {
+function isBase64FileString(str: string) {
   if (str === '' || str.trim() === '') {
     return false
   }

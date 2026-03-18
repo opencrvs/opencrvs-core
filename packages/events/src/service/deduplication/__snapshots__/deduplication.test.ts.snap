@@ -75,25 +75,111 @@ exports[`deduplication query input conversion > should convert similar child nam
 }
 `;
 
-exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query 1`] = `
+exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query when age present > with reference date absent 1`] = `null`;
+
+exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query when age present > with reference date present 1`] = `
 {
   "bool": {
-    "must": [
+    "should": [
       {
-        "range": {
-          "declaration.mother____dob": {
-            "gte": "1998-11-11T00:00:00.000Z",
-            "lte": "2000-11-10T00:00:00.000Z",
-          },
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "declaration.mother____age.__derived_dob": {
+                  "gte": "2000-11-11T00:00:00.000Z",
+                  "lte": "2002-11-11T00:00:00.000Z",
+                },
+              },
+            },
+          ],
+          "should": [
+            {
+              "distance_feature": {
+                "field": "declaration.mother____age.__derived_dob",
+                "origin": "2001-11-11",
+                "pivot": "243d",
+              },
+            },
+          ],
+        },
+      },
+      {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "declaration.mother____dob": {
+                  "gte": "2000-11-11T00:00:00.000Z",
+                  "lte": "2002-11-11T00:00:00.000Z",
+                },
+              },
+            },
+          ],
+          "should": [
+            {
+              "distance_feature": {
+                "field": "declaration.mother____dob",
+                "origin": "2001-11-11",
+                "pivot": "243d",
+              },
+            },
+          ],
         },
       },
     ],
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query when dob present 1`] = `
+{
+  "bool": {
     "should": [
       {
-        "distance_feature": {
-          "field": "declaration.mother____dob",
-          "origin": "1999-11-11",
-          "pivot": "243d",
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "declaration.mother____dob": {
+                  "gte": "1998-11-11T00:00:00.000Z",
+                  "lte": "2000-11-10T00:00:00.000Z",
+                },
+              },
+            },
+          ],
+          "should": [
+            {
+              "distance_feature": {
+                "field": "declaration.mother____dob",
+                "origin": "1999-11-11",
+                "pivot": "243d",
+              },
+            },
+          ],
+        },
+      },
+      {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "declaration.mother____age.__derived_dob": {
+                  "gte": "1998-11-11T00:00:00.000Z",
+                  "lte": "2000-11-10T00:00:00.000Z",
+                },
+              },
+            },
+          ],
+          "should": [
+            {
+              "distance_feature": {
+                "field": "declaration.mother____age.__derived_dob",
+                "origin": "1999-11-11",
+                "pivot": "243d",
+              },
+            },
+          ],
         },
       },
     ],

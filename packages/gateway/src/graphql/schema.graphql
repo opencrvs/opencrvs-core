@@ -29,7 +29,6 @@ type Query {
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-  isLeafLevelLocation(locationId: String!): Boolean!
   getUser(userId: String!): User
   getUserByMobile(mobile: String!): User
   getUserByEmail(email: String!): User
@@ -1074,9 +1073,8 @@ enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
-  WEBHOOK
   IMPORT_EXPORT
-  REINDEX
+  CUSTOM
 }
 
 enum IntegratingSystemType {

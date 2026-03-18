@@ -18,9 +18,10 @@ import {
   UserOrSystem,
   TokenUserType,
   logger,
-  SystemRole
+  isUUID
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
+import { getSystemByLegacyId, getSystemClientById } from '@events/storage/postgres/events/system-clients'
 
 type UserAPIResult = {
   id: string
@@ -65,39 +66,6 @@ export async function getUser(
   return res.json() as Promise<UserAPIResult>
 }
 
-type SystemAPIResult = {
-  name: string
-  createdBy: string
-  username: string
-  client_id: string
-  status: string
-  scope: string[]
-  sha_secret: string
-  type: SystemRole
-}
-
-export async function getSystem(
-  systemId: string,
-  token: string
-): Promise<SystemAPIResult> {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getSystem').href, {
-    method: 'POST',
-    body: JSON.stringify({ systemId }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to retrieve system details. Error: ${res.status} status received`
-    )
-  }
-
-  return res.json() as Promise<SystemAPIResult>
-}
-
 export async function getUserOrSystem(
   id: string,
   token: string
@@ -116,8 +84,8 @@ export async function getUserOrSystem(
       device: user.device ? user.device : undefined,
       email: user.emailForNotification ? user.emailForNotification : undefined,
       fullHonorificName: user.fullHonorificName
-        ? user.fullHonorificName
-        : undefined
+      ? user.fullHonorificName
+      : undefined
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
@@ -125,13 +93,15 @@ export async function getUserOrSystem(
   }
 
   try {
-    const system = await getSystem(id, token)
+    const system = isUUID(id) ?
+    await getSystemClientById(id) :
+    await getSystemByLegacyId(id)
 
     return {
       type: TokenUserType.enum.system,
       id,
-      name: system.name,
-      role: system.type
+      legacyId: system.legacyId ? system.legacyId : undefined,
+      name: system.name
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {

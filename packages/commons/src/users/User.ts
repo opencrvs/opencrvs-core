@@ -22,8 +22,6 @@ export type IUserName = {
   given: string[]
 }
 
-export type SystemRole = z.infer<typeof SystemRole>
-
 export const User = z.object({
   id: z.string(),
   name: z.array(
@@ -47,27 +45,38 @@ export const User = z.object({
 })
 export type User = z.infer<typeof User>
 
-export const SystemRole = z.enum([
-  'HEALTH',
-  'NATIONAL_ID',
-  'RECORD_SEARCH',
-  'REINDEX',
-  'WEBHOOK',
-  'IMPORT_EXPORT'
-])
-
 export const System = z.object({
   id: z.string(),
   name: z.string(),
   type: TokenUserType.extract(['system']),
-  role: SystemRole,
   primaryOfficeId: z.undefined().optional(),
   administrativeAreaId: z.undefined().optional(),
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
-  fullHonorificName: z.string().optional()
+  fullHonorificName: z.string().optional(),
+  legacyId: z.string().optional()
 })
 export type System = z.infer<typeof System>
 
 export const UserOrSystem = z.discriminatedUnion('type', [User, System])
 export type UserOrSystem = z.infer<typeof UserOrSystem>
+
+export const UserContext = User.pick({
+  id: true,
+  primaryOfficeId: true,
+  administrativeAreaId: true,
+  role: true,
+  signature: true,
+  type: true
+})
+export type UserContext = z.infer<typeof UserContext>
+
+export const SystemContext = System.pick({
+  id: true,
+  type: true,
+  primaryOfficeId: true,
+  administrativeAreaId: true,
+  signature: true
+})
+
+export type SystemContext = z.infer<typeof SystemContext>

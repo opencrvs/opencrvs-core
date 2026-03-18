@@ -23,13 +23,18 @@ import {
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
   ActionUpdate,
-  EventState
+  EventState,
+  encodeScope
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
   tennisClubMembershipEventWithDedupCheck
 } from '@opencrvs/commons/fixtures'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 import { CreatedUser, payloadGenerator } from '@events/tests/generators'
 import {
   getEventIndexName,
@@ -38,6 +43,7 @@ import {
 import { encodeEventIndex } from '@events/service/indexing/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { EventNotFoundError } from '@events/service/events/events'
 
 describe('Declare action', () => {
   let user: CreatedUser
@@ -64,21 +70,33 @@ describe('Declare action', () => {
     ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
   })
 
-  test('prevents forbidden access if configurable scope does not have required event type allowed', async () => {
-    const client = createTestClient(user, ['record.declare[event=death]'])
+  test('prevents access if configurable scope does not have required event type allowed', async () => {
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['death']
+        }
+      })
+    ])
 
     await expect(
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
       )
-    ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    ).rejects.toMatchObject(new EventNotFoundError(eventId))
   })
 
   test('allows access if required scope is present', async () => {
     const client = createTestClient(user, [
-      'record.create[event=death|birth|tennis-club-membership]',
-      'record.declare[event=death|birth|tennis-club-membership]'
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['death', 'birth', 'tennis-club-membership']
+        }
+      })
     ])
+
     await expect(
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
@@ -87,7 +105,11 @@ describe('Declare action', () => {
   })
 
   test('Validation error message contains all the offending fields', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -103,7 +125,11 @@ describe('Declare action', () => {
   })
 
   test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -132,7 +158,11 @@ describe('Declare action', () => {
   })
 
   test('Skips required field validation when they are conditionally hidden', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const form = {
       'applicant.dob': '2024-02-01',
@@ -171,7 +201,11 @@ describe('Declare action', () => {
   })
 
   test('gives validation error when a conditional page, which is visible, has a required field', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const form = {
       // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
@@ -202,7 +236,9 @@ describe('Declare action', () => {
   })
 
   test('successfully validates a fields on a conditional page, which is visible', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const form = {
       // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
@@ -243,7 +279,9 @@ describe('Declare action', () => {
   })
 
   test('Prevents adding birth date in future', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const form = {
       'applicant.dob': '2040-02-01',
@@ -274,7 +312,9 @@ describe('Declare action', () => {
   })
 
   test('validation prevents including hidden fields', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -293,7 +333,9 @@ describe('Declare action', () => {
   })
 
   test('validation prevents including miscellaneous fields', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -312,11 +354,14 @@ describe('Declare action', () => {
   })
 
   test('valid action is appended to event actions', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.read' }),
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId)
     await client.event.actions.declare.request(data)
-    const updatedEvent = await client.event.get(eventId)
+    const updatedEvent = await client.event.get({ eventId })
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -337,7 +382,9 @@ describe('Declare action', () => {
   })
 
   test(`DECLARE is idempotent`, async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       keepAssignment: true
@@ -360,7 +407,9 @@ describe('Declare action', () => {
         }
       )
     )
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       keepAssignment: true
@@ -383,7 +432,7 @@ describe('Declare action', () => {
 
 test('deduplication and annotation check is performed after declaration', async () => {
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
         tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
       ])
@@ -392,7 +441,11 @@ test('deduplication and annotation check is performed after declaration', async 
   const esClient = getOrCreateClient()
   const prng = createPrng(73)
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.declare' })
+  ])
 
   const newEvent = await client.event.create(generator.event.create())
   const existingEventId = getUUID()
@@ -443,4 +496,23 @@ test('deduplication and annotation check is performed after declaration', async 
   ).toEqual([
     { id: existingEventId, trackingId: existingEventIndex.trackingId }
   ])
+})
+
+test('System user can not declare an event, even with the right scope', async () => {
+  const { generator, locations } = await setupTestCase()
+  const systemUserClient = createSystemTestClient('test-system', [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' })
+  ])
+
+  const event = await systemUserClient.event.create({
+    ...generator.event.create(),
+    createdAtLocation: locations[0].id
+  })
+
+  await expect(
+    systemUserClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })

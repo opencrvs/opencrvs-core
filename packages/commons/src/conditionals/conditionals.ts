@@ -18,6 +18,8 @@ import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
 import { EventStatus } from '../events/EventMetadata'
+import { FieldReference } from '../events/FieldConfig'
+import { userReferenceFunctions } from '../users/userReferences'
 
 /* eslint-disable max-lines */
 
@@ -149,8 +151,6 @@ export function never(): JSONSchema {
   return not(alwaysTrue())
 }
 
-type FieldReference = { $$field: string; $$subfield: string[] }
-
 function jsonFieldPath(field: FieldReference) {
   return [field.$$field, ...field.$$subfield].join('/')
 }
@@ -195,6 +195,7 @@ export const now = Object.assign(todayDateTimeValueSerializer, {})
  * Generate conditional rules for user.
  */
 export const user = Object.assign(userSerializer, {
+  ...userReferenceFunctions,
   hasScope: (scope: Scope) =>
     defineConditional({
       type: 'object',
@@ -244,14 +245,16 @@ export const user = Object.assign(userSerializer, {
       required: ['$online']
     }),
   locationLevel: (adminLevelId: string) => ({
-    $user: {
-      $location: adminLevelId
-    }
+    $user: { $location: adminLevelId }
   })
 })
 
 export function isFieldReference(value: unknown): value is FieldReference {
   return typeof value === 'object' && value !== null && '$$field' in value
+}
+
+export function isEventFieldReference(value: unknown): value is FieldReference {
+  return typeof value === 'object' && value !== null && '$$event' in value
 }
 
 /**

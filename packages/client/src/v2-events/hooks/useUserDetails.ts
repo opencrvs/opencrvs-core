@@ -32,16 +32,16 @@ const messages = defineMessages({
   role: {
     id: 'event.history.role',
     defaultMessage:
-      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} HEALTH {Health integration} IMPORT_EXPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
+      '{role, select, LOCAL_REGISTRAR {Local Registrar} HOSPITAL_CLERK {Hospital Clerk} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} COMMUNITY_LEADER {Community Leader} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} other {Unknown}}',
     description: 'Role of the user in the event history'
   }
 })
 
 export function useUserDetails() {
   const intl = useIntl()
-  const { getUser } = useUsers()
+  const { getUser, getSystem } = useUsers()
   const users = getUser.getAllCached()
-  const { systems } = useSelector(getOfflineData)
+  const systems = getSystem.getAllCached()
 
   const getUserDetails = ({
     createdByUserType,
@@ -62,15 +62,6 @@ export function useUserDetails() {
       role: createdByRole || ''
     })
 
-    if (createdByUserType === 'system') {
-      const system = systems.find((s) => s._id === createdBy)
-      return {
-        type: 'integration',
-        name: system?.name ?? intl.formatMessage(messages.systemDefaultName),
-        role
-      } as const
-    }
-
     if (type === ActionType.DUPLICATE_DETECTED) {
       return {
         type: 'system',
@@ -80,19 +71,31 @@ export function useUserDetails() {
     }
 
     const user = users.find((u) => u.id === createdBy)
-    const splitNames = user?.name
-      ? personNameFromV1ToV2(user.name)
-      : {
-          firstname: '',
-          middlename: '',
-          surname: ''
-        }
+    const system = systems.find(
+      (s) => s.id === createdBy || s.legacyId === createdBy
+    )
+    if(system) {
+      return {
+        type: 'integration',
+        name: system.name,
+        role
+      } as const
+    }
+
+    if(!user) {
+      return {
+        type: 'user',
+        name: 'Missing user',
+        role
+      } as const
+    }
+
 
     return {
       type: 'user',
-      name: user ? getUsersFullName(user.name, intl.locale) : 'Missing user',
+      name: getUsersFullName(user.name, intl.locale),
       role,
-      ...splitNames
+      ...personNameFromV1ToV2(user.name)
     } as const
   }
 

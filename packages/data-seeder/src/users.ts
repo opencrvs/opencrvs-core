@@ -14,7 +14,7 @@ import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
-import { EventConfig, joinUrl } from '@opencrvs/commons'
+import { decodeScope, EventConfig, joinUrl } from '@opencrvs/commons'
 import {
   parseLiteralScope,
   parseConfigurableScope
@@ -38,8 +38,13 @@ const RoleSchema = (eventIds: string[]) =>
         z.string().superRefine((scope, ctx) => {
           const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedLiteralScope = parseLiteralScope(scope)
+          const parsedV2Scopes = decodeScope(scope)
 
-          if (!parsedConfigurableScope && !parsedLiteralScope) {
+          if (
+            !parsedConfigurableScope &&
+            !parsedLiteralScope &&
+            !parsedV2Scopes
+          ) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
@@ -47,17 +52,20 @@ const RoleSchema = (eventIds: string[]) =>
             return
           }
 
-          if (parsedConfigurableScope?.type === 'search') {
-            const options = parsedConfigurableScope.options
-            const invalidEventIds = options.event.filter(
-              (id) => !eventIds.includes(id)
-            )
+          if (parsedV2Scopes?.type) {
+            const options = parsedV2Scopes.options
 
-            if (invalidEventIds.length > 0) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-              })
+            if (options?.event && Array.isArray(options.event)) {
+              const invalidEventIds = options.event.filter(
+                (id) => !eventIds.includes(id)
+              )
+
+              if (invalidEventIds.length > 0) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
+                })
+              }
             }
           }
         })
@@ -103,7 +111,7 @@ const createUserMutation = print(gql`
 `)
 
 async function getUsers(token: string) {
-  const url = new URL('users', env.COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -127,8 +135,8 @@ async function getUsers(token: string) {
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'roles')
-  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'events')
+  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
+  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
     fetch(rolesUrl),

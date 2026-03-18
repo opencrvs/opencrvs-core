@@ -60,6 +60,76 @@ const successfulMutationEvent = generateEventDocument({
   actions: [{ type: ActionType.CREATE }]
 })
 
+const noReviewButtonEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [{ type: ActionType.CREATE }]
+})
+
+export const NoReviewButtonInOutbox: Story = {
+  parameters: {
+    userRole: TestUserRole.enum.FIELD_AGENT,
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: noReviewButtonEvent.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    offline: {
+      drafts: [
+        generateEventDraftDocument({
+          eventId: noReviewButtonEvent.id,
+          actionType: ActionType.DECLARE
+        })
+      ],
+      events: [noReviewButtonEvent],
+      configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.create.mutation(() => {
+            return noReviewButtonEvent
+          }),
+          tRPCMsw.event.actions.declare.request.mutation(async () => {
+            await new Promise((resolve) =>
+              setTimeout(resolve, OUTBOX_FREEZE_TIME)
+            )
+            return getDeclareEventDocument(noReviewButtonEvent.id)
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Declare event to put it in outbox', async () => {
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Action' })
+      )
+      await userEvent.click(await canvas.findByText('Declare'))
+      await userEvent.click(
+        await canvas.findByRole('button', { name: 'Declare' })
+      )
+    })
+
+    await step('Navigate to Outbox', async () => {
+      const outboxButton = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await userEvent.click(outboxButton)
+    })
+
+    await step('Review button should not appear in Outbox', async () => {
+      await canvas.findByTestId('search-result')
+      await expect(
+        canvas.queryByRole('button', { name: 'Review' })
+      ).not.toBeInTheDocument()
+    })
+  }
+}
+
 export const SuccessfulMutation: Story = {
   parameters: {
     userRole: TestUserRole.enum.FIELD_AGENT,

@@ -205,6 +205,23 @@ function SignatureFieldInput({
   )
 }
 
+const SignatureOutputPreview = styled(SignaturePreview)`
+  max-width: 100%;
+`
+
+function SignatureOutput({ value }: { value?: FileFieldValue }) {
+  if (!value) {
+    return null
+  }
+  return (
+    <SignatureOutputPreview
+      alt="Signature preview"
+      src={getUnsignedFileUrl(value.path)}
+    />
+  )
+}
+
 export const SignatureField = {
-  Input: SignatureFieldInput
+  Input: SignatureFieldInput,
+  Output: SignatureOutput
 }

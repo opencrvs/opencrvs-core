@@ -13,7 +13,6 @@ import * as z from 'zod/v4'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { UUID } from '../uuid'
-import { CreatedAtLocation } from './CreatedAtLocation'
 import { TokenUserType } from '../authentication'
 
 /**
@@ -59,12 +58,14 @@ export const ActionBase = z.object({
     .describe('Identifier of the user who created the action.'),
   createdByRole: z
     .string()
+    .optional()
     .describe('Role of the user who created the action.'),
   createdBySignature: z
     .string()
     .nullish()
     .describe('Reference to the signature of the user who created the action.'),
-  createdAtLocation: CreatedAtLocation.describe(
+  // @TODO: createdAtLocation should be non-nullable in the future once all actions have this field populated.
+  createdAtLocation: UUID.nullish().describe(
     'Reference to the location of the user who created the action.'
   ),
   declaration: ActionUpdate.describe(

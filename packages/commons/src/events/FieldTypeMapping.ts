@@ -55,7 +55,8 @@ import {
   AgeField,
   CustomField,
   HiddenField,
-  AutocompleteField
+  AutocompleteField,
+  ImageViewField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -160,6 +161,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
@@ -187,7 +189,9 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
       schema = FileFieldValue
       break
     case FieldType.FILE_WITH_OPTIONS:
-      schema = FileFieldWithOptionValue
+      schema = field.required
+        ? FileFieldWithOptionValue.min(1)
+        : FileFieldWithOptionValue
       break
     case FieldType.ADDRESS:
       schema = getDynamicAddressFieldValue(field)
@@ -246,6 +250,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
@@ -302,6 +307,13 @@ export const isParagraphFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Paragraph } => {
   return field.config.type === FieldType.PARAGRAPH
+}
+
+export const isImageViewFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: ImageViewField } => {
+  return field.config.type === FieldType.IMAGE_VIEW
 }
 
 export const isDateFieldType = (field: {
@@ -495,6 +507,7 @@ export const isAdministrativeAreaFieldType = (field: {
   return field.config.type === FieldType.ADMINISTRATIVE_AREA
 }
 
+/** @deprecated Moving on, we should only use FieldType.LOCATION. */
 export const isFacilityFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
@@ -502,6 +515,7 @@ export const isFacilityFieldType = (field: {
   return field.config.type === FieldType.FACILITY
 }
 
+/** @deprecated Moving on, we should only use FieldType.LOCATION. */
 export const isOfficeFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
@@ -616,6 +630,7 @@ export const isHiddenFieldType = (field: {
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
+  | ImageViewField
   | Paragraph
   | BulletList
   | DataField

@@ -14,30 +14,22 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
 import { userEvent, within } from '@storybook/test'
-import addDays from 'date-fns/addDays'
 import {
   ActionType,
-  generateEventDraftDocument,
-  ActionStatus,
   getUUID,
   createPrng,
   generateRandomDatetime,
   tennisClubMembershipEvent,
   getCurrentEventState,
   UUID,
-  SystemRole,
   TestUserRole,
   generateActionDocument,
-  ActionDocument,
-  generateUuid,
-  generateTrackingId,
-  generateRandomSignature
+  ActionDocument
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { setEventData } from '../../events/useEvents/api'
 import { EventOverviewIndex } from './EventOverview'
 
 const meta: Meta<typeof EventOverviewIndex> = {

@@ -709,7 +709,6 @@ export interface GQLApplicationConfiguration {
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
-  NID_NUMBER_PATTERN?: string
   USER_NOTIFICATION_DELIVERY_METHOD?: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
@@ -726,7 +725,6 @@ export interface GQLApplicationConfigurationInput {
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
-  NID_NUMBER_PATTERN?: string
   USER_NOTIFICATION_DELIVERY_METHOD?: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
@@ -1092,7 +1090,8 @@ export const enum GQLSystemType {
   NATIONAL_ID = 'NATIONAL_ID',
   HEALTH = 'HEALTH',
   RECORD_SEARCH = 'RECORD_SEARCH',
-  WEBHOOK = 'WEBHOOK'
+  WEBHOOK = 'WEBHOOK',
+  CUSTOM = 'CUSTOM'
 }
 
 export const enum GQLIntegratingSystemType {
@@ -5166,7 +5165,6 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
-  NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   USER_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<TParent>
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<TParent>
   DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>

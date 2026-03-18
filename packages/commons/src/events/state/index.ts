@@ -20,13 +20,19 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventMetadata, EventStatus, ZodDate } from '../EventMetadata'
+import {
+  EventMetadata,
+  EventStatus,
+  ZodDate,
+  ZodDateTime
+} from '../EventMetadata'
 import { Draft } from '../Draft'
 import {
   aggregateActionDeclarations,
   deepMerge,
   getAcceptedActions,
-  getCompleteActionAnnotation
+  getCompleteActionAnnotation,
+  getMixedPath
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
@@ -38,6 +44,7 @@ import {
   FullDocumentUrl
 } from '../../documents'
 import { AddressFieldValue, AddressType } from '../CompositeFieldValue'
+import { isFieldReference } from '../../conditionals/conditionals'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -150,16 +157,30 @@ export function isUndeclaredDraft(status: EventStatus): boolean {
 export const DEFAULT_DATE_OF_EVENT_PROPERTY =
   'createdAt' satisfies keyof EventDocument
 
+function extractDateString(dateTime: string): string {
+  return dateTime.split('T')[0]
+}
+
 export function resolveDateOfEvent(
-  eventMetadata: { createdAt: string },
+  eventIndex: EventIndex,
   declaration: EventState,
   config: EventConfig
 ) {
   if (!config.dateOfEvent) {
-    return eventMetadata[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+    return extractDateString(eventIndex[DEFAULT_DATE_OF_EVENT_PROPERTY])
   }
-  const parsedDate = ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
-  return parsedDate.success ? parsedDate.data : undefined
+
+  // If dateOfEvent is a field reference, we need to extract the date from the declaration using the field id.
+  // Otherwise, we extract it from the event index using the event reference.
+  // i.e. event('legalStatuses.REGISTERED.acceptedAt') will look for the acceptedAt field in the legalStatuses object
+  // in the event metadata in EventIndex, whereas field('child.dob') will look for the dob field in the declaration.
+  const parsedDate = isFieldReference(config.dateOfEvent)
+    ? ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
+    : ZodDateTime.safeParse(
+        getMixedPath(eventIndex, config.dateOfEvent.$$event)
+      )
+
+  return parsedDate.success ? extractDateString(parsedDate.data) : undefined
 }
 
 export const DEFAULT_PLACE_OF_EVENT_PROPERTY =
@@ -230,7 +251,6 @@ export function extractPotentialDuplicatesFromActions(
 
 /**
  * NOTE: This function should not run field validations. It should return the state based on the actions, without considering context (users, roles, permissions, etc).
-createdAtLocation: CreatedAtLocation
  *
  * If you update this function, please ensure @EventIndex type is updated accordingly.
  * In most cases, you won't need to add new parameters to this function. Discuss with the team before doing so.
@@ -266,12 +286,14 @@ export function getCurrentEventState(
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
   const declaration = aggregateActionDeclarations(event)
+  const status = getStatusFromActions(sortedActions)
+  const legalStatuses = getLegalStatuses(sortedActions)
 
-  return deepDropNulls({
+  const base = deepDropNulls({
     id: event.id,
     type: event.type,
-    status: getStatusFromActions(sortedActions),
-    legalStatuses: getLegalStatuses(sortedActions),
+    status,
+    legalStatuses,
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdByUserType: creationAction.createdByUserType,
@@ -285,7 +307,6 @@ export function getCurrentEventState(
     declaration,
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
-    dateOfEvent: resolveDateOfEvent(event, declaration, config),
     placeOfEvent: resolvePlaceOfEvent(
       { createdAtLocation: creationAction.createdAtLocation },
       declaration,
@@ -293,6 +314,11 @@ export function getCurrentEventState(
     ),
     potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
     flags: getEventFlags(event, config)
+  })
+
+  return deepDropNulls({
+    ...base,
+    dateOfEvent: resolveDateOfEvent(base, declaration, config)
   })
 }
 

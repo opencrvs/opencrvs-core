@@ -31,22 +31,25 @@ import {
   ConfigurableScopes,
   getAuthorizedEventsFromScopes,
   getTokenPayload,
-  canUserReadEvent,
   hasScope,
   SCOPES,
   hasAnyOfScopes,
-  AnyScope,
   getCurrentEventState,
-  ResolvedRecordScopeV2
+  EventInput,
+  RecordScopeTypeV2,
+  RecordScopeV2,
+  canUserCreateEvent,
+  getEventConfigById,
+  userCanAccessEventWithScopes,
+  getAcceptedScopesFromToken
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
-import { TrpcContext, UserContext } from '@events/context'
+import { TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
 import { getUserOrSystem } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
-import { canAccessEventWithScopes, getAcceptedScopesFromToken } from './utils'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -98,7 +101,7 @@ function getAuthorizedEntities(
 
 type CtxWithAuthorizedEntities = TrpcContext & {
   authorizedEntities?: { events?: string[] }
-  acceptedScopes?: AnyScope[]
+  acceptedScopes?: RecordScopeV2[]
 }
 
 function inScope(token: string, scopes: Scope[]) {
@@ -114,12 +117,18 @@ function inScope(token: string, scopes: Scope[]) {
  * @returns TRPC compatible middleware function
  */
 export function requiresAnyOfScopes(
+  /**
+   * @deprecated only v2 scopes should be used going forward. This parameter will be removed once all scopes have been migrated to v2. For new features, please use `v2ScopeTypes` instead of this parameter.
+   */
   scopes: Scope[],
+  /**
+   * @deprecated only v2 scopes should be used going forward. This parameter will be removed once all scopes have been migrated to v2. For new features, please use `v2ScopeTypes` instead of this parameter.
+   */
   configurableScopes?: ConfigurableScopeType[],
   /**
    * Truly transient property. After complete migration to V2 scopes we should have a single parameter instead of 2-3.
    */
-  v2ScopeTypes?: string[]
+  v2ScopeTypes?: RecordScopeTypeV2[]
 ) {
   const fn: MiddlewareFunction<
     TrpcContext,
@@ -175,6 +184,8 @@ export function requiresAnyOfScopes(
 /**
  * Middleware function that checks if the event type is authorized for the user.
  *
+ * @deprecated in 2.0. @see canAccessEventWithScopes checks event access based on scope options, including event types.
+ *
  * The function accepts either an eventId or event type directly in the input.
  * If an eventId is provided, it fetches the event to determine its type.
  *
@@ -215,8 +226,12 @@ export const eventTypeAuthorization: MiddlewareFunction<
   return next()
 }
 
-export const EventIdParam = z.object({ eventId: UUID })
+export const EventIdParam = z.object({
+  eventId: UUID,
+  customActionType: z.string().optional()
+})
 export type EventIdParam = z.infer<typeof EventIdParam>
+
 export const requireAssignment: MiddlewareFunction<
   TrpcContext,
   OpenApiMeta,
@@ -334,91 +349,109 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   return next()
 }
 
-export const userCanReadEventV2: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext & { eventId: UUID; eventType: string },
-  UUID
-> = async ({ next, ctx, input }) => {
-  const humanUser = UserContext.safeParse(ctx.user)
+/**
+ * Given scope types, determines whether the user has relevant scopes to access the event based on the current state.
+ *
+ */
+export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext & { eventId: UUID; eventType: string },
+    unknown
+  > = async ({ next, ctx, getRawInput }) => {
+    const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
+    const acceptedScopes = getAcceptedScopesFromToken(ctx.token, scopes)
 
-  if (!humanUser.success) {
-    throw new EventNotFoundError(input)
-  }
-
-  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-
-  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, ['record.read'])
-  const event = await getEventById(input)
-
-  // 1. If no accepted scopes are found, fall back to V1 style check based on CREATE action.
-  // This will be removed once we have migrated countryconfigs to use V2 scopes only.
-  if (acceptedScopes.length === 0) {
-    const createAction = event.actions.find(
-      (action) => action.type === ActionType.CREATE
-    )
-
-    if (!createAction) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: `Event ${event.id} is missing ${ActionType.CREATE} action`
-      })
+    if (acceptedScopes.length === 0) {
+      throw new TRPCError({ code: 'FORBIDDEN' })
     }
 
-    const canRead = canUserReadEvent(
-      {
-        createdBy: createAction.createdBy,
-        type: event.type
-      },
-      {
-        userId: ctx.user.id,
-        scopes: getScopes(ctx.token)
+    // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+    // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+    const rawInput = await getRawInput()
+    const input = EventIdParam.safeParse(rawInput)?.data
+
+    if (!input) {
+      throw new TRPCError({ code: 'BAD_REQUEST' })
+    }
+
+    const event = await getEventById(input.eventId)
+    const eventConfig = getEventConfigById(eventConfigs, event.type)
+
+    const eventIndex = getCurrentEventState(event, eventConfig)
+    const eventIndexWithLocationHierarchy =
+      await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
+
+    const hasAccess = userCanAccessEventWithScopes(
+      eventIndexWithLocationHierarchy,
+      acceptedScopes,
+      ctx.user,
+      input?.customActionType
+    )
+
+    if (!hasAccess) {
+      throw new EventNotFoundError(input.eventId)
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        acceptedScopes,
+        eventId: input.eventId,
+        eventType: event.type
       }
-    )
-
-    if (canRead) {
-      return next({
-        ctx: {
-          ...ctx,
-          eventId: input,
-          eventType: event.type
-        }
-      })
-    }
-
-    throw new EventNotFoundError(input)
-  }
-
-  const eventConfig = eventConfigs.find((c) => c.id === event.type)
-  if (!eventConfig) {
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: `Event configuration not found with type: ${event.type}`
     })
   }
 
-  const eventIndex = getCurrentEventState(event, eventConfig)
-  const eventIndexWithLocationHierarchy =
-    await getEventIndexWithAdministrativeHierarchy(eventConfig, eventIndex)
+  return fn
+}
 
-  const hasAccess = canAccessEventWithScopes(
-    eventIndexWithLocationHierarchy,
-    acceptedScopes as ResolvedRecordScopeV2[],
-    humanUser.data
-  )
+export const userCanCreateEvent: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  unknown
+> = async ({ next, ctx, getRawInput }) => {
+  const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
-  if (!hasAccess) {
-    throw new EventNotFoundError(input)
+  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
+    'record.create'
+  ])
+
+  if (acceptedScopes.length === 0) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  return next({
-    ctx: {
-      ...ctx,
-      eventId: input,
-      eventType: event.type
-    }
-  })
+  // Since determining access requires knowing the event type, we need to parse the input before we can check access.
+  // default .input(...) throws 400, which is something that we want to return only if the user should have access.
+  const rawInput = await getRawInput()
+  const input = EventInput.safeParse(rawInput).data
+
+  if (!input) {
+    throw new TRPCError({ code: 'BAD_REQUEST' })
+  }
+
+  const eventConfig = eventConfigs.find((c) => c.id === input.type)
+
+  if (!eventConfig) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `No configuration found for event type: ${input.type}`
+    })
+  }
+
+  const canCreateEvent = canUserCreateEvent(acceptedScopes, input.type)
+
+  if (!canCreateEvent) {
+    throw new TRPCError({
+      code: 'FORBIDDEN'
+    })
+  }
+
+  return next()
 }
 
 export const userCanReadOtherUser: MiddlewareFunction<

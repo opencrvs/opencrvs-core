@@ -139,6 +139,7 @@ export function Dialog({
             width={width}
             variant={variant}
             ref={dialogRef}
+            role="dialog"
           >
             <DialogHeader>
               <DialogTitle>

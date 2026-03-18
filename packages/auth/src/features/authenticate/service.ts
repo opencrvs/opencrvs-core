@@ -16,6 +16,8 @@ import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { redis } from '@auth/database'
 import * as t from 'io-ts'
+import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import superjson from 'superjson'
 import {
   NotificationEvent,
   generateVerificationCode,
@@ -28,6 +30,7 @@ import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
+import { AppRouter } from '@opencrvs/events/src/router'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
@@ -38,6 +41,15 @@ const sign = promisify<
   jwt.SignOptions,
   string
 >(jwt.sign)
+
+const eventsClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson
+    })
+  ]
+})
 
 export interface IAuthentication {
   name: IUserName[]
@@ -92,19 +104,10 @@ export async function authenticateSystem(
   client_id: string,
   client_secret: string
 ): Promise<ISystemAuthentication> {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/verifySystem')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ client_id, client_secret }),
-    headers: { 'Content-Type': 'application/json' }
+  const body = await eventsClient.integrations.authenticate.mutate({
+    client_id,
+    client_secret
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  const body = await res.json()
   return {
     systemId: body.id,
     scope: body.scope,
@@ -119,14 +122,17 @@ export async function createToken(
   issuer: string,
   role?: string | number | undefined,
   temporary = false,
-  userType: TokenUserType = TokenUserType.enum.user
+  userType: TokenUserType = TokenUserType.enum.user,
+  expiresInSeconds?: number
 ): Promise<string> {
   return sign({ scope, userType, role }, cert, {
     subject: userId,
     algorithm: 'RS256',
-    expiresIn: temporary
-      ? env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
-      : env.CONFIG_TOKEN_EXPIRY_SECONDS,
+    expiresIn:
+      expiresInSeconds ??
+      (temporary
+        ? env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
+        : env.CONFIG_TOKEN_EXPIRY_SECONDS),
     audience,
     issuer
   })
@@ -143,15 +149,21 @@ type LegacyRecordValidationInput = {
 
 export async function createTokenForActionConfirmation(
   input: ActionConfirmationInput | LegacyRecordValidationInput,
-  userId: UUID
+  userId: UUID,
+  userType: TokenUserType,
+  userRejectScope: string | undefined = undefined
 ) {
   return sign(
     {
-      scope: ['record.confirm-registration', 'record.reject-registration'],
+      scope: [
+        'record.confirm-registration',
+        'record.reject-registration',
+        userRejectScope
+      ].filter(Boolean),
       eventId: 'eventId' in input ? input.eventId : undefined,
       actionId: 'actionId' in input ? input.actionId : undefined,
       recordId: 'recordId' in input ? input.recordId : undefined,
-      userType: TokenUserType.enum.user
+      userType
     },
     cert,
     {
@@ -239,7 +251,8 @@ const tokenPayload = t.type({
   // role: t.string,
   iat: t.number,
   exp: t.number,
-  aud: t.array(t.string)
+  aud: t.array(t.string),
+  userType: t.string
 })
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>
