@@ -176,10 +176,10 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
       {
         id: payload.request.id,
         packetName: "111111112_evidence",
-        source: "OPENCRVS",
+        source: "CRVS1",
         process: "CRVS_NEW",
         refId: payload.request.id,
-        schemaVersion: "0.1",
+        schemaVersion: "0.5",
         signature:
           "Pjss9ng-js3eZZ6eUxOjjzNtKTyAzwWNI7qun8cN2UAEIS-rV3YzionqJId1WBdNFoistFPlrqrGnfI2xaX5MY95ttMWYzw89JyAWi-VeDaYPVFWEvcLEUTU68e0uBMXFG6D15_zjiSrn9OW8pRMngUuusOaIlmGh2BwiM1NwmLbSTRHpJ0LkC69SiWQcA5igTR5ihuJtWcygiBiEX48LOaFvOkhyoShnYGlY8_gW2Ew_Z26EnJ7vP2y_ODZYqzWTRTHTDivsKQHyWdBczwGium6aug6A0H0lPSqxTXJslKylsotbA79Bv6gUviTLVjdglLdHdxIWNaVfmKeHiCQ9w",
         encryptedHash: "Cly6hXkKx6TbqwjH3Frm9DZsCPjmCnB6aVKd_8sGRm0",
@@ -190,10 +190,10 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
       {
         id: payload.request.id,
         packetName: "111111112_optional",
-        source: "OPENCRVS",
+        source: "CRVS1",
         process: "CRVS_NEW",
         refId: payload.request.id,
-        schemaVersion: "0.1",
+        schemaVersion: "0.5",
         signature:
           "Pjss9ng-js3eZZ6eUxOjjzNtKTyAzwWNI7qun8cN2UAEIS-rV3YzionqJId1WBdNFoistFPlrqrGnfI2xaX5MY95ttMWYzw89JyAWi-VeDaYPVFWEvcLEUTU68e0uBMXFG6D15_zjiSrn9OW8pRMngUuusOaIlmGh2BwiM1NwmLbSTRHpJ0LkC69SiWQcA5igTR5ihuJtWcygiBiEX48LOaFvOkhyoShnYGlY8_gW2Ew_Z26EnJ7vP2y_ODZYqzWTRTHTDivsKQHyWdBczwGium6aug6A0H0lPSqxTXJslKylsotbA79Bv6gUviTLVjdglLdHdxIWNaVfmKeHiCQ9w",
         encryptedHash: "pb0yrVpnz8QwLFI2ghVXs4hPkeGivnviph7SBpjJTxU",
@@ -204,7 +204,7 @@ export const packetManagerCreateHandler: RouteHandlerMethod = async (
       {
         id: payload.request.id,
         packetName: "111111112_id",
-        source: "OPENCRVS",
+        source: "CRVS1",
         process: "CRVS_NEW",
         refId: payload.request.id,
         schemaVersion: "0.1",

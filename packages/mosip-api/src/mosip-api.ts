@@ -99,8 +99,8 @@ export const postBirthRecord = async ({
         refId: `${env.MOSIP_CENTER_ID}_${env.MOSIP_MACHINE_ID}`,
         offlineMode: false,
         process: "CRVS_NEW",
-        source: "OPENCRVS",
-        schemaVersion: "0.100",
+        source: "CRVS1",
+        schemaVersion: "0.500",
         fields: requestFields,
         metaInfo: metaInfo,
         audits: Array.of(audit),
@@ -140,7 +140,7 @@ export const postBirthRecord = async ({
       request: {
         registrationId: event.id,
         process: "CRVS_NEW",
-        source: "OPENCRVS",
+        source: "CRVS1",
         additionalInfoReqId: "",
         notificationInfo: {
           name: notification.recipientFullName,
@@ -209,8 +209,8 @@ export const postDeathRecord = async ({
         refId: `${env.MOSIP_CENTER_ID}_${env.MOSIP_MACHINE_ID}`,
         offlineMode: false,
         process: "CRVS_DEATH",
-        source: "OPENCRVS",
-        schemaVersion: "0.100",
+        source: "CRVS1",
+        schemaVersion: "0.500",
         fields: newRequestBody,
         metaInfo: metaInfo,
         audits: Array.of(audit),
@@ -248,7 +248,7 @@ export const postDeathRecord = async ({
       request: {
         registrationId: event.id,
         process: "CRVS_DEATH",
-        source: "OPENCRVS",
+        source: "CRVS1",
         additionalInfoReqId: "",
         notificationInfo: {
           name: notification.recipientFullName,
