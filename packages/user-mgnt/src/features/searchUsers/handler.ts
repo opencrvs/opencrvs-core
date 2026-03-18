@@ -66,6 +66,7 @@ export default async function searchUsers(
     .skip(skip)
     .limit(count)
     .sort({
+      username: sortOrder,
       creationDate: sortOrder
     })
 
