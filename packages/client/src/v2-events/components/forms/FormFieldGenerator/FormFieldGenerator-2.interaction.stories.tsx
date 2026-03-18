@@ -324,7 +324,7 @@ const fields = [
     label: generateTranslationConfig('Facility'),
     defaultValue: 'Gym Hall',
     configuration: {
-      searchableResource: ['HEALTH_FACILITY']
+      locationTypes: ['HEALTH_FACILITY']
     }
   },
 
@@ -334,7 +334,7 @@ const fields = [
     label: generateTranslationConfig('Membership Office'),
     defaultValue: 'Head Office',
     configuration: {
-      searchableResource: ['CRVS_OFFICE']
+      locationTypes: ['CRVS_OFFICE']
     }
   },
 

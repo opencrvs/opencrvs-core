@@ -36,7 +36,7 @@ import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
  * Return the available location options. The options will be filtered based on the jurisdiction filter.
  */
 function useAvailableLocations(
-  searchableResource?: string[],
+  locationTypes?: string[],
   jurisdictionFilter?: JurisdictionFilter
 ) {
   const { getLocations } = useLocations()
@@ -59,11 +59,9 @@ function useAvailableLocations(
     return Array.from(locations.values()).filter(
       (location) =>
         location.locationType &&
-        (searchableResource
-          ? searchableResource.includes(location.locationType)
-          : true)
+        (locationTypes ? locationTypes.includes(location.locationType) : true)
     )
-  }, [searchableResource, locations])
+  }, [locationTypes, locations])
 
   // If jurisdiction filter is administrative area, we filter the options to only include locations that are under the user's admin area jurisdiction.
   if (
@@ -90,14 +88,14 @@ function useAvailableLocations(
 function LocationSearchInput({
   onChange,
   value,
-  searchableResource,
+  locationTypes,
   onBlur,
   id,
   eventType,
   ...props
 }: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
-  searchableResource?: string[]
+  locationTypes?: string[]
   value?: string
   onBlur?: (e: React.FocusEvent<HTMLElement>) => void
   disabled?: boolean
@@ -111,10 +109,7 @@ function LocationSearchInput({
     eventType
   )
 
-  const locations = useAvailableLocations(
-    searchableResource,
-    jurisdictionFilter
-  )
+  const locations = useAvailableLocations(locationTypes, jurisdictionFilter)
 
   const options = useMemo(
     () => locations.map((l) => ({ value: l.id, label: l.name })),
