@@ -181,9 +181,21 @@ export function useIntlFormatMessageWithFlattenedParams() {
     const variablesWithEmptyValues = Object.fromEntries(
       variablesInMessage.map((variable) => [variable, EMPTY_TOKEN])
     )
+    const mergedVariables = { ...variablesWithEmptyValues, ...variables }
+
+    // Date-element variables cannot accept EMPTY_TOKEN — IntlMessageFormat throws RangeError
+    // when it tries to format a non-date string as a date. Return '' if any date field is absent.
+    const dateVariableNames = parse(defaultMessage)
+      .filter(isDateElement)
+      .map((el) => el.value)
+    if (
+      dateVariableNames.some((name) => mergedVariables[name] === EMPTY_TOKEN)
+    ) {
+      return ''
+    }
 
     const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
-      { ...variablesWithEmptyValues, ...variables }
+      mergedVariables
     )
     if (!formatted || typeof formatted !== 'string') {
       return ''
