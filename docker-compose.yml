@@ -106,7 +106,7 @@ services:
       - DOCUMENTS_URL=http://documents:9050
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - COUNTRY_CONFIG_URL=http://countr
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - WEBHOOKS_URL=http://webhooks:2525/
       - APPLICATION_CONFIG_URL=http://config:2021/
       - AUTH_URL=http://auth:4040
@@ -144,7 +144,7 @@ services:
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
-      - DOCUMENTS_URL=http://documents:9
+      - DOCUMENTS_URL=http://documents:9050
   # END User facing services
   scheduler:
     image: ghcr.io/opencrvs/ocrvs-scheduler:${VERSION}
