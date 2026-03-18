@@ -1,6 +1,6 @@
 import { env } from "./constants";
 import MOSIPAuthenticator from "@mosip/ida-auth-sdk";
-import { schemaJson } from "./types/idSchemaJson";
+import { schemaJson as defaultSchemaJson } from "./types/idSchemaJson";
 import {
   BirthRequestFields,
   DeathRequestFields,
@@ -74,6 +74,7 @@ export async function getMosipAuthToken(authType: AuthType) {
 export const postBirthRecord = async ({
   event,
   requestFields,
+  schemaJson,
   audit,
   metaInfo,
   notification,
@@ -83,6 +84,7 @@ export const postBirthRecord = async ({
     trackingId: string;
   };
   requestFields: BirthRequestFields;
+  schemaJson?: string;
   audit: MosipInteropPayload["audit"];
   metaInfo: MosipInteropPayload["metaInfo"];
   notification: MosipInteropPayload["notification"];
@@ -102,7 +104,7 @@ export const postBirthRecord = async ({
         fields: requestFields,
         metaInfo: metaInfo,
         audits: Array.of(audit),
-        schemaJson: schemaJson,
+        schemaJson: schemaJson ?? defaultSchemaJson,
       },
     },
     null,
@@ -178,6 +180,7 @@ export const postBirthRecord = async ({
 export const postDeathRecord = async ({
   event,
   requestFields,
+  schemaJson,
   audit,
   metaInfo,
   notification,
@@ -187,6 +190,7 @@ export const postDeathRecord = async ({
     trackingId: string;
   };
   requestFields: DeathRequestFields;
+  schemaJson?: string;
   audit: MosipInteropPayload["audit"];
   metaInfo: MosipInteropPayload["metaInfo"];
   notification: MosipInteropPayload["notification"];
@@ -210,7 +214,7 @@ export const postDeathRecord = async ({
         fields: newRequestBody,
         metaInfo: metaInfo,
         audits: Array.of(audit),
-        schemaJson: schemaJson,
+        schemaJson: schemaJson ?? defaultSchemaJson,
       },
     },
     null,

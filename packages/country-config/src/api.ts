@@ -21,6 +21,7 @@ export const MosipInteropPayloadSchema = z.object({
   trackingId: z.string(),
   notification: MosipNotificationSchema,
   requestFields: z.union([BirthRequestFieldsSchema, DeathRequestFieldsSchema]),
+  schemaJson: z.string().optional(),
   metaInfo: z.record(z.string(), z.unknown()),
   audit: z.record(z.string(), z.unknown()),
 });

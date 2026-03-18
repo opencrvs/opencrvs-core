@@ -11,7 +11,14 @@ export const registrationEventHandler = async (
 ) => {
   const body = MosipInteropPayloadSchema.parse(request.body);
 
-  const { trackingId, requestFields, audit, metaInfo, notification } = body;
+  const {
+    trackingId,
+    requestFields,
+    schemaJson,
+    audit,
+    metaInfo,
+    notification,
+  } = body;
 
   const token = request.headers.authorization!.split(" ")[1];
 
@@ -29,6 +36,7 @@ export const registrationEventHandler = async (
     await mosip.postBirthRecord({
       event: { id: transactionId, trackingId },
       requestFields,
+      schemaJson,
       audit,
       metaInfo,
       notification,
@@ -47,6 +55,7 @@ export const registrationEventHandler = async (
     await mosip.postDeathRecord({
       event: { id: transactionId, trackingId },
       requestFields,
+      schemaJson,
       audit,
       metaInfo,
       notification,
