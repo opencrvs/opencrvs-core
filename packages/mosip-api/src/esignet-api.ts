@@ -18,6 +18,7 @@ import { enGB } from "date-fns/locale/en-GB";
 import { fr } from "date-fns/locale/fr";
 import fs from "node:fs";
 import type { FastifyBaseLogger } from "fastify";
+import crypto from "node:crypto";
 
 const OIDP_CLIENT_PRIVATE_KEY = fs
   .readFileSync(env.OIDP_CLIENT_PRIVATE_KEY_PATH)
@@ -87,8 +88,8 @@ const generateSignedJwt = async (clientId: string) => {
   const payload = {
     iss: clientId,
     sub: clientId,
-    // aud: env.OPENID_PROVIDER_CLAIMS,
     aud: env.ESIGNET_TOKEN_URL,
+    jti: crypto.randomUUID(),
   };
 
   const decodeKey = Buffer.from(OIDP_CLIENT_PRIVATE_KEY, "base64")?.toString();
