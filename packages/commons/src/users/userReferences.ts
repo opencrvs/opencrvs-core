@@ -13,7 +13,7 @@ import {
   RecordScopeTypeV2,
   ScopeOptionKey,
   getScopeOptionValue
-} from '../scopes-v2'
+} from '../scopes'
 import { getAcceptedScopesFromToken } from '../authentication'
 import z from 'zod/v4'
 

@@ -10,8 +10,8 @@
  */
 
 import { isActionInScope } from './scopes'
+import { encodeScope } from '../scopes'
 import { ActionType } from './ActionType'
-import { encodeScope } from '../scopes-v2'
 import { EventIndexWithAdministrativeHierarchy } from './locations'
 import { UserContext } from '../users/User'
 import { createPrng, generateUuid, TestUserRole } from './test.utils'

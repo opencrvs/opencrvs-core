@@ -11,9 +11,8 @@
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
-import { SCOPES } from './scopes'
+import { SCOPES, encodeScope, RecordScopeV2, decodeScope } from './scopes'
 import { UUID } from './uuid'
-import { encodeScope, RecordScopeV2, decodeScope } from './scopes-v2'
 export * from './scopes'
 
 /**

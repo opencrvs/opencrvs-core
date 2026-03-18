@@ -15,7 +15,7 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes-v2'
+import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes'
 import {
   EventIndexWithAdministrativeHierarchy,
   userCanAccessEventWithScopes

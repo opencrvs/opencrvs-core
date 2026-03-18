@@ -13,9 +13,7 @@ import {
   findScope,
   parseConfigurableScope,
   parseLiteralScope,
-  SCOPES
-} from './scopes'
-import {
+  SCOPES,
   decodeScope,
   encodeScope,
   v1ScopeToV2Scope,
@@ -24,7 +22,7 @@ import {
   ScopesWithDeclaredOptions,
   ScopesWithFullOptions,
   ScopesWithPlaceEventOptions
-} from './scopes-v2'
+} from './scopes'
 
 describe('getScopeOptionValue()', () => {
   it('should return the default value if the scope option is not set', () => {
