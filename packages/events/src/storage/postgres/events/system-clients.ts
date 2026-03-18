@@ -75,3 +75,44 @@ export async function getSystemClientById(
     .where('id', '=', id)
     .executeTakeFirstOrThrow()
 }
+
+export async function updateSystemClientStatus(
+  id: UUID,
+  status: 'active' | 'disabled',
+  trx?: Kysely<Schema>
+) {
+  const db = trx ?? getClient()
+  return db
+    .updateTable('systemClients')
+    .set({ status })
+    .where('id', '=', id)
+    .returning(['id', 'name', 'scopes', 'status'])
+    .executeTakeFirstOrThrow()
+}
+
+export async function deleteSystemClient(
+  id: UUID,
+  trx?: Kysely<Schema>
+) {
+  const db = trx ?? getClient()
+  return db
+    .deleteFrom('systemClients')
+    .where('id', '=', id)
+    .returning(['id'])
+    .executeTakeFirstOrThrow()
+}
+
+export async function refreshSystemClientSecret(
+  id: UUID,
+  secretHash: string,
+  salt: string,
+  trx?: Kysely<Schema>
+) {
+  const db = trx ?? getClient()
+  return db
+    .updateTable('systemClients')
+    .set({ secretHash, salt })
+    .where('id', '=', id)
+    .returning(['id', 'name', 'scopes', 'status'])
+    .executeTakeFirstOrThrow()
+}

@@ -8,17 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { updateOfflineSystems } from '@client/offline/actions'
-import { getOfflineData } from '@client/offline/selectors'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
-  EventType,
   System,
-  SystemType,
-  WebhookPermission
+  SystemStatus,
+  SystemType
 } from '@client/utils/gateway'
+import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { UUID } from '@opencrvs/commons/client'
 
 /** Handles the user input when creating a new system in a modal */
 function useNewSystemDraft() {
@@ -47,47 +46,14 @@ function useNewSystemDraft() {
   }
 }
 
-/** Handles communication with global state management */
-function useSystemsGlobalState() {
-  const { systems: existingSystems } = useSelector(getOfflineData)
-  const dispatch = useDispatch()
-
-  const dispatchSystemUpdate = (updatedSystem: System) => {
-    const systems = existingSystems.map((system) => {
-      if (system.clientId === updatedSystem.clientId) {
-        return updatedSystem
-      } else {
-        return system
-      }
-    })
-    dispatch(updateOfflineSystems({ systems }))
-  }
-
-  const dispatchNewSystem = (newSystem: System) => {
-    dispatch(updateOfflineSystems({ systems: [...existingSystems, newSystem] }))
-  }
-
-  const dispatchSystemRemove = (system: System) => {
-    const systems = existingSystems.filter(
-      (ite) => ite.clientId !== system.clientId
-    )
-    dispatch(updateOfflineSystems({ systems }))
-  }
-
-  return {
-    dispatchSystemUpdate,
-    dispatchNewSystem,
-    existingSystems,
-    dispatchSystemRemove
-  }
+function scopesToSystemType(scopes: string[]): SystemType {
+  if (scopes.includes('notification-api')) return SystemType.Health
+  if (scopes.includes('recordsearch')) return SystemType.RecordSearch
+  if (scopes.includes('webhook')) return SystemType.Webhook
+  if (scopes.includes('nationalId')) return SystemType.NationalId
+  return SystemType.Custom
 }
 
-function initWebHook(event: string) {
-  return {
-    event: event,
-    permissions: []
-  }
-}
 
 export function useSystems() {
   const [systemToToggleActivation, setSystemToToggleActivation] =
@@ -100,22 +66,53 @@ export function useSystems() {
     onChangeClientName,
     clearNewSystemDraft
   } = useNewSystemDraft()
-  const { dispatchSystemUpdate, existingSystems } = useSystemsGlobalState()
 
-  const [birthPermissions, setBirthPermissions] = useState<WebhookPermission>(
-    initWebHook(EventType.Birth)
+  const listQuery = useQuery(
+    trpcOptionsProxy.integrations.list.queryOptions()
   )
 
-  const [deathPermissions, setDeathPermissions] = useState<WebhookPermission>(
-    initWebHook(EventType.Death)
-  )
+  const existingSystems: System[] = (listQuery.data ?? []).map((item) => ({
+    _id: item.id,
+    clientId: item.id,
+    name: item.name,
+    status: item.status === 'active' ? SystemStatus.Active : SystemStatus.Deactivated,
+    type: scopesToSystemType(item.scopes),
+    shaSecret: ''
+  }))
+
+  const invalidateList = () => {
+    void queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.integrations.list.queryKey()
+    })
+  }
 
   const [systemToShowPermission, setSystemToShowPermission] = useState<System>()
 
   const [systemToDelete, setSystemToDelete] = useState<System>()
 
+  const refreshTokenMutation = useMutation(
+    trpcOptionsProxy.integrations.refreshToken.mutationOptions()
+  )
+
+  const deactivateMutation = useMutation(
+    trpcOptionsProxy.integrations.deactivate.mutationOptions()
+  )
+
+  const activateMutation = useMutation(
+    trpcOptionsProxy.integrations.activate.mutationOptions()
+  )
+
+  const deleteMutation = useMutation(
+    trpcOptionsProxy.integrations.delete.mutationOptions()
+  )
+
+  const createMutation = useMutation(
+    trpcOptionsProxy.integrations.create.mutationOptions()
+  )
+
   const clientRefreshToken = (clientId: string | undefined) => {
     if (!clientId) return
+    refreshTokenMutation.mutate({ clientId: clientId as UUID })
   }
 
   const updatePermissions = () => {
@@ -124,32 +121,71 @@ export function useSystems() {
 
   const deactivateSystem = () => {
     if (!systemToToggleActivation) return
-
-    throw new Error('Deactivate system mutation not yet implemented')
+    deactivateMutation.mutate(
+      { clientId: systemToToggleActivation.clientId as UUID },
+      {
+        onSuccess: () => {
+          invalidateList()
+          setSystemToToggleActivation(undefined)
+        }
+      }
+    )
   }
 
   const activateSystem = () => {
     if (!systemToToggleActivation) return
-
-    throw new Error('Reactivate system mutation not yet implemented')
+    activateMutation.mutate(
+      { clientId: systemToToggleActivation.clientId as UUID },
+      {
+        onSuccess: () => {
+          invalidateList()
+          setSystemToToggleActivation(undefined)
+        }
+      }
+    )
   }
 
   const registerSystem = () => {
-    throw new Error('Register system mutation not yet implemented')
+    const scopesByType: Record<string, string[]> = {
+      [SystemType.Health]: ['notification-api'],
+      [SystemType.RecordSearch]: ['recordsearch']
+    }
+
+    const scopes = scopesByType[newSystemType] ?? []
+
+    createMutation.mutate(
+      { name: newClientName, scopes },
+      {
+        onSuccess: () => {
+          invalidateList()
+        }
+      }
+    )
   }
 
   const deleteSystem = () => {
     if (!systemToDelete) return
+    deleteMutation.mutate(
+      { clientId: systemToDelete.clientId as UUID },
+      {
+        onSuccess: () => {
+          invalidateList()
+          setSystemToDelete(undefined)
+        }
+      }
+    )
   }
+
   const resetData = () => {
-    setDeathPermissions(initWebHook(EventType.Death))
-    setBirthPermissions(initWebHook(EventType.Birth))
+    refreshTokenMutation.reset()
+    deactivateMutation.reset()
+    activateMutation.reset()
+    deleteMutation.reset()
+    createMutation.reset()
   }
 
   const closePermissionModal = () => {
     setSystemToShowPermission(undefined)
-    setDeathPermissions(initWebHook(EventType.Death))
-    setBirthPermissions(initWebHook(EventType.Birth))
   }
 
   return {
@@ -160,13 +196,8 @@ export function useSystems() {
     updatePermissions,
     systemToShowPermission,
     setSystemToShowPermission,
-    birthPermissions,
-    setBirthPermissions,
-    deathPermissions,
-    setDeathPermissions,
     existingSystems,
     deactivateSystem,
-    dispatchSystemUpdate,
     activateSystem,
     registerSystem,
     systemToToggleActivation,
@@ -178,6 +209,37 @@ export function useSystems() {
     onChangeClientName,
     clearNewSystemDraft,
     clientRefreshToken,
-    resetData
+    resetData,
+    // Loading states
+    deactivateSystemLoading: deactivateMutation.isPending,
+    activateSystemLoading: activateMutation.isPending,
+    refreshTokenLoading: refreshTokenMutation.isPending,
+    systemToDeleteLoading: deleteMutation.isPending,
+    // Data states
+    deactivateSystemData: deactivateMutation.data,
+    activateSystemData: activateMutation.data,
+    refreshTokenData: refreshTokenMutation.data
+      ? { refreshSystemSecret: { clientSecret: refreshTokenMutation.data.clientSecret } }
+      : undefined,
+    systemToDeleteData: deleteMutation.data,
+    // Error states
+    deactivateSystemError: deactivateMutation.error,
+    activateSystemError: activateMutation.error,
+    refreshTokenError: refreshTokenMutation.error,
+    systemToDeleteError: deleteMutation.error,
+    registerSystemData: createMutation.data
+      ? {
+          registerSystem: {
+            system: {
+              clientId: createMutation.data.clientId,
+              shaSecret: createMutation.data.shaSecret,
+              name: newClientName
+            },
+            clientSecret: createMutation.data.clientSecret
+          }
+        }
+      : undefined,
+    registerSystemLoading: createMutation.isPending,
+    registerSystemError: createMutation.error
   }
 }

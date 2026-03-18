@@ -81,6 +81,7 @@ export type EventCorrectionRejectAuditLog = {
   responseSummary: EventResponseSummary
 }
 
+
 /**
  * All event action audit log variants share the same requestData and responseSummary shapes.
  * Defined as a single type with a union operation field so call sites can pass a
@@ -101,6 +102,46 @@ export type IntegrationCreateAuditLog = {
   requestData: {
     name: string
     scopes: string[]
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
+export type IntegrationRefreshTokenAuditLog = {
+  operation: 'integrations.refreshToken'
+  requestData: {
+    clientId: string
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
+export type IntegrationDeactivateAuditLog = {
+  operation: 'integrations.deactivate'
+  requestData: {
+    clientId: string
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
+export type IntegrationActivateAuditLog = {
+  operation: 'integrations.activate'
+  requestData: {
+    clientId: string
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
+export type IntegrationDeleteAuditLog = {
+  operation: 'integrations.delete'
+  requestData: {
+    clientId: string
   }
   responseSummary: {
     clientId: string
@@ -129,8 +170,12 @@ export type AuditLogOperation =
   | EventGetAuditLog
   | EventSearchAuditLog
   | EventActionAuditLog
-  | IntegrationCreateAuditLog
   | AttachmentUploadAuditLog
+  | IntegrationCreateAuditLog
+  | IntegrationRefreshTokenAuditLog
+  | IntegrationDeactivateAuditLog
+  | IntegrationActivateAuditLog
+  | IntegrationDeleteAuditLog
 
 /**
  * Parameters for writing an audit log entry.

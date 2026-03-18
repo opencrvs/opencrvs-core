@@ -16,7 +16,7 @@ import { SCOPES, UUID } from '@opencrvs/commons'
 import { publicProcedure, router, userAndSystemProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { createSystemClient, getSystemClientById, listSystemClients } from '@events/storage/postgres/events/system-clients'
+import { createSystemClient, getSystemClientById, listSystemClients, updateSystemClientStatus, deleteSystemClient, refreshSystemClientSecret } from '@events/storage/postgres/events/system-clients'
 import { compare, generateSaltedHash } from '@events/service/auth/hash'
 
 const CreateIntegrationInput = z.object({
@@ -54,6 +54,26 @@ const AuthenticateSystemOutput = z.object({
   id: UUID,
   status: z.string(),
   scope: z.array(z.string())
+})
+
+const IntegrationIdInput = z.object({
+  clientId: UUID
+})
+
+const RefreshTokenOutput = z.object({
+  clientId: z.string(),
+  clientSecret: z.string()
+})
+
+const IntegrationStatusOutput = z.object({
+  id: z.string(),
+  name: z.string(),
+  scopes: z.array(z.string()),
+  status: z.string()
+})
+
+const DeleteIntegrationOutput = z.object({
+  id: z.string()
 })
 
 export const integrationsRouter = router({
@@ -142,5 +162,129 @@ export const integrationsRouter = router({
         scopes: row.scopes as string[],
         status: row.status
       }))
+    }),
+
+  refreshToken: userAndSystemProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/integrations/refresh-token',
+        summary: 'Refresh client secret for an integration',
+        tags: ['Integrations']
+      }
+    })
+    .input(IntegrationIdInput)
+    .output(RefreshTokenOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .mutation(async ({ input, ctx }) => {
+      const clientSecret = randomUUID()
+      const { hash: secretHash, salt } = await generateSaltedHash(clientSecret)
+
+      await refreshSystemClientSecret(
+        input.clientId,
+        secretHash,
+        salt
+      )
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.refreshToken',
+        requestData: { clientId: input.clientId },
+        responseSummary: { clientId: input.clientId }
+      })
+
+      return {
+        clientId: input.clientId,
+        clientSecret
+      }
+    }),
+
+  deactivate: userAndSystemProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/integrations/deactivate',
+        summary: 'Deactivate an integration client',
+        tags: ['Integrations']
+      }
+    })
+    .input(IntegrationIdInput)
+    .output(IntegrationStatusOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .mutation(async ({ input, ctx }) => {
+      const row = await updateSystemClientStatus(input.clientId, 'disabled')
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.deactivate',
+        requestData: { clientId: input.clientId },
+        responseSummary: { clientId: input.clientId }
+      })
+
+      return {
+        id: row.id,
+        name: row.name,
+        scopes: row.scopes as string[],
+        status: row.status
+      }
+    }),
+
+  activate: userAndSystemProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/integrations/activate',
+        summary: 'Activate an integration client',
+        tags: ['Integrations']
+      }
+    })
+    .input(IntegrationIdInput)
+    .output(IntegrationStatusOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .mutation(async ({ input, ctx }) => {
+      const row = await updateSystemClientStatus(input.clientId, 'active')
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.activate',
+        requestData: { clientId: input.clientId },
+        responseSummary: { clientId: input.clientId }
+      })
+
+      return {
+        id: row.id,
+        name: row.name,
+        scopes: row.scopes as string[],
+        status: row.status
+      }
+    }),
+
+  delete: userAndSystemProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/integrations/delete',
+        summary: 'Delete an integration client',
+        tags: ['Integrations']
+      }
+    })
+    .input(IntegrationIdInput)
+    .output(DeleteIntegrationOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .mutation(async ({ input, ctx }) => {
+      const row = await deleteSystemClient(input.clientId)
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.delete',
+        requestData: { clientId: input.clientId },
+        responseSummary: { clientId: input.clientId }
+      })
+
+      return { id: row.id }
     })
 })

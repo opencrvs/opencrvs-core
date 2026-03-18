@@ -133,7 +133,22 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
     onChangeClientName,
     clearNewSystemDraft,
     clientRefreshToken,
-    resetData
+    resetData,
+    deactivateSystemLoading,
+    activateSystemLoading,
+    refreshTokenLoading,
+    systemToDeleteLoading,
+    deactivateSystemData,
+    activateSystemData,
+    refreshTokenData,
+    systemToDeleteData,
+    deactivateSystemError,
+    activateSystemError,
+    refreshTokenError,
+    registerSystemError,
+    systemToDeleteError,
+    registerSystemData,
+    registerSystemLoading
   } = useSystems()
 
   function changeActiveStatusIntl(status: SystemStatus) {
