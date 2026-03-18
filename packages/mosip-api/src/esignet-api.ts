@@ -153,33 +153,6 @@ export const fetchToken = async ({
   return response as { access_token?: string };
 };
 
-export const fetchLocationFromFHIR = <T = any>(
-  suffix: string,
-  method = "GET",
-  body: string | undefined = undefined,
-): Promise<T> => {
-  return fetch(`${env.OPENCRVS_GATEWAY_URL}/${suffix}`, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body,
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Fetch Location from FHIR request failed: ${error.message}`),
-      );
-    });
-};
-
-const searchLocationFromFHIR = (name: string) =>
-  fetchLocationFromFHIR<fhir2.Bundle>(
-    `/locations?${new URLSearchParams({ name, type: "ADMIN_STRUCTURE" })}`,
-  );
-
 function formatDate(dateString: string, formatStr = "PP") {
   const date = parse(dateString, "yyyy/MM/dd", new Date());
   if (!isValid(date)) {

@@ -649,11 +649,6 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.6.tgz#628effeeae2064a1b4e79f78e81d87b7e5fc7b50"
   integrity sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==
 
-"@types/fhir@^0.0.37":
-  version "0.0.37"
-  resolved "https://registry.yarnpkg.com/@types/fhir/-/fhir-0.0.37.tgz#54835d905009b34360437ba014564299c530253c"
-  integrity sha512-fR1y6tPfDmxYDWN4JkJhuI5F5QpbaFVSoNo3pu9A6nzuoojANqg0UBnNZTVegTz/MilV3PSjyvFe6/vO55geKA==
-
 "@types/hapi__catbox@*":
   version "10.2.6"
   resolved "https://registry.yarnpkg.com/@types/hapi__catbox/-/hapi__catbox-10.2.6.tgz#e516bfb4e461441b4ea7f9be870e48864a289494"
