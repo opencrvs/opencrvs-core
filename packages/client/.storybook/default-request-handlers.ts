@@ -2535,7 +2535,7 @@ export const handlers = {
         }
       })
     }),
-    http.post('http://localhost:7070/sendVerifyCode', () => {
+    http.post('/api/gateway/sendVerifyCode', () => {
       const generator = testDataGenerator()
       return HttpResponse.json({
         userId: generator.user.registrationAgent().v2.id,

@@ -56,7 +56,8 @@ export const System = z.object({
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
   fullHonorificName: z.string().optional(),
-  legacyId: z.string().optional()
+  legacyId: z.string().optional(),
+  status: z.undefined().optional()
 })
 export type System = z.infer<typeof System>
 

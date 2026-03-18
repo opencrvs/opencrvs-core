@@ -28,22 +28,14 @@ import {
 } from '@client/notification/actions'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
-import {
-  UserDetailsAvailable
-} from '@client/profile/profileActions'
+import { UserDetailsAvailable } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
-import {
-  draftToGqlTransformer
-} from '@client/transformer'
+import { draftToGqlTransformer } from '@client/transformer'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import {
-  AssignmentData,
-  EventType,
-  RegStatus
-} from '@client/utils/gateway'
+import { AssignmentData, EventType, RegStatus } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -650,6 +642,7 @@ function writeDeclarationFailed(): IWriteDeclarationFailedAction {
 
 export async function getCurrentUserID(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
+  console.log('userDetails', userDetails)
 
   if (!userDetails) {
     return ''
@@ -717,7 +710,6 @@ async function getDeclarationsOfCurrentUser(): Promise<string> {
   }
   return JSON.stringify(payload)
 }
-
 
 export async function writeDeclarationByUserWithoutStateUpdate(
   userId: string,
@@ -794,8 +786,6 @@ function downloadDeclaration(
   }
 }
 
-
-
 function unassignDeclaration(
   id: string,
   client: ApolloClient<{}>,
@@ -810,7 +800,6 @@ function unassignDeclaration(
     }
   }
 }
-
 
 export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   state: IDeclarationsState = initialState,
