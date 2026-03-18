@@ -401,7 +401,7 @@ export const V2_DEFAULT_MOCK_LOCATIONS: Location[] = [
   {
     id: '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID,
     name: 'Klow Village Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
+    locationType: 'CRVS_OFFICE',
     administrativeAreaId: '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID,
     validUntil: null,
     externalId: 'PmAyxAJkxiJ'
