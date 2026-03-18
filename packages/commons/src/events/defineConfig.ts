@@ -18,7 +18,8 @@ const IGNORED_EVENT_TYPES = [
   'FOOTBALL_CLUB_MEMBERSHIP',
   'tennis-club-membership',
   'library-membership',
-  'child-onboarding'
+  'child-onboarding',
+  'digital-identity'
 ]
 
 function warnOnConfigurationIssues(config: EventConfig) {
