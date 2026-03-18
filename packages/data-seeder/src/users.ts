@@ -11,7 +11,7 @@
 import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
-import { parseGQLResponse, raise, delay } from './utils'
+import { raise } from './utils'
 import { decodeScope, EventConfig, joinUrl } from '@opencrvs/commons'
 import {
   parseLiteralScope,
@@ -20,8 +20,6 @@ import {
 import { fromZodError } from 'zod-validation-error'
 import { createClient } from '@opencrvs/toolkit/api'
 
-const MAX_RETRY = 5
-const RETRY_DELAY_IN_MILLISECONDS = 5000
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -191,7 +189,7 @@ async function userAlreadyExists(
   return Boolean(res.length)
 }
 
-async function createUser(token: string, userPayload: unknown) {
+async function createUser(token: string, userPayload: any) {
   const url = new URL('events', env.GATEWAY_HOST).toString()
   const client = createClient(url, `Bearer ${token}`)
   return client.user.create.mutate(userPayload)
@@ -238,25 +236,6 @@ export async function seedUsers(token: string) {
       primaryOffice: primaryOffice.id,
       username
     }
-    let tryNumber = 0
-    let jsonRes
-    let res
-
-    do {
-      ++tryNumber
-      if (tryNumber > 1) {
-        await delay(RETRY_DELAY_IN_MILLISECONDS)
-        // eslint-disable-next-line no-console
-        console.log('Trying again for time: ', tryNumber)
-      }
-      res = await createUser(token, userPayload)
-      jsonRes = await res.json()
-    } while (
-      tryNumber < MAX_RETRY &&
-      'errors' in jsonRes &&
-      jsonRes.errors[0].extensions?.code === 'INTERNAL_SERVER_ERROR'
-    )
-
-    parseGQLResponse(jsonRes)
+    await createUser(token, userPayload)
   }
 }
