@@ -735,3 +735,13 @@ export function canUserCreateEvent(
 ) {
   return acceptedScopes.some((scope) => isEventTypeAllowed(scope, eventType))
 }
+
+/**
+ * Helper for defining scopes for user roles.
+ * @param scopes Array of scopes in object format.
+ *
+ * @returns Array of scopes in string format, encoded for use in JWT tokens.
+ */
+export function defineScopes(scopes: RecordScopeV2[]) {
+  return scopes.map((scope) => RecordScopeV2.parse(scope)).map(encodeScope)
+}
