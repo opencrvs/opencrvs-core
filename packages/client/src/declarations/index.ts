@@ -15,7 +15,6 @@ import {
 } from '@apollo/client'
 import {
   Action as DeclarationAction,
-  DownloadAction,
   IForm,
   IFormData,
   IFormFieldValue
@@ -30,15 +29,13 @@ import {
   UserDetailsAvailable
 } from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import {
   AssignmentData,
   EventType,
   RegStatus
 } from '@client/utils/gateway'
 import type {
-  GQLEventSearchResultSet,
-  GQLEventSearchSet
+  GQLEventSearchResultSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
 import {
@@ -139,20 +136,6 @@ const processingStates = [
   SUBMISSION_STATUS.ISSUING,
   SUBMISSION_STATUS.REJECT_CORRECTION
 ]
-
-const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
-interface IActionList {
-  [key: string]: string
-}
-
-const ACTION_LIST: IActionList = {
-  [DownloadAction.LOAD_REVIEW_DECLARATION]:
-    DownloadAction.LOAD_REVIEW_DECLARATION,
-  [DownloadAction.LOAD_CERTIFICATE_DECLARATION]:
-    DownloadAction.LOAD_REVIEW_DECLARATION,
-  [DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION]:
-    DownloadAction.LOAD_REVIEW_DECLARATION
-}
 
 export interface IPayload {
   [key: string]: IFormFieldValue
@@ -473,7 +456,6 @@ const initialState: IDeclarationsState = {
   isWritingDraft: false
 }
 
-
 export function createDeclaration(event: EventType, initialData?: IFormData) {
   return {
     id: uuid(),
@@ -497,25 +479,6 @@ function makeDeclarationReadyToDownload(
   }
 }
 
-function createReviewDeclaration(
-  declarationId: string,
-  formData: IFormData,
-  event: EventType,
-  status?: RegStatus,
-  duplicates?: IDuplicates[]
-): IDeclaration {
-  return {
-    id: declarationId,
-    data: formData,
-    duplicates,
-    originalData: formData,
-    localData: formData,
-    review: true,
-    event,
-    registrationStatus: status
-  }
-}
-
 export function dynamicDispatch(
   action: string,
   payload: { [key: string]: string }
@@ -533,36 +496,9 @@ export function storeDeclaration(
   return { type: STORE_DECLARATION, payload: { declaration } }
 }
 
-function modifyDeclaration(
-  declaration: IPrintableDeclaration | Partial<IDeclaration>
-): IModifyDeclarationAction {
-  return { type: MODIFY_DECLARATION, payload: { declaration } }
-}
-
-function clearCorrectionAndPrintChanges(
-  declarationId: string
-): IClearCorrectionAndPrintChanges {
-  return {
-    type: CLEAR_CORRECTION_AND_PRINT_CHANGES,
-    payload: { declarationId }
-  }
-}
-
 export function setInitialDeclarations() {
   return { type: SET_INITIAL_DECLARATION }
 }
-
-const getStorageDeclarationsSuccess = (
-  response: string
-): IGetStorageDeclarationsSuccessAction => ({
-  type: GET_DECLARATIONS_SUCCESS,
-  payload: response
-})
-
-const getStorageDeclarationsFailed =
-  (): IGetStorageDeclarationsFailedAction => ({
-    type: GET_DECLARATIONS_FAILED
-  })
 
 export function archiveDeclaration(
   declarationId: string,
@@ -576,51 +512,12 @@ export function archiveDeclaration(
   }
 }
 
-const RemoveUnassignedDeclarationsActionCreator = (payload: {
-  currentlyDownloadedDeclarations: IDeclaration[]
-  unassignedDeclarations: IDeclaration[]
-}): IRemoveUnassignedDeclarationAction => ({
-  type: REMOVE_UNASSIGNED_DECLARATIONS,
-  payload: payload
-})
-
-function deleteDeclaration(
-  declarationId: string,
-  client: ApolloClient<{}>
-): IDeleteDeclarationAction {
-  return { type: DELETE_DECLARATION, payload: { declarationId, client } }
-}
-
-function deleteDeclarationSuccess(
-  declarationId: string,
-  client: ApolloClient<{}>
-): IDeleteDeclarationSuccessAction {
-  return {
-    type: DELETE_DECLARATION_SUCCESS,
-    payload: { declarationId, client }
-  }
-}
-
-function deleteDeclarationFailed(): IDeleteDeclarationFailedAction {
-  return { type: DELETE_DECLARATION_FAILED }
-}
-
 export function writeDeclaration(
   declaration: IDeclaration | IPrintableDeclaration,
   callback?: () => void
 ): IWriteDeclarationAction {
   declaration.modifiedOn = Date.now()
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
-}
-
-function writeDeclarationSuccess(
-  declaration: IDeclaration
-): IWriteDeclarationSuccessAction {
-  return { type: WRITE_DECLARATION_SUCCESS, payload: { declaration } }
-}
-
-function writeDeclarationFailed(): IWriteDeclarationFailedAction {
-  return { type: WRITE_DECLARATION_FAILED }
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -641,58 +538,6 @@ async function getUserData(userId: string) {
 
   return { allUserData, currentUserData }
 }
-
-function mergeDeclaredDeclarations(
-  declarations: IDeclaration[],
-  declaredDeclarations: GQLEventSearchSet[]
-) {
-  const localDeclarations = declarations.map((declaration) => declaration.id)
-
-  const declarationsNotStoredLocally = declaredDeclarations.filter(
-    (declaredDeclaration) => !localDeclarations.includes(declaredDeclaration.id)
-  )
-  const transformedDeclaredDeclarations = declarationsNotStoredLocally.map(
-    (app) => {
-      return transformSearchQueryDataToDraft(app)
-    }
-  )
-  declarations.push(...transformedDeclaredDeclarations)
-}
-
-async function getDeclarationsOfCurrentUser(): Promise<string> {
-  // returns a 'stringified' IUserData
-  const storageTable = await storage.getItem('USER_DATA')
-  if (!storageTable) {
-    return JSON.stringify({ declarations: [] })
-  }
-
-  const currentUserID = await getCurrentUserID()
-
-  const allUserData = JSON.parse(storageTable) as IUserData[]
-
-  if (!allUserData.length) {
-    // No user-data at all
-    const payloadWithoutDeclarations: IUserData = {
-      userID: currentUserID,
-      declarations: []
-    }
-
-    return JSON.stringify(payloadWithoutDeclarations)
-  }
-
-  const currentUserData = allUserData.find(
-    (uData) => uData.userID === currentUserID
-  )
-  const currentUserDeclarations: IDeclaration[] =
-    (currentUserData && currentUserData.declarations) || []
-
-  const payload: IUserData = {
-    userID: currentUserID,
-    declarations: currentUserDeclarations
-  }
-  return JSON.stringify(payload)
-}
-
 
 export async function writeDeclarationByUserWithoutStateUpdate(
   userId: string,
@@ -721,71 +566,6 @@ export async function writeDeclarationByUserWithoutStateUpdate(
   await storage.setItem('USER_DATA', JSON.stringify(allUserData))
   return declaration
 }
-
-async function deleteDeclarationByUser(
-  userId: string,
-  declarationId: string,
-  state: IDeclarationsState
-): Promise<string> {
-  const uID = userId || (await getCurrentUserID())
-  const { allUserData, currentUserData } = await getUserData(uID)
-
-  allUserData.map((userData) => {
-    if (userData.userID === state.userID) {
-      userData.declarations = state.declarations
-    }
-    return userData
-  })
-
-  const deletedDeclarationId = currentUserData
-    ? currentUserData.declarations.findIndex((app) => app.id === declarationId)
-    : -1
-
-  if (deletedDeclarationId >= 0) {
-    currentUserData &&
-      currentUserData.declarations.splice(deletedDeclarationId, 1)
-    await storage.setItem('USER_DATA', JSON.stringify(allUserData))
-  }
-  return declarationId
-}
-
-function downloadDeclaration(
-  event: EventType,
-  compositionId: string,
-  action: DeclarationAction,
-  client: ApolloClient<{}>
-): IDownloadDeclaration {
-  const declaration = makeDeclarationReadyToDownload(
-    event,
-    compositionId,
-    action
-  )
-  return {
-    type: ENQUEUE_DOWNLOAD_DECLARATION,
-    payload: {
-      declaration,
-      client
-    }
-  }
-}
-
-
-
-function unassignDeclaration(
-  id: string,
-  client: ApolloClient<{}>,
-  refetchQueries?: InternalRefetchQueriesInclude
-): IEnqueueUnassignDeclaration {
-  return {
-    type: ENQUEUE_UNASSIGN_DECLARATION,
-    payload: {
-      id,
-      client,
-      refetchQueries
-    }
-  }
-}
-
 
 export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   state: IDeclarationsState = initialState,

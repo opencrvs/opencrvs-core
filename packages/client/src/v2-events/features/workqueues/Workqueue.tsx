@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo } from 'react'
 
 import {
   useTypedParams,

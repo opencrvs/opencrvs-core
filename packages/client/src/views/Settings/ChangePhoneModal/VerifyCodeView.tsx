@@ -36,6 +36,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
   const intl = useIntl()
   const { phoneNumber, email } = data
   const userDetails = useSelector(getUserDetails)
+
   const nonce = useSelector(getUserNonce)
   const [verifyCode, setVerifyCode] = React.useState(EMPTY_STRING)
   const [isInvalidLength, setIsInvalidLength] = React.useState(false)

@@ -1278,6 +1278,10 @@ export const handlers = {
         response = generator.user.registrationAgent().v2
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v2
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v2
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v2
       } else {
         response = generator.user.localRegistrar().v2
       }
@@ -2535,7 +2539,7 @@ export const handlers = {
         }
       })
     }),
-    http.post('http://localhost:7070/sendVerifyCode', () => {
+    http.post('/api/gateway/sendVerifyCode', () => {
       const generator = testDataGenerator()
       return HttpResponse.json({
         userId: generator.user.registrationAgent().v2.id,

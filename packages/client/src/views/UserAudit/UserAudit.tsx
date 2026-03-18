@@ -46,6 +46,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ProfileState } from '../../profile/profileReducer'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -157,6 +158,8 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
   const { getUser } = useUsers()
   const { isFetching: loading, error, data } = getUser.useQuery(userId!)
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
 
   const user = data as User | undefined
   const userRole = user && formatUserRole(user.role, intl)
@@ -319,7 +322,8 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
                       })
                     }
                   >
-                    {user.primaryOfficeId}
+                    {locations.get(user.primaryOfficeId)?.name ||
+                      user.primaryOfficeId}
                   </Link>
                 }
               />

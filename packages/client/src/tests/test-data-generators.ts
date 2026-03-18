@@ -88,8 +88,10 @@ export function testDataGenerator(rngSeed?: number) {
         fullHonorificName: undefined,
         signature: undefined,
         avatar: undefined,
-        status: 'active',
+        status: Status.Active,
         type: TokenUserType.enum.user,
+        mobile: '+260911111111',
+        email: 'kalushabwalya17@gmail.com',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       } satisfies User,
       v1: {
@@ -143,6 +145,8 @@ export function testDataGenerator(rngSeed?: number) {
         fullHonorificName: undefined,
         status: 'active',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
+        mobile: '+260922222222',
+        email: 'kalushabwalya17+@gmail.com',
         type: TokenUserType.enum.user
       } satisfies User,
       v1: {
@@ -194,8 +198,10 @@ export function testDataGenerator(rngSeed?: number) {
         fullHonorificName: '1st Order Honorable Kennedy Mweene',
         primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
         avatar: undefined,
+        mobile: '+260933333333',
+        email: 'kalushabwalya1.7@gmail.com',
         signature: undefined,
-        status: 'active',
+        status: Status.Active,
         type: TokenUserType.enum.user
       } satisfies User,
       v1: {
@@ -264,7 +270,9 @@ export function testDataGenerator(rngSeed?: number) {
         avatar: undefined,
         type: TokenUserType.enum.user,
         primaryOfficeId: '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID,
-        status: 'active'
+        mobile: '+260717456139',
+        email: 'g.phiri@gmail.com',
+        status: Status.Active
       } satisfies User,
       v1: {
         id: userIds.communityLeader,
@@ -320,7 +328,9 @@ export function testDataGenerator(rngSeed?: number) {
         avatar: undefined,
         type: TokenUserType.enum.user,
         primaryOfficeId: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID,
-        status: 'active'
+        email: 'kalushabwaly.a17@gmail.com',
+        mobile: '+260921111111',
+        status: Status.Active
       } satisfies User,
       v1: {
         id: userIds.provincialRegistrar,
@@ -415,7 +425,9 @@ export function testDataGenerator(rngSeed?: number) {
           }
         ],
         role: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
-        status: 'active',
+        status: Status.Active,
+        mobile: '+260921111111',
+        email: 'kalushabwaly.a17@gmail.com',
         primaryOfficeId: '8788d17c-b639-4aa0-89f0-ebc64263d81c' as UUID,
         type: TokenUserType.enum.user
       },
