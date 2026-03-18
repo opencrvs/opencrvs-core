@@ -185,7 +185,12 @@ async function userAlreadyExists(
 ): Promise<boolean> {
   const url = new URL('events', env.GATEWAY_HOST).toString()
   const client = createClient(url, `Bearer ${token}`)
-  const res = await client.user.search.query({ username, count: 1, skip: 0, sortOrder: 'asc' })
+  const res = await client.user.search.query({
+    username,
+    count: 1,
+    skip: 0,
+    sortOrder: 'asc'
+  })
   return Boolean(res.length)
 }
 
@@ -228,12 +233,12 @@ export async function seedUsers(token: string) {
       name: [
         {
           use: 'en',
-          familyName,
-          firstNames: givenNames
+          family: familyName,
+          given: [givenNames]
         }
       ],
       ...(env.ACTIVATE_USERS && { status: 'active' }),
-      primaryOffice: primaryOffice.id,
+      primaryOfficeId: primaryOffice.id,
       username
     }
     await createUser(token, userPayload)

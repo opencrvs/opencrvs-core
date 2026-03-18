@@ -54,7 +54,7 @@ export default async function createUser(
     throw unauthorized()
   }
 
-  let practitionerId: string = uuid()
+  const practitionerId: string = uuid()
   let password = null
 
   try {
@@ -126,6 +126,10 @@ export default async function createUser(
     logger.error(err.message)
   }
 
-  const resUser = _.omit(userModelObject.toObject(), ['passwordHash', 'salt'])
+  const createdUser = userModelObject.toObject()
+  const resUser = {
+    ..._.omit(createdUser, ['passwordHash', 'salt']),
+    id: createdUser._id
+  }
   return h.response(resUser).code(201)
 }

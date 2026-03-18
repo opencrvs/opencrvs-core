@@ -228,6 +228,6 @@ export async function createUser(input: CreateUserPayload, token: string) {
     )
   }
 
-  const user = (await res.json()) as UserAPIResult
-  return getUser(user.id, token)
+  const response = (await res.json()) as UserAPIResult
+  return getUser(response.id, token)
 }

@@ -12,7 +12,7 @@
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import { UserOrSystem, User } from '@opencrvs/commons'
-import { router, userOnlyProcedure } from '@events/router/trpc'
+import { router, userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { getRoles } from '@events/service/config/config'
@@ -44,7 +44,7 @@ export const userRouter = router({
 
       return users[0]
     }),
-  create: userOnlyProcedure
+  create: userAndSystemProcedure
     .input(UserInput)
     .output(User)
     .mutation(async ({ input, ctx }) => createUser(input, ctx.token)),
@@ -52,7 +52,7 @@ export const userRouter = router({
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
-  search: userOnlyProcedure
+  search: userAndSystemProcedure
     .input(UserSearch)
     .output(z.array(UserOrSystem))
     .query(async ({ input, ctx }) => searchUsers(input, ctx.token)),
