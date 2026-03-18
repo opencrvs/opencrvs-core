@@ -13,7 +13,6 @@ import { createTestComponent, userDetails } from '@client/tests/util'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import * as React from 'react'
 import { UserSetupReview } from './SetupReviewPage'
-import { activateUserMutation } from './queries'
 
 const { store } = createStore()
 
@@ -93,81 +92,5 @@ describe('SetupReviewPage page tests', () => {
       .find('#Question_Action_BIRTH_TOWN')
       .hostNodes()
       .simulate('click')
-  })
-  it('submit user setup for activation', async () => {
-    const mock = [
-      {
-        request: {
-          query: activateUserMutation,
-          variables: {
-            userId: 'ba7022f0ff4822',
-            password: 'password',
-            securityQuestionAnswers: [
-              { questionKey: 'BIRTH_TOWN', answer: 'test' }
-            ]
-          }
-        },
-        result: {
-          data: []
-        }
-      }
-    ]
-    const { component: testComponent } = await createTestComponent(
-      // @ts-ignore
-      <UserSetupReview
-        setupData={{
-          userId: 'ba7022f0ff4822',
-          password: 'password',
-          securityQuestionAnswers: [
-            { questionKey: 'BIRTH_TOWN', answer: 'test' }
-          ]
-        }}
-      />,
-      { store, graphqlMocks: mock }
-    )
-
-    testComponent.find('button#Confirm').simulate('click')
-  })
-
-  it('it shows error if error occurs', async () => {
-    const graphqlErrorMock = [
-      {
-        request: {
-          query: activateUserMutation,
-          variables: {
-            userId: 'ba7022f0ff4822',
-            password: 'password',
-            securityQuestionAnswers: [
-              { questionKey: 'BIRTH_TOWN', answer: 'test' }
-            ]
-          }
-        },
-        error: new Error('boom!')
-      }
-    ]
-
-    const { component: testComponent } = await createTestComponent(
-      // @ts-ignore
-      <UserSetupReview
-        setupData={{
-          userId: 'ba7022f0ff4822',
-          password: 'password',
-          securityQuestionAnswers: [
-            { questionKey: 'BIRTH_TOWN', answer: 'test' }
-          ]
-        }}
-      />,
-      { store, graphqlMocks: graphqlErrorMock }
-    )
-
-    testComponent.find('button#Confirm').simulate('click')
-
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.update()
-    expect(testComponent.find('#GlobalError').hostNodes().text()).toBe(
-      'An error occurred. Please try again.'
-    )
   })
 })

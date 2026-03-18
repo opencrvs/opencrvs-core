@@ -263,7 +263,8 @@ export function testDataGenerator(rngSeed?: number) {
         signature: undefined,
         avatar: undefined,
         type: TokenUserType.enum.user,
-        primaryOfficeId: '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID
+        primaryOfficeId: '1f4a5b6c-7d8e-4312-8abc-345678901234' as UUID,
+        status: 'active'
       } satisfies User,
       v1: {
         id: userIds.communityLeader,
@@ -318,7 +319,8 @@ export function testDataGenerator(rngSeed?: number) {
         signature: undefined,
         avatar: undefined,
         type: TokenUserType.enum.user,
-        primaryOfficeId: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID
+        primaryOfficeId: '6f6186ce-cd5f-4a5f-810a-2d99e7c4ba12' as UUID,
+        status: 'active'
       } satisfies User,
       v1: {
         id: userIds.provincialRegistrar,

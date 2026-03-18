@@ -41,7 +41,6 @@ import { useIntl } from 'react-intl'
 import { connect, useSelector } from 'react-redux'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
@@ -316,10 +315,11 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
 
   const resendInvite = useCallback(async function resendInvite(userId: string) {
     try {
-      const res = await userMutations.resendInvite(userId, [])
-      if (res && res.data && res.data.resendInvite) {
-        setShowResendInviteSuccess(true)
-      }
+      // const res = await userMutations.resendInvite(userId, [])
+      // if (res && res.data && res.data.resendInvite) {
+      //   setShowResendInviteSuccess(true)
+      // }
+      throw new Error('@todo Resend invite mutation is not implemented')
     } catch (err) {
       setShowResendInviteError(true)
     }
@@ -329,10 +329,11 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
     userId: string
   ) {
     try {
-      const res = await userMutations.usernameReminderSend(userId, [])
-      if (res && res.data && res.data.usernameReminder) {
-        setShowUsernameReminderSuccess(true)
-      }
+      throw new Error('@todo Username reminder mutation is not implemented')
+      // const res = await userMutations.usernameReminderSend(userId, [])
+      // if (res && res.data && res.data.usernameReminder) {
+      //   setShowUsernameReminderSuccess(true)
+      // }
     } catch (err) {
       setShowUsernameReminderError(true)
     }
@@ -342,10 +343,11 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
     userId: string
   ) {
     try {
-      const res = await userMutations.sendResetPasswordInvite(userId, [])
-      if (res && res.data && res.data.resetPasswordInvite) {
-        setShowResetPasswordSuccess(true)
-      }
+      throw new Error('@todo Reset password mutation is not implemented')
+      // const res = await userMutations.sendResetPasswordInvite(userId, [])
+      // if (res && res.data && res.data.resetPasswordInvite) {
+      //   setShowResetPasswordSuccess(true)
+      // }
     } catch (err) {
       setResetPasswordError(true)
     }

@@ -26,9 +26,7 @@ import * as validators from '@opencrvs/client/src/utils/validate'
 import { IFont } from '@opencrvs/components/lib/fonts'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import * as mutations from './register/mappings/mutation'
-import * as graphQLQueries from './register/legacy'
 import * as queries from './register/mappings/query'
-import * as responseTransformers from './register/legacy/response-transformers'
 import { UserDetails } from '@client/utils/userUtils'
 import { Conditional } from './conditionals'
 import * as labels from '@client/forms/certificate/fieldDefinitions/label'
@@ -404,9 +402,6 @@ type SerializedSelectFormFieldWithOptions = Omit<
   optionCondition?: string
 }
 
-type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
-  queryMap: ISerializedQueryMap
-}
 
 type SerializedRadioGroupWithNestedFields = Omit<
   IRadioGroupWithNestedFieldsFormField,
@@ -431,7 +426,6 @@ export type SerializedFormField = UnionOmit<
     >
   | SerializedSelectFormFieldWithOptions
   | SerializedFormFieldWithDynamicDefinitions
-  | ILoaderButtonWithSerializedQueryMap
   | SerializedRadioGroupWithNestedFields,
   'validator' | 'mapping'
 > & {
@@ -682,12 +676,7 @@ export interface IQuery {
   responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
 }
 
-export interface ISerializedQueryMap {
-  [key: string]: Omit<IQuery, 'responseTransformer' | 'query'> & {
-    responseTransformer: Operation<typeof responseTransformers>
-    query: Operation<typeof graphQLQueries>
-  }
-}
+
 export interface IQueryMap {
   [key: string]: IQuery
 }

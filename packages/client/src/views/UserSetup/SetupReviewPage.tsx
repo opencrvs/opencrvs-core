@@ -30,7 +30,6 @@ import {
 import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { getOfflineData } from '@client/offline/selectors'
-import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { ErrorText } from '@opencrvs/components/lib/'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -134,19 +133,20 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const onError = () => {
     setSubmitError(true)
   }
-  return (
-    <Mutation<SubmitActivateUserMutation, SubmitActivateUserMutationVariables>
-      mutation={activateUserMutation}
-      variables={{
-        userId: String(setupData.userId),
-        password: String(setupData.password),
-        securityQuestionAnswers:
-          setupData.securityQuestionAnswers as ISecurityQuestionAnswer[]
-      }}
-      onCompleted={() => onCompleted()}
-      onError={() => onError()}
-    >
-      {(submitActivateUser, { loading }) => {
+  return <h1>@todo activate user query not yet implemented</h1>
+  // <Mutation<SubmitActivateUserMutation, SubmitActivateUserMutationVariables>
+  //   mutation={activateUserMutation}
+  //   variables={{
+  //     userId: String(setupData.userId),
+  //     password: String(setupData.password),
+  //     securityQuestionAnswers:
+  //       setupData.securityQuestionAnswers as ISecurityQuestionAnswer[]
+  //   }}
+  //   onCompleted={() => onCompleted()}
+  //   onError={() => onError()}
+  // ></Mutation>
+  {
+    /* {(submitActivateUser, { loading }) => {
         return (
           <ActionPageLight
             title={intl.formatMessage(messages.userSetupRevieTitle)}
@@ -193,9 +193,8 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
                 </div>
               </Content>
             )}
-          </ActionPageLight>
-        )
-      }}
-    </Mutation>
-  )
+            </ActionPageLight>
+            )
+            }} */
+  }
 }

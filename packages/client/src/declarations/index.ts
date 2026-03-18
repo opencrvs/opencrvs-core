@@ -16,7 +16,6 @@ import {
 import {
   Action as DeclarationAction,
   DownloadAction,
-  IContactPoint,
   IForm,
   IFormData,
   IFormFieldValue
@@ -27,17 +26,10 @@ import {
   ShowUnassignedDeclarations
 } from '@client/notification/actions'
 import { IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
 import {
   UserDetailsAvailable
 } from '@client/profile/profileActions'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
-import { IStoreState } from '@client/store'
-import {
-  draftToGqlTransformer
-} from '@client/transformer'
-import { EMPTY_STRING } from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import {
   AssignmentData,
@@ -45,18 +37,10 @@ import {
   RegStatus
 } from '@client/utils/gateway'
 import type {
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
   GQLEventSearchResultSet,
-  GQLEventSearchSet,
-  GQLHumanName,
-  GQLMarriageEventSearchSet,
-  GQLRegistrationSearchSet
+  GQLEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
-import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
-import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
-import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
 import {
   IQueryData,
   IWorkqueue,
@@ -489,15 +473,6 @@ const initialState: IDeclarationsState = {
   isWritingDraft: false
 }
 
-/* Need to add mappings for events here */
-const QueryMapper = {
-  [EventType.Birth]: getBirthQueryMappings,
-  [EventType.Death]: getDeathQueryMappings,
-  [EventType.Marriage]: getMarriageQueryMappings
-}
-const getQueryMapping = (event: EventType, action: DeclarationAction) => {
-  return QueryMapper[event] && QueryMapper[event](action)
-}
 
 export function createDeclaration(event: EventType, initialData?: IFormData) {
   return {

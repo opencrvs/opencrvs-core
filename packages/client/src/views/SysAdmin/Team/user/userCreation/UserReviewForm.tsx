@@ -19,7 +19,6 @@ import {
   SIMPLE_DOCUMENT_UPLOADER,
   SUBSECTION_HEADER
 } from '@client/forms'
-import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
   getVisibleSectionGroupsBasedOnConditions,
   getConditionalActionsForField
@@ -457,16 +456,17 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     submitForm: (variables: Record<string, any>) => {
-      dispatch(
-        submitUserFormData(
-          props.client,
-          createOrUpdateUserMutation,
-          variables,
-          props.formData.registrationOffice as string,
-          Boolean(props.router.match.params.userId), // to detect if update or create
-          navigateToUserList
-        )
-      )
+      throw new Error('@todo Submit user form mutation is not implemented')
+      // dispatch(
+      //   submitUserFormData(
+      //     props.client,
+      //     createOrUpdateUserMutation,
+      //     variables,
+      //     props.formData.registrationOffice as string,
+      //     Boolean(props.router.match.params.userId), // to detect if update or create
+      //     navigateToUserList
+      //   )
+      // )
     }
   }
 }
@@ -474,7 +474,6 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 export const UserReviewForm = withRouter(
   connect((store: IStoreState) => {
     return {
-      userFormSection: store.userForm.userForm!.sections[0],
       offlineCountryConfiguration: getOfflineData(store),
       userDetails: getUserDetails(store)
     }

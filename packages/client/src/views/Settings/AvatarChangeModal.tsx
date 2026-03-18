@@ -91,15 +91,6 @@ const Error = styled.div`
   color: ${({ theme }) => theme.colors.negative};
 `
 
-export const changeAvatarMutation = gql`
-  mutation changeAvatar($userId: String!, $avatar: AvatarInput!) {
-    changeAvatar(userId: $userId, avatar: $avatar) {
-      type
-      data
-    }
-  }
-`
-
 type IProps = IntlShapeProps &
   IOnlineStatusProps & {
     theme: ITheme
@@ -194,42 +185,7 @@ function AvatarChangeModalComp({
       actions={[
         <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <Mutation<{ changeAvatar: IImage }, { userId: string; avatar: IImage }>
-          key="change-avatar-mutation"
-          mutation={changeAvatarMutation}
-          onCompleted={({ changeAvatar: avatar }) => {
-            onAvatarChanged(avatar.data)
-            reset()
-          }}
-        >
-          {(changeAvatar) => {
-            return (
-              <PrimaryButton
-                key="apply"
-                id="apply_change"
-                disabled={!isOnline || !!error}
-                onClick={async () => {
-                  const croppedImage = await getCroppedImage(
-                    imgSrc,
-                    croppedArea
-                  )
-                  if (userDetails && userDetails.id && croppedImage) {
-                    changeAvatar({
-                      variables: {
-                        userId: userDetails.id,
-                        avatar: croppedImage
-                      }
-                    })
-                    onConfirmAvatarChange()
-                  }
-                }}
-              >
-                {intl.formatMessage(buttonMessages.apply)}
-              </PrimaryButton>
-            )
-          }}
-        </Mutation>
+        </TertiaryButton>
       ]}
       handleClose={handleCancel}
     >

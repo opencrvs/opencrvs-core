@@ -24,7 +24,6 @@ import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { userMutations } from '@client/user/mutations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
@@ -177,10 +176,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const resendInvite = async (userId: string) => {
     try {
-      const res = await userMutations.resendInvite(userId, [])
-      if (res && res.data && res.data.resendInvite) {
-        setShowResendInviteSuccess(true)
-      }
+      throw new Error('Resend invite is currently not implemented')
     } catch (err) {
       setShowResendInviteError(true)
     }
@@ -188,10 +184,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const usernameReminder = async (userId: string) => {
     try {
-      const res = await userMutations.usernameReminderSend(userId, [])
-      if (res && res.data && res.data.usernameReminder) {
-        setShowUsernameReminderSuccess(true)
-      }
+      throw new Error('Username reminder is currently not implemented')
     } catch (err) {
       setShowUsernameReminderError(true)
     }
@@ -199,10 +192,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const resetPassword = async (userId: string) => {
     try {
-      const res = await userMutations.sendResetPasswordInvite(userId, [])
-      if (res && res.data && res.data.resetPasswordInvite) {
-        setShowResetPasswordSuccess(true)
-      }
+      throw new Error('Reset password is currently not implemented')
     } catch (err) {
       setShowResetPasswordError(true)
     }

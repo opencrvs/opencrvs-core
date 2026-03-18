@@ -19,7 +19,6 @@ import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { isAValidPhoneNumberFormat } from '@client/utils/validate'
 import { convertToMSISDN } from '@client/forms/utils'
-import { GET_USER_BY_MOBILE } from '@client/views/Settings/queries'
 import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -36,8 +35,6 @@ interface IProps {
 }
 
 export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
-  const [fetchUserDetailsByMobile] =
-    useLazyQuery<GetUserByMobileQuery>(GET_USER_BY_MOBILE)
   const intl = useIntl()
   const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
   const [unknownError, setUnknownError] = React.useState(false)
@@ -70,38 +67,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (phoneNumber: string) => {
-    const formattedNumber = convertToMSISDN(phoneNumber, window.config.COUNTRY)
-    const { data: userData, error } = await fetchUserDetailsByMobile({
-      variables: { mobile: formattedNumber }
-    })
-    if (error) {
-      setUnknownError(true)
-      return
-    }
-    const mobileNumberExist = userData?.getUserByMobile
-
-    if (!mobileNumberExist) {
-      const notificationEvent = TriggerEvent.CHANGE_PHONE_NUMBER
-
-      dispatch(
-        sendVerifyCode(
-          [
-            {
-              use: language,
-              family: String(userDetails?.name?.[0].family),
-              given: userDetails?.name?.[0].given ?? []
-            }
-          ],
-          notificationEvent,
-          convertToMSISDN(phoneNumber, window.config.COUNTRY),
-          String(userDetails?.email)
-        )
-      )
-      onSuccess(phoneNumber)
-    } else {
-      toggleDuplicateMobileErrorNotification()
-      setUnknownError(false)
-    }
+    throw new Error('Change phone functionality is currently not implemented')
   }
   React.useEffect(() => {
     if (!show) {

@@ -8,31 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useMutation } from '@apollo/client'
 import { updateOfflineSystems } from '@client/offline/actions'
 import { getOfflineData } from '@client/offline/selectors'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
-  DeactivateSystemMutation,
-  DeactivateSystemMutationVariables,
-  DeleteSystemMutation,
-  DeleteSystemMutationVariables,
   EventType,
-  ReactivateSystemMutation,
-  ReactivateSystemMutationVariables,
-  RefreshSystemSecretMutation,
-  RefreshSystemSecretMutationVariables,
-  RegisterSystemMutation,
-  RegisterSystemMutationVariables,
   System,
   SystemType,
-  UpdatePermissionsMutation,
-  UpdatePermissionsMutationVariables,
   WebhookPermission
 } from '@client/utils/gateway'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import * as mutations from './mutations'
 
 /** Handles the user input when creating a new system in a modal */
 function useNewSystemDraft() {
@@ -114,12 +100,7 @@ export function useSystems() {
     onChangeClientName,
     clearNewSystemDraft
   } = useNewSystemDraft()
-  const {
-    dispatchNewSystem,
-    dispatchSystemUpdate,
-    existingSystems,
-    dispatchSystemRemove
-  } = useSystemsGlobalState()
+  const { dispatchSystemUpdate, existingSystems } = useSystemsGlobalState()
 
   const [birthPermissions, setBirthPermissions] = useState<WebhookPermission>(
     initWebHook(EventType.Birth)
@@ -133,185 +114,36 @@ export function useSystems() {
 
   const [systemToDelete, setSystemToDelete] = useState<System>()
 
-  const [
-    activateSystemMutate,
-    {
-      error: activateSystemError,
-      loading: activateSystemLoading,
-      data: activateSystemData,
-      reset: resetActivateSystemData
-    }
-  ] = useMutation<ReactivateSystemMutation, ReactivateSystemMutationVariables>(
-    mutations.activateSystem,
-    {
-      onCompleted: ({ reactivateSystem }) => {
-        if (reactivateSystem) dispatchSystemUpdate(reactivateSystem)
-        setSystemToToggleActivation(undefined)
-      }
-    }
-  )
-  const [
-    deactivateSystemMutate,
-    {
-      error: deactivateSystemError,
-      loading: deactivateSystemLoading,
-      data: deactivateSystemData,
-      reset: resetDeactivateSystemData
-    }
-  ] = useMutation<DeactivateSystemMutation, DeactivateSystemMutationVariables>(
-    mutations.deactivateSystem,
-    {
-      onCompleted: ({ deactivateSystem }) => {
-        if (deactivateSystem) dispatchSystemUpdate(deactivateSystem)
-        setSystemToToggleActivation(undefined)
-      }
-    }
-  )
-  const [
-    registerSystemMutate,
-    {
-      data: registerSystemData,
-      error: registerSystemError,
-      loading: registerSystemLoading,
-      reset: resetRegisterSystemData
-    }
-  ] = useMutation<RegisterSystemMutation, RegisterSystemMutationVariables>(
-    mutations.registerSystem,
-    {
-      onCompleted: ({ registerSystem }) => {
-        if (registerSystem) dispatchNewSystem(registerSystem.system)
-      }
-    }
-  )
-
-  const [
-    clientRefreshTokenMutate,
-    {
-      data: refreshTokenData,
-      loading: refreshTokenLoading,
-      error: refreshTokenError,
-      reset: resetRefreshTokenData
-    }
-  ] = useMutation<
-    RefreshSystemSecretMutation,
-    RefreshSystemSecretMutationVariables
-  >(mutations.refreshClientSecret)
-
   const clientRefreshToken = (clientId: string | undefined) => {
     if (!clientId) return
-    clientRefreshTokenMutate({
-      variables: {
-        clientId
-      }
-    })
   }
-
-  const [
-    updateWebhookPermissions,
-    {
-      data: updatePermissionsData,
-      loading: updatePermissionsLoading,
-      error: updatePermissionsError,
-      reset: updatePermissionsReset
-    }
-  ] = useMutation<
-    UpdatePermissionsMutation,
-    UpdatePermissionsMutationVariables
-  >(mutations.updateSystemPermissions, {
-    onCompleted: ({ updatePermissions }) => {
-      if (updatePermissions) {
-        dispatchSystemUpdate(updatePermissions)
-        setSystemToShowPermission(undefined)
-      }
-    },
-    onError: () => {
-      setSystemToShowPermission(undefined)
-    }
-  })
-
-  const [
-    deleteSystemMutate,
-    {
-      data: systemToDeleteData,
-      loading: systemToDeleteLoading,
-      error: systemToDeleteError,
-      reset: systemToDeleteReset
-    }
-  ] = useMutation<DeleteSystemMutation, DeleteSystemMutationVariables>(
-    mutations.deleteSystem,
-    {
-      onCompleted: ({ deleteSystem }) => {
-        if (deleteSystem) {
-          dispatchSystemRemove(deleteSystem)
-          setSystemToDelete(undefined)
-        }
-      }
-    }
-  )
 
   const updatePermissions = () => {
     if (!systemToShowPermission) return
-
-    updateWebhookPermissions({
-      variables: {
-        setting: {
-          clientId: systemToShowPermission.clientId,
-          webhook: [birthPermissions, deathPermissions]
-        }
-      }
-    })
   }
 
   const deactivateSystem = () => {
     if (!systemToToggleActivation) return
 
-    deactivateSystemMutate({
-      variables: {
-        clientId: systemToToggleActivation?.clientId
-      }
-    })
+    throw new Error('Deactivate system mutation not yet implemented')
   }
 
   const activateSystem = () => {
     if (!systemToToggleActivation) return
 
-    activateSystemMutate({
-      variables: {
-        clientId: systemToToggleActivation?.clientId
-      }
-    })
+    throw new Error('Reactivate system mutation not yet implemented')
   }
 
   const registerSystem = () => {
-    registerSystemMutate({
-      variables: {
-        system: {
-          type: newSystemType,
-          name: newClientName,
-          integratingSystemType: undefined
-        }
-      }
-    })
+    throw new Error('Register system mutation not yet implemented')
   }
 
   const deleteSystem = () => {
     if (!systemToDelete) return
-
-    deleteSystemMutate({
-      variables: {
-        clientId: systemToDelete.clientId
-      }
-    })
   }
   const resetData = () => {
-    resetActivateSystemData()
-    resetDeactivateSystemData()
-    resetRegisterSystemData()
     setDeathPermissions(initWebHook(EventType.Death))
     setBirthPermissions(initWebHook(EventType.Birth))
-    resetRefreshTokenData()
-    updatePermissionsReset()
-    systemToDeleteReset()
   }
 
   const closePermissionModal = () => {
@@ -322,15 +154,9 @@ export function useSystems() {
 
   return {
     closePermissionModal,
-    systemToDeleteData,
     deleteSystem,
     systemToDelete,
     setSystemToDelete,
-    systemToDeleteLoading,
-    systemToDeleteError,
-    updatePermissionsData,
-    updatePermissionsLoading,
-    updatePermissionsError,
     updatePermissions,
     systemToShowPermission,
     setSystemToShowPermission,
@@ -343,15 +169,6 @@ export function useSystems() {
     dispatchSystemUpdate,
     activateSystem,
     registerSystem,
-    registerSystemData,
-    deactivateSystemError,
-    activateSystemError,
-    registerSystemError,
-    activateSystemData,
-    deactivateSystemData,
-    deactivateSystemLoading,
-    activateSystemLoading,
-    registerSystemLoading,
     systemToToggleActivation,
     setSystemToToggleActivation,
     newClientName,
@@ -361,10 +178,6 @@ export function useSystems() {
     onChangeClientName,
     clearNewSystemDraft,
     clientRefreshToken,
-    refreshTokenData,
-    refreshTokenLoading,
-    refreshTokenError,
-    resetRefreshTokenData,
     resetData
   }
 }

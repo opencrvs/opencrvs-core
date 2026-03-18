@@ -118,36 +118,21 @@ export function SystemList({ hideNavigation }: { hideNavigation?: boolean }) {
   }, [])
 
   const {
-    systemToDeleteData,
     deleteSystem,
     systemToDelete,
     setSystemToDelete,
-    systemToDeleteLoading,
-    systemToDeleteError,
     existingSystems,
     deactivateSystem,
     systemToToggleActivation,
     setSystemToToggleActivation,
     activateSystem,
     registerSystem,
-    registerSystemData,
     newClientName,
     newSystemType,
     setNewSystemType,
     onChangeClientName,
-    activateSystemLoading,
-    deactivateSystemLoading,
-    registerSystemLoading,
-    registerSystemError,
-    activateSystemData,
-    deactivateSystemData,
-    activateSystemError,
-    deactivateSystemError,
     clearNewSystemDraft,
     clientRefreshToken,
-    refreshTokenData,
-    refreshTokenLoading,
-    refreshTokenError,
     resetData
   } = useSystems()
 

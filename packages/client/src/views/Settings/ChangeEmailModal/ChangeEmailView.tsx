@@ -17,7 +17,6 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { GET_USER_BY_EMAIL } from '@client/views/Settings/queries'
 import { useDispatch, useSelector } from 'react-redux'
 import { sendVerifyCode } from '@client/profile/profileActions'
 import { isAValidEmailAddressFormat } from '@client/utils/validate'
@@ -36,8 +35,6 @@ interface IProps {
 }
 
 export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
-  const [fetchUserDetailsByEmail] =
-    useLazyQuery<GetUserByEmailQuery>(GET_USER_BY_EMAIL)
   const intl = useIntl()
   const [emailAddress, setEmailAddress] = React.useState(EMPTY_STRING)
   const [unknownError, setUnknownError] = React.useState(false)
@@ -72,38 +69,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setUnknownError((prevValue) => !prevValue)
   }
   const continueButtonHandler = async (emailAddress: string) => {
-    const { data: userData, error } = await fetchUserDetailsByEmail({
-      variables: { email: emailAddress }
-    })
-    if (error) {
-      setUnknownError(true)
-      return
-    }
-    const emailExists = userData?.getUserByEmail
-
-    if (!emailExists) {
-      const notificationEvent = TriggerEvent.CHANGE_EMAIL_ADDRESS
-      dispatch(
-        sendVerifyCode(
-          [
-            {
-              use: language,
-              family: String(userDetails?.name?.[0].family),
-              given: userDetails?.name?.[0].given ?? []
-            }
-          ],
-          notificationEvent,
-          userDetails?.mobile
-            ? convertToMSISDN(userDetails?.mobile, window.config.COUNTRY)
-            : undefined,
-          emailAddress
-        )
-      )
-      onSuccess(emailAddress)
-    } else {
-      toggleDuplicateEmailErrorNotification()
-      setUnknownError(false)
-    }
+    throw new Error('Change email functionality is currently not implemented')
   }
   React.useEffect(() => {
     if (!show) {
