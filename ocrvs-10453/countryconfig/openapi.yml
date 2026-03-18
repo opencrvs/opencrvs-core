@@ -7721,7 +7721,7 @@ components:
             configuration:
               type: object
               properties:
-                searchableResource:
+                locationTypes:
                   description: Types of the locations that are available for selection.
                   type: array
                   items:
