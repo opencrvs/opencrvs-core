@@ -44,7 +44,8 @@ export const UserInput = z.object({
   password: z.string(),
   role: z.string(),
   primaryOfficeId: z.string(),
-  device: z.string().optional()
+  device: z.string().optional(),
+  status: z.enum(['active', 'pending']).optional()
 })
 
 type UserAPIResult = {
