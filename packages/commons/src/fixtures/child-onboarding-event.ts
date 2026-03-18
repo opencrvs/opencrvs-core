@@ -77,7 +77,7 @@ const child = defineFormPage({
       id: 'child.birthLocation',
       analytics: true,
       type: FieldType.LOCATION,
-      configuration: { searchableResource: ['HEALTH_FACILITY'] },
+      configuration: { locationTypes: ['HEALTH_FACILITY'] },
       required: true,
       secured: true,
       label: generateTranslationConfig('Health Institution'),

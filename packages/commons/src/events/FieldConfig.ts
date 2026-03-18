@@ -631,7 +631,7 @@ const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
-    searchableResource: z
+    locationTypes: z
       .array(z.string())
       .optional()
       .describe('Types of the locations that are available for selection.'),
@@ -668,7 +668,7 @@ const FileUploadWithOptions = BaseField.extend({
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
 /**
- * @deprecated Use FieldType.LOCATION with searchableResource: ['HEALTH_FACILITY']
+ * @deprecated Use FieldType.LOCATION with locationTypes: ['HEALTH_FACILITY']
  */
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
@@ -679,7 +679,7 @@ const Facility = BaseField.extend({
 export type Facility = z.infer<typeof Facility>
 
 /**
- * @deprecated Use FieldType.LOCATION with searchableResource: ['CRVS_OFFICE']
+ * @deprecated Use FieldType.LOCATION with locationTypes: ['CRVS_OFFICE']
  */
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
