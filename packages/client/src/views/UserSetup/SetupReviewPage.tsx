@@ -28,8 +28,8 @@ import {
   SubmitActivateUserMutationVariables
 } from '@client/utils/gateway'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
-import { getOfflineData } from '@client/offline/selectors'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { ErrorText } from '@opencrvs/components/lib/'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -61,16 +61,18 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const userDetails = useSelector<IStoreState, UserDetails | null>(
     getUserDetails
   )
-  const offlineData = useSelector(getOfflineData)
+
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
+
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
   const email = (userDetails && (userDetails.email as string)) || ''
   const role = formatUserRole(userDetails?.role, intl)
 
-  const primaryOffice =
-    (userDetails?.primaryOfficeId &&
-      offlineData.offices[userDetails.primaryOfficeId]?.name) ||
-    ''
+  const primaryOffice = userDetails
+    ? (locations.get(userDetails.primaryOfficeId)?.name ?? '')
+    : ''
 
   const answeredQuestions: IDataProps[] = []
   setupData.securityQuestionAnswers &&
