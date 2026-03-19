@@ -372,9 +372,11 @@ const UserReviewFormComponent = ({
     actionComponent = (
       <SuccessButton
         id="submit-edit-user-form"
+        // @TODO: Limit access based on role permissions and whether signature is required once file API is implemented
         disabled={
-          userRole?.scopes?.includes('profile.electronic-signature') &&
-          !formData.signature
+          false
+          // userRole?.scopes?.includes('profile.electronic-signature') &&
+          // !formData.signature
         }
         onClick={handleSubmit}
         icon={() => <Check />}
@@ -392,9 +394,11 @@ const UserReviewFormComponent = ({
         type="positive"
         size="large"
         fullWidth
+        // @TODO: Limit access based on role permissions and whether signature is required once file API is implemented
         disabled={
-          userRole?.scopes?.includes('profile.electronic-signature') &&
-          !formData.signature
+          false
+          // userRole?.scopes?.includes('profile.electronic-signature') &&
+          // !formData.signature
         }
         onClick={handleSubmit}
       >
