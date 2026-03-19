@@ -11,8 +11,14 @@
 
 import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
+import { ProtectedPage } from '@client/components/ProtectedPage'
+import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
+import * as routes from '@client/navigation/routes'
+import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
+import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
+import { SCOPES } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components'
 import * as React from 'react'
 import { Provider } from 'react-redux'
@@ -32,6 +38,7 @@ import { ApolloProvider } from './utils/ApolloProvider'
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
 import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
+import { TRPCProvider } from './v2-events/trpc'
 import { ReloadModal } from './views/Modals/ReloadModal'
 
 // Injecting global styles for the body tag - used only once
@@ -67,7 +74,11 @@ export const routesConfig = [
         <NotificationComponent>
           <Page>
             <MainSection>
-              <Outlet />
+              <ProtectedPage
+                unprotectedRouteElements={['documents', 'affidavit']}
+              >
+                <Outlet />
+              </ProtectedPage>
             </MainSection>
           </Page>
         </NotificationComponent>
@@ -83,7 +94,55 @@ export const routesConfig = [
       createRedirect('/registration-home/readyToIssue/*', '/'),
       createRedirect('/registration-home/print/*', '/'),
       createRedirect('/registration-home/readyForReview/*', '/'),
-      createRedirect('/events', '/events/create')
+      createRedirect('/events', '/events/create'),
+      {
+        path: routes.TEAM_SEARCH,
+        element: (
+          <TRPCProvider>
+            <ProtectedRoute
+              scopes={[
+                SCOPES.USER_READ,
+                SCOPES.USER_READ_MY_OFFICE,
+                SCOPES.USER_READ_MY_JURISDICTION
+              ]}
+            >
+              <TeamSearch />
+            </ProtectedRoute>
+          </TRPCProvider>
+        )
+      },
+      {
+        path: routes.CREATE_USER_ON_LOCATION,
+        element: (
+          <TRPCProvider>
+            <CreateNewUser />
+          </TRPCProvider>
+        )
+      },
+      {
+        path: routes.CREATE_USER_SECTION,
+        element: (
+          <TRPCProvider>
+            <CreateNewUser />
+          </TRPCProvider>
+        )
+      },
+      {
+        path: routes.REVIEW_USER_FORM,
+        element: (
+          <TRPCProvider>
+            <CreateNewUser />
+          </TRPCProvider>
+        )
+      },
+      {
+        path: routes.REVIEW_USER_DETAILS,
+        element: (
+          <TRPCProvider>
+            <CreateNewUser />
+          </TRPCProvider>
+        )
+      }
     ]
   }
 ]

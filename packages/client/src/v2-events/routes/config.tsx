@@ -46,9 +46,6 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { SettingsPage } from '@client/v2-events/features/settings/Settings'
 import { TeamPage } from '@client/v2-events/features/team/Team'
 import { OrganisationPage } from '@client/v2-events/features/organisation/Organisation'
-import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
-import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { ProtectedPage } from '@client/components/ProtectedPage'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
@@ -154,11 +151,7 @@ export const routesConfig = {
       <NavigationHistoryProvider>
         <TRPCErrorBoundary>
           <TRPCProvider storeIdentifier={currentUser.id}>
-            <ProtectedPage
-              unprotectedRouteElements={['documents', 'affidavit']}
-            >
-              <Outlet />
-            </ProtectedPage>
+            <Outlet />
             <Debug />
             <Toaster />
             <PrefetchQueries />
@@ -369,52 +362,6 @@ export const routesConfig = {
             <AllUserEmail hideNavigation={true} />
           </WorkqueueLayout>
         </ProtectedRoute>
-      )
-    },
-    {
-      path: ROUTES.V2.path + V1_LEGACY_ROUTES.TEAM_SEARCH,
-      element: (
-        <ProtectedRoute
-          scopes={[
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_OFFICE,
-            SCOPES.USER_READ_MY_JURISDICTION
-          ]}
-        >
-          <TeamSearch />
-        </ProtectedRoute>
-      )
-    },
-    {
-      path: ROUTES.V2.path + V1_LEGACY_ROUTES.CREATE_USER_ON_LOCATION,
-      element: (
-        <TRPCProvider>
-          <CreateNewUser />
-        </TRPCProvider>
-      )
-    },
-    {
-      path: ROUTES.V2.path + V1_LEGACY_ROUTES.CREATE_USER_SECTION,
-      element: (
-        <TRPCProvider>
-          <CreateNewUser />
-        </TRPCProvider>
-      )
-    },
-    {
-      path: ROUTES.V2.path + V1_LEGACY_ROUTES.REVIEW_USER_FORM,
-      element: (
-        <TRPCProvider>
-          <CreateNewUser />
-        </TRPCProvider>
-      )
-    },
-    {
-      path: ROUTES.V2.path + V1_LEGACY_ROUTES.REVIEW_USER_DETAILS,
-      element: (
-        <TRPCProvider>
-          <CreateNewUser />
-        </TRPCProvider>
       )
     }
   ]
