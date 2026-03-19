@@ -71,8 +71,8 @@ function getTokenPayload(token: string): TokenPayload {
   }
 }
 
+/* eslint-disable no-console */
 async function triggerSystemReady(token: string) {
-  // eslint-disable-next-line no-console
   console.log('Triggering system ready')
   const systemReadyUrl = new URL(
     'triggers/system/ready',
@@ -87,15 +87,17 @@ async function triggerSystemReady(token: string) {
       }
     })
 
-    // 501, 404, and 2xx responses are acceptable
-    if (
-      res.status === 501 ||
-      res.status === 404 ||
-      (res.status >= 200 && res.status < 300)
-    ) {
-      // eslint-disable-next-line no-console
+    if (res.status === 501) {
       console.log(
-        `System ready trigger responded with acceptable status: ${res.status} ${res.statusText}`
+        `System ready trigger endpoint not implemented. If this is a real country implementation, consider implementing it!`
+      )
+      return
+    }
+
+    // 404, and 2xx responses are acceptable
+    if (res.status === 404 || (res.status >= 200 && res.status < 300)) {
+      console.log(
+        `System ready trigger responded with expected status: ${res.status} ${res.statusText}`
       )
       return
     }
@@ -134,11 +136,9 @@ async function deactivateSuperuser(token: string) {
 async function main() {
   const token = await getToken()
 
-  // eslint-disable-next-line no-console
   console.log('Seeding locations')
   await seedLocations(token)
 
-  // eslint-disable-next-line no-console
   console.log('Seeding users')
   await seedUsers(token)
 
