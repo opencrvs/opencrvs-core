@@ -191,6 +191,22 @@ export function useUsers() {
         }
       })
     },
+    activateUser: ({
+      onSuccess,
+      onError
+    }: { onSuccess?: () => void; onError?: () => void } = {}) => {
+      const mutationOptions = trpc.user.activate.mutationOptions()
+
+      return useMutation({
+        ...mutationOptions,
+        onSuccess: () => {
+          onSuccess?.()
+        },
+        onError: () => {
+          onError?.()
+        }
+      })
+    },
     getSystem: {
       getAllCached: () => {
         return queryClient

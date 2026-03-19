@@ -402,7 +402,6 @@ type SerializedSelectFormFieldWithOptions = Omit<
   optionCondition?: string
 }
 
-
 type SerializedRadioGroupWithNestedFields = Omit<
   IRadioGroupWithNestedFieldsFormField,
   'nestedFields'
@@ -675,7 +674,6 @@ export interface IQuery {
   networkErrorText: MessageDescriptor
   responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
 }
-
 
 export interface IQueryMap {
   [key: string]: IQuery

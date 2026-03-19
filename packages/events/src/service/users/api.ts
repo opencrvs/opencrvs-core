@@ -36,12 +36,14 @@ export const UserInput = z.object({
       family: z.string()
     })
   ),
-  // username: z.string(),
+  // @TODO: Separate from "create user from client"
+  username: z.string().optional(),
   email: z.string(),
   mobile: z.string().optional(),
   fullHonorificName: z.string().optional(),
   emailForNotification: z.string().optional(),
-  // password: z.string(),
+  // @TODO: Separate from "create user from client"
+  password: z.string().optional(),
   role: z.string(),
   primaryOfficeId: z.string(),
   device: z.string().optional(),
@@ -247,6 +249,28 @@ export async function changeUserPassword(
       }
     }
   )
+  if (!res.ok) {
+    throw new Error(
+      `Unable to change password. Error: ${res.status} status received`
+    )
+  }
+}
+
+export async function activateUser(
+  input: { userId: string; password: string; securityQNAs: unknown[] },
+  token: string
+) {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'activateUser').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
 
   if (!res.ok) {
     throw new Error(
@@ -322,4 +346,6 @@ export async function changeUserAvatar(
       `Unable to change avatar. Error: ${res.status} status received`
     )
   }
+
+  await res.json()
 }

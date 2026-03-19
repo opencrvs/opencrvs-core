@@ -19,6 +19,8 @@ import {
   SIMPLE_DOCUMENT_UPLOADER,
   SUBSECTION_HEADER
 } from '@client/forms'
+
+import { omitBy } from 'lodash'
 import {
   getVisibleSectionGroupsBasedOnConditions,
   getConditionalActionsForField
@@ -343,18 +345,24 @@ const UserReviewFormComponent = ({
     } = formData
 
     // @ts-ignore
-    createUserMutation.mutate({
-      ...rest,
-      primaryOfficeId: registrationOffice as string,
-      mobile: phoneNumber as string,
-      name: [
+    createUserMutation.mutate(
+      // @ts-ignore
+      omitBy(
         {
-          use: 'en',
-          family: familyName as string,
-          given: [firstName] as string[]
-        }
-      ]
-    })
+          ...rest,
+          primaryOfficeId: registrationOffice as string,
+          mobile: phoneNumber ? phoneNumber : undefined,
+          name: [
+            {
+              use: 'en',
+              family: familyName as string,
+              given: [firstName] as string[]
+            }
+          ]
+        },
+        (v) => v === undefined || v === ''
+      )
+    )
   }
 
   if (userId) {
@@ -363,9 +371,11 @@ const UserReviewFormComponent = ({
     actionComponent = (
       <SuccessButton
         id="submit-edit-user-form"
+        // @TODO: Limit access based on role permissions and whether signature is required once file API is implemented
         disabled={
-          userRole?.scopes?.includes('profile.electronic-signature') &&
-          !formData.signature
+          false
+          // userRole?.scopes?.includes('profile.electronic-signature') &&
+          // !formData.signature
         }
         onClick={handleSubmit}
         icon={() => <Check />}
@@ -383,9 +393,11 @@ const UserReviewFormComponent = ({
         type="positive"
         size="large"
         fullWidth
+        // @TODO: Limit access based on role permissions and whether signature is required once file API is implemented
         disabled={
-          userRole?.scopes?.includes('profile.electronic-signature') &&
-          !formData.signature
+          false
+          // userRole?.scopes?.includes('profile.electronic-signature') &&
+          // !formData.signature
         }
         onClick={handleSubmit}
       >
