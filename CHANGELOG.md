@@ -26,6 +26,10 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 - The `conditionals` option has been removed from workqueue configuration under `action`. This option was previously present but had no effect.
 - The `'DEFAULT'` value is no longer supported in workqueue `action` configuration. Please ensure you specify a valid `CtaActionType` (see [WorkqueueConfig.ts](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/commons/src/events/WorkqueueConfig.ts)).
 
+#### Inherent flags
+
+- The inherent flag `InherentFlags.PENDING_CERTIFICATION` has been removed. Similar logic can be implemented in the country config with a custom flag, [see example](https://github.com/opencrvs/opencrvs-countryconfig/blob/81db21f4cf9ccbba90cb2c6e48648c9b258dc905/src/form/v2/birth/index.ts#L95-L102).
+
 ### New features
 
 #### HTTP Input
