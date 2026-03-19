@@ -182,16 +182,14 @@ export function useUsers() {
       }
     },
     createUser: ({ onSuccess }: { onSuccess?: () => void } = {}) => {
-      useMutation: {
-        const mutationOptions = trpc.user.create.mutationOptions()
+      const mutationOptions = trpc.user.create.mutationOptions()
 
-        return useMutation({
-          ...mutationOptions,
-          onSuccess: () => {
-            onSuccess?.()
-          }
-        })
-      }
+      return useMutation({
+        ...mutationOptions,
+        onSuccess: () => {
+          onSuccess?.()
+        }
+      })
     },
     getSystem: {
       getAllCached: () => {
