@@ -373,8 +373,8 @@ export function testDataGenerator(rngSeed?: number) {
         __typename: 'User'
       } satisfies FetchUserQuery['getUser']
     }),
-    localSystemAdmin: () =>
-      ({
+    localSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
+      v1: {
         id: userIds.localSystemAdmin,
         userMgntUserID: '68cbd26fc64761565469591d',
         creationDate: '1758188143348',
@@ -413,7 +413,24 @@ export function testDataGenerator(rngSeed?: number) {
         avatar: null,
         searches: [],
         __typename: 'User'
-      }) satisfies FetchUserQuery['getUser'],
+      } satisfies FetchUserQuery['getUser'],
+      v2: {
+        id: userIds.localSystemAdmin,
+        name: [
+          {
+            use: 'en',
+            given: ['Alex'],
+            family: 'Ngonga'
+          }
+        ],
+        role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
+        status: Status.Active,
+        mobile: '+260978787878',
+        email: 'kalushab.walya17@gmail.com',
+        primaryOfficeId: 'f403ca64-6a1d-4882-94c1-d8674df59a85' as UUID,
+        type: TokenUserType.enum.user
+      }
+    }),
     nationalSystemAdmin: (): { v2: User; v1: FetchUserQuery['getUser'] } => ({
       v2: {
         id: user.id.nationalSystemAdmin,
