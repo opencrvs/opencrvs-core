@@ -77,8 +77,9 @@ import {
 } from '@client/navigation'
 import { getListOfLocations } from '@client/utils/validate'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { UUID, Role } from '@opencrvs/commons/client'
+import { UUID, Role, FullNameV1 } from '@opencrvs/commons/client'
 import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -93,8 +94,6 @@ interface IStateProps {
   userDetails: UserDetails | null
 }
 interface IDispatchProps {
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  submitForm: (variables: Record<string, any>) => void
   modify: (values: IFormSectionData) => void
 }
 
@@ -296,10 +295,21 @@ const UserReviewFormComponent = ({
   userFormSection,
   formData,
   userDetails,
-  offlineCountryConfiguration,
-  submitForm
+  offlineCountryConfiguration
 }: IFullProps & IDispatchProps & IStateProps) => {
   const navigate = useNavigate()
+
+  const { createUser } = useUsers()
+  const createUserMutation = createUser({
+    onSuccess: () => {
+      navigate({
+        pathname: routes.TEAM_USER_LIST,
+        search: stringify({
+          locationId: formData.registrationOffice as string
+        })
+      })
+    }
+  })
 
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
@@ -326,25 +336,31 @@ const UserReviewFormComponent = ({
       location.id !== parsedPrimaryOfficeId.data
   )
 
+  // @TODO: This should be refactored separately from the API replacement work.
+  // It works now but the whole flow is sus.
   const handleSubmit = () => {
-    const variables = draftToGqlTransformer(
-      { sections: [userFormSection] },
-      { user: formData },
-      '',
-      userDetails,
-      offlineCountryConfiguration,
-      undefined
-    )
-    if (variables.user._fhirID) {
-      variables.user.id = variables.user._fhirID
-      delete variables.user._fhirID
-    }
+    const {
+      phoneNumber,
+      familyName,
+      firstName,
+      seperator,
+      registrationOffice,
+      ...rest
+    } = formData
 
-    if (variables.user.signature) {
-      delete variables.user.signature.name
-      delete variables.user.signature.__typename
-    }
-    submitForm(variables)
+    // @ts-ignore
+    createUserMutation.mutate({
+      ...rest,
+      primaryOfficeId: registrationOffice as string,
+      mobile: phoneNumber as string,
+      name: [
+        {
+          use: 'en',
+          family: familyName as string,
+          given: [firstName] as string[]
+        }
+      ]
+    })
   }
 
   if (userId) {
@@ -454,20 +470,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     })
 
   return {
-    modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    submitForm: (variables: Record<string, any>) => {
-      dispatch(
-        submitUserFormData(
-          props.client,
-          createOrUpdateUserMutation,
-          variables,
-          props.formData.registrationOffice as string,
-          Boolean(props.router.match.params.userId), // to detect if update or create
-          navigateToUserList
-        )
-      )
-    }
+    modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values))
   }
 }
 

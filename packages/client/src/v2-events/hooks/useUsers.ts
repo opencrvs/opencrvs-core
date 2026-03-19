@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { inferInput } from '@trpc/tanstack-react-query'
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { inferInput, TRPCMutationOptions } from '@trpc/tanstack-react-query'
 import {
   FullDocumentUrl,
   System,
@@ -146,6 +146,18 @@ export function useUsers() {
             (userOrSystem): userOrSystem is User =>
               userOrSystem?.type === TokenUserType.enum.user
           )
+      }
+    },
+    createUser: ({ onSuccess }: { onSuccess?: () => void } = {}) => {
+      useMutation: {
+        const mutationOptions = trpc.user.create.mutationOptions()
+
+        return useMutation({
+          ...mutationOptions,
+          onSuccess: () => {
+            onSuccess?.()
+          }
+        })
       }
     },
     getSystem: {

@@ -474,6 +474,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
           getUsersFullName(user.name, 'en')
         const role = formatUserRole(user.role, intl)
         const avatar = user.avatar
+
         const userForPermissions = {
           id: user.id,
           primaryOfficeId: user.primaryOfficeId
