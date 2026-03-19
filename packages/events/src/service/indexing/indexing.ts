@@ -536,6 +536,8 @@ export async function findRecordsByQuery({
     scopesV2: resolvedScopes
   })
 
+  console.log(JSON.stringify(esQuery, null, 2))
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     size: limit,
