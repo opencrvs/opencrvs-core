@@ -76,9 +76,9 @@ export function usePermissions() {
   const userPrimaryOfficeId = currentUser?.primaryOfficeId
 
   const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
-  const locations = getLocations.useSuspenseQuery()
 
   const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
 
@@ -131,9 +131,7 @@ export function usePermissions() {
     return false
   }
 
-  const canEditUser = (
-    user: User
-  ) => {
+  const canEditUser = (user: User) => {
     const editableRoleIds = findScope(userScopes ?? [], 'user.edit')?.options
       ?.role
 

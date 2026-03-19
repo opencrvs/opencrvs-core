@@ -24,10 +24,10 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
-import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { getOrThrow } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components/lib/'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -52,11 +52,16 @@ interface IProps {
   ) => void
 }
 
-export function UserSetupReviewPage({ setupData, goToStep }: IProps) {
+export function UserSetupReview({ setupData, goToStep }: IProps) {
   const intl = useIntl()
   const [submitError, setSubmitError] = React.useState(false)
   const userDetails = useSelector<IStoreState, UserDetails | null>(
     getUserDetails
+  )
+
+  const primaryOfficeId = getOrThrow(
+    userDetails?.primaryOfficeId,
+    'User primary office ID is required'
   )
 
   const onCompleted = () => {
@@ -66,8 +71,8 @@ export function UserSetupReviewPage({ setupData, goToStep }: IProps) {
     setSubmitError(true)
   }
 
-  const { getLocations } = useLocations()
-  const locations = getLocations.useSuspenseQuery()
+  const { getLocation } = useLocations()
+  const location = getLocation.useQuery(primaryOfficeId)
   const { activateUser } = useUsers()
 
   const activateUserUserMutation = activateUser({
@@ -79,9 +84,7 @@ export function UserSetupReviewPage({ setupData, goToStep }: IProps) {
   const email = (userDetails && (userDetails.email as string)) || ''
   const role = formatUserRole(userDetails?.role, intl)
 
-  const primaryOffice = userDetails
-    ? (locations.get(userDetails.primaryOfficeId)?.name ?? '')
-    : ''
+  const primaryOffice = location.data?.name ?? ''
 
   const answeredQuestions: IDataProps[] = []
   setupData.securityQuestionAnswers &&
@@ -195,5 +198,3 @@ export function UserSetupReviewPage({ setupData, goToStep }: IProps) {
     </ActionPageLight>
   )
 }
-
-export const UserSetupReview = withSuspense(UserSetupReviewPage)
