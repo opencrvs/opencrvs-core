@@ -36,12 +36,12 @@ export const UserInput = z.object({
       family: z.string()
     })
   ),
-  username: z.string(),
+  // username: z.string(),
   email: z.string(),
   mobile: z.string().optional(),
   fullHonorificName: z.string().optional(),
   emailForNotification: z.string().optional(),
-  password: z.string(),
+  // password: z.string(),
   role: z.string(),
   primaryOfficeId: z.string(),
   device: z.string().optional(),
@@ -157,18 +157,17 @@ export async function findUserOrSystem(
   return
 }
 
-
 async function getUser(id: string, token: string): Promise<User> {
- const userOrSystem = await findUserOrSystem(id, token)
- if (!userOrSystem) {
-   throw new Error(`No user or system found for id: ${id}`)
- }
+  const userOrSystem = await findUserOrSystem(id, token)
+  if (!userOrSystem) {
+    throw new Error(`No user or system found for id: ${id}`)
+  }
 
- if (userOrSystem.type === TokenUserType.enum.system) {
-   throw new Error(`The id: ${id} belongs to a system, not a user`)
- }
+  if (userOrSystem.type === TokenUserType.enum.system) {
+    throw new Error(`The id: ${id} belongs to a system, not a user`)
+  }
 
- return userOrSystem
+  return userOrSystem
 }
 
 export async function searchUsers(
