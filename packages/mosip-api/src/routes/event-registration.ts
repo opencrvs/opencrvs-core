@@ -1,8 +1,12 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import * as mosip from "../mosip-api";
-import { generateTransactionId } from "../registration-number";
 import { insertTransaction } from "../database";
 import { MosipInteropPayloadSchema } from "@opencrvs/mosip/api";
+import { env } from "../constants";
+
+const generateTransactionId = (prefix = env.TRANSACTION_ID_PREFIX) => {
+  return `${prefix}${Array.from({ length: 10 }, () => Math.floor(Math.random() * 10)).join("")}`;
+};
 
 /** Handles the calls coming from OpenCRVS countryconfig */
 export const registrationEventHandler = async (
