@@ -29,7 +29,6 @@ import {
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
-import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
 import { FormikTouched, FormikValues } from 'formik'
@@ -68,10 +67,8 @@ type IState = {
   fileUploading: boolean
 }
 
-type IDispatchProps = {
-  modifyUserFormData: typeof modifyUserFormData
-  clearUserFormData: typeof clearUserFormData
-}
+type IDispatchProps = {}
+
 type IFullProps = IntlShapeProps & IProps & IDispatchProps & RouteComponentProps
 
 class UserFormComponent extends React.Component<IFullProps, IState> {
@@ -127,9 +124,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     this.props.router.navigate(-1)
   }
 
-  modifyData = (values: IFormSectionData) => {
-    const { formData } = this.props
-    this.props.modifyUserFormData({ ...formData, ...values })
+  modifyData = () => {
+    throw new Error('Not implemented')
   }
 
   render = () => {
@@ -160,7 +156,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
             <FormFieldGenerator
               key={activeGroup.id}
               id={section.id}
-              onChange={(values) => this.modifyData(values)}
+              onChange={(values) => this.modifyData()}
               setAllFieldsDirty={false}
               fields={getVisibleGroupFields(activeGroup)}
               onSetTouched={(setTouchedFunc) => {
@@ -197,8 +193,5 @@ const mapStateToProps = (state: IStoreState) => {
 }
 
 export const UserForm = withRouter(
-  connect(mapStateToProps, {
-    modifyUserFormData,
-    clearUserFormData
-  })(injectIntl(UserFormComponent))
+  connect(mapStateToProps, {})(injectIntl(UserFormComponent))
 )

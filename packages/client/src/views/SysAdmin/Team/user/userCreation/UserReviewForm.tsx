@@ -32,7 +32,6 @@ import {
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { modifyUserFormData } from '@client/user/userReducer'
 import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { SuccessButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -457,7 +456,7 @@ const UserReviewFormComponent = ({
 
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
   return {
-    modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values))
+    modify: (values: IFormSectionData) => new Error('Not implemented')
   }
 }
 

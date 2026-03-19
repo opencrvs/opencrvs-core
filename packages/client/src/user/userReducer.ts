@@ -13,8 +13,6 @@ import {
   IFormSectionData
 } from '@client/forms'
 import {
-  ShowCreateUserDuplicateEmailErrorToast,
-  ShowCreateUserErrorToast,
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
 } from '@client/notification/actions'
@@ -127,8 +125,6 @@ type UserFormAction =
   | ISubmitSuccessAction
   | ISubmitFailedAction
   | profileActions.Action
-  | ShowCreateUserErrorToast
-  | ShowCreateUserDuplicateEmailErrorToast
   | IFetchAndStoreUserData
   | IStoreUserFormDataAction
   | IRoleMessagesLoadedAction
