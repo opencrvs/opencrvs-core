@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApolloClient, ApolloError } from '@apollo/client'
-import {
-  IFormSectionData
-} from '@client/forms'
+import { IFormSectionData } from '@client/forms'
 import {
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
@@ -59,7 +57,6 @@ interface IUserFormDataModifyAction {
   }
 }
 
-
 interface IUserFormDataSubmitAction {
   type: typeof SUBMIT_USER_FORM_DATA
   payload: {
@@ -74,7 +71,7 @@ interface IUserFormDataSubmitAction {
   }
 }
 
-export function clearUserFormData() {
+function clearUserFormData() {
   return {
     type: CLEAR_USER_FORM_DATA
   }
@@ -108,9 +105,7 @@ interface IStoreUserFormDataAction {
   }
 }
 
-function storeUserFormData(
-  user: User
-): IStoreUserFormDataAction {
+function storeUserFormData(user: User): IStoreUserFormDataAction {
   return {
     type: STORE_USER_FORM_DATA,
     payload: {
@@ -157,14 +152,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       } = (action as IFetchAndStoreUserData).payload
       return loop(
         state,
-        Cmd.run(
-          () => trpcClient.user.get.query(userId),
-          {
-            successActionCreator: (result) => storeUserFormData(result as User),
-            failActionCreator: () =>
-              showSubmitFormErrorToast(TOAST_MESSAGES.FAIL)
-          }
-        )
+        Cmd.run(() => trpcClient.user.get.query(userId), {
+          successActionCreator: (result) => storeUserFormData(result as User),
+          failActionCreator: () => showSubmitFormErrorToast(TOAST_MESSAGES.FAIL)
+        })
       )
 
     default:

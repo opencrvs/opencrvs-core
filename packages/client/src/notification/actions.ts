@@ -222,7 +222,7 @@ export const showSubmitFormErrorToast = (
   payload: { data }
 })
 
-export const showCreateUserErrorToast = (
+const showCreateUserErrorToast = (
   data: string,
   mobile: string
 ): ShowCreateUserErrorToast => ({
@@ -230,7 +230,7 @@ export const showCreateUserErrorToast = (
   payload: { data, mobile }
 })
 
-export const showCreateUserDuplicateEmailErrorToast = (
+const showCreateUserDuplicateEmailErrorToast = (
   data: string,
   email: string
 ): ShowCreateUserDuplicateEmailErrorToast => ({
@@ -312,9 +312,7 @@ export const hidePINUpdateSuccessToast = (): HidePINUpdateSuccessAction => ({
   type: HIDE_PIN_UPDATE_SUCCESS
 })
 
-const showUnassigned = (
-  data: ShowUnassignedPayload
-): ShowUnassigned => ({
+const showUnassigned = (data: ShowUnassignedPayload): ShowUnassigned => ({
   type: SHOW_UNASSIGNED,
   payload: data
 })

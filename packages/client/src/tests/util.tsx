@@ -907,7 +907,7 @@ export const mockConfigResponse = {
   systems: mockOfflineData.systems
 }
 
-export const mockOfflineDataDispatch = {
+const mockOfflineDataDispatch = {
   languages: mockOfflineData.languages,
   templates: mockOfflineData.templates,
   locations: mockOfflineData.locations,
@@ -1005,7 +1005,7 @@ export async function createTestComponent(
   return { component: mount(<PropProxy />, options), router }
 }
 
-export const mockRoles = {
+const mockRoles = {
   data: {
     getUserRoles: DEFAULT_ROLES_DEFINITION
   }

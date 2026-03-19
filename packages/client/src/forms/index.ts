@@ -166,7 +166,7 @@ export type IDynamicValueMapper = (key: string) => string
 
 type IDynamicFieldTypeMapper = (key: string) => string
 
-export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
+const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   switch (key) {
     case NATIONAL_ID:
       return BIG_NUMBER
@@ -903,11 +903,8 @@ type QueryDefaultOperation<
 type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
 
 type ISimpleTemplateDescriptor = { fieldName: string }
-type IQueryTemplateDescriptor = ISimpleTemplateDescriptor &
-  IQueryDescriptor
-type ITemplateDescriptor =
-  | IQueryTemplateDescriptor
-  | ISimpleTemplateDescriptor
+type IQueryTemplateDescriptor = ISimpleTemplateDescriptor & IQueryDescriptor
+type ITemplateDescriptor = IQueryTemplateDescriptor | ISimpleTemplateDescriptor
 // Mutations
 
 type MutationFactoryOperationKeys = FilterType<
@@ -936,9 +933,7 @@ type MutationDefaultOperation<
   operation: T
 }
 
-type IMutationDescriptor =
-  | MutationFactoryOperation
-  | MutationDefaultOperation
+type IMutationDescriptor = MutationFactoryOperation | MutationDefaultOperation
 
 // Initial type as it's always used as an object.
 // @todo should be stricter than this
@@ -967,12 +962,13 @@ type IFormSectionQueryMapFunction = (
 ) => void
 
 export enum UserSection {
-  User = 'user',
-  Preview = 'preview'
+  Preview = 'preview',
+  User = 'user'
 }
 
 enum CertificateSection {
-  Collector = 'collector'
+  Collector = 'collector',
+  User = 'user'
 }
 
 export enum CorrectionSection {
@@ -1370,45 +1366,3 @@ export interface IFormData {
 type PaymentType = 'MANUAL'
 
 type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
-
-type Payment = {
-  paymentId?: string
-  type: PaymentType
-  amount: string
-  outcome: PaymentOutcomeType
-  date: number
-}
-
-export function modifyFormField(
-  form: IForm,
-  sectionId: string,
-  groupId: string,
-  fieldName: string,
-  modifyFn: (field: IFormField) => IFormField
-) {
-  return {
-    ...form,
-    sections: form.sections.map((section) => {
-      if (section.id === sectionId) {
-        return {
-          ...section,
-          groups: section.groups.map((group) => {
-            if (group.id === groupId) {
-              return {
-                ...group,
-                fields: group.fields.map((field) => {
-                  if (field.name === fieldName) {
-                    return modifyFn(field)
-                  }
-                  return field
-                })
-              }
-            }
-            return group
-          })
-        }
-      }
-      return section
-    })
-  }
-}

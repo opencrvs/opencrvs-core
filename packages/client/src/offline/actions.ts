@@ -196,14 +196,6 @@ export const facilitiesLoaded = (
   payload: payload
 })
 
-/*
- * Only called from tests atm
- */
-export const setOfflineData = (userDetails: UserDetails): SetOfflineData => ({
-  type: GET_EXISTING_OFFLINE_DATA,
-  payload: userDetails
-})
-
 export const getOfflineDataSuccess = (
   response: string
 ): IGetOfflineDataSuccessAction => ({
