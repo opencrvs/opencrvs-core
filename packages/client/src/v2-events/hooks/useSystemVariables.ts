@@ -10,6 +10,7 @@
  */
 
 import { SystemVariables } from '@opencrvs/commons/client'
+import { getUsersFullName } from '../utils'
 import { useCurrentUser } from './useCurrentUser'
 
 /**
@@ -19,7 +20,10 @@ export function useSystemVariables() {
   const { currentUser: user } = useCurrentUser()
 
   const variables = {
-    user,
+    user: {
+      ...user,
+      name: getUsersFullName(user.name, 'en')
+    },
     $window: {
       location: {
         href: window.location.href,

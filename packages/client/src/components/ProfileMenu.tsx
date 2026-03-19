@@ -23,9 +23,7 @@ import {
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
-import { UserDetails } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { buttonMessages } from '@client/i18n/messages'
 import { useNavigate } from 'react-router-dom'
@@ -33,6 +31,7 @@ import * as routes from '@client/navigation/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
+import { User } from '@opencrvs/commons/client'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -74,7 +73,7 @@ const ProfileMenuComponent = ({
     return items
   }
 
-  const getUserName = (userDetails: UserDetails | null): string => {
+  const getUserName = (userDetails: User | null): string => {
     let userName = ''
 
     if (userDetails && userDetails.name) {
@@ -84,7 +83,7 @@ const ProfileMenuComponent = ({
     return userName
   }
 
-  const getMenuHeader = (userDetails: UserDetails | null): JSX.Element => {
+  const getMenuHeader = (userDetails: User | null): JSX.Element => {
     const userName = getUserName(userDetails)
 
     return (

@@ -83,7 +83,7 @@ const DefaultImage = styled.div<{ width: number; height: number }>`
   background-color: ${({ theme }) => theme.colors.grey100};
 `
 
-const Error = styled.div`
+const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.negative};
 `
 
@@ -237,7 +237,7 @@ function AvatarChangeModalComp({
     >
       <Description>
         {!error && intl.formatMessage(messages.resizeAvatar)}
-        {error && <Error>{error}</Error>}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
         <ImageLoader
           onImageLoaded={(image) => {
             reset()
