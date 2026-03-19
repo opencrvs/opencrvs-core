@@ -72,6 +72,7 @@ type UserAPIResult = {
 type SearchUsersPayload = {
   username?: string
   mobile?: string
+  email?: string
   status?: string
   primaryOfficeId?: string
   locationId?: string
@@ -155,7 +156,6 @@ export async function findUserOrSystem(
 
   return
 }
-
 
 
 async function getUser(id: string, token: string): Promise<User> {

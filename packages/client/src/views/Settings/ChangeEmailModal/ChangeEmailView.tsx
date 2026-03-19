@@ -22,10 +22,11 @@ import { isAValidEmailAddressFormat } from '@client/utils/validate'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { TriggerEvent } from '@opencrvs/commons/client'
 
 interface IProps {
   show: boolean
-  onSuccess: (emailAddress: string) => void
+  onSuccess: (emailAddress: string, nonce: string) => void
   onClose: () => void
 }
 
@@ -40,7 +41,7 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
     setShowDuplicateEmailErrorNotification
   ] = React.useState(false)
   const userDetails = useSelector(getUserDetails)
-  const { changeEmail } = useUsers()
+  const { sendVerifyCode } = useUsers()
 
   const onChangeEmailAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     const emailAddress = event.target.value
@@ -64,11 +65,13 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
   }
   const continueButtonHandler = async (emailAddress: string) => {
     if (!userDetails) return
-    changeEmail.mutate(
-      { userId: userDetails.id, email: emailAddress },
+    sendVerifyCode.mutate(
       {
-        onSuccess: () => {
-          onSuccess(emailAddress)
+        notificationEvent: TriggerEvent.CHANGE_EMAIL_ADDRESS
+      },
+      {
+        onSuccess: (data) => {
+          onSuccess(emailAddress, data.nonce)
         },
         onError: (error) => {
           if (

@@ -29,6 +29,8 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { Square } from '@opencrvs/components/lib/icons'
 import { useOnlineStatus } from '@client/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { uploadAvatar } from '@client/v2-events/features/files/useFileUpload'
+import { getFullDocumentPath, cacheFile } from '@client/v2-events/cache'
 
 const Container = styled.div`
   align-self: center;
@@ -169,15 +171,40 @@ function AvatarChangeModalComp({
 
   const handleApply = async () => {
     const croppedImage = await getCroppedImage(imgSrc, croppedArea)
+
+    if (!userDetails) {
+      throw new Error(
+        'User details not in the scope of avatar change modal. This should never happen'
+      )
+    }
+
+    if (!croppedImage) {
+      setError(intl.formatMessage(messages.avatarProcessingError))
+      return
+    }
+    const { url } = await uploadAvatar({
+      file: croppedImage,
+      userId: userDetails.id || '',
+      meta: {
+        transactionId: crypto.randomUUID(),
+        referenceId: userDetails.id
+      }
+    })
+
     if (userDetails && userDetails.id && croppedImage) {
       changeAvatarMutation.mutate(
         {
           userId: userDetails.id,
-          avatar: croppedImage
+          avatar: {
+            data: url,
+            type: croppedImage.type
+          }
         },
         {
-          onSuccess: () => {
-            onAvatarChanged(croppedImage.data)
+          onSuccess: (data) => {
+            const fullUrl = getFullDocumentPath(url)
+            cacheFile({ url: fullUrl, file: croppedImage })
+            onAvatarChanged(fullUrl)
             reset()
           }
         }

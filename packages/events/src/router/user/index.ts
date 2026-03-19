@@ -11,7 +11,7 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { UserOrSystem, User } from '@opencrvs/commons'
+import { UserOrSystem, User, personNameFromV1ToV2, logger } from '@opencrvs/commons'
 import { router, userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
@@ -24,8 +24,14 @@ import {
   changeUserPassword,
   changeUserPhone,
   changeUserEmail,
-  changeUserAvatar
+  changeUserAvatar,
+  getLegacyUser
 } from '@events/service/users/api'
+import {
+  generateNonce,
+  generateAndSendVerificationCode,
+  checkVerificationCode
+} from '@events/service/verifyCode'
 import { userCanReadOtherUser } from '../middleware'
 
 const UserSearch = z.object({
@@ -82,27 +88,124 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      if (input.userId !== ctx.user.id) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not allowed to change another user\'s password' })
+      }
       await changeUserPassword(input, ctx.token)
+    }),
+  sendVerifyCode: userOnlyProcedure
+    .input(
+      z.object({
+        notificationEvent: z.enum(['change-phone-number', 'change-email-address'])
+      })
+    )
+    .output(
+      z.object({
+        nonce: z.string()
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const nonce = generateNonce()
+      const rawToken = ctx.token.replace('Bearer ', '')
+      const user = await getLegacyUser(ctx.user.id, ctx.token)
+
+      await generateAndSendVerificationCode({
+        nonce,
+        token: rawToken,
+        notificationEvent: input.notificationEvent,
+        recipientName: personNameFromV1ToV2(user.name),
+        phoneNumber: user.mobile,
+        email: user.email
+      })
+
+      return {
+        nonce
+      }
     }),
   changePhone: userOnlyProcedure
     .input(
       z.object({
         userId: z.string(),
-        phoneNumber: z.string()
+        phoneNumber: z.string(),
+        nonce: z.string(),
+        verifyCode: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
-      await changeUserPhone(input, ctx.token)
+      if (input.userId !== ctx.user.id) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not allowed to change another user\'s phone number' })
+      }
+      try {
+        checkVerificationCode(input.nonce, input.verifyCode)
+      } catch (err) {
+        logger.error(`Phone number change verification failed for user ${input.userId}: ${(err as Error).message}`)
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Verification failed: ${(err as Error).message}`
+        })
+      }
+
+      const userWithDuplicateNumber = await searchUsers({
+        mobile: input.phoneNumber,
+        count: 1,
+        skip: 0,
+        sortOrder: 'asc'
+      }, ctx.token)
+
+      if (userWithDuplicateNumber.length > 0 && userWithDuplicateNumber[0].id !== input.userId) {
+        logger.error(`Phone number ${input.phoneNumber} is already in use by another user`)
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'Phone number is already in use'
+        })
+      }
+
+      await changeUserPhone(
+        { userId: input.userId, phoneNumber: input.phoneNumber },
+        ctx.token
+      )
     }),
   changeEmail: userOnlyProcedure
     .input(
       z.object({
         userId: z.string(),
-        email: z.string()
+        email: z.string(),
+        nonce: z.string(),
+        verifyCode: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
-      await changeUserEmail(input, ctx.token)
+      if (input.userId !== ctx.user.id) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not allowed to change another user\'s email' })
+      }
+      try {
+        checkVerificationCode(input.nonce, input.verifyCode)
+      } catch (err) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Verification failed: ${(err as Error).message}`
+        })
+      }
+
+      const userWithDuplicateEmail = await searchUsers({
+        email: input.email,
+        count: 1,
+        skip: 0,
+        sortOrder: 'asc'
+      }, ctx.token)
+
+      if (userWithDuplicateEmail.length > 0 && userWithDuplicateEmail[0].id !== input.userId) {
+        logger.error(`Email ${input.email} is already in use by another user`)
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'Email is already in use'
+        })
+      }
+
+      await changeUserEmail(
+        { userId: input.userId, email: input.email },
+        ctx.token
+      )
     }),
   changeAvatar: userOnlyProcedure
     .input(
@@ -115,6 +218,9 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      if (input.userId !== ctx.user.id) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Not allowed to change another user\'s avatar' })
+      }
       await changeUserAvatar(input, ctx.token)
     })
 })

@@ -11,46 +11,63 @@
 import { convertToMSISDN } from '@client/forms/utils'
 import { buttonMessages, userMessages as messages } from '@client/i18n/messages'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { getUserDetails, getUserNonce } from '@client/profile/profileSelectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Message } from '@client/views/Settings/items/components'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { TRPCClientError } from '@trpc/client'
+import { AppRouter } from '@client/v2-events/trpc'
 
 interface IProps {
   show: boolean
   onSuccess: () => void
   onClose: () => void
+  nonce: string
   data: {
     phoneNumber?: string
     email?: string
   }
 }
 
-export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
+function isConflict(error: TRPCClientError<AppRouter> | null): boolean {
+  return error?.data?.code === 'CONFLICT'
+}
+
+export function VerifyCodeView({
+  show,
+  onSuccess,
+  onClose,
+  nonce,
+  data
+}: IProps) {
   const intl = useIntl()
   const { phoneNumber, email } = data
   const userDetails = useSelector(getUserDetails)
 
-  const nonce = useSelector(getUserNonce)
   const [verifyCode, setVerifyCode] = React.useState(EMPTY_STRING)
-  const [isInvalidLength, setIsInvalidLength] = React.useState(false)
-  const [errorOccured, setErrorOccured] = React.useState(false)
+  const [isValidLength, setIsValidLength] = React.useState(false)
+  const [errorOccured, setErrorOccured] =
+    React.useState<TRPCClientError<AppRouter> | null>(null)
   const dispatch = useDispatch()
+  const { changePhone, changeEmail } = useUsers()
+
   const onChangeVerifyCode = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const verifyCode = event.target.value
-    setVerifyCode(verifyCode)
-    setIsInvalidLength(verifyCode.length === 6)
+    const value = event.target.value
+    setVerifyCode(value)
+    setIsValidLength(value.length === 6)
+    setErrorOccured(null)
   }
   const restoreState = () => {
     setVerifyCode(EMPTY_STRING)
-    setIsInvalidLength(false)
-    setErrorOccured(false)
+    setIsValidLength(false)
+    setErrorOccured(null)
   }
   const phoneChangeCompleted = () => {
     if (userDetails && phoneNumber) {
@@ -75,6 +92,41 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
     }
     onSuccess()
   }
+
+  const submitVerification = () => {
+    if (!userDetails || !nonce || verifyCode.length !== 6) return
+
+    if (phoneNumber) {
+      changePhone.mutate(
+        {
+          userId: userDetails.id,
+          phoneNumber,
+          nonce,
+          verifyCode
+        },
+        {
+          onSuccess: () => phoneChangeCompleted(),
+          onError: (err) => {
+            setErrorOccured(err as TRPCClientError<AppRouter>)
+          }
+        }
+      )
+    } else if (email) {
+      changeEmail.mutate(
+        {
+          userId: userDetails.id,
+          email,
+          nonce,
+          verifyCode
+        },
+        {
+          onSuccess: () => emailChangeCompleted(),
+          onError: (err) => setErrorOccured(err as TRPCClientError<AppRouter>)
+        }
+      )
+    }
+  }
+
   React.useEffect(() => {
     if (!show) {
       restoreState()
@@ -89,14 +141,22 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
       actions={[
         <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>
+        </TertiaryButton>,
+        <PrimaryButton
+          key="verify"
+          id="verify-button"
+          onClick={submitVerification}
+          disabled={!isValidLength}
+        >
+          {intl.formatMessage(buttonMessages.continueButton)}
+        </PrimaryButton>
       ]}
       handleClose={onClose}
       contentHeight={150}
       contentScrollableY={true}
     >
       <Message>
-        {window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'sms'
+        {data.phoneNumber
           ? intl.formatMessage(messages.confirmationPhoneMsg, {
               num: phoneNumber || userDetails?.mobile
             })
@@ -110,14 +170,24 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
         required={false}
         optionalLabel=""
         error={
-          errorOccured ? intl.formatMessage(messages.incorrectVerifyCode) : ''
+          isConflict(errorOccured)
+            ? data.phoneNumber
+              ? intl.formatMessage(messages.duplicateUserMobileErrorMessege, {
+                  number: phoneNumber
+                })
+              : intl.formatMessage(messages.duplicateUserEmailErrorMessege, {
+                  email: email
+                })
+            : errorOccured
+              ? intl.formatMessage(messages.incorrectVerifyCode)
+              : ''
         }
       >
         <TextInput
           id="VerifyCode"
           type="number"
           touched={true}
-          error={errorOccured}
+          error={!!errorOccured}
           value={verifyCode}
           onChange={onChangeVerifyCode}
         />

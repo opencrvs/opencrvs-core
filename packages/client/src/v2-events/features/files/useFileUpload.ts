@@ -38,6 +38,40 @@ interface UploadFileParams {
   }
 }
 
+interface UploadAvatarParams {
+  file: File
+  userId: string
+  meta: {
+    transactionId: string
+    referenceId: string
+  }
+}
+
+export async function uploadAvatar({
+  file,
+  userId,
+  meta
+}: UploadAvatarParams): Promise<{ url: string }> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('transactionId', meta.transactionId)
+  formData.append('path', `users/${userId}`)
+
+  const response = await fetch('/api/upload', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    },
+    body: formData
+  })
+
+  if (!response.ok) {
+    throw new Error('File upload failed')
+  }
+
+  return { url: await response.text() }
+}
+
 async function uploadFile({
   file,
   eventId,

@@ -22,6 +22,7 @@ import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import {
   QueryOptions,
+  setMutationDefaults,
   setQueryDefaults
 } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
@@ -107,6 +108,38 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
         : undefined,
       avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
     }))
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.user.changePhone, {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  mutationFn: trpcOptionsProxy.user.changePhone.mutationOptions().mutationFn!,
+  retry: false,
+  onSuccess: async (data, variables) => {
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
+  }
+})
+
+setMutationDefaults(trpcOptionsProxy.user.changeEmail, {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  mutationFn: trpcOptionsProxy.user.changeEmail.mutationOptions().mutationFn!,
+  retry: false,
+  onSuccess: async (data, variables) => {
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
+  }
+})
+setMutationDefaults(trpcOptionsProxy.user.changeAvatar, {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  mutationFn: trpcOptionsProxy.user.changeAvatar.mutationOptions().mutationFn!,
+  retry: false,
+  onSuccess: async (data, variables) => {
+    await queryClient.invalidateQueries({
+      queryKey: trpcOptionsProxy.user.get.queryKey(variables.userId)
+    })
   }
 })
 
@@ -205,6 +238,9 @@ export function useUsers() {
     },
     changePassword: useMutation(
       trpcOptionsProxy.user.changePassword.mutationOptions()
+    ),
+    sendVerifyCode: useMutation(
+      trpcOptionsProxy.user.sendVerifyCode.mutationOptions()
     ),
     changePhone: useMutation(
       trpcOptionsProxy.user.changePhone.mutationOptions()

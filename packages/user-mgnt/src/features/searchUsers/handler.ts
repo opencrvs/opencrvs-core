@@ -81,6 +81,7 @@ export default async function searchUsers(
 
 export const searchSchema = Joi.object({
   username: Joi.string().optional(),
+  email: Joi.string().optional(),
   mobile: Joi.string().optional(),
   status: Joi.string().optional(),
   primaryOfficeId: Joi.string().optional(),

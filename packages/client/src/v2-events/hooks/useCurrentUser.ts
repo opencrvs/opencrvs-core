@@ -33,12 +33,13 @@ export function useCurrentUser() {
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
   const name = getUsersFullName(user.name, 'en')
-
   const sharedFields = {
     id: user.id,
     name,
     role: user.role,
     type: user.type,
+    mobile: user.mobile,
+    avatar: user.avatar,
     primaryOfficeId: user.primaryOfficeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
     signature: user.signature
@@ -57,10 +58,14 @@ export function useCurrentUser() {
       adminLevelIds
     )
     return {
-      ...sharedFields,
-      ...adminLevels
+      currentUser: {
+        ...sharedFields,
+        ...adminLevels
+      }
     }
   }
 
-  return sharedFields
+  return {
+    currentUser: sharedFields
+  }
 }

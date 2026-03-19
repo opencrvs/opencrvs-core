@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
+import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -47,7 +48,6 @@ const UserRole = styled.div`
 
 interface IProps {
   language: string
-  userDetails: UserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
 }
 
@@ -55,12 +55,10 @@ type FullProps = IProps & IntlShapeProps
 
 const ProfileMenuComponent = ({
   intl,
-  language,
-  userDetails,
   redirectToAuthentication
 }: FullProps) => {
   const navigate = useNavigate()
-
+  const { currentUser: userDetails } = useCurrentUser()
   const getMenuItems = (intl: IntlShape): IToggleMenuItem[] => {
     const items = [] as IToggleMenuItem[]
     items.push({
@@ -118,8 +116,7 @@ const ProfileMenuComponent = ({
 
 const mapStateToProps = (store: IStoreState) => {
   return {
-    language: getLanguage(store),
-    userDetails: getUserDetails(store)
+    language: getLanguage(store)
   }
 }
 

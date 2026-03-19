@@ -16,7 +16,7 @@ import { useCurrentUser } from './useCurrentUser'
  * Exposes template variables such as `$user` for components to replace field values or other templates
  */
 export function useSystemVariables() {
-  const user = useCurrentUser()
+  const { currentUser: user } = useCurrentUser()
 
   const variables = {
     user,
