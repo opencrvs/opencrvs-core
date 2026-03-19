@@ -61,16 +61,6 @@ interface IUserFormDataModifyAction {
   }
 }
 
-export function modifyUserFormData(
-  data: IFormSectionData
-): IUserFormDataModifyAction {
-  return {
-    type: MODIFY_USER_FORM_DATA,
-    payload: {
-      data
-    }
-  }
-}
 
 interface IUserFormDataSubmitAction {
   type: typeof SUBMIT_USER_FORM_DATA
@@ -83,29 +73,6 @@ interface IUserFormDataSubmitAction {
     isUpdate: boolean
     officeLocationId: string
     onSuccess: () => void
-  }
-}
-
-export function submitUserFormData(
-  client: ApolloClient<unknown>,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  mutation: any,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  variables: { [key: string]: any },
-  officeLocationId: string,
-  isUpdate = false,
-  onSuccess: () => void
-): IUserFormDataSubmitAction {
-  return {
-    type: SUBMIT_USER_FORM_DATA,
-    payload: {
-      client,
-      mutation,
-      variables,
-      officeLocationId,
-      isUpdate,
-      onSuccess
-    }
   }
 }
 
@@ -123,32 +90,10 @@ interface ISubmitSuccessAction {
   }
 }
 
-function submitSuccess(
-  isUpdate: boolean,
-  onSuccess: () => void
-): ISubmitSuccessAction {
-  return {
-    type: SUBMIT_USER_FORM_DATA_SUCCESS,
-    payload: {
-      isUpdate,
-      onSuccess
-    }
-  }
-}
-
 interface ISubmitFailedAction {
   type: typeof SUBMIT_USER_FORM_DATA_FAIL
   payload: {
     errorData: ApolloError
-  }
-}
-
-function submitFail(errorData: ApolloError): ISubmitFailedAction {
-  return {
-    type: SUBMIT_USER_FORM_DATA_FAIL,
-    payload: {
-      errorData
-    }
   }
 }
 
@@ -158,18 +103,6 @@ interface IFetchAndStoreUserData {
     variables: { userId: string }
   }
 }
-
-export function fetchAndStoreUserData(
-  variables: { userId: string }
-): IFetchAndStoreUserData {
-  return {
-    type: FETCH_USER_DATA,
-    payload: {
-      variables
-    }
-  }
-}
-
 interface IStoreUserFormDataAction {
   type: typeof STORE_USER_FORM_DATA
   payload: {

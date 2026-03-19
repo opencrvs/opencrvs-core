@@ -35,5 +35,3 @@ export const getUserDetails = (
   store: IStoreState
 ): ProfileState['userDetails'] => getKey(store, 'userDetails')
 
-export const getUserNonce = (store: IStoreState): ProfileState['nonce'] =>
-  getKey(store, 'nonce')

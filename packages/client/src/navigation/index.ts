@@ -238,37 +238,6 @@ export const generateRegistrationsListUrlConfig = ({
   })
 })
 
-export const generateUserReviewFormUrl = ({
-  userId,
-  sectionId,
-  groupId,
-  userFormFieldNameHash
-}: {
-  userId: string
-  sectionId: string
-  groupId: string
-  userFormFieldNameHash?: string
-}) =>
-  formatUrl(REVIEW_USER_FORM, {
-    userId,
-    sectionId,
-    groupId
-  }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : '')
-
-export const generateCreateUserSectionUrl = ({
-  sectionId,
-  groupId,
-  userFormFieldNameHash
-}: {
-  sectionId: string
-  groupId: string
-  userFormFieldNameHash?: string
-}) =>
-  formatUrl(CREATE_USER_SECTION, {
-    sectionId,
-    groupId
-  }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : '')
-
 export const generateGoToPageGroupUrl = ({
   pageRoute,
   declarationId,

@@ -9,33 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  Scope,
-  SCOPES,
-  DEFAULT_ROLES_DEFINITION,
-  TestUserRole,
-  TokenUserType,
-  UUID
-} from '@opencrvs/commons/client'
-import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
-import { offlineDataReady, setOfflineData } from '@client/offline/actions'
-import { AppStore, createStore, IStoreState } from '@client/store'
-import { ThemeProvider } from 'styled-components'
-import { getSchema } from '@client/tests/graphql-schema-mock'
-import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
-import { getTheme } from '@opencrvs/components/lib/theme'
-import { join } from 'path'
-import {
   ApolloClient,
   ApolloLink,
   ApolloProvider,
   InMemoryCache,
-  Observable,
-  gql
+  Observable
 } from '@apollo/client'
 import { MockedProvider } from '@apollo/client/testing'
 import { App, routesConfig } from '@client/App'
-import { setUserDetails } from '@client/profile/profileActions'
+import { offlineDataReady } from '@client/offline/actions'
+import { AppStore, createStore, IStoreState } from '@client/store'
+import { getSchema } from '@client/tests/graphql-schema-mock'
+import { EventType, FetchUserQuery, Status } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
+import {
+  DEFAULT_ROLES_DEFINITION,
+  Scope,
+  SCOPES,
+  TestUserRole,
+  TokenUserType,
+  UUID
+} from '@opencrvs/commons/client'
+import { getTheme } from '@opencrvs/components/lib/theme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 import {
   configure,
@@ -46,28 +42,23 @@ import {
 } from 'enzyme'
 import { readFileSync } from 'fs'
 import { graphql, print } from 'graphql'
-import { createLocation, createMemoryHistory } from 'history'
 import * as jwt from 'jsonwebtoken'
-import { stringify } from 'qs'
+import { join } from 'path'
 import * as React from 'react'
 import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
-import { AnyAction, Store } from 'redux'
+import { ThemeProvider } from 'styled-components'
 import { waitForElement } from './wait-for-element'
 
 import { SUBMISSION_STATUS } from '@client/declarations'
-import { vi } from 'vitest'
-import { draftToGqlTransformer } from '@client/transformer'
-import { Section, SubmissionAction } from '@client/forms'
-import * as builtInValidators from '@client/utils/validate'
+import { SubmissionAction } from '@client/forms'
 import * as actions from '@client/profile/profileActions'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { vi } from 'vitest'
 import { mockOfflineData, validImageB64String } from './mock-offline-data'
 
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
-const inValidImageB64String =
-  'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
 export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   SCOPES.CONFIG_UPDATE_ALL,
@@ -1014,140 +1005,9 @@ export async function createTestComponent(
   return { component: mount(<PropProxy />, options), router }
 }
 
-/**
- * Create a test component with the given node and store.
- * Returns component route
- */
-export type TestComponentWithRouteMock = {
-  component: ReactWrapper<{}, {}>
-  router: Awaited<ReturnType<typeof createTestComponent>>['router']
-}
-
-export const getFileFromBase64String = (
-  base64String: string,
-  name: string,
-  contentType: string
-): File => {
-  const byteCharacters = atob(base64String)
-  const bytesLength = byteCharacters.length
-  const slicesCount = Math.ceil(bytesLength / 1024)
-  const byteArrays = new Array(slicesCount)
-
-  for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-    const begin = sliceIndex * 1024
-    const end = Math.min(begin + 1024, bytesLength)
-
-    const bytes = new Array(end - begin)
-    for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
-      bytes[i] = byteCharacters[offset].charCodeAt(0)
-    }
-    byteArrays[sliceIndex] = new Uint8Array(bytes)
-  }
-  return new File(byteArrays, name, {
-    type: contentType
-  })
-}
-
-async function getReviewFormFromStore(
-  store: Store<IStoreState, AnyAction>,
-  event: EventType
-) {
-  store.dispatch(setOfflineData(userDetails))
-  const state = store.getState()
-  throw new Error('Deleted')
-}
-
-export function loginAsFieldAgent(store: AppStore) {
-  return store.dispatch(
-    setUserDetails({
-      id: '5eba726866458970cf2e23c2',
-      type: 'user',
-      mobile: '+8801711111111',
-      role: 'CHA',
-      status: 'active',
-      name: [
-        {
-          use: 'en',
-          given: ['Shakib'],
-          family: 'Al Hasan'
-        }
-      ],
-      primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a' as UUID
-    })
-  )
-}
-
-function createRouterProps<
-  T,
-  Params extends { [K in keyof Params]?: string | undefined }
->(
-  path: string,
-  locationState?: T,
-  {
-    search,
-    matchParams = {} as Params
-  }: { search?: Record<string, string>; matchParams?: Params } = {}
-) {
-  const location = createLocation(path, locationState)
-
-  /*
-   * Uses memory history because goBack
-   * wasn't working in the test environment
-   */
-  const history = createMemoryHistory<T>({
-    initialEntries: [path]
-  })
-  history.location = location
-  if (search) {
-    location.search = stringify(search)
-  }
-  const match = {
-    isExact: false,
-    path,
-    url: path,
-    params: matchParams
-  }
-
-  return { location, history, match }
-}
-
 export const mockRoles = {
   data: {
     getUserRoles: DEFAULT_ROLES_DEFINITION
-  }
-}
-
-export const mockCompleteFormData = {
-  accountDetails: '',
-  assignedRegistrationOffice: '',
-  device: '',
-  familyName: 'Hossain',
-  firstName: 'Jeff',
-  nid: '123456789',
-  phoneNumber: '01662132132',
-  email: 'jeff.hossain@gmail.com',
-  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'HOSPITAL',
-  userDetails: '',
-  username: ''
-}
-
-export const mockDataWithRegistarRoleSelected = {
-  accountDetails: '',
-  assignedRegistrationOffice: '',
-  device: '',
-  familyName: 'Hossain',
-  firstName: 'Jeff',
-  email: 'jeff@gmail.com',
-  nid: '101488192',
-  phoneNumber: '01662132132',
-  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'LOCAL_REGISTRAR',
-  userDetails: '',
-  username: '',
-  signature: {
-    type: 'image/png',
-    data: 'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
   }
 }
 

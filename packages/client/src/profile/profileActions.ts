@@ -139,29 +139,6 @@ export const redirectToAuthentication = (
   }
 })
 
-export const sendVerifyCode = (
-  userFullName: {
-    use: string
-    family: string
-    given: string[]
-  }[],
-  notificationEvent:
-    | typeof TriggerEvent.CHANGE_PHONE_NUMBER
-    | typeof TriggerEvent.CHANGE_EMAIL_ADDRESS,
-  phoneNumber?: string,
-  email?: string
-): SendVerifyCode => {
-  return {
-    type: SEND_VERIFY_CODE,
-    payload: {
-      userFullName,
-      notificationEvent,
-      phoneNumber,
-      email
-    }
-  }
-}
-
 export const SendVerifyCodeSuccess = (payload: {
   userId: string
   nonce: string

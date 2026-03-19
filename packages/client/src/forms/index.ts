@@ -179,7 +179,7 @@ export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   }
 }
 
-export interface ISerializedDynamicFormFieldDefinitions {
+interface ISerializedDynamicFormFieldDefinitions {
   label?: {
     dependency: string
     labelMapper: Operation<typeof labels>
@@ -209,7 +209,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
   }>
 }
 
-export interface IDynamicFormFieldDefinitions {
+interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
   helperText?: IDynamicFieldHelperText
   tooltip?: IDynamicFieldTooltip
@@ -416,7 +416,7 @@ type IMapping = {
   template?: ITemplateDescriptor
 }
 
-export type SerializedFormField = UnionOmit<
+type SerializedFormField = UnionOmit<
   | Exclude<
       IFormField,
       | IFormFieldWithDynamicDefinitions
@@ -855,7 +855,7 @@ type ValidationDefaultOperationKeys = Exclude<
   ValidationFactoryOperationKeys
 >
 
-export type ValidationFactoryOperation<
+type ValidationFactoryOperation<
   T extends ValidationFactoryOperationKeys = ValidationFactoryOperationKeys
 > = {
   operation: T
@@ -868,7 +868,7 @@ type ValidationDefaultOperation<
   operation: T
 }
 
-export type IValidatorDescriptor =
+type IValidatorDescriptor =
   | ValidationFactoryOperation
   | ValidationDefaultOperation
 
@@ -884,7 +884,7 @@ type QueryDefaultOperationKeys = Exclude<
   QueryFactoryOperationKeys
 >
 
-export type QueryFactoryOperation<
+type QueryFactoryOperation<
   T extends QueryFactoryOperationKeys = QueryFactoryOperationKeys
 > = {
   operation: T
@@ -900,12 +900,12 @@ type QueryDefaultOperation<
   operation: T
 }
 
-export type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
+type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
 
 type ISimpleTemplateDescriptor = { fieldName: string }
-export type IQueryTemplateDescriptor = ISimpleTemplateDescriptor &
+type IQueryTemplateDescriptor = ISimpleTemplateDescriptor &
   IQueryDescriptor
-export type ITemplateDescriptor =
+type ITemplateDescriptor =
   | IQueryTemplateDescriptor
   | ISimpleTemplateDescriptor
 // Mutations
@@ -920,7 +920,7 @@ type MutationDefaultOperationKeys = Exclude<
   MutationFactoryOperationKeys
 >
 
-export type MutationFactoryOperation<
+type MutationFactoryOperation<
   T extends MutationFactoryOperationKeys = MutationFactoryOperationKeys
 > = {
   operation: T
@@ -936,7 +936,7 @@ type MutationDefaultOperation<
   operation: T
 }
 
-export type IMutationDescriptor =
+type IMutationDescriptor =
   | MutationFactoryOperation
   | MutationDefaultOperation
 
@@ -950,13 +950,13 @@ type IFormSectionMapping = {
   template?: [string, IFormSectionQueryMapFunction][]
 }
 
-export type IFormSectionMutationMapFunction = (
+type IFormSectionMutationMapFunction = (
   transFormedData: TransformedData,
   draftData: IFormData,
   sectionId: string
 ) => void
 
-export type IFormSectionQueryMapFunction = (
+type IFormSectionQueryMapFunction = (
   transFormedData: IFormData,
   queryData: any,
   sectionId: string,
@@ -1377,13 +1377,6 @@ type Payment = {
   amount: string
   outcome: PaymentOutcomeType
   date: number
-}
-
-interface ICertificate {
-  collector?: IFormSectionData
-  hasShowedVerifiedDocument?: boolean
-  payments?: Payment[]
-  certificateTemplateId?: string
 }
 
 export function modifyFormField(

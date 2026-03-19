@@ -256,13 +256,6 @@ export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   payload: error
 })
 
-export const updateOfflineSystems = (payload: {
-  systems: System[]
-}): UpdateOfflineSystemsAction => ({
-  type: UPDATE_OFFLINE_SYSTEMS,
-  payload: payload
-})
-
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
