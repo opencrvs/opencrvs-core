@@ -11494,16 +11494,20 @@ components:
           $ref: "#/components/schemas/DateCondition"
         updatedAt:
           $ref: "#/components/schemas/DateCondition"
-        legalStatuses.REGISTERED.acceptedAt:
-          $ref: "#/components/schemas/DateCondition"
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.DECLARED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateCondition"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.REGISTERED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
@@ -11514,8 +11518,6 @@ components:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
           $ref: "#/components/schemas/ExactUserType"
-        createdByRole:
-          $ref: "#/components/schemas/AnyOf"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
@@ -11644,6 +11646,20 @@ components:
         - type
         - location
       additionalProperties: false
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
+      additionalProperties: false
     Exact:
       type: object
       properties:
@@ -11670,20 +11686,6 @@ components:
       required:
         - type
         - term
-      additionalProperties: false
-    AnyOf:
-      type: object
-      properties:
-        type:
-          type: string
-          const: anyOf
-        terms:
-          type: array
-          items:
-            type: string
-      required:
-        - type
-        - terms
       additionalProperties: false
     ContainsFlags:
       type: object

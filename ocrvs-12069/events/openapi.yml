@@ -890,16 +890,20 @@ components:
           $ref: "#/components/schemas/DateCondition"
         updatedAt:
           $ref: "#/components/schemas/DateCondition"
-        legalStatuses.REGISTERED.acceptedAt:
-          $ref: "#/components/schemas/DateCondition"
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.DECLARED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateCondition"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.REGISTERED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
@@ -910,8 +914,6 @@ components:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
           $ref: "#/components/schemas/ExactUserType"
-        createdByRole:
-          $ref: "#/components/schemas/AnyOf"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
@@ -1033,6 +1035,19 @@ components:
       required:
         - type
         - location
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
     Exact:
       type: object
       properties:
@@ -1058,19 +1073,6 @@ components:
       required:
         - type
         - term
-    AnyOf:
-      type: object
-      properties:
-        type:
-          type: string
-          const: anyOf
-        terms:
-          type: array
-          items:
-            type: string
-      required:
-        - type
-        - terms
     ContainsFlags:
       type: object
       properties:
@@ -14589,16 +14591,20 @@ components:
           $ref: "#/components/schemas/DateConditionOutput"
         updatedAt:
           $ref: "#/components/schemas/DateConditionOutput"
-        legalStatuses.REGISTERED.acceptedAt:
-          $ref: "#/components/schemas/DateConditionOutput"
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
             - type: "null"
+        legalStatuses.DECLARED.createdByRole:
+          $ref: "#/components/schemas/AnyOfOutput"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateConditionOutput"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
             - type: "null"
+        legalStatuses.REGISTERED.createdByRole:
+          $ref: "#/components/schemas/AnyOfOutput"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/ExactOutput"
         createdAtLocation:
@@ -14609,8 +14615,6 @@ components:
           $ref: "#/components/schemas/ExactOutput"
         createdByUserType:
           $ref: "#/components/schemas/ExactUserTypeOutput"
-        createdByRole:
-          $ref: "#/components/schemas/AnyOfOutput"
         createdBy:
           $ref: "#/components/schemas/ExactOutput"
         updatedBy:
@@ -14739,6 +14743,20 @@ components:
         - type
         - location
       additionalProperties: false
+    AnyOfOutput:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
+      additionalProperties: false
     ExactOutput:
       type: object
       properties:
@@ -14765,20 +14783,6 @@ components:
       required:
         - type
         - term
-      additionalProperties: false
-    AnyOfOutput:
-      type: object
-      properties:
-        type:
-          type: string
-          const: anyOf
-        terms:
-          type: array
-          items:
-            type: string
-      required:
-        - type
-        - terms
       additionalProperties: false
     ContainsFlagsOutput:
       type: object
