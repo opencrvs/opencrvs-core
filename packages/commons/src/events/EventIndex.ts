@@ -182,6 +182,7 @@ export const QueryExpression = z
     updatedAtLocation: z.optional(Within),
     assignedTo: z.optional(Exact),
     createdByUserType: z.optional(ExactUserType),
+    createdByRole: z.optional(AnyOf),
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),

@@ -18,7 +18,8 @@ import {
   Exact,
   ExactStatus,
   QueryInput,
-  ExactUserType
+  ExactUserType,
+  AnyOf
 } from './EventIndex'
 
 const SerializableExact = z.object({
@@ -47,6 +48,7 @@ export const SerializedQueryExpression = z
     assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(SerializableExact),
     createdByUserType: ExactUserType,
+    createdByRole: z.optional(AnyOf),
     updatedBy: z.optional(SerializableExact),
     trackingId: z.optional(Exact),
     flags: z.optional(ContainsFlags),
