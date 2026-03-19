@@ -12,12 +12,21 @@
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import { UserOrSystem, User } from '@opencrvs/commons'
-import { router, userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
+import {
+  router,
+  userAndSystemProcedure,
+  userOnlyProcedure
+} from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { getRoles } from '@events/service/config/config'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
-import { UserInput, searchUsers, createUser } from '@events/service/users/api'
+import {
+  UserInput,
+  searchUsers,
+  createUser,
+  activateUser
+} from '@events/service/users/api'
 import { userCanReadOtherUser } from '../middleware'
 
 const UserSearch = z.object({
@@ -30,7 +39,6 @@ const UserSearch = z.object({
   skip: z.number().min(0),
   sortOrder: z.enum(['asc', 'desc'])
 })
-
 
 export const userRouter = router({
   get: userOnlyProcedure
@@ -64,6 +72,10 @@ export const userRouter = router({
     }),
   roles: router({
     list: userOnlyProcedure.query(async ({ ctx }) => getRoles(ctx.token))
-  })
+  }),
+  activate: userOnlyProcedure
+    .input(z.any())
+    .mutation(async ({ input, ctx }) => {
+      return await activateUser(input, ctx.token)
+    })
 })
-

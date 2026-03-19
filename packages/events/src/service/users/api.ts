@@ -232,3 +232,29 @@ export async function createUser(input: CreateUserPayload, token: string) {
   const response = (await res.json()) as UserAPIResult
   return getUser(response.id, token)
 }
+
+export async function activateUser(
+  input: { userId: string; password: string; securityQNAs: any[] },
+  token: string
+) {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'activateUser').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to activate user. Error: ${res.status} status received`
+    )
+  }
+
+  const response = (await res.json()) as UserAPIResult
+  return response
+}
