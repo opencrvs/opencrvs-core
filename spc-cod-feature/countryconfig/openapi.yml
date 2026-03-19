@@ -9145,6 +9145,19 @@ components:
                   enum:
                     - GET
                     - POST
+                defaultOptions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      label:
+                        type: string
+                      value:
+                        type: string
+                    required:
+                      - label
+                      - value
+                    additionalProperties: false
               additionalProperties: false
           required:
             - id
