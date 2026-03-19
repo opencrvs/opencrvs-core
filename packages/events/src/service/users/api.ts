@@ -36,12 +36,14 @@ export const UserInput = z.object({
       family: z.string()
     })
   ),
-  // username: z.string(),
+  // @TODO: Separate from "create user from client"
+  username: z.string().optional(),
   email: z.string(),
   mobile: z.string().optional(),
   fullHonorificName: z.string().optional(),
   emailForNotification: z.string().optional(),
-  // password: z.string(),
+  // @TODO: Separate from "create user from client"
+  password: z.string().optional(),
   role: z.string(),
   primaryOfficeId: z.string(),
   device: z.string().optional(),
