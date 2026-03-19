@@ -234,7 +234,7 @@ export async function createUser(input: CreateUserPayload, token: string) {
 }
 
 export async function activateUser(
-  input: { userId: string; password: string; securityQNAs: any[] },
+  input: { userId: string; password: string; securityQNAs: unknown[] },
   token: string
 ) {
   const res = await fetch(
