@@ -1078,39 +1078,38 @@ test('Search by legalStatuses.DECLARED.createdByRole', async () => {
 
   await client.event.actions.declare.request(data)
 
-  expect(
-    await client.event.search({
-      query: {
-        type: 'and',
-        clauses: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            'legalStatuses.DECLARED.createdByRole': {
-              type: 'anyOf',
-              terms: ['REGISTRATION_AGENT']
-            }
+  const { results: response1 } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          'legalStatuses.DECLARED.createdByRole': {
+            type: 'anyOf',
+            terms: ['REGISTRATION_AGENT']
           }
-        ]
-      }
-    })
-  ).toHaveLength(1)
+        }
+      ]
+    }
+  })
 
-  expect(
-    await client.event.search({
-      query: {
-        type: 'and',
-        clauses: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            'legalStatuses.DECLARED.createdByRole': {
-              type: 'anyOf',
-              terms: ['OTHER_ROLE']
-            }
+  expect(response1).toHaveLength(1)
+
+  const { results: response2 } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          'legalStatuses.DECLARED.createdByRole': {
+            type: 'anyOf',
+            terms: ['OTHER_ROLE']
           }
-        ]
-      }
-    })
-  ).toHaveLength(0)
+        }
+      ]
+    }
+  })
+  expect(response2).toHaveLength(0) // no documents should be returned
 })
 
 test('Returns correctly based on registration location even when a parent administrative area level is used for searching', async () => {
