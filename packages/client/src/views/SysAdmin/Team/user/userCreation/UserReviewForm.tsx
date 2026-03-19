@@ -19,7 +19,6 @@ import {
   SIMPLE_DOCUMENT_UPLOADER,
   SUBSECTION_HEADER
 } from '@client/forms'
-import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
   getVisibleSectionGroupsBasedOnConditions,
   getConditionalActionsForField
@@ -33,10 +32,7 @@ import {
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import {
-  modifyUserFormData,
-  submitUserFormData
-} from '@client/user/userReducer'
+import { modifyUserFormData } from '@client/user/userReducer'
 import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { SuccessButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -63,7 +59,6 @@ import {
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Link } from '@opencrvs/components'
-import { draftToGqlTransformer } from '@client/transformer'
 import {
   RouteComponentProps,
   withRouter
@@ -77,7 +72,7 @@ import {
 } from '@client/navigation'
 import { getListOfLocations } from '@client/utils/validate'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { UUID, Role, FullNameV1 } from '@opencrvs/commons/client'
+import { UUID, Role } from '@opencrvs/commons/client'
 import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 
@@ -461,14 +456,6 @@ const UserReviewFormComponent = ({
 }
 
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
-  const navigateToUserList = () =>
-    props.router.navigate({
-      pathname: routes.TEAM_USER_LIST,
-      search: stringify({
-        locationId: props.formData.registrationOffice as string
-      })
-    })
-
   return {
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values))
   }

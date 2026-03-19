@@ -10,7 +10,7 @@
  */
 
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { inferInput, TRPCMutationOptions } from '@trpc/tanstack-react-query'
+import { inferInput } from '@trpc/tanstack-react-query'
 import {
   FullDocumentUrl,
   System,
@@ -149,16 +149,14 @@ export function useUsers() {
       }
     },
     createUser: ({ onSuccess }: { onSuccess?: () => void } = {}) => {
-      useMutation: {
-        const mutationOptions = trpc.user.create.mutationOptions()
+      const mutationOptions = trpc.user.create.mutationOptions()
 
-        return useMutation({
-          ...mutationOptions,
-          onSuccess: () => {
-            onSuccess?.()
-          }
-        })
-      }
+      return useMutation({
+        ...mutationOptions,
+        onSuccess: () => {
+          onSuccess?.()
+        }
+      })
     },
     getSystem: {
       getAllCached: () => {
