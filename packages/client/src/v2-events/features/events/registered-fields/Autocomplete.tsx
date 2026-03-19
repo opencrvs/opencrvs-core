@@ -70,11 +70,11 @@ function RowComponent<T extends string | number>({
   return (
     <DropDownItem
       key={index}
-      id={`locationOption${index}`}
+      id={`dropdownOption${index}`}
       style={style}
-      onClick={option.value ? () => selectOption(option) : undefined}
+      onClick={option.label ? () => selectOption(option) : undefined}
     >
-      {`${option.value}: ${option.label}`}
+      {option.label}
     </DropDownItem>
   )
 }
@@ -269,6 +269,8 @@ function debouncePromise<Args extends any[], R>(
 function AutocompleteInput(props: AutocompleteProps) {
   const { id, onChange, value, configuration, error, touched } = props
 
+  const defaultOptions = configuration?.defaultOptions
+
   const fetchOptions = useCallback(
     async (inputValue: string): Promise<AutocompleteValue[]> => {
       // We can skip the API call if the input is empty or just whitespace
@@ -284,11 +286,11 @@ function AutocompleteInput(props: AutocompleteProps) {
         return []
       }
 
-      const [, displays] = await res.json()
+      const displays = await res.json()
 
-      return displays.map(([code, label]: [string, string]) => ({
-        value: code,
-        label
+      return displays.results.map((row: { id: string; label: string }) => ({
+        value: row.id,
+        label: row.label
       }))
     },
     [configuration.url]
@@ -317,9 +319,9 @@ function AutocompleteInput(props: AutocompleteProps) {
         DropdownIndicator,
         IndicatorSeparator: () => null
       }}
-      defaultOptions={false}
+      defaultOptions={defaultOptions}
       error={error}
-      formatOptionLabel={(option) => `${option.value}: ${option.label}`}
+      formatOptionLabel={(option) => option.label}
       id={`autocomplete`}
       inputId={id}
       isClearable={true}
@@ -334,6 +336,6 @@ function AutocompleteInput(props: AutocompleteProps) {
 export const Autocomplete = {
   Input: AutocompleteInput,
   Output: ({ value }: { value: AutocompleteUpdateValue }) => {
-    return value ? `${value.value}: ${value.label}` : null
+    return value ? value.label : null
   }
 }

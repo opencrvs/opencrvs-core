@@ -764,7 +764,15 @@ const AutocompleteField = BaseField.extend({
       .string()
       .describe('URL to fetch autocomplete suggestions from')
       .optional(),
-    method: z.enum(['GET', 'POST']).default('GET').optional()
+    method: z.enum(['GET', 'POST']).default('GET').optional(),
+    defaultOptions: z
+      .array(
+        z.object({
+          label: z.string(),
+          value: z.string()
+        })
+      )
+      .optional()
   })
 }).describe('Autocomplete input field')
 
