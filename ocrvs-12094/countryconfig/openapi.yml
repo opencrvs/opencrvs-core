@@ -7721,7 +7721,7 @@ components:
             configuration:
               type: object
               properties:
-                searchableResource:
+                locationTypes:
                   description: Types of the locations that are available for selection.
                   type: array
                   items:
@@ -11494,16 +11494,20 @@ components:
           $ref: "#/components/schemas/DateCondition"
         updatedAt:
           $ref: "#/components/schemas/DateCondition"
-        legalStatuses.REGISTERED.acceptedAt:
-          $ref: "#/components/schemas/DateCondition"
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.DECLARED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateCondition"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.REGISTERED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
@@ -11642,6 +11646,20 @@ components:
         - type
         - location
       additionalProperties: false
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
+      additionalProperties: false
     Exact:
       type: object
       properties:
@@ -11753,20 +11771,6 @@ components:
         - type
         - gte
         - lte
-      additionalProperties: false
-    AnyOf:
-      type: object
-      properties:
-        type:
-          type: string
-          const: anyOf
-        terms:
-          type: array
-          items:
-            type: string
-      required:
-        - type
-        - terms
       additionalProperties: false
     DeclareActionConfig:
       type: object

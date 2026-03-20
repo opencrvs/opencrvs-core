@@ -890,16 +890,20 @@ components:
           $ref: "#/components/schemas/DateCondition"
         updatedAt:
           $ref: "#/components/schemas/DateCondition"
-        legalStatuses.REGISTERED.acceptedAt:
-          $ref: "#/components/schemas/DateCondition"
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.DECLARED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateCondition"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.REGISTERED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
@@ -1031,6 +1035,19 @@ components:
       required:
         - type
         - location
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
     Exact:
       type: object
       properties:
@@ -1138,19 +1155,6 @@ components:
         - type
         - gte
         - lte
-    AnyOf:
-      type: object
-      properties:
-        type:
-          type: string
-          const: anyOf
-        terms:
-          type: array
-          items:
-            type: string
-      required:
-        - type
-        - terms
     error.BAD_REQUEST:
       title: Invalid input data error (400)
       description: The error information
@@ -7031,7 +7035,7 @@ components:
             configuration:
               type: object
               properties:
-                searchableResource:
+                locationTypes:
                   description: Types of the locations that are available for selection.
                   type: array
                   items:
@@ -14587,16 +14591,20 @@ components:
           $ref: "#/components/schemas/DateConditionOutput"
         updatedAt:
           $ref: "#/components/schemas/DateConditionOutput"
-        legalStatuses.REGISTERED.acceptedAt:
-          $ref: "#/components/schemas/DateConditionOutput"
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
             - type: "null"
+        legalStatuses.DECLARED.createdByRole:
+          $ref: "#/components/schemas/AnyOfOutput"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateConditionOutput"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
             - type: "null"
+        legalStatuses.REGISTERED.createdByRole:
+          $ref: "#/components/schemas/AnyOfOutput"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/ExactOutput"
         createdAtLocation:
@@ -14735,6 +14743,20 @@ components:
         - type
         - location
       additionalProperties: false
+    AnyOfOutput:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
+      additionalProperties: false
     ExactOutput:
       type: object
       properties:
@@ -14846,20 +14868,6 @@ components:
         - type
         - gte
         - lte
-      additionalProperties: false
-    AnyOfOutput:
-      type: object
-      properties:
-        type:
-          type: string
-          const: anyOf
-        terms:
-          type: array
-          items:
-            type: string
-      required:
-        - type
-        - terms
       additionalProperties: false
   securitySchemes:
     Authorization:
