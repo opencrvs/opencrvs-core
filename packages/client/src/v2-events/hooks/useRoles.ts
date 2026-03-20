@@ -14,6 +14,8 @@ import { defineMessages, IntlShape } from 'react-intl'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useTRPC } from '@client/v2-events/trpc'
 
+// This will be used in user creation form
+/** @knipignore *
 export function useRoles() {
   const trpc = useTRPC()
   return {

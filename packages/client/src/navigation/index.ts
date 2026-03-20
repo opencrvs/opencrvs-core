@@ -237,7 +237,8 @@ export const generateRegistrationsListUrlConfig = ({
     currentPageNumber
   })
 })
-
+// This will be used in user creation form
+/** @knipignore */
 export const generateUserReviewFormUrl = ({
   userId,
   sectionId,
@@ -255,6 +256,8 @@ export const generateUserReviewFormUrl = ({
     groupId
   }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : '')
 
+// This will be used in user creation form
+/** @knipignore */
 export const generateCreateUserSectionUrl = ({
   sectionId,
   groupId,

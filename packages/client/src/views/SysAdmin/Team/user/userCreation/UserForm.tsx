@@ -8,45 +8,37 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FormFieldGenerator } from '@client/components/form'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import {
   IFormSection,
   IFormSectionData,
   IFormSectionGroup
 } from '@client/forms'
-import {
-  getSectionFields,
-  getVisibleGroupFields,
-  hasFormError
-} from '@client/forms/utils'
-import {
-  buttonMessages,
-  validationMessages as messages
-} from '@client/i18n/messages'
+import { hasFormError } from '@client/forms/utils'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import {
   generateCreateUserSectionUrl,
   generateUserReviewFormUrl
 } from '@client/navigation'
+import * as routes from '@client/navigation/routes'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled from 'styled-components'
+import { UserDetails } from '@client/utils/userUtils'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { FormikTouched, FormikValues } from 'formik'
+import { stringify } from 'qs'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
-import { IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { UserDetails } from '@client/utils/userUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import {
-  RouteComponentProps,
-  withRouter
-} from '@client/components/WithRouterProps'
-import * as routes from '@client/navigation/routes'
-import { stringify } from 'qs'
+import styled from 'styled-components'
 
 export const Action = styled.div`
   margin-top: 32px;
@@ -113,11 +105,11 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   showAllValidationErrors = () => {
-    const touched = getSectionFields(
-      this.props.section,
-      this.props.formData
-    ).reduce((memo, { name }) => ({ ...memo, [name]: true }), {})
-    this.setAllFormFieldsTouched(touched)
+    // const touched = getSectionFields(
+    //   this.props.section,
+    //   this.props.formData
+    // ).reduce((memo, { name }) => ({ ...memo, [name]: true }), {})
+    // this.setAllFormFieldsTouched(touched)
   }
 
   handleBackAction = () => {
@@ -153,7 +145,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
           hideBackground={true}
         >
           <Content size={ContentSize.SMALL} title={title}>
-            <FormFieldGenerator
+            {/*<FormFieldGenerator
               key={activeGroup.id}
               id={section.id}
               onChange={(values) => this.modifyData()}
@@ -165,7 +157,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               draftData={{ user: formData }}
               requiredErrorMessage={messages.requiredForNewUser}
               onUploadingStateChanged={this.onUploadingStateChanged}
-            />
+            />*/}
             <Action>
               <Button
                 id="confirm_form"
