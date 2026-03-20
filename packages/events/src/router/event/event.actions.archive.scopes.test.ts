@@ -92,7 +92,7 @@ test('Check scopes against event.actions.archive', async () => {
         user,
         scope,
         clientReadingAllEvents,
-        (client) =>
+        async (client) =>
           client.event.actions.archive.request({
             eventId,
             transactionId: getUUID(),

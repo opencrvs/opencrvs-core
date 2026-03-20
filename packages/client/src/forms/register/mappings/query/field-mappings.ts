@@ -1123,7 +1123,7 @@ export function questionnaireToTemplateFieldTransformer(
   }
 
   switch (field.type) {
-    case SELECT_WITH_DYNAMIC_OPTIONS:
+    case SELECT_WITH_DYNAMIC_OPTIONS: {
       if (!offlineCountryConfig) {
         return
       }
@@ -1133,17 +1133,46 @@ export function questionnaireToTemplateFieldTransformer(
         queryData,
         offlineCountryConfig
       )
-      transformedData[sectionId][field.name] =
-        options
-          .find((option) => option.value === selectedQuestion.value)
-          ?.label.defaultMessage?.toString() || selectedQuestion.value
+
+      const option =  options
+        .find((option) => option.value === selectedQuestion.value)
+
+      if(!option) {
+        transformedData[sectionId][field.name] = selectedQuestion.value
+        break
+      }
+
+      const label = typeof option.label === 'string' ? option.label :
+        option.label.defaultMessage?.toString() || selectedQuestion.value
+
+      transformedData[sectionId][field.name] = label
       break
-    case SELECT_WITH_OPTIONS:
-      transformedData[sectionId][field.name] =
-        field.options
-          .find((option) => option.value === selectedQuestion.value)
-          ?.label.defaultMessage?.toString() || selectedQuestion.value
+    }
+    case SELECT_WITH_OPTIONS: {
+      if (!offlineCountryConfig) {
+        return
+      }
+      const options = getFieldOptions(
+        sectionId,
+        field,
+        queryData,
+        offlineCountryConfig
+      )
+
+      const option =  options
+        .find((option) => option.value === selectedQuestion.value)
+
+      if(!option) {
+        transformedData[sectionId][field.name] = selectedQuestion.value
+        break
+      }
+
+      const label = typeof option.label === 'string' ? option.label :
+        option.label.defaultMessage?.toString() || selectedQuestion.value
+
+      transformedData[sectionId][field.name] = label
       break
+    }
     case CHECKBOX:
       transformedData[sectionId][field.name] = selectedQuestion.value === 'true'
       break

@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { NetworkStatus } from '@apollo/client'
 import { AppStore, createStore } from '@client/store'
 import {
   setScopes,
   createTestComponent,
-  fetchUserMock
+  userDetails
 } from '@client/tests/util'
 import { SCOPES } from '@opencrvs/commons/client'
 import { AdministrativeLevels } from './AdministrativeLevels'
@@ -58,11 +57,7 @@ describe('for user with read organisation in my jurisdiction scope', () => {
     })
 
     store.dispatch(
-      setUserDetails({
-        loading: false,
-        data: fetchUserMock(centralProvincialOffice.id),
-        networkStatus: NetworkStatus.ready
-      })
+      setUserDetails({ ...userDetails, primaryOfficeId: centralProvincialOffice.id })
     )
     component.update()
     expect(
@@ -97,11 +92,7 @@ describe('for user with read organisation in my jurisdiction scope', () => {
     })
 
     store.dispatch(
-      setUserDetails({
-        loading: false,
-        data: fetchUserMock(centralProvincialOffice.id),
-        networkStatus: NetworkStatus.ready
-      })
+      setUserDetails({ ...userDetails, primaryOfficeId: centralProvincialOffice.id })
     )
     component.update()
     expect(
@@ -145,11 +136,7 @@ describe('for user with read organisation scope', () => {
     })
 
     store.dispatch(
-      setUserDetails({
-        loading: false,
-        data: fetchUserMock(centralProvincialOffice.id),
-        networkStatus: NetworkStatus.ready
-      })
+      setUserDetails({ ...userDetails, primaryOfficeId: centralProvincialOffice.id })
     )
     component.update()
     expect(
@@ -184,11 +171,7 @@ describe('for user with read organisation scope', () => {
     })
 
     store.dispatch(
-      setUserDetails({
-        loading: false,
-        data: fetchUserMock(centralProvincialOffice.id),
-        networkStatus: NetworkStatus.ready
-      })
+      setUserDetails({ ...userDetails, primaryOfficeId: centralProvincialOffice.id })
     )
     component.update()
     expect(
@@ -232,11 +215,7 @@ describe('for user with read organisation my office scope', () => {
     })
 
     store.dispatch(
-      setUserDetails({
-        loading: false,
-        data: fetchUserMock(ibomboDistrictOffice.id),
-        networkStatus: NetworkStatus.ready
-      })
+      setUserDetails({ ...userDetails, primaryOfficeId: ibomboDistrictOffice.id })
     )
     component.update()
     expect(
@@ -271,11 +250,7 @@ describe('for user with read organisation my office scope', () => {
     })
 
     store.dispatch(
-      setUserDetails({
-        loading: false,
-        data: fetchUserMock(ibomboDistrictOffice.id),
-        networkStatus: NetworkStatus.ready
-      })
+      setUserDetails({ ...userDetails, primaryOfficeId: ibomboDistrictOffice.id })
     )
     component.update()
     expect(

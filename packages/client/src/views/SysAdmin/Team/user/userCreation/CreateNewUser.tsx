@@ -13,7 +13,8 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup
+  IFormSectionGroup,
+  ISelectFormFieldWithOptions
 } from '@client/forms'
 import {
   getVisibleSectionGroupsBasedOnConditions,
@@ -49,6 +50,7 @@ import { SCOPES, UUID } from '@opencrvs/commons/client'
 import { IOfflineData } from '@client/offline/reducer'
 import { UserDetails } from '@client/utils/userUtils'
 import { get, isNull, isUndefined } from 'lodash'
+import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
 
 type IUserProps = {
   userId?: string
@@ -59,7 +61,6 @@ type IUserProps = {
   formData: IFormSectionData
   submitting: boolean
   userDetailsStored?: boolean
-  loadingRoles?: boolean
 }
 
 interface IDispatchProps {
@@ -99,9 +100,33 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
     fetchAndStoreUserData,
     client,
     section,
-    userDetailsStored,
-    loadingRoles
+    userDetailsStored
   } = props
+
+  const { listRoles } = useRoles()
+  const [roles] = listRoles.useSuspenseQuery()
+
+  const formSectionWithRolesSelect = {
+    ...props.section,
+    groups: props.section.groups.map((group) => ({
+      ...group,
+      fields: group.fields.map((field) => {
+        if (field.name !== 'role') {
+          return field
+        }
+        return {
+          ...field,
+          options: roles.map((role) => ({
+            label: formatUserRole(role.id, intl),
+            value: role.id
+          }))
+        } as ISelectFormFieldWithOptions
+      })
+    }))
+  }
+  const activeGroupWithRolesSelect = formSectionWithRolesSelect.groups.find(
+    (group) => group.id === props.activeGroup.id
+  )!
 
   useEffect(() => {
     const initialize = async () => {
@@ -113,10 +138,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
         clearUserFormData()
       }
       if (userId) {
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        fetchAndStoreUserData(client as ApolloClient<any>, {
-          userId
-        })
+        fetchAndStoreUserData({ userId })
       }
     }
 
@@ -155,17 +177,28 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
     </ActionPageLight>
   )
 
-  if (submitting || loadingRoles || (userId && !userDetailsStored)) {
+  if (submitting || (userId && !userDetailsStored)) {
     return renderLoadingPage()
   }
 
   if (section.viewType === 'form') {
-    return <UserForm {...props} />
+    return (
+      <UserForm
+        {...props}
+        activeGroup={activeGroupWithRolesSelect}
+        section={formSectionWithRolesSelect}
+      />
+    )
   }
 
   if (section.viewType === 'preview') {
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    return <UserReviewForm client={client as ApolloClient<any>} {...props} />
+    return (
+      <UserReviewForm
+        client={client as ApolloClient<unknown>}
+        {...props}
+        section={formSectionWithRolesSelect}
+      />
+    )
   }
   return null
 }
@@ -272,8 +305,8 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
     throw new Error(`No section found ${sectionId}`)
   }
 
-  if (!user?.primaryOffice.id) {
-    throw new Error(`No primary office found for user`)
+  if (!user) {
+    throw new Error('User details not found in store')
   }
 
   section = scopes.some((scope) =>
@@ -282,10 +315,7 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
       SCOPES.USER_UPDATE_MY_JURISDICTION
     ].some((s) => s === scope)
   )
-    ? addJurisdictionFilterToLocationSearchInput(
-        section,
-        user.primaryOffice.id as UUID
-      )
+    ? addJurisdictionFilterToLocationSearchInput(section, user.primaryOfficeId)
     : section
 
   let formData = { ...state.userForm.userFormData }
@@ -336,7 +366,6 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
     formData,
     submitting: state.userForm.submitting,
     userDetailsStored: state.userForm.userDetailsStored,
-    loadingRoles: state.userForm.loadingRoles,
     activeGroup: {
       ...group,
       fields

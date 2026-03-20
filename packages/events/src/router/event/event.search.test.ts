@@ -1032,6 +1032,86 @@ test('Returns multiple documents after creation', async () => {
   expect(response).toHaveLength(2)
 })
 
+test('Search by legalStatuses.DECLARED.createdByRole', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Doe'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data)
+
+  const { results: response1 } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          'legalStatuses.DECLARED.createdByRole': {
+            type: 'anyOf',
+            terms: ['REGISTRATION_AGENT']
+          }
+        }
+      ]
+    }
+  })
+
+  expect(response1).toHaveLength(1)
+
+  const { results: response2 } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          'legalStatuses.DECLARED.createdByRole': {
+            type: 'anyOf',
+            terms: ['OTHER_ROLE']
+          }
+        }
+      ]
+    }
+  })
+  expect(response2).toHaveLength(0) // no documents should be returned
+})
+
 test('Returns correctly based on registration location even when a parent administrative area level is used for searching', async () => {
   const { user, generator, seed, locations } = await setupTestCase()
 

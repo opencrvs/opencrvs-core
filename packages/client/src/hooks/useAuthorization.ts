@@ -13,9 +13,10 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
   findScope,
   getAcceptedScopesByType,
-  SCOPES
+  SCOPES,
+  User,
+  Location
 } from '@opencrvs/commons/client'
-import { User, Location } from '@client/utils/gateway'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
@@ -32,13 +33,14 @@ export const RECORD_DECLARE_SCOPES = [
 
 export function usePermissions() {
   const userScopes = useSelector(getScope)
+
   const currentUser = useSelector(getUserDetails)
-  const userPrimaryOffice = currentUser?.primaryOffice
+  const userPrimaryOfficeId = currentUser?.primaryOfficeId
 
   const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
-  const locations = getLocations.useSuspenseQuery()
 
   const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
 
@@ -60,20 +62,20 @@ export function usePermissions() {
       scopes: userScopes ?? []
     }).length > 0
 
-  const canReadUser = (user: Pick<User, 'id' | 'primaryOffice'>) => {
-    if (!userPrimaryOffice?.id) {
+  const canReadUser = (user: Pick<User, 'id' | 'primaryOfficeId'>) => {
+    if (!userPrimaryOfficeId) {
       return false
     }
     if (hasScope(SCOPES.USER_READ)) {
       return true
     }
     if (hasScope(SCOPES.USER_READ_MY_OFFICE)) {
-      return user.primaryOffice.id === userPrimaryOffice?.id
+      return user.primaryOfficeId === userPrimaryOfficeId
     }
     if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
       return isLocationUnderJurisdiction({
-        locationId: userPrimaryOffice.id,
-        otherLocationId: user.primaryOffice.id,
+        locationId: userPrimaryOfficeId,
+        otherLocationId: user.primaryOfficeId,
         locations,
         administrativeAreas
       })
@@ -85,28 +87,26 @@ export function usePermissions() {
     return false
   }
 
-  const canEditUser = (
-    user: Pick<User, 'primaryOffice'> & { role: { id: string } }
-  ) => {
+  const canEditUser = (user: User) => {
     const editableRoleIds = findScope(userScopes ?? [], 'user.edit')?.options
       ?.role
 
     if (Array.isArray(editableRoleIds)) {
-      return editableRoleIds.includes(user.role.id)
+      return editableRoleIds.includes(user.role)
     }
-    if (!userPrimaryOffice?.id) {
+    if (!userPrimaryOfficeId) {
       return false
     }
     if (hasScope(SCOPES.USER_UPDATE)) {
       return true
     }
     if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION)) {
-      if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
+      if (roleScopes(user.role).includes(SCOPES.USER_UPDATE)) {
         return false
       }
       return isLocationUnderJurisdiction({
-        locationId: userPrimaryOffice.id,
-        otherLocationId: user.primaryOffice.id,
+        locationId: userPrimaryOfficeId,
+        otherLocationId: user.primaryOfficeId,
         locations,
         administrativeAreas
       })
@@ -122,19 +122,19 @@ export function usePermissions() {
     : hasAnyScope([SCOPES.USER_CREATE, SCOPES.USER_CREATE_MY_JURISDICTION])
 
   const canAccessOffice = (office: Pick<Location, 'id'>) => {
-    if (!userPrimaryOffice?.id) {
+    if (!userPrimaryOfficeId) {
       return false
     }
     if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS)) {
       return true
     }
     if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE)) {
-      return office.id === userPrimaryOffice.id
+      return office.id === userPrimaryOfficeId
     }
 
     if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
       return isLocationUnderJurisdiction({
-        locationId: userPrimaryOffice.id,
+        locationId: userPrimaryOfficeId,
         otherLocationId: office.id,
         locations,
         administrativeAreas
@@ -144,7 +144,7 @@ export function usePermissions() {
   }
 
   const canAddOfficeUsers = (office: Pick<Location, 'id'>) => {
-    if (!userPrimaryOffice?.id) {
+    if (!userPrimaryOfficeId) {
       return false
     }
     if (hasScope(SCOPES.USER_CREATE)) {
@@ -152,7 +152,7 @@ export function usePermissions() {
     }
     if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
       return isLocationUnderJurisdiction({
-        locationId: userPrimaryOffice.id,
+        locationId: userPrimaryOfficeId,
         otherLocationId: office.id,
         locations,
         administrativeAreas

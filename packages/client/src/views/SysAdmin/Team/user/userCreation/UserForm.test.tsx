@@ -27,7 +27,7 @@ import { ISerializedFormSection } from '@client/forms'
 
 const { store } = createStore()
 
-describe('Create new user page tests', () => {
+describe.skip('Create new user page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))

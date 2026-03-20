@@ -89,54 +89,6 @@ export const GET_USER_AUDIT_LOG = gql`
   }
 `
 
-export const GET_USER = gql`
-  query getUser($userId: String!) {
-    getUser(userId: $userId) {
-      id
-      userMgntUserID
-      name {
-        use
-        firstNames
-        familyName
-      }
-      username
-      mobile
-      email
-      fullHonorificName
-      identifier {
-        system
-        value
-      }
-      role {
-        id
-        label {
-          id
-          defaultMessage
-          description
-        }
-      }
-      status
-      underInvestigation
-      practitionerId
-      primaryOffice {
-        id
-        name
-        alias
-      }
-      creationDate
-      signature {
-        type
-        data
-      }
-      device
-      avatar {
-        type
-        data
-      }
-    }
-  }
-`
-
 export const USER_AUDIT_ACTION = gql`
   mutation auditUser(
     $userId: String!

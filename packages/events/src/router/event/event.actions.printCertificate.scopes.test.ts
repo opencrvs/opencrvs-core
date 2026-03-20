@@ -95,7 +95,7 @@ test('Check scopes against event.actions.printCertificate', async () => {
         user,
         scope,
         clientReadingAllEvents,
-        (client) =>
+        async (client) =>
           client.event.actions.printCertificate.request({
             eventId,
             transactionId: getUUID(),
@@ -153,7 +153,7 @@ test('templates option in scope does not affect printCertificate action authoriz
     users[0],
     scopeWithTemplateRestriction,
     clientReadingAllEvents,
-    (client) =>
+    async (client) =>
       client.event.actions.printCertificate.request({
         eventId,
         transactionId: getUUID(),

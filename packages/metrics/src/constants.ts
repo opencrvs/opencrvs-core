@@ -14,7 +14,6 @@ import { join } from 'path'
 const env = cleanEnv(process.env, {
   METRICS_HOST: str({ default: '0.0.0.0' }),
   METRICS_PORT: num({ default: 1050 }),
-  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir/' }),
   CERT_PUBLIC_KEY_PATH: str({ default: '../../.secrets/public-key.pem' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
@@ -26,14 +25,12 @@ const env = cleanEnv(process.env, {
   EXPECTED_BIRTH_REGISTRATION_IN_DAYS: num({ default: 45 }),
   CONFIG_API_URL: url({ devDefault: 'http://localhost:2021' }),
   DEFAULT_TIMEOUT: num({ default: 600000 }),
-  HEARTH_MONGO_URL: str({ devDefault: 'mongodb://localhost/hearth-dev' }),
   DASHBOARD_MONGO_URL: str({ devDefault: 'mongodb://localhost/performance' })
 })
 
 export const {
   METRICS_HOST: HOST,
   METRICS_PORT: PORT,
-  FHIR_URL: fhirUrl,
   CERT_PUBLIC_KEY_PATH,
   COUNTRY_CONFIG_URL,
   USER_MANAGEMENT_URL,
@@ -46,13 +43,9 @@ export const {
   EXPECTED_BIRTH_REGISTRATION_IN_DAYS,
   CONFIG_API_URL,
   DEFAULT_TIMEOUT,
-  HEARTH_MONGO_URL,
   DASHBOARD_MONGO_URL
 } = env
 
-export const VS_EXPORT_SCRIPT_PATH = PRODUCTION
-  ? './build/dist/src/scripts/VSExportGenerator.js'
-  : './src/scripts/VSExportGenerator.ts'
 
 export const BIRTH_REPORT_PATH = PRODUCTION
   ? '/usr/src/app/packages/metrics/src/scripts/Birth_Report.csv'

@@ -770,7 +770,6 @@ export const WithDuplicateDetectedAction: Story = {
 }
 
 const rng = createPrng(33123)
-const validateActionUuid = generateUuid(rng)
 
 const annotationUpdateOnValidateEvent = {
   id: getUUID(),
