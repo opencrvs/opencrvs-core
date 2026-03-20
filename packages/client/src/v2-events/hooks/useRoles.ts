@@ -15,27 +15,20 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useTRPC } from '@client/v2-events/trpc'
 
 // This will be used in user creation form
-/** @knipignore *
+/** @knipignore */
 export function useRoles() {
   const trpc = useTRPC()
   return {
     listRoles: {
-      useQuery: (
-        options?: {
-          enabled?: boolean
-        }
-      ) => {
+      useQuery: (options?: { enabled?: boolean }) => {
         return useQuery(trpc.user.roles.list.queryOptions())
       },
       useSuspenseQuery: () => {
-        return [
-          useSuspenseQuery(trpc.user.roles.list.queryOptions()).data
-        ]
+        return [useSuspenseQuery(trpc.user.roles.list.queryOptions()).data]
       }
     }
   }
 }
-
 
 const messages = defineMessages({
   role: {
