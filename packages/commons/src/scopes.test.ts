@@ -10,8 +10,6 @@
  */
 
 import {
-  findScope,
-  parseConfigurableScope,
   parseLiteralScope,
   SCOPES,
   decodeScope,
@@ -23,6 +21,10 @@ import {
   ScopesWithFullOptions,
   ScopesWithPlaceEventOptions
 } from './scopes'
+import {
+  findScope,
+  parseConfigurableScope
+} from './scopes.deprecated.do-not-use'
 
 describe('getScopeOptionValue()', () => {
   it('should return the default value if the scope option is not set', () => {
@@ -67,7 +69,7 @@ describe('findScope()', () => {
     const result = findScope(userScopes, 'user.create')
     expect(result).toEqual({
       type: 'user.create',
-      options: { event: ['first-role', 'second-role'] }
+      options: { role: ['first-role', 'second-role'] }
     })
   })
 

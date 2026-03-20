@@ -4,24 +4,8 @@ exports[`transform v1 scope to v2 1`] = `
 {
   "fieldAgent": [
     {
-      "v1": "record.declaration-submit-for-review",
-      "v2": "type=record.declaration-submit-for-review",
-    },
-    {
-      "v1": "search.birth",
-      "v2": "type=search.birth",
-    },
-    {
-      "v1": "search.death",
-      "v2": "type=search.death",
-    },
-    {
-      "v1": "search.marriage",
-      "v2": "type=search.marriage",
-    },
-    {
       "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]",
-      "v2": "type=workqueue&id=all-events,assigned-to-you,recent,requires-updates,sent-for-review",
+      "v2": "workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]",
     },
     {
       "v1": "search[event=birth,access=all]",
@@ -54,26 +38,6 @@ exports[`transform v1 scope to v2 1`] = `
   ],
   "localRegistrar": [
     {
-      "v1": "record.declaration-edit",
-      "v2": "type=record.declaration-edit",
-    },
-    {
-      "v1": "record.review-duplicates",
-      "v2": "type=record.review-duplicates",
-    },
-    {
-      "v1": "record.declaration-reinstate",
-      "v2": "type=record.declaration-reinstate",
-    },
-    {
-      "v1": "record.confirm-registration",
-      "v2": "type=record.confirm-registration",
-    },
-    {
-      "v1": "record.reject-registration",
-      "v2": "type=record.reject-registration",
-    },
-    {
       "v1": "performance.read",
       "v2": "type=performance.read",
     },
@@ -90,20 +54,8 @@ exports[`transform v1 scope to v2 1`] = `
       "v2": "type=organisation.read-locations:my-office",
     },
     {
-      "v1": "search.birth",
-      "v2": "type=search.birth",
-    },
-    {
-      "v1": "search.death",
-      "v2": "type=search.death",
-    },
-    {
-      "v1": "search.marriage",
-      "v2": "type=search.marriage",
-    },
-    {
       "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]",
-      "v2": "type=workqueue&id=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review-all,in-external-validation,ready-to-print,ready-to-issue",
+      "v2": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]",
     },
     {
       "v1": "search[event=birth,access=all]",
@@ -201,11 +153,11 @@ exports[`transform v1 scope to v2 1`] = `
     },
     {
       "v1": "user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]",
-      "v2": "type=user.create&role=FIELD_AGENT,POLICE_OFFICER,SOCIAL_WORKER,HEALTHCARE_WORKER,LOCAL_LEADER,REGISTRATION_AGENT,LOCAL_REGISTRAR",
+      "v2": "user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]",
     },
     {
       "v1": "user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]",
-      "v2": "type=user.edit&role=FIELD_AGENT,POLICE_OFFICER,SOCIAL_WORKER,HEALTHCARE_WORKER,LOCAL_LEADER,REGISTRATION_AGENT,LOCAL_REGISTRAR",
+      "v2": "user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]",
     },
   ],
   "nationalSystemAdmin": [
@@ -247,22 +199,14 @@ exports[`transform v1 scope to v2 1`] = `
     },
     {
       "v1": "user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]",
-      "v2": "type=user.create&role=FIELD_AGENT,HOSPITAL_CLERK,COMMUNITY_LEADER,REGISTRATION_AGENT,LOCAL_REGISTRAR,NATIONAL_REGISTRAR,LOCAL_SYSTEM_ADMIN,NATIONAL_SYSTEM_ADMIN,PERFORMANCE_MANAGER",
+      "v2": "user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]",
     },
     {
       "v1": "user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]",
-      "v2": "type=user.edit&role=FIELD_AGENT,HOSPITAL_CLERK,COMMUNITY_LEADER,REGISTRATION_AGENT,LOCAL_REGISTRAR,NATIONAL_REGISTRAR,LOCAL_SYSTEM_ADMIN,NATIONAL_SYSTEM_ADMIN,PERFORMANCE_MANAGER",
+      "v2": "user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]",
     },
   ],
   "registrationAgent": [
-    {
-      "v1": "record.declaration-edit",
-      "v2": "type=record.declaration-edit",
-    },
-    {
-      "v1": "record.declaration-reinstate",
-      "v2": "type=record.declaration-reinstate",
-    },
     {
       "v1": "performance.read",
       "v2": "type=performance.read",
@@ -280,20 +224,8 @@ exports[`transform v1 scope to v2 1`] = `
       "v2": "type=user.read:only-my-audit",
     },
     {
-      "v1": "search.birth",
-      "v2": "type=search.birth",
-    },
-    {
-      "v1": "search.death",
-      "v2": "type=search.death",
-    },
-    {
-      "v1": "search.marriage",
-      "v2": "type=search.marriage",
-    },
-    {
       "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]",
-      "v2": "type=workqueue&id=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review,sent-for-approval,in-external-validation,ready-to-print,ready-to-issue",
+      "v2": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]",
     },
     {
       "v1": "search[event=birth,access=all]",
