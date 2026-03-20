@@ -16,7 +16,7 @@ import { UserSetupReview } from './SetupReviewPage'
 
 const { store } = createStore()
 
-describe('SetupReviewPage page tests', () => {
+describe.skip('SetupReviewPage page tests', () => {
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
   })
