@@ -599,7 +599,7 @@ export function getCompleteActionAnnotation(
       ({ id }) => id === action.originalActionId
     )
     if (originalAction?.status !== ActionStatus.Requested) {
-      return annotation
+      return deepMerge(annotation, action.annotation ?? {})
     }
 
     return deepMerge(
