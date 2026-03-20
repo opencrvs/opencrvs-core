@@ -18,7 +18,8 @@ import {
   resourceIdentifierToUUID,
   SavedPractitioner
 } from '@opencrvs/commons/types'
-import { UUID, SCOPES } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 
 type UserSearchCriteria = 'userId' | 'practitionerId' | 'mobile' | 'email'
 export type SearchCriteria = {
@@ -134,12 +135,10 @@ export async function getLoggedInPractitionerResource(
   token: string
 ): Promise<SavedPractitioner> {
   const tokenPayload = getTokenPayload(token)
-  const isNotificationAPIUser =
-    tokenPayload.scope.indexOf(SCOPES.NOTIFICATION_API) > -1
-  const isRecordSearchAPIUser = tokenPayload.scope.indexOf(SCOPES.RECORDSEARCH) > -1
+  const isSystemUser = tokenPayload.userType === TokenUserType.enum.system
 
   let userResponse
-  if (isNotificationAPIUser || isRecordSearchAPIUser) {
+  if (isSystemUser) {
     userResponse = await getSystem(tokenPayload.sub, {
       Authorization: `Bearer ${token}`
     })

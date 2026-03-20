@@ -58,7 +58,7 @@ export const getRoutes = () => {
             SCOPES.RECORD_DECLARE_BIRTH,
             SCOPES.RECORD_DECLARE_DEATH,
             SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.NOTIFICATION_API
+            'type=record.notify'
           ]
         },
         validate: {

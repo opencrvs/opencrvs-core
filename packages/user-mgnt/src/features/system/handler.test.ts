@@ -114,7 +114,7 @@ describe('registerSystem handler', () => {
       url: '/registerSystem',
       payload: {
         name: 'Fortune Green',
-        scope: [SCOPES.RECORDSEARCH],
+        scope: ['type=record.search'],
         type: 'RECORD_SEARCH',
         settings: {
           dailyQuota: 50

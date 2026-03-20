@@ -45,7 +45,12 @@ export async function clientCredentialsHandler(
     return oauthResponse.invalidClient(h)
   }
 
-  const isNotificationAPIUser = result.scope.includes(SCOPES.NOTIFICATION_API)
+  const isNotificationAPIUser = result.scope.some(
+    (s) =>
+      s === 'notification-api' ||
+      s === 'record.notify' ||
+      s === 'type=record.notify'
+  )
   const isImportExportClient = result.scope.includes(SCOPES.RECORD_IMPORT)
 
   /**
@@ -56,7 +61,11 @@ export async function clientCredentialsHandler(
    */
   const v2Scopes = result.scope.map((s) => {
     // Intentionally verbose for clarity.
-    if (s === 'record.search') {
+    if (s === 'notification-api' || s === 'record.notify') {
+      return 'type=record.notify'
+    }
+
+    if (s === 'recordsearch' || s === 'record.search') {
       return 'type=record.search'
     }
 

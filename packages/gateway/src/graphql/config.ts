@@ -48,7 +48,7 @@ import {
 import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
 import { merge } from 'lodash'
-import { SCOPES } from '@opencrvs/commons'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -198,7 +198,7 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
         try {
           const userId = credentials.sub
           let user: IUserModelData | ISystemModelData
-          const isSystemUser = credentials.scope.indexOf(SCOPES.RECORDSEARCH) > -1
+          const isSystemUser = credentials.userType === TokenUserType.enum.system
           if (isSystemUser) {
             user = await getSystem(
               { systemId: userId },

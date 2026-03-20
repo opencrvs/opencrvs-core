@@ -145,7 +145,9 @@ describe('audit log', () => {
   describe('event.search', () => {
     test('writes an audit log entry when a system client searches for events', async () => {
       const systemId = 'test-system'
-      const client = createSystemTestClient(systemId, [SCOPES.RECORDSEARCH])
+      const client = createSystemTestClient(systemId, [
+        encodeScope({ type: 'record.search', options: {} })
+      ])
 
       const searchInput = {
         query: {

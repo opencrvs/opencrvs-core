@@ -16,7 +16,7 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
 import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
 
 export interface ITokenPayload {
@@ -24,6 +24,7 @@ export interface ITokenPayload {
   exp: string
   algorithm: string
   scope: Scope[]
+  userType?: TokenUserType
   /** The record ID that the token has access to */
   recordId?: UUID
 }

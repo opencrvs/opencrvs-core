@@ -31,8 +31,6 @@ export const SCOPES = {
   // systems / integrations
   WEBHOOK: 'webhook',
   NATIONALID: 'nationalId',
-  NOTIFICATION_API: 'record.notify',
-  RECORDSEARCH: 'record.search',
   RECORD_IMPORT: 'record.import',
   RECORD_EXPORT: 'record.export',
   RECORD_REINDEX: 'record.reindex',
@@ -134,8 +132,6 @@ const LegacyScopes = z.union([
 const IntegrationScopes = z.union([
   z.literal(SCOPES.WEBHOOK),
   z.literal(SCOPES.NATIONALID),
-  z.literal(SCOPES.NOTIFICATION_API),
-  z.literal(SCOPES.RECORDSEARCH),
   z.literal(SCOPES.INTEGRATION_CREATE)
 ])
 

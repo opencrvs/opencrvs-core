@@ -15,9 +15,7 @@ import {
   IAuthHeader,
   joinUrl,
   logger,
-  RecordScopeTypeV2,
-  Scope,
-  SCOPES
+  RecordScopeTypeV2
 } from '@opencrvs/commons'
 import fetch from '@gateway/fetch'
 import { COUNTRY_CONFIG_URL, PRODUCTION } from '@gateway/constants'
@@ -31,16 +29,6 @@ import { COUNTRY_CONFIG_URL, PRODUCTION } from '@gateway/constants'
 export type SystemIntegrationType = 'HEALTH' | 'RECORD_SEARCH'
 
 /**
- * Default scopes for each system integration type.
- * These are the base scopes that each type gets.
- * Note: REINDEX is hidden from UI - it's managed internally.
- */
-const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, Scope[]> = {
-  HEALTH: [SCOPES.NOTIFICATION_API],
-  RECORD_SEARCH: [SCOPES.RECORDSEARCH]
-}
-
-/**
  * Configurable scopes that need to be expanded with event IDs.
  * For example, HEALTH type gets record.create and record.notify scopes
  * that are expanded for each configured event type.
@@ -50,7 +38,7 @@ const CONFIGURABLE_SCOPES_BY_TYPE: Record<
   RecordScopeTypeV2[]
 > = {
   HEALTH: ['record.create', 'record.notify'],
-  RECORD_SEARCH: []
+  RECORD_SEARCH: ['record.search']
 }
 
 /**
@@ -120,7 +108,6 @@ export function getSystemScopesFromType(
     throw new Error(`Invalid system integration type: ${type}`)
   }
 
-  const literalScopes = DEFAULT_SCOPES_BY_TYPE[type]
   const v2Scopes = CONFIGURABLE_SCOPES_BY_TYPE[type].map(
     (scope: RecordScopeTypeV2) =>
       encodeScope({
@@ -129,7 +116,7 @@ export function getSystemScopesFromType(
       })
   )
 
-  return [...literalScopes, ...v2Scopes]
+  return v2Scopes
 }
 
 /**
@@ -138,5 +125,5 @@ export function getSystemScopesFromType(
 export function isValidSystemIntegrationType(
   type: string
 ): type is SystemIntegrationType {
-  return type in DEFAULT_SCOPES_BY_TYPE
+  return type in CONFIGURABLE_SCOPES_BY_TYPE
 }

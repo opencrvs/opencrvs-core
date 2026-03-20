@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { getScopes, getUUID, SCOPES } from '@opencrvs/commons'
+import { getUUID, SCOPES } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -397,7 +397,7 @@ export const eventRouter = router({
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
     .use(
-      requiresAnyOfScopes([SCOPES.RECORDSEARCH], undefined, ['record.search'])
+      requiresAnyOfScopes([], undefined, ['record.search'])
     )
     .input(SearchQuery)
     .output(
@@ -408,25 +408,10 @@ export const eventRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
-      const scopes = getScopes(ctx.token)
-
-      const isRecordSearchSystemClient = scopes.includes(SCOPES.RECORDSEARCH)
 
       let result
 
-      if (isRecordSearchSystemClient) {
-        result = await findRecordsByQuery({
-          search: input,
-          eventConfigs,
-          user: ctx.user,
-          acceptedScopes: [
-            {
-              type: 'record.search',
-              options: {}
-            }
-          ]
-        })
-      } else if (ctx.acceptedScopes) {
+      if (ctx.acceptedScopes) {
         result = await findRecordsByQuery({
           search: input,
           eventConfigs,

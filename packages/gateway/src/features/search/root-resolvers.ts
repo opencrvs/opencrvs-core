@@ -12,7 +12,6 @@ import { getMetrics, postMetrics } from '@gateway/features/metrics/service'
 import {
   getSystem,
   getTokenPayload,
-  hasScope,
   inScope
 } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
@@ -23,7 +22,7 @@ import {
   postAdvancedSearch
 } from './utils'
 import { retrieveRecord } from '@gateway/workflow/index'
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { SCOPES, TokenUserType } from '@opencrvs/commons/authentication'
 import { RateLimitError } from '@gateway/rate-limit'
 import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 
@@ -94,21 +93,28 @@ export const resolvers: GQLResolver = {
           SCOPES.SEARCH_MARRIAGE,
           SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
           SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION,
-          SCOPES.RECORDSEARCH
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ])
-      )
-        return {
-          totalItems: 0,
-          results: []
+      ) {
+        const tokenPayload = getTokenPayload(authHeader.Authorization)
+        const isSystemUser =
+          tokenPayload.userType === TokenUserType.enum.system
+        if (!isSystemUser) {
+          return {
+            totalItems: 0,
+            results: []
+          }
         }
+      }
 
       // TODO: refactor this concept to avoid calling the dataSource.usersAPI
       const userIdentifier = getTokenPayload(authHeader.Authorization).sub
       let user
       let system
 
-      const isExternalAPI = hasScope(authHeader, SCOPES.RECORDSEARCH)
+      const isExternalAPI =
+        getTokenPayload(authHeader.Authorization).userType ===
+        TokenUserType.enum.system
 
       if (isExternalAPI) {
         system = await getSystem({ systemId: userIdentifier }, authHeader)

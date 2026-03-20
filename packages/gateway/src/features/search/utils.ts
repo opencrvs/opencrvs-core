@@ -17,6 +17,7 @@ import {
 import { IAuthHeader } from '@opencrvs/commons'
 import fetch from '@gateway/fetch'
 import { Scope, SCOPES } from '@opencrvs/commons/authentication'
+import { decodeScope } from '@opencrvs/commons'
 
 export interface ISearchCriteria {
   parameters: AdvancedSearchParams
@@ -93,7 +94,7 @@ function scopeToEventParams(
         : undefined
     })
   }
-  if (userScopes.includes(SCOPES.RECORDSEARCH)) {
+  if (userScopes.some((s) => decodeScope(s)?.type === 'record.search')) {
     eventParams.push({
       eventName: GQLEventType.birth
     })

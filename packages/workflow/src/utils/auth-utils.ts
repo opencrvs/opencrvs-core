@@ -17,6 +17,7 @@ export interface ITokenPayload {
   exp: string
   algorithm: string
   scope: string[]
+  userType?: string
 }
 
 export const getTokenPayload = (token: string) => {

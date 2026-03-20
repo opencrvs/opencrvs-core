@@ -2181,7 +2181,7 @@ test('System integration with record search scope is allowed to search any recor
   await createEvent(otherClient, otherGen, [ActionType.DECLARE])
 
   const recordSearchClient = createSystemTestClient('test-system', [
-    SCOPES.RECORDSEARCH
+    encodeScope({ type: 'record.search', options: {} })
   ])
   const { results } = await recordSearchClient.event.search({
     query: {
