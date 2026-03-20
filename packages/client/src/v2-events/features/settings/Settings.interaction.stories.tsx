@@ -10,11 +10,40 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { userEvent, within, expect, fireEvent } from '@storybook/test'
+import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
+import superjson from 'superjson'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { AppRouter } from '@client/v2-events/trpc'
 import { SettingsPage } from './Settings'
 
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
+  transformer: { input: superjson, output: superjson }
+})
+
 const meta: Meta<typeof SettingsPage> = {
-  title: 'Settings/Interaction'
+  title: 'Settings/Interaction',
+  parameters: {
+    msw: {
+      handlers: {
+        sendVerifyCode: [
+          tRPCMsw.user.sendVerifyCode.mutation(() => ({
+            nonce: '123'
+          })),
+          tRPCMsw.user.changeEmail.mutation(() => {
+            return
+          }),
+          tRPCMsw.user.changePhone.mutation(() => {
+            return
+          })
+        ]
+      }
+    }
+  }
 }
 
 export default meta
@@ -57,19 +86,21 @@ export const ChangePhoneNumber: Story = {
       await canvas.findByText('Enter 6 digit verification code')
 
       await canvas.findByText(
-        'A confirmational SMS has been sent to kalushabwalya1.7@gmail.com'
+        'A confirmational SMS has been sent to +8801741234567'
       )
     })
 
     await expect(
-      await canvas.findByRole('button', { name: 'Verify' })
+      await canvas.findByRole('button', { name: 'Continue' })
     ).toBeDisabled()
 
     const input = await canvas.findByRole('spinbutton', { name: '' })
 
     await fireEvent.change(input, { target: { value: '000000' } })
 
-    await userEvent.click(await canvas.findByRole('button', { name: 'Verify' }))
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Continue' })
+    )
 
     await canvas.findByText('Phone number updated')
   }
