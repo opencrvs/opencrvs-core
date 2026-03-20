@@ -44,7 +44,7 @@ function useAvailableLocations(
   const locations = getLocations.useSuspenseQuery()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const userDetails = useSelector(getUserDetails)
-  const userLocationId = userDetails?.primaryOffice.id
+  const userLocationId = userDetails?.primaryOfficeId
 
   // If the jurisdiction filter is only for users current location, we return the location as a single option.
   if (

@@ -95,7 +95,7 @@ test('Check scopes against event.actions.printCertificate', async () => {
         user,
         scope,
         clientReadingAllEvents,
-        (client) =>
+        async (client) =>
           client.event.actions.printCertificate.request({
             eventId,
             transactionId: getUUID(),

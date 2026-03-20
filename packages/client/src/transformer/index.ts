@@ -554,25 +554,8 @@ export const gqlToDraftTransformer = (
   }
 
   if (queryData.user?.role) {
-    transformedData.user.role = queryData.user.role.id
+    transformedData.user.role = queryData.user.role
   }
 
   return transformedData
-}
-
-function getPotentialDuplicateIds(
-  eventRegistration: EventRegistration | EventSearchSet | null
-) {
-  const duplicates = eventRegistration?.registration?.duplicates
-  if (duplicates && duplicates[0] && typeof duplicates[0] === 'object') {
-    return (eventRegistration?.registration?.duplicates as DuplicatesInfo[])
-      .filter(
-        (duplicate): duplicate is IDuplicates => !!duplicate.compositionId
-      )
-      .map(({ compositionId }) => compositionId)
-  } else if (duplicates && typeof duplicates[0] === 'string') {
-    return (eventRegistration?.registration?.duplicates as string[]).filter(
-      (duplicate): duplicate is string => !!duplicate
-    )
-  }
 }

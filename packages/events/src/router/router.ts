@@ -15,7 +15,6 @@ import { userRouter } from './user'
 import { locationRouter } from './locations'
 import { workqueueRouter } from './workqueue'
 import { administrativeAreaRouter } from './administrative-areas'
-import { administrativeHierarchyRouter } from './administrative-hierarchy'
 import { integrationsRouter } from './integrations'
 import { attachmentsRouter } from './attachments'
 
@@ -24,7 +23,6 @@ export const appRouter = router({
   user: userRouter,
   locations: locationRouter,
   workqueue: workqueueRouter,
-  administrativeHierarchy: administrativeHierarchyRouter,
   administrativeAreas: administrativeAreaRouter,
   integrations: integrationsRouter,
   attachments: attachmentsRouter

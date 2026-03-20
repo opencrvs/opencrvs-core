@@ -12,7 +12,7 @@ import { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
+import { expect, within } from '@storybook/test'
 import {
   tennisClubMembershipEvent,
   generateEventDraftDocument,

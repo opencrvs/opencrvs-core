@@ -21,6 +21,5 @@ export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ default: undefined }),
   QA_ENV: bool({ default: false }),
-  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
   METRICS_URL: url({ devDefault: 'http://localhost:1050' })
 })

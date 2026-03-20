@@ -8,16 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader, logger, UUID } from '@opencrvs/commons'
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import {
-  ISystemModelData,
-  IUserModelData
-} from '@gateway/features/user/type-resolvers'
-import decode from 'jwt-decode'
-import fetch from '@gateway/fetch'
-import { Scope } from '@opencrvs/commons/authentication'
+import { IAuthHeader, UUID } from '@opencrvs/commons'
+
 import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
+import { Scope } from '@opencrvs/commons/authentication'
+import decode from 'jwt-decode'
 
 export interface ITokenPayload {
   sub: string
@@ -26,54 +21,6 @@ export interface ITokenPayload {
   scope: Scope[]
   /** The record ID that the token has access to */
   recordId?: UUID
-}
-
-export async function getUser(
-  body: { [key: string]: string | undefined },
-  authHeader: IAuthHeader
-): Promise<IUserModelData> {
-  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-  return await res.json()
-}
-
-export async function getSystem(
-  body: { [key: string]: string | undefined },
-  authHeader: IAuthHeader
-): Promise<ISystemModelData> {
-  const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-  return await res.json()
-}
-
-export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
-  try {
-    const res = await fetch(`${USER_MANAGEMENT_URL}getUserMobile`, {
-      method: 'POST',
-      body: JSON.stringify({ userId }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    })
-    const body = await res.json()
-
-    return body
-  } catch (err) {
-    logger.error(`Unable to retrieve mobile for error : ${err}`)
-  }
 }
 
 export function scopesInclude(
@@ -133,16 +80,6 @@ export const getUserId = (authHeader: IAuthHeader): string => {
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   return tokenPayload.sub
-}
-
-export function getUserFromHeader(header: IAuthHeader) {
-  const userId = getUserId(header)
-  return getUser({ userId }, header)
-}
-
-export function getFullName(user: IUserModelData, language: string) {
-  const localName = user.name.find((name) => name.use === language)
-  return `${localName?.given.join(' ') || ''} ${localName?.family || ''}`.trim()
 }
 
 export async function isOfficeUnderJurisdiction(

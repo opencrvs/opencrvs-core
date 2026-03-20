@@ -16,8 +16,8 @@ import {
   sanitizeForSnapshot,
   setupTestCase
 } from '@events/tests/utils'
-import { mswServer } from '../../tests/msw'
 import { createSystemClient } from '@events/storage/postgres/events/system-clients'
+import { mswServer } from '../../tests/msw'
 
 test('Returns empty list when no ids provided', async () => {
   const { user } = await setupTestCase()
@@ -54,14 +54,15 @@ test('Returns user in correct format', async () => {
   const fetchedUser = await client.user.list([user.id])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user
-    }
+      type: TokenUserType.enum.user,
+      status: user.status,
+    })
   ])
 })
 
@@ -134,14 +135,15 @@ test('Does not return users or systems which are not found', async () => {
   const fetchedUser = await client.user.list([user.id, '123-123-123', 'foobar'])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user
-    }
+      type: TokenUserType.enum.user,
+      fullHonorificName: user.fullHonorificName
+    })
   ])
 })
 

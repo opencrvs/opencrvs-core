@@ -798,8 +798,8 @@ GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 const mapFieldsToValues = (
   fields: IFormField[],
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
-) =>
-  fields.reduce((memo, field) => {
+) => {
+  return fields.reduce((memo, field) => {
     let fieldInitialValue = handleInitialValue(
       field.initialValue as InitialValue,
       ...evalParams
@@ -834,6 +834,7 @@ const mapFieldsToValues = (
 
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
+}
 
 type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 interface IFormSectionProps {

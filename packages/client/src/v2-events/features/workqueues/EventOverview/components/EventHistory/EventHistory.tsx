@@ -146,12 +146,7 @@ function User({ action }: { action: EventHistoryActionDocument }) {
     throw new Error('Expected action creator to be a user')
   }
 
-  const canViewUser =
-    !!user &&
-    canReadUser({
-      id: user.id,
-      primaryOffice: { id: user.primaryOfficeId }
-    })
+  const canViewUser = !!user && canReadUser(user)
 
   return canViewUser ? (
     <Link

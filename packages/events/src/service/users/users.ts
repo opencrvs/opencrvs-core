@@ -10,7 +10,7 @@
  */
 
 import { UserOrSystem } from '@opencrvs/commons'
-import { getUserOrSystem } from './api'
+import { findUserOrSystem } from './api'
 /**
  * Retrieves multiple users/systems by their IDs.
  *
@@ -26,7 +26,7 @@ export const getUsersById = async (
   token: string
 ): Promise<UserOrSystem[]> => {
   const users = await Promise.all(
-    ids.map(async (id) => getUserOrSystem(id, token))
+    ids.map(async (id) => findUserOrSystem(id, token))
   )
 
   return users.filter((user) => user !== undefined)
