@@ -119,13 +119,10 @@ const ConfigurableRawScopes = z.discriminatedUnion('type', [
   WorkqueueScope
 ])
 
-export type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
-export type ConfigurableScopeType = ConfigurableRawScopes['type']
+type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
+type ConfigurableScopeType = ConfigurableRawScopes['type']
 
-export type ConfigurableScopes = Exclude<
-  ConfigurableRawScopes,
-  { type: 'search' }
->
+type ConfigurableScopes = Exclude<ConfigurableRawScopes, { type: 'search' }>
 
 type FlattenedSearchScope = {
   type: 'search'
