@@ -26,4 +26,5 @@ export * from './events/serializers/date/serializer'
 export { TriggerEvent } from './notification'
 export * from './application-config'
 export * from './icons'
+/** @knipignore */
 export { findScope } from './scopes.deprecated.do-not-use'
