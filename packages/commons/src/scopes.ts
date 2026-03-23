@@ -634,3 +634,22 @@ export function canUserCreateEvent(
 export function defineScopes(scopes: RecordScopeV2[]) {
   return scopes.map((scope) => RecordScopeV2.parse(scope)).map(encodeScope)
 }
+
+/**
+ * Helper for porting v1 scopes to v2. Intended to be used in the interim during migration, not for new development.
+ * @param scopes v1 scopes
+ * @returns array of v2 compatible scopes, filtering out the old ones not used used anymore.
+ */
+export function migrateV1ScopesToV2(scopes: string[]): string[] {
+  return scopes
+    .map((scope) => {
+      try {
+        return v1ScopeToV2Scope(scope)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn(`Could not migrate scope: ${scope}. Error: ${error}`)
+        return null
+      }
+    })
+    .filter((scope): scope is string => !!scope)
+}
