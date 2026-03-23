@@ -31,7 +31,7 @@ import { waitUntilEventIsCreated } from '../events/useEvents/procedures/utils'
 
 interface UploadFileParams {
   file: File
-  eventId: string
+  path: string
   meta: {
     transactionId: string
     referenceId: string
@@ -52,36 +52,23 @@ export async function uploadAvatar({
   userId,
   meta
 }: UploadAvatarParams): Promise<{ url: string }> {
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('transactionId', meta.transactionId)
-  formData.append('path', `users/${userId}`)
-
-  const response = await fetch('/api/upload', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    },
-    body: formData
+  return uploadFile({
+    file,
+    path: `users/${userId}`,
+    meta
   })
-
-  if (!response.ok) {
-    throw new Error('File upload failed')
-  }
-
-  return { url: await response.text() }
 }
 
 async function uploadFile({
   file,
-  eventId,
+  path,
   meta
 }: UploadFileParams): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
 
-  formData.append('path', eventId)
+  formData.append('path', path)
 
   const response = await fetch('/api/upload', {
     method: 'POST',
@@ -200,10 +187,6 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   // Start with good enough: Components do not need to pass `eventId` explicitly, it is automatically derived from the URL params without forcing low-level components to know about events concept.
   const { eventId } = useParams()
 
-  if (!eventId) {
-    throw new Error("`eventId` not found in URL params. Can't upload files")
-  }
-
   const upload = useMutation({
     mutationFn: waitUntilEventIsCreated(async (variables: UploadFileParams) =>
       uploadFile({ ...variables, meta: { ...variables.meta } })
@@ -250,7 +233,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     uploadFile: (file: File, referenceId = 'default') => {
       return upload.mutate({
         file,
-        eventId,
+        path: eventId ? eventId : '',
         meta: {
           transactionId: uuid(),
           referenceId

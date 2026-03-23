@@ -22,7 +22,7 @@ import {
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
-import { getUsersById } from '@events/service/users/users'
+import { getUsersById, isUser } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import { getRoles } from '@events/service/config/config'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
@@ -165,9 +165,29 @@ export const userRouter = router({
         })
       }
 
+      const [user] = await getUsersById([input.userId], ctx.token)
+
+      if (!isUser(user)) {
+        logger.error(`Failed to change phone number: Subject is a system user`)
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Failed to change phone number: Subject is a system user`
+        })
+      }
+
+      if (!user.email) {
+        logger.error(
+          `Failed to change phone number for user ${input.userId}: User has no email address to send verification code to`
+        )
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Failed to change phone number: User has no email address to send verification code to`
+        })
+      }
+
       const userWithDuplicateNumber = await searchUsers(
         {
-          mobile: input.phoneNumber,
+          email: user.email,
           count: 1,
           skip: 0,
           sortOrder: 'asc'

@@ -152,7 +152,6 @@ export function Pages({
     onPreviousPage,
     onSubmit
   }
-
   const fields = (
     <FormFieldGenerator
       eventConfig={eventConfig}

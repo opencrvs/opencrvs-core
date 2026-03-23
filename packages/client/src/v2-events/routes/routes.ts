@@ -149,7 +149,39 @@ export const ROUTES = {
           offset: zod(z.number().min(0)).default(0)
         }
       }),
-      SETTINGS: route('settings', {})
+      SETTINGS: route(
+        'settings',
+        {},
+        {
+          USER: route(
+            'users',
+            {},
+            {
+              VIEW: route('view/:userId', {
+                params: {
+                  userId: string().defined()
+                }
+              }),
+              CREATE: route('create', {
+                searchParams: {
+                  officeId: string().defined()
+                }
+              }),
+              EDIT: route(':userId/:pageId', {
+                params: {
+                  userId: string().defined(),
+                  pageId: string()
+                }
+              }),
+              REVIEW: route(':userId/review', {
+                params: {
+                  userId: string().defined()
+                }
+              })
+            }
+          )
+        }
+      )
     }
   )
 }

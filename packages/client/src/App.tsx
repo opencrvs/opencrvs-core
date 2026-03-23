@@ -110,38 +110,6 @@ export const routesConfig = [
             </ProtectedRoute>
           </TRPCProvider>
         )
-      },
-      {
-        path: routes.CREATE_USER_ON_LOCATION,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.CREATE_USER_SECTION,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.REVIEW_USER_FORM,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.REVIEW_USER_DETAILS,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
       }
     ]
   }

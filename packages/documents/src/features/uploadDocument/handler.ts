@@ -57,7 +57,7 @@ const FileSchema = z
 const Payload = z.object({
   file: FileSchema,
   transactionId: z.string(),
-  path: z.string().min(1).optional()
+  path: z.string().optional().default('/')
 })
 
 /**
@@ -68,6 +68,7 @@ export async function fileUploadHandler(
   h: Hapi.ResponseToolkit
 ) {
   const userId = getUserId(request.headers.authorization)
+  console.log(request.payload)
   const payload = await Payload.parseAsync(request.payload).catch((error) => {
     logger.error(error)
     throw badRequest('Invalid payload')

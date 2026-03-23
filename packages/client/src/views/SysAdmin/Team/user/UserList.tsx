@@ -60,6 +60,7 @@ import { LoadingIndicator } from '@client/components/LoadingIndicator'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
+import { ROUTES } from '@client/v2-events/routes'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -532,9 +533,12 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
     function onClickAddUser() {
       if (searchedLocation) {
         navigate(
-          formatUrl(routes.CREATE_USER_ON_LOCATION, {
-            locationId: searchedLocation.id
-          })
+          ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+            {},
+            {
+              officeId: searchedLocation.id
+            }
+          )
         )
       }
     },
