@@ -81,6 +81,8 @@ const PrintCertifiedCopiesScope = z.object({
 })
 
 /**
+ * Legacy record scopes are not supported in 2.0.
+ * They are solely for migration purposes.
  * @deprecated - will be removed in v2.1.
  */
 const LegacyRecordScope = z
@@ -91,6 +93,7 @@ const LegacyRecordScope = z
       'record.declare',
       'record.notify',
       'record.declared.edit',
+      'record.declared.validate',
       'record.declared.reject',
       'record.declared.archive',
       'record.declared.review-duplicates',

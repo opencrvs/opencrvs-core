@@ -526,7 +526,8 @@ const v1ToV2ConfigScopeTypeMap: Record<string, string> = {
   'record.registered.print-certified-copies': 'record.print-certified-copies',
   'record.registered.request-correction': 'record.request-correction',
   'record.registered.correct': 'record.correct',
-  'record.declared.edit': 'record.edit'
+  'record.declared.edit': 'record.edit',
+  'record.declared.validate': 'record.custom-action'
 }
 
 /**
@@ -570,6 +571,15 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
       })
     }
 
+    if (configurableV1Scope.type === 'record.declared.validate') {
+      return encodeScope({
+        type: 'record.custom-action',
+        options: {
+          event: configurableV1Scope.options.event,
+          customActionTypes: ['VALIDATE_DECLARATION']
+        }
+      })
+    }
     if (!configurableV1Scope.type.startsWith('record.')) {
       return v1Scope
     }

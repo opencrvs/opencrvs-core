@@ -512,6 +512,7 @@ it('migrate v1 scopes to v2', () => {
     'record.declare[event=birth|death|tennis-club-membership]',
     'record.declared.reject[event=birth|death|tennis-club-membership]',
     'record.declared.archive[event=birth|death|tennis-club-membership]',
+    'record.declared.validate[event=birth|death|tennis-club-membership]',
     'record.register[event=birth|death|tennis-club-membership]',
     'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
     'record.registered.correct[event=birth|death|tennis-club-membership]',
@@ -519,10 +520,10 @@ it('migrate v1 scopes to v2', () => {
     'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
   ]
 
-  expect(v1Scopes).toHaveLength(33)
+  expect(v1Scopes).toHaveLength(34)
 
   const v2Scopes = migrateV1ScopesToV2(v1Scopes)
-  expect(v2Scopes).toHaveLength(25)
+  expect(v2Scopes).toHaveLength(26)
 
   expect(v2Scopes).toEqual([
     'performance.read',
@@ -545,6 +546,7 @@ it('migrate v1 scopes to v2', () => {
     'type=record.declare&event=birth,death,tennis-club-membership',
     'type=record.reject&event=birth,death,tennis-club-membership',
     'type=record.archive&event=birth,death,tennis-club-membership',
+    'type=record.custom-action&event=birth,death,tennis-club-membership&customActionTypes=VALIDATE_DECLARATION',
     'type=record.register&event=birth,death,tennis-club-membership',
     'type=record.print-certified-copies&event=birth,death,tennis-club-membership',
     'type=record.correct&event=birth,death,tennis-club-membership',
