@@ -202,6 +202,7 @@ export function createEventActionMutationFn<
         declaration: params.declaration
       })
       if (params.type === ActionType.ASSIGN) {
+        // eslint-disable-nextline @typescript-eslint/no-floating-promises
         prefetchPotentialDuplicates(params.eventId)
       }
       return response
