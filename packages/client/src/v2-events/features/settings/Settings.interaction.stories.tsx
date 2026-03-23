@@ -150,14 +150,16 @@ export const ChangeEmailAddress: Story = {
     })
 
     await expect(
-      await canvas.findByRole('button', { name: 'Verify' })
+      await canvas.findByRole('button', { name: 'Continue' })
     ).toBeDisabled()
 
     const input = await canvas.findByRole('spinbutton', { name: '' })
 
     await fireEvent.change(input, { target: { value: '000000' } })
 
-    await userEvent.click(await canvas.findByRole('button', { name: 'Verify' }))
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Continue' })
+    )
 
     await canvas.findByText('Email Address updated')
   }

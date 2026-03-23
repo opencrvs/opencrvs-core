@@ -158,7 +158,7 @@ export function VerifyCodeView({
       <Message>
         {data.phoneNumber
           ? intl.formatMessage(messages.confirmationPhoneMsg, {
-              num: phoneNumber || userDetails?.mobile
+              num: userDetails?.email
             })
           : intl.formatMessage(messages.confirmationEmailMsg, {
               email: email || userDetails?.email
