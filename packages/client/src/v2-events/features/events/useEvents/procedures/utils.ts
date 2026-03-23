@@ -202,7 +202,7 @@ export function createEventActionMutationFn<
         declaration: params.declaration
       })
       if (params.type === ActionType.ASSIGN) {
-        await prefetchPotentialDuplicates(params.eventId)
+        prefetchPotentialDuplicates(params.eventId)
       }
       return response
     }
