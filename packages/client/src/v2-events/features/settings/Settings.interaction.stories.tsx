@@ -86,7 +86,7 @@ export const ChangePhoneNumber: Story = {
       await canvas.findByText('Enter 6 digit verification code')
 
       await canvas.findByText(
-        'A confirmational SMS has been sent to +8801741234567'
+        'Verification code has been sent to kalushabwalya1.7@gmail.com'
       )
     })
 
@@ -145,7 +145,7 @@ export const ChangeEmailAddress: Story = {
       await canvas.findByText('Enter 6 digit verification code')
 
       await canvas.findByText(
-        'A confirmational SMS has been sent to opencrvs@opencrvs.org'
+        'Verification code has been sent to opencrvs@opencrvs.org'
       )
     })
 
