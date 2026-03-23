@@ -648,7 +648,7 @@ export function defineScopes(scopes: RecordScopeV2[]) {
 /**
  * Helper for porting v1 scopes to v2. Intended to be used in the interim during migration, not for new development.
  * @param scopes v1 scopes
- * @returns array of v2 compatible scopes, filtering out the old ones not used used anymore.
+ * @returns array of v2 compatible scopes, filtering out the old ones not used anymore.
  */
 export function migrateV1ScopesToV2(scopes: string[]): string[] {
   return scopes
