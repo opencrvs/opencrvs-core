@@ -126,8 +126,6 @@ const HeaderComponent = (props: IFullProps) => {
 
   const { canCreateUser, canSearchRecords } = usePermissions()
 
-  const canDoAdvanceSearch = canSearchRecords
-
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
     const locationId = parse(router.location.search, {
       ignoreQueryPrefix: true
@@ -295,8 +293,7 @@ const HeaderComponent = (props: IFullProps) => {
           selectedSearchType ?? offlineData.config.SEARCH_DEFAULT_CRITERIA
         }
         searchTypeList={searchTypeList}
-        // @TODO: How to hide the navigation list from field agents? Ask JPF
-        navigationList={canDoAdvanceSearch ? advancedSearchNavigationList : []}
+        navigationList={canSearchRecords ? advancedSearchNavigationList : []}
         searchHandler={(text, type) =>
           props.router.navigate(
             {

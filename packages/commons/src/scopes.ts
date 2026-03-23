@@ -547,7 +547,7 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
   }
 
   if (literalV1Scope) {
-    return encodeScope(literalV1Scope as any) // Literal scopes have same structure in V2, just encode to string.
+    return literalV1Scope.type
   }
 
   if (configurableV1Scope) {

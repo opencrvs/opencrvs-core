@@ -39,19 +39,19 @@ exports[`transform v1 scope to v2 1`] = `
   "localRegistrar": [
     {
       "v1": "performance.read",
-      "v2": "type=performance.read",
+      "v2": "performance.read",
     },
     {
       "v1": "performance.read-dashboards",
-      "v2": "type=performance.read-dashboards",
+      "v2": "performance.read-dashboards",
     },
     {
       "v1": "profile.electronic-signature",
-      "v2": "type=profile.electronic-signature",
+      "v2": "profile.electronic-signature",
     },
     {
       "v1": "organisation.read-locations:my-office",
-      "v2": "type=organisation.read-locations:my-office",
+      "v2": "organisation.read-locations:my-office",
     },
     {
       "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]",
@@ -75,7 +75,7 @@ exports[`transform v1 scope to v2 1`] = `
     },
     {
       "v1": "user.read:only-my-audit",
-      "v2": "type=user.read:only-my-audit",
+      "v2": "user.read:only-my-audit",
     },
     {
       "v1": "record.create[event=birth|death|tennis-club-membership]",
@@ -121,35 +121,35 @@ exports[`transform v1 scope to v2 1`] = `
   "localSystemAdmin": [
     {
       "v1": "user.read:my-office",
-      "v2": "type=user.read:my-office",
+      "v2": "user.read:my-office",
     },
     {
       "v1": "user.read:my-jurisdiction",
-      "v2": "type=user.read:my-jurisdiction",
+      "v2": "user.read:my-jurisdiction",
     },
     {
       "v1": "user.update:my-jurisdiction",
-      "v2": "type=user.update:my-jurisdiction",
+      "v2": "user.update:my-jurisdiction",
     },
     {
       "v1": "organisation.read-locations:my-jurisdiction",
-      "v2": "type=organisation.read-locations:my-jurisdiction",
+      "v2": "organisation.read-locations:my-jurisdiction",
     },
     {
       "v1": "performance.read",
-      "v2": "type=performance.read",
+      "v2": "performance.read",
     },
     {
       "v1": "performance.read-dashboards",
-      "v2": "type=performance.read-dashboards",
+      "v2": "performance.read-dashboards",
     },
     {
       "v1": "performance.vital-statistics-export",
-      "v2": "type=performance.vital-statistics-export",
+      "v2": "performance.vital-statistics-export",
     },
     {
       "v1": "organisation.read-locations:my-office",
-      "v2": "type=organisation.read-locations:my-office",
+      "v2": "organisation.read-locations:my-office",
     },
     {
       "v1": "user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]",
@@ -163,39 +163,39 @@ exports[`transform v1 scope to v2 1`] = `
   "nationalSystemAdmin": [
     {
       "v1": "config.update:all",
-      "v2": "type=config.update:all",
+      "v2": "config.update:all",
     },
     {
       "v1": "organisation.read-locations:all",
-      "v2": "type=organisation.read-locations:all",
+      "v2": "organisation.read-locations:all",
     },
     {
       "v1": "user.create:all",
-      "v2": "type=user.create:all",
+      "v2": "user.create:all",
     },
     {
       "v1": "user.update:all",
-      "v2": "type=user.update:all",
+      "v2": "user.update:all",
     },
     {
       "v1": "user.read:all",
-      "v2": "type=user.read:all",
+      "v2": "user.read:all",
     },
     {
       "v1": "performance.read",
-      "v2": "type=performance.read",
+      "v2": "performance.read",
     },
     {
       "v1": "performance.read-dashboards",
-      "v2": "type=performance.read-dashboards",
+      "v2": "performance.read-dashboards",
     },
     {
       "v1": "performance.vital-statistics-export",
-      "v2": "type=performance.vital-statistics-export",
+      "v2": "performance.vital-statistics-export",
     },
     {
       "v1": "record.reindex",
-      "v2": "type=record.reindex",
+      "v2": "record.reindex",
     },
     {
       "v1": "user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]",
@@ -209,19 +209,19 @@ exports[`transform v1 scope to v2 1`] = `
   "registrationAgent": [
     {
       "v1": "performance.read",
-      "v2": "type=performance.read",
+      "v2": "performance.read",
     },
     {
       "v1": "performance.read-dashboards",
-      "v2": "type=performance.read-dashboards",
+      "v2": "performance.read-dashboards",
     },
     {
       "v1": "organisation.read-locations:my-office",
-      "v2": "type=organisation.read-locations:my-office",
+      "v2": "organisation.read-locations:my-office",
     },
     {
       "v1": "user.read:only-my-audit",
-      "v2": "type=user.read:only-my-audit",
+      "v2": "user.read:only-my-audit",
     },
     {
       "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]",

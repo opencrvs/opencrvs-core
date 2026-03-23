@@ -275,7 +275,6 @@ export enum CoreWorkqueues {
   DRAFT = 'draft'
 }
 
-// @TODO: why we have this?
 export function hasOutboxWorkqueue(scopes: string[]) {
   const hasRecordScope = scopes.some((scope) => !!decodeScope(scope))
 
