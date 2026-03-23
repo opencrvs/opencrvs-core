@@ -46,7 +46,7 @@ import {
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 import { AsyncActionConfirmationResponseSchema } from '@events/router/event/actions'
-import { getUserOrSystem } from '../../../service/users/api'
+import { findUserOrSystem } from '../../../service/users/api'
 import { getInMemoryEventConfigurations } from '../../../service/config/config'
 import { getEventIndexWithAdministrativeHierarchy } from '../../../service/indexing/utils'
 import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/administrative-hierarchy/locations'
@@ -371,7 +371,7 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
     // Since determining access requires knowing the event type, we need to parse the input before we can check access.
     // default .input(...) throws 400, which is something that we want to return only if the user should have access.
     const rawInput = await getRawInput()
-    const input = EventIdParam.safeParse(rawInput)?.data
+    const input = EventIdParam.safeParse(rawInput).data
 
     if (!input) {
       throw new TRPCError({ code: 'BAD_REQUEST' })
@@ -479,7 +479,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  const otherUser = await getUserOrSystem(input.userId, token)
+  const otherUser = await findUserOrSystem(input.userId, token)
 
   // Don't reveal the existence of the user
   if (!otherUser) {

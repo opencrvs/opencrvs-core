@@ -151,12 +151,7 @@ describe('Route authorization', () => {
     })
     expect(res.result).toEqual({
       auth: false,
-      search: false,
-      'user-mgnt': false,
-      metrics: false,
-      notification: false,
-      countryconfig: false,
-      workflow: false
+      countryconfig: false
     })
   })
 })

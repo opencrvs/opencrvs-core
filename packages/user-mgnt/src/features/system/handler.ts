@@ -12,11 +12,6 @@
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { QA_ENV } from '@user-mgnt/constants'
-import {
-  createFhirPractitioner,
-  createFhirPractitionerRole,
-  postFhir
-} from '@user-mgnt/features/createUser/service'
 import { logger } from '@opencrvs/commons'
 import System, { WebhookPermissions } from '@user-mgnt/model/system'
 import User from '@user-mgnt/model/user'
@@ -95,25 +90,7 @@ export async function registerSystem(
     const sha_secret = uuid()
     const { hash, salt } = generateSaltedHash(clientSecret)
 
-    const practitioner = createFhirPractitioner(systemAdminUser, true)
-    const practitionerId = await postFhir(authorization, practitioner)
-    if (!practitionerId) {
-      throw new Error(
-        'Practitioner resource not saved correctly, practitioner ID not returned'
-      )
-    }
-
-    const role = await createFhirPractitionerRole(
-      systemAdminUser,
-      practitionerId,
-      true
-    )
-    const roleId = await postFhir(authorization, role)
-    if (!roleId) {
-      throw new Error(
-        'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
-      )
-    }
+    const practitionerId = uuid()
 
     const systemDetails = {
       client_id,

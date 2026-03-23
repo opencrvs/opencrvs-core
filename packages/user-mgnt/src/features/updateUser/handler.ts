@@ -15,20 +15,10 @@ import {
   triggerUserEventNotification,
   personNameFromV1ToV2
 } from '@opencrvs/commons'
-import {
-  Practitioner,
-  findExtension,
-  OPENCRVS_SPECIFICATION_URL
-} from '@opencrvs/commons/types'
 import { findScope, getScopes, SCOPES } from '@opencrvs/commons/authentication'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
-  createFhirPractitioner,
-  createFhirPractitionerRole,
   generateUsername,
-  getFromFhir,
-  postFhir,
-  rollbackUpdateUser,
   uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
@@ -55,35 +45,12 @@ export default async function updateUser(
     throw unauthorized()
   }
 
-  const existingPractitioner = (await getFromFhir(
-    token,
-    `/Practitioner/${existingUser.practitionerId}`
-  )) satisfies Practitioner
-  const existingPractitionerRoleBundle: fhir.Bundle = await getFromFhir(
-    token,
-    `/PractitionerRole?practitioner=${existingUser.practitionerId}`
-  )
-  let existingPractitionerRole: fhir.PractitionerRole
-  if (
-    !existingPractitionerRoleBundle ||
-    !existingPractitionerRoleBundle.entry ||
-    !existingPractitionerRoleBundle.entry[0] ||
-    !existingPractitionerRoleBundle.entry[0].resource
-  ) {
-    throw new Error(
-      `No PractitionerRole by given id in bundle: ${existingUser.practitionerId}`
-    )
-  } else {
-    existingPractitionerRole = existingPractitionerRoleBundle.entry[0]
-      .resource as fhir.PractitionerRole
-  }
   // Update existing user's fields
   existingUser.name = user.name
   existingUser.email = user.email
   existingUser.mobile = user.mobile
   existingUser.fullHonorificName = user.fullHonorificName
   existingUser.emailForNotification = user.emailForNotification
-  existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar
   existingUser.device = user.device
   existingUser.role = user.role
@@ -96,46 +63,13 @@ export default async function updateUser(
     }
   }
 
-  const existingSignatureAttachment = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
-    existingPractitioner.extension || []
-  )?.valueAttachment
-
-  const signatureAttachment =
-    (user.signature &&
-      isBase64FileString(user.signature.data) && {
-        contentType: user.signature.type,
-        url: await uploadSignatureToMinio(token, user.signature),
-        creation: new Date().getTime().toString()
-      }) ||
-    existingSignatureAttachment
-
-  const practitioner = createFhirPractitioner(
-    existingUser,
-    false,
-    signatureAttachment
-  )
-  practitioner.id = existingPractitioner.id
-
-  const practitionerId = await postFhir(token, practitioner)
-  if (!practitionerId) {
-    throw new Error(
-      'Practitioner resource not updated correctly, practitioner ID not returned'
-    )
+  if (user.signature && isBase64FileString(user.signature.data)) {
+    await uploadSignatureToMinio(token, user.signature)
   }
-  const practitionerRole = await createFhirPractitionerRole(
-    existingUser,
-    existingUser.practitionerId,
-    false
-  )
-
-  practitionerRole.id = existingPractitionerRole.id
-  const practitionerRoleId = await postFhir(token, practitionerRole)
-  if (!practitionerRoleId) {
-    throw new Error(
-      'PractitionerRole resource not updated correctly, practitionerRole ID not returned'
-    )
+  if (user.signature) {
+    existingUser.signature = user.signature
   }
+
   // Updating user in user-mgnt db
   let userNameChanged = false
   const oldUsername = existingUser.username
@@ -149,19 +83,11 @@ export default async function updateUser(
       existingUser.username = newUserName
       userNameChanged = true
     }
-    if (practitionerId !== existingUser.practitionerId) {
-      existingUser.practitionerId = practitionerId
-    }
 
     // update user in user-mgnt data store
     await User.update({ _id: existingUser._id }, existingUser)
   } catch (err) {
     logger.error(err)
-    await rollbackUpdateUser(
-      token,
-      existingPractitioner,
-      existingPractitionerRole
-    )
     if (err.code === 11000) {
       // check if phone or email has thrown unique constraint errors
       const errorThrowingProperty =
@@ -205,7 +131,7 @@ export default async function updateUser(
       remoteAddress,
       userAgent,
       systemAdminUser?.practitionerId,
-      practitionerId
+      existingUser.practitionerId
     )
   } catch (err) {
     logger.error(err.message)

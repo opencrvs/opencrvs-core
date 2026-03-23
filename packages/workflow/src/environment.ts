@@ -14,7 +14,6 @@ import { cleanEnv, str, url, num } from 'envalid'
 export const env = cleanEnv(process.env, {
   HOST: str({ default: '0.0.0.0' }),
   PORT: num({ default: 5050 }),
-  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
   APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
   NOTIFICATION_SERVICE_URL: url({ devDefault: 'http://localhost:2020/' }),
   SEARCH_URL: url({ devDefault: 'http://localhost:9090/' }),

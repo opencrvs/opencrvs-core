@@ -16,7 +16,7 @@ interface SaltedHash {
   salt: string
 }
 
-export function compare(password: string, hash: string) {
+export async function compare(password: string, hash: string) {
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, hash, (err, res) => {
       if (err) {

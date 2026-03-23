@@ -25,7 +25,7 @@ scan:
   scanners:
     - vuln
     - misconfig
-ignorefile: .trivyignore.yaml
+
 vulnerability:
   ignore-unfixed: true
 db:

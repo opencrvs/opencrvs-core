@@ -40,7 +40,10 @@ export const User = z.object({
   administrativeAreaId: UUID.nullish(),
   device: z.string().optional(),
   fullHonorificName: z.string().optional(),
-  type: TokenUserType.extract(['user'])
+  type: TokenUserType.extract(['user']),
+  mobile: z.string().optional(),
+  email: z.string().optional(),
+  status: z.enum(['active', 'deactivated', 'pending'])
 })
 export type User = z.infer<typeof User>
 
@@ -53,7 +56,8 @@ export const System = z.object({
   signature: z.undefined().optional(),
   avatar: z.undefined().optional(),
   fullHonorificName: z.string().optional(),
-  legacyId: z.string().optional()
+  legacyId: z.string().optional(),
+  status: z.undefined().optional()
 })
 export type System = z.infer<typeof System>
 

@@ -61,7 +61,7 @@ export function ProfileImage() {
   const dispatch = useDispatch()
 
   const changeAvatar = React.useCallback(
-    (avatar: IImage) => {
+    (avatar: string) => {
       if (userDetails) {
         setImageUploading(false)
         dispatch(

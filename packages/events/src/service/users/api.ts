@@ -10,18 +10,45 @@
  */
 
 import fetch from 'node-fetch'
+import { z } from 'zod'
 import {
   joinUrl,
   FullDocumentPath,
   UUID,
   IUserName,
   UserOrSystem,
+  User,
   TokenUserType,
   logger,
   isUUID
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { getSystemByLegacyId, getSystemClientById } from '@events/storage/postgres/events/system-clients'
+import {
+  getSystemByLegacyId,
+  getSystemClientById
+} from '@events/storage/postgres/events/system-clients'
+
+export const UserInput = z.object({
+  name: z.array(
+    z.object({
+      use: z.string(),
+      given: z.array(z.string()),
+      family: z.string()
+    })
+  ),
+  // @TODO: Separate from "create user from client"
+  username: z.string().optional(),
+  email: z.string(),
+  mobile: z.string().optional(),
+  fullHonorificName: z.string().optional(),
+  emailForNotification: z.string().optional(),
+  // @TODO: Separate from "create user from client"
+  password: z.string().optional(),
+  role: z.string(),
+  primaryOfficeId: z.string(),
+  device: z.string().optional(),
+  status: z.enum(['active', 'pending']).optional()
+})
 
 type UserAPIResult = {
   id: string
@@ -34,6 +61,7 @@ type UserAPIResult = {
   name: IUserName[]
   username: string
   email: string
+  mobile: string
   role: string
   fullHonorificName?: string
   practitionerId: string
@@ -43,7 +71,23 @@ type UserAPIResult = {
   creationDate: number
 }
 
-export async function getUser(
+type SearchUsersPayload = {
+  username?: string
+  mobile?: string
+  status?: string
+  primaryOfficeId?: string
+  locationId?: string
+  count: number
+  skip: number
+  sortOrder: 'asc' | 'desc'
+}
+
+export type SearchUsersResult = {
+  totalItems: number
+  results: UserAPIResult[]
+}
+
+export async function getLegacyUser(
   userId: string,
   token: string
 ): Promise<UserAPIResult> {
@@ -65,25 +109,28 @@ export async function getUser(
   return res.json() as Promise<UserAPIResult>
 }
 
-export async function getUserOrSystem(
+export async function findUserOrSystem(
   id: string,
   token: string
 ): Promise<UserOrSystem | undefined> {
   try {
-    const user = await getUser(id, token)
+    const user = await getLegacyUser(id, token)
 
     return {
       type: TokenUserType.enum.user,
       id: user.id,
       name: user.name,
       role: user.role,
+      email: user.email,
+      mobile: user.mobile,
+      status: user.status as User['status'],
       signature: user.signature ? user.signature : undefined,
       avatar: user.avatar?.data ? user.avatar.data : undefined,
       primaryOfficeId: user.primaryOfficeId,
       device: user.device ? user.device : undefined,
       fullHonorificName: user.fullHonorificName
-      ? user.fullHonorificName
-      : undefined
+        ? user.fullHonorificName
+        : undefined
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
@@ -91,9 +138,9 @@ export async function getUserOrSystem(
   }
 
   try {
-    const system = isUUID(id) ?
-    await getSystemClientById(id) :
-    await getSystemByLegacyId(id)
+    const system = isUUID(id)
+      ? await getSystemClientById(id)
+      : await getSystemByLegacyId(id)
 
     return {
       type: TokenUserType.enum.system,
@@ -109,4 +156,105 @@ export async function getUserOrSystem(
   }
 
   return
+}
+
+async function getUser(id: string, token: string): Promise<User> {
+  const userOrSystem = await findUserOrSystem(id, token)
+  if (!userOrSystem) {
+    throw new Error(`No user or system found for id: ${id}`)
+  }
+
+  if (userOrSystem.type === TokenUserType.enum.system) {
+    throw new Error(`The id: ${id} belongs to a system, not a user`)
+  }
+
+  return userOrSystem
+}
+
+export async function searchUsers(
+  payload: SearchUsersPayload,
+  token: string
+): Promise<User[]> {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'searchUsers').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to search users. Error: ${res.status} status received`
+    )
+  }
+
+  const { results } = (await res.json()) as SearchUsersResult
+
+  return results.map((user) => ({
+    type: TokenUserType.enum.user,
+    id: user.id,
+    name: user.name,
+    role: user.role,
+    signature: user.signature ? user.signature : undefined,
+    avatar: user.avatar?.data ? user.avatar.data : undefined,
+    primaryOfficeId: user.primaryOfficeId,
+    status: user.status as User['status'],
+    device: user.device ? user.device : undefined,
+    fullHonorificName: user.fullHonorificName
+      ? user.fullHonorificName
+      : undefined
+  }))
+}
+
+type CreateUserPayload = z.infer<typeof UserInput>
+
+export async function createUser(input: CreateUserPayload, token: string) {
+  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'createUser').href, {
+    method: 'POST',
+    body: JSON.stringify(input),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to create user. Error: ${res.status} status received`
+    )
+  }
+
+  const response = (await res.json()) as UserAPIResult
+  return getUser(response.id, token)
+}
+
+export async function activateUser(
+  input: { userId: string; password: string; securityQNAs: unknown[] },
+  token: string
+) {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'activateUser').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to activate user. Error: ${res.status} status received`
+    )
+  }
+
+  const response = (await res.json()) as UserAPIResult
+  return response
 }
