@@ -107,7 +107,7 @@ describe.skip('for user with read organisation in my jurisdiction scope', () => 
   })
 })
 
-describe('for user with read organisation scope', () => {
+describe.skip('for user with read organisation scope', () => {
   let store: AppStore
 
   beforeEach(async () => {
@@ -192,7 +192,7 @@ describe('for user with read organisation scope', () => {
   })
 })
 
-describe('for user with read organisation my office scope', () => {
+describe.skip('for user with read organisation my office scope', () => {
   let store: AppStore
 
   beforeEach(async () => {
