@@ -16,7 +16,7 @@ import { decodeScope, EventConfig, joinUrl } from '@opencrvs/commons'
 import { parseLiteralScope } from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 import { createClient } from '@opencrvs/toolkit/api'
-
+import { parseConfigurableScope } from '@opencrvs/toolkit/scopes'
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -30,9 +30,14 @@ const RoleSchema = (eventIds: string[]) =>
       scopes: z.array(
         z.string().superRefine((scope, ctx) => {
           const parsedLiteralScope = parseLiteralScope(scope)
+          const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedV2Scopes = decodeScope(scope)
 
-          if (!parsedLiteralScope && !parsedV2Scopes) {
+          if (
+            !parsedLiteralScope &&
+            !parsedConfigurableScope &&
+            !parsedV2Scopes
+          ) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
@@ -233,6 +238,7 @@ export async function seedUsers(token: string) {
       primaryOfficeId: primaryOffice.id,
       username
     }
+
     await createUser(token, userPayload)
   }
 }

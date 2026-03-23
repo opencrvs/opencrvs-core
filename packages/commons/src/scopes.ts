@@ -193,6 +193,7 @@ const LiteralScopes = z.union([
   LegacyScopes,
   IntegrationScopes,
   z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
+  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   PerformanceScopes,
   OrganisationScopes,
   UserScopes,
