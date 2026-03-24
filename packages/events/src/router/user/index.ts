@@ -30,6 +30,7 @@ import {
   UserInput,
   searchUsers,
   createUser,
+  updateUser,
   changeUserPassword,
   changeUserPhone,
   changeUserEmail,
@@ -71,6 +72,10 @@ export const userRouter = router({
     .input(UserInput)
     .output(User)
     .mutation(async ({ input, ctx }) => createUser(input, ctx.token)),
+  update: userAndSystemProcedure
+    .input(UserInput.and(z.object({ id: z.string() })))
+    .output(User)
+    .mutation(async ({ input, ctx }) => updateUser(input, ctx.token)),
   list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))

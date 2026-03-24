@@ -361,9 +361,8 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
           label: intl.formatMessage(messages.editUserDetailsTitle),
           handler: () => {
             navigate(
-              formatUrl(routes.REVIEW_USER_DETAILS, {
-                userId: user.id,
-                sectionId: UserSection.Preview
+              ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+                userId: user.id
               })
             )
           }
@@ -488,7 +487,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
             <Link
               onClick={() =>
                 navigate(
-                  formatUrl(routes.USER_PROFILE, {
+                  ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
                     userId: String(user.id)
                   })
                 )
@@ -503,7 +502,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
               id="profile-link"
               onClick={() =>
                 navigate(
-                  formatUrl(routes.USER_PROFILE, {
+                  ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
                     userId: String(user.id)
                   })
                 )

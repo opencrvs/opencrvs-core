@@ -8,40 +8,46 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { messages } from '@client/i18n/messages/views/userForm'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
+import { messages } from '@client/i18n/messages/views/userForm'
+import * as routes from '@client/navigation/routes'
 import { Icon } from '@client/v2-events/components/IconWithName'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
 import { ROUTES } from '@client/v2-events/routes'
-import { create } from 'zustand'
 import {
   ActionType,
   alwaysTrue,
   deepDropNulls,
+  defineConditional,
   EventConfig,
   FieldType,
   never,
   PageTypes,
-  UserInput,
-  SCOPES
+  SCOPES,
+  TokenUserType,
+  UserInput
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner, ToggleMenu } from '@opencrvs/components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
-import { Button } from '@opencrvs/components/src/Button'
-import React, { useCallback, useEffect, useState } from 'react'
+import { Button } from '@opencrvs/components/lib/Button'
+import {
+  CircleButton,
+  ICON_ALIGNMENT,
+  SuccessButton
+} from '@opencrvs/components/lib/buttons'
+import { BackArrowDeepBlue, Check, Cross } from '@opencrvs/components/lib/icons'
+import React, { useCallback, useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
-import { defineConditional } from '@opencrvs/commons/client'
-import { CircleButton } from '@opencrvs/components/src/buttons'
-import { BackArrowDeepBlue, Cross } from '@opencrvs/components/src/icons'
 import styled from 'styled-components'
+import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
+import { buttonMessages } from '@client/i18n/messages'
 
 type RoleWithLabel = { id: string; label: string; scopes: string[] }
 function getUserEditConfig(
@@ -71,7 +77,7 @@ function getUserEditConfig(
       pages: [
         {
           id: 'user.office',
-          title: messages.assignedRegistrationOfficeGroupTitle,
+          title: messages.registrationOffice,
           type: PageTypes.enum.FORM,
           requireCompletionToContinue: true,
           fields: [
@@ -164,12 +170,12 @@ function getUserEditConfig(
             : never(),
           fields: [
             {
-              id: 'user.signature',
+              id: 'signature',
               type: FieldType.SIGNATURE,
-              required: true,
+              required: false,
               label: messages.userSignatureAttachment,
               signaturePromptLabel: {
-                id: 'user.signature.prompt',
+                id: 'signature.prompt',
                 defaultMessage: 'Sign here',
                 description: ''
               },
@@ -232,7 +238,7 @@ export const EditUser = () => {
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
   const formState = getUserForm()
-
+  const isNewUser = userId === NEW_USER
   useEffect(() => {
     if (!formState['primaryOfficeId'] && pageId !== 'user.office') {
       navigate(
@@ -253,8 +259,22 @@ export const EditUser = () => {
     formState['role']
   )
   const formConfig = eventConfig.declaration
+
+  const handleClose = () => {
+    if (isNewUser) {
+      const officeId = formState['primaryOfficeId']
+      navigate(
+        officeId
+          ? `${routes.TEAM_USER_LIST}?locationId=${officeId}`
+          : routes.TEAM_USER_LIST
+      )
+    } else {
+      navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+    }
+  }
+
   return (
-    <FormLayout actionComponent={<div>todo</div>}>
+    <FormLayout onClose={handleClose} actionComponent={<div>todo</div>}>
       <PagesComponent
         showReviewButton={false}
         actionType={ActionType.DECLARE}
@@ -263,7 +283,9 @@ export const EditUser = () => {
         formPages={formConfig.pages}
         pageId={pageId}
         back
-        setFormData={(data) => setUserForm(data)}
+        setFormData={(data) => {
+          setUserForm(data)
+        }}
         validatorContext={{}}
         onPageChange={(nextPageId: string) =>
           navigate(
@@ -281,7 +303,6 @@ export const EditUser = () => {
           )
         }}
       />
-      {/*{modal}*/}
     </FormLayout>
   )
 }
@@ -289,31 +310,69 @@ export const EditUser = () => {
 export const ReviewUser = () => {
   const intl = useIntl()
   const navigate = useNavigate()
-  const { getUserForm, getTouchedFields, clear } = useUserFormState()
-  const formState = getUserForm()
+  const { getUserForm, getTouchedFields, setUserForm, clear } =
+    useUserFormState()
   const { userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.REVIEW)
+  const isNewUser = userId === NEW_USER
+  const { getUser, createUser, updateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
+
+  const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
+
+  useEffect(() => {
+    if (isNewUser || !existingUserQuery.data) return
+    const user = existingUserQuery.data
+    if (user.type !== TokenUserType.enum.user) return
+    if (Object.keys(getUserForm()).length > 0) return
+
+    setUserForm({
+      primaryOfficeId: user.primaryOfficeId,
+      role: user.role,
+      name: {
+        firstname: user.name[0]?.given[0] ?? '',
+        surname: user.name[0]?.family ?? ''
+      },
+      phoneNumber: user.mobile,
+      email: user.email,
+      fullHonorificName: user.fullHonorificName,
+      device: user.device
+    })
+  }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm])
+
+  const formState = getUserForm()
+
   const rolesWithHumanReadableNames = roles.map((role) => ({
     ...role,
     label: formatUserRole(role.id, intl)
   }))
-  const { createUser } = useUsers()
   const createUserMutation = createUser()
+  const updateUserMutation = updateUser()
   const eventConfig = getUserEditConfig(
     rolesWithHumanReadableNames,
     formState['role']
   )
   const formConfig = eventConfig.declaration
+  const handleClose = () => {
+    if (isNewUser) {
+      const officeId = formState['primaryOfficeId']
+      navigate(
+        officeId
+          ? `${routes.TEAM_USER_LIST}?locationId=${officeId}`
+          : routes.TEAM_USER_LIST
+      )
+    } else {
+      navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
+    }
+  }
+
   return (
-    <FormLayout actionComponent={<div>todo</div>}>
+    <FormLayout actionComponent={<div>todo</div>} onClose={handleClose}>
       <ReviewComponent.Body
-        // annotation={{}}
-        // onAnnotationChange={(values) => console.log(values)}
         form={formState}
         formConfig={formConfig}
         reviewFields={[]}
-        title={'TODO'}
+        title={intl.formatMessage(messages.userFormReviewTitle)}
         validatorContext={{}}
         onEdit={(values) =>
           navigate(
@@ -324,43 +383,71 @@ export const ReviewUser = () => {
           )
         }
       >
-        <Button
-          id="submit_user_form"
-          type="positive"
-          size="large"
-          fullWidth
-          onClick={() => {
-            console.log({ formState })
-            const payload: UserInput = {
-              ...formState,
-              name: [
-                {
-                  use: 'en',
-                  given: [formState.name.firstname],
-                  family: formState.name.surname
-                }
-              ]
-            }
-
-            createUserMutation.mutate(payload, {
-              onSuccess: (data) => {
-                navigate(
-                  ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
-                    userId: data.id
-                  })
-                )
+        {isNewUser ? (
+          <Button
+            id="submit_user_form"
+            type="positive"
+            size="large"
+            fullWidth
+            onClick={() => {
+              const payload: UserInput = {
+                ...formState,
+                mobile: formState.phoneNumber,
+                name: [
+                  {
+                    use: 'en',
+                    given: [formState.name.firstname],
+                    family: formState.name.surname
+                  }
+                ]
               }
-            })
-            // navigate(
-            //   ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
-            //     { eventId },
-            //     { workqueue: slug }
-            //   )
-            // )
-          }}
-        >
-          {intl.formatMessage(messages.creatingNewUser)}
-        </Button>
+              createUserMutation.mutate(payload, {
+                onSuccess: (data) => {
+                  clear()
+                  navigate(
+                    `${routes.TEAM_USER_LIST}?locationId=${payload.primaryOfficeId}`
+                  )
+                }
+              })
+            }}
+          >
+            {intl.formatMessage(buttonMessages.createUser)}
+          </Button>
+        ) : (
+          <SuccessButton
+            id="submit-edit-user-form"
+            onClick={() => {
+              const payload: UserInput = {
+                ...formState,
+                mobile: formState.phoneNumber,
+                name: [
+                  {
+                    use: 'en',
+                    given: [formState.name.firstname],
+                    family: formState.name.surname
+                  }
+                ]
+              }
+              updateUserMutation.mutate(
+                { ...payload, id: userId },
+                {
+                  onSuccess: (data) => {
+                    clear()
+                    navigate(
+                      ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
+                        userId: data.id
+                      })
+                    )
+                  }
+                }
+              )
+            }}
+            icon={() => <Check />}
+            align={ICON_ALIGNMENT.LEFT}
+          >
+            {intl.formatMessage(buttonMessages.confirm)}
+          </SuccessButton>
+        )}
       </ReviewComponent.Body>
     </FormLayout>
   )
@@ -373,10 +460,12 @@ export const ReviewUser = () => {
 function FormLayout({
   children,
   onSaveAndExit,
+  onClose,
   actionComponent
 }: {
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
+  onClose?: () => void
   actionComponent?: React.ReactNode
 }) {
   const intl = useIntl()
@@ -388,6 +477,7 @@ function FormLayout({
           actionComponent={actionComponent}
           label={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
           onSaveAndExit={onSaveAndExit}
+          onClose={onClose}
         />
       }
       skipToContentText="Skip to form"
@@ -402,10 +492,12 @@ function FormLayout({
 function FormHeader({
   label,
   onSaveAndExit,
+  onClose,
   actionComponent
 }: {
   label: string
   onSaveAndExit?: () => void
+  onClose?: () => void
   actionComponent?: React.ReactNode
 }) {
   const intl = useIntl()
@@ -469,7 +561,7 @@ function FormHeader({
           data-testid="exit-button"
           size="small"
           type="icon"
-          onClick={async () => console.log('FOO')}
+          onClick={onClose}
         >
           <Icon name="X" />
         </Button>
@@ -507,7 +599,7 @@ function FormHeader({
       <CircleButton
         data-testid="crcl-btn"
         id="crcl-btn"
-        onClick={() => console.log('home')}
+        onClick={onClose}
         key="crcl-btn"
       >
         <Cross color="currentColor" />

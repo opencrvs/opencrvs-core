@@ -22,6 +22,7 @@ import { messages as userFormMessages } from '@client/i18n/messages/views/userFo
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
+import { ROUTES } from '@client/v2-events/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
@@ -207,9 +208,8 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
         handler: () =>
           navigate(
-            formatUrl(routes.REVIEW_USER_DETAILS, {
-              userId,
-              sectionId: UserSection.Preview
+            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+              userId
             })
           )
       }

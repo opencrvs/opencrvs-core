@@ -214,6 +214,29 @@ export async function searchUsers(
 
 type CreateUserPayload = z.infer<typeof UserInput>
 
+export async function updateUser(
+  input: CreateUserPayload & { id: string },
+  token: string
+): Promise<User> {
+  console.log(JSON.stringify(input))
+  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'updateUser').href, {
+    method: 'POST',
+    body: JSON.stringify(input),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to update user. Error: ${res.status} status received`
+    )
+  }
+
+  return getUser(input.id, token)
+}
+
 export async function createUser(input: CreateUserPayload, token: string) {
   const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'createUser').href, {
     method: 'POST',

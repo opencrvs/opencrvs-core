@@ -195,6 +195,23 @@ export function useUsers() {
         }
       })
     },
+    updateUser: ({
+      onSuccess
+    }: {
+      onSuccess?: (response: inferOutput<typeof trpc.user.update>) => void
+    } = {}) => {
+      const mutationOptions = trpc.user.update.mutationOptions()
+
+      return useMutation({
+        ...mutationOptions,
+        onSuccess: (response) => {
+          void queryClient.invalidateQueries({
+            queryKey: trpc.user.get.queryKey(response.id)
+          })
+          onSuccess?.(response)
+        }
+      })
+    },
     activateUser: ({
       onSuccess,
       onError
