@@ -12,7 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
-import { within } from '@storybook/test'
+import { within, expect } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import {
   ConditionalType,
@@ -29,6 +29,9 @@ import { withValidatorContext } from '../../../../../.storybook/decorators'
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Select',
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -55,6 +58,15 @@ export const WithHiddenOption: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('combobox'))
+    await expect(
+      canvas.queryByRole('option', { name: 'Apple' })
+    ).toBeInTheDocument()
+    await expect(
+      canvas.queryByRole('option', { name: 'Banana' })
+    ).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByRole('option', { name: 'Cherry' })
+    ).toBeInTheDocument()
   },
   render: function Component(args) {
     return (
@@ -117,6 +129,15 @@ export const WithDisabledOption: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('combobox'))
+    const bananaOption = canvas.queryByRole('option', { name: 'Banana' })
+    await expect(bananaOption).toBeInTheDocument()
+    await expect(bananaOption).toHaveAttribute('aria-disabled', 'true')
+    await expect(
+      canvas.queryByRole('option', { name: 'Apple' })
+    ).not.toHaveAttribute('aria-disabled', 'true')
+    await expect(
+      canvas.queryByRole('option', { name: 'Cherry' })
+    ).not.toHaveAttribute('aria-disabled', 'true')
   },
   render: function Component(args) {
     return (
