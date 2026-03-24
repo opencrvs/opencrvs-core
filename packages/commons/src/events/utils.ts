@@ -598,14 +598,12 @@ export function getCompleteActionAnnotation(
     const originalAction = event.actions.find(
       ({ id }) => id === action.originalActionId
     )
-    if (originalAction?.status !== ActionStatus.Requested) {
-      return deepMerge(annotation, action.annotation ?? {})
+    if (originalAction?.status === ActionStatus.Requested) {
+      return deepMerge(
+        deepMerge(annotation, originalAction.annotation ?? {}),
+        action.annotation ?? {}
+      )
     }
-
-    return deepMerge(
-      deepMerge(annotation, originalAction.annotation ?? {}),
-      action.annotation ?? {}
-    )
   }
   return deepMerge(annotation, action.annotation ?? {})
 }
