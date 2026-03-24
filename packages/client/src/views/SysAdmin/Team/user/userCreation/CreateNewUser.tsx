@@ -39,6 +39,7 @@ import {
   SuccessButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrowDeepBlue, Check, Cross } from '@opencrvs/components/lib/icons'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { TRPCClientError } from '@trpc/client'
 import React, { useEffect } from 'react'
@@ -52,6 +53,24 @@ import styled from 'styled-components'
 import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
 import { emptyMessage } from '@client/v2-events/utils'
+
+const Container = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0px auto;
+  width: 100%;
+`
+
+const SpinnerWrapper = styled.div`
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`
 
 type RoleWithLabel = { id: string; label: string; scopes: string[] }
 function getUserEditConfig(roles: RoleWithLabel[], selectedRoleId?: string) {
@@ -390,6 +409,34 @@ export const ReviewUser = () => {
     } else {
       navigate(ROUTES.V2.SETTINGS.USER.VIEW.buildPath({ userId }))
     }
+  }
+
+  const isSubmitting =
+    createUserMutation.isPending || updateUserMutation.isPending
+
+  if (isSubmitting) {
+    return (
+      <ActionPageLight
+        title={
+          isNewUser
+            ? intl.formatMessage(messages.userFormTitle)
+            : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+        }
+        goBack={() => navigate(-1)}
+        hideBackground={true}
+      >
+        <Container>
+          <SpinnerWrapper>
+            <Spinner id="user-form-submitting-spinner" size={25} />
+            <p>
+              {isNewUser
+                ? intl.formatMessage(messages.creatingNewUser)
+                : intl.formatMessage(messages.updatingUser)}
+            </p>
+          </SpinnerWrapper>
+        </Container>
+      </ActionPageLight>
+    )
   }
 
   return (
