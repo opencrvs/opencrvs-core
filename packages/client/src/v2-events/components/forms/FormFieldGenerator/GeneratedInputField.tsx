@@ -70,7 +70,9 @@ import {
   IndexMap,
   FormState,
   flattenFieldReference,
-  flattenFormState
+  flattenFormState,
+  ConditionalType,
+  isConditionMet
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -559,12 +561,37 @@ export const GeneratedInputField = <T extends FieldConfig>(
     )
   }
   if (isSelectFieldType(field)) {
+    const resolvedOptions = field.config.options
+      .filter((option) => {
+        const showConditionals = (option.conditionals ?? []).filter(
+          (c) => c.type === ConditionalType.SHOW
+        )
+        if (showConditionals.length === 0) {
+          return true
+        }
+        return showConditionals.some((c) =>
+          isConditionMet(c.conditional, form, validatorContext)
+        )
+      })
+      .map(({ conditionals, ...option }) => {
+        const enableConditionals = (conditionals ?? []).filter(
+          (c) => c.type === ConditionalType.ENABLE
+        )
+        if (enableConditionals.length === 0) {
+          return option
+        }
+        const isEnabled = enableConditionals.some((c) =>
+          isConditionMet(c.conditional, form, validatorContext)
+        )
+        return { ...option, disabled: !isEnabled }
+      })
+
     return (
       <InputField {...inputFieldProps}>
         <Select.Input
           {...inputProps}
           noOptionsMessage={field.config.noOptionsMessage}
-          options={field.config.options}
+          options={resolvedOptions}
           value={field.value}
         />
       </InputField>

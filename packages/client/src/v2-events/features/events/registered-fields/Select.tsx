@@ -19,7 +19,7 @@ export interface SelectInputProps
   onChange: (newValue: string) => void
   value?: string
   noOptionsMessage?: SelectField['noOptionsMessage']
-  options: SelectField['options']
+  options: Array<Omit<SelectOption, 'conditionals'> & { disabled?: boolean }>
   'data-testid'?: string
 }
 
@@ -34,12 +34,13 @@ function SelectInput({
 }: SelectInputProps) {
   const intl = useIntlWithFormData()
   const selectedOption = options.find((option) => option.value === value)
-  const formattedOptions = options.map((option: SelectOption) => ({
+  const formattedOptions = options.map((option) => ({
     value: option.value,
     label:
       typeof option.label === 'string'
         ? option.label
-        : intl.formatMessage(option.label)
+        : intl.formatMessage(option.label),
+    disabled: option.disabled
   }))
 
   const inputValue = selectedOption?.value ?? ''
