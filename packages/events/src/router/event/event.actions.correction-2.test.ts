@@ -18,6 +18,7 @@ import {
   defineConfig,
   defineDeclarationForm,
   defineFormPage,
+  encodeScope,
   field,
   FieldType,
   getCurrentEventState,
@@ -27,8 +28,7 @@ import {
   generateTranslationConfig,
   EventState,
   UUID,
-  getDeclarationFields,
-  SCOPES
+  getDeclarationFields
 } from '@opencrvs/commons'
 import { ChildOnboardingEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -386,7 +386,7 @@ describe('Search index should reflect corrected null informant fields', () => {
 
     // 2) Search by informant name should return it
     const recordSearchClient = createSystemTestClient('test-system', [
-      SCOPES.RECORDSEARCH
+      encodeScope({ type: 'record.search' })
     ])
     const { results: resultsBeforeCorrection } =
       await recordSearchClient.event.search({
