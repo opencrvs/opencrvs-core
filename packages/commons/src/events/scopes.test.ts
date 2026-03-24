@@ -10,8 +10,8 @@
  */
 
 import { isActionInScope } from './scopes'
+import { encodeScope } from '../scopes'
 import { ActionType } from './ActionType'
-import { encodeScope } from '../scopes-v2'
 import { EventIndexWithAdministrativeHierarchy } from './locations'
 import { UserContext } from '../users/User'
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
@@ -88,7 +88,7 @@ describe('isActionInScope()', () => {
   })
 
   describe('non-encoded scopes', () => {
-    it('should allow READ when legacy scope includes the event type', () => {
+    it('should prevent READ when legacy scope includes the event type', () => {
       expect(
         isActionInScope({
           scopes: ['record.read[event=birth]'],
@@ -96,7 +96,7 @@ describe('isActionInScope()', () => {
           event: makeEvent('birth'),
           currentUser: testUser
         })
-      ).toBe(true)
+      ).toBe(false)
     })
 
     it('should deny READ when legacy scope does not include the event type', () => {
@@ -110,7 +110,7 @@ describe('isActionInScope()', () => {
       ).toBe(false)
     })
 
-    it('should allow DECLARE when user has record.declare scope for the event', () => {
+    it('should deny DECLARE when user has legacy record.declare scope for the event', () => {
       expect(
         isActionInScope({
           scopes: ['record.declare[event=birth|death]'],
@@ -118,10 +118,10 @@ describe('isActionInScope()', () => {
           event: makeEvent('birth'),
           currentUser: testUser
         })
-      ).toBe(true)
+      ).toBe(false)
     })
 
-    it('should allow DECLARE when user has record.register scope for the event', () => {
+    it('should deny DECLARE when user has legacy record.register scope for the event', () => {
       expect(
         isActionInScope({
           scopes: ['record.register[event=birth]'],
@@ -129,7 +129,7 @@ describe('isActionInScope()', () => {
           event: makeEvent('birth'),
           currentUser: testUser
         })
-      ).toBe(true)
+      ).toBe(false)
     })
   })
 
@@ -248,7 +248,7 @@ describe('isActionInScope()', () => {
       ).toBe(true)
     })
 
-    it('should allow when V1 allows but V2 denies', () => {
+    it('should deny when V1 allows but V2 denies', () => {
       const nonEncodedScope = 'record.read[event=birth]'
       const encodedScope = encodeScope({
         type: 'record.read',
@@ -262,7 +262,7 @@ describe('isActionInScope()', () => {
           event: makeEvent('birth'),
           currentUser: testUser
         })
-      ).toBe(true)
+      ).toBe(false)
     })
 
     it('should deny when both V1 and V2 deny', () => {

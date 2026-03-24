@@ -145,7 +145,7 @@ const LinkButtonModified = styled(LinkButton)`
 `
 
 interface SearchParams {
-  locationId?: string
+  locationId?: UUID
 }
 
 type UserListProps = {
@@ -195,10 +195,6 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const locations = getLocations.useSuspenseQuery()
-
-  const userRoles = useSelector(
-    (store: IStoreState) => store.userForm.userRoles
-  )
 
   const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)
   const [showUsernameReminderSuccess, setShowUsernameReminderSuccess] =
@@ -553,7 +549,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
     }
   }
 
-  const LocationButton = (locationId: string) => {
+  const LocationButton = (locationId: UUID) => {
     const buttons: React.ReactElement[] = []
     if (canAccessMultipleLocations) {
       buttons.push(
@@ -597,7 +593,7 @@ function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
       userDetails
     }: {
       users: User[]
-      locationId: string
+      locationId: UUID
       userDetails: UserDetails | null
     }) {
       const totalData = users.length
