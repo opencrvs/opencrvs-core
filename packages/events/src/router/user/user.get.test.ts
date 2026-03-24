@@ -34,20 +34,27 @@ test('Returns user in correct format if found', async () => {
   const client = createTestClient(user)
   mswServer.use(
     http.post(`http://localhost:3030/getUser`, () => {
-      return HttpResponse.json(user)
+      return HttpResponse.json({
+        ...user,
+        signature: {
+          data: user.signature
+        }
+      })
     })
   )
   const fetchedUser = await client.user.get(user.id)
 
-  expect(fetchedUser).toEqual(expect.objectContaining({
-    id: user.id,
-    name: user.name,
-    role: user.role,
-    signature: user.signature,
-    status: user.status,
-    primaryOfficeId: user.primaryOfficeId,
-    type: TokenUserType.enum.user
-  }))
+  expect(fetchedUser).toEqual(
+    expect.objectContaining({
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      signature: user.signature,
+      status: user.status,
+      primaryOfficeId: user.primaryOfficeId,
+      type: TokenUserType.enum.user
+    })
+  )
 })
 
 test('Returns user with full honorific name when defined', async () => {
@@ -61,19 +68,26 @@ test('Returns user with full honorific name when defined', async () => {
 
   mswServer.use(
     http.post(`http://localhost:3030/getUser`, () => {
-      return HttpResponse.json(userWithHonorific)
+      return HttpResponse.json({
+        ...userWithHonorific,
+        signature: {
+          data: userWithHonorific.signature
+        }
+      })
     })
   )
   const fetchedUser = await client.user.get(user.id)
 
-  expect(fetchedUser).toEqual(expect.objectContaining({
-    id: user.id,
-    name: user.name,
-    role: user.role,
-    status: user.status,
-    signature: user.signature,
-    primaryOfficeId: user.primaryOfficeId,
-    fullHonorificName: userWithHonorific.fullHonorificName,
-    type: TokenUserType.enum.user
-  }))
+  expect(fetchedUser).toEqual(
+    expect.objectContaining({
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      status: user.status,
+      signature: user.signature,
+      primaryOfficeId: user.primaryOfficeId,
+      fullHonorificName: userWithHonorific.fullHonorificName,
+      type: TokenUserType.enum.user
+    })
+  )
 })
