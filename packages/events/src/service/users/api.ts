@@ -222,7 +222,6 @@ export async function updateUser(
   }
 
   const user = await getUser(input.id, token)
-  console.log(user)
   return user
 }
 

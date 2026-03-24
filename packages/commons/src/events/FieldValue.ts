@@ -26,6 +26,8 @@ import {
   IdReaderFieldValue,
   CustomFieldValue
 } from './CompositeFieldValue'
+import { EventConfig } from './EventConfig'
+import { FieldType } from './FieldType'
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).

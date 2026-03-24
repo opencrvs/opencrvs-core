@@ -68,7 +68,7 @@ export const UserInput = z.object({
   primaryOfficeId: z.string(),
   device: z.string().optional(),
   status: z.enum(['active', 'pending']).optional(),
-  signature: FileFieldValue
+  signature: FileFieldValue.optional()
 })
 
 export type UserInput = z.infer<typeof UserInput>

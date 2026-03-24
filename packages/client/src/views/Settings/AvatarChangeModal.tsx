@@ -188,7 +188,6 @@ function AvatarChangeModalComp({
       return
     }
     const { url } = await uploadFileAsync(croppedImage, userDetails.id)
-    console.log(url)
     if (userDetails && userDetails.id && croppedImage) {
       changeAvatarMutation.mutate(
         {

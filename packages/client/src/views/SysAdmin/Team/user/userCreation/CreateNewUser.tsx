@@ -27,6 +27,7 @@ import {
   PageTypes,
   SCOPES,
   TokenUserType,
+  EventConfigToDeclarationFormType,
   UserInput
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
@@ -50,10 +51,7 @@ import { useUsers } from '../../../../../v2-events/hooks/useUsers'
 import { emptyMessage } from '@client/v2-events/utils'
 
 type RoleWithLabel = { id: string; label: string; scopes: string[] }
-function getUserEditConfig(
-  roles: RoleWithLabel[],
-  selectedRoleId: string
-): EventConfig {
+function getUserEditConfig(roles: RoleWithLabel[], selectedRoleId?: string) {
   const selectedRole = roles.find((role) => role.id === selectedRoleId)
 
   return {
@@ -168,10 +166,14 @@ function getUserEditConfig(
       ]
     },
     actions: []
-  }
+  } as const satisfies EventConfig
 }
-type EventState = any
-interface ActionAnnotationProps {
+
+type EventState = Partial<
+  EventConfigToDeclarationFormType<ReturnType<typeof getUserEditConfig>>
+>
+
+interface UserFormState {
   userForm?: EventState
   setUserForm: (data: EventState) => void
   getUserForm: (initialValues?: EventState) => EventState
@@ -179,7 +181,7 @@ interface ActionAnnotationProps {
   clear: () => void
 }
 
-const useUserFormState = create<ActionAnnotationProps>()((set, get) => ({
+const useUserFormState = create<UserFormState>()((set, get) => ({
   getUserForm: (initialValues?: EventState) =>
     get().userForm || deepDropNulls(initialValues ?? {}),
   setUserForm: (data: EventState) => {
@@ -318,7 +320,8 @@ export const ReviewUser = () => {
       role: user.role,
       name: {
         firstname: user.name[0]?.given[0] ?? '',
-        surname: user.name[0]?.family ?? ''
+        surname: user.name[0]?.family ?? '',
+        middlename: ''
       },
       phoneNumber: user.mobile,
       email: user.email,
@@ -390,11 +393,15 @@ export const ReviewUser = () => {
               const payload: UserInput = {
                 ...formState,
                 mobile: formState.phoneNumber,
+                email: formState.email!,
+                role: formState.role!,
+                primaryOfficeId: formState.primaryOfficeId!,
+                signature: formState.signature,
                 name: [
                   {
                     use: 'en',
-                    given: [formState.name.firstname],
-                    family: formState.name.surname
+                    given: [formState!.name!.firstname],
+                    family: formState!.name!.surname
                   }
                 ]
               }
@@ -417,11 +424,15 @@ export const ReviewUser = () => {
               const payload: UserInput = {
                 ...formState,
                 mobile: formState.phoneNumber,
+                email: formState.email!,
+                role: formState.role!,
+                primaryOfficeId: formState.primaryOfficeId!,
+                signature: formState.signature,
                 name: [
                   {
                     use: 'en',
-                    given: [formState.name.firstname],
-                    family: formState.name.surname
+                    given: [formState!.name!.firstname],
+                    family: formState!.name!.surname
                   }
                 ]
               }
@@ -490,35 +501,23 @@ function FormLayout({
 
 function FormHeader({
   label,
-  onSaveAndExit,
-  onClose,
-  actionComponent
+  onClose
 }: {
   label: string
   onSaveAndExit?: () => void
   onClose?: () => void
   actionComponent?: React.ReactNode
 }) {
-  const intl = useIntl()
-
   const BackButtonContainer = styled.div`
     margin-right: 16px;
     cursor: pointer;
-  `
-
-  const BackButtonText = styled.span`
-    ${({ theme }) => theme.fonts.bold16};
-    text-transform: capitalize;
-    @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-      display: none;
-    }
   `
 
   const getHeaderLeft = () => {
     return (
       <BackButtonContainer
         id="action_page_back_button"
-        onClick={() => console.log('back')}
+        onClick={onClose}
         key="action_page_back_button"
       >
         <CircleButton>{<BackArrowDeepBlue />}</CircleButton>

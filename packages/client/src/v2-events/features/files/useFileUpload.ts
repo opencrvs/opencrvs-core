@@ -225,7 +225,7 @@ export function useFileUpload(
         mutateOptions
       )
     },
-    uploadFileAsync: (
+    uploadFileAsync: async (
       file: File,
       referenceId = 'default',
       mutateOptions: Parameters<typeof upload.mutate>[1] = {}
