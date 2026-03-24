@@ -25,7 +25,6 @@ import { UserDetails } from '@client/utils/userUtils'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import {
   DEFAULT_ROLES_DEFINITION,
-  Scope,
   SCOPES,
   TestUserRole,
   TokenUserType,
@@ -69,27 +68,14 @@ export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
   SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-] satisfies Scope[]
+]
 
 export const REGISTRAR_DEFAULT_SCOPES = [
-  SCOPES.RECORD_DECLARE_BIRTH,
-  SCOPES.RECORD_DECLARE_DEATH,
-  SCOPES.RECORD_DECLARE_MARRIAGE,
-  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-  SCOPES.RECORD_REVIEW_DUPLICATES,
-  SCOPES.RECORD_DECLARATION_ARCHIVE,
-  SCOPES.RECORD_DECLARATION_REINSTATE,
-  SCOPES.RECORD_REGISTER,
-  SCOPES.RECORD_REGISTRATION_CORRECT,
-  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
   SCOPES.ORGANISATION_READ_LOCATIONS,
-  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_MARRIAGE
-] satisfies Scope[]
+  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+]
 
 const ACTION_STATUS_MAP = {
   [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -1052,7 +1038,7 @@ export function generateToken({
   role,
   subject
 }: {
-  scope: Scope[]
+  scope: string[]
   subject?: string
   userType?: TokenUserType
   role?: TestUserRole
@@ -1077,7 +1063,7 @@ export function generateToken({
   })
 }
 
-export function setScopes(scope: Scope[], store: AppStore) {
+export function setScopes(scope: string[], store: AppStore) {
   const token = generateToken({ scope })
 
   window.history.replaceState({}, '', '?token=' + token)
