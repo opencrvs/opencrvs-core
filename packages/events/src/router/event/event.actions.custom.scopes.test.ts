@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import fc from 'fast-check'
 import {
   ActionType,
@@ -29,7 +28,7 @@ import {
 import { createIndex } from '@events/service/indexing/indexing'
 import { getEventIndexName } from '@events/storage/elasticsearch'
 
-test('Check scopes against event.actions.register', async () => {
+test('Check scopes against event.actions.custom', async () => {
   await createIndex(
     getEventIndexName('tennis-club-membership_premium'),
     getDeclarationFields(tennisClubMembershipEvent)
@@ -37,8 +36,9 @@ test('Check scopes against event.actions.register', async () => {
 
   // 1. Setup test fixture with a known set of users, administrative areas, and events.
   const { users, isUnderAdministrativeArea, eventIds } =
-    await setupScopeTestFixture(124334532, [
+    await setupScopeTestFixture(8843, [
       ActionType.DECLARE,
+      ActionType.REGISTER,
       ActionType.UNASSIGN
     ])
 
@@ -72,16 +72,20 @@ test('Check scopes against event.actions.register', async () => {
     ),
     placeOfEvent: jurisdictionOptions,
     declaredBy: userOptions,
-    declaredIn: jurisdictionOptions
+    declaredIn: jurisdictionOptions,
+    registeredBy: userOptions,
+    registeredIn: jurisdictionOptions
   })
 
   // 3. Test combination against random event and assert results
-
   await fc.assert(
     fc.asyncProperty(combinations, async ({ user, ...options }) => {
       const scope = encodeScope({
-        type: 'record.register',
-        options
+        type: 'record.custom-action',
+        options: {
+          ...options,
+          customActionTypes: ['ESCALATE']
+        }
       })
 
       const randomIndex = Math.floor(Math.random() * eventIds.length)
@@ -92,11 +96,13 @@ test('Check scopes against event.actions.register', async () => {
         user,
         scope,
         clientReadingAllEvents,
-        async (client) =>
-          client.event.actions.register.request({
+        (client) =>
+          client.event.actions.custom.request({
             eventId,
             transactionId: getUUID(),
-            declaration: {}
+            declaration: {},
+            annotation: {},
+            customActionType: 'ESCALATE'
           })
       )
 
@@ -106,6 +112,8 @@ test('Check scopes against event.actions.register', async () => {
         ...options
       })
     }),
-    { numRuns: 20 }
+    {
+      numRuns: 20
+    }
   )
 })

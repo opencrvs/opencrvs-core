@@ -111,7 +111,7 @@ export enum AddressCases {
 export type Action = SubmissionAction | DownloadAction
 export interface ISelectOption {
   value: SelectComponentOption['value']
-  label: MessageDescriptor
+  label: MessageDescriptor | string
   isDefault?: boolean
 }
 export interface IRadioOption {

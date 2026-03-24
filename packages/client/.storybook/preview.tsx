@@ -243,6 +243,24 @@ const preview: Preview = {
 
         addUserToQueryData(generator.user.registrationAgent().v2)
       } else if (
+        options.parameters.userRole === TestUserRole.enum.COMMUNITY_LEADER
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.communityLeader
+        )
+
+        addUserToQueryData(generator.user.communityLeader().v2)
+      } else if (
+        options.parameters.userRole === TestUserRole.enum.PROVINCIAL_REGISTRAR
+      ) {
+        window.localStorage.setItem(
+          'opencrvs',
+          generator.user.token.provincialRegistrar
+        )
+
+        addUserToQueryData(generator.user.provincialRegistrar().v2)
+      } else if (
         options.parameters.userRole === TestUserRole.enum.LOCAL_SYSTEM_ADMIN
       ) {
         window.localStorage.setItem(
@@ -255,6 +273,7 @@ const preview: Preview = {
           name: [{ use: 'en', given: ['Alex'], family: 'Ngonga' }],
           role: TestUserRole.enum.LOCAL_SYSTEM_ADMIN,
           primaryOfficeId,
+          status: 'active',
           type: TokenUserType.enum.user
         })
       } else if (

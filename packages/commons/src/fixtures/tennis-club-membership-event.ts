@@ -319,6 +319,23 @@ export const tennisClubMembershipEvent = defineConfig({
           'This is shown as the action name anywhere the user can trigger the action from'
       },
       printForm: PRINT_CERTIFICATE_FORM
+    },
+    {
+      type: ActionType.CUSTOM,
+      customActionType: 'ESCALATE',
+      label: {
+        id: 'event.tennis-club-membership.action.escalate.label',
+        defaultMessage: 'Escalate',
+        description:
+          'This is shown as the action name anywhere the user can trigger the action from'
+      },
+      form: [],
+      auditHistoryLabel: {
+        id: 'event.tennis-club-membership.action.escalate.audit-history-label',
+        defaultMessage: 'Escalated',
+        description:
+          'This is the label to show in audit history for the escalate action'
+      }
     }
   ],
   advancedSearch: [

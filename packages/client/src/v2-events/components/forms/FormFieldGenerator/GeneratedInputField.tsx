@@ -632,11 +632,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             eventType={eventConfig?.id}
-            searchableResource={
-              field.config.configuration.searchableResource.length > 0
-                ? field.config.configuration.searchableResource
-                : ['locations']
-            }
+            locationTypes={field.config.configuration.locationTypes}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -652,7 +648,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             eventType={eventConfig?.id}
-            searchableResource={['offices']}
+            locationTypes={['CRVS_OFFICE']}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -668,7 +664,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             disabled={disabled}
             eventType={eventConfig?.id}
-            searchableResource={['facilities']}
+            locationTypes={['HEALTH_FACILITY']}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -676,9 +672,11 @@ export const GeneratedInputField = React.memo(
         </InputField>
       )
     }
+
     if (isDividerFieldType(field)) {
       return <Divider.Input />
     }
+
     if (isFileFieldWithOptionType(field)) {
       return (
         <InputField {...inputFieldProps}>

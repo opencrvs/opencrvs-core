@@ -94,7 +94,7 @@ export const eventRouter = router({
           tags: ['events']
         }
       })
-      .mutation(({ ctx, input }) => {
+      .mutation(async ({ ctx, input }) => {
         if (input?.waitForCompletion === false) {
           void reindex(ctx.token).catch((err) => {
             logger.error(`Reindex failed ${err.message}`)

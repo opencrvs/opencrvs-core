@@ -13,7 +13,6 @@ import { env } from '@workflow/environment'
 
 export const HOST = env.HOST
 export const PORT = env.PORT
-export const FHIR_URL = env.FHIR_URL
 export const APPLICATION_CONFIG_URL = env.APPLICATION_CONFIG_URL
 
 export const NOTIFICATION_SERVICE_URL = env.NOTIFICATION_SERVICE_URL

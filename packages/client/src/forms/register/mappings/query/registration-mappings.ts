@@ -10,14 +10,12 @@
  */
 import {
   IFormData,
-  TransformedData,
   IFormField,
-  IFormSectionData
+  TransformedData
 } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
 import {
-  AdminStructure,
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
@@ -28,21 +26,16 @@ import {
   RegStatus,
   RegWorkflow
 } from '@client/utils/gateway'
-import { get } from 'lodash'
-import { MessageDescriptor } from 'react-intl'
-import QRCode from 'qrcode'
+import {
+  countryAlpha3toAlpha2
+} from '@client/utils/locationUtils'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
 import {
-  PhoneNumber,
   PhoneNumberFormat,
   PhoneNumberUtil
 } from 'google-libphonenumber'
-import {
-  countryAlpha3toAlpha2,
-  getLocationHierarchy
-} from '@client/utils/locationUtils'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { LANG_EN } from '@client/utils/constants'
+import { get } from 'lodash'
+import QRCode from 'qrcode'
 
 /** @deprecated Use userTransformer instead */
 export const roleUserTransformer = (
@@ -159,99 +152,6 @@ export const localPhoneTransformer =
     return transformedData
   }
 
-const getUserFullName = (history: History): string => {
-  return history?.user?.name ? createNamesMap(history.user.name)[LANG_EN] : ''
-}
-
-const getUserRole = (history: History): MessageDescriptor => {
-  return (
-    history?.user?.role.label || {
-      defaultMessage: ' ',
-      description: 'empty string',
-      id: 'form.field.label.empty'
-    }
-  )
-}
-
-const getUserFullHonorificName = (history: History): string => {
-  return history?.user?.fullHonorificName || ''
-}
-
-const getUserSignature = (history: History): string => {
-  return history?.signature?.data as string
-}
-
-export const userTransformer =
-  (...statuses: RegStatus[]) =>
-  (
-    transformedData: IFormData,
-    event: EventRegistration,
-    sectionId: string,
-    targetSectionId?: string,
-    targetFieldName?: string,
-    offlineData?: IOfflineData
-  ) => {
-    if (!event.history) {
-      return
-    }
-    const history = [...(event.history as History[])]
-      .reverse()
-      .find(
-        ({ action, regStatus }: History) =>
-          !action && regStatus && statuses.includes(regStatus)
-      )
-
-    if (history?.location && offlineData) {
-      const { country, ...locationHierarchyIds } = getLocationHierarchy(
-        history.location.id,
-        offlineData.locations
-      )
-      const locationHierarchy: Record<
-        string,
-        string | AdminStructure | undefined
-      > = { country }
-
-      for (const [key, value] of Object.entries(locationHierarchyIds)) {
-        locationHierarchy[`${key}Id`] = value
-        locationHierarchy[key] = offlineData.locations[value]
-      }
-
-      transformedData[targetSectionId || sectionId][
-        targetFieldName || 'registrar'
-      ] = {
-        name: getUserFullName(history),
-        role: getUserRole(history),
-        office: history.office,
-        officeId: history.office?.id,
-        date: history.date,
-        ...locationHierarchy,
-        signature: getUserSignature(history),
-        comments: history.comments?.[0]?.comment,
-        fullHonorificName: getUserFullHonorificName(history)
-      } as IFormSectionData
-    }
-  }
-/** @deprecated Use userTransformer instead */
-export const registrarNameUserTransformer = (
-  transformedData: IFormData,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  _: any,
-  sectionId: string,
-  targetSectionId?: string,
-  targetFieldName?: string,
-  __?: IOfflineData
-) => {
-  if (!_.history) {
-    return
-  }
-
-  const history = _.history.find(
-    ({ action, regStatus }: History) =>
-      !action && regStatus === RegStatus.Registered
-  )
-  transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
-    getUserFullName(history)
-}
 export const registrationLocationUserTransformer = (
   transformedData: IFormData,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

@@ -11,12 +11,11 @@
 import * as React from 'react'
 import { AvatarSmall as DefaultAvatar } from '@opencrvs/components/lib/icons'
 import { AVATAR_API } from '@client/utils/constants'
-import { Avatar } from '@client/utils/gateway'
 import styled from 'styled-components'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string
-  avatar?: Avatar | undefined | null
+  avatar?: string | undefined | null
 }
 
 const AvatarImage = styled.img`
@@ -41,7 +40,7 @@ export function AvatarSmall({ name, avatar, ...props }: IProps) {
         height={36}
         src={
           avatar
-            ? avatar.data
+            ? avatar
             : `${AVATAR_API}${encodeURIComponent(name!).replace(/%20/g, '+')}`
         }
         onError={() => setError(true)}

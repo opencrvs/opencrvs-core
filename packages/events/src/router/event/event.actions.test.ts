@@ -261,7 +261,7 @@ const multiFileConfig = {
   advancedSearch: []
 } satisfies EventConfig
 
-beforeEach(() => {
+beforeEach(async () => {
   return createIndex(
     getEventIndexName(multiFileConfig.id),
     getDeclarationFields(tennisClubMembershipEvent)
@@ -741,7 +741,7 @@ describe('Conditionals based on user role', () => {
       })
     })
 
-    expect(users).toHaveLength(7)
+    expect(users).toHaveLength(9)
     for (const u of users) {
       const userClient = createTestClient(u)
 

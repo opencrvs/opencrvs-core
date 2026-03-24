@@ -49,12 +49,6 @@ import { ApplicationConfig } from '@opencrvs/commons/client'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
-export type LocationType =
-  | 'HEALTH_FACILITY'
-  | 'CRVS_OFFICE'
-  | 'ADMIN_STRUCTURE'
-  | 'PRIVATE_HOME'
-
 export interface ILocation {
   id: string
   name: string
@@ -75,19 +69,19 @@ type JurisdictionType =
   | 'LOCATION_LEVEL_5'
 
 export interface AdminStructure extends ILocation {
-  type: 'ADMIN_STRUCTURE'
+  type: string
   jurisdictionType: JurisdictionType
-  physicalType: 'Jurisdiction'
+  physicalType: string
 }
 
 export interface Facility extends ILocation {
-  type: 'HEALTH_FACILITY'
-  physicalType: 'Building'
+  type: string
+  physicalType: string
 }
 
 export interface CRVSOffice extends ILocation {
-  type: 'CRVS_OFFICE'
-  physicalType: 'Building'
+  type: string
+  physicalType: string
 }
 
 export interface IForms {
@@ -562,19 +556,6 @@ function reducer(
       const offices = filterLocations(
         action.payload,
         'CRVS_OFFICE'
-        /*
-
-        // This is used to filter office locations available offline
-        // It was important in an older design and may become important again
-
-        {
-          locationLevel: 'id',
-          locationId: isNationalSystemAdmin(state.userDetails)
-            ? undefined
-            : state.userDetails &&
-              state.userDetails.primaryOffice &&
-              state.userDetails.primaryOffice.id
-        }*/
       )
       const activeOffices = Object.fromEntries(
         Object.entries(offices).filter(

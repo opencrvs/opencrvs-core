@@ -23,7 +23,6 @@ import {
   FieldConfig,
   EventState,
   generateTranslationConfig,
-  user,
   UUID,
   DocumentPath
 } from '@opencrvs/commons/client'
@@ -219,8 +218,8 @@ const fields = [
       ]
     },
     defaultValue: {
-      country: 'Bangladesh',
-      administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+      country: 'FAR',
+      administrativeArea: '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID,
       addressType: 'DOMESTIC'
     }
   },
@@ -322,16 +321,22 @@ const fields = [
 
   {
     id: 'membership.facility',
-    type: FieldType.FACILITY,
+    type: FieldType.LOCATION,
     label: generateTranslationConfig('Facility'),
-    defaultValue: 'Gym Hall'
+    defaultValue: 'Gym Hall',
+    configuration: {
+      locationTypes: ['HEALTH_FACILITY']
+    }
   },
 
   {
     id: 'membership.office',
-    type: FieldType.OFFICE,
+    type: FieldType.LOCATION,
     label: generateTranslationConfig('Membership Office'),
-    defaultValue: 'Head Office'
+    defaultValue: 'Head Office',
+    configuration: {
+      locationTypes: ['CRVS_OFFICE']
+    }
   },
 
   {
@@ -418,9 +423,9 @@ const declaration = {
   'applicant.country': 'BGD',
   'applicant.region': 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
   'applicant.address': {
-    country: 'BGD',
+    country: 'FAR',
     addressType: 'DOMESTIC',
-    administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a'
+    administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9'
   },
   'applicant.documents': [
     {

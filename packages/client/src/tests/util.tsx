@@ -13,7 +13,8 @@ import {
   SCOPES,
   DEFAULT_ROLES_DEFINITION,
   TestUserRole,
-  TokenUserType
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons/client'
 import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -29,8 +30,8 @@ import {
   ApolloLink,
   ApolloProvider,
   InMemoryCache,
-  NetworkStatus,
-  Observable
+  Observable,
+  gql
 } from '@apollo/client'
 import { MockedProvider } from '@apollo/client/testing'
 import { App, routesConfig } from '@client/App'
@@ -56,7 +57,6 @@ import { waitForElement } from './wait-for-element'
 
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { vi } from 'vitest'
-import { getUserRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { Section, SubmissionAction } from '@client/forms'
@@ -310,49 +310,20 @@ const secondaryInternationalAddressLines = {
 }
 
 export const userDetails: UserDetails = {
-  userMgntUserID: '123',
   id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
-  status: 'active' as Status,
-  creationDate: '1487076708000',
-  practitionerId: '12345',
+  type: 'user',
+  status: 'active',
   name: [
     {
       use: 'en',
-      firstNames: 'Shakib',
-      familyName: 'Al Hasan'
+      given: ['Shakib'],
+      family: 'Al Hasan'
     },
-    { use: 'bn', firstNames: '', familyName: '' }
+    { use: 'bn', given: [''], family: '' }
   ],
-  role: {
-    id: TestUserRole.enum.FIELD_AGENT,
-    label: {
-      defaultMessage: 'Field Agent',
-      description: 'Name for user role Field Agent',
-      id: 'userRole.fieldAgent'
-    }
-  },
+  role: TestUserRole.enum.FIELD_AGENT,
   mobile: '01677701431',
-  primaryOffice: {
-    id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
-    name: 'Kaliganj Union Sub Center',
-    alias: ['কালিগাঞ্জ ইউনিয়ন পরিষদ'],
-    status: 'active'
-  },
-  localRegistrar: {
-    role: 'LOCAL_REGISTRAR',
-    signature: {
-      data: `data:image/png;base64,${validImageB64String}`,
-      type: 'image/png'
-    },
-    name: [
-      {
-        use: 'en',
-        firstNames: 'Mohammad',
-        familyName: 'Ashraful',
-        __typename: 'HumanName'
-      }
-    ]
-  }
+  primaryOfficeId: '6327dbd9-e118-4dbe-9246-cb0f7649a666' as UUID
 }
 
 export const mockUserResponse = {
@@ -1091,51 +1062,19 @@ async function getReviewFormFromStore(
 export function loginAsFieldAgent(store: AppStore) {
   return store.dispatch(
     setUserDetails({
-      loading: false,
-      networkStatus: NetworkStatus.ready,
-      data: {
-        getUser: {
-          id: '5eba726866458970cf2e23c2',
-          username: 'a.alhasan',
-          creationDate: '2022-10-03T10:42:46.920Z',
-          userMgntUserID: '5eba726866458970cf2e23c2',
-          practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-          mobile: '+8801711111111',
-          role: {
-            id: 'CHA',
-            label: {
-              id: 'userRoles.CHA',
-              defaultMessage: 'CHA',
-              description: 'CHA'
-            }
-          },
-          status: Status.Active,
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Shakib',
-              familyName: 'Al Hasan'
-            }
-          ],
-          primaryOffice: {
-            id: '0d8474da-0361-4d32-979e-af91f012340a',
-            name: 'Kaliganj Union Sub Center',
-            status: 'active',
-            alias: ['বানিয়াজান']
-          },
-          localRegistrar: {
-            name: [
-              {
-                use: 'en',
-                firstNames: 'Mohammad',
-                familyName: 'Ashraful'
-              }
-            ],
-            role: 'LOCAL_REGISTRAR',
-            signature: undefined
-          }
+      id: '5eba726866458970cf2e23c2',
+      type: 'user',
+      mobile: '+8801711111111',
+      role: 'CHA',
+      status: 'active',
+      name: [
+        {
+          use: 'en',
+          given: ['Shakib'],
+          family: 'Al Hasan'
         }
-      }
+      ],
+      primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a' as UUID
     })
   )
 }
@@ -1179,6 +1118,20 @@ export const mockRoles = {
     getUserRoles: DEFAULT_ROLES_DEFINITION
   }
 }
+
+const getUserRolesQuery = gql`
+  query GetUserRoles {
+    getUserRoles {
+      id
+      label {
+        id
+        defaultMessage
+        description
+      }
+      scopes
+    }
+  }
+`
 
 export const mockFetchRoleGraphqlOperation = {
   request: {

@@ -85,6 +85,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
   handleFormAction = () => {
     const { formData, activeGroup, offlineCountryConfig, user } = this.props
+
     if (
       hasFormError(activeGroup.fields, formData, offlineCountryConfig, {}, user)
     ) {
@@ -136,7 +137,6 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     const title = activeGroup?.title
       ? intl.formatMessage(activeGroup.title)
       : ''
-
     return (
       <>
         <ActionPageLight

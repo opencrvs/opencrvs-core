@@ -8,13 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  createPrng,
-  generateUuid,
-  Location,
-  LocationType,
-  SCOPES
-} from '@opencrvs/commons'
+import { createPrng, generateUuid, Location, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Returns single location in right format', async () => {
@@ -29,7 +23,7 @@ test('Returns single location in right format', async () => {
       administrativeAreaId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       externalId: 'abc123xyz456'
     }
   ]
