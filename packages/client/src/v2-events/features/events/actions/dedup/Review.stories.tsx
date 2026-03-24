@@ -132,7 +132,10 @@ const actions = [
   }),
   generateActionDocument({
     configuration: overriddenEventConfig,
-    action: ActionType.REGISTER
+    action: ActionType.REGISTER,
+    defaults: {
+      declaration: declarationObj
+    }
   }),
   generateActionDocument({
     configuration: overriddenEventConfig,
@@ -225,7 +228,10 @@ export const DuplicateWithSameLabels: Story = {
         {
           ...mockOriginalEvent,
           actions: mockOriginalEvent.actions.map((x) => {
-            if (x.type === ActionType.DECLARE) {
+            if (
+              x.type === ActionType.DECLARE ||
+              x.type === ActionType.REGISTER
+            ) {
               return {
                 ...x,
                 declaration: {
@@ -241,7 +247,10 @@ export const DuplicateWithSameLabels: Story = {
         {
           ...mockDuplicateEvent,
           actions: mockDuplicateEvent.actions.map((x) => {
-            if (x.type === ActionType.DECLARE) {
+            if (
+              x.type === ActionType.DECLARE ||
+              x.type === ActionType.REGISTER
+            ) {
               return {
                 ...x,
                 declaration: {
