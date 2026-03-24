@@ -24,7 +24,7 @@ import {
   UserFilter,
   isCustomActionScope,
   scopeUsesPrintCertifiedCopiesOptions
-} from '../scopes-v2'
+} from '../scopes'
 import { SystemContext, UserContext } from '../users/User'
 
 /** @deprecated Moving on, location types are arbitrary and defined by the country config. */

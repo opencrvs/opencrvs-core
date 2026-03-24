@@ -153,7 +153,7 @@ test('templates option in scope does not affect printCertificate action authoriz
     users[0],
     scopeWithTemplateRestriction,
     clientReadingAllEvents,
-    (client) =>
+    async (client) =>
       client.event.actions.printCertificate.request({
         eventId,
         transactionId: getUUID(),

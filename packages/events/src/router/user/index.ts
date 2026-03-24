@@ -266,6 +266,6 @@ export const userRouter = router({
   activate: userOnlyProcedure
     .input(z.any())
     .mutation(async ({ input, ctx }) => {
-      return await activateUser(input, ctx.token)
+      return activateUser(input, ctx.token)
     })
 })

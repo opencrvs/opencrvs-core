@@ -13,9 +13,10 @@ import {
   logger,
   isBase64FileString,
   triggerUserEventNotification,
-  personNameFromV1ToV2
+  personNameFromV1ToV2,
+  findScope
 } from '@opencrvs/commons'
-import { findScope, getScopes, SCOPES } from '@opencrvs/commons/authentication'
+import { getScopes, SCOPES } from '@opencrvs/commons/authentication'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
   generateUsername,
