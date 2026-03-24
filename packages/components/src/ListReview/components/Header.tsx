@@ -13,11 +13,10 @@ import styled from 'styled-components'
 
 export const HeaderContainer = styled.tr`
   th {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey100};
     padding: 12px 0;
     text-align: left;
-    color: ${({ theme }) => theme.colors.grey400};
-    ${({ theme }) => theme.fonts.bold12};
+    ${({ theme }) => theme.fonts.bold18};
 
     @media screen and (max-width: 768px) {
       display: none;

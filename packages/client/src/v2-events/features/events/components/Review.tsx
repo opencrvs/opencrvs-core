@@ -342,6 +342,7 @@ function FormReview({
                   {displayedFields.map(
                     ({
                       id,
+                      type,
                       label,
                       errorDisplay,
                       valueDisplay,
@@ -352,31 +353,42 @@ function FormReview({
                         (isCorrection && uncorrectable) ||
                         isReviewCorrection
 
+                      const showSectionHeading = type === 'PARAGRAPH'
+
                       return (
-                        <ListReview.Row
-                          key={id}
-                          actions={
-                            !shouldHideEditLink && (
-                              <Link
-                                data-testid={`change-button-${id}`}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  onEdit({
-                                    pageId: page.id,
-                                    fieldId: id
-                                  })
-                                }}
-                              >
-                                {intl.formatMessage(
-                                  reviewMessages.changeButton
-                                )}
-                              </Link>
-                            )
-                          }
-                          id={id}
-                          label={intl.formatMessage(label)}
-                          value={errorDisplay || valueDisplay}
-                        />
+                        <>
+                          {showSectionHeading ? (
+                            <ListReview.Header
+                              label={intl.formatMessage(label)}
+                              value={null}
+                            />
+                          ) : (
+                            <ListReview.Row
+                              key={id}
+                              actions={
+                                !shouldHideEditLink && (
+                                  <Link
+                                    data-testid={`change-button-${id}`}
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      onEdit({
+                                        pageId: page.id,
+                                        fieldId: id
+                                      })
+                                    }}
+                                  >
+                                    {intl.formatMessage(
+                                      reviewMessages.changeButton
+                                    )}
+                                  </Link>
+                                )
+                              }
+                              id={id}
+                              label={intl.formatMessage(label)}
+                              value={errorDisplay || valueDisplay}
+                            />
+                          )}
+                        </>
                       )
                     }
                   )}
