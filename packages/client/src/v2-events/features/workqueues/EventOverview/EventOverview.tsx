@@ -162,11 +162,7 @@ function EventOverviewContainer() {
       {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} />
       ) : (
-        <EventOverviewProtected
-          eventIndex={eventIndex}
-          // @TODO: Is this needed after new event overview UI?
-          // onAction={getEventQuery.refetch}
-        />
+        <EventOverviewProtected eventIndex={eventIndex} />
       )}
     </>
   )

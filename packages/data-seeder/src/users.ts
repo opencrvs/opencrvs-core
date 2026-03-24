@@ -13,13 +13,10 @@ import { env } from './environment'
 import { z } from 'zod'
 import { raise } from './utils'
 import { decodeScope, EventConfig, joinUrl } from '@opencrvs/commons'
-import {
-  parseLiteralScope,
-  parseConfigurableScope
-} from '@opencrvs/commons/authentication'
+import { parseLiteralScope } from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 import { createClient } from '@opencrvs/toolkit/api'
-
+import { parseConfigurableScope } from '@opencrvs/toolkit/scopes'
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -32,13 +29,13 @@ const RoleSchema = (eventIds: string[]) =>
       }),
       scopes: z.array(
         z.string().superRefine((scope, ctx) => {
-          const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedLiteralScope = parseLiteralScope(scope)
+          const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedV2Scopes = decodeScope(scope)
 
           if (
-            !parsedConfigurableScope &&
             !parsedLiteralScope &&
+            !parsedConfigurableScope &&
             !parsedV2Scopes
           ) {
             ctx.addIssue({
@@ -241,6 +238,7 @@ export async function seedUsers(token: string) {
       primaryOfficeId: primaryOffice.id,
       username
     }
+
     await createUser(token, userPayload)
   }
 }
