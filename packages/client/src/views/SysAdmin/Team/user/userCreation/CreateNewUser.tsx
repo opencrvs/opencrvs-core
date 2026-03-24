@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { buttonMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
 import * as routes from '@client/navigation/routes'
-import { Icon } from '@client/v2-events/components/IconWithName'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
@@ -29,7 +29,7 @@ import {
   TokenUserType,
   UserInput
 } from '@opencrvs/commons/client'
-import { AppBar, Frame, Spinner, ToggleMenu } from '@opencrvs/components'
+import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import {
   CircleButton,
@@ -37,7 +37,7 @@ import {
   SuccessButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrowDeepBlue, Check, Cross } from '@opencrvs/components/lib/icons'
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -47,7 +47,7 @@ import {
 import styled from 'styled-components'
 import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
-import { buttonMessages } from '@client/i18n/messages'
+import { emptyMessage } from '@client/v2-events/utils'
 
 type RoleWithLabel = { id: string; label: string; scopes: string[] }
 function getUserEditConfig(
@@ -63,22 +63,13 @@ function getUserEditConfig(
     },
     advancedSearch: [],
     flags: [],
-    title: {
-      id: 'user.title',
-      defaultMessage: 'User',
-      description: ''
-    },
-    label: {
-      id: 'user.label',
-      defaultMessage: 'User',
-      description: ''
-    },
+    // Not showin anywhere
+    title: messages.userFormTitle,
+    // Not showin anywhere
+    label: messages.userFormTitle,
     declaration: {
-      label: {
-        id: 'foobar',
-        defaultMessage: 'foo',
-        description: ''
-      },
+      // Not showin anywhere
+      label: messages.userFormTitle,
       pages: [
         {
           id: 'user.office',
@@ -93,11 +84,7 @@ function getUserEditConfig(
               configuration: {
                 locationTypes: ['CRVS_OFFICE']
               },
-              label: {
-                id: 'user.office',
-                defaultMessage: 'Office',
-                description: ''
-              }
+              label: messages.registrationOffice
             }
           ]
         },
@@ -112,11 +99,7 @@ function getUserEditConfig(
               type: FieldType.NAME,
               required: true,
               hideLabel: true,
-              label: {
-                id: 'user.name',
-                defaultMessage: 'Name',
-                description: ''
-              }
+              label: emptyMessage
             },
             {
               id: 'phoneNumber',
@@ -139,11 +122,7 @@ function getUserEditConfig(
             {
               id: 'divider',
               type: FieldType.DIVIDER,
-              label: {
-                id: 'user.divider',
-                defaultMessage: '',
-                description: ''
-              }
+              label: emptyMessage
             },
             {
               id: 'role',
@@ -179,11 +158,7 @@ function getUserEditConfig(
               type: FieldType.SIGNATURE,
               required: false,
               label: messages.userSignatureAttachment,
-              signaturePromptLabel: {
-                id: 'signature.prompt',
-                defaultMessage: 'Sign here',
-                description: ''
-              },
+              signaturePromptLabel: messages.userSignatureAttachment,
               configuration: {
                 maxFileSize: 123456
               }
