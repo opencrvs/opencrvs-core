@@ -169,7 +169,9 @@ function resolveOptions(
       const showConditionals = (option.conditionals ?? []).filter(
         (c) => c.type === ConditionalType.SHOW
       )
-      if (showConditionals.length === 0) return true
+      if (showConditionals.length === 0) {
+        return true
+      }
       return showConditionals.some((c) =>
         isConditionMet(c.conditional, form, validatorContext)
       )
@@ -178,7 +180,9 @@ function resolveOptions(
       const enableConditionals = (conditionals ?? []).filter(
         (c) => c.type === ConditionalType.ENABLE
       )
-      if (enableConditionals.length === 0) return option
+      if (enableConditionals.length === 0) {
+        return option
+      }
       const isEnabled = enableConditionals.some((c) =>
         isConditionMet(c.conditional, form, validatorContext)
       )
