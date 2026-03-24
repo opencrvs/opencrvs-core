@@ -10,24 +10,22 @@
  */
 import * as z from 'zod/v4'
 import {
-  AddressFieldValue,
   AddressFieldUpdateValue,
+  AddressFieldValue,
+  CustomFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  NameFieldValue,
-  NameFieldUpdateValue,
-  NumberWithUnitFieldValue,
-  NumberWithUnitFieldUpdateValue,
   HttpFieldUpdateValue,
   HttpFieldValue,
-  QueryParamReaderFieldValue,
-  QueryParamReaderFieldUpdateValue,
-  QrReaderFieldValue,
   IdReaderFieldValue,
-  CustomFieldValue
+  NameFieldUpdateValue,
+  NameFieldValue,
+  NumberWithUnitFieldUpdateValue,
+  NumberWithUnitFieldValue,
+  QrReaderFieldValue,
+  QueryParamReaderFieldUpdateValue,
+  QueryParamReaderFieldValue
 } from './CompositeFieldValue'
-import { EventConfig } from './EventConfig'
-import { FieldType } from './FieldType'
 /**
  * FieldValues defined in this file are primitive field values.
  * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
