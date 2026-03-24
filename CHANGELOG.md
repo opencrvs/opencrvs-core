@@ -18,7 +18,7 @@ A composite field type (`FIELD_GROUP`) that groups related child fields into a s
   ]
 }
 ```
-- Support for conditional actions "ENABLE" and "SHOW" in SELECT field options
+- Support for conditional actions "ENABLE" and "SHOW" in SELECT field options to allow the options to be hidden/disabled conditionally.
 
 ## 1.9.11
 
