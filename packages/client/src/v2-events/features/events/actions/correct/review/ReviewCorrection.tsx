@@ -146,8 +146,8 @@ function ApproveModal({
     <Dialog
       actions={[
         <StyledButton
-          key="cancel_correction"
-          id="cancel_correction"
+          key="cancel_correction_approval"
+          id="cancel_correction_approval"
           type="tertiary"
           onClick={() => {
             close(true)
@@ -194,8 +194,8 @@ function RejectModal({
     <Dialog
       actions={[
         <StyledButton
-          key="cancel_correction"
-          id="cancel_correction"
+          key="cancel_correction_rejection"
+          id="cancel_correction_rejection"
           size="large"
           type="tertiary"
           onClick={() => {
