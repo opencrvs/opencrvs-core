@@ -15,6 +15,6 @@ RUN yarn install --frozen-lockfile && yarn build
 FROM nginxinc/nginx-unprivileged:1.29-alpine
 
 COPY --from=base --chown=nginx:nginx /app/packages/login/build/ /usr/share/nginx/html/
-COPY --chmod=555 packages/login/nginx-deploy-config.sh /docker-entrypoint.d/11-nginx-deploy-config.sh
-COPY --chown=nginx:nginx packages/login/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx packages/login/nginx.template.conf /etc/nginx/templates/default.conf.template
+USER nginx
 EXPOSE 3020
