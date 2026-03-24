@@ -39,6 +39,7 @@ interface PagesProps {
   validatorContext: ValidatorContext
   continueButtonText?: string
   eventConfig?: EventConfig
+  attachmentPath: string
   isCorrection?: boolean
 }
 
@@ -57,6 +58,7 @@ type DeclarationProps =
 export function Pages({
   form,
   showReviewButton,
+  attachmentPath,
   formPages,
   onPageChange,
   onSubmit,
@@ -154,6 +156,7 @@ export function Pages({
   }
   const fields = (
     <FormFieldGenerator
+      attachmentPath={attachmentPath}
       eventConfig={eventConfig}
       fields={page.fields}
       id="pagesSection"

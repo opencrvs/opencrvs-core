@@ -146,6 +146,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   readonlyMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
+  attachmentPath: string
 }
 
 export const GeneratedInputField = React.memo(
@@ -162,6 +163,7 @@ export const GeneratedInputField = React.memo(
     value,
     form,
     disabled,
+    attachmentPath,
     readonlyMode
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
@@ -504,6 +506,7 @@ export const GeneratedInputField = React.memo(
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
             disabled={disabled}
             error={inputFieldProps.error}
+            filePath={attachmentPath}
             label={uploadedFileNameLabel}
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
@@ -594,6 +597,7 @@ export const GeneratedInputField = React.memo(
           <SignatureField.Input
             {...field.config}
             disabled={disabled}
+            filePath={attachmentPath}
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
@@ -684,10 +688,10 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
             error={inputFieldProps.error}
+            filePath={attachmentPath}
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />

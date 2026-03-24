@@ -45,6 +45,7 @@ import {
 import { parse, stringify } from 'qs'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
+import { ROUTES } from '../../v2-events/routes/routes'
 
 type IStateProps = {
   language: string
@@ -175,7 +176,12 @@ const HeaderComponent = (props: IFullProps) => {
               handler: () => {
                 if (locationId) {
                   router.navigate(
-                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                    ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+                      {},
+                      {
+                        officeId: locationId
+                      }
+                    )
                   )
                 }
               }
@@ -198,7 +204,12 @@ const HeaderComponent = (props: IFullProps) => {
               handler: () => {
                 if (locationId) {
                   router.navigate(
-                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                    ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+                      {},
+                      {
+                        officeId: locationId
+                      }
+                    )
                   )
                 }
               }

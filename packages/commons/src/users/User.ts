@@ -13,6 +13,7 @@ import { FullDocumentPath } from '../documents'
 import * as z from 'zod/v4'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
+import { FileFieldValue } from '../events'
 
 export const REINDEX_USER_ID = '__ANONYMOUS_REINDEX_USER__'
 
@@ -46,6 +47,31 @@ export const User = z.object({
   status: z.enum(['active', 'deactivated', 'pending'])
 })
 export type User = z.infer<typeof User>
+
+export const UserInput = z.object({
+  name: z.array(
+    z.object({
+      use: z.string(),
+      given: z.array(z.string()),
+      family: z.string()
+    })
+  ),
+  // @TODO: Separate from "create user from client"
+  username: z.string().optional(),
+  email: z.string(),
+  mobile: z.string().optional(),
+  fullHonorificName: z.string().optional(),
+  emailForNotification: z.string().optional(),
+  // @TODO: Separate from "create user from client"
+  password: z.string().optional(),
+  role: z.string(),
+  primaryOfficeId: z.string(),
+  device: z.string().optional(),
+  status: z.enum(['active', 'pending']).optional(),
+  signature: FileFieldValue
+})
+
+export type UserInput = z.infer<typeof UserInput>
 
 export const System = z.object({
   id: z.string(),

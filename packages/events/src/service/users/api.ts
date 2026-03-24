@@ -20,6 +20,7 @@ import {
   User,
   TokenUserType,
   logger,
+  UserInput,
   isUUID
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
@@ -28,35 +29,16 @@ import {
   getSystemClientById
 } from '@events/storage/postgres/events/system-clients'
 
-export const UserInput = z.object({
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
-  // @TODO: Separate from "create user from client"
-  username: z.string().optional(),
-  email: z.string(),
-  mobile: z.string().optional(),
-  fullHonorificName: z.string().optional(),
-  emailForNotification: z.string().optional(),
-  // @TODO: Separate from "create user from client"
-  password: z.string().optional(),
-  role: z.string(),
-  primaryOfficeId: z.string(),
-  device: z.string().optional(),
-  status: z.enum(['active', 'pending']).optional()
-})
-
 type UserAPIResult = {
   id: string
   avatar?: {
     data: FullDocumentPath
     type: string
   }
-  signature?: FullDocumentPath
+  signature?: {
+    data: FullDocumentPath
+    type: string
+  }
   device?: string
   name: IUserName[]
   username: string
@@ -125,7 +107,7 @@ export async function findUserOrSystem(
       email: user.email,
       mobile: user.mobile,
       status: user.status as User['status'],
-      signature: user.signature ? user.signature : undefined,
+      signature: user.signature?.data ? user.signature.data : undefined,
       avatar: user.avatar?.data ? user.avatar.data : undefined,
       primaryOfficeId: user.primaryOfficeId,
       device: user.device ? user.device : undefined,
@@ -201,7 +183,7 @@ export async function searchUsers(
     id: user.id,
     name: user.name,
     role: user.role,
-    signature: user.signature ? user.signature : undefined,
+    signature: user.signature?.data ? user.signature.data : undefined,
     avatar: user.avatar?.data ? user.avatar.data : undefined,
     primaryOfficeId: user.primaryOfficeId,
     status: user.status as User['status'],
@@ -218,10 +200,15 @@ export async function updateUser(
   input: CreateUserPayload & { id: string },
   token: string
 ): Promise<User> {
-  console.log(JSON.stringify(input))
   const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'updateUser').href, {
     method: 'POST',
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      signature: input.signature && {
+        type: input.signature.type,
+        data: input.signature.path
+      }
+    }),
     headers: {
       'Content-Type': 'application/json',
       Authorization: token
@@ -234,13 +221,21 @@ export async function updateUser(
     )
   }
 
-  return getUser(input.id, token)
+  const user = await getUser(input.id, token)
+  console.log(user)
+  return user
 }
 
 export async function createUser(input: CreateUserPayload, token: string) {
   const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'createUser').href, {
     method: 'POST',
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      signature: {
+        type: input.signature?.type,
+        data: input.signature?.path
+      }
+    }),
     headers: {
       'Content-Type': 'application/json',
       Authorization: token
@@ -351,7 +346,7 @@ export async function changeUserEmail(
 export async function changeUserAvatar(
   payload: { userId: string; avatar: { type: string; data: string } },
   token: string
-): Promise<void> {
+) {
   const res = await fetch(
     joinUrl(env.USER_MANAGEMENT_URL, 'changeUserAvatar').href,
     {
@@ -370,5 +365,5 @@ export async function changeUserAvatar(
     )
   }
 
-  await res.json()
+  return res
 }

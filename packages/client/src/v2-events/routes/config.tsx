@@ -376,14 +376,6 @@ export const routesConfig = {
         </ProtectedRoute>
       )
     },
-    // {
-    //   path: ROUTES.V2.path + V1_LEGACY_ROUTES.USER_PROFILE,
-    //   element: (
-    //     <WorkqueueLayout>
-    //       <UserAudit hideNavigation={true} />
-    //     </WorkqueueLayout>
-    //   )
-    // },
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.ORGANISATIONS_INDEX,
       element: (

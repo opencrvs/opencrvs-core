@@ -57,7 +57,12 @@ const FileSchema = z
 const Payload = z.object({
   file: FileSchema,
   transactionId: z.string(),
-  path: z.string().optional().default('/')
+  // Remove trailing slashes from path
+  path: z
+    .string()
+    .transform((val) => val.replace(/\/+$/, ''))
+    .optional()
+    .default('/')
 })
 
 /**
@@ -68,7 +73,6 @@ export async function fileUploadHandler(
   h: Hapi.ResponseToolkit
 ) {
   const userId = getUserId(request.headers.authorization)
-  console.log(request.payload)
   const payload = await Payload.parseAsync(request.payload).catch((error) => {
     logger.error(error)
     throw badRequest('Invalid payload')
@@ -80,7 +84,6 @@ export async function fileUploadHandler(
   const filename = `${transactionId}.${extension}`
 
   const filePath = joinValues([path, filename], '/')
-
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId,
     ...(filename.endsWith('.pdf') && { 'content-type': 'application/pdf' })

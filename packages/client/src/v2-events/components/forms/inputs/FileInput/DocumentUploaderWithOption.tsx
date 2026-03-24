@@ -76,6 +76,7 @@ function DocumentUploaderWithOption({
   acceptedFileTypes = [],
   options,
   error,
+  filePath,
   hideOnEmptyOption,
   autoSelectOnlyOption,
   maxFileSize,
@@ -89,6 +90,7 @@ function DocumentUploaderWithOption({
   value: FileFieldWithOptionValue
   onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
+  filePath: string
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number
@@ -117,7 +119,7 @@ function DocumentUploaderWithOption({
     useState<FileFieldValueWithOption | null>(null)
   const { processImageFile } = useImageProcessing()
 
-  const { uploadFile } = useFileUpload(name, {
+  const { uploadFile } = useFileUpload(filePath, name, {
     onSuccess: ({ type, originalFilename, path, id }) => {
       const newFile = {
         path,
@@ -197,6 +199,7 @@ function DocumentUploaderWithOption({
         description={description}
         disabled={disabled}
         error={error}
+        filePath={filePath}
         label={
           typeof onlyOption.label === 'string'
             ? onlyOption.label

@@ -27,7 +27,6 @@ import {
   removeCached
 } from '@client/v2-events/cache'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
-import { waitUntilEventIsCreated } from '../events/useEvents/procedures/utils'
 
 interface UploadFileParams {
   file: File
@@ -38,27 +37,6 @@ interface UploadFileParams {
   }
 }
 
-interface UploadAvatarParams {
-  file: File
-  userId: string
-  meta: {
-    transactionId: string
-    referenceId: string
-  }
-}
-
-export async function uploadAvatar({
-  file,
-  userId,
-  meta
-}: UploadAvatarParams): Promise<{ url: string }> {
-  return uploadFile({
-    file,
-    path: `users/${userId}`,
-    meta
-  })
-}
-
 async function uploadFile({
   file,
   path,
@@ -67,7 +45,6 @@ async function uploadFile({
   const formData = new FormData()
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
-
   formData.append('path', path)
 
   const response = await fetch('/api/upload', {
@@ -82,7 +59,7 @@ async function uploadFile({
     throw new Error('File upload failed')
   }
 
-  return response
+  return { url: await response.text() }
 }
 
 /**
@@ -181,23 +158,24 @@ interface Options {
   }) => void
 }
 
-export function useFileUpload(fieldId: string, options: Options = {}) {
-  // Introduce `eventId` to the params to allow uploading files related to a specific event.
-  // Main goal is to allow uploading files in the context of an event, which is helpful when we need to clean up orphans.
-  // Start with good enough: Components do not need to pass `eventId` explicitly, it is automatically derived from the URL params without forcing low-level components to know about events concept.
-  const { eventId } = useParams()
-
+export function useFileUpload(
+  path: string,
+  uniqueIdentifier: string,
+  options: Options = {}
+) {
   const upload = useMutation({
-    mutationFn: waitUntilEventIsCreated(async (variables: UploadFileParams) =>
-      uploadFile({ ...variables, meta: { ...variables.meta } })
-    ),
-    mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, meta, eventId: dir }: UploadFileParams) => {
+    mutationFn: async (variables: UploadFileParams) =>
+      uploadFile({ ...variables, meta: { ...variables.meta } }),
+    mutationKey: [UPLOAD_MUTATION_KEY, uniqueIdentifier],
+    onMutate: async ({ file, meta }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
-      const filePathWithDirectory = joinValues([dir, temporaryFilename], '/')
-      const path = getFullDocumentPath(filePathWithDirectory)
-      const url = getUnsignedFileUrl(path)
+      const filePathWithDirectory = joinValues(
+        [path.replace(/\/$/, ''), temporaryFilename],
+        '/'
+      )
+      const fullPath = getFullDocumentPath(filePathWithDirectory)
+      const url = getUnsignedFileUrl(fullPath)
       await cacheFile({ url, file })
 
       // NOTE: In the long run, client should not reverse-engineer the file path.
@@ -206,7 +184,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
         ...file,
         originalFilename: file.name,
         type: file.type,
-        path,
+        path: fullPath,
         id: meta.referenceId
       })
     }
@@ -214,7 +192,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
 
   const del = useMutation({
     mutationFn: deleteFile,
-    mutationKey: [DELETE_MUTATION_KEY, fieldId],
+    mutationKey: [DELETE_MUTATION_KEY, uniqueIdentifier],
     onSuccess: (data, { filename }) => {
       void removeCached(filename)
     }
@@ -230,15 +208,39 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
      * @param file - The file to be uploaded.
      * @param referenceId An optional identifier for the file. Allows the caller to track the file when its upload completes.
      */
-    uploadFile: (file: File, referenceId = 'default') => {
-      return upload.mutate({
-        file,
-        path: eventId ? eventId : '',
-        meta: {
-          transactionId: uuid(),
-          referenceId
-        }
-      })
+    uploadFile: (
+      file: File,
+      referenceId = 'default',
+      mutateOptions: Parameters<typeof upload.mutate>[1] = {}
+    ) => {
+      return upload.mutate(
+        {
+          file,
+          path,
+          meta: {
+            transactionId: uuid(),
+            referenceId
+          }
+        },
+        mutateOptions
+      )
+    },
+    uploadFileAsync: (
+      file: File,
+      referenceId = 'default',
+      mutateOptions: Parameters<typeof upload.mutate>[1] = {}
+    ) => {
+      return upload.mutateAsync(
+        {
+          file,
+          path,
+          meta: {
+            transactionId: uuid(),
+            referenceId
+          }
+        },
+        mutateOptions
+      )
     }
   }
 }

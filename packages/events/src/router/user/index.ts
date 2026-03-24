@@ -14,6 +14,7 @@ import { TRPCError } from '@trpc/server'
 import {
   UserOrSystem,
   User,
+  UserInput,
   personNameFromV1ToV2,
   logger
 } from '@opencrvs/commons'
@@ -27,7 +28,6 @@ import { getUserActions } from '@events/service/events/user/actions'
 import { getRoles } from '@events/service/config/config'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import {
-  UserInput,
   searchUsers,
   createUser,
   updateUser,

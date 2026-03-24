@@ -58,6 +58,11 @@ function getUserEditConfig(
 
   return {
     id: '__user__',
+    summary: {
+      fields: []
+    },
+    advancedSearch: [],
+    flags: [],
     title: {
       id: 'user.title',
       defaultMessage: 'User',
@@ -274,15 +279,22 @@ export const EditUser = () => {
   }
 
   return (
-    <FormLayout onClose={handleClose} actionComponent={<div>todo</div>}>
+    <FormLayout
+      onClose={handleClose}
+      title={
+        isNewUser
+          ? intl.formatMessage(messages.userFormTitle)
+          : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+      }
+    >
       <PagesComponent
+        attachmentPath={`users/${userId}/`}
         showReviewButton={false}
         actionType={ActionType.DECLARE}
         eventConfig={eventConfig}
         form={formState}
         formPages={formConfig.pages}
-        pageId={pageId}
-        back
+        pageId={pageId || eventConfig.declaration.pages[0].id}
         setFormData={(data) => {
           setUserForm(data)
         }}
@@ -336,6 +348,9 @@ export const ReviewUser = () => {
       phoneNumber: user.mobile,
       email: user.email,
       fullHonorificName: user.fullHonorificName,
+      signature: user.signature
+        ? { path: user.signature, originalFilename: '', type: '' }
+        : undefined,
       device: user.device
     })
   }, [isNewUser, existingUserQuery.data, setUserForm, getUserForm])
@@ -367,7 +382,14 @@ export const ReviewUser = () => {
   }
 
   return (
-    <FormLayout actionComponent={<div>todo</div>} onClose={handleClose}>
+    <FormLayout
+      title={
+        isNewUser
+          ? intl.formatMessage(messages.userFormTitle)
+          : intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+      }
+      onClose={handleClose}
+    >
       <ReviewComponent.Body
         form={formState}
         formConfig={formConfig}
@@ -461,11 +483,13 @@ function FormLayout({
   children,
   onSaveAndExit,
   onClose,
+  title,
   actionComponent
 }: {
   children: React.ReactNode
   onSaveAndExit?: () => void | Promise<void>
   onClose?: () => void
+  title: string
   actionComponent?: React.ReactNode
 }) {
   const intl = useIntl()
@@ -475,7 +499,7 @@ function FormLayout({
       header={
         <FormHeader
           actionComponent={actionComponent}
-          label={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
+          label={title}
           onSaveAndExit={onSaveAndExit}
           onClose={onClose}
         />
@@ -501,73 +525,6 @@ function FormHeader({
   actionComponent?: React.ReactNode
 }) {
   const intl = useIntl()
-
-  const onExit = useCallback(async () => {
-    console.log('Edit')
-  }, [])
-
-  const onDelete = useCallback(async () => {
-    console.log('Delete')
-  }, [])
-
-  const menuItems = []
-
-  const getActionComponent = () => {
-    if (onSaveAndExit) {
-      return (
-        <>
-          <Button
-            disabled={false}
-            id="save-exit-btn"
-            size="small"
-            type="primary"
-            onClick={onSaveAndExit}
-          >
-            <Icon name="FloppyDisk" />
-            {'TOddaaDO'}
-          </Button>
-
-          <Button
-            data-testid="exit-button"
-            size="small"
-            type="secondary"
-            onClick={onExit}
-          >
-            <Icon name="X" />
-            {'TOddDO'}
-          </Button>
-          {menuItems.length > 0 && (
-            <ToggleMenu
-              id="event-menu"
-              menuItems={menuItems}
-              toggleButton={
-                <Icon
-                  color="primary"
-                  data-testid="event-menu-toggle-button-image"
-                  name="DotsThreeVertical"
-                  size="large"
-                />
-              }
-            />
-          )}
-        </>
-      )
-    }
-
-    return (
-      <>
-        {actionComponent}
-        <Button
-          data-testid="exit-button"
-          size="small"
-          type="icon"
-          onClick={onClose}
-        >
-          <Icon name="X" />
-        </Button>
-      </>
-    )
-  }
 
   const BackButtonContainer = styled.div`
     margin-right: 16px;
