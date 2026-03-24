@@ -12,6 +12,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import styled from 'styled-components'
+import { within } from '@storybook/test'
+import { userEvent } from '@storybook/testing-library'
 import {
   ConditionalType,
   FieldType,
@@ -49,6 +51,10 @@ export const WithHiddenOption: Story = {
   name: 'With hidden option',
   parameters: {
     layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(await canvas.findByRole('combobox'))
   },
   render: function Component(args) {
     return (
@@ -107,6 +113,10 @@ export const WithDisabledOption: Story = {
   name: 'With disabled option',
   parameters: {
     layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(await canvas.findByRole('combobox'))
   },
   render: function Component(args) {
     return (
