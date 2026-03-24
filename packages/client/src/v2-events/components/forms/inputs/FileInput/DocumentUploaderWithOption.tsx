@@ -87,7 +87,7 @@ function DocumentUploaderWithOption({
   disabled?: boolean
   acceptedFileTypes?: MimeType[]
   options: SelectOption[]
-  value: FileFieldWithOptionValue
+  value?: FileFieldWithOptionValue
   onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
   filePath: string
@@ -102,7 +102,7 @@ function DocumentUploaderWithOption({
     DocumentTypeRequiredError
   )
 
-  const [files, setFiles] = useState(value)
+  const [files, setFiles] = useState(value || [])
   const [filesBeingProcessed, setFilesBeingProcessed] = useState<
     Array<{ label: string }>
   >([])
