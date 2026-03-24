@@ -171,7 +171,9 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     onMutate: async ({ file, meta, eventId: dir }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
-      const path = joinValues([dir, temporaryFilename], '/') as DocumentPath
+      const path = ('/' +
+        joinValues([dir, temporaryFilename], '/')) as DocumentPath
+
       await cacheFile({ url: path, file })
 
       // NOTE: In the long run, client should not reverse-engineer the file path.

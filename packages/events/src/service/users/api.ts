@@ -53,10 +53,10 @@ export const UserInput = z.object({
 type UserAPIResult = {
   id: string
   avatar?: {
-    data: string
+    data: DocumentPath
     type: string
   }
-  signature?: string
+  signature?: DocumentPath
   device?: string
   name: IUserName[]
   username: string

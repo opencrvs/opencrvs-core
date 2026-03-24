@@ -12,7 +12,7 @@
 import { Db, MongoClient } from 'mongodb'
 
 function stripBucketPrefix(path: string): string {
-  return path.startsWith('/ocrvs/') ? path.replace('/ocrvs/', '') : path
+  return path.startsWith('/ocrvs/') ? path.replace('/ocrvs/', '/') : path
 }
 
 export const up = async (db: Db, client: MongoClient) => {
