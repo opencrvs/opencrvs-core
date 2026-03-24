@@ -987,7 +987,6 @@ enum RegistrationSection {
 export type Section =
   | ReviewSection
   | PaymentSection
-  | UserSection
   | CertificateSection
   | CorrectionSection
   | RegistrationSection

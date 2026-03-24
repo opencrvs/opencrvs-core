@@ -207,7 +207,7 @@ function DocumentUploaderWithOption({
         }
         maxFileSize={maxFileSize}
         name={name}
-        value={value[0]}
+        value={value?.[0]}
         width={'full'}
         onChange={(file) => {
           if (file) {
