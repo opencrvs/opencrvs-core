@@ -19,7 +19,12 @@ import {
   UserOrSystem
 } from '@opencrvs/commons/client'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
-import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import {
+  hasConflict,
+  queryClient,
+  trpcOptionsProxy,
+  useTRPC
+} from '@client/v2-events/trpc'
 import {
   QueryOptions,
   setMutationDefaults,
@@ -190,6 +195,9 @@ export function useUsers() {
 
       return useMutation({
         ...mutationOptions,
+        retry: (_failureCount, error) => {
+          return !hasConflict(error)
+        },
         onSuccess: (response) => {
           onSuccess?.(response)
         }

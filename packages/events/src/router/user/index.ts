@@ -71,11 +71,65 @@ export const userRouter = router({
   create: userAndSystemProcedure
     .input(UserInput)
     .output(User)
-    .mutation(async ({ input, ctx }) => createUser(input, ctx.token)),
+    .mutation(async ({ input, ctx }) => {
+      if (input.mobile) {
+        const existingWithMobile = await searchUsers(
+          { mobile: input.mobile, count: 1, skip: 0, sortOrder: 'asc' },
+          ctx.token
+        )
+        if (existingWithMobile.length > 0) {
+          logger.error(
+            `Phone number ${input.mobile} is already in use by another user`
+          )
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
+        }
+      }
+      if (input.email) {
+        const existingWithEmail = await searchUsers(
+          { email: input.email, count: 1, skip: 0, sortOrder: 'asc' },
+          ctx.token
+        )
+        if (existingWithEmail.length > 0) {
+          logger.error(`Email ${input.email} is already in use by another user`)
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+        }
+      }
+      return createUser(input, ctx.token)
+    }),
   update: userAndSystemProcedure
     .input(UserInput.and(z.object({ id: z.string() })))
     .output(User)
-    .mutation(async ({ input, ctx }) => updateUser(input, ctx.token)),
+    .mutation(async ({ input, ctx }) => {
+      if (input.mobile) {
+        const existingWithMobile = await searchUsers(
+          { mobile: input.mobile, count: 1, skip: 0, sortOrder: 'asc' },
+          ctx.token
+        )
+        if (
+          existingWithMobile.length > 0 &&
+          existingWithMobile[0].id !== input.id
+        ) {
+          logger.error(
+            `Phone number ${input.mobile} is already in use by another user`
+          )
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
+        }
+      }
+      if (input.email) {
+        const existingWithEmail = await searchUsers(
+          { email: input.email, count: 1, skip: 0, sortOrder: 'asc' },
+          ctx.token
+        )
+        if (
+          existingWithEmail.length > 0 &&
+          existingWithEmail[0].id !== input.id
+        ) {
+          logger.error(`Email ${input.email} is already in use by another user`)
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+        }
+      }
+      return updateUser(input, ctx.token)
+    }),
   list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))

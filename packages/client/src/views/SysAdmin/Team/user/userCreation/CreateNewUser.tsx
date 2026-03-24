@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { buttonMessages } from '@client/i18n/messages'
+import { userMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages } from '@client/i18n/messages/views/userForm'
 import * as routes from '@client/navigation/routes'
@@ -38,6 +39,8 @@ import {
   SuccessButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrowDeepBlue, Check, Cross } from '@opencrvs/components/lib/icons'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { TRPCClientError } from '@trpc/client'
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
@@ -307,6 +310,20 @@ export const ReviewUser = () => {
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
 
+  const [showDuplicateMobileError, setShowDuplicateMobileError] =
+    React.useState(false)
+  const [duplicatePhoneNumber, setDuplicatePhoneNumber] = React.useState('')
+  const [showDuplicateEmailError, setShowDuplicateEmailError] =
+    React.useState(false)
+  const [duplicateEmail, setDuplicateEmail] = React.useState('')
+
+  const resetErrors = () => {
+    setShowDuplicateMobileError(false)
+    setDuplicatePhoneNumber('')
+    setShowDuplicateEmailError(false)
+    setDuplicateEmail('')
+  }
+
   const existingUserQuery = getUser.useQuery(userId, { enabled: !isNewUser })
 
   useEffect(() => {
@@ -346,6 +363,22 @@ export const ReviewUser = () => {
     formState['role']
   )
   const formConfig = eventConfig.declaration
+
+  const handleMutationError = (error: unknown) => {
+    if (error instanceof TRPCClientError && error.data?.code === 'CONFLICT') {
+      if (error.message === 'DUPLICATE_PHONE') {
+        setDuplicatePhoneNumber(formState.phoneNumber ?? '')
+        setShowDuplicateMobileError(true)
+        return
+      }
+      if (error.message === 'DUPLICATE_EMAIL') {
+        setDuplicateEmail(formState.email ?? '')
+        setShowDuplicateEmailError(true)
+        return
+      }
+    }
+  }
+
   const handleClose = () => {
     if (isNewUser) {
       const officeId = formState['primaryOfficeId']
@@ -368,6 +401,28 @@ export const ReviewUser = () => {
       }
       onClose={handleClose}
     >
+      {showDuplicateMobileError && (
+        <Toast
+          id="duplicate-mobile-error-notification"
+          type="warning"
+          onClose={() => setShowDuplicateMobileError(false)}
+        >
+          {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
+            number: duplicatePhoneNumber
+          })}
+        </Toast>
+      )}
+      {showDuplicateEmailError && (
+        <Toast
+          id="duplicate-email-error-notification"
+          type="warning"
+          onClose={() => setShowDuplicateEmailError(false)}
+        >
+          {intl.formatMessage(userMessages.duplicateUserEmailErrorMessege, {
+            email: duplicateEmail
+          })}
+        </Toast>
+      )}
       <ReviewComponent.Body
         form={formState}
         formConfig={formConfig}
@@ -390,6 +445,7 @@ export const ReviewUser = () => {
             size="large"
             fullWidth
             onClick={() => {
+              resetErrors()
               const payload: UserInput = {
                 ...formState,
                 mobile: formState.phoneNumber,
@@ -406,12 +462,13 @@ export const ReviewUser = () => {
                 ]
               }
               createUserMutation.mutate(payload, {
-                onSuccess: (data) => {
+                onSuccess: () => {
                   clear()
                   navigate(
                     `${routes.TEAM_USER_LIST}?locationId=${payload.primaryOfficeId}`
                   )
-                }
+                },
+                onError: handleMutationError
               })
             }}
           >
@@ -421,6 +478,7 @@ export const ReviewUser = () => {
           <SuccessButton
             id="submit-edit-user-form"
             onClick={() => {
+              resetErrors()
               const payload: UserInput = {
                 ...formState,
                 mobile: formState.phoneNumber,
@@ -446,7 +504,8 @@ export const ReviewUser = () => {
                         userId: data.id
                       })
                     )
-                  }
+                  },
+                  onError: handleMutationError
                 }
               )
             }}
@@ -478,8 +537,6 @@ function FormLayout({
   title: string
   actionComponent?: React.ReactNode
 }) {
-  const intl = useIntl()
-
   return (
     <Frame
       header={
