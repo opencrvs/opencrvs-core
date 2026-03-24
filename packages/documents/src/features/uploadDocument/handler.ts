@@ -11,19 +11,19 @@
 import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
-import { v4 as uuid } from 'uuid'
-import { fromBuffer } from 'file-type'
 import {
   FullDocumentPath,
   getUserId,
-  joinValues,
+  joinUrlPaths,
   logger,
   toDocumentPath
 } from '@opencrvs/commons'
+import { fromBuffer } from 'file-type'
+import { v4 as uuid } from 'uuid'
 
-import { z } from 'zod'
-import { Readable } from 'stream'
 import { badRequest, notFound } from '@hapi/boom'
+import { Readable } from 'stream'
+import { z } from 'zod'
 export interface IDocumentPayload {
   fileData: string
   metaData?: Record<string, string>
@@ -57,12 +57,7 @@ const FileSchema = z
 const Payload = z.object({
   file: FileSchema,
   transactionId: z.string(),
-  // Remove trailing slashes from path
-  path: z
-    .string()
-    .transform((val) => val.replace(/\/+$/, ''))
-    .optional()
-    .default('/')
+  path: z.string().optional().default('/')
 })
 
 /**
@@ -77,19 +72,18 @@ export async function fileUploadHandler(
     logger.error(error)
     throw badRequest('Invalid payload')
   })
-
   const { file, transactionId, path } = payload
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
+  const filePath = joinUrlPaths(path, filename)
 
-  const filePath = joinValues([path, filename], '/')
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId,
     ...(filename.endsWith('.pdf') && { 'content-type': 'application/pdf' })
   })
 
-  return `/${MINIO_BUCKET}/${filePath}` as FullDocumentPath
+  return ('/' + joinUrlPaths(MINIO_BUCKET, filePath)) as FullDocumentPath
 }
 
 export async function fileExistsHandler(

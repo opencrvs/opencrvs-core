@@ -333,23 +333,6 @@ export const routesConfig = {
         </TRPCProvider>
       )
     },
-
-    // {
-    //   path: routes.REVIEW_USER_FORM,
-    //   element: (
-    //     <TRPCProvider>
-    //       <CreateNewUser />
-    //     </TRPCProvider>
-    //   )
-    // },
-    // {
-    //   path: routes.REVIEW_USER_DETAILS,
-    //   element: (
-    //     <TRPCProvider>
-    //       <CreateNewUser />
-    //     </TRPCProvider>
-    //   )
-    // }
     {
       path: ROUTES.V2.DASHBOARD.path,
       element: (
