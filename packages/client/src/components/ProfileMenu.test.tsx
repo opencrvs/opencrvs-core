@@ -46,8 +46,8 @@ describe('when user opens profile menu with user details', () => {
     details.name = [
       {
         use: 'bn',
-        firstNames: 'সাকিব',
-        familyName: 'হাসান'
+        given: ['সাকিব'],
+        family: 'হাসান'
       }
     ]
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(details)))

@@ -32,12 +32,7 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import {
-  AdministrativeArea,
-  Location,
-  LocationType,
-  UUID
-} from '@opencrvs/commons/client'
+import { AdministrativeArea, Location, UUID } from '@opencrvs/commons/client'
 import { useAdministrativeAreas } from '../../v2-events/hooks/useAdministrativeAreas'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10

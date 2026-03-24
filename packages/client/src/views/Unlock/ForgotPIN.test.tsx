@@ -11,17 +11,16 @@
 import React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { AppStore, createStore } from '@client/store'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import { createTestComponent, flushPromises, userDetails } from '@client/tests/util'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'
-import { NetworkStatus } from '@apollo/client'
+import { UUID } from '@opencrvs/commons/client'
 import { userQueries } from '@client/user/queries'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { vi, Mock } from 'vitest'
-import { Status } from '@client/utils/gateway'
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper
@@ -35,50 +34,11 @@ describe('ForgotPIN tests', () => {
 
     store.dispatch(
       setUserDetails({
-        loading: false,
-        networkStatus: NetworkStatus.ready,
-        data: {
-          getUser: {
-            id: '5eba726866458970cf2e23c2',
-            username: 'a.alhasan',
-            creationDate: '2022-10-03T10:42:46.920Z',
-            userMgntUserID: '5eba726866458970cf2e23c2',
-            practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-            mobile: '+8801711111111',
-            role: {
-              id: 'CHA',
-              label: {
-                id: 'userRoles.cha',
-                defaultMessage: 'CHA',
-                description: 'CHA'
-              }
-            },
-            status: Status.Active,
-            name: [
-              {
-                use: 'en',
-                firstNames: 'Shakib',
-                familyName: 'Al Hasan'
-              }
-            ],
-            primaryOffice: {
-              id: '895cc945-94a9-4195-9a29-22e9310f3385',
-              name: 'Narsingdi Paurasabha',
-              alias: ['নরসিংদী পৌরসভা']
-            },
-            localRegistrar: {
-              name: [
-                {
-                  use: 'en',
-                  firstNames: 'Mohammad',
-                  familyName: 'Ashraful'
-                }
-              ],
-              role: 'LOCAL_REGISTRAR',
-              signature: undefined
-            }
-          }
-        }
+        ...userDetails,
+        id: '5eba726866458970cf2e23c2',
+        mobile: '+8801711111111',
+        primaryOfficeId: '895cc945-94a9-4195-9a29-22e9310f3385' as UUID,
+        name: [{ use: 'en', given: ['Shakib'], family: 'Al Hasan' }]
       })
     )
   })

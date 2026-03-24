@@ -88,8 +88,8 @@ export function ChangeEmailView({ show, onSuccess, onClose }: IProps) {
           [
             {
               use: language,
-              family: String(userDetails?.name?.[0].familyName),
-              given: [String(userDetails?.name?.[0].firstNames)]
+              family: String(userDetails?.name?.[0].family),
+              given: userDetails?.name?.[0].given ?? []
             }
           ],
           notificationEvent,

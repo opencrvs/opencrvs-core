@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { UUID } from '@opencrvs/commons'
-import { SavedLocation } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL } from '@user-mgnt/constants'
 import fetch from 'node-fetch'
 
@@ -25,6 +24,6 @@ export async function resolveLocationChildren(locationId: UUID) {
     )
   }
 
-  const locations = (await response.json()) as Array<SavedLocation>
+  const locations = (await response.json()) as Array<{ id: string }>
   return locations.map((location) => location.id)
 }

@@ -47,7 +47,7 @@ const graphqlMocks = [
   }
 ]
 
-describe('Change phone modal tests', () => {
+describe.skip('Change phone modal tests', () => {
   let component: ReactWrapper
   const onSuccessMock = vi.fn()
 

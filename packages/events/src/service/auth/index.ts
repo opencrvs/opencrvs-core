@@ -58,4 +58,3 @@ export async function getActionConfirmationToken(
   }
   return accessToken
 }
-

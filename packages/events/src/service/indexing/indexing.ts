@@ -616,6 +616,7 @@ export async function getEventCount({
       scopesV2: resolvedScopes
     })
   )
+
   const { responses } = await esClient.msearch({
     searches: filteredQueries.flatMap((query) => [
       { index: getEventAliasName() },

@@ -117,25 +117,14 @@ export const routesConfig = {
             signal: controller.signal
           })
 
-          const status = await res.json()
-          const services = [
-            'auth',
-            'search',
-            'user-mgnt',
-            'metrics',
-            'notification',
-            'countryconfig',
-            'workflow'
-          ]
+          if (!res.ok) {
+            throw new Error('Network probe failed')
+          }
 
-          const allServicesReady =
-            res.ok &&
-            services.every((service) => {
-              return status[service] === true
-            })
+          await res.json()
 
           if (!cancelled) {
-            onlineManager.setOnline(allServicesReady)
+            onlineManager.setOnline(true)
           }
         } catch {
           if (!cancelled) {

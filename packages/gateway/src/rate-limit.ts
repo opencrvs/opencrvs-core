@@ -8,14 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { hasScope } from '@gateway/features/user/utils'
 import { redis } from '@gateway/utils/redis'
-import { GraphQLResolveInfo, GraphQLError } from 'graphql'
-import { Context } from '@gateway/graphql/context'
-import { getUserId, hasScope } from '@gateway/features/user/utils'
-import { DISABLE_RATE_LIMIT } from './constants'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
-import { get } from 'lodash'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { GraphQLError } from 'graphql'
+import { get } from 'lodash'
+import { DISABLE_RATE_LIMIT } from './constants'
 
 /**
  * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
@@ -127,28 +126,6 @@ export const rateLimitedRoute =
     return withRateLimit(
       {
         key: `${value}:${route}`,
-        requestsPerMinute
-      },
-      fn
-    )(...args)
-  }
-
-export const rateLimitedResolver =
-  <A extends [any, any, Context, GraphQLResolveInfo], R>(
-    { requestsPerMinute }: { requestsPerMinute: number },
-    fn: (...args: A) => R
-  ) =>
-  (...args: A) => {
-    if (hasScope(args[2].headers, SCOPES.BYPASSRATELIMIT)) {
-      return fn(...args)
-    }
-
-    const route = args[3].fieldName // e.g. "getUser"
-    const userId = getUserId(args[2].headers)
-
-    return withRateLimit(
-      {
-        key: `${userId}:${route}`,
         requestsPerMinute
       },
       fn

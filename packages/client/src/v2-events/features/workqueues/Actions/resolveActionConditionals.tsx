@@ -11,14 +11,15 @@
 import {
   ActionType,
   ActionTypes,
+  AssignmentStatus,
   ClientSpecificAction,
-  configurableEventScopeAllowed,
   DisplayableAction,
   EventConfig,
   EventIndex,
   EventStatus,
   filterActionsByFlags,
   getActionConfig,
+  getAssignmentStatus,
   getAvailableActionsForEvent,
   getOrThrow,
   isActionEnabled,
@@ -27,7 +28,6 @@ import {
   ValidatorContext,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { ActionMenuActionType } from './utils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
@@ -45,12 +45,6 @@ function getAvailableAssignmentActions(
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
   const eventStatus = event.status
 
-  const mayUnassignOthers = configurableEventScopeAllowed(
-    authentication.scope,
-    ['record.unassign-others'],
-    event.type
-  )
-
   let actions: ActionTypes[] = []
   if (!STATUSES_THAT_CAN_BE_ASSIGNED.includes(eventStatus)) {
     return []
@@ -58,12 +52,7 @@ function getAvailableAssignmentActions(
 
   if (assignmentStatus === AssignmentStatus.UNASSIGNED) {
     actions = [ActionType.ASSIGN]
-  } else if (
-    assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS &&
-    mayUnassignOthers
-  ) {
-    actions = [ActionType.UNASSIGN]
-  } else if (assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF) {
+  } else {
     actions = [ActionType.UNASSIGN]
   }
 

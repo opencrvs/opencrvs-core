@@ -20,7 +20,6 @@ import {
   generateEventDocument,
   generateUuid,
   getUUID,
-  LocationType,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType
@@ -120,7 +119,7 @@ beforeEach(async () => {
       name: 'Location within Admin level 2',
       administrativeAreaId: adminLevel2Id,
       externalId: 'AS0978ASD2C',
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       id: crvsOfficeId,
       validUntil: null
     }

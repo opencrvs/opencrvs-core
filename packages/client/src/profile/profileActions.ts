@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ApolloQueryResult } from '@apollo/client'
-import { FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { TriggerEvent } from '@opencrvs/commons/client'
+import { TriggerEvent, User } from '@opencrvs/commons/client'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =
@@ -42,7 +40,7 @@ type CheckAuthAction = {
 
 type SetUserDetailsAction = {
   type: typeof SET_USER_DETAILS
-  payload: ApolloQueryResult<FetchUserQuery>
+  payload: User
 }
 
 type ModifyUserDetailsAction = {
@@ -94,7 +92,7 @@ export const checkAuth = (): CheckAuthAction => ({
 })
 
 export const setUserDetails = (
-  payload: ApolloQueryResult<FetchUserQuery>
+  payload: User
 ): SetUserDetailsAction => ({
   type: SET_USER_DETAILS,
   payload

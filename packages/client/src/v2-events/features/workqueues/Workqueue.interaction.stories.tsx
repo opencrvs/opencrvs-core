@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { userEvent, within, expect, waitFor } from '@storybook/test'
+import { userEvent, within, expect } from '@storybook/test'
 import {
   ActionType,
   createPrng,

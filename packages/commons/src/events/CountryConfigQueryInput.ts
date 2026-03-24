@@ -18,7 +18,8 @@ import {
   Exact,
   ExactStatus,
   QueryInput,
-  ExactUserType
+  ExactUserType,
+  AnyOf
 } from './EventIndex'
 
 const SerializableExact = z.object({
@@ -37,10 +38,12 @@ export const SerializedQueryExpression = z
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
-    'legalStatuses.REGISTERED.createdAt': z.optional(DateCondition),
     'legalStatuses.DECLARED.createdAtLocation': z.optional(SerializableWithin),
+    'legalStatuses.DECLARED.createdByRole': z.optional(AnyOf),
+    'legalStatuses.REGISTERED.createdAt': z.optional(DateCondition),
     'legalStatuses.REGISTERED.createdAtLocation':
       z.optional(SerializableWithin),
+    'legalStatuses.REGISTERED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
     createdAtLocation: z.optional(SerializableWithin),
     updatedAtLocation: z.optional(SerializableWithin),

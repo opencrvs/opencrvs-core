@@ -501,6 +501,7 @@ export const isAdministrativeAreaFieldType = (field: {
   return field.config.type === FieldType.ADMINISTRATIVE_AREA
 }
 
+/** @deprecated Moving on, we should only use FieldType.LOCATION. */
 export const isFacilityFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
@@ -508,6 +509,7 @@ export const isFacilityFieldType = (field: {
   return field.config.type === FieldType.FACILITY
 }
 
+/** @deprecated Moving on, we should only use FieldType.LOCATION. */
 export const isOfficeFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
