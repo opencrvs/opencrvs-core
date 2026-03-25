@@ -19,11 +19,7 @@ import {
 } from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
-  createFhirPractitioner,
-  createFhirPractitionerRole,
   generateUsername,
-  postFhir,
-  rollbackCreateUser,
   sendCredentialsNotification,
   uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
@@ -34,6 +30,7 @@ import {
 } from '@user-mgnt/utils/hash'
 import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import * as _ from 'lodash'
+import uuid from 'uuid/v4'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -57,36 +54,12 @@ export default async function createUser(
     throw unauthorized()
   }
 
-  // construct Practitioner resource and save them
-  let practitionerId = null
-  let roleId = null
+  const practitionerId: string = uuid()
   let password = null
 
   try {
-    const signatureAttachment = user.signature && {
-      contentType: user.signature.type,
-      url: await uploadSignatureToMinio(token, user.signature),
-      creation: new Date().getTime().toString()
-    }
-
-    const practitioner = createFhirPractitioner(
-      user,
-      false,
-      signatureAttachment
-    )
-    practitionerId = await postFhir(token, practitioner)
-    if (!practitionerId) {
-      throw new Error(
-        'Practitioner resource not saved correctly, practitioner ID not returned'
-      )
-    }
-
-    const role = await createFhirPractitionerRole(user, practitionerId, false)
-    roleId = await postFhir(token, role)
-    if (!roleId) {
-      throw new Error(
-        'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
-      )
+    if (user.signature) {
+      await uploadSignatureToMinio(token, user.signature)
     }
 
     user.status = user.status ?? statuses.PENDING
@@ -100,7 +73,6 @@ export default async function createUser(
     user.practitionerId = practitionerId
     user.username = user.username ?? (await generateUsername(user.name))
   } catch (err) {
-    await rollbackCreateUser(token, practitionerId, roleId)
     logger.error(err)
     // cause an internal server error
     throw err
@@ -112,7 +84,6 @@ export default async function createUser(
     userModelObject = await User.create(user)
   } catch (err) {
     logger.error(err)
-    await rollbackCreateUser(token, practitionerId, roleId)
     if (err.code === 11000) {
       // check if phone or email has thrown unique constraint errors
       const errorThrowingProperty =
@@ -155,6 +126,10 @@ export default async function createUser(
     logger.error(err.message)
   }
 
-  const resUser = _.omit(userModelObject.toObject(), ['passwordHash', 'salt'])
+  const createdUser = userModelObject.toObject()
+  const resUser = {
+    ..._.omit(createdUser, ['passwordHash', 'salt']),
+    id: createdUser._id
+  }
   return h.response(resUser).code(201)
 }

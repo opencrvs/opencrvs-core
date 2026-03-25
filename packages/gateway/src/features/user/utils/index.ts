@@ -8,91 +8,26 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader, logger, UUID } from '@opencrvs/commons'
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import {
-  ISystemModelData,
-  IUserModelData
-} from '@gateway/features/user/type-resolvers'
-import decode from 'jwt-decode'
-import fetch from '@gateway/fetch'
-import { Scope } from '@opencrvs/commons/authentication'
+import { IAuthHeader, UUID } from '@opencrvs/commons'
+
 import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
 import { api as eventsApi } from '@gateway/v2-events/events/service'
+import decode from 'jwt-decode'
 
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: Scope[]
+  scope: string[]
   /** The record ID that the token has access to */
   recordId?: UUID
 }
 
-export async function getUser(
-  body: { [key: string]: string | undefined },
-  authHeader: IAuthHeader
-): Promise<IUserModelData> {
-  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-  return await res.json()
-}
-
-export async function getSystem(
-  body: { [key: string]: string | undefined },
-  authHeader: IAuthHeader
-): Promise<ISystemModelData> {
-  const systemId = body.systemId || body.clientId
-  if (!systemId) {
-    throw new Error('getSystem: systemId or clientId is required')
-  }
-  const result = await eventsApi.integrations.get.query(
-    { id: systemId as UUID },
-    { context: { headers: authHeader } }
-  )
-  return {
-    scope: result.scopes as Scope[],
-    name: result.name,
-    createdBy: result.createdBy,
-    client_id: result.id,
-    username: '',
-    status: result.status,
-    sha_secret: result.shaSecret ?? '',
-    type: 'HEALTH',
-    practitionerId: '',
-    settings: { dailyQuota: 0 }
-  }
-}
-
-export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
-  try {
-    const res = await fetch(`${USER_MANAGEMENT_URL}getUserMobile`, {
-      method: 'POST',
-      body: JSON.stringify({ userId }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    })
-    const body = await res.json()
-
-    return body
-  } catch (err) {
-    logger.error(`Unable to retrieve mobile for error : ${err}`)
-  }
-}
-
 export function scopesInclude(
   scopes:
-    | Scope[]
+    | string[]
     | undefined /* @todo remove undefined variant and make scope a required field for users */,
-  scope: Scope
+  scope: string
 ) {
   if (!scopes) {
     return false
@@ -100,7 +35,7 @@ export function scopesInclude(
   return scopes.includes(scope)
 }
 
-export function hasScope(authHeader: IAuthHeader, scope: Scope) {
+export function hasScope(authHeader: IAuthHeader, scope: string) {
   if (!authHeader || !authHeader.Authorization) {
     return false
   }
@@ -109,7 +44,7 @@ export function hasScope(authHeader: IAuthHeader, scope: Scope) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
-export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
+export function inScope(authHeader: IAuthHeader, scopes: string[]) {
   const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
   return !!matchedScope
 }
@@ -145,16 +80,6 @@ export const getUserId = (authHeader: IAuthHeader): string => {
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   return tokenPayload.sub
-}
-
-export function getUserFromHeader(header: IAuthHeader) {
-  const userId = getUserId(header)
-  return getUser({ userId }, header)
-}
-
-export function getFullName(user: IUserModelData, language: string) {
-  const localName = user.name.find((name) => name.use === language)
-  return `${localName?.given.join(' ') || ''} ${localName?.family || ''}`.trim()
 }
 
 export async function isOfficeUnderJurisdiction(

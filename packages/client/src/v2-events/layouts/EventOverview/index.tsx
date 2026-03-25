@@ -93,7 +93,9 @@ function EventOverviewTabs() {
   const location = useLocation()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
-  const showRecordTab = useCanAccessEventWithScopes(eventId, ['record.read'])
+  const { canAccessEventWithScopes } = useCanAccessEventWithScopes(eventId, [
+    'record.read'
+  ])
 
   const isActive = (pattern: string) => {
     return !!matchPath({ path: pattern, end: true }, location.pathname)
@@ -109,7 +111,7 @@ function EventOverviewTabs() {
       >
         {intl.formatMessage(messages.summary)}
       </Tab>
-      {showRecordTab && (
+      {canAccessEventWithScopes() && (
         <Tab
           className={
             isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''

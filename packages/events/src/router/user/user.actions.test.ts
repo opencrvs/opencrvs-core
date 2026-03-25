@@ -12,7 +12,6 @@
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
 import {
-  LocationType,
   SCOPES,
   generateUuid,
   TestUserRole,
@@ -121,7 +120,7 @@ test('Finds user in nested location using administrative area id with my jurisdi
     {
       name: 'Grandchild office',
       administrativeAreaId: childAdministrativeAreaId,
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       id: grandchildLocationId,
       validUntil: null,
       externalId: 'abc123xyz458'
@@ -173,7 +172,7 @@ test('Find user with appropriate scopes', async () => {
     {
       name: 'Child office',
       administrativeAreaId: userOnParentLocation.administrativeAreaId,
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       id: userToSearchLocationId,
       validUntil: null,
       externalId: 'abc123xyz459'

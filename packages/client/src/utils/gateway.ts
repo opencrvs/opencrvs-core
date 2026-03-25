@@ -2015,28 +2015,7 @@ type UpdatePermissionsInput = {
   webhook: Array<WebhookInput>
 }
 
-export type User = {
-  __typename?: 'User'
-  avatar?: Maybe<Avatar>
-  creationDate: Scalars['String']
-  device?: Maybe<Scalars['String']>
-  email?: Maybe<Scalars['String']>
-  fullHonorificName?: Maybe<Scalars['String']>
-  id: Scalars['ID']
-  identifier?: Maybe<Identifier>
-  localRegistrar?: Maybe<LocalRegistrar>
-  mobile?: Maybe<Scalars['String']>
-  name: Array<HumanName>
-  practitionerId: Scalars['String']
-  primaryOffice: Location
-  role: UserRole
-  searches?: Maybe<Array<BookmarkedSeachItem>>
-  signature?: Maybe<Signature>
-  status: Status
-  underInvestigation?: Maybe<Scalars['Boolean']>
-  userMgntUserID: Scalars['ID']
-  username?: Maybe<Scalars['String']>
-}
+type User = unknown
 
 type UserAuditLogItem = AuditLogItemBase & {
   __typename?: 'UserAuditLogItem'

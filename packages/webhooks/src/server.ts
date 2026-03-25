@@ -19,11 +19,9 @@ import {
   DEFAULT_TIMEOUT
 } from '@webhooks/constants'
 import getPlugins from '@webhooks/config/plugins'
-import * as database from '@webhooks/database'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
 import { getRoutes } from '@webhooks/config/routes'
-import * as queue from '@webhooks/queue'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -65,14 +63,11 @@ export async function createServer() {
 
   async function start() {
     await server.start()
-    await database.start()
-    await queue.startQueue()
     server.log('info', `server started on ${HOST}:${PORT}`)
   }
 
   async function stop() {
     await server.stop()
-    await database.stop()
     server.log('info', 'server stopped')
   }
 

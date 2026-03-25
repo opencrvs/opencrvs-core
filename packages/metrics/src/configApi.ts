@@ -11,12 +11,6 @@
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
 import { Document } from 'mongoose'
-import { UUID } from '@opencrvs/commons'
-import {
-  Location,
-  ResourceIdentifier,
-  SavedLocation
-} from '@opencrvs/commons/types'
 
 export interface ICountryLogo {
   fileName: string
@@ -34,8 +28,6 @@ export interface IApplicationConfig {
   HEALTH_FACILITY_FILTER: string
   PHONE_NUMBER_PATTERN: string
 }
-
-type LocationType = 'CRVS_OFFICE' | 'HEALTH_FACILITY' | 'ADMIN_STRUCTURE'
 
 export async function getApplicationConfig(
   authorization: string
@@ -78,33 +70,4 @@ export async function getDashboardQueries(): Promise<
         new Error(`Dashboard queries request failed: ${error.message}`)
       )
     })
-}
-
-const FETCH_ALL_LOCATION_CHILDREN = (id: UUID, type?: LocationType) => {
-  const typeQuery = type ? `?type=${type}` : ''
-  return new URL(`/locations/${id}/children${typeQuery}`, CONFIG_API_URL)
-}
-
-export const fetchLocationChildren = async (id: UUID, type?: LocationType) => {
-  const response = await fetch(FETCH_ALL_LOCATION_CHILDREN(id, type))
-
-  if (!response.ok) {
-    throw new Error(
-      `Couldn't fetch the children of a location from config: ${await response.text()}`
-    )
-  }
-
-  return response.json() as Promise<SavedLocation[]>
-}
-
-export const fetchLocationChildrenIds = async (
-  id: ResourceIdentifier<Location>,
-  typeFilter?: LocationType
-) => {
-  // TODO: Migrate InfluxDB to use UUID's instead of the "Location/" prefix
-  const locations = await fetchLocationChildren(
-    id.replace('Location/', '') as UUID,
-    typeFilter
-  )
-  return locations.map(({ id }) => `Location/${id}`)
 }

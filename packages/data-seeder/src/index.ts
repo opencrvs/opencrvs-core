@@ -88,9 +88,15 @@ async function triggerSystemReady(token: string) {
     })
 
     // 501, 404, and 2xx responses are acceptable
-    if (res.status === 501 || res.status === 404 || (res.status >= 200 && res.status < 300)) {
+    if (
+      res.status === 501 ||
+      res.status === 404 ||
+      (res.status >= 200 && res.status < 300)
+    ) {
       // eslint-disable-next-line no-console
-      console.log(`System ready trigger responded with status: ${res.status}`)
+      console.log(
+        `System ready trigger responded with acceptable status: ${res.status} ${res.statusText}`
+      )
       return
     }
 

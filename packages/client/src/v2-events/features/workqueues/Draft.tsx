@@ -15,7 +15,6 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
-  getOrThrow,
   mandatoryColumns,
   getCurrentEventState,
   applyDraftToEventIndex,

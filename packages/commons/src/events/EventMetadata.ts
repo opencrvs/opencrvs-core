@@ -73,7 +73,6 @@ export type RegistrationCreationMetadata = z.infer<
   typeof RegistrationCreationMetadata
 >
 
-// @TODO: In the future REVOKE should be added to the list of statuses
 export const LegalStatuses = z.object({
   [EventStatus.enum.DECLARED]: ActionCreationMetadata.nullish(),
   [EventStatus.enum.REGISTERED]: RegistrationCreationMetadata.nullish()

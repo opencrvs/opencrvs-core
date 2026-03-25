@@ -21,10 +21,6 @@ import {
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
   SystemVariables,
-  Scope,
-  ActionScopes,
-  ConfigurableActionScopes,
-  parseConfigurableScope,
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
@@ -255,28 +251,6 @@ export function replacePlaceholders({
   )
 }
 
-export const AssignmentStatus = {
-  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
-  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
-  UNASSIGNED: 'UNASSIGNED'
-} as const
-
-export type AssignmentStatus =
-  (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
-
-export function getAssignmentStatus(
-  eventState: EventIndex,
-  userId: string
-): AssignmentStatus {
-  if (!eventState.assignedTo) {
-    return AssignmentStatus.UNASSIGNED
-  }
-
-  return eventState.assignedTo == userId
-    ? AssignmentStatus.ASSIGNED_TO_SELF
-    : AssignmentStatus.ASSIGNED_TO_OTHERS
-}
-
 export function filterEmptyValues(
   obj: Record<string, unknown>
 ): Record<string, unknown> {
@@ -301,21 +275,13 @@ export enum CoreWorkqueues {
   DRAFT = 'draft'
 }
 
-export function hasOutboxWorkqueue(scopes: Scope[]) {
-  const hasLiteralActionScopes = scopes.some(
-    (scope) => ActionScopes.safeParse(scope).success
-  )
-  const parsedScopes = scopes.map(parseConfigurableScope)
-  const hasConfigurableActionScopes = parsedScopes.some(
-    (scope) => ConfigurableActionScopes.safeParse(scope).success
-  )
+export function hasOutboxWorkqueue(scopes: string[]) {
+  const hasRecordScope = scopes.some((scope) => !!decodeScope(scope))
 
-  const hasV2Scopes = scopes.some((scope) => !!decodeScope(scope))
-
-  return hasLiteralActionScopes || hasConfigurableActionScopes || hasV2Scopes
+  return hasRecordScope
 }
 
-export function hasDraftWorkqueue(scopes: Scope[]) {
+export function hasDraftWorkqueue(scopes: string[]) {
   return (
     getAcceptedScopesByType({
       acceptedScopes: ['record.create'],

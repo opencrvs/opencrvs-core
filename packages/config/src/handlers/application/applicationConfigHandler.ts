@@ -74,18 +74,19 @@ async function getCertificatesConfig(
 
   const certificateConfigs = await res.json()
 
-  // @TODO: new 1.9.11 will be ported when working on this task: https://github.com/opencrvs/opencrvs-core/issues/12039
-  // If there are no templateIds specified in the scope, all the certificates configuration will be fetched
-  // if (!templateIds.length) {
-  return certificateConfigs
-  // }
+  const hasUnrestrictedScope = printCertifiedCopiesScope.some(
+    (scope) => !scope.options?.templates?.length
+  )
+  if (hasUnrestrictedScope) {
+    return certificateConfigs
+  }
 
-  // If there are templateIds specified in the scope, only the certificates configuration matching those templateIds will be fetched
-  // if (templateIds.length > 0) {
-  //   return certificateConfigs.filter((config: { id: string }) =>
-  //     templateIds.includes(config.id)
-  //   )
-  // }
+  const allowedTemplateIds = new Set(
+    printCertifiedCopiesScope.flatMap((scope) => scope.options?.templates ?? [])
+  )
+  return certificateConfigs.filter((config: { id: string }) =>
+    allowedTemplateIds.has(config.id)
+  )
 }
 
 async function getConfigFromCountry(authToken?: string) {

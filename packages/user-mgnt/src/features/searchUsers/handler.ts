@@ -66,12 +66,16 @@ export default async function searchUsers(
     .skip(skip)
     .limit(count)
     .sort({
+      username: sortOrder,
       creationDate: sortOrder
     })
 
   return {
     totalItems: await User.find(criteria).count(),
-    results: userList
+    results: userList.map((user) => ({
+      ...user.toObject(),
+      id: user._id
+    }))
   }
 }
 

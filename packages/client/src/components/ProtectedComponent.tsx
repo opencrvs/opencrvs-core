@@ -10,11 +10,10 @@
  */
 import React from 'react'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { Scope } from '@opencrvs/commons/client'
 
 interface ScopeComponentProps {
-  scopes?: Scope[]
-  denyScopes?: Scope[]
+  scopes?: string[]
+  denyScopes?: string[]
   children: React.ReactNode
 }
 

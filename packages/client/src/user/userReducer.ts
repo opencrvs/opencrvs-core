@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
+import { ApolloClient, ApolloError } from '@apollo/client'
 import {
   IForm,
   IFormField,
@@ -18,7 +18,6 @@ import {
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/deserializer/deserializer'
 import { getCreateUserForm } from '@client/forms/user/fieldDefinitions/createUser'
-import { roleQueries } from '@client/forms/user/query/queries'
 import { validators } from '@client/forms/validators'
 import {
   ShowCreateUserDuplicateEmailErrorToast,
@@ -31,19 +30,17 @@ import {
 import * as offlineActions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { IStoreState } from '@client/store'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { GET_USER, SEARCH_USERS } from '@client/user/queries'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
-import { findScope } from '@opencrvs/commons/client'
 import { UserRole } from '@client/utils/gateway'
+import { SEARCH_USERS } from '@client/user/queries'
+import { trpcClient } from '@client/v2-events/trpc'
+import { User } from '@opencrvs/commons/client'
 
-import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
 import { Action } from 'redux'
 import { ActionCmd, Cmd, Loop, LoopReducer, RunCmd, loop } from 'redux-loop'
 
-const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
 const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA' as const
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
@@ -64,7 +61,6 @@ const initialState: IUserFormState = {
   userFormData: {},
   userDetailsStored: false,
   submitting: false,
-  loadingRoles: false,
   userRoles: [],
   submissionError: false,
   userAuditForm
@@ -172,43 +168,19 @@ function submitFail(errorData: ApolloError): ISubmitFailedAction {
   }
 }
 
-export interface IRoleLoadedAction {
-  type: typeof ROLES_LOADED
-  payload: {
-    loggedInUserScopes: string[]
-    userRoles: UserRole[]
-  }
-}
-
-function rolesLoaded(
-  loggedInUserScopes: string[],
-  userRoles: UserRole[]
-): IRoleLoadedAction {
-  return {
-    type: ROLES_LOADED,
-    payload: {
-      loggedInUserScopes,
-      userRoles
-    }
-  }
-}
-
 interface IFetchAndStoreUserData {
   type: typeof FETCH_USER_DATA
   payload: {
-    client: ApolloClient<unknown>
     variables: { userId: string }
   }
 }
 
 export function fetchAndStoreUserData(
-  client: ApolloClient<unknown>,
   variables: { userId: string }
 ): IFetchAndStoreUserData {
   return {
     type: FETCH_USER_DATA,
     payload: {
-      client,
       variables
     }
   }
@@ -217,17 +189,17 @@ export function fetchAndStoreUserData(
 interface IStoreUserFormDataAction {
   type: typeof STORE_USER_FORM_DATA
   payload: {
-    queryData: ApolloQueryResult<GQLQuery>
+    user: User
   }
 }
 
 function storeUserFormData(
-  queryData: ApolloQueryResult<GQLQuery>
+  user: User
 ): IStoreUserFormDataAction {
   return {
     type: STORE_USER_FORM_DATA,
     payload: {
-      queryData
+      user
     }
   }
 }
@@ -240,7 +212,6 @@ type UserFormAction =
   | profileActions.Action
   | ShowCreateUserErrorToast
   | ShowCreateUserDuplicateEmailErrorToast
-  | IRoleLoadedAction
   | IFetchAndStoreUserData
   | IStoreUserFormDataAction
   | IRoleMessagesLoadedAction
@@ -257,28 +228,9 @@ export interface IUserFormState {
   userFormData: IFormSectionData
   userDetailsStored: boolean
   submitting: boolean
-  loadingRoles: boolean
   submissionError: boolean
   userRoles: UserRole[]
   userAuditForm: IUserAuditForm
-}
-
-function withScopes<T extends Record<string, unknown>>(
-  values: T,
-  userRoles: UserRole[]
-): T & { scopes?: string[] } {
-  if (!('role' in values)) {
-    return values
-  }
-  return {
-    ...values,
-    scopes: userRoles.find((role) => role.id === values.role)?.scopes
-  }
-}
-
-const fetchRoles = async (getState: () => IStoreState) => {
-  const roles = await roleQueries.fetchRoles()
-  return [getState().profile.tokenPayload?.scope, roles.data.getUserRoles]
 }
 
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
@@ -287,24 +239,16 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
     case offlineActions.READY:
-      return loop(
-        {
-          ...state,
-          userAuditForm,
-          loadingRoles: true
-        },
-        Cmd.run(fetchRoles, {
-          successActionCreator: ([loggedInUserScopes, roles]) =>
-            rolesLoaded(loggedInUserScopes, roles),
-          args: [Cmd.getState]
-        })
-      )
+      return {
+        ...state,
+        userAuditForm
+      }
 
     case MODIFY_USER_FORM_DATA: {
       const formData = action.payload.data
       return {
         ...state,
-        userFormData: withScopes(formData, state.userRoles)
+        userFormData: formData
       }
     }
 
@@ -405,62 +349,16 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
       )
 
-    case ROLES_LOADED:
-      const { loggedInUserScopes, userRoles } = action.payload
-
-      const creatableRoleIds =
-        findScope(loggedInUserScopes, 'user.create')?.options?.role ?? []
-
-      const editableRoleIds =
-        findScope(loggedInUserScopes, 'user.edit')?.options?.role ?? []
-
-      const allowedRoleIds = [...creatableRoleIds, ...editableRoleIds]
-
-      const form = deserializeForm(getCreateUserForm(), validators)
-
-      const modifiedForm = modifyFormField(
-        form,
-        'user',
-        'user-view-group',
-        'role',
-        (field: IFormField) => {
-          if (field.type === 'SELECT_WITH_OPTIONS') {
-            return {
-              ...field,
-              options: userRoles
-                .filter(({ id }) => allowedRoleIds.includes(id))
-                .map((role) => ({
-                  value: role.id,
-                  label: role.label
-                }))
-            }
-          }
-          return field
-        }
-      )
-
-      return {
-        ...state,
-        userForm: modifiedForm,
-        userRoles,
-        loadingRoles: false
-      }
     case FETCH_USER_DATA:
       const {
-        client: userClient,
         variables: { userId }
       } = (action as IFetchAndStoreUserData).payload
       return loop(
         state,
         Cmd.run(
-          () =>
-            userClient.query({
-              query: GET_USER,
-              variables: { userId },
-              fetchPolicy: 'no-cache'
-            }),
+          () => trpcClient.user.get.query(userId),
           {
-            successActionCreator: storeUserFormData,
+            successActionCreator: (result) => storeUserFormData(result as User),
             failActionCreator: () =>
               showSubmitFormErrorToast(TOAST_MESSAGES.FAIL)
           }
@@ -468,19 +366,26 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case STORE_USER_FORM_DATA:
-      const { queryData } = action.payload
+      const { user } = action.payload
+      const gqlCompatibleUser = {
+        ...user,
+        name: user.name.map((n) => ({
+          use: n.use,
+          firstNames: n.given.join(' '),
+          familyName: n.family
+        })),
+        primaryOffice: { id: user.primaryOfficeId }
+      }
       const formData = gqlToDraftTransformer(
         { sections: state.userForm.sections },
         {
-          [UserSection.User]: {
-            ...queryData.data.getUser
-          }
+          [UserSection.User]: gqlCompatibleUser
         }
       )
 
       return {
         ...state,
-        userFormData: withScopes(formData.user, state.userRoles),
+        userFormData: formData.user,
         userDetailsStored: true
       }
 

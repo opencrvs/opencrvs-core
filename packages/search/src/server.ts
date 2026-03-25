@@ -17,9 +17,7 @@ import {
   DEFAULT_TIMEOUT
 } from '@search/constants'
 import getPlugins from '@search/config/plugins'
-import { getRoutes } from '@search/config/routes'
 import { readFileSync } from 'fs'
-import * as mongoDirect from '@search/config/hearthClient'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -49,8 +47,20 @@ export async function createServer() {
 
   server.auth.default('jwt')
 
-  const routes = getRoutes()
-  server.route(routes)
+  server.route({
+    method: 'GET',
+    path: '/ping',
+    handler: () =>
+      // Perform any health checks and return true or false for success prop
+      ({
+        success: true
+      }),
+    options: {
+      auth: false,
+      tags: ['api'],
+      description: 'Health check endpoint'
+    }
+  })
 
   server.ext({
     type: 'onRequest',
@@ -62,13 +72,11 @@ export async function createServer() {
 
   async function start() {
     await server.start()
-    await mongoDirect.start()
     server.log('info', `Search server started on ${HOST}:${PORT}`)
   }
 
   async function stop() {
     await server.stop()
-    await mongoDirect.stop()
     server.log('info', 'Search server stopped')
   }
 
