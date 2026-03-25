@@ -81,7 +81,6 @@ export type EventCorrectionRejectAuditLog = {
   responseSummary: EventResponseSummary
 }
 
-
 /**
  * All event action audit log variants share the same requestData and responseSummary shapes.
  * Defined as a single type with a union operation field so call sites can pass a
@@ -121,27 +120,40 @@ export type IntegrationRefreshTokenAuditLog = {
 export type IntegrationDeactivateAuditLog = {
   operation: 'integrations.deactivate'
   requestData: {
-    clientId: string
+    id: string
   }
   responseSummary: {
-    clientId: string
+    id: string
+    status: string
   }
 }
 
 export type IntegrationActivateAuditLog = {
   operation: 'integrations.activate'
   requestData: {
-    clientId: string
+    id: string
   }
   responseSummary: {
-    clientId: string
+    id: string
+    status: string
   }
 }
 
 export type IntegrationDeleteAuditLog = {
   operation: 'integrations.delete'
   requestData: {
-    clientId: string
+    id: string
+  }
+  responseSummary: {
+    id: string
+    name: string
+  }
+}
+
+export type IntegrationRefreshSecretAuditLog = {
+  operation: 'integrations.refreshSecret'
+  requestData: {
+    id: string
   }
   responseSummary: {
     clientId: string
@@ -170,6 +182,11 @@ export type AuditLogOperation =
   | EventGetAuditLog
   | EventSearchAuditLog
   | EventActionAuditLog
+  | IntegrationCreateAuditLog
+  | IntegrationDeactivateAuditLog
+  | IntegrationActivateAuditLog
+  | IntegrationDeleteAuditLog
+  | IntegrationRefreshSecretAuditLog
   | AttachmentUploadAuditLog
   | IntegrationCreateAuditLog
   | IntegrationRefreshTokenAuditLog

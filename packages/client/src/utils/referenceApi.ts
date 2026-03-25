@@ -18,7 +18,7 @@ import {
   ILocation
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
-import { EventType, System } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { cacheFile } from '@client/v2-events/cache'
 import { ApplicationConfig, TranslationConfig } from '@opencrvs/commons/client'
 import { IntlShape } from 'react-intl'
@@ -121,7 +121,6 @@ export interface IApplicationConfigAnonymous {
 export interface IApplicationConfigResponse {
   config: ApplicationConfig
   certificates: ICertificateConfigData[]
-  systems: System[]
 }
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {

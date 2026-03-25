@@ -36,11 +36,6 @@ const currencySchema = new Schema<ICurrency>({
   languagesAndCountry: { type: [String] }
 })
 
-export interface Integration {
-  name: string
-  status: string
-}
-
 const configSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   COUNTRY_LOGO: { type: countryLogoSchema, required: false },

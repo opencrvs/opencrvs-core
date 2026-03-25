@@ -111,7 +111,11 @@ test('Returns both normal users and system users', async () => {
 
   await createSystemClient({
     name: 'My health system integration',
-    legacyId: systemUserId
+    legacyId: systemUserId,
+    createdBy: user.id,
+    salt: 'RANDOM_STRING',
+    secretHash: 'RANDOM_STRING',
+    shaSecret: 'RANDOM_STRING'
   })
 
   const fetchedUsers = await client.user.list([...userIds, systemUserId])
