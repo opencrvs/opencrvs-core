@@ -57,7 +57,7 @@ export const WithHiddenOption: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('combobox'))
+    await userEvent.click(await canvas.findByRole('textbox'))
     await expect(
       canvas.queryByRole('option', { name: 'Apple' })
     ).toBeInTheDocument()
@@ -128,7 +128,7 @@ export const WithDisabledOption: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('combobox'))
+    await userEvent.click(await canvas.findByRole('textbox'))
     const bananaOption = canvas.queryByRole('option', { name: 'Banana' })
     await expect(bananaOption).toBeInTheDocument()
     await expect(bananaOption).toHaveAttribute('aria-disabled', 'true')
