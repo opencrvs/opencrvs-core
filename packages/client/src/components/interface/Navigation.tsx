@@ -191,7 +191,7 @@ const NavigationView = (props: IFullProps) => {
       return
     }
     updateRegistrarWorkqueue(
-      userDetails.practitionerId,
+      userDetails.id,
       10 // Page size shouldn't matter here as we're only interested in totals
     )
   }, [userDetails, updateRegistrarWorkqueue, loadWorkqueueStatuses])
@@ -455,11 +455,11 @@ const NavigationView = (props: IFullProps) => {
                     navigationMessages[WORKQUEUE_TABS.team]
                   )}
                   onClick={() => {
-                    if (userDetails && userDetails.primaryOffice) {
+                    if (userDetails && userDetails.primaryOfficeId) {
                       props.router.navigate({
                         pathname: routes.TEAM_USER_LIST,
                         search: stringify({
-                          locationId: userDetails.primaryOffice.id
+                          locationId: userDetails.primaryOfficeId
                         })
                       })
                     }
@@ -581,50 +581,6 @@ const NavigationView = (props: IFullProps) => {
         </NavigationGroup>
       )}
 
-      <NavigationGroup>
-        {userDetails?.searches && userDetails.searches.length > 0 ? (
-          userDetails.searches.map((bookmarkResult) => {
-            return (
-              <NavigationItem
-                key={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
-                icon={() => (
-                  <Icon
-                    name="Star"
-                    color="yellow"
-                    size="small"
-                    weight="fill"
-                  ></Icon>
-                )}
-                id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
-                label={bookmarkResult.name}
-                disabled={
-                  advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.router.location.pathname === ADVANCED_SEARCH_RESULT
-                }
-                onClick={() => {
-                  const filteredParam = omit(
-                    bookmarkResult.parameters,
-                    '__typename'
-                  ) as IAdvancedSearchParamState
-                  setAdvancedSearchParam({
-                    ...filteredParam,
-                    searchId: bookmarkResult?.searchId,
-                    bookmarkName: bookmarkResult?.name
-                  })
-
-                  router.navigate(routes.ADVANCED_SEARCH_RESULT)
-                }}
-                isSelected={
-                  advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.router.location.pathname === ADVANCED_SEARCH_RESULT
-                }
-              />
-            )
-          })
-        ) : (
-          <></>
-        )}
-      </NavigationGroup>
       <NavigationGroup>
         {menuCollapse && getSettingsAndLogout(props)}
       </NavigationGroup>

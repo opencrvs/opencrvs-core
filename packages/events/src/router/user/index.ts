@@ -11,8 +11,8 @@
 
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { UserOrSystem } from '@opencrvs/commons'
 import { UserAuditRecordInput } from '@opencrvs/commons/events'
+import { UserOrSystem, User } from '@opencrvs/commons'
 import {
   router,
   userAndSystemProcedure,
@@ -20,11 +20,18 @@ import {
 } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 import { getUserActions } from '@events/service/events/user/actions'
+import { getRoles } from '@events/service/config/config'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import {
   queryUserAuditLog,
   writeAuditLog
 } from '@events/storage/postgres/events/auditLog'
+import {
+  UserInput,
+  searchUsers,
+  createUser,
+  activateUser
+} from '@events/service/users/api'
 import { userCanReadOtherUser } from '../middleware'
 
 const UserAuditListQuery = z.object({
@@ -70,28 +77,54 @@ const auditRouter = router({
     })
 })
 
+const UserSearch = z.object({
+  username: z.string().optional(),
+  mobile: z.string().optional(),
+  status: z.string().optional(),
+  primaryOfficeId: z.string().optional(),
+  locationId: z.string().optional(),
+  count: z.number().min(0),
+  skip: z.number().min(0),
+  sortOrder: z.enum(['asc', 'desc'])
+})
+
 export const userRouter = router({
   get: userOnlyProcedure
     .input(z.string())
     .output(UserOrSystem)
     .query(async ({ input, ctx }) => {
       const users = await getUsersById([input], ctx.token)
-
       if (users.length === 0) {
         throw new TRPCError({ code: 'NOT_FOUND' })
       }
 
       return users[0]
     }),
+  create: userAndSystemProcedure
+    .input(UserInput)
+    .output(User)
+    .mutation(async ({ input, ctx }) => createUser(input, ctx.token)),
   list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
     .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
+  search: userAndSystemProcedure
+    .input(UserSearch)
+    .output(z.array(UserOrSystem))
+    .query(async ({ input, ctx }) => searchUsers(input, ctx.token)),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadOtherUser)
     .query(async ({ input }) => {
       return getUserActions(input)
+    }),
+  roles: router({
+    list: userOnlyProcedure.query(async ({ ctx }) => getRoles(ctx.token))
+  }),
+  activate: userOnlyProcedure
+    .input(z.any())
+    .mutation(async ({ input, ctx }) => {
+      return activateUser(input, ctx.token)
     }),
   audit: auditRouter
 })

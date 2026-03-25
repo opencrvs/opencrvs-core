@@ -23,13 +23,15 @@ import {
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
-import { UserDetails, getIndividualNameObj } from '@client/utils/userUtils'
+import { UserDetails } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { buttonMessages } from '@client/i18n/messages'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -74,34 +76,24 @@ const ProfileMenuComponent = ({
     return items
   }
 
-  const getUserName = (
-    language: string,
-    userDetails: UserDetails | null
-  ): string => {
+  const getUserName = (userDetails: UserDetails | null): string => {
     let userName = ''
 
     if (userDetails && userDetails.name) {
-      const nameObj = getIndividualNameObj(userDetails.name, language)
-
-      if (nameObj) {
-        userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-      }
+      userName = getUsersFullName(userDetails.name, intl.locale)
     }
 
     return userName
   }
 
-  const getMenuHeader = (
-    language: string,
-    userDetails: UserDetails | null
-  ): JSX.Element => {
-    const userName = getUserName(language, userDetails)
+  const getMenuHeader = (userDetails: UserDetails | null): JSX.Element => {
+    const userName = getUserName(userDetails)
 
     return (
       <>
         <UserName>{userName}</UserName>
         <UserRole>
-          {userDetails && intl.formatMessage(userDetails.role.label)}
+          {userDetails && formatUserRole(userDetails.role, intl)}
         </UserRole>
       </>
     )
@@ -113,11 +105,11 @@ const ProfileMenuComponent = ({
         id="ProfileMenu"
         toggleButton={
           <AvatarSmall
-            name={getUserName(language, userDetails)}
+            name={getUserName(userDetails)}
             avatar={userDetails?.avatar}
           />
         }
-        menuHeader={getMenuHeader(language, userDetails)}
+        menuHeader={getMenuHeader(userDetails)}
         menuItems={getMenuItems(intl)}
       />
     </>

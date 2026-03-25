@@ -110,7 +110,7 @@ type IProps = IntlShapeProps &
     error: string
     onErrorChanged: (error: string) => void
     onConfirmAvatarChange: () => void
-    onAvatarChanged: (img: IImage) => void
+    onAvatarChanged: (img: string) => void
     userDetails: UserDetails | null
   }
 
@@ -199,7 +199,7 @@ function AvatarChangeModalComp({
           key="change-avatar-mutation"
           mutation={changeAvatarMutation}
           onCompleted={({ changeAvatar: avatar }) => {
-            onAvatarChanged(avatar)
+            onAvatarChanged(avatar.data)
             reset()
           }}
         >
@@ -214,14 +214,10 @@ function AvatarChangeModalComp({
                     imgSrc,
                     croppedArea
                   )
-                  if (
-                    userDetails &&
-                    userDetails.userMgntUserID &&
-                    croppedImage
-                  ) {
+                  if (userDetails && userDetails.id && croppedImage) {
                     changeAvatar({
                       variables: {
-                        userId: userDetails.userMgntUserID,
+                        userId: userDetails.id,
                         avatar: croppedImage
                       }
                     })

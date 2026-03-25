@@ -29,6 +29,7 @@ export function useCountryConfigWorkqueueConfigurations() {
   return useMemo(() => {
     const availableWorkqueues =
       findScope(scopes ?? [], 'workqueue')?.options.id ?? []
+
     return config.filter(({ slug }) => availableWorkqueues.includes(slug))
   }, [config, scopes])
 }

@@ -516,6 +516,10 @@ export const CanSubmitValidlyFilledForm: Story = {
       await userEvent.click(district)
       await selectEvent.select(district, 'Ibombo')
 
+      const village = await canvas.findByLabelText(/Village/i)
+      await userEvent.click(village)
+      await selectEvent.select(village, 'Pemba')
+
       const continueButton = await canvas.findByText('Continue')
       await userEvent.click(continueButton)
     })

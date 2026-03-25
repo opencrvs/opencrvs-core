@@ -46,6 +46,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
   const intl = useIntl()
   const { phoneNumber, email } = data
   const userDetails = useSelector(getUserDetails)
+
   const nonce = useSelector(getUserNonce)
   const [verifyCode, setVerifyCode] = React.useState(EMPTY_STRING)
   const [isInvalidLength, setIsInvalidLength] = React.useState(false)
@@ -116,11 +117,11 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
                 id="verify-button"
                 key="verify"
                 onClick={() => {
-                  if (userDetails?.userMgntUserID) {
+                  if (userDetails?.id) {
                     if (phoneNumber) {
                       changePhoneOrEmail({
                         variables: {
-                          userId: userDetails.userMgntUserID,
+                          userId: userDetails.id,
                           phoneNumber: convertToMSISDN(
                             phoneNumber,
                             window.config.COUNTRY
@@ -132,7 +133,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
                     } else if (email) {
                       changePhoneOrEmail({
                         variables: {
-                          userId: userDetails.userMgntUserID,
+                          userId: userDetails.id,
                           email: email,
                           nonce: nonce,
                           verifyCode: verifyCode

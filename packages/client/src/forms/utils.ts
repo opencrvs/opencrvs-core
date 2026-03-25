@@ -115,7 +115,7 @@ const internationaliseOptions = (
   return options.map((opt) => {
     return {
       ...opt,
-      label: intl.formatMessage(
+      label: typeof opt.label === 'string' ? opt.label : intl.formatMessage(
         opt.label,
         'param' in opt ? opt.param : undefined
       )

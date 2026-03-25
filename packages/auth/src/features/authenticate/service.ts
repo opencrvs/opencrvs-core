@@ -27,7 +27,7 @@ import {
 import { logger, UUID, IUserName } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -64,7 +64,7 @@ export interface IAuthentication {
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: Scope[]
+  scope: string[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -175,7 +175,6 @@ export async function createTokenForActionConfirmation(
         'opencrvs:gateway-user',
         'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
-        'opencrvs:hearth-user',
         'opencrvs:notification-user',
         'opencrvs:workflow-user',
         'opencrvs:search-user',

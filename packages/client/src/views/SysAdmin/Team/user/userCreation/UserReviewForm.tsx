@@ -19,7 +19,8 @@ import {
   SIMPLE_DOCUMENT_UPLOADER,
   SUBSECTION_HEADER
 } from '@client/forms'
-import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
+
+import { omitBy } from 'lodash'
 import {
   getVisibleSectionGroupsBasedOnConditions,
   getConditionalActionsForField
@@ -33,10 +34,7 @@ import {
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import {
-  modifyUserFormData,
-  submitUserFormData
-} from '@client/user/userReducer'
+import { modifyUserFormData } from '@client/user/userReducer'
 import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { SuccessButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -63,8 +61,6 @@ import {
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Link } from '@opencrvs/components'
-import { UserRole } from '@client/utils/gateway'
-import { draftToGqlTransformer } from '@client/transformer'
 import {
   RouteComponentProps,
   withRouter
@@ -78,7 +74,9 @@ import {
 } from '@client/navigation'
 import { getListOfLocations } from '@client/utils/validate'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { UUID } from '@opencrvs/commons/client'
+import { UUID, Role } from '@opencrvs/commons/client'
+import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -90,12 +88,9 @@ interface IUserReviewFormProps {
 interface IStateProps {
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
-  userRoles: UserRole[]
   userDetails: UserDetails | null
 }
 interface IDispatchProps {
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  submitForm: (variables: Record<string, any>) => void
   modify: (values: IFormSectionData) => void
 }
 
@@ -130,7 +125,7 @@ const Value = styled.span`
 interface ICommonProps {
   offlineCountryConfiguration: IOfflineData
   formData: IFormSectionData
-  userRoles: UserRole[]
+  userRoles: Role[]
   userDetails: UserDetails | null
   intl: IntlShape
 }
@@ -264,7 +259,7 @@ const getValue = ({
       ? field.name === 'systemRole'
         ? intl.formatMessage(userMessages[formData.systemRole as string])
         : field.name === 'role' && role
-          ? intl.formatMessage(role.label)
+          ? formatUserRole(role.id, intl)
           : String(formData[field.name])
       : (formData[field.name] as IDynamicValues).label
     : ''
@@ -297,11 +292,21 @@ const UserReviewFormComponent = ({
   userFormSection,
   formData,
   userDetails,
-  offlineCountryConfiguration,
-  submitForm,
-  userRoles
+  offlineCountryConfiguration
 }: IFullProps & IDispatchProps & IStateProps) => {
   const navigate = useNavigate()
+
+  const { createUser } = useUsers()
+  const createUserMutation = createUser({
+    onSuccess: () => {
+      navigate({
+        pathname: routes.TEAM_USER_LIST,
+        search: stringify({
+          locationId: formData.registrationOffice as string
+        })
+      })
+    }
+  })
 
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
@@ -312,9 +317,11 @@ const UserReviewFormComponent = ({
 
   const parsedLocationId = UUID.safeParse(locationId)
 
+  const { listRoles } = useRoles()
+  const [userRoles] = listRoles.useSuspenseQuery()
   const userRole = userRoles.find(({ id }) => id === formData.role)
 
-  const parsedPrimaryOfficeId = UUID.safeParse(userDetails?.primaryOffice.id)
+  const parsedPrimaryOfficeId = UUID.safeParse(userDetails?.primaryOfficeId)
   const administrativeAreaId = parsedPrimaryOfficeId.success
     ? (locations.get(parsedPrimaryOfficeId.data)?.administrativeAreaId ?? null)
     : null
@@ -326,25 +333,37 @@ const UserReviewFormComponent = ({
       location.id !== parsedPrimaryOfficeId.data
   )
 
+  // @TODO: This should be refactored separately from the API replacement work.
+  // It works now but the whole flow is sus.
   const handleSubmit = () => {
-    const variables = draftToGqlTransformer(
-      { sections: [userFormSection] },
-      { user: formData },
-      '',
-      userDetails,
-      offlineCountryConfiguration,
-      undefined
-    )
-    if (variables.user._fhirID) {
-      variables.user.id = variables.user._fhirID
-      delete variables.user._fhirID
-    }
+    const {
+      phoneNumber,
+      familyName,
+      firstName,
+      seperator,
+      registrationOffice,
+      ...rest
+    } = formData
 
-    if (variables.user.signature) {
-      delete variables.user.signature.name
-      delete variables.user.signature.__typename
-    }
-    submitForm(variables)
+    // @ts-ignore
+    createUserMutation.mutate(
+      // @ts-ignore
+      omitBy(
+        {
+          ...rest,
+          primaryOfficeId: registrationOffice as string,
+          mobile: phoneNumber ? phoneNumber : undefined,
+          name: [
+            {
+              use: 'en',
+              family: familyName as string,
+              given: [firstName] as string[]
+            }
+          ]
+        },
+        (v) => v === undefined || v === ''
+      )
+    )
   }
 
   if (userId) {
@@ -353,9 +372,11 @@ const UserReviewFormComponent = ({
     actionComponent = (
       <SuccessButton
         id="submit-edit-user-form"
+        // @TODO: Limit access based on role permissions and whether signature is required once file API is implemented
         disabled={
-          userRole?.scopes?.includes('profile.electronic-signature') &&
-          !formData.signature
+          false
+          // userRole?.scopes?.includes('profile.electronic-signature') &&
+          // !formData.signature
         }
         onClick={handleSubmit}
         icon={() => <Check />}
@@ -373,9 +394,11 @@ const UserReviewFormComponent = ({
         type="positive"
         size="large"
         fullWidth
+        // @TODO: Limit access based on role permissions and whether signature is required once file API is implemented
         disabled={
-          userRole?.scopes?.includes('profile.electronic-signature') &&
-          !formData.signature
+          false
+          // userRole?.scopes?.includes('profile.electronic-signature') &&
+          // !formData.signature
         }
         onClick={handleSubmit}
       >
@@ -396,11 +419,11 @@ const UserReviewFormComponent = ({
               locationId
             })
           })
-        } else if (userDetails?.primaryOffice?.id) {
+        } else if (userDetails?.primaryOfficeId) {
           navigate({
             pathname: routes.TEAM_USER_LIST,
             search: stringify({
-              locationId: userDetails.primaryOffice.id
+              locationId: userDetails.primaryOfficeId
             })
           })
         }
@@ -445,29 +468,8 @@ const UserReviewFormComponent = ({
 }
 
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
-  const navigateToUserList = () =>
-    props.router.navigate({
-      pathname: routes.TEAM_USER_LIST,
-      search: stringify({
-        locationId: props.formData.registrationOffice as string
-      })
-    })
-
   return {
-    modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    submitForm: (variables: Record<string, any>) => {
-      dispatch(
-        submitUserFormData(
-          props.client,
-          createOrUpdateUserMutation,
-          variables,
-          props.formData.registrationOffice as string,
-          Boolean(props.router.match.params.userId), // to detect if update or create
-          navigateToUserList
-        )
-      )
-    }
+    modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values))
   }
 }
 
@@ -476,8 +478,7 @@ export const UserReviewForm = withRouter(
     return {
       userFormSection: store.userForm.userForm!.sections[0],
       offlineCountryConfiguration: getOfflineData(store),
-      userDetails: getUserDetails(store),
-      userRoles: store.userForm.userRoles
+      userDetails: getUserDetails(store)
     }
   }, mapDispatchToProps)(injectIntl(UserReviewFormComponent))
 )

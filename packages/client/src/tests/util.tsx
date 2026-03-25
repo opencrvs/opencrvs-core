@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  Scope,
   SCOPES,
   DEFAULT_ROLES_DEFINITION,
   TestUserRole,
-  TokenUserType
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons/client'
 import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -29,8 +29,8 @@ import {
   ApolloLink,
   ApolloProvider,
   InMemoryCache,
-  NetworkStatus,
-  Observable
+  Observable,
+  gql
 } from '@apollo/client'
 import { MockedProvider } from '@apollo/client/testing'
 import { App, routesConfig } from '@client/App'
@@ -56,7 +56,6 @@ import { waitForElement } from './wait-for-element'
 
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { vi } from 'vitest'
-import { getUserRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { Section, SubmissionAction } from '@client/forms'
@@ -68,8 +67,6 @@ import { mockOfflineData, validImageB64String } from './mock-offline-data'
 
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
-const inValidImageB64String =
-  'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
 export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   SCOPES.CONFIG_UPDATE_ALL,
@@ -80,27 +77,14 @@ export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
   SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-] satisfies Scope[]
+]
 
 export const REGISTRAR_DEFAULT_SCOPES = [
-  SCOPES.RECORD_DECLARE_BIRTH,
-  SCOPES.RECORD_DECLARE_DEATH,
-  SCOPES.RECORD_DECLARE_MARRIAGE,
-  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-  SCOPES.RECORD_REVIEW_DUPLICATES,
-  SCOPES.RECORD_DECLARATION_ARCHIVE,
-  SCOPES.RECORD_DECLARATION_REINSTATE,
-  SCOPES.RECORD_REGISTER,
-  SCOPES.RECORD_REGISTRATION_CORRECT,
-  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
   SCOPES.ORGANISATION_READ_LOCATIONS,
-  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_MARRIAGE
-] satisfies Scope[]
+  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+]
 
 const ACTION_STATUS_MAP = {
   [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -310,49 +294,20 @@ const secondaryInternationalAddressLines = {
 }
 
 export const userDetails: UserDetails = {
-  userMgntUserID: '123',
   id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
-  status: 'active' as Status,
-  creationDate: '1487076708000',
-  practitionerId: '12345',
+  type: 'user',
+  status: 'active',
   name: [
     {
       use: 'en',
-      firstNames: 'Shakib',
-      familyName: 'Al Hasan'
+      given: ['Shakib'],
+      family: 'Al Hasan'
     },
-    { use: 'bn', firstNames: '', familyName: '' }
+    { use: 'bn', given: [''], family: '' }
   ],
-  role: {
-    id: TestUserRole.enum.FIELD_AGENT,
-    label: {
-      defaultMessage: 'Field Agent',
-      description: 'Name for user role Field Agent',
-      id: 'userRole.fieldAgent'
-    }
-  },
+  role: TestUserRole.enum.FIELD_AGENT,
   mobile: '01677701431',
-  primaryOffice: {
-    id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
-    name: 'Kaliganj Union Sub Center',
-    alias: ['কালিগাঞ্জ ইউনিয়ন পরিষদ'],
-    status: 'active'
-  },
-  localRegistrar: {
-    role: 'LOCAL_REGISTRAR',
-    signature: {
-      data: `data:image/png;base64,${validImageB64String}`,
-      type: 'image/png'
-    },
-    name: [
-      {
-        use: 'en',
-        firstNames: 'Mohammad',
-        familyName: 'Ashraful',
-        __typename: 'HumanName'
-      }
-    ]
-  }
+  primaryOfficeId: '6327dbd9-e118-4dbe-9246-cb0f7649a666' as UUID
 }
 
 export const mockUserResponse = {
@@ -1091,51 +1046,19 @@ async function getReviewFormFromStore(
 export function loginAsFieldAgent(store: AppStore) {
   return store.dispatch(
     setUserDetails({
-      loading: false,
-      networkStatus: NetworkStatus.ready,
-      data: {
-        getUser: {
-          id: '5eba726866458970cf2e23c2',
-          username: 'a.alhasan',
-          creationDate: '2022-10-03T10:42:46.920Z',
-          userMgntUserID: '5eba726866458970cf2e23c2',
-          practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-          mobile: '+8801711111111',
-          role: {
-            id: 'CHA',
-            label: {
-              id: 'userRoles.CHA',
-              defaultMessage: 'CHA',
-              description: 'CHA'
-            }
-          },
-          status: Status.Active,
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Shakib',
-              familyName: 'Al Hasan'
-            }
-          ],
-          primaryOffice: {
-            id: '0d8474da-0361-4d32-979e-af91f012340a',
-            name: 'Kaliganj Union Sub Center',
-            status: 'active',
-            alias: ['বানিয়াজান']
-          },
-          localRegistrar: {
-            name: [
-              {
-                use: 'en',
-                firstNames: 'Mohammad',
-                familyName: 'Ashraful'
-              }
-            ],
-            role: 'LOCAL_REGISTRAR',
-            signature: undefined
-          }
+      id: '5eba726866458970cf2e23c2',
+      type: 'user',
+      mobile: '+8801711111111',
+      role: 'CHA',
+      status: 'active',
+      name: [
+        {
+          use: 'en',
+          given: ['Shakib'],
+          family: 'Al Hasan'
         }
-      }
+      ],
+      primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a' as UUID
     })
   )
 }
@@ -1179,6 +1102,20 @@ export const mockRoles = {
     getUserRoles: DEFAULT_ROLES_DEFINITION
   }
 }
+
+const getUserRolesQuery = gql`
+  query GetUserRoles {
+    getUserRoles {
+      id
+      label {
+        id
+        defaultMessage
+        description
+      }
+      scopes
+    }
+  }
+`
 
 export const mockFetchRoleGraphqlOperation = {
   request: {
@@ -1710,7 +1647,7 @@ export function generateToken({
   role,
   subject
 }: {
-  scope: Scope[]
+  scope: string[]
   subject?: string
   userType?: TokenUserType
   role?: TestUserRole
@@ -1735,7 +1672,7 @@ export function generateToken({
   })
 }
 
-export function setScopes(scope: Scope[], store: AppStore) {
+export function setScopes(scope: string[], store: AppStore) {
   const token = generateToken({ scope })
 
   window.history.replaceState({}, '', '?token=' + token)
