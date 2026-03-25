@@ -28,7 +28,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
-import { RawScopes, User } from '@opencrvs/commons/client'
+import { User } from '@opencrvs/commons/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -72,7 +72,7 @@ function WithFrame({
   isHidden: boolean
   userDetails: ProfileState['userDetails']
   user: User | undefined
-  scope: RawScopes[] | null
+  scope: string[] | null
   getMenuItems: (
     userId: string,
     status: string

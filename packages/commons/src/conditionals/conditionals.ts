@@ -11,7 +11,7 @@
 import * as objectHash from 'object-hash'
 import { EventDocument } from '../events/EventDocument'
 import { EventState } from '../events/ActionDocument'
-import { ITokenPayload as TokenPayload, Scope } from '../authentication'
+import { ITokenPayload as TokenPayload } from '../authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
@@ -196,7 +196,7 @@ export const now = Object.assign(todayDateTimeValueSerializer, {})
  */
 export const user = Object.assign(userSerializer, {
   ...userReferenceFunctions,
-  hasScope: (scope: Scope) =>
+  hasScope: (scope: string) =>
     defineConditional({
       type: 'object',
       properties: {
