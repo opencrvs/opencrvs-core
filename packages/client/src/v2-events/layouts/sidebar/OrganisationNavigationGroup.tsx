@@ -112,17 +112,18 @@ export function OrganisationNavigationGroup({
                 )}
                 onClick={() => setIsConfigExpanded(!isConfigExpanded)}
               />
-              {(isConfigExpanded ||
-                currentWorkqueueSlug === WORKQUEUE_TABS.systems) && (
-                <NavigationSubItem
-                  id={`navigation_${WORKQUEUE_TABS.systems}`}
-                  isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.systems}
-                  label={intl.formatMessage(
-                    navigationMessages[WORKQUEUE_TABS.systems]
-                  )}
-                  onClick={() => navigate(routes.SYSTEM_LIST)}
-                />
-              )}
+              {hasAccess(WORKQUEUE_TABS.systems) &&
+                (isConfigExpanded ||
+                  currentWorkqueueSlug === WORKQUEUE_TABS.systems) && (
+                  <NavigationSubItem
+                    id={`navigation_${WORKQUEUE_TABS.systems}`}
+                    isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.systems}
+                    label={intl.formatMessage(
+                      navigationMessages[WORKQUEUE_TABS.systems]
+                    )}
+                    onClick={() => navigate(routes.SYSTEM_LIST)}
+                  />
+                )}
             </>
           )}
           {hasAccess(WORKQUEUE_TABS.config) && (
