@@ -70,7 +70,10 @@ import {
   IndexMap,
   FormState,
   flattenFieldReference,
-  flattenFormState
+  flattenFormState,
+  ConditionalType,
+  isConditionMet,
+  SelectOption
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -154,6 +157,37 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   readonlyMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
+}
+
+function resolveOptions(
+  options: SelectOption[],
+  form: EventState,
+  validatorContext: ValidatorContext
+) {
+  return options
+    .filter((option) => {
+      const showConditionals = (option.conditionals ?? []).filter(
+        (c) => c.type === ConditionalType.SHOW
+      )
+      if (showConditionals.length === 0) {
+        return true
+      }
+      return showConditionals.some((c) =>
+        isConditionMet(c.conditional, form, validatorContext)
+      )
+    })
+    .map(({ conditionals, ...option }) => {
+      const enableConditionals = (conditionals ?? []).filter(
+        (c) => c.type === ConditionalType.ENABLE
+      )
+      if (enableConditionals.length === 0) {
+        return option
+      }
+      const isEnabled = enableConditionals.some((c) =>
+        isConditionMet(c.conditional, form, validatorContext)
+      )
+      return { ...option, disabled: !isEnabled }
+    })
 }
 
 export const GeneratedInputField = <T extends FieldConfig>(
@@ -475,12 +509,17 @@ export const GeneratedInputField = <T extends FieldConfig>(
     )
   }
   if (isNumberWithUnitFieldType(field)) {
+    const resolvedOptions = resolveOptions(
+      field.config.options,
+      form,
+      validatorContext
+    )
     return (
       <InputField {...inputFieldProps}>
         <NumberWithUnit.Input
           {...inputProps}
           configuration={field.config.configuration}
-          options={field.config.options}
+          options={resolvedOptions}
           value={field.value}
         />
       </InputField>
@@ -559,12 +598,18 @@ export const GeneratedInputField = <T extends FieldConfig>(
     )
   }
   if (isSelectFieldType(field)) {
+    const resolvedOptions = resolveOptions(
+      field.config.options,
+      form,
+      validatorContext
+    )
+
     return (
       <InputField {...inputFieldProps}>
         <Select.Input
           {...inputProps}
           noOptionsMessage={field.config.noOptionsMessage}
-          options={field.config.options}
+          options={resolvedOptions}
           value={field.value}
         />
       </InputField>
@@ -588,11 +633,17 @@ export const GeneratedInputField = <T extends FieldConfig>(
     )
   }
   if (isRadioGroupFieldType(field)) {
+    const resolvedOptions = resolveOptions(
+      field.config.options,
+      form,
+      validatorContext
+    )
     return (
       <InputField {...inputFieldProps}>
         <RadioGroup.Input
           {...field.config}
           disabled={disabled}
+          options={resolvedOptions}
           value={field.value}
           onChange={(val) => onFieldValueChange(name, val)}
         />
@@ -685,6 +736,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
     return <Divider.Input />
   }
   if (isFileFieldWithOptionType(field)) {
+    const resolvedOptions = resolveOptions(
+      field.config.options,
+      form,
+      validatorContext
+    )
     return (
       <InputField {...inputFieldProps}>
         <FileWithOption.Input
@@ -693,7 +749,7 @@ export const GeneratedInputField = <T extends FieldConfig>(
           error={inputFieldProps.error}
           maxFileSize={field.config.configuration.maxFileSize}
           maxImageSize={field.config.configuration.maxImageSize}
-          options={field.config.options}
+          options={resolvedOptions}
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           value={field.value ?? []}
           onChange={(val) => onFieldValueChange(name, val)}

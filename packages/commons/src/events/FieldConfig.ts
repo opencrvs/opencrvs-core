@@ -10,7 +10,7 @@
  */
 /*  eslint-disable max-lines */
 import { z } from 'zod'
-import { Conditional, FieldConditional } from './Conditional'
+import { ActionConditional, Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldType } from './FieldType'
 import {
@@ -411,7 +411,8 @@ export const SelectOption = z.object({
   value: z.string().describe('The value of the option'),
   label: z
     .union([z.string(), TranslationConfig])
-    .describe('The label of the option')
+    .describe('The label of the option'),
+  conditionals: z.array(ActionConditional).default([]).optional()
 })
 
 const NumberWithUnitField = BaseField.extend({
