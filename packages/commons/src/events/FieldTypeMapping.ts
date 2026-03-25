@@ -55,7 +55,8 @@ import {
   AgeField,
   CustomField,
   HiddenField,
-  ImageViewField
+  ImageViewField,
+  UserRoleField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -170,6 +171,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ID:
     case FieldType.LOADER:
     case FieldType.ALPHA_HIDDEN:
+    case FieldType.USER_ROLE:
       schema = field.required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -258,6 +260,7 @@ type FieldTypeValueMap = {
   [FieldType.ID]: z.infer<typeof TextValue>
   [FieldType.LOADER]: z.infer<typeof TextValue>
   [FieldType.ALPHA_HIDDEN]: z.infer<typeof TextValue>
+  [FieldType.USER_ROLE]: z.infer<typeof TextValue>
   [FieldType.NUMBER]: z.infer<typeof NumberFieldValue>
   [FieldType.NUMBER_WITH_UNIT]: z.infer<typeof NumberWithUnitFieldValue>
   [FieldType.CHECKBOX]: z.infer<typeof CheckboxFieldValue>
@@ -346,6 +349,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.ID_READER:
     case FieldType.LOADER:
     case FieldType.ALPHA_HIDDEN:
+    case FieldType.USER_ROLE:
       return null
     case FieldType.ADDRESS:
       return {
@@ -678,6 +682,13 @@ export const isCustomFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: CustomFieldValue; config: CustomField } => {
   return field.config.type === FieldType._EXPERIMENTAL_CUSTOM
+}
+
+export const isUserRoleFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: UserRoleField } => {
+  return field.config.type === FieldType.USER_ROLE
 }
 
 export const isHiddenFieldType = (field: {

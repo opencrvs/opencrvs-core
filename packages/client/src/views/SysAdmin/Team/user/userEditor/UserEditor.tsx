@@ -15,7 +15,7 @@ import { messages } from '@client/i18n/messages/views/userForm'
 import * as routes from '@client/navigation/routes'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
-import { formatUserRole, useRoles } from '@client/v2-events/hooks/useRoles'
+import { useRoles } from '@client/v2-events/hooks/useRoles'
 import { ROUTES } from '@client/v2-events/routes'
 import {
   ActionType,
@@ -72,10 +72,7 @@ const SpinnerWrapper = styled.div`
   padding: 20px;
 `
 
-type RoleWithLabel = { id: string; label: string; scopes: string[] }
-function getUserEditConfig(roles: RoleWithLabel[], selectedRoleId?: string) {
-  const selectedRole = roles.find((role) => role.id === selectedRoleId)
-
+function getUserEditConfig(selectedRole?: { scopes: string[] }) {
   return {
     id: '__user__',
     summary: {
@@ -143,13 +140,9 @@ function getUserEditConfig(roles: RoleWithLabel[], selectedRoleId?: string) {
             },
             {
               id: 'role',
-              type: FieldType.SELECT,
+              type: FieldType.USER_ROLE,
               required: true,
-              label: messages.labelRole,
-              options: roles.map((role) => ({
-                value: role.id,
-                label: role.label
-              }))
+              label: messages.labelRole
             },
             {
               id: 'device',
@@ -239,6 +232,7 @@ export const EditUser = () => {
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
   const formState = getUserForm()
+  const selectedRole = roles.find((role) => role.id === formState['role'])
   const isNewUser = userId === NEW_USER
   useEffect(() => {
     if (!formState['primaryOfficeId'] && pageId !== 'user.office') {
@@ -251,14 +245,7 @@ export const EditUser = () => {
     }
   }, [formState, navigate, userId, pageId])
 
-  const rolesWithHumanReadableNames = roles.map((role) => ({
-    ...role,
-    label: formatUserRole(role.id, intl)
-  }))
-  const eventConfig = getUserEditConfig(
-    rolesWithHumanReadableNames,
-    formState['role']
-  )
+  const eventConfig = getUserEditConfig(selectedRole)
   const formConfig = eventConfig.declaration
 
   const handleClose = () => {
@@ -325,6 +312,7 @@ export const ReviewUser = () => {
   const { getUser, createUser, updateUser } = useUsers()
   const { listRoles } = useRoles()
   const [roles] = listRoles.useSuspenseQuery()
+  const selectedRole = roles.find((role) => role.id === getUserForm()['role'])
 
   const [showDuplicateMobileError, setShowDuplicateMobileError] =
     React.useState(false)
@@ -368,16 +356,9 @@ export const ReviewUser = () => {
 
   const formState = getUserForm()
 
-  const rolesWithHumanReadableNames = roles.map((role) => ({
-    ...role,
-    label: formatUserRole(role.id, intl)
-  }))
   const createUserMutation = createUser()
   const updateUserMutation = updateUser()
-  const eventConfig = getUserEditConfig(
-    rolesWithHumanReadableNames,
-    formState['role']
-  )
+  const eventConfig = getUserEditConfig(selectedRole)
   const formConfig = eventConfig.declaration
 
   const handleMutationError = (error: unknown) => {
