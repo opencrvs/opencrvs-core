@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
+    "baseUrl": "./src",
     "paths": {
-      "@auth/*": ["./src/*"],
+      "@auth/*": ["./*"],
       "@events/*": ["../../events/src/*"]
     },
     "target": "es6",
