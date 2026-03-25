@@ -601,13 +601,6 @@ CREATE UNIQUE INDEX system_clients_legacy_id_idx ON app.system_clients USING btr
 
 
 --
--- Name: system_clients_legacy_id_idx; Type: INDEX; Schema: app; Owner: events_migrator
---
-
-CREATE UNIQUE INDEX system_clients_legacy_id_idx ON app.system_clients USING btree (legacy_id) WHERE (legacy_id IS NOT NULL);
-
-
---
 -- Name: administrative_areas administrative_areas_parent_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
