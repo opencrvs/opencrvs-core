@@ -50,7 +50,7 @@ import {
   CreateNewUser,
   EditUser,
   ReviewUser
-} from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
+} from '@client/views/SysAdmin/Team/user/userEditor/UserEditor'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'

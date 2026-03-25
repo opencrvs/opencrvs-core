@@ -83,13 +83,10 @@ function getUserEditConfig(roles: RoleWithLabel[], selectedRoleId?: string) {
     },
     advancedSearch: [],
     flags: [],
-    // Not showin anywhere
-    title: messages.userFormTitle,
-    // Not showin anywhere
-    label: messages.userFormTitle,
+    title: emptyMessage,
+    label: emptyMessage,
     declaration: {
-      // Not showin anywhere
-      label: messages.userFormTitle,
+      label: emptyMessage,
       pages: [
         {
           id: 'user.office',
