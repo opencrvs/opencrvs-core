@@ -27,7 +27,6 @@ import {
   PageTypes,
   RequestedCorrectionAction,
   TranslationConfig,
-  User,
   UUID,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -40,8 +39,7 @@ import {
   Output
 } from '@client/v2-events/features/events/components/Output'
 import { ROUTES } from '@client/v2-events/routes'
-import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getUsersFullName } from '@client/v2-events/utils'
+import { useUserDetails } from '@client/v2-events/hooks/useUserDetails'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { DeclarationComparisonTable } from './DeclarationComparisonTable'
 
@@ -80,11 +78,9 @@ const Label = styled.label`
  */
 function getRequestActionDetails(
   correctionRequestAction: Action,
-  users: User[],
-  locations: Map<UUID, Location>,
-  intl: IntlShape
+  submitterName: string,
+  locations: Map<UUID, Location>
 ): CorrectionDetail[] {
-  const user = users.find((u) => u.id === correctionRequestAction.createdBy)
   const location =
     correctionRequestAction.createdAtLocation &&
     locations.get(correctionRequestAction.createdAtLocation)
@@ -92,7 +88,7 @@ function getRequestActionDetails(
     {
       label: messages.correctionSubmittedBy,
       id: 'correction.submitter',
-      valueDisplay: user ? getUsersFullName(user.name, intl.locale) : ''
+      valueDisplay: submitterName
     },
     {
       label: messages.correctionRequesterOffice,
@@ -115,7 +111,7 @@ function buildCorrectionDetails(
   annotation: EventState,
   form: EventState,
   intl: IntlShape,
-  users: User[],
+  submitterName: string,
   locations: Map<UUID, Location>,
   validatorContext: ValidatorContext,
   correctionRequestAction?: Action
@@ -155,9 +151,8 @@ function buildCorrectionDetails(
     details.unshift(
       ...getRequestActionDetails(
         correctionRequestAction,
-        users,
-        locations,
-        intl
+        submitterName,
+        locations
       )
     )
   }
@@ -209,8 +204,7 @@ export function CorrectionDetails({
   const { eventConfiguration } = useEventConfiguration(event.type)
 
   const navigate = useNavigate()
-  const { getUser } = useUsers()
-  const users = getUser.getAllCached()
+  const { getUserDetails } = useUserDetails()
 
   const { getLocations } = useLocations()
   const locations = getLocations.useSuspenseQuery()
@@ -220,12 +214,21 @@ export function CorrectionDetails({
       (action) => action.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
 
+  const submitterName = correctionRequestAction
+    ? getUserDetails({
+        createdByUserType: correctionRequestAction.createdByUserType,
+        createdBy: correctionRequestAction.createdBy,
+        type: correctionRequestAction.type,
+        createdByRole: correctionRequestAction.createdByRole
+      }).name
+    : ''
+
   const correctionDetails = buildCorrectionDetails(
     correctionFormPages,
     annotation,
     form,
     intl,
-    users,
+    submitterName,
     locations,
     validatorContext,
     correctionRequestAction
