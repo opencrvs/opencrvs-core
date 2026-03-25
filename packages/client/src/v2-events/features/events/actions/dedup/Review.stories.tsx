@@ -279,7 +279,7 @@ export const DuplicateWithSameLabels: Story = {
     await expect(canvas.getByText('Email')).toBeInTheDocument()
     await expect(canvas.getByText('abc@gmail.com')).toBeInTheDocument()
 
-    await expect(canvas.getByText('Phone')).toBeInTheDocument()
-    await expect(canvas.getByText('0912345678')).toBeInTheDocument()
+    await canvas.findByText('Phone')
+    await canvas.findByText('0912345678')
   }
 }
