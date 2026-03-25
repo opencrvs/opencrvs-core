@@ -2846,110 +2846,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Read-action can not be disabled or hidden with conditionals.
           not: {}
@@ -3233,6 +3129,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
+                                - record.custom-action
                             $option:
                               type: string
                               enum:
@@ -7486,6 +7383,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
+                                - record.custom-action
                             $option:
                               type: string
                               enum:
@@ -7823,14 +7721,11 @@ components:
             configuration:
               type: object
               properties:
-                searchableResource:
+                locationTypes:
+                  description: Types of the locations that are available for selection.
                   type: array
                   items:
                     type: string
-                    enum:
-                      - locations
-                      - facilities
-                      - offices
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
@@ -7864,6 +7759,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
+                                - record.custom-action
                             $option:
                               type: string
                               enum:
@@ -7880,8 +7776,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-              required:
-                - searchableResource
               additionalProperties: false
           required:
             - id
@@ -8079,6 +7973,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
+                                - record.custom-action
                             $option:
                               type: string
                               enum:
@@ -8291,6 +8186,7 @@ components:
                                 - record.request-correction
                                 - record.correct
                                 - record.unassign-others
+                                - record.custom-action
                             $option:
                               type: string
                               enum:
@@ -11598,16 +11494,20 @@ components:
           $ref: "#/components/schemas/DateCondition"
         updatedAt:
           $ref: "#/components/schemas/DateCondition"
-        legalStatuses.REGISTERED.acceptedAt:
-          $ref: "#/components/schemas/DateCondition"
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.DECLARED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateCondition"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.REGISTERED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
@@ -11746,6 +11646,20 @@ components:
         - type
         - location
       additionalProperties: false
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
+      additionalProperties: false
     Exact:
       type: object
       properties:
@@ -11858,20 +11772,6 @@ components:
         - gte
         - lte
       additionalProperties: false
-    AnyOf:
-      type: object
-      properties:
-        type:
-          type: string
-          const: anyOf
-        terms:
-          type: array
-          items:
-            type: string
-      required:
-        - type
-        - terms
-      additionalProperties: false
     DeclareActionConfig:
       type: object
       properties:
@@ -11919,110 +11819,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -12285,110 +12081,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -12476,110 +12168,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -12681,110 +12269,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -12994,110 +12478,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -13271,110 +12651,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -13480,110 +12756,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
@@ -13671,110 +12843,6 @@ components:
         icon:
           description: Icon representing the action
           type: string
-          enum:
-            - Archived
-            - Assigned
-            - Briefcase
-            - Certified
-            - Close
-            - Collapse
-            - Draft
-            - DuplicateYellow
-            - Expand
-            - ExternalValidate
-            - FilledCheck
-            - InReview
-            - Offline
-            - Registered
-            - RequiresUpdates
-            - Sent
-            - Validated
-            - WaitingApproval
-            - ChartActivity
-            - Activity
-            - Archive
-            - ArchiveTray
-            - ArrowLeft
-            - ArrowRight
-            - Buildings
-            - Circle
-            - CaretDown
-            - CaretLeft
-            - CaretRight
-            - ChartBar
-            - ChartLine
-            - ChatCircle
-            - CheckSquare
-            - Compass
-            - Check
-            - Copy
-            - Database
-            - DotsThreeVertical
-            - ArrowCounterClockwise
-            - MagnifyingGlassMinus
-            - MagnifyingGlassPlus
-            - Export
-            - Eye
-            - EyeSlash
-            - Envelope
-            - File
-            - FileSearch
-            - FileMinus
-            - FilePlus
-            - FileText
-            - FileX
-            - Handshake
-            - Gear
-            - GitBranch
-            - IdentificationCard
-            - List
-            - ListBullets
-            - Lock
-            - MagnifyingGlass
-            - MapPin
-            - Medal
-            - NotePencil
-            - Paperclip
-            - PaperPlaneTilt
-            - Pen
-            - PenNib
-            - Pencil
-            - PencilSimpleLine
-            - Phone
-            - Plus
-            - Printer
-            - SignOut
-            - Stamp
-            - Star
-            - Target
-            - TextT
-            - Trash
-            - UploadSimple
-            - User
-            - UserPlus
-            - Users
-            - WarningCircle
-            - X
-            - ChatText
-            - CircleWavyCheck
-            - CircleWavyQuestion
-            - ArchiveBox
-            - ArrowCircleDown
-            - FileArrowUp
-            - FileDotted
-            - Files
-            - PencilLine
-            - PencilCircle
-            - UserCircle
-            - Clock
-            - QrCode
-            - Webcam
-            - Sun
-            - DeviceTabletCamera
-            - Globe
-            - Fingerprint
-            - PushPin
-            - Timer
         conditionals:
           description: Conditionals which can disable or hide actions.
           type: array
