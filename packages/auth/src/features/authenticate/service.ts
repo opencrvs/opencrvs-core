@@ -293,5 +293,6 @@ export async function recordUserAuditEvent(
     await client.user.audit.record.mutate(input)
   } catch (err) {
     logger.error('Failed to record user audit event', err)
+    throw err
   }
 }
