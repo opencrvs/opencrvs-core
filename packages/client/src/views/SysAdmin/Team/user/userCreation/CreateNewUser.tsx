@@ -46,7 +46,7 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
-import { Scope, SCOPES, UUID } from '@opencrvs/commons/client'
+import { SCOPES, UUID } from '@opencrvs/commons/client'
 import { IOfflineData } from '@client/offline/reducer'
 import { UserDetails } from '@client/utils/userUtils'
 import { get, isNull, isUndefined } from 'lodash'
@@ -310,12 +310,10 @@ const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
   }
 
   section = scopes.some((scope) =>
-    (
-      [
-        SCOPES.USER_CREATE_MY_JURISDICTION,
-        SCOPES.USER_UPDATE_MY_JURISDICTION
-      ] as Scope[]
-    ).includes(scope)
+    [
+      SCOPES.USER_CREATE_MY_JURISDICTION,
+      SCOPES.USER_UPDATE_MY_JURISDICTION
+    ].some((s) => s === scope)
   )
     ? addJurisdictionFilterToLocationSearchInput(section, user.primaryOfficeId)
     : section

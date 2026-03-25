@@ -26,7 +26,7 @@ import {
 } from '@auth/features/verifyCode/service'
 import { logger, UUID, IUserName } from '@opencrvs/commons'
 import * as F from 'fp-ts'
-import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -63,7 +63,7 @@ export interface IAuthentication {
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: Scope[]
+  scope: string[]
 }
 
 export class UserInfoNotFoundError extends Error {}

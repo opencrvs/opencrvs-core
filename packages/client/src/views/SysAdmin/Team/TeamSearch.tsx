@@ -29,6 +29,7 @@ import { stringify } from 'qs'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useOnlineStatus } from '@client/utils'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import { UUID } from '@opencrvs/commons/client'
 
 const ConnectivityContainer = styled.div`
   justify-content: center;
@@ -87,7 +88,9 @@ export function TeamSearch() {
             selectedLocation={selectedLocation}
             buttonLabel={intl.formatMessage(buttonMessages.search)}
             locationList={Object.values(offlineCountryConfiguration.offices)
-              .filter(canAccessOffice)
+              .filter((location) =>
+                canAccessOffice({ id: location.id as UUID })
+              )
               .map((location) => {
                 return {
                   id: location.id,

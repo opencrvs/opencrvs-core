@@ -107,7 +107,7 @@ test(
           user,
           scope,
           clientReadingAllEvents,
-          (client) =>
+          async (client) =>
             client.event.actions.correction.reject.request({
               eventId,
               transactionId: getUUID(),
