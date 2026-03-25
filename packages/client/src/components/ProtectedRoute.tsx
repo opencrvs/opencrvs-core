@@ -12,10 +12,9 @@ import React from 'react'
 import { Navigate, RouteProps } from 'react-router-dom'
 import { HOME } from '@client/navigation/routes'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { Scope } from '@opencrvs/commons/client'
 
 interface IProps {
-  scopes?: Scope[]
+  scopes?: string[]
 }
 
 /**
