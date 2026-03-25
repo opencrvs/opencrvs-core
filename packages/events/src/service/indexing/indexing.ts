@@ -133,6 +133,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
+    case FieldType.USER_ROLE:
     case FieldType.PHONE:
     case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }

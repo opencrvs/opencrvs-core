@@ -9,40 +9,42 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
+import * as z from 'zod/v4'
 import {
-  UserOrSystem,
+  logger,
+  personNameFromV1ToV2,
+  SCOPES,
   User,
   UserInput,
-  personNameFromV1ToV2,
-  logger
+  UserOrSystem
 } from '@opencrvs/commons'
+import { requiresAnyOfScopes } from '@events/router/middleware'
 import {
   router,
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
-import { getUsersById, isUser } from '@events/service/users/users'
-import { getUserActions } from '@events/service/events/user/actions'
 import { getRoles } from '@events/service/config/config'
-import { UserActionsQuery } from '@events/storage/postgres/events/actions'
+import { getUserActions } from '@events/service/events/user/actions'
 import {
-  searchUsers,
-  createUser,
-  updateUser,
+  activateUser,
+  changeUserAvatar,
+  changeUserEmail,
   changeUserPassword,
   changeUserPhone,
-  changeUserEmail,
-  changeUserAvatar,
+  createUser,
   getLegacyUser,
-  activateUser
+  searchUsers,
+  updateUser
 } from '@events/service/users/api'
+import { getUsersById, isUser } from '@events/service/users/users'
 import {
-  generateNonce,
+  checkVerificationCode,
   generateAndSendVerificationCode,
-  checkVerificationCode
+  generateNonce
 } from '@events/service/verifyCode'
+import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadOtherUser } from '../middleware'
 
 const UserSearch = z.object({
@@ -69,6 +71,7 @@ export const userRouter = router({
       return users[0]
     }),
   create: userAndSystemProcedure
+    .use(requiresAnyOfScopes([SCOPES.USER_CREATE]))
     .input(UserInput)
     .output(User)
     .mutation(async ({ input, ctx }) => {
@@ -97,6 +100,7 @@ export const userRouter = router({
       return createUser(input, ctx.token)
     }),
   update: userAndSystemProcedure
+    .use(requiresAnyOfScopes([SCOPES.USER_UPDATE]))
     .input(UserInput.and(z.object({ id: z.string() })))
     .output(User)
     .mutation(async ({ input, ctx }) => {
