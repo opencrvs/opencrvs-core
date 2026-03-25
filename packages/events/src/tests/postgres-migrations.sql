@@ -51,7 +51,6 @@ CREATE TYPE app.user_type AS ENUM (
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
 
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -304,10 +303,6 @@ CREATE TABLE app.system_clients (
     secret_hash text,
     salt text,
     sha_secret text,
-    created_by text NOT NULL,
-    secret_hash text NOT NULL,
-    salt text NOT NULL,
-    sha_secret text NOT NULL,
     status text DEFAULT 'active'::text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT system_clients_status_check CHECK ((status = ANY (ARRAY['active'::text, 'disabled'::text])))
@@ -582,6 +577,9 @@ CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
 --
 
 CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
+
+
+--
 -- Name: idx_event_tracking_id; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
