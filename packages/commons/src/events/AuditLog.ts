@@ -108,6 +108,49 @@ export type IntegrationCreateAuditLog = {
   }
 }
 
+export type IntegrationDeactivateAuditLog = {
+  operation: 'integrations.deactivate'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    id: string
+    status: string
+  }
+}
+
+export type IntegrationActivateAuditLog = {
+  operation: 'integrations.activate'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    id: string
+    status: string
+  }
+}
+
+export type IntegrationDeleteAuditLog = {
+  operation: 'integrations.delete'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    id: string
+    name: string
+  }
+}
+
+export type IntegrationRefreshSecretAuditLog = {
+  operation: 'integrations.refreshSecret'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
 export type AttachmentUploadAuditLog = {
   operation: 'attachments.upload'
   requestData: {
@@ -213,6 +256,10 @@ export type AuditLogOperation =
   | EventSearchAuditLog
   | EventActionAuditLog
   | IntegrationCreateAuditLog
+  | IntegrationDeactivateAuditLog
+  | IntegrationActivateAuditLog
+  | IntegrationDeleteAuditLog
+  | IntegrationRefreshSecretAuditLog
   | AttachmentUploadAuditLog
   | UserAuditLog
 
