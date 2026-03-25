@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { sql } from 'kysely'
 import { AuditLogParams } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
-import { sql } from 'kysely'
 
 /**
  * Writes an audit log entry for a client operation.
@@ -33,7 +33,7 @@ export async function writeAuditLog(params: AuditLogParams) {
     .execute()
 }
 
-export interface UserAuditLogQuery {
+interface UserAuditLogQuery {
   subjectId: string
   skip?: number
   count?: number
@@ -74,14 +74,21 @@ export async function queryUserAuditLog({
     .offset(skip)
     .execute()
 
-  const totalResult = await db
+  let countQuery = db
     .selectFrom('auditLog')
     .select(({ fn }) => [fn.count<string>('id').as('count')])
     .where('operation', 'like', 'user.%')
     .where(sql<string>`"requestData"->>'subjectId'`, '=', subjectId)
-    .$if(Boolean(timeStart), (q) => q.where('createdAt', '>=', timeStart!))
-    .$if(Boolean(timeEnd), (q) => q.where('createdAt', '<=', timeEnd!))
-    .executeTakeFirstOrThrow()
+
+  if (timeStart) {
+    countQuery = countQuery.where('createdAt', '>=', timeStart)
+  }
+
+  if (timeEnd) {
+    countQuery = countQuery.where('createdAt', '<=', timeEnd)
+  }
+
+  const totalResult = await countQuery.executeTakeFirstOrThrow()
 
   return {
     results,
