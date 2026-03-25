@@ -58,15 +58,9 @@ export const WithHiddenOption: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('textbox'))
-    await expect(
-      canvas.queryByRole('option', { name: 'Apple' })
-    ).toBeInTheDocument()
-    await expect(
-      canvas.queryByRole('option', { name: 'Banana' })
-    ).not.toBeInTheDocument()
-    await expect(
-      canvas.queryByRole('option', { name: 'Cherry' })
-    ).toBeInTheDocument()
+    await expect(canvas.queryByText('Apple')).toBeInTheDocument()
+    await expect(canvas.queryByText('Banana')).not.toBeInTheDocument()
+    await expect(canvas.queryByText('Cherry')).toBeInTheDocument()
   },
   render: function Component(args) {
     return (
@@ -129,15 +123,17 @@ export const WithDisabledOption: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('textbox'))
-    const bananaOption = canvas.queryByRole('option', { name: 'Banana' })
+    const bananaOption = canvas.queryByText('Banana')
     await expect(bananaOption).toBeInTheDocument()
-    await expect(bananaOption).toHaveAttribute('aria-disabled', 'true')
-    await expect(
-      canvas.queryByRole('option', { name: 'Apple' })
-    ).not.toHaveAttribute('aria-disabled', 'true')
-    await expect(
-      canvas.queryByRole('option', { name: 'Cherry' })
-    ).not.toHaveAttribute('aria-disabled', 'true')
+    // this can be replaced with aria-disabled attribute once the react-select
+    // version in components package is upgraded
+    await expect(bananaOption).toHaveClass('react-select__option--is-disabled')
+    await expect(canvas.queryByText('Apple')).not.toHaveClass(
+      'react-select__option--is-disabled'
+    )
+    await expect(canvas.queryByText('Cherry')).not.toHaveClass(
+      'react-select__option--is-disabled'
+    )
   },
   render: function Component(args) {
     return (
