@@ -11,7 +11,6 @@
 import { IAuthHeader, UUID } from '@opencrvs/commons'
 
 import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
-import { api as eventsApi } from '@gateway/v2-events/events/service'
 import decode from 'jwt-decode'
 
 export interface ITokenPayload {
