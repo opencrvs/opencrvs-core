@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { IAuthHeader } from '@opencrvs/commons'
+import { IAuthHeader , logger } from '@opencrvs/commons'
 import {
   USER_MANAGEMENT_URL,
   DOCUMENTS_URL
 } from '@metrics/constants'
-import { logger } from '@opencrvs/commons'
 
 export interface ICountByLocation {
   total: number
