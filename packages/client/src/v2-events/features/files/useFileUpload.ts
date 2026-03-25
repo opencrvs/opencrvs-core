@@ -11,22 +11,20 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import { useParams } from 'react-router-dom'
 import {
-  DocumentPath,
   FullDocumentPath,
   joinUrlPaths,
   joinValues
 } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
-import { queryClient } from '@client/v2-events/trpc'
+import { fetchFileFromUrl } from '@client/utils/imageUtils'
 import {
   cacheFile,
   getFullDocumentPath,
   getUnsignedFileUrl,
   removeCached
 } from '@client/v2-events/cache'
-import { fetchFileFromUrl } from '@client/utils/imageUtils'
+import { queryClient } from '@client/v2-events/trpc'
 
 interface UploadFileParams {
   file: File

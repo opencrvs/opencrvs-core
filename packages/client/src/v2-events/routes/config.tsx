@@ -311,27 +311,15 @@ export const routesConfig = {
     },
     {
       path: ROUTES.V2.SETTINGS.USER.CREATE.path,
-      element: (
-        <TRPCProvider>
-          <CreateNewUser />
-        </TRPCProvider>
-      )
+      element: <CreateNewUser />
     },
     {
       path: ROUTES.V2.SETTINGS.USER.EDIT.path,
-      element: (
-        <TRPCProvider>
-          <EditUser />
-        </TRPCProvider>
-      )
+      element: <EditUser />
     },
     {
       path: ROUTES.V2.SETTINGS.USER.REVIEW.path,
-      element: (
-        <TRPCProvider>
-          <ReviewUser />
-        </TRPCProvider>
-      )
+      element: <ReviewUser />
     },
     {
       path: ROUTES.V2.DASHBOARD.path,

@@ -230,9 +230,9 @@ export async function createUser(input: CreateUserPayload, token: string) {
     method: 'POST',
     body: JSON.stringify({
       ...input,
-      signature: {
-        type: input.signature?.type,
-        data: input.signature?.path
+      signature: input.signature && {
+        type: input.signature.type,
+        data: input.signature.path
       }
     }),
     headers: {
