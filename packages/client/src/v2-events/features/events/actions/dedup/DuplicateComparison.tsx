@@ -20,7 +20,8 @@ import {
   FieldType,
   FieldTypesToHideInReview,
   isFieldDisplayedOnReview,
-  isPageVisible
+  isPageVisible,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   ComparisonListView,
@@ -36,9 +37,10 @@ import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { noop } from '@client/v2-events'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useAdministrativeAreas } from '@client/v2-events/hooks/useAdministrativeAreas'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { Output, ValueOutput } from '../../components/Output'
-import { AdministrativeArea } from '../../registered-fields'
 import { DocumentViewer } from '../../components/DocumentViewer'
 import { duplicateMessages } from './ReviewDuplicate'
 
@@ -112,6 +114,20 @@ function UserFullName({ userId }: { userId: string }) {
     return null
   }
   return getUsersFullName(user.name, intl.locale)
+}
+
+function PlaceOfEventName({ id }: { id?: UUID }) {
+  const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+
+  const locations = getLocations.useSuspenseQuery()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+
+  const placeOfEventName = id
+    ? (locations.get(id)?.name ?? administrativeAreas.get(id)?.name)
+    : null
+
+  return placeOfEventName
 }
 
 export function DuplicateComparison({
@@ -265,14 +281,12 @@ export function DuplicateComparison({
       {
         label: intl.formatMessage(duplicateMessages.registeredAt),
         rightValue: flattenedPotentialDuplicateEvent['event.registeredAt'] ? (
-          <AdministrativeArea.Output
-            value={flattenedPotentialDuplicateEvent['event.registeredAt']}
+          <PlaceOfEventName
+            id={flattenedPotentialDuplicateEvent['event.registeredAt']}
           />
         ) : null,
         leftValue: flattenedOriginalEvent['event.registeredAt'] ? (
-          <AdministrativeArea.Output
-            value={flattenedOriginalEvent['event.registeredAt']}
-          />
+          <PlaceOfEventName id={flattenedOriginalEvent['event.registeredAt']} />
         ) : null
       },
       {
