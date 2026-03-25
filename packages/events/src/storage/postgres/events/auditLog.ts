@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { sql } from 'kysely'
 import { AuditLogParams } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 
@@ -58,7 +57,7 @@ export async function queryUserAuditLog({
     .selectFrom('auditLog')
     .selectAll()
     .where('operation', 'like', 'user.%')
-    .where(sql<string>`"requestData"->>'subjectId'`, '=', subjectId)
+    .where('clientId', '=', subjectId)
 
   if (timeStart) {
     query = query.where('createdAt', '>=', timeStart)
@@ -78,7 +77,7 @@ export async function queryUserAuditLog({
     .selectFrom('auditLog')
     .select(({ fn }) => [fn.count<string>('id').as('count')])
     .where('operation', 'like', 'user.%')
-    .where(sql<string>`"requestData"->>'subjectId'`, '=', subjectId)
+    .where('clientId', '=', subjectId)
 
   if (timeStart) {
     countQuery = countQuery.where('createdAt', '>=', timeStart)
