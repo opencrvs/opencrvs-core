@@ -32,11 +32,9 @@ describe('authenticate handler receives a request', () => {
 
   beforeEach(async () => {
     server = await createProductionEnvironmentServer()
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
     const authService = require('../authenticate/service')
-    jest
-      .spyOn(authService, 'recordUserAuditEvent')
-      .mockImplementation(() => {})
+    jest.spyOn(authService, 'recordUserAuditEvent').mockImplementation(() => {})
   })
 
   describe('user management service says credentials are valid', () => {
