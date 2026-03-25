@@ -9,39 +9,42 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
+import * as z from 'zod/v4'
 import {
-  UserOrSystem,
-  User,
+  logger,
   personNameFromV1ToV2,
-  logger
+  SCOPES,
+  User,
+  UserInput,
+  UserOrSystem
 } from '@opencrvs/commons'
+import { requiresAnyOfScopes } from '@events/router/middleware'
 import {
   router,
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
-import { getUsersById } from '@events/service/users/users'
-import { getUserActions } from '@events/service/events/user/actions'
 import { getRoles } from '@events/service/config/config'
-import { UserActionsQuery } from '@events/storage/postgres/events/actions'
+import { getUserActions } from '@events/service/events/user/actions'
 import {
-  UserInput,
-  searchUsers,
-  createUser,
+  activateUser,
+  changeUserAvatar,
+  changeUserEmail,
   changeUserPassword,
   changeUserPhone,
-  changeUserEmail,
-  changeUserAvatar,
+  createUser,
   getLegacyUser,
-  activateUser
+  searchUsers,
+  updateUser
 } from '@events/service/users/api'
+import { getUsersById, isUser } from '@events/service/users/users'
 import {
-  generateNonce,
+  checkVerificationCode,
   generateAndSendVerificationCode,
-  checkVerificationCode
+  generateNonce
 } from '@events/service/verifyCode'
+import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadOtherUser } from '../middleware'
 
 const UserSearch = z.object({
@@ -68,9 +71,69 @@ export const userRouter = router({
       return users[0]
     }),
   create: userAndSystemProcedure
+    .use(requiresAnyOfScopes([SCOPES.USER_CREATE]))
     .input(UserInput)
     .output(User)
-    .mutation(async ({ input, ctx }) => createUser(input, ctx.token)),
+    .mutation(async ({ input, ctx }) => {
+      if (input.mobile) {
+        const existingWithMobile = await searchUsers(
+          { mobile: input.mobile, count: 1, skip: 0, sortOrder: 'asc' },
+          ctx.token
+        )
+        if (existingWithMobile.length > 0) {
+          logger.error(
+            `Phone number ${input.mobile} is already in use by another user`
+          )
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
+        }
+      }
+      if (input.email) {
+        const existingWithEmail = await searchUsers(
+          { email: input.email, count: 1, skip: 0, sortOrder: 'asc' },
+          ctx.token
+        )
+        if (existingWithEmail.length > 0) {
+          logger.error(`Email ${input.email} is already in use by another user`)
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+        }
+      }
+      return createUser(input, ctx.token)
+    }),
+  update: userAndSystemProcedure
+    .use(requiresAnyOfScopes([SCOPES.USER_UPDATE]))
+    .input(UserInput.and(z.object({ id: z.string() })))
+    .output(User)
+    .mutation(async ({ input, ctx }) => {
+      if (input.mobile) {
+        const existingWithMobile = await searchUsers(
+          { mobile: input.mobile, count: 1, skip: 0, sortOrder: 'asc' },
+          ctx.token
+        )
+        if (
+          existingWithMobile.length > 0 &&
+          existingWithMobile[0].id !== input.id
+        ) {
+          logger.error(
+            `Phone number ${input.mobile} is already in use by another user`
+          )
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_PHONE' })
+        }
+      }
+      if (input.email) {
+        const existingWithEmail = await searchUsers(
+          { email: input.email, count: 1, skip: 0, sortOrder: 'asc' },
+          ctx.token
+        )
+        if (
+          existingWithEmail.length > 0 &&
+          existingWithEmail[0].id !== input.id
+        ) {
+          logger.error(`Email ${input.email} is already in use by another user`)
+          throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
+        }
+      }
+      return updateUser(input, ctx.token)
+    }),
   list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
@@ -165,9 +228,29 @@ export const userRouter = router({
         })
       }
 
+      const [user] = await getUsersById([input.userId], ctx.token)
+
+      if (!isUser(user)) {
+        logger.error(`Failed to change phone number: Subject is a system user`)
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Failed to change phone number: Subject is a system user`
+        })
+      }
+
+      if (!user.email) {
+        logger.error(
+          `Failed to change phone number for user ${input.userId}: User has no email address to send verification code to`
+        )
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Failed to change phone number: User has no email address to send verification code to`
+        })
+      }
+
       const userWithDuplicateNumber = await searchUsers(
         {
-          mobile: input.phoneNumber,
+          email: user.email,
           count: 1,
           skip: 0,
           sortOrder: 'asc'

@@ -10,7 +10,7 @@
  */
 
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { inferInput } from '@trpc/tanstack-react-query'
+import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import {
   FullDocumentUrl,
   System,
@@ -19,7 +19,12 @@ import {
   UserOrSystem
 } from '@opencrvs/commons/client'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
-import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import {
+  hasConflict,
+  queryClient,
+  trpcOptionsProxy,
+  useTRPC
+} from '@client/v2-events/trpc'
 import {
   QueryOptions,
   setMutationDefaults,
@@ -181,13 +186,37 @@ export function useUsers() {
           )
       }
     },
-    createUser: ({ onSuccess }: { onSuccess?: () => void } = {}) => {
+    createUser: ({
+      onSuccess
+    }: {
+      onSuccess?: (response: inferOutput<typeof trpc.user.create>) => void
+    } = {}) => {
       const mutationOptions = trpc.user.create.mutationOptions()
 
       return useMutation({
         ...mutationOptions,
-        onSuccess: () => {
-          onSuccess?.()
+        retry: (_failureCount, error) => {
+          return !hasConflict(error)
+        },
+        onSuccess: (response) => {
+          onSuccess?.(response)
+        }
+      })
+    },
+    updateUser: ({
+      onSuccess
+    }: {
+      onSuccess?: (response: inferOutput<typeof trpc.user.update>) => void
+    } = {}) => {
+      const mutationOptions = trpc.user.update.mutationOptions()
+
+      return useMutation({
+        ...mutationOptions,
+        onSuccess: (response) => {
+          void queryClient.invalidateQueries({
+            queryKey: trpc.user.get.queryKey(response.id)
+          })
+          onSuccess?.(response)
         }
       })
     },

@@ -284,6 +284,8 @@ function mapFieldTypeToMockValue(
       return Object.create(null)
     case FieldType.ID_READER:
       return Object.create(null)
+    case FieldType.USER_ROLE:
+      return TestUserRole.enum.FIELD_AGENT
   }
 }
 

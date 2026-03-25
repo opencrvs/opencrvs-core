@@ -29,7 +29,7 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { Square } from '@opencrvs/components/lib/icons'
 import { useOnlineStatus } from '@client/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { uploadAvatar } from '@client/v2-events/features/files/useFileUpload'
+import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { getFullDocumentPath, cacheFile } from '@client/v2-events/cache'
 
 const Container = styled.div`
@@ -169,6 +169,11 @@ function AvatarChangeModalComp({
     reset()
   }
 
+  const { uploadFileAsync } = useFileUpload(
+    `users/${userDetails?.id}`,
+    userDetails?.id || '',
+    {}
+  )
   const handleApply = async () => {
     const croppedImage = await getCroppedImage(imgSrc, croppedArea)
 
@@ -182,15 +187,7 @@ function AvatarChangeModalComp({
       setError(intl.formatMessage(messages.avatarProcessingError))
       return
     }
-    const { url } = await uploadAvatar({
-      file: croppedImage,
-      userId: userDetails.id || '',
-      meta: {
-        transactionId: crypto.randomUUID(),
-        referenceId: userDetails.id
-      }
-    })
-
+    const { url } = await uploadFileAsync(croppedImage, userDetails.id)
     if (userDetails && userDetails.id && croppedImage) {
       changeAvatarMutation.mutate(
         {

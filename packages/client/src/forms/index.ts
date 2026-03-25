@@ -959,11 +959,6 @@ type IFormSectionQueryMapFunction = (
   userDetails?: UserDetails // user for template user mappings
 ) => void
 
-export enum UserSection {
-  Preview = 'preview',
-  User = 'user'
-}
-
 enum CertificateSection {
   Collector = 'collector',
   User = 'user'
@@ -992,7 +987,6 @@ enum RegistrationSection {
 export type Section =
   | ReviewSection
   | PaymentSection
-  | UserSection
   | CertificateSection
   | CorrectionSection
   | RegistrationSection
