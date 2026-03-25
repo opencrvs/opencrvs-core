@@ -14,6 +14,7 @@
     "create:hearth": "./create-mongo-migrations.sh hearth",
     "create:events": "DATABASE_URL=postgres://events_migrator:migrator_password@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/events --migration-file-language=sql",
     "create:migrate-legacy-users": "DATABASE_URL=postgres://postgres:postgres@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/migrate-legacy-users --migration-file-language=sql --migrations-table=pgmigrations_legacy_users",
+    "create:hearth-to-events": "DATABASE_URL=postgres://postgres:postgres@localhost:5432/events yarn node-pg-migrate create --migrations-dir=./src/migrations/hearth-to-events --migration-file-language=sql --migrations-table=pgmigrations_hearth_to_events",
     "create:openhim": "./create-mongo-migrations.sh openhim",
     "create:performance": "./create-mongo-migrations.sh performance",
     "create:user-mgnt": "./create-mongo-migrations.sh user-mgnt",
