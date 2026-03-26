@@ -119,7 +119,7 @@ app.get("/oidc/userinfo", {
     }
 
     const userInfo: OIDPUserInfo = {
-      sub: "405710304278395",
+      sub: "1234567890" + "1234567890" + "123456" + nid, // mosip.kernel.tokenid.length (PSUT) is generally 36 characters
       name: `${identity.firstName} ${identity.familyName}`,
       given_name: identity.firstName,
       family_name: identity.familyName,

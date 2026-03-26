@@ -166,6 +166,7 @@ function formatDate(dateString: string, formatStr = "PP") {
 
 const pickUserInfo = async (userInfo: OIDPUserInfo) => {
   return {
+    sub: userInfo.sub, // usually holds the PSUT
     name: {
       firstname: userInfo.name?.split(" ")[0],
       surname: userInfo.name?.split(" ").at(-1),
