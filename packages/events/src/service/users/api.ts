@@ -73,7 +73,7 @@ export type SearchUsersResult = {
 export async function getLegacyUser(
   userId: string,
   token: string
-): Promise<UserAPIResult> {
+): Promise<User & { username: string }> {
   const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getUser').href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
@@ -89,7 +89,31 @@ export async function getLegacyUser(
     )
   }
 
-  return res.json() as Promise<UserAPIResult>
+  const legacyUser = (await res.json()) as UserAPIResult
+
+  if (!legacyUser) {
+    throw new Error(`No user found for id: ${userId}`)
+  }
+
+  return {
+    type: TokenUserType.enum.user,
+    id: legacyUser.id,
+    name: legacyUser.name,
+    role: legacyUser.role,
+    email: legacyUser.email,
+    mobile: legacyUser.mobile,
+    username: legacyUser.username,
+    status: legacyUser.status as User['status'],
+    signature: legacyUser.signature?.data
+      ? legacyUser.signature.data
+      : undefined,
+    avatar: legacyUser.avatar?.data ? legacyUser.avatar.data : undefined,
+    primaryOfficeId: legacyUser.primaryOfficeId,
+    device: legacyUser.device ? legacyUser.device : undefined,
+    fullHonorificName: legacyUser.fullHonorificName
+      ? legacyUser.fullHonorificName
+      : undefined
+  }
 }
 
 export async function findUserOrSystem(
@@ -97,24 +121,7 @@ export async function findUserOrSystem(
   token: string
 ): Promise<UserOrSystem | undefined> {
   try {
-    const user = await getLegacyUser(id, token)
-
-    return {
-      type: TokenUserType.enum.user,
-      id: user.id,
-      name: user.name,
-      role: user.role,
-      email: user.email,
-      mobile: user.mobile,
-      status: user.status as User['status'],
-      signature: user.signature?.data ? user.signature.data : undefined,
-      avatar: user.avatar?.data ? user.avatar.data : undefined,
-      primaryOfficeId: user.primaryOfficeId,
-      device: user.device ? user.device : undefined,
-      fullHonorificName: user.fullHonorificName
-        ? user.fullHonorificName
-        : undefined
-    }
+    return getLegacyUser(id, token)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
     logger.info(`No user found for id: ${id}. Will look for a system instead.`)
