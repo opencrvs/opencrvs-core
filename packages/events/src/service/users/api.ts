@@ -121,7 +121,7 @@ export async function findUserOrSystem(
   token: string
 ): Promise<UserOrSystem | undefined> {
   try {
-    return getLegacyUser(id, token)
+    return await getLegacyUser(id, token)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
     logger.info(`No user found for id: ${id}. Will look for a system instead.`)
