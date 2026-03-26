@@ -11,7 +11,7 @@ This repository provides an mediator/API layer that facilitates communication be
 
 ```sh
 # copy demo certs to gitignored location
-cp docs/example-certs/* certs/
+cp -n docs/example-certs/* certs/
 
 # install dependencies
 yarn install

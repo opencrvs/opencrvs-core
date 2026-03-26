@@ -1,16 +1,32 @@
 {
   "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["build/**"]
+    },
+    "@opencrvs/mosip#build": {
+      "outputs": ["build/**"]
+    },
     "dev": {
+      "cache": false,
+      "persistent": true,
       "outputs": []
     },
-    "dev:@opencrvs/mosip-api": {
-      "dependsOn": ["dev:@opencrvs/mosip-mock", "dev:@opencrvs/esignet-mock"],
+    "@opencrvs/mosip-api#dev": {
+      "dependsOn": ["@opencrvs/mosip#build"],
+      "with": ["@opencrvs/mosip-mock#dev", "@opencrvs/esignet-mock#dev"],
+      "cache": false,
+      "persistent": true,
       "outputs": []
     },
-    "dev:@opencrvs/mosip-mock": {
+    "@opencrvs/mosip-mock#dev": {
+      "cache": false,
+      "persistent": true,
       "outputs": []
     },
-    "dev:@opencrvs/esignet-mock": {
+    "@opencrvs/esignet-mock#dev": {
+      "cache": false,
+      "persistent": true,
       "outputs": []
     }
   }
