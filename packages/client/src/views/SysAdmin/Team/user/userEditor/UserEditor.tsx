@@ -395,6 +395,22 @@ export const ReviewUserComponent = () => {
   const isSubmitting =
     createUserMutation.isPending || updateUserMutation.isPending
 
+  if (existingUserQuery.isLoading) {
+    return (
+      <ActionPageLight
+        title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
+        goBack={() => navigate(-1)}
+        hideBackground={true}
+      >
+        <Container>
+          <SpinnerWrapper>
+            <Spinner id="user-form-submitting-spinner" size={25} />
+          </SpinnerWrapper>
+        </Container>
+      </ActionPageLight>
+    )
+  }
+
   if (isSubmitting) {
     return (
       <ActionPageLight
