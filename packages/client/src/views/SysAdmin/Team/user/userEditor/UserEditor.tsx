@@ -53,6 +53,7 @@ import styled from 'styled-components'
 import { create } from 'zustand'
 import { useUsers } from '../../../../../v2-events/hooks/useUsers'
 import { emptyMessage } from '@client/v2-events/utils'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
 const Container = styled.div`
   display: flex;
@@ -224,7 +225,7 @@ export const CreateNewUser = () => {
   return <div />
 }
 
-export const EditUser = () => {
+export const EditUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { pageId, userId } = useTypedParams(ROUTES.V2.SETTINGS.USER.EDIT)
@@ -302,7 +303,9 @@ export const EditUser = () => {
   )
 }
 
-export const ReviewUser = () => {
+export const EditUser = withSuspense(EditUserComponent)
+
+export const ReviewUserComponent = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { getUserForm, getTouchedFields, setUserForm, clear } =
@@ -544,6 +547,7 @@ export const ReviewUser = () => {
     </FormLayout>
   )
 }
+export const ReviewUser = withSuspense(ReviewUserComponent)
 
 /**
  * Layout for form and review pages.

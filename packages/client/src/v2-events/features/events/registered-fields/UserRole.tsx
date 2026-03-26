@@ -52,19 +52,7 @@ function UserRoleInput({
 
 function UserRoleOutput({ value }: { value: string | undefined }) {
   const intl = useIntl()
-  const { listRoles } = useRoles()
-  const [roles] = listRoles.useSuspenseQuery()
-
-  if (!value) {
-    return ''
-  }
-
-  const selectedRole = roles.find((role) => role.id === value)
-  if (!selectedRole) {
-    return value
-  }
-
-  return formatUserRole(selectedRole.id, intl)
+  return formatUserRole(value, intl)
 }
 
 function stringify(

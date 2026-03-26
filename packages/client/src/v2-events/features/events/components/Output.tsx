@@ -51,7 +51,8 @@ import {
   isAgeFieldType,
   FieldUpdateValue,
   isCustomFieldType,
-  isImageViewFieldType
+  isImageViewFieldType,
+  isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -73,7 +74,8 @@ import {
   getRegisteredFieldByFieldConfig,
   VerificationStatus,
   AgeField,
-  ImageView
+  ImageView,
+  UserRole
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { SignatureField } from '@client/v2-events/components/forms/inputs/SignatureField/SignatureField'
@@ -242,6 +244,10 @@ export function ValueOutput({
         value={field.value}
       />
     )
+  }
+
+  if (isUserRoleFieldType(field)) {
+    return <UserRole.Output value={field.value} />
   }
 
   if (isCustomFieldType(field)) {
