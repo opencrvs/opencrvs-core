@@ -91,10 +91,6 @@ export async function getLegacyUser(
 
   const legacyUser = (await res.json()) as UserAPIResult
 
-  if (!legacyUser) {
-    throw new Error(`No user found for id: ${userId}`)
-  }
-
   return {
     type: TokenUserType.enum.user,
     id: legacyUser.id,
