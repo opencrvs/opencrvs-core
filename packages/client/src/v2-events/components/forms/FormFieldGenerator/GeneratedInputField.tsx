@@ -75,9 +75,9 @@ import {
   isConditionMet,
   SelectOption
 } from '@opencrvs/commons/client'
-import { countries } from '@client/utils/countries'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
+import { countries } from '@client/utils/countries'
 import {
   BulletList,
   Checkbox,
@@ -620,6 +620,9 @@ export const GeneratedInputField = <T extends FieldConfig>(
     const resolvedCountryOptions = field.config.optionOverrides
       ? resolveOptions(
           (countries as SelectOption[]).map((country) => {
+            // tsserver for some reason cannot filter out the undefined
+            // from the type here
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const override = field.config.optionOverrides!.find(
               (o) => o.value === country.value
             )
