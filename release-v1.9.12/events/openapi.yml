@@ -840,7 +840,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 86f14629-5e45-4211-a5d4-40a69dd51cdd
+                transactionId: be0f9db8-fb0a-4e69-8264-278f4371a496
                 type: birth
       responses:
         "200":
@@ -926,7 +926,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: e0c8e6a2-672a-4904-8b25-441e4c3d4033
+                transactionId: 63b9d707-6fd8-4b57-91a1-07522a2e7486
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2731,14 +2731,7 @@ components:
                 fields:
                   type: array
                   items:
-                    type: string
-                    enum:
-                      - country
-                      - administrativeArea
-                administrativeLevels:
-                  type: array
-                  items:
-                    type: string
+                    type: object
                 streetAddressForm:
                   type: array
                   items:
