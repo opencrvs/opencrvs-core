@@ -1,7 +1,7 @@
 -- Up Migration
 CREATE FOREIGN TABLE hearth_locations(
   _id        name,
-  name       text,
+  id         text,
   identifier json
 ) SERVER mongo OPTIONS(
   database   'hearth-dev',

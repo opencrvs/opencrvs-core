@@ -110,8 +110,6 @@ if [ $MIGRATE_LEGACY_DATA = true ]; then
     export MONGO_USER_MAPPING_OPTIONS="OPTIONS( username '$MONGO_USERNAME', password '$MONGO_PASSWORD')"
   fi
 
-  export POPULATE_EXTERNAL_ID_BATCH_SIZE=1000
-
   export EVENTS_MIGRATION_USER="${EVENTS_MIGRATION_USER:-events_migrator}"
 
   run_pg_migrations \
