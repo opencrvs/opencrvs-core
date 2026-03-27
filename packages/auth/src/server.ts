@@ -62,9 +62,7 @@ import sendUserNameHandler, {
 import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
-import anonymousTokenHandler, {
-  responseSchema as anonymousResponseSchema
-} from './features/anonymousToken/handler'
+import anonymousTokenHandler from './features/anonymousToken/handler'
 import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
 } from './features/reindexToken/handler'
@@ -140,13 +138,10 @@ export async function createServer() {
     path: '/anonymous-token',
     handler: anonymousTokenHandler,
     options: {
-      tags: ['api'],
-      description: 'Authenticate an anonymous user',
+      tags: ['api', 'deprecated'],
+      description: 'Deprecated: Authenticate an anonymous user',
       notes:
-        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints',
-      response: {
-        schema: anonymousResponseSchema
-      }
+        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints'
     }
   })
   // curl -H 'Content-Type: application/json' http://localhost:4040/reindexing-token

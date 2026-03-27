@@ -11,7 +11,11 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTRPC, trpcClient } from '@client/v2-events/trpc'
-import { SCOPES, encodeScope, RecordScopeTypeV2 } from '@opencrvs/commons/client'
+import {
+  SCOPES,
+  encodeScope,
+  RecordScopeTypeV2
+} from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { UUID } from '@opencrvs/commons/client'
 
@@ -44,8 +48,8 @@ export interface IntegrationDetails {
 type SystemIntegrationType = 'HEALTH' | 'RECORD_SEARCH'
 
 const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, string[]> = {
-  HEALTH: [SCOPES.NOTIFICATION_API],
-  RECORD_SEARCH: [SCOPES.RECORDSEARCH]
+  HEALTH: ['record.notify'],
+  RECORD_SEARCH: ['record.search']
 }
 
 const CONFIGURABLE_SCOPES_BY_TYPE: Record<
@@ -143,7 +147,8 @@ export function useIntegrations() {
     isLoading: listQuery.isLoading,
     isError: listQuery.isError,
     createIntegration: createMutation.mutateAsync,
-    createResult: (createMutation.data ?? null) as CreateIntegrationResult | null,
+    createResult: (createMutation.data ??
+      null) as CreateIntegrationResult | null,
     isCreating: createMutation.isPending,
     createError: createMutation.error,
     resetCreate: createMutation.reset,

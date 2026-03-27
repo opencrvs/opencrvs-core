@@ -14,13 +14,9 @@ import {
   authenticateSystem,
   createToken
 } from '@auth/features/authenticate/service'
-import {
-  WEB_USER_JWT_AUDIENCES,
-  JWT_ISSUER,
-  NOTIFICATION_API_USER_AUDIENCE
-} from '@auth/constants'
+import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 import * as oauthResponse from './responses'
-import { SCOPES, TokenUserType } from '@opencrvs/commons/authentication'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 import { getParam } from './utils'
 
 export async function clientCredentialsHandler(
@@ -45,14 +41,6 @@ export async function clientCredentialsHandler(
     return oauthResponse.invalidClient(h)
   }
 
-  const isNotificationAPIUser = result.scope.some(
-    (s) =>
-      s === 'notification-api' ||
-      s === 'record.notify' ||
-      s === 'type=record.notify'
-  )
-  const isImportExportClient = result.scope.includes(SCOPES.RECORD_IMPORT)
-
   /**
    * Intermediary step to convert any legacy scopes to the new format.
    * For example, 'record.create' becomes 'type=record.create' to align with the new scope format.
@@ -61,11 +49,11 @@ export async function clientCredentialsHandler(
    */
   const v2Scopes = result.scope.map((s) => {
     // Intentionally verbose for clarity.
-    if (s === 'notification-api' || s === 'record.notify') {
+    if (s === 'record.notify') {
       return 'type=record.notify'
     }
 
-    if (s === 'recordsearch' || s === 'record.search') {
+    if (s === 'record.search') {
       return 'type=record.search'
     }
 
@@ -83,12 +71,9 @@ export async function clientCredentialsHandler(
   const token = await createToken(
     result.systemId,
     v2Scopes,
-    isNotificationAPIUser
-      ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
-      : WEB_USER_JWT_AUDIENCES,
+    WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
     undefined,
-    !isImportExportClient,
     TokenUserType.enum.system
   )
   return oauthResponse.success(h, token)
