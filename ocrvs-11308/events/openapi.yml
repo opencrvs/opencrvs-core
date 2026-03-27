@@ -4731,8 +4731,6 @@ components:
                         - reg18
                         - h4
                         - h3
-                        - h2
-                        - h1
                     textAlign:
                       description: Text alignment for the paragraph
                       type: string
