@@ -11,31 +11,31 @@
 import React from 'react'
 
 import { Text as TextComponent } from '@opencrvs/components'
-import { ParagraphConfiguration } from '@opencrvs/commons/client'
+import { HeadingConfiguration } from '@opencrvs/commons/client'
 
-function ParagraphInput({
+function HeadingInput({
   configuration,
   message
 }: {
   message: string
-  configuration: ParagraphConfiguration
+  configuration: HeadingConfiguration
 }) {
-  const hint = configuration.styles?.hint
+  const fontVariant = configuration.styles?.fontVariant
   const textAlign = configuration.styles?.textAlign
 
   return (
     <TextComponent
       align={textAlign}
-      color={hint ? 'grey500' : 'copy'}
+      color={'copy'}
       element="p"
-      variant="reg16"
+      variant={fontVariant ?? 'reg16'}
     >
       <span dangerouslySetInnerHTML={{ __html: message }} />
     </TextComponent>
   )
 }
 
-export const Paragraph = {
-  Input: ParagraphInput,
+export const Heading = {
+  Input: HeadingInput,
   Output: null
 }
