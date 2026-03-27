@@ -357,11 +357,15 @@ const ParagraphConfiguration = z
 
 export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
 
+const TitleFontVariant = HtmlFontVariant.exclude(['h1', 'h2'])
+
+type TitleFontVariant = z.infer<typeof TitleFontVariant>
+
 const TitleConfiguration = z
   .object({
     styles: z
       .object({
-        fontVariant: HtmlFontVariant.optional().describe(
+        fontVariant: TitleFontVariant.optional().describe(
           'Font variant to use for the paragraph text'
         ),
         textAlign: ParagraphTextAlign.optional().describe(

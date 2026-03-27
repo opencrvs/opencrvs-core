@@ -12,7 +12,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 export const HeaderContainer = styled.tr<{
-  fontVariant: FontVariant
+  fontVariant: HeaderFontVariant
 }>`
   th {
     border-bottom: 2px solid ${({ theme }) => theme.colors.grey100};
@@ -41,21 +41,13 @@ export const HeaderContainer = styled.tr<{
     text-align: right;
   }
 `
-type FontVariant =
-  | 'reg12'
-  | 'reg14'
-  | 'reg16'
-  | 'reg18'
-  | 'h4'
-  | 'h3'
-  | 'h2'
-  | 'h1'
+type HeaderFontVariant = 'reg12' | 'reg14' | 'reg16' | 'reg18' | 'h4' | 'h3'
 
 type HeaderProps = {
   id?: string
   value: React.ReactNode
   label: React.ReactNode
-  fontVariant?: FontVariant
+  fontVariant?: HeaderFontVariant
 }
 
 export const Header = ({
