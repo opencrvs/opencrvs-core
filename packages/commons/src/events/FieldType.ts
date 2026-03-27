@@ -99,6 +99,7 @@ export const FieldTypesToHideInReview = [
   FieldType.DIVIDER,
   FieldType.PAGE_HEADER,
   FieldType.IMAGE_VIEW,
+  FieldType.PARAGRAPH,
   FieldType.ID_READER,
   FieldType.LOADER,
   FieldType.HTTP,
