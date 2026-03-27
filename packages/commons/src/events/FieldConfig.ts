@@ -569,7 +569,13 @@ export type Checkbox = z.infer<typeof Checkbox>
 
 const Country = BaseField.extend({
   type: z.literal(FieldType.COUNTRY),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  optionOverrides: z
+    .array(SelectOption.omit({ label: true }))
+    .optional()
+    .describe(
+      'Conditionals for specific countries. Countries not listed are always shown and enabled.'
+    )
 }).describe('Country select field')
 
 export type Country = z.infer<typeof Country>

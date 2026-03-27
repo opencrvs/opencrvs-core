@@ -75,6 +75,7 @@ import {
   isConditionMet,
   SelectOption
 } from '@opencrvs/commons/client'
+import { countries } from '@client/utils/countries'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import {
@@ -616,9 +617,28 @@ export const GeneratedInputField = <T extends FieldConfig>(
     )
   }
   if (isCountryFieldType(field)) {
+    const resolvedCountryOptions = field.config.optionOverrides
+      ? resolveOptions(
+          (countries as SelectOption[]).map((country) => {
+            const override = field.config.optionOverrides!.find(
+              (o) => o.value === country.value
+            )
+            return override
+              ? { ...country, conditionals: override.conditionals }
+              : country
+          }),
+          form,
+          validatorContext
+        )
+      : undefined
+
     return (
       <InputField {...inputFieldProps}>
-        <SelectCountry.Input {...inputProps} value={field.value} />
+        <SelectCountry.Input
+          {...inputProps}
+          options={resolvedCountryOptions}
+          value={field.value}
+        />
       </InputField>
     )
   }
