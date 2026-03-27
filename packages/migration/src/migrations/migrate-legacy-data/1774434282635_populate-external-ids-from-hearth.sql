@@ -29,6 +29,7 @@ BEGIN
       FROM hearth_pcode_map hp
       JOIN app.locations l ON l.name = hp.name AND l.external_id IS NULL
       WHERE hp.pcode IS NOT NULL
+        AND NOT EXISTS (SELECT 1 FROM app.locations WHERE external_id = hp.pcode)
       ORDER BY hp.pcode, l.ctid
       LIMIT batch_size
     )
@@ -51,6 +52,7 @@ BEGIN
       FROM hearth_pcode_map hp
       JOIN app.administrative_areas aa ON aa.name = hp.name AND aa.external_id IS NULL
       WHERE hp.pcode IS NOT NULL
+        AND NOT EXISTS (SELECT 1 FROM app.administrative_areas WHERE external_id = hp.pcode)
       ORDER BY hp.pcode, aa.ctid
       LIMIT batch_size
     )
