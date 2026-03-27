@@ -58,4 +58,7 @@ else
   find dist -type f -exec sed -i 's|@opencrvs/commons|../commons|g' {} +
 fi
 
+# Generate core-en.json from client + login source and place it in dist
+(cd ../.. && yarn generate:core-translations)
+
 echo "Build completed successfully."

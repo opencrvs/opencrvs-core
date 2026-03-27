@@ -36,6 +36,7 @@
     "check:license": "license-check-and-add check -f license-config.json",
     "seed:dev": "NODE_ENV=development lerna run seed --stream --scope @opencrvs/data-seeder",
     "seed:prod": "NODE_ENV=production lerna run seed --stream --scope @opencrvs/data-seeder",
+    "generate:core-translations": "ts-node --compiler-options='{\"module\": \"commonjs\", \"moduleResolution\": \"node\", \"esModuleInterop\": true}' generate-core-translations.ts",
     "add:license": "license-check-and-add add -f license-config.json",
     "build:components": "lerna run build --scope @opencrvs/components",
     "debug": "bash debug-service-in-chrome.sh"
