@@ -59,7 +59,7 @@ export const WithHiddenOption: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('textbox'))
     await expect(canvas.queryByText('Bangladesh')).toBeInTheDocument()
-    await expect(canvas.queryByText('Finland')).not.toBeInTheDocument()
+    await expect(canvas.queryByText('Canada')).not.toBeInTheDocument()
     await expect(
       canvas.queryByText('United States of America')
     ).toBeInTheDocument()
@@ -79,7 +79,7 @@ export const WithHiddenOption: Story = {
             },
             optionOverrides: [
               {
-                value: 'FIN',
+                value: 'CAN',
                 conditionals: [
                   {
                     type: ConditionalType.SHOW,
@@ -96,6 +96,57 @@ export const WithHiddenOption: Story = {
   }
 }
 
+export const WithAddressCountryOverride: Story = {
+  name: 'Address field with hidden country option override',
+  parameters: {
+    layout: 'centered'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(await canvas.findByRole('textbox'))
+    await expect(canvas.queryByText('Bangladesh')).toBeInTheDocument()
+    await expect(canvas.queryByText('Canada')).not.toBeInTheDocument()
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={[
+          {
+            id: 'storybook.address',
+            type: FieldType.ADDRESS,
+            label: {
+              id: 'storybook.address.label',
+              defaultMessage: 'Address',
+              description: 'The label for the address input'
+            },
+            configuration: {
+              fields: [
+                {
+                  id: 'country',
+                  type: FieldType.COUNTRY,
+                  optionOverrides: [
+                    {
+                      value: 'CAN',
+                      conditionals: [
+                        {
+                          type: ConditionalType.SHOW,
+                          conditional: not(alwaysTrue())
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]}
+        id="my-form"
+      />
+    )
+  }
+}
+
 export const WithDisabledOption: Story = {
   name: 'With disabled country option',
   parameters: {
@@ -104,9 +155,9 @@ export const WithDisabledOption: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('textbox'))
-    const finlandOption = canvas.queryByText('Finland')
-    await expect(finlandOption).toBeInTheDocument()
-    await expect(finlandOption).toHaveClass('react-select__option--is-disabled')
+    const canadaOption = canvas.queryByText('Canada')
+    await expect(canadaOption).toBeInTheDocument()
+    await expect(canadaOption).toHaveClass('react-select__option--is-disabled')
     await expect(canvas.queryByText('Bangladesh')).not.toHaveClass(
       'react-select__option--is-disabled'
     )
@@ -126,7 +177,7 @@ export const WithDisabledOption: Story = {
             },
             optionOverrides: [
               {
-                value: 'FIN',
+                value: 'CAN',
                 conditionals: [
                   {
                     type: ConditionalType.ENABLE,
