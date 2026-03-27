@@ -56,7 +56,7 @@ import {
   CustomField,
   HiddenField,
   ImageViewField,
-  Title,
+  Heading,
   UserRoleField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -162,7 +162,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
-    case FieldType.TITLE:
+    case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
@@ -252,7 +252,7 @@ type FieldTypeValueMap = {
   [FieldType.COUNTRY]: z.infer<typeof TextValue>
   [FieldType.RADIO_GROUP]: z.infer<typeof TextValue>
   [FieldType.PARAGRAPH]: z.infer<typeof TextValue>
-  [FieldType.TITLE]: z.infer<typeof TextValue>
+  [FieldType.HEADING]: z.infer<typeof TextValue>
   [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
   [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof TextValue>
   [FieldType.FACILITY]: z.infer<typeof TextValue>
@@ -324,7 +324,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
-    case FieldType.TITLE:
+    case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
@@ -384,11 +384,11 @@ export const isParagraphFieldType = (field: {
   return field.config.type === FieldType.PARAGRAPH
 }
 
-export const isTitleFieldType = (field: {
+export const isHeadingFieldType = (field: {
   config: FieldConfig
   value: FieldValue | FieldUpdateValue
-}): field is { value: string; config: Title } => {
-  return field.config.type === FieldType.TITLE
+}): field is { value: string; config: Heading } => {
+  return field.config.type === FieldType.HEADING
 }
 
 export const isImageViewFieldType = (field: {
@@ -714,7 +714,7 @@ export type NonInteractiveFieldType =
   | PageHeader
   | ImageViewField
   | Paragraph
-  | Title
+  | Heading
   | BulletList
   | DataField
   | AlphaPrintButton
@@ -732,7 +732,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.DIVIDER ||
     field.type === FieldType.PAGE_HEADER ||
     field.type === FieldType.PARAGRAPH ||
-    field.type === FieldType.TITLE ||
+    field.type === FieldType.HEADING ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
     field.type === FieldType.ALPHA_PRINT_BUTTON ||

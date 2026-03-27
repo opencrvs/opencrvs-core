@@ -197,7 +197,7 @@ function mapFieldTypeToMockValue(
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
-    case FieldType.TITLE:
+    case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.PHONE:

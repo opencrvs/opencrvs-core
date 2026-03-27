@@ -11,14 +11,14 @@
 import React from 'react'
 
 import { Text as TextComponent } from '@opencrvs/components'
-import { TitleConfiguration } from '@opencrvs/commons/client'
+import { HeadingConfiguration } from '@opencrvs/commons/client'
 
-function TitleInput({
+function HeadingInput({
   configuration,
   message
 }: {
   message: string
-  configuration: TitleConfiguration
+  configuration: HeadingConfiguration
 }) {
   const fontVariant = configuration.styles?.fontVariant
   const textAlign = configuration.styles?.textAlign
@@ -35,7 +35,7 @@ function TitleInput({
   )
 }
 
-export const Title = {
-  Input: TitleInput,
+export const Heading = {
+  Input: HeadingInput,
   Output: null
 }

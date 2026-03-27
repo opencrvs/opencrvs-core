@@ -52,7 +52,7 @@ import {
   FieldUpdateValue,
   isCustomFieldType,
   isImageViewFieldType,
-  isTitleFieldType,
+  isHeadingFieldType,
   isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import {
@@ -68,7 +68,7 @@ import {
   Select,
   SelectCountry,
   Paragraph,
-  Title,
+  Heading,
   Number,
   NumberWithUnit,
   Text,
@@ -153,8 +153,8 @@ export function ValueOutput({
     return Paragraph.Output
   }
 
-  if (isTitleFieldType(field)) {
-    return Title.Output
+  if (isHeadingFieldType(field)) {
+    return Heading.Output
   }
 
   if (isNumberFieldType(field)) {

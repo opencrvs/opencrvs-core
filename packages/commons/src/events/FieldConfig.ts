@@ -357,15 +357,15 @@ const ParagraphConfiguration = z
 
 export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
 
-const TitleFontVariant = HtmlFontVariant.exclude(['h1', 'h2'])
+const HeadingFontVariant = HtmlFontVariant.exclude(['h1', 'h2'])
 
-type TitleFontVariant = z.infer<typeof TitleFontVariant>
+type HeadingFontVariant = z.infer<typeof HeadingFontVariant>
 
-const TitleConfiguration = z
+const HeadingConfiguration = z
   .object({
     styles: z
       .object({
-        fontVariant: TitleFontVariant.optional().describe(
+        fontVariant: HeadingFontVariant.optional().describe(
           'Font variant to use for the paragraph text'
         ),
         textAlign: ParagraphTextAlign.optional().describe(
@@ -376,7 +376,7 @@ const TitleConfiguration = z
   })
   .default({})
 
-export type TitleConfiguration = z.infer<typeof TitleConfiguration>
+export type HeadingConfiguration = z.infer<typeof HeadingConfiguration>
 
 const ImageConfiguration = z.object({
   alt: z.string().optional().describe('Alternative text for the image'),
@@ -409,13 +409,13 @@ const Paragraph = BaseField.extend({
 
 export type Paragraph = z.infer<typeof Paragraph>
 
-const Title = BaseField.extend({
-  type: z.literal(FieldType.TITLE),
+const Heading = BaseField.extend({
+  type: z.literal(FieldType.HEADING),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: TitleConfiguration
-}).describe('A read-only title component for form pages')
+  configuration: HeadingConfiguration
+}).describe('A read-only heading component for form pages')
 
-export type Title = z.infer<typeof Title>
+export type Heading = z.infer<typeof Heading>
 
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER),
@@ -1000,7 +1000,7 @@ export const FieldConfig = z
     SelectDateRangeField,
     ImageViewField,
     Paragraph,
-    Title,
+    Heading,
     RadioGroup,
     BulletList,
     PageHeader,

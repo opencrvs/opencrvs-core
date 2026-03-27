@@ -353,7 +353,7 @@ function FormReview({
                       (isCorrection && uncorrectable) ||
                       isReviewCorrection
 
-                    const showSectionHeading = type === FieldType.TITLE
+                    const showSectionHeading = type === FieldType.HEADING
 
                     return (
                       <>

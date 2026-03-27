@@ -35,7 +35,7 @@ import {
   isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
-  isTitleFieldType,
+  isHeadingFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
   isSignatureFieldType,
@@ -88,7 +88,7 @@ import {
   Divider,
   PageHeader,
   Paragraph,
-  Title,
+  Heading,
   SelectDateRangeField,
   TimeField,
   Button,
@@ -397,13 +397,13 @@ export const GeneratedInputField = React.memo(
       )
     }
 
-    if (isTitleFieldType(field)) {
+    if (isHeadingFieldType(field)) {
       const message = intl.formatMessage(fieldDefinition.label, {
         [fieldDefinition.id]: field.value
       })
 
       return (
-        <Title.Input
+        <Heading.Input
           configuration={field.config.configuration}
           message={message}
         />

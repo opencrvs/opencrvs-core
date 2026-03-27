@@ -27,7 +27,7 @@ import { NumberWithUnit } from './NumberWithUnit'
 import { PageHeader } from './PageHeader'
 import { AgeField } from './AgeField'
 import { Paragraph } from './Paragraph'
-import { Title } from './Title'
+import { Heading } from './Heading'
 import { RadioGroup } from './RadioGroup'
 import { RegisteredFieldModule } from './RegisteredField'
 import { Select } from './Select'
@@ -58,7 +58,7 @@ export * from './Number'
 export * from './NumberWithUnit'
 export * from './PageHeader'
 export * from './Paragraph'
-export * from './Title'
+export * from './Heading'
 export * from './RadioGroup'
 export * from './Select'
 export * from './SelectCountry'
@@ -115,8 +115,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return PageHeader
     case FieldType.PARAGRAPH:
       return Paragraph
-    case FieldType.TITLE:
-      return Title
+    case FieldType.HEADING:
+      return Heading
     case FieldType.IMAGE_VIEW:
       return ImageView
     case FieldType.NAME:
