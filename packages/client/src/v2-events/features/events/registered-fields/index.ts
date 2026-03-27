@@ -40,6 +40,7 @@ import { LinkButton } from './LinkButton'
 import { VerificationStatus } from './VerificationStatus'
 import { QueryParamReader } from './QueryParamReader'
 import { ImageView } from './ImageView'
+import { UserRole } from './UserRole'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -66,6 +67,7 @@ export * from './AlphaPrintButton'
 export * from './LinkButton'
 export * from './VerificationStatus'
 export * from './ImageView'
+export * from './UserRole'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -129,6 +131,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return QueryParamReader
     case FieldType.AGE:
       return AgeField
+    case FieldType.USER_ROLE:
+      return UserRole
     case FieldType.FILE:
       return File
     case FieldType.FILE_WITH_OPTIONS:

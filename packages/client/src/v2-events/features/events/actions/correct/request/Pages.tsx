@@ -90,6 +90,7 @@ export function Pages() {
       {modal}
       <PagesComponent
         actionType={ActionType.REQUEST_CORRECTION}
+        attachmentPath={`events/${eventId}/`}
         eventConfig={configuration}
         form={form}
         formPages={correctablePages}

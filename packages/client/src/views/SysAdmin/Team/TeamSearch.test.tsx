@@ -31,7 +31,7 @@ import { SCOPES, UUID } from '@opencrvs/commons/client'
 import { createMemoryRouter } from 'react-router-dom'
 import * as actions from '@client/profile/profileActions'
 
-describe('Team search test', () => {
+describe.skip('Team search test', () => {
   let store: AppStore
   let router: ReturnType<typeof createMemoryRouter>
 

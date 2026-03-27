@@ -46,6 +46,11 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { SettingsPage } from '@client/v2-events/features/settings/Settings'
 import { TeamPage } from '@client/v2-events/features/team/Team'
 import { OrganisationPage } from '@client/v2-events/features/organisation/Organisation'
+import {
+  CreateNewUser,
+  EditUser,
+  ReviewUser
+} from '@client/views/SysAdmin/Team/user/userEditor/UserEditor'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
@@ -297,6 +302,26 @@ export const routesConfig = {
       element: <SettingsPage />
     },
     {
+      path: ROUTES.V2.SETTINGS.USER.VIEW.path,
+      element: (
+        <WorkqueueLayout>
+          <UserAudit hideNavigation={true} />
+        </WorkqueueLayout>
+      )
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.CREATE.path,
+      element: <CreateNewUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.EDIT.path,
+      element: <EditUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.REVIEW.path,
+      element: <ReviewUser />
+    },
+    {
       path: ROUTES.V2.DASHBOARD.path,
       element: (
         <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
@@ -320,14 +345,6 @@ export const routesConfig = {
         >
           <TeamPage />
         </ProtectedRoute>
-      )
-    },
-    {
-      path: ROUTES.V2.path + V1_LEGACY_ROUTES.USER_PROFILE,
-      element: (
-        <WorkqueueLayout>
-          <UserAudit hideNavigation={true} />
-        </WorkqueueLayout>
       )
     },
     {
