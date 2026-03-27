@@ -25,10 +25,18 @@ import {
   ShowUnassignedDeclarations
 } from '@client/notification/actions'
 import { IOfflineData } from '@client/offline/reducer'
-import { UserDetailsAvailable } from '@client/profile/profileActions'
+import {
+  UserDetailsAvailable
+} from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import { AssignmentData, EventType, RegStatus } from '@client/utils/gateway'
-import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
+import {
+  AssignmentData,
+  EventType,
+  RegStatus
+} from '@client/utils/gateway'
+import type {
+  GQLEventSearchResultSet
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
 import {
   IQueryData,

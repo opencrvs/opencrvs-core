@@ -67,7 +67,8 @@ import {
   isCustomFieldType,
   isHiddenFieldType,
   EventConfig,
-  isImageViewFieldType
+  isImageViewFieldType,
+  isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -93,7 +94,8 @@ import {
   Http,
   LinkButton,
   VerificationStatus,
-  ImageView
+  ImageView,
+  UserRole
 } from '@client/v2-events/features/events/registered-fields'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
@@ -146,6 +148,7 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   readonlyMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
+  attachmentPath: string
 }
 
 export const GeneratedInputField = React.memo(
@@ -162,6 +165,7 @@ export const GeneratedInputField = React.memo(
     value,
     form,
     disabled,
+    attachmentPath,
     readonlyMode
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
@@ -504,6 +508,7 @@ export const GeneratedInputField = React.memo(
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
             disabled={disabled}
             error={inputFieldProps.error}
+            filePath={attachmentPath}
             label={uploadedFileNameLabel}
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
@@ -594,6 +599,7 @@ export const GeneratedInputField = React.memo(
           <SignatureField.Input
             {...field.config}
             disabled={disabled}
+            filePath={attachmentPath}
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
@@ -684,11 +690,11 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
             error={inputFieldProps.error}
+            filePath={attachmentPath}
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            value={field.value ?? []}
+            value={field.value}
             onChange={handleFileWithOptionChange}
           />
         </InputField>
@@ -879,6 +885,19 @@ export const GeneratedInputField = React.memo(
           {...inputProps}
           value={field.value as string | undefined}
         />
+      )
+    }
+
+    if (isUserRoleFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <UserRole.Input
+            {...field.config}
+            id={field.config.id}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
 

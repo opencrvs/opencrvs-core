@@ -11,14 +11,15 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
-import User, { IUserModel } from '@user-mgnt/model/user'
-import { FilterQuery, SortOrder } from 'mongoose'
-import { resolveLocationChildren } from '@user-mgnt/utils/location'
 import { UUID } from '@opencrvs/commons'
+import User, { IUserModel } from '@user-mgnt/model/user'
+import { resolveLocationChildren } from '@user-mgnt/utils/location'
+import { FilterQuery, SortOrder } from 'mongoose'
 
 interface IVerifyPayload {
   username?: string
   mobile?: string
+  email?: string
   status?: string
   primaryOfficeId?: string
   locationId?: UUID
@@ -34,6 +35,7 @@ export default async function searchUsers(
   const {
     username,
     mobile,
+    email,
     status,
     primaryOfficeId,
     locationId,
@@ -50,6 +52,12 @@ export default async function searchUsers(
   }
   if (mobile) {
     criteria = { ...criteria, mobile }
+  }
+  if (email) {
+    criteria = {
+      ...criteria,
+      email
+    }
   }
   if (primaryOfficeId) {
     criteria = { ...criteria, primaryOfficeId }
@@ -81,6 +89,7 @@ export default async function searchUsers(
 
 export const searchSchema = Joi.object({
   username: Joi.string().optional(),
+  email: Joi.string().optional(),
   mobile: Joi.string().optional(),
   status: Joi.string().optional(),
   primaryOfficeId: Joi.string().optional(),
