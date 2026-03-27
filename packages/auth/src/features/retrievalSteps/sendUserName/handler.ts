@@ -19,12 +19,11 @@ import {
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import {
-  logger,
   triggerUserEventNotification,
   personNameFromV1ToV2
 } from '@opencrvs/commons'
-import { postUserActionToMetrics } from '@auth/metrics'
 import { env } from '@auth/environment'
+import { recordUserAuditEvent } from '@auth/features/authenticate/service'
 
 interface IPayload {
   nonce: string
@@ -45,11 +44,6 @@ export default async function sendUserNameHandler(
     return h.response().code(401)
   }
 
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
-
   await triggerUserEventNotification({
     event: 'username-reminder',
     payload: {
@@ -64,17 +58,13 @@ export default async function sendUserNameHandler(
     authHeader: { Authorization: request.headers.authorization }
   })
 
-  try {
-    await postUserActionToMetrics(
-      'USERNAME_REMINDER',
-      request.headers.authorization,
-      remoteAddress,
-      userAgent,
-      retrievalStepInformation.practitionerId
-    )
-  } catch (err) {
-    logger.error(err.message)
-  }
+  await recordUserAuditEvent(request.headers.authorization, {
+    operation: 'user.USERNAME_REMINDER',
+    requestData: {
+      subjectId: retrievalStepInformation.userId
+    },
+    responseSummary: {}
+  })
 
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)

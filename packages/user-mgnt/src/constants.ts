@@ -23,3 +23,4 @@ export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const SENTRY_DSN = env.SENTRY_DSN
 export const QA_ENV = env.QA_ENV
 export const METRICS_URL = env.METRICS_URL
+export const EVENTS_URL = env.EVENTS_URL

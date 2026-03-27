@@ -15,11 +15,11 @@ import User, {
   IAuditHistory,
   IUserModel
 } from '@user-mgnt/model/user'
-import { getUserId, statuses } from '@user-mgnt/utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 
 interface IAuditUserPayload {
   userId: string
@@ -34,15 +34,8 @@ export async function userAuditHandler(
   h: Hapi.ResponseToolkit
 ) {
   const auditUserPayload = request.payload as IAuditUserPayload
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   const user: IUserModel | null = await User.findById(auditUserPayload.userId)
-  const systemAdminUser: IUserModel | null = await User.findById(
-    getUserId({ Authorization: request.headers.authorization })
-  )
 
   if (!user) {
     logger.error(
@@ -98,27 +91,19 @@ export async function userAuditHandler(
       AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE ||
       AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.DEACTIVATE
     ) {
-      let action
-      if (AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE) {
-        action = 'REACTIVATE'
-      } else {
-        action = 'DEACTIVATE'
-      }
-      const subjectPractitionerId = user.practitionerId
-      const practitionerId = systemAdminUser!.practitionerId
-
-      try {
-        await postUserActionToMetrics(
-          action,
-          request.headers.authorization,
-          remoteAddress,
-          userAgent,
-          practitionerId,
-          subjectPractitionerId
-        )
-      } catch (err) {
-        logger.error(err)
-      }
+      const operation =
+        AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE
+          ? ('user.REACTIVATE' as const)
+          : ('user.DEACTIVATE' as const)
+      recordUserAuditEvent(request.headers.authorization, {
+        operation,
+        requestData: {
+          subjectId: auditUserPayload.userId,
+          reason: auditUserPayload.reason,
+          comment: auditUserPayload.comment
+        },
+        responseSummary: {}
+      })
     }
     try {
       await User.update({ _id: user._id }, user)
