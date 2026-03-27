@@ -782,11 +782,19 @@ paths:
                         type: string
                     status:
                       type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+                      pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+                    createdBy:
+                      type: string
                   required:
                     - id
                     - name
                     - scopes
                     - status
+                    - createdAt
+                    - createdBy
                   additionalProperties: false
         "400": *a1
         "401": *a2
@@ -890,16 +898,20 @@ components:
           $ref: "#/components/schemas/DateCondition"
         updatedAt:
           $ref: "#/components/schemas/DateCondition"
-        legalStatuses.REGISTERED.acceptedAt:
-          $ref: "#/components/schemas/DateCondition"
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.DECLARED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateCondition"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - type: "null"
+        legalStatuses.REGISTERED.createdByRole:
+          $ref: "#/components/schemas/AnyOf"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
@@ -1031,6 +1043,19 @@ components:
       required:
         - type
         - location
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
     Exact:
       type: object
       properties:
@@ -1138,19 +1163,6 @@ components:
         - type
         - gte
         - lte
-    AnyOf:
-      type: object
-      properties:
-        type:
-          type: string
-          const: anyOf
-        terms:
-          type: array
-          items:
-            type: string
-      required:
-        - type
-        - terms
     error.BAD_REQUEST:
       title: Invalid input data error (400)
       description: The error information
@@ -1640,6 +1652,7 @@ components:
                             - ID_READER
                             - LOADER
                             - ALPHA_HIDDEN
+                            - USER_ROLE
                             - CUSTOM
                         label:
                           description: "
@@ -1877,6 +1890,7 @@ components:
                             - ID_READER
                             - LOADER
                             - ALPHA_HIDDEN
+                            - USER_ROLE
                             - CUSTOM
                         label:
                           description: "
@@ -7031,14 +7045,11 @@ components:
             configuration:
               type: object
               properties:
-                searchableResource:
+                locationTypes:
+                  description: Types of the locations that are available for selection.
                   type: array
                   items:
                     type: string
-                    enum:
-                      - locations
-                      - facilities
-                      - offices
                 allowedLocations:
                   description: Limits which location options are selectable depending on user
                     jurisdiction and location.
@@ -7089,8 +7100,6 @@ components:
                   required:
                     - $jurisdiction
                   additionalProperties: false
-              required:
-                - searchableResource
               additionalProperties: false
           required:
             - id
@@ -10530,6 +10539,165 @@ components:
             type:
               type: string
               const: ALPHA_HIDDEN
+            defaultValue:
+              type: string
+          required:
+            - id
+            - label
+            - type
+          additionalProperties: false
+        - description: A select dropdown that is automatically populated with available
+            user roles
+          type: object
+          properties:
+            id:
+              description: Unique identifier of the field.
+              type: string
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+            required:
+              description: Indicates whether the field is mandatory.
+              default: false
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+                  additionalProperties: false
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
+              const: USER_ROLE
             defaultValue:
               type: string
           required:
@@ -14592,16 +14760,20 @@ components:
           $ref: "#/components/schemas/DateConditionOutput"
         updatedAt:
           $ref: "#/components/schemas/DateConditionOutput"
-        legalStatuses.REGISTERED.acceptedAt:
-          $ref: "#/components/schemas/DateConditionOutput"
         legalStatuses.DECLARED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
             - type: "null"
+        legalStatuses.DECLARED.createdByRole:
+          $ref: "#/components/schemas/AnyOfOutput"
+        legalStatuses.REGISTERED.acceptedAt:
+          $ref: "#/components/schemas/DateConditionOutput"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/WithinOutput"
             - type: "null"
+        legalStatuses.REGISTERED.createdByRole:
+          $ref: "#/components/schemas/AnyOfOutput"
         legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/ExactOutput"
         createdAtLocation:
@@ -14740,6 +14912,20 @@ components:
         - type
         - location
       additionalProperties: false
+    AnyOfOutput:
+      type: object
+      properties:
+        type:
+          type: string
+          const: anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
+      additionalProperties: false
     ExactOutput:
       type: object
       properties:
@@ -14851,20 +15037,6 @@ components:
         - type
         - gte
         - lte
-      additionalProperties: false
-    AnyOfOutput:
-      type: object
-      properties:
-        type:
-          type: string
-          const: anyOf
-        terms:
-          type: array
-          items:
-            type: string
-      required:
-        - type
-        - terms
       additionalProperties: false
   securitySchemes:
     Authorization:
