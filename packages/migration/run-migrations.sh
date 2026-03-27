@@ -22,12 +22,12 @@ SCRIPT_PATH=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 export NODE_OPTIONS=--dns-result-order=ipv4first
 
-MIGRATE_LEGACRY_USERS=false
+MIGRATE_LEGACY_DATA=false
 
 for arg in "$@"; do
   case $arg in
-  --migrate-legacy-users)
-    MIGRATE_LEGACRY_USERS=true
+  --migrate-legacy-data)
+    MIGRATE_LEGACY_DATA=true
     ;;
   *)
     # Handle unknown option
@@ -94,29 +94,31 @@ run_pg_migrations() {
   restore_backups
 }
 
-# needed for both legacy users and events migrations
+# needed for both legacy data and events migrations
 export EVENTS_DB_USER="${EVENTS_DB_USER:-events_app}"
 
-# Mongo connection options — needed for FDW-based migrations (migrate-legacy-users and hearth-to-events)
-if [ -n "$MONGO_REPLICA_SET" ]; then
-  export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', replica_set '$MONGO_REPLICA_SET', authentication_database 'admin')"
-else
-  export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', authentication_database 'admin')"
-fi
+# migrate legacy data (users + hearth locations); requires superuser and MongoDB credentials
+if [ $MIGRATE_LEGACY_DATA = true ]; then
+  # Mongo connection options — needed for FDW-based migrations
+  if [ -n "$MONGO_REPLICA_SET" ]; then
+    export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', replica_set '$MONGO_REPLICA_SET', authentication_database 'admin')"
+  else
+    export MONGO_SERVER_OPTIONS="OPTIONS( address '${MONGO_HOST:-mongo1}', port '${MONGO_PORT:-27017}', authentication_database 'admin')"
+  fi
 
-if [ -n "$MONGO_USERNAME" ] && [ -n "$MONGO_PASSWORD" ]; then
-  export MONGO_USER_MAPPING_OPTIONS="OPTIONS( username '$MONGO_USERNAME', password '$MONGO_PASSWORD')"
-fi
+  if [ -n "$MONGO_USERNAME" ] && [ -n "$MONGO_PASSWORD" ]; then
+    export MONGO_USER_MAPPING_OPTIONS="OPTIONS( username '$MONGO_USERNAME', password '$MONGO_PASSWORD')"
+  fi
 
-# migrate legacy users
-if [ $MIGRATE_LEGACRY_USERS = true ]; then
+  export POPULATE_EXTERNAL_ID_BATCH_SIZE=1000
+
   export EVENTS_MIGRATION_USER="${EVENTS_MIGRATION_USER:-events_migrator}"
 
   run_pg_migrations \
-    "$SCRIPT_PATH/src/migrations/migrate-legacy-users" \
+    "$SCRIPT_PATH/src/migrations/migrate-legacy-data" \
     "$EVENTS_SUPERUSER_POSTGRES_URL" \
     "app" \
-    "pgmigrations_legacy_users"
+    "pgmigrations_legacy_data"
 
 fi
 
@@ -125,13 +127,6 @@ run_pg_migrations \
   "$SCRIPT_PATH/src/migrations/events" \
   "$EVENTS_POSTGRES_URL" \
   "app"
-
-# Run hearth-to-events migrations (superuser required for mongo_fdw)
-run_pg_migrations \
-  "$SCRIPT_PATH/src/migrations/hearth-to-events" \
-  "$EVENTS_SUPERUSER_POSTGRES_URL" \
-  "app" \
-  "pgmigrations_hearth_to_events"
 
 #openhim migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG
