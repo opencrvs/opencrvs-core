@@ -1,0 +1,2548 @@
+/* eslint-disable max-lines */
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+import { DateTime } from 'luxon'
+import { TRPCError } from '@trpc/server'
+import {
+  ActionStatus,
+  ActionType,
+  ActionUpdate,
+  AddressFieldUpdateValue,
+  AddressType,
+  createPrng,
+  encodeScope,
+  EventStatus,
+  generateActionDocument,
+  getCurrentEventState,
+  getMixedPath,
+  getUUID,
+  Location,
+  SCOPES,
+  TENNIS_CLUB_MEMBERSHIP,
+  TEST_SYSTEM_IANA_TIMEZONE
+} from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  createEvent,
+  createSystemTestClient,
+  createTestClient,
+  sanitizeForSnapshot,
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES,
+  UNSTABLE_EVENT_FIELDS
+} from '@events/tests/utils'
+
+test('User without any search scopes should not see any events', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Doe'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data)
+
+  await expect(
+    client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            eventType: TENNIS_CLUB_MEMBERSHIP,
+            data: {
+              'applicant.name.firstname': 'Unique'
+            }
+          }
+        ]
+      }
+    })
+  ).rejects.toThrowError('FORBIDDEN')
+})
+
+test('Returns empty list when no events match search criteria', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const initialData = {
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, {
+      declaration: initialData
+    })
+  )
+
+  const response = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.name': { type: 'exact', term: 'Johnson' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(response).toEqual({ total: 0, results: [] })
+})
+
+test('Throws when searching without payload', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  await expect(
+    client.event.search({
+      query: undefined
+    })
+  ).rejects.toMatchSnapshot()
+})
+
+test('Throws when searching by unrelated properties', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  await expect(
+    client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            completelyUnrelatedProperty: 'cat'
+          }
+        ]
+      }
+    })
+  ).rejects.toMatchSnapshot()
+})
+
+test('Throws when searching with empty clauses', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  await expect(
+    client.event.search({
+      query: {
+        type: 'and',
+        clauses: []
+      }
+    })
+  ).rejects.toMatchSnapshot()
+})
+
+test('Throws when date field is invalid', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  await expect(
+    client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            updatedAt: {
+              type: 'exact',
+              term: 'invalid-date'
+            }
+          }
+        ]
+      }
+    })
+  ).rejects.toMatchSnapshot()
+})
+
+test('Throws when one of the date range fields has invalid date', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  await expect(
+    client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            updatedAt: {
+              type: 'range',
+              gte: 'invalid-date',
+              lte: '2023-01-01'
+            }
+          }
+        ]
+      }
+    })
+  ).rejects.toMatchSnapshot()
+})
+
+test('Returns events based on the updatedAt column', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    SCOPES.RECORD_IMPORT,
+    ...TEST_USER_DEFAULT_SCOPES
+  ])
+
+  const oldEventCreatedAt = new Date(2022, 5, 6).toISOString()
+
+  const oldEventCreateAction = generateActionDocument({
+    configuration: tennisClubMembershipEvent,
+    action: ActionType.CREATE,
+    defaults: {
+      createdAt: oldEventCreatedAt,
+      createdBy: user.id,
+      createdAtLocation: user.primaryOfficeId
+    }
+  })
+
+  const oldEventDeclarationRequestActions = [
+    ActionType.DECLARE,
+    ActionType.REGISTER
+  ].map((action) =>
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action,
+      defaults: {
+        status: ActionStatus.Requested,
+        createdBy: user.id,
+        createdAtLocation: user.primaryOfficeId
+      }
+    })
+  )
+
+  const oldEventActions = [
+    oldEventCreateAction,
+    ...oldEventDeclarationRequestActions
+  ]
+
+  const oldDocumentWithoutAcceptedDeclaration = {
+    trackingId: getUUID(),
+    type: tennisClubMembershipEvent.id,
+    actions: oldEventActions,
+    createdAt: oldEventCreatedAt,
+    id: getUUID(),
+    updatedAt: new Date().toISOString()
+  }
+
+  await client.event.bulkImport([oldDocumentWithoutAcceptedDeclaration])
+
+  const newlyCreatedEvent = await client.event.create(generator.event.create())
+  const newlyCreatedEvent2 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(newlyCreatedEvent.id)
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(newlyCreatedEvent2.id)
+  )
+
+  const { results: oldEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          // updatedAt changes are triggered by certain status changes, in which CREATED is included.  See up-to-date definition for updatedAt in EventMetadata.ts.
+          updatedAt: {
+            type: 'range',
+            gte: '2022-01-01',
+            lte: '2023-01-01'
+          }
+        }
+      ]
+    }
+  })
+
+  expect(oldEvents).toHaveLength(1)
+  const [oldEvent] = oldEvents
+
+  // Only accepted action should update updatedAt timestamp
+  expect(oldEvent.createdAt).toEqual(oldEventCreatedAt)
+  expect(oldEvent.updatedAt).toEqual(oldEventCreatedAt)
+
+  expect(oldEvent).toEqual(
+    getCurrentEventState(
+      oldDocumentWithoutAcceptedDeclaration,
+      tennisClubMembershipEvent
+    )
+  )
+
+  const yesterday = DateTime.now()
+    .setZone(TEST_SYSTEM_IANA_TIMEZONE)
+    .startOf('day')
+    .toFormat('yyyy-MM-dd')
+
+  const today = DateTime.now()
+    .setZone(TEST_SYSTEM_IANA_TIMEZONE)
+    .endOf('day')
+    .toFormat('yyyy-MM-dd')
+
+  const { results: acceptedTodayResult } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          updatedAt: {
+            type: 'range',
+            gte: yesterday,
+            lte: today
+          }
+        }
+      ]
+    }
+  })
+
+  expect(acceptedTodayResult).toHaveLength(2)
+
+  acceptedTodayResult.forEach((event) => {
+    const updatedAtInMillis = +new Date(event.updatedAt)
+    expect(+new Date(event.createdAt)).toBeLessThan(updatedAtInMillis) // DECLARE action was accepted, so updatedAt should be greater than createdAt
+
+    expect(event.updatedAt).toEqual(
+      event.legalStatuses['DECLARED']?.acceptedAt ?? null
+    )
+
+    expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
+  })
+})
+
+test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    SCOPES.RECORD_IMPORT,
+    ...TEST_USER_DEFAULT_SCOPES
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request({
+    ...generator.event.actions.declare(event.id),
+    keepAssignment: true
+  })
+
+  await client.event.actions.register.request(
+    generator.event.actions.register(event.id)
+  )
+  const today = new Date().toISOString().split('T')[0]
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+
+  const { results: resultForToday } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          ['legalStatuses.REGISTERED.acceptedAt']: {
+            type: 'exact',
+            term: today
+          }
+        }
+      ]
+    }
+  })
+  const { results: resultForYesterday } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          ['legalStatuses.REGISTERED.acceptedAt']: {
+            type: 'exact',
+            term: yesterday
+          }
+        }
+      ]
+    }
+  })
+  const { results: resultForTomorrow } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          ['legalStatuses.REGISTERED.acceptedAt']: {
+            type: 'exact',
+            term: tomorrow
+          }
+        }
+      ]
+    }
+  })
+
+  expect(resultForToday).toHaveLength(1)
+  expect(resultForYesterday).toHaveLength(0)
+  expect(resultForTomorrow).toHaveLength(0)
+})
+
+test('Returns events that match the name field criteria of applicant', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {}
+    }
+  } satisfies ActionUpdate
+
+  const record2 = {
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {}
+    }
+  } satisfies ActionUpdate
+
+  const record3 = {
+    'applicant.name': {
+      firstname: 'Johnson', // different first name than previous records
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {}
+    }
+  } satisfies ActionUpdate
+
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
+  const event3 = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, {
+      declaration: record1
+    })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, {
+      declaration: record2
+    })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event3.id, {
+      declaration: record3
+    })
+  )
+
+  const { results: fetchedEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.name': { type: 'fuzzy', term: 'John' },
+            'applicant.dob': { type: 'exact', term: '2000-01-01' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(fetchedEvents).toHaveLength(2)
+})
+
+test('Should not match partially when searching with emails against name field', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'Matt',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, {
+      declaration: record1
+    })
+  )
+
+  const { results: fetchedEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          data: {
+            'applicant.name': { type: 'fuzzy', term: 'matt.doe@gmail.com' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(fetchedEvents).toHaveLength(0)
+})
+
+test('Returns events that match date of birth of applicant', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'Johnson',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const record2 = {
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-12', // different dob
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, {
+      declaration: record1
+    })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, {
+      declaration: record2
+    })
+  )
+
+  const { results: fetchedEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '2000-01-01' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(
+    getMixedPath(fetchedEvents[0].declaration, 'applicant.name.firstname')
+  ).toBe('Johnson')
+
+  // fetches first document as result
+  expect(fetchedEvents).toHaveLength(1)
+})
+
+test('Does not return events when searching with a similar but different date of birth', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'Johnson',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2024-11-11',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const record2 = {
+    'applicant.name': {
+      firstname: 'Johnson',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2024-12-12',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, {
+      declaration: record1
+    })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, {
+      declaration: record2
+    })
+  )
+
+  const { results: fetchedEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '1999-11-11' } // search with same day and month
+          }
+        }
+      ]
+    }
+  })
+  expect(fetchedEvents).toHaveLength(0)
+})
+
+test('Returns single document after creation', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Doe'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data)
+
+  const { results: response } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': {
+              type: 'exact',
+              term: '2000-11-11'
+            }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(response).toHaveLength(1)
+})
+
+test('Returns multiple documents after creation', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const event1 = await client.event.create(generator.event.create())
+  const data1 = generator.event.actions.declare(event1.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data1)
+
+  const event2 = await client.event.create(generator.event.create())
+  const data2 = generator.event.actions.declare(event2.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+  await client.event.actions.declare.request(data2)
+
+  const event3 = await client.event.create(generator.event.create())
+  const data3 = generator.event.actions.declare(event3.id, {
+    declaration: {
+      'applicant.dob': '2000-11-12',
+      'applicant.name': {
+        firstname: 'Different',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data3)
+
+  const { results: response } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': {
+              type: 'exact',
+              term: '2000-11-11'
+            }
+          }
+        }
+      ]
+    }
+  })
+
+  // event1 and event2 should be returned
+  expect(response).toHaveLength(2)
+})
+
+test('Search by legalStatuses.DECLARED.createdByRole', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Doe'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data)
+
+  const { results: response1 } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          'legalStatuses.DECLARED.createdByRole': {
+            type: 'anyOf',
+            terms: ['REGISTRATION_AGENT']
+          }
+        }
+      ]
+    }
+  })
+
+  expect(response1).toHaveLength(1)
+
+  const { results: response2 } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          'legalStatuses.DECLARED.createdByRole': {
+            type: 'anyOf',
+            terms: ['OTHER_ROLE']
+          }
+        }
+      ]
+    }
+  })
+  expect(response2).toHaveLength(0) // no documents should be returned
+})
+
+test('Returns correctly based on registration location even when a parent administrative area level is used for searching', async () => {
+  const { user, generator, seed, locations } = await setupTestCase()
+
+  const locationRng = createPrng(842)
+  const administrativeArea = {
+    ...generator.administrativeAreas.set(1, locationRng)[0],
+    name: 'Administrative Area'
+  }
+
+  const newLocations: Location[] = [
+    {
+      ...locations[0],
+      id: user.primaryOfficeId,
+      name: 'Child location',
+      administrativeAreaId: administrativeArea.id
+    }
+  ]
+
+  await seed.administrativeAreas([administrativeArea])
+  await seed.locations(newLocations)
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+  await client.event.actions.declare.request(data)
+
+  // search with administrative area id
+  const { results: response } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          'legalStatuses.DECLARED.createdAtLocation': {
+            type: 'within',
+            location: administrativeArea.id
+          }
+        }
+      ]
+    }
+  })
+  expect(response).toHaveLength(1)
+})
+
+test('Search by legalStatuses.DECLARED.createdAtLocation when a redeclaration action is present', async () => {
+  const { user, generator, locations } = await setupTestCase(8918)
+
+  const client = createTestClient(user)
+
+  // 1. Let's first declare the event in the original user location
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+  await client.event.actions.declare.request(data)
+
+  // using different location id for a different user
+  const OTHER_OFFICE_ID = locations[1].id
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(8919)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: OTHER_OFFICE_ID
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  const form = {
+    // Applicant dob updated
+    'applicant.dob': '2001-11-11',
+    'applicant.name': {
+      firstname: 'Unique',
+      surname: 'Lastname'
+    },
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  await otherClient.event.actions.assignment.assign(
+    otherGen.event.actions.assign(event.id, {
+      assignedTo: otherUser.id
+    })
+  )
+
+  // 2. Let's edit and redeclare event in other users location
+  const declaration = otherGen.event.actions.edit(event.id, {
+    declaration: form,
+    keepAssignment: true
+  })
+
+  await otherClient.event.actions.edit.request(declaration)
+
+  await otherClient.event.actions.declare.request(
+    otherGen.event.actions.declare(event.id, {
+      declaration: form
+    })
+  )
+
+  // 3. We should be able to search by the other users location
+  const { results: response } = await otherClient.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          'legalStatuses.DECLARED.createdAtLocation': {
+            type: 'within',
+            location: OTHER_OFFICE_ID
+          }
+        }
+      ]
+    }
+  })
+  expect(response).toHaveLength(1)
+})
+
+test('Returns no documents when search params are not matched', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const event1 = await client.event.create(generator.event.create())
+  const data1 = generator.event.actions.declare(event1.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data1)
+
+  const event2 = await client.event.create(generator.event.create())
+  const data2 = generator.event.actions.declare(event2.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+  await client.event.actions.declare.request(data2)
+
+  const event3 = await client.event.create(generator.event.create())
+  const data3 = generator.event.actions.declare(event3.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Different',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data3)
+
+  const { results: response } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.name': {
+              type: 'exact',
+              term: 'Nothing Matching'
+            }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(response).toHaveLength(0)
+})
+
+test('Throws error when search params are not matching proper schema', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data)
+
+  await expect(
+    client.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            eventType: TENNIS_CLUB_MEMBERSHIP,
+            data: {
+              'applicant.firstname': 'Johnny' // invalid schema
+            }
+          }
+        ]
+      }
+    })
+  ).rejects.toThrowError()
+})
+
+test('Returns events assigned to a specific user', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const WindmillVillage = {
+    country: 'FAR',
+    addressType: AddressType.DOMESTIC,
+    administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+    streetLevelDetails: {
+      state: 'RURAL',
+      district2: 'Windmill village, Kingdom of Goa'
+    }
+  } satisfies AddressFieldUpdateValue
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'Ace',
+      surname: 'Portgues D'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': WindmillVillage
+  }
+
+  const record2 = {
+    'applicant.name': {
+      firstname: 'Luffy',
+      surname: 'Monkey D'
+    },
+    'applicant.dob': '2002-02-03',
+    'recommender.none': true,
+    'applicant.address': WindmillVillage
+  }
+
+  const record3 = {
+    'applicant.name': {
+      firstname: 'Sabo',
+      surname: 'Archipelago D'
+    },
+    'applicant.dob': '2001-06-07',
+    'recommender.none': true,
+    'applicant.address': WindmillVillage
+  }
+
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
+  const event3 = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, { declaration: record1 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, {
+      declaration: record2
+    })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event3.id, {
+      declaration: record3
+    })
+  )
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event2.id, {
+      assignedTo: user.id
+    })
+  )
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event3.id, {
+      assignedTo: user.id
+    })
+  )
+
+  const { results: fetchedEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          assignedTo: { type: 'exact', term: user.id }
+        }
+      ]
+    }
+  })
+
+  expect(fetchedEvents).toHaveLength(2)
+  expect(fetchedEvents.every(({ assignedTo }) => assignedTo === user.id)).toBe(
+    true
+  )
+})
+
+test('Returns relevant events in right order', async () => {
+  const { user, generator } = await setupTestCase(4432)
+
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  // Until we have a way to reindex from mongodb, we create events through API.
+  // Since it is expensive and time consuming, we will run multiple checks against the same set of events.
+  const actionCombinations = [
+    [ActionType.DECLARE],
+    [ActionType.DECLARE, ActionType.REJECT],
+    [ActionType.DECLARE, ActionType.ARCHIVE],
+    [ActionType.DECLARE, ActionType.REGISTER],
+    [ActionType.DECLARE, ActionType.REGISTER, ActionType.PRINT_CERTIFICATE]
+  ]
+
+  // 1. Create events with all combinations of actions
+  for (const actionCombination of actionCombinations) {
+    await createEvent(client, generator, actionCombination)
+  }
+
+  // 2. Ensure we return only events that match the action type (1 each)
+  const { results: declaredEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          status: { type: 'exact', term: EventStatus.enum.DECLARED }
+        }
+      ]
+    }
+  })
+
+  expect(declaredEvents).toHaveLength(2)
+  expect(
+    sanitizeForSnapshot(declaredEvents, UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+
+  // 3. Search by past timestamp, which should not match to any event.
+  const { results: eventsCreatedBeforeTests } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          createdAt: {
+            eventType: TENNIS_CLUB_MEMBERSHIP,
+            type: 'range',
+            gte: '2020-01-01',
+            lte: '2022-01-01'
+          }
+        }
+      ]
+    }
+  })
+
+  expect(eventsCreatedBeforeTests).toHaveLength(0)
+
+  // 4. Search by future timestamp, which should match to all events.
+  const { results: eventsCreatedToday } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          createdAt: {
+            eventType: TENNIS_CLUB_MEMBERSHIP,
+            type: 'exact',
+            term: new Date().toISOString().split('T')[0] // today's date. Let's have something more sophisticated later.
+          }
+        }
+      ]
+    }
+  })
+
+  expect(eventsCreatedToday).toHaveLength(actionCombinations.length)
+
+  // The score for all the events created today are the same so the
+  // order of the events returned by the search is a bit flaky. I'm
+  // commenting this out until we incorporate the sorting functionality
+
+  // const eventStatuses = eventsCreatedToday.map((event) => event.status)
+
+  // 5. Order of statuses should stay constant. Whatever that is.
+  // expect(eventStatuses).toMatchSnapshot()
+
+  // 6. Search by partial name
+  const partialName = 'Sara'
+  const { results: eventsByName } = await client.event.search({
+    query: {
+      type: 'or',
+      clauses: [
+        { data: { 'applicant.name': { type: 'fuzzy', term: partialName } } },
+        { data: { 'recommender.name': { type: 'fuzzy', term: partialName } } }
+      ]
+    }
+  })
+
+  expect(eventsByName).toHaveLength(2)
+  const names = eventsByName.map((event) => event.declaration['applicant.name'])
+
+  expect(names).toEqual(
+    expect.arrayContaining([
+      // These names are expected to be in the events created above based on the prng. The result of the search does not seem fuzzy.
+      { firstname: 'Sara', surname: 'Garcia' },
+      { firstname: 'Zara', surname: 'Sarajanen' }
+    ])
+  )
+})
+
+test('User with "location" scope only sees events from their primary office', async () => {
+  const { user, generator, locations } = await setupTestCase(5541)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  const ownOfficeId = user.primaryOfficeId
+
+  await createEvent(client, generator, [ActionType.DECLARE])
+
+  const OTHER_OFFICE_ID = locations[1].id // using different location id for a different user
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: OTHER_OFFICE_ID
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  // Create an event from another office
+  await createEvent(otherClient, otherGen, [ActionType.DECLARE])
+
+  // Test user should only see their own event
+  const { results: events } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  expect(events).toHaveLength(1)
+  expect(events[0].updatedAtLocation).toBe(ownOfficeId)
+  expect(
+    sanitizeForSnapshot(events[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+})
+
+test('User with "location" scope only sees events created by system user to their primary office', async () => {
+  const { user, generator, locations } = await setupTestCase(5541)
+
+  const systemClient = createSystemTestClient('test-system', [
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.notify',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  const ownOfficeId = user.primaryOfficeId
+
+  const ownLocationEvent = await systemClient.event.create({
+    ...generator.event.create(),
+    createdAtLocation: ownOfficeId
+  })
+  const otherLocationEvent = await systemClient.event.create({
+    ...generator.event.create(),
+    createdAtLocation: locations[1].id
+  })
+
+  const userClient = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  await systemClient.event.actions.notify.request({
+    ...generator.event.actions.notify(ownLocationEvent.id),
+    createdAtLocation: ownOfficeId
+  })
+
+  await systemClient.event.actions.notify.request({
+    ...generator.event.actions.notify(otherLocationEvent.id),
+    createdAtLocation: locations[1].id
+  })
+
+  // Test user should only see event created in their own location
+  const { results: events } = await userClient.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  expect(events).toHaveLength(1)
+  expect(events[0].updatedAtLocation).toBe(ownOfficeId)
+  expect(
+    sanitizeForSnapshot(events[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+})
+
+test('User without an event in the scope should not be able to view events of that type', async () => {
+  const { user, generator, locations } = await setupTestCase(5541)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: ['birth'],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  await createEvent(client, generator, [ActionType.DECLARE])
+
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: locations[1].id // using different location id for a different user
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  // Create an event from another office
+  await createEvent(otherClient, otherGen, [ActionType.DECLARE])
+
+  // Test user should only see their own event
+  const { results: events } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  expect(events).toHaveLength(0)
+})
+
+test('User with "location" scope can see events from other offices based on their scopes', async () => {
+  const { user: userA, locations } = await setupTestCase(6003)
+
+  const clientA = createTestClient(userA, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  const { user: userB, generator: generatorB } = await setupTestCase(6004)
+  const userBOverride = {
+    ...userB,
+    primaryOfficeId: locations[1].id // using different location id for a different user
+  }
+
+  const clientB = createTestClient(userBOverride, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  // Only user B creates event
+  await createEvent(clientB, generatorB, [ActionType.DECLARE])
+
+  // user A should see nothing
+  const { results: eventsA } = await clientA.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  expect(eventsA).toHaveLength(0)
+
+  const { results: eventsB } = await clientB.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  // user B should see the created event
+  expect(eventsB).toHaveLength(1)
+  expect(eventsB[0].updatedAtLocation).toBe(userBOverride.primaryOfficeId)
+  expect(
+    sanitizeForSnapshot(eventsB[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+})
+
+test('Does not return events of tennis club membership when scopes are not available', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: ['birth']
+      }
+    }),
+
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  await createEvent(client, generator, [ActionType.DECLARE])
+
+  const { results: resultEvent } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  expect(resultEvent).toHaveLength(0)
+})
+
+test('User with "all" scope sees events from all offices', async () => {
+  const { user: userA, generator: generatorA } = await setupTestCase(6005)
+  const clientA = createTestClient(userA, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  const { user: userB, generator: generatorB } = await setupTestCase(6006)
+  const clientB = createTestClient(userB, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  await createEvent(clientA, generatorA, [ActionType.DECLARE])
+  await createEvent(clientB, generatorB, [ActionType.DECLARE])
+
+  const { results: events } = await clientA.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  expect(events).toHaveLength(2)
+  const locations = events.map((e) => e.updatedAtLocation)
+  expect(locations).toContain(userA.primaryOfficeId)
+  expect(locations).toContain(userB.primaryOfficeId)
+})
+
+test('User with both "all" and "my-jurisdiction" scopes sees all matching events', async () => {
+  const { user, generator } = await setupTestCase(6007)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: ['birth'],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  const { generator: tennisGen, user: otherUser } = await setupTestCase(6008)
+  const otherClient = createTestClient(otherUser, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  await createEvent(client, generator, [ActionType.DECLARE])
+  await createEvent(otherClient, tennisGen, [ActionType.DECLARE])
+
+  const { results: events } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  expect(events.length).toBe(2)
+})
+
+test('User only sees tennis club membership events within their jurisdiction', async () => {
+  const { user, generator, locations } = await setupTestCase(6011)
+  const ownOfficeId = user.primaryOfficeId
+
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
+  ])
+
+  // Create 2 events in user's own jurisdiction
+  await createEvent(client, generator, [ActionType.DECLARE])
+  await createEvent(client, generator, [ActionType.DECLARE])
+
+  const otherOfficeId = locations[1].id // using different location id for a different user
+  const userOtherOffice = { ...user, primaryOfficeId: otherOfficeId }
+  const clientOtherOffice = createTestClient(userOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
+  ])
+
+  await createEvent(clientOtherOffice, generator, [ActionType.DECLARE])
+
+  // User should only see the 2 events from their own office
+  const { results: events } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+
+  expect(events).toHaveLength(2)
+  for (const event of events) {
+    expect(event.updatedAtLocation).toBe(ownOfficeId)
+  }
+  expect(
+    events.map((e) => sanitizeForSnapshot(e, UNSTABLE_EVENT_FIELDS))
+  ).toMatchSnapshot()
+
+  // User should only see the 3 events from their all offices
+  const { results: eventsOthersOffice } = await clientOtherOffice.event.search({
+    query: {
+      type: 'and',
+      clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+    }
+  })
+  expect(eventsOthersOffice).toHaveLength(3)
+  expect(
+    eventsOthersOffice.map((e) => sanitizeForSnapshot(e, UNSTABLE_EVENT_FIELDS))
+  ).toMatchSnapshot()
+})
+
+test('Returns paginated results when limit and size parameters are provided', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const totalNumberOfRecords = 5
+
+  const events = []
+  for (let i = 0; i < totalNumberOfRecords; i++) {
+    const event = await client.event.create(generator.event.create())
+    const data = generator.event.actions.declare(event.id, {
+      declaration: {
+        'applicant.dob': '2000-01-01',
+        'applicant.name': {
+          firstname: `User${i}`,
+          surname: 'Doe'
+        },
+        'recommender.none': true,
+        'applicant.address': {
+          country: 'FAR',
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+          streetLevelDetails: {
+            state: 'state',
+            district2: 'district2'
+          }
+        }
+      }
+    })
+    await client.event.actions.declare.request(data)
+    events.push(event)
+  }
+
+  // Test first page with limit 2
+  const { results: firstPage, total: total } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '2000-01-01' }
+          }
+        }
+      ]
+    },
+    limit: 2,
+    offset: 0
+  })
+
+  expect(firstPage).toHaveLength(2)
+  expect(total).toEqual(totalNumberOfRecords)
+
+  // Test second page with limit 2
+  const { results: secondPage } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '2000-01-01' }
+          }
+        }
+      ]
+    },
+    limit: 2,
+    offset: 2
+  })
+
+  expect(secondPage).toHaveLength(2)
+
+  // Test third page with limit 2 (should have 1 remaining)
+  const { results: thirdPage } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '2000-01-01' }
+          }
+        }
+      ]
+    },
+    limit: 2,
+    offset: 4
+  })
+
+  expect(thirdPage).toHaveLength(1)
+
+  // Verify no overlap between pages
+  const firstPageIds = firstPage.map((e) => e.id)
+  const secondPageIds = secondPage.map((e) => e.id)
+  const thirdPageIds = thirdPage.map((e) => e.id)
+
+  expect(firstPageIds).not.toEqual(expect.arrayContaining(secondPageIds))
+  expect(firstPageIds).not.toEqual(expect.arrayContaining(thirdPageIds))
+  expect(secondPageIds).not.toEqual(expect.arrayContaining(thirdPageIds))
+
+  // Test with larger limit than total results
+  const { results: allResults } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '2000-01-01' }
+          }
+        }
+      ]
+    },
+    limit: 10,
+    offset: 0
+  })
+
+  expect(allResults).toHaveLength(totalNumberOfRecords)
+})
+
+test('System integration with record search scope is allowed to search any records', async () => {
+  const { user, generator, locations } = await setupTestCase(6012)
+  const client = createTestClient(user)
+
+  await createEvent(client, generator, [ActionType.DECLARE])
+
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(6013)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: locations[1].id // using different location id for a different user
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice)
+
+  // Create an event from another office
+  await createEvent(otherClient, otherGen, [ActionType.DECLARE])
+
+  const recordSearchClient = createSystemTestClient('test-system', [
+    encodeScope({
+      type: 'record.search'
+    })
+  ])
+  const { results } = await recordSearchClient.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP
+        }
+      ]
+    },
+    limit: 10,
+    offset: 0
+  })
+
+  expect(results).toHaveLength(2)
+})
+
+test('System integration without record search scope is not allowed to search any records', async () => {
+  const { user, generator } = await setupTestCase(6012)
+  const client = createTestClient(user)
+
+  await createEvent(client, generator, [ActionType.DECLARE])
+
+  const recordSearchClient = createSystemTestClient('test-system')
+
+  await expect(
+    recordSearchClient.event.search({
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            eventType: TENNIS_CLUB_MEMBERSHIP
+          }
+        ]
+      },
+      limit: 10,
+      offset: 0
+    })
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test('Returns events using nested AND/OR query combinations', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'Bob',
+      surname: 'Smith'
+    },
+    'applicant.dob': '1985-01-01',
+    'applicant.email': 'bob.smith@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const record2 = {
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '1985-01-01',
+    'applicant.email': 'bob@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const record3 = {
+    'applicant.name': {
+      firstname: 'Bob',
+      surname: 'Johnson'
+    },
+    'applicant.dob': '1990-01-01',
+    'applicant.email': 'different@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const record4 = {
+    'applicant.name': {
+      firstname: 'Alice',
+      surname: 'Smith'
+    },
+    'applicant.dob': '1985-01-01',
+    'applicant.email': 'alice@example.com',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
+  const event3 = await client.event.create(generator.event.create())
+  const event4 = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, { declaration: record1 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, { declaration: record2 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event3.id, { declaration: record3 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event4.id, { declaration: record4 })
+  )
+
+  // Test nested query: { applicant.name: "Bob" OR applicant.email: "bob@example.com" } AND { applicant.dob: "1985-01-01" }
+  const { results: fetchedEvents } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          type: 'or',
+          clauses: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.name': { type: 'fuzzy', term: 'Bob' }
+              }
+            },
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.email': { type: 'exact', term: 'bob@example.com' }
+              }
+            }
+          ]
+        },
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.dob': { type: 'exact', term: '1985-01-01' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(fetchedEvents.length).toBeGreaterThanOrEqual(2)
+
+  const matchingFirstnames = fetchedEvents.map((event) =>
+    getMixedPath(event.declaration, 'applicant.name.firstname')
+  )
+  const matchingEmails = fetchedEvents.map((event) =>
+    getMixedPath(event.declaration, 'applicant.email')
+  )
+
+  // Should match record1 (Bob with dob 1985-01-01) and record2 (John with bob@example.com and dob 1985-01-01)
+  expect(matchingFirstnames).toContain('Bob')
+  expect(matchingEmails).toContain('bob@example.com')
+})
+
+test('Search response contains single UUIDs for location fields, not arrays', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+  const initialData = {
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+      streetLevelDetails: {
+        state: 'state',
+        district2: 'district2'
+      }
+    }
+  } satisfies ActionUpdate
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, {
+      declaration: initialData
+    })
+  )
+
+  const { results } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          data: {
+            'applicant.name': { type: 'fuzzy', term: 'John' }
+          }
+        }
+      ]
+    }
+  })
+
+  expect(results).toHaveLength(1)
+  const result = results[0]
+
+  // --- ASSERTIONS ---
+
+  // createdAtLocation must be a string UUID
+  expect(typeof result.createdAtLocation).toBe('string')
+  expect(result.createdAtLocation).toMatch(/^[0-9a-fA-F-]{36}$/)
+
+  // updatedAtLocation must be a string UUID (or null if nothing updated)
+  if (result.updatedAtLocation) {
+    expect(typeof result.updatedAtLocation).toBe('string')
+    expect(result.updatedAtLocation).toMatch(/^[0-9a-fA-F-]{36}$/)
+  }
+})
