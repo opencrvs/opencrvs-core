@@ -19,6 +19,7 @@ A composite field type (`FIELD_GROUP`) that groups related child fields into a s
 }
 ```
 - Support for conditional actions "ENABLE" and "SHOW" in SELECT field options to allow the options to be hidden/disabled conditionally.
+- `COUNTRY` field now supports `optionOverrides` to conditionally hide or disable specific country options using "SHOW" and "ENABLE" conditionals.
 
 ## 1.9.11
 
