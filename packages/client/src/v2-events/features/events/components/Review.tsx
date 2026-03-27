@@ -339,59 +339,61 @@ function FormReview({
                 name={'Accordion_' + page.id}
               >
                 <ListReview id={'Section_' + page.id}>
-                  {displayedFields.map(
-                    ({
+                  {displayedFields.map((field) => {
+                    const {
                       id,
                       type,
                       label,
                       errorDisplay,
                       valueDisplay,
                       uncorrectable
-                    }) => {
-                      const shouldHideEditLink =
-                        readonlyMode ||
-                        (isCorrection && uncorrectable) ||
-                        isReviewCorrection
+                    } = field
+                    const shouldHideEditLink =
+                      readonlyMode ||
+                      (isCorrection && uncorrectable) ||
+                      isReviewCorrection
 
-                      const showSectionHeading = type === 'PARAGRAPH'
+                    const showSectionHeading = type === FieldType.TITLE
 
-                      return (
-                        <>
-                          {showSectionHeading ? (
-                            <ListReview.Header
-                              label={intl.formatMessage(label)}
-                              value={null}
-                            />
-                          ) : (
-                            <ListReview.Row
-                              key={id}
-                              actions={
-                                !shouldHideEditLink && (
-                                  <Link
-                                    data-testid={`change-button-${id}`}
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      onEdit({
-                                        pageId: page.id,
-                                        fieldId: id
-                                      })
-                                    }}
-                                  >
-                                    {intl.formatMessage(
-                                      reviewMessages.changeButton
-                                    )}
-                                  </Link>
-                                )
-                              }
-                              id={id}
-                              label={intl.formatMessage(label)}
-                              value={errorDisplay || valueDisplay}
-                            />
-                          )}
-                        </>
-                      )
-                    }
-                  )}
+                    return (
+                      <>
+                        {showSectionHeading ? (
+                          <ListReview.Header
+                            fontVariant={
+                              field.configuration.styles?.fontVariant
+                            }
+                            label={intl.formatMessage(label)}
+                            value={null}
+                          />
+                        ) : (
+                          <ListReview.Row
+                            key={id}
+                            actions={
+                              !shouldHideEditLink && (
+                                <Link
+                                  data-testid={`change-button-${id}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    onEdit({
+                                      pageId: page.id,
+                                      fieldId: id
+                                    })
+                                  }}
+                                >
+                                  {intl.formatMessage(
+                                    reviewMessages.changeButton
+                                  )}
+                                </Link>
+                              )
+                            }
+                            id={id}
+                            label={intl.formatMessage(label)}
+                            value={errorDisplay || valueDisplay}
+                          />
+                        )}
+                      </>
+                    )
+                  })}
                 </ListReview>
               </Accordion>
             </DeclarationDataContainer>
