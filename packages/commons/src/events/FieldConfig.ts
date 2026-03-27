@@ -651,13 +651,26 @@ export const DefaultAddressFieldValue = DomesticAddressFieldValue.extend({
 
 export type DefaultAddressFieldValue = z.infer<typeof DefaultAddressFieldValue>
 
+const DomesticAddressField = BaseField.pick({
+  id: true,
+  required: true,
+  conditionals: true
+})
+  .transform((config) => ({
+    ...config,
+    type:
+      config.id === 'country'
+        ? FieldType.COUNTRY
+        : FieldType.ADMINISTRATIVE_AREA
+  }))
+  .openapi({ effectType: 'input', type: 'object' })
+
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
   configuration: z
     .object({
       lineSeparator: z.string().optional(),
-      fields: z.array(z.enum(['country', 'administrativeArea'])).optional(),
-      administrativeLevels: z.array(z.string()).optional(),
+      fields: z.array(DomesticAddressField).optional(),
       streetAddressForm: z
         .array(
           z.object({

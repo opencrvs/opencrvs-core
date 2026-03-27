@@ -2,9 +2,45 @@
 
 ## 1.9.12
 
+### Improvements
+
+- More expressive `ADDRESS` field configuration
+
+The `fields` array in `ADDRESS` field configuration now accepts a field-override object, giving you per-level control over `required` and `conditionals`.
+
+Previously only a fixed set of string values (`'country'` / `'administrativeArea'`) were accepted. The separate `administrativeLevels` array has been removed in favor of this unified `fields` array.
+
+```ts
+{
+  id: 'applicant.address',
+  type: FieldType.ADDRESS,
+  configuration: {
+    fields: [
+      { id: 'country' },           // shorthand – uses defaults
+      {
+        id: 'province',
+        required: true,
+        conditionals: []
+      },
+      {
+        id: 'district',
+        required: false,   // override required per level
+        conditionals: [{ type: ConditionalType.SHOW, conditional: ... }]
+      }
+    ]
+  }
+}
+```
+> [!IMPORTANT]
+> The `id` of the object must match the administrative hierarchy id defined in `applicationConfig`.
+
+- The `ADMINISTRATIVE_AREA` field's `configuration.partOf` now uses the standard typed `FieldReference` (produced by `field(...)`) instead of the previous ad-hoc `{ $declaration: string }` shape, and its `defaultValue` now accepts `user(...)` references in addition to plain strings.
+
 ### New features
 
-A composite field type (`FIELD_GROUP`) that groups related child fields into a single unit with a shared label, conditionals, and validation.
+- Support for conditional actions "ENABLE" and "SHOW" in SELECT field options to allow the options to be hidden/disabled conditionally.
+
+- A composite field type (`FIELD_GROUP`) that groups related child fields into a single unit with a shared label, conditionals, and validation.
 
 **Structure:**
 ```typescript
@@ -18,7 +54,7 @@ A composite field type (`FIELD_GROUP`) that groups related child fields into a s
   ]
 }
 ```
-- Support for conditional actions "ENABLE" and "SHOW" in SELECT field options to allow the options to be hidden/disabled conditionally.
+N.B. Support for `DISPLAY_ON_REVIEW` conditionals in nested fields has not been implemented yet.
 
 ## 1.9.11
 
