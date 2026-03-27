@@ -34,11 +34,7 @@ import {
   findLocalEventDocument,
   findLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
-import {
-  AppRouter,
-  queryClient,
-  trpcOptionsProxy
-} from '@client/v2-events/trpc'
+import { AppRouter, queryClient } from '@client/v2-events/trpc'
 import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
 import { prefetchPotentialDuplicates } from '../../actions/dedup/getDuplicates'
 

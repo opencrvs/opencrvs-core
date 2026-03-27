@@ -15,7 +15,7 @@ import {
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
 import { logger } from '@opencrvs/commons'
-import { IPoints } from '@metrics/features/registration'
+
 import fetch from 'node-fetch'
 
 export const influx = new Influx.InfluxDB({
@@ -175,7 +175,7 @@ export const influx = new Influx.InfluxDB({
   ]
 })
 
-export const writePoints = (points: IPoints[]) => {
+export const writePoints = (points: any[]) => {
   return influx.writePoints(points).catch((err: Error) => {
     logger.error(`Error saving data to InfluxDB! ${err.stack}`)
     throw err

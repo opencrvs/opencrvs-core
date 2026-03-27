@@ -8,25 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import {
-  TopAlignedListViewItemSimplified,
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
-} from '@client/views/Settings/items/components'
-import { useIntl, FormattedMessage } from 'react-intl'
 import { Avatar } from '@client/components/Avatar'
-import { userMessages, buttonMessages } from '@client/i18n/messages'
-import { ImageLoader } from '@client/views/Settings/ImageLoader'
+import { buttonMessages, userMessages } from '@client/i18n/messages'
 import { IImage } from '@client/utils/imageUtils'
+import { useUserName } from '@client/utils/userUtils'
+import { useCurrentUser } from '@client/v2-events/hooks/useCurrentUser'
 import { AvatarChangeModal } from '@client/views/Settings/AvatarChangeModal'
+import { ImageLoader } from '@client/views/Settings/ImageLoader'
+import {
+  DynamicHeightLinkButton,
+  LabelContainer,
+  TopAlignedListViewItemSimplified,
+  ValueContainer
+} from '@client/views/Settings/items/components'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { useSelector, useDispatch } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { UserDetails, useUserName } from '@client/utils/userUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { modifyUserDetails } from '@client/profile/profileActions'
+import * as React from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 export function ProfileImage() {
   const intl = useIntl()
@@ -55,25 +52,11 @@ export function ProfileImage() {
 
   const englishName = useUserName()
 
-  const userDetails = useSelector<IStoreState, UserDetails | null>(
-    getUserDetails
-  )
-  const dispatch = useDispatch()
+  const { currentUser: userDetails } = useCurrentUser()
 
-  const changeAvatar = React.useCallback(
-    (avatar: IImage) => {
-      if (userDetails) {
-        setImageUploading(false)
-        dispatch(
-          modifyUserDetails({
-            ...userDetails,
-            avatar
-          })
-        )
-      }
-    },
-    [dispatch, userDetails]
-  )
+  const changeAvatar = React.useCallback((avatar: string) => {
+    setImageUploading(false)
+  }, [])
 
   const handleImageLoaded = (image: IImage) => {
     setImage(image)

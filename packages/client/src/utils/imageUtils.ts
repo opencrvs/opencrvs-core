@@ -115,10 +115,16 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
   // paste generated image at the top left corner
   ctx.putImageData(data, 0, 0)
 
-  return {
-    type: 'image/jpeg',
-    data: canvas.toDataURL('image/jpeg')
-  }
+  const file = await new Promise<File | null>((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        resolve(null)
+        return
+      }
+      resolve(new File([blob], 'image.jpeg', { type: 'image/jpeg' }));
+    });
+  });
+  return file
 }
 
 export async function getCroppedImageWithTargetSize(

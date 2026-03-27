@@ -21,6 +21,4 @@ export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 export const DOCUMENTS_URL = env.DOCUMENTS_URL
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const SENTRY_DSN = env.SENTRY_DSN
-export const QA_ENV = env.QA_ENV
-export const FHIR_URL = env.FHIR_URL
 export const METRICS_URL = env.METRICS_URL

@@ -27,13 +27,16 @@ interface IProps {
 export function ChangeEmailModal({ show, onClose, onSuccess }: IProps) {
   const [view, setView] = React.useState(VIEW_TYPE.CHANGE_EMAIL)
   const [emailAddress, setEmailAddress] = React.useState(EMPTY_STRING)
-  const onSuccessChangeEmail = (emailAddress: string) => {
+  const [nonce, setNonce] = React.useState(EMPTY_STRING)
+  const onSuccessChangeEmail = (emailAddress: string, nonceValue: string) => {
     setEmailAddress(emailAddress)
+    setNonce(nonceValue)
     setView(VIEW_TYPE.VERIFY_NUMBER)
   }
   const restoreState = () => {
     setView(VIEW_TYPE.CHANGE_EMAIL)
     setEmailAddress(EMPTY_STRING)
+    setNonce(EMPTY_STRING)
   }
   React.useEffect(() => {
     if (!show) {
@@ -52,6 +55,7 @@ export function ChangeEmailModal({ show, onClose, onSuccess }: IProps) {
         show={show && view === VIEW_TYPE.VERIFY_NUMBER}
         onSuccess={onSuccess}
         onClose={onClose}
+        nonce={nonce}
         data={{ email: emailAddress }}
       />
     </>

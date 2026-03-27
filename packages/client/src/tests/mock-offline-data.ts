@@ -15,7 +15,6 @@ import type {
   Facility,
   IForms
 } from '@client/offline/reducer'
-import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import {
   CertificateConfiguration,
   ICertificateData
@@ -27,27 +26,6 @@ import templates from './templates.json'
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
-const systems: System[] = [
-  {
-    name: 'Health Integration 1',
-    status: SystemStatus.Active,
-    type: SystemType.Health,
-    _id: '63998b6efbd0f8bad7708033',
-    shaSecret: 'c37d4f5d-4c12-4016-9c7e-d810d2f871df',
-    clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
-    settings: {}
-  },
-  {
-    _id: '63a01ffe607915acacc2f553',
-    clientId: '5923118f-c633-40c6-ba97-c3e3cbb412aa',
-    name: 'Health Deactivation',
-    shaSecret: '2569a6d4-1f38-4f53-8724-1bfcba8262f6',
-    status: SystemStatus.Deactivated,
-    type: SystemType.Health,
-    settings: {},
-    __typename: 'System'
-  }
-]
 const facilities: Record<string, Facility> = {
   '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
     id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
@@ -455,6 +433,14 @@ export const mockOfflineData = {
           defaultMessage: 'District',
           description: 'Label for district in address'
         }
+      },
+      {
+        id: 'village',
+        label: {
+          id: 'field.address.village.label',
+          defaultMessage: 'Village',
+          description: 'Label for village in address'
+        }
       }
     ],
     HEALTH_FACILITY_FILTER: 'DISTRICT',
@@ -486,8 +472,7 @@ export const mockOfflineData = {
       file: `data:image;base64,${validImageB64String}`
     },
     PHONE_NUMBER_PATTERN: '^01[1-9][0-9]{8}$'
-  },
-  systems
+  }
 }
 
 export const mockOfflineLocationsWithHierarchy: {

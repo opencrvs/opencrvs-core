@@ -24,7 +24,7 @@ import {
   UserContext
 } from '@opencrvs/commons'
 export { SystemContext, UserContext }
-import { getUser } from './service/users/api'
+import { getLegacyUser } from './service/users/api'
 import { getLocationById } from './service/locations/locations'
 
 export const TrpcContext = z.object({
@@ -106,7 +106,7 @@ async function resolveUserDetails(
       })
     }
 
-    const { primaryOfficeId, role, signature, username } = await getUser(
+    const { primaryOfficeId, role, signature, username } = await getLegacyUser(
       userId,
       token
     )

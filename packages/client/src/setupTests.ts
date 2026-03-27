@@ -16,8 +16,6 @@ import { referenceApi } from './utils/referenceApi'
 import 'core-js/features/array/flat'
 // eslint-disable-next-line import/no-unassigned-import
 import 'jsdom-worker'
-import { roleQueries } from './forms/user/query/queries'
-import { userQueries } from './user/queries'
 import { mockOfflineData } from './tests/mock-offline-data'
 // eslint-disable-next-line import/no-unassigned-import
 import './tests/queryMock'
@@ -184,9 +182,6 @@ console.warn = warn
 console.error = error
 console.debug = debug
 queries.fetchUserDetails = vi.fn()
-roleQueries.fetchRoles = vi.fn()
-
-userQueries.searchUsers = vi.fn()
 
 vi.doMock(
   '@client/utils/referenceApi',
@@ -245,7 +240,7 @@ beforeEach(() => {
 
   const userData: IUserData[] = [
     {
-      userID: userDetails.userMgntUserID,
+      userID: userDetails.id,
       userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
       declarations: []
     }

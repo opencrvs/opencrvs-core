@@ -40,10 +40,7 @@ import {
   TokenWithBearer
 } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
-import {
-  requiresAnyOfScopes,
-  setBearerForToken
-} from '@events/router/middleware'
+import { setBearerForToken } from '@events/router/middleware'
 import { userAndSystemProcedure, userOnlyProcedure } from '@events/router/trpc'
 
 import {
@@ -360,27 +357,6 @@ export function getDefaultActionProcedures(
     )
   }
 
-  const actionsMigratedToV2Scopes = [
-    ActionType.NOTIFY,
-    ActionType.DECLARE,
-    ActionType.REGISTER,
-    ActionType.ARCHIVE,
-    ActionType.REJECT,
-    ActionType.EDIT,
-    ActionType.REJECT_CORRECTION,
-    ActionType.APPROVE_CORRECTION,
-    ActionType.REQUEST_CORRECTION,
-    ActionType.PRINT_CERTIFICATE
-  ] as const
-
-  const canAccessEventMiddleware = actionsMigratedToV2Scopes.some(
-    (act) => act === actionType
-  )
-    ? middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType])
-    : // @TODO
-      // @ts-expect-error - All scopes do not overlap between 2.0 and 1.9. Since scopes are migrated one by one, we can ignore this error until all scopes for the action are migrated as long as @see actionsMigratedToV2Scopes is updated accordingly.
-      requiresAnyOfScopes([], ACTION_SCOPE_MAP[actionType])
-
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
   const userTypeBasedProcedure = SYSTEM_USER_ALLOWED_ACTIONS.some(
@@ -392,11 +368,8 @@ export function getDefaultActionProcedures(
   return {
     request: userTypeBasedProcedure
       .meta(meta)
-      .use(canAccessEventMiddleware)
+      .use(middleware.canAccessEventWithScopes(ACTION_SCOPE_MAP[actionType]))
       .input(actionConfig.inputSchema.strict())
-      // @TODO:
-      // @ts-expect-error - deprecated by the end of 2.0
-      .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
       .use(middleware.detectDuplicate)

@@ -39,7 +39,9 @@ export const FieldType = {
   LOCATION: 'LOCATION',
   DIVIDER: 'DIVIDER',
   ADMINISTRATIVE_AREA: 'ADMINISTRATIVE_AREA',
+  /** @deprecated Use FieldType.LOCATION with locationTypes: ['HEALTH_FACILITY'] */
   FACILITY: 'FACILITY',
+  /** @deprecated Use FieldType.LOCATION with locationTypes: ['CRVS_OFFICE'] */
   OFFICE: 'OFFICE',
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',
@@ -54,6 +56,7 @@ export const FieldType = {
   ID_READER: 'ID_READER',
   LOADER: 'LOADER',
   ALPHA_HIDDEN: 'ALPHA_HIDDEN',
+  USER_ROLE: 'USER_ROLE',
   /**
    * @internal
    * @experimental

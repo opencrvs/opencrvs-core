@@ -238,3 +238,10 @@ export function TRPCProvider({
     </PersistQueryClientProvider>
   )
 }
+
+export function hasConflict(error: unknown) {
+  if (error instanceof TRPCClientError) {
+    return error.data.code === 'CONFLICT'
+  }
+  return false
+}

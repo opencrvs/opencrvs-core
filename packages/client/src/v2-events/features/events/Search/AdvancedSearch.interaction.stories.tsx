@@ -309,10 +309,6 @@ export const AdvancedSearchTabsBehaviour: Story = {
       }
     )
 
-    // @TODO: Re-enable once the application supports NAME parameter as a serializedParams parameter.
-    // updating NAME is done only on core. Updating countryconfig happens separately.
-    // This should be solved by: https://github.com/opencrvs/opencrvs-core/issues/9690
-
     await step("Prepopulate Applicant's details", async () => {
       const accordion = await canvas.findByTestId(
         'accordion-event.tennis-club-membership.search.applicants'
@@ -450,15 +446,11 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
         ).find((btn) => btn.id === 'search')
 
         if (searchBtn) {
-          // @TODO: Check for Enabled when https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
-          // Currently, name fields are interpreted as required fields, so clearing them disables the search button.
           await expect(searchBtn).toBeEnabled()
-          // await userEvent.click(searchBtn)
         }
       }
     )
 
-    // @TODO: Bring back once issues in https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
     await step(
       'Ensure cleared fields do not appear in search criteria',
       async () => {

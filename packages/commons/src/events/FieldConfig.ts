@@ -631,7 +631,10 @@ const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z.object({
-    searchableResource: z.array(z.enum(['locations', 'facilities', 'offices'])),
+    locationTypes: z
+      .array(z.string())
+      .optional()
+      .describe('Types of the locations that are available for selection.'),
     allowedLocations: AllowedLocations
   })
 }).describe('Input field for a location')
@@ -664,6 +667,9 @@ const FileUploadWithOptions = BaseField.extend({
 
 export type FileUploadWithOptions = z.infer<typeof FileUploadWithOptions>
 
+/**
+ * @deprecated Use FieldType.LOCATION with locationTypes: ['HEALTH_FACILITY']
+ */
 const Facility = BaseField.extend({
   type: z.literal(FieldType.FACILITY),
   defaultValue: NonEmptyTextValue.optional(),
@@ -672,6 +678,9 @@ const Facility = BaseField.extend({
 
 export type Facility = z.infer<typeof Facility>
 
+/**
+ * @deprecated Use FieldType.LOCATION with locationTypes: ['CRVS_OFFICE']
+ */
 const Office = BaseField.extend({
   type: z.literal(FieldType.OFFICE),
   defaultValue: NonEmptyTextValue.optional(),
@@ -942,6 +951,15 @@ const HiddenField = BaseField.extend({
 
 export type HiddenField = z.infer<typeof HiddenField>
 
+const UserRoleField = BaseField.extend({
+  type: z.literal(FieldType.USER_ROLE),
+  defaultValue: TextValue.optional()
+}).describe(
+  'A select dropdown that is automatically populated with available user roles'
+)
+
+export type UserRoleField = z.infer<typeof UserRoleField>
+
 export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
@@ -986,7 +1004,8 @@ export const FieldConfig = z
     LoaderField,
     SearchField,
     CustomField,
-    HiddenField
+    HiddenField,
+    UserRoleField
   ])
   .meta({
     description: 'Form field configuration',

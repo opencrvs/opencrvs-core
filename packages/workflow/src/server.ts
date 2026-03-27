@@ -17,7 +17,6 @@ import {
   DEFAULT_TIMEOUT
 } from '@workflow/constants'
 import getPlugins from '@workflow/config/plugins'
-import { getRoutes } from '@workflow/config/routes'
 import { readFileSync } from 'fs'
 import { logger } from '@opencrvs/commons'
 import { Boom } from '@hapi/boom'
@@ -50,8 +49,18 @@ export async function createServer() {
 
   server.auth.default('jwt')
 
-  const routes = getRoutes()
-  server.route(routes)
+  server.route({
+    method: 'GET',
+    path: '/ping',
+    handler: () => ({
+      success: true
+    }),
+    options: {
+      auth: false,
+      tags: ['api'],
+      description: 'Health check endpoint'
+    }
+  })
 
   server.ext({
     type: 'onRequest',

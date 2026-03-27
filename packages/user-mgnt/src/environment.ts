@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { bool, cleanEnv, port, str, url } from 'envalid'
+import { cleanEnv, port, str, url } from 'envalid'
 
 export const env = cleanEnv(process.env, {
   HOST: str({ devDefault: 'localhost' }),
@@ -20,7 +20,5 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ default: undefined }),
-  QA_ENV: bool({ default: false }),
-  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
   METRICS_URL: url({ devDefault: 'http://localhost:1050' })
 })

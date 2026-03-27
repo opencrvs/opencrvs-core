@@ -185,7 +185,6 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
         }
         break
       }
-
       case 'trackingId':
       case 'assignedTo':
       case 'createdBy':
@@ -212,7 +211,11 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
         must.push({ term: { [key]: clause[key].location } })
         break
       }
-
+      case 'legalStatuses.DECLARED.createdByRole':
+      case 'legalStatuses.REGISTERED.createdByRole': {
+        must.push({ terms: { [key]: clause[key].terms } })
+        break
+      }
       case 'data': {
         // @todo: The type for this comes out as "any"
         const value = clause[key]
@@ -342,7 +345,6 @@ export function withJurisdictionFilters({
           case 'event':
             must.push({
               terms: {
-                // @TODO: Clarify why V1 had 1-tuple.
                 type: Array.isArray(value) ? value : [value]
               }
             })

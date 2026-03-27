@@ -104,8 +104,8 @@ export const AlphaPrintButton = {
         declaration: formDeclaration,
         annotation: null,
         originalActionId: null,
-        createdBySignature: userDetails.localRegistrar?.signature,
-        createdAtLocation: userDetails.primaryOffice.id as UUID
+        createdBySignature: userDetails.signature,
+        createdAtLocation: userDetails.primaryOfficeId
       }
     ]
 
