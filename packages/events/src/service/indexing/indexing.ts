@@ -103,6 +103,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.TIME:
@@ -133,6 +134,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
+    case FieldType.USER_ROLE:
     case FieldType.PHONE:
     case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }

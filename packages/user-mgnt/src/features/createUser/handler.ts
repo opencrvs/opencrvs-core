@@ -20,8 +20,7 @@ import {
 import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 import {
   generateUsername,
-  sendCredentialsNotification,
-  uploadSignatureToMinio
+  sendCredentialsNotification
 } from '@user-mgnt/features/createUser/service'
 import User, { IUser } from '@user-mgnt/model/user'
 import {
@@ -37,7 +36,7 @@ export default async function createUser(
   h: Hapi.ResponseToolkit
 ) {
   const user = request.payload as IUser & { password?: string }
-  const token = request.headers.authorization
+
   const scopes = getScopes(request.headers.authorization)
   const creatableRoleIds = findScope(scopes, 'user.create')?.options?.role
   const isDataSeeder = hasScope(
@@ -58,10 +57,6 @@ export default async function createUser(
   let password = null
 
   try {
-    if (user.signature) {
-      await uploadSignatureToMinio(token, user.signature)
-    }
-
     user.status = user.status ?? statuses.PENDING
 
     password = user.password ?? generateRandomPassword(hasDemoScope(request))

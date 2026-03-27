@@ -197,6 +197,7 @@ function mapFieldTypeToMockValue(
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.PHONE:
@@ -284,6 +285,8 @@ function mapFieldTypeToMockValue(
       return Object.create(null)
     case FieldType.ID_READER:
       return Object.create(null)
+    case FieldType.USER_ROLE:
+      return TestUserRole.enum.FIELD_AGENT
   }
 }
 

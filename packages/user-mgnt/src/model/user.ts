@@ -323,6 +323,7 @@ const userSchema = new Schema({
   creationDate: { type: Number, default: Date.now },
   auditHistory: [AuditHistory],
   avatar: Avatar,
+  signature: Avatar,
   searches: [SearchesSchema]
 })
 

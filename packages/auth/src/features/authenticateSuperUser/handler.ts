@@ -45,6 +45,7 @@ export default async function authenticateSuperUserHandler(
 
   const SUPER_ADMIN_SCOPES = [
     SCOPES.BYPASSRATELIMIT,
+    SCOPES.USER_CREATE,
     SCOPES.USER_DATA_SEEDING,
     SCOPES.INTEGRATION_CREATE
   ]

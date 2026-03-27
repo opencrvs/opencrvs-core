@@ -10,7 +10,6 @@
  */
 import { ISerializedForm } from '@client/forms'
 import { Conditional } from '@client/forms/conditionals'
-import { Validator } from '@client/forms/validators'
 import { ILanguage } from '@client/i18n/reducer'
 import {
   AdminStructure,
@@ -207,7 +206,7 @@ async function loadForms(): Promise<LoadFormsResponse> {
   }
 }
 
-export type LoadValidatorsResponse = Record<string, Validator>
+
 const countryconfigBase: string = '/api/countryconfig'
 
 export type LoadConditionalsResponse = Record<string, Conditional>

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UserOrSystem } from '@opencrvs/commons'
+import { TokenUserType, User, UserOrSystem } from '@opencrvs/commons'
 import { findUserOrSystem } from './api'
 /**
  * Retrieves multiple users/systems by their IDs.
@@ -30,4 +30,8 @@ export const getUsersById = async (
   )
 
   return users.filter((user) => user !== undefined)
+}
+
+export function isUser(userOrSystem: UserOrSystem): userOrSystem is User {
+  return userOrSystem.type === TokenUserType.enum.user
 }

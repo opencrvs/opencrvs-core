@@ -19,7 +19,12 @@ import {
   getCurrentEventState,
   EventState
 } from '@opencrvs/commons/client'
-import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import {
+  hasConflict,
+  queryClient,
+  trpcOptionsProxy,
+  useTRPC
+} from '@client/v2-events/trpc'
 import { useEventConfigurations } from '../useEventConfiguration'
 
 const MutationVariables = z.object({
@@ -32,12 +37,6 @@ function assignmentMutation(mutationKey: MutationKey) {
     hashKey(trpcOptionsProxy.event.actions.assignment.assign.mutationKey()),
     hashKey(trpcOptionsProxy.event.actions.assignment.unassign.mutationKey())
   ].includes(hashKey(mutationKey))
-}
-function hasConflict(error: unknown) {
-  if (error instanceof TRPCClientError) {
-    return error.data.code === 'CONFLICT'
-  }
-  return false
 }
 
 export type OutboxEventIndex = EventIndex & {
