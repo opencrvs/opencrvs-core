@@ -343,9 +343,6 @@ const ParagraphConfiguration = z
   .object({
     styles: z
       .object({
-        fontVariant: HtmlFontVariant.optional().describe(
-          'Font variant to use for the paragraph text'
-        ),
         hint: z
           .boolean()
           .optional()
