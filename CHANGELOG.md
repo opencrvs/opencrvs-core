@@ -38,6 +38,8 @@ Previously only a fixed set of string values (`'country'` / `'administrativeArea
 
 ### New features
 
+- Support for conditional actions "ENABLE" and "SHOW" in SELECT field options to allow the options to be hidden/disabled conditionally.
+
 - A composite field type (`FIELD_GROUP`) that groups related child fields into a single unit with a shared label, conditionals, and validation.
 
 **Structure:**
