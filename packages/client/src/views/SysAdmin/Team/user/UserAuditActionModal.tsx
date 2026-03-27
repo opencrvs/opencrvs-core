@@ -26,7 +26,6 @@ import styled from 'styled-components'
 import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { Dispatch } from 'redux'
 import {
   showUserAuditSuccessToast,
@@ -167,25 +166,8 @@ function UserAuditActionModalComponent(
     }
     makeErrorVisible(true)
     if (!formError) {
-      const userId = user?.id ?? ''
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      ;(props.client as ApolloClient<any>)
-        .mutate({
-          mutation: USER_AUDIT_ACTION,
-          variables: {
-            userId,
-            ...(formValues as {
-              reason: string
-              comment: string
-              action: AUDIT_ACTION
-            })
-          } as IUserAuditVariables,
-          refetchQueries: []
-        })
+      Promise.reject(new Error('@TODO!'))
         .then(() => {
-          queryClient.invalidateQueries({
-            queryKey: trpcOptionsProxy.user.get.queryKey(userId)
-          })
           props.showSuccessToast(name, formValues.action as AUDIT_ACTION)
         })
         .catch(() => props.showErrorToast())

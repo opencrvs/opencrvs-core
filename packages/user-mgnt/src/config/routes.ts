@@ -45,6 +45,7 @@ import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
+
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
@@ -74,6 +75,7 @@ import resetPasswordInviteHandler, {
 import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
+
 import { SCOPES } from '@opencrvs/commons/authentication'
 import mongoose from 'mongoose'
 
@@ -455,6 +457,7 @@ export const getRoutes = () => {
           'Reset password via sms for given userid and make the corresponding user pending'
       }
     },
+
     {
       method: 'POST',
       path: '/countUsersByLocation',

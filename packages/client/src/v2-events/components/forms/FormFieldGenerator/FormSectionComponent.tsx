@@ -65,6 +65,7 @@ type AllProps = {
   fields: FieldConfig[]
   className?: string
   readonlyMode?: boolean
+  attachmentPath: string
   errors: IndexMap<string>
   /**
    * Update the form values in the non-formik state.
@@ -228,6 +229,7 @@ export function FormSectionComponent({
   onChange,
   resetForm,
   setErrors,
+  attachmentPath,
   validateAllFields,
   fieldsToShowValidationErrors,
   onAllFieldsValidated,
@@ -594,6 +596,7 @@ export function FormSectionComponent({
               {({ field: formikField }: FieldProps) => (
                 <GeneratedInputField
                   allKnownFields={allFieldsWithDotSeparator}
+                  attachmentPath={attachmentPath}
                   disabled={isDisabled}
                   error={isDisabled ? '' : error}
                   eventConfig={eventConfig}

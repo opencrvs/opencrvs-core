@@ -364,7 +364,7 @@ const fields = [
     label: generateTranslationConfig('Club Rules'),
     defaultValue: 'All members must follow club guidelines and regulations.',
     configuration: {
-      styles: { fontVariant: 'reg12', hint: true }
+      styles: { hint: true }
     }
   },
 

@@ -13,7 +13,11 @@ import { randomUUID } from 'crypto'
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import { SCOPES, UUID } from '@opencrvs/commons'
-import { publicProcedure, router, userAndSystemProcedure } from '@events/router/trpc'
+import {
+  publicProcedure,
+  router,
+  userAndSystemProcedure
+} from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 import {

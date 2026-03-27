@@ -8,9 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { gql } from '@apollo/client'
-import { client } from '@client/utils/apolloClient'
-import { ADVANCED_SEARCH_PARAM_FIELDS } from './mutations'
 import { trpcClient } from '../v2-events/trpc'
 
 async function fetchUserDetails(userId: string) {

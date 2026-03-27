@@ -107,6 +107,16 @@ export type IntegrationCreateAuditLog = {
   }
 }
 
+export type IntegrationRefreshTokenAuditLog = {
+  operation: 'integrations.refreshToken'
+  requestData: {
+    clientId: string
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
 export type IntegrationDeactivateAuditLog = {
   operation: 'integrations.deactivate'
   requestData: {
@@ -178,6 +188,11 @@ export type AuditLogOperation =
   | IntegrationDeleteAuditLog
   | IntegrationRefreshSecretAuditLog
   | AttachmentUploadAuditLog
+  | IntegrationCreateAuditLog
+  | IntegrationRefreshTokenAuditLog
+  | IntegrationDeactivateAuditLog
+  | IntegrationActivateAuditLog
+  | IntegrationDeleteAuditLog
 
 /**
  * Parameters for writing an audit log entry.
