@@ -30,7 +30,8 @@ import { withValidatorContext } from '../../../../../.storybook/decorators'
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/SelectCountry',
   parameters: {
-    chromatic: { disableSnapshot: true }
+    chromatic: { disableSnapshot: true },
+    layout: 'centered'
   },
   decorators: [
     (Story, context) => (
@@ -52,9 +53,6 @@ type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 export const WithHiddenOption: Story = {
   name: 'With hidden country option',
-  parameters: {
-    layout: 'centered'
-  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('textbox'))
@@ -98,9 +96,6 @@ export const WithHiddenOption: Story = {
 
 export const WithAddressCountryOverride: Story = {
   name: 'Address field with hidden country option override',
-  parameters: {
-    layout: 'centered'
-  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('textbox'))
@@ -149,9 +144,6 @@ export const WithAddressCountryOverride: Story = {
 
 export const WithDisabledOption: Story = {
   name: 'With disabled country option',
-  parameters: {
-    layout: 'centered'
-  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(await canvas.findByRole('textbox'))
