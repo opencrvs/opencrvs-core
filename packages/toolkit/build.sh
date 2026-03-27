@@ -62,4 +62,7 @@ fi
 npx esbuild src/cli.ts --bundle --format=cjs --outdir=./dist --allow-overwrite --packages=external --banner:js="#!/usr/bin/env node"
 chmod +x ./dist/cli.js
 
+# Generate core-en.json from client + login source and place it in dist
+(cd ../.. && yarn generate:core-translations)
+
 echo "Build completed successfully."
