@@ -16,7 +16,6 @@ import {
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
-import { System } from '@client/utils/gateway'
 import {
   IApplicationConfigAnonymous,
   IApplicationConfigResponse,
@@ -26,8 +25,7 @@ import {
   LoadConditionalsResponse,
   LoadFormsResponse,
   LoadHandlebarHelpersResponse,
-  ICertificateData,
-  LoadValidatorsResponse
+  ICertificateData
 } from '@client/utils/referenceApi'
 import { UserDetails } from '@client/utils/userUtils'
 import { ApplicationConfig } from '@opencrvs/commons/client'
@@ -129,12 +127,6 @@ type ApplicationConfigAnonymousUserAction = {
   payload: { anonymousConfig: IApplicationConfigAnonymous }
 }
 
-export const UPDATE_OFFLINE_SYSTEMS = 'OFFLINE/UPDATE_OFFLINE_SYSTEMS' as const
-type UpdateOfflineSystemsAction = {
-  type: typeof UPDATE_OFFLINE_SYSTEMS
-  payload: { systems: System[] }
-}
-
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
 type ApplicationConfigFailedAction = {
   type: typeof APPLICATION_CONFIG_FAILED
@@ -197,14 +189,6 @@ export const facilitiesLoaded = (
   payload: payload
 })
 
-/*
- * Only called from tests atm
- */
-export const setOfflineData = (userDetails: UserDetails): SetOfflineData => ({
-  type: GET_EXISTING_OFFLINE_DATA,
-  payload: userDetails
-})
-
 export const getOfflineDataSuccess = (
   response: string
 ): IGetOfflineDataSuccessAction => ({
@@ -257,26 +241,9 @@ export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   payload: error
 })
 
-export const updateOfflineSystems = (payload: {
-  systems: System[]
-}): UpdateOfflineSystemsAction => ({
-  type: UPDATE_OFFLINE_SYSTEMS,
-  payload: payload
-})
-
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
-})
-
-export const validatorsLoaded = (payload: LoadValidatorsResponse) => ({
-  type: 'OFFLINE/VALIDATORS_LOADED' as const,
-  payload: payload
-})
-
-export const validatorsFailed = (error: Error) => ({
-  type: 'OFFLINE/VALIDATORS_FAILED' as const,
-  payload: error
 })
 
 export const handlebarsLoaded = (payload: LoadHandlebarHelpersResponse) => ({
@@ -320,13 +287,10 @@ export type Action =
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | UpdateOfflineSystemsAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
   | ReturnType<typeof refreshOfflineData>
-  | ReturnType<typeof validatorsLoaded>
-  | ReturnType<typeof validatorsFailed>
   | ReturnType<typeof conditionalsLoaded>
   | ReturnType<typeof conditionalsFailed>
   | ReturnType<typeof handlebarsLoaded>

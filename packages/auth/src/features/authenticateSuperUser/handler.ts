@@ -17,7 +17,7 @@ import {
 } from '@auth/features/authenticate/service'
 import { unauthorized } from '@hapi/boom'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
-import { Scope, SCOPES } from '@opencrvs/commons/authentication'
+import { SCOPES } from '@opencrvs/commons/authentication'
 import { logger } from '@opencrvs/commons'
 
 interface IAuthPayload {
@@ -45,9 +45,10 @@ export default async function authenticateSuperUserHandler(
 
   const SUPER_ADMIN_SCOPES = [
     SCOPES.BYPASSRATELIMIT,
+    SCOPES.USER_CREATE,
     SCOPES.USER_DATA_SEEDING,
     SCOPES.INTEGRATION_CREATE
-  ] satisfies Scope[]
+  ]
 
   const token = await createToken(
     result.userId,

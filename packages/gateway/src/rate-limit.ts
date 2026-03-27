@@ -12,23 +12,15 @@ import { hasScope } from '@gateway/features/user/utils'
 import { redis } from '@gateway/utils/redis'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 import { SCOPES } from '@opencrvs/commons/authentication'
-import { GraphQLError } from 'graphql'
 import { get } from 'lodash'
 import { DISABLE_RATE_LIMIT } from './constants'
 
 /**
  * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
  */
-export class RateLimitError extends GraphQLError {
+export class RateLimitError extends Error {
   constructor(message = 'You are being rate limited') {
-    super(message, {
-      extensions: {
-        code: 'RATE_LIMIT_EXCEEDED',
-        http: {
-          status: 429
-        }
-      }
-    })
+    super(message)
   }
 }
 

@@ -57,6 +57,7 @@ export const FieldType = {
   ID_READER: 'ID_READER',
   LOADER: 'LOADER',
   ALPHA_HIDDEN: 'ALPHA_HIDDEN',
+  USER_ROLE: 'USER_ROLE',
   /**
    * @internal
    * @experimental

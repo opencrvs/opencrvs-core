@@ -11,7 +11,6 @@
 import configHandler, {
   getLoginConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
-import getSystems from '@config/handlers/system/systemHandler'
 import getForms from '@config/handlers/forms/formsHandler'
 import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 import { ServerRoute } from '@hapi/hapi'
@@ -51,15 +50,6 @@ export default function getRoutes(): ServerRoute[] {
         auth: false,
         tags: ['api'],
         description: 'Retrieve Application configuration'
-      }
-    },
-    {
-      method: 'GET',
-      path: '/integrationConfig',
-      handler: getSystems,
-      options: {
-        tags: ['api'],
-        description: 'Retrieve Application integrations'
       }
     },
     {

@@ -45,6 +45,7 @@ import {
 import { parse, stringify } from 'qs'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
+import { ROUTES } from '../../v2-events/routes/routes'
 
 type IStateProps = {
   language: string
@@ -124,14 +125,7 @@ const HeaderComponent = (props: IFullProps) => {
     changeTeamLocation
   } = props
 
-  const {
-    canCreateUser,
-    canSearchRecords,
-    canSearchBirthRecords,
-    canSearchDeathRecords
-  } = usePermissions()
-
-  const canDoAdvanceSearch = canSearchBirthRecords || canSearchDeathRecords
+  const { canCreateUser, canSearchRecords } = usePermissions()
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
     const locationId = parse(router.location.search, {
@@ -175,7 +169,12 @@ const HeaderComponent = (props: IFullProps) => {
               handler: () => {
                 if (locationId) {
                   router.navigate(
-                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                    ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+                      {},
+                      {
+                        officeId: locationId
+                      }
+                    )
                   )
                 }
               }
@@ -198,7 +197,12 @@ const HeaderComponent = (props: IFullProps) => {
               handler: () => {
                 if (locationId) {
                   router.navigate(
-                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                    ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+                      {},
+                      {
+                        officeId: locationId
+                      }
+                    )
                   )
                 }
               }
@@ -300,8 +304,7 @@ const HeaderComponent = (props: IFullProps) => {
           selectedSearchType ?? offlineData.config.SEARCH_DEFAULT_CRITERIA
         }
         searchTypeList={searchTypeList}
-        // @TODO: How to hide the navigation list from field agents? Ask JPF
-        navigationList={canDoAdvanceSearch ? advancedSearchNavigationList : []}
+        navigationList={canSearchRecords ? advancedSearchNavigationList : []}
         searchHandler={(text, type) =>
           props.router.navigate(
             {

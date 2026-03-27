@@ -18,13 +18,13 @@ export default interface SystemClientsTable {
     Record<string, any>
   >
 
-  createdBy: ColumnType<string | null, string | null, string | null>
+  createdBy: ColumnType<string, string, string>
 
-  secretHash: ColumnType<string | null, string | null, string | null>
+  secretHash: ColumnType<string, string, string>
 
-  salt: ColumnType<string | null, string | null, string | null>
+  salt: ColumnType<string, string, string>
 
-  shaSecret: ColumnType<string | null, string | null, string | null>
+  shaSecret: ColumnType<string, string, string>
 
   status: ColumnType<string, string | undefined, string>
 

@@ -14,22 +14,21 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { Navigation } from '@client/components/interface/Navigation'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { UserSection } from '@client/forms'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
-import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { userMutations } from '@client/user/mutations'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { formatUserRole } from '@client/v2-events/hooks/useRoles'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { ROUTES } from '@client/v2-events/routes'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
-import { RawScopes, User } from '@opencrvs/commons/client'
+import { User } from '@opencrvs/commons/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -47,7 +46,6 @@ import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ProfileState } from '../../profile/profileReducer'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -74,7 +72,7 @@ function WithFrame({
   isHidden: boolean
   userDetails: ProfileState['userDetails']
   user: User | undefined
-  scope: RawScopes[] | null
+  scope: string[] | null
   getMenuItems: (
     userId: string,
     status: string
@@ -180,10 +178,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const resendInvite = async (userId: string) => {
     try {
-      const res = await userMutations.resendInvite(userId, [])
-      if (res && res.data && res.data.resendInvite) {
-        setShowResendInviteSuccess(true)
-      }
+      throw new Error('Resend invite is currently not implemented')
     } catch (err) {
       setShowResendInviteError(true)
     }
@@ -191,10 +186,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const usernameReminder = async (userId: string) => {
     try {
-      const res = await userMutations.usernameReminderSend(userId, [])
-      if (res && res.data && res.data.usernameReminder) {
-        setShowUsernameReminderSuccess(true)
-      }
+      throw new Error('Username reminder is currently not implemented')
     } catch (err) {
       setShowUsernameReminderError(true)
     }
@@ -202,10 +194,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const resetPassword = async (userId: string) => {
     try {
-      const res = await userMutations.sendResetPasswordInvite(userId, [])
-      if (res && res.data && res.data.resetPasswordInvite) {
-        setShowResetPasswordSuccess(true)
-      }
+      throw new Error('Reset password is currently not implemented')
     } catch (err) {
       setShowResetPasswordError(true)
     }
@@ -217,9 +206,8 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
         handler: () =>
           navigate(
-            formatUrl(routes.REVIEW_USER_DETAILS, {
-              userId,
-              sectionId: UserSection.Preview
+            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+              userId
             })
           )
       }

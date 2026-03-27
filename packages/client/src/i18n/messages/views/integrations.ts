@@ -328,6 +328,32 @@ const messagesToDefine = {
       '{type, select, HEALTH {Health integration} NATIONAL_ID {National ID} RECORD_SEARCH {Record search} IMPORT_EXPORT {Import/Export} other {Custom}}',
     description:
       'Label for integration type using ICU MessageFormat select for all types'
+  },
+  createdOnBy: {
+    id: 'integrations.createdOnBy',
+    defaultMessage: 'Created {date} by {user}',
+    description: 'Label showing when an integration was created and by whom'
+  },
+  createdOn: {
+    id: 'integrations.createdOn',
+    defaultMessage: 'Created {date}',
+    description:
+      'Label showing when an integration was created (no user info)'
+  },
+  clientDetails: {
+    id: 'integrations.clientDetails',
+    defaultMessage: 'Client details',
+    description: 'Label for the client details menu item and dialog title'
+  },
+  clientName: {
+    id: 'integrations.clientName',
+    defaultMessage: 'Client name',
+    description: 'Heading for the client name field in the details dialog'
+  },
+  scopes: {
+    id: 'integrations.scopes',
+    defaultMessage: 'Scopes',
+    description: 'Heading for the scopes list in the client details dialog'
   }
 }
 

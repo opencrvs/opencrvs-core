@@ -973,6 +973,15 @@ const HiddenField = BaseField.extend({
 
 export type HiddenField = z.infer<typeof HiddenField>
 
+const UserRoleField = BaseField.extend({
+  type: z.literal(FieldType.USER_ROLE),
+  defaultValue: TextValue.optional()
+}).describe(
+  'A select dropdown that is automatically populated with available user roles'
+)
+
+export type UserRoleField = z.infer<typeof UserRoleField>
+
 export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
@@ -1018,7 +1027,8 @@ export const FieldConfig = z
     LoaderField,
     SearchField,
     CustomField,
-    HiddenField
+    HiddenField,
+    UserRoleField
   ])
   .meta({
     description: 'Form field configuration',

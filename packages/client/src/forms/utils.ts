@@ -115,10 +115,13 @@ const internationaliseOptions = (
   return options.map((opt) => {
     return {
       ...opt,
-      label: typeof opt.label === 'string' ? opt.label : intl.formatMessage(
-        opt.label,
-        'param' in opt ? opt.param : undefined
-      )
+      label:
+        typeof opt.label === 'string'
+          ? opt.label
+          : intl.formatMessage(
+              opt.label,
+              'param' in opt ? opt.param : undefined
+            )
     }
   })
 }
@@ -382,7 +385,7 @@ function getNextSectionIds(
   }
 }
 
-export const getVisibleGroupFields = (group: IFormSectionGroup) => {
+const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
 
@@ -710,7 +713,7 @@ export const getVisibleOptions = (
   })
 }
 
-export const getSectionFields = (
+const getSectionFields = (
   section: IFormSection,
   values?: IFormSectionData,
   draftData?: IFormData

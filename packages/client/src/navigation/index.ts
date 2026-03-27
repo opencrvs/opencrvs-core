@@ -14,7 +14,6 @@ import { CorrectionSection } from '@client/forms'
 import {
   CERTIFICATE_COLLECTOR,
   CERTIFICATE_CORRECTION,
-  CREATE_USER_SECTION,
   EVENT_COMPLETENESS_RATES,
   ISSUE_CERTIFICATE_PAYMENT,
   ISSUE_COLLECTOR,
@@ -237,7 +236,8 @@ export const generateRegistrationsListUrlConfig = ({
     currentPageNumber
   })
 })
-
+// This will be used in user creation form
+/** @knipignore */
 export const generateUserReviewFormUrl = ({
   userId,
   sectionId,
@@ -251,20 +251,6 @@ export const generateUserReviewFormUrl = ({
 }) =>
   formatUrl(REVIEW_USER_FORM, {
     userId,
-    sectionId,
-    groupId
-  }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : '')
-
-export const generateCreateUserSectionUrl = ({
-  sectionId,
-  groupId,
-  userFormFieldNameHash
-}: {
-  sectionId: string
-  groupId: string
-  userFormFieldNameHash?: string
-}) =>
-  formatUrl(CREATE_USER_SECTION, {
     sectionId,
     groupId
   }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : '')
