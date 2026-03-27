@@ -19,7 +19,6 @@ import {
 import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 import {
-  logger,
   triggerUserEventNotification,
   personNameFromV1ToV2
 } from '@opencrvs/commons'
