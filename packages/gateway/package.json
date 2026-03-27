@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@apollo/datasource-rest": "^6.3.0",
-    "@apollo/server": "^4.11.2",
+    "@apollo/server": "^5.0.0",
     "@as-integrations/hapi": "^2.0.1",
     "@elastic/elasticsearch": "8.13.1",
     "@graphql-tools/graphql-file-loader": "^8.0.3",
