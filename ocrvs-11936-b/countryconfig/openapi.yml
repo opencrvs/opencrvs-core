@@ -2017,7 +2017,116 @@ components:
                 fields:
                   type: array
                   items:
-                    type: object
+                    anyOf:
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the field.
+                          type:
+                            type: string
+                            const: COUNTRY
+                          label:
+                            $ref: "#/components/schemas/TranslationConfig"
+                            description: Human-readable label of the field.
+                          conditionals:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/FieldConditional"
+                            default: *a10
+                            description: Conditions determining when the field is shown or enabled. By
+                              default, the field is always shown and enabled.
+                          required:
+                            anyOf:
+                              - type: boolean
+                              - type: object
+                                properties:
+                                  message:
+                                    $ref: "#/components/schemas/TranslationConfig"
+                                    description: Custom required validation message
+                                required:
+                                  - message
+                            default: false
+                            description: Indicates whether the field is mandatory.
+                          optionOverrides:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                value:
+                                  type: string
+                                  description: The value of the option
+                                conditionals:
+                                  type: array
+                                  items:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: SHOW
+                                          conditional:
+                                            $ref: "#/components/schemas/Conditional"
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'SHOW' conditional is defined, the component is shown to the
+                                          user only if the condition is met
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            const: ENABLE
+                                          conditional:
+                                            $ref: "#/components/schemas/Conditional"
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'ENABLE' conditional is defined, the component is enabled only
+                                          if the condition is met
+                                  default: *a3
+                              required:
+                                - value
+                            description: Conditionals for specific countries. Countries not listed are
+                              always shown and enabled.
+                        required:
+                          - id
+                          - type
+                        description: Country select field
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the field.
+                          type:
+                            type: string
+                            const: ADMINISTRATIVE_AREA
+                          label:
+                            $ref: "#/components/schemas/TranslationConfig"
+                            description: Human-readable label of the field.
+                          conditionals:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/FieldConditional"
+                            default: *a10
+                            description: Conditions determining when the field is shown or enabled. By
+                              default, the field is always shown and enabled.
+                          required:
+                            anyOf:
+                              - type: boolean
+                              - type: object
+                                properties:
+                                  message:
+                                    $ref: "#/components/schemas/TranslationConfig"
+                                    description: Custom required validation message
+                                required:
+                                  - message
+                            default: false
+                            description: Indicates whether the field is mandatory.
+                        required:
+                          - id
+                          - type
+                        description: Administrative area input field e.g. facility, office
                 streetAddressForm:
                   type: array
                   items:
