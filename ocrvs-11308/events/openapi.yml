@@ -1626,7 +1626,7 @@ components:
                             - TIME
                             - IMAGE_VIEW
                             - PARAGRAPH
-                            - TITLE
+                            - HEADING
                             - PAGE_HEADER
                             - RADIO_GROUP
                             - FILE
@@ -1865,7 +1865,7 @@ components:
                             - TIME
                             - IMAGE_VIEW
                             - PARAGRAPH
-                            - TITLE
+                            - HEADING
                             - PAGE_HEADER
                             - RADIO_GROUP
                             - FILE
@@ -4560,7 +4560,7 @@ components:
             - type
             - configuration
           additionalProperties: false
-        - description: A read-only title component for form pages
+        - description: A read-only heading component for form pages
           type: object
           properties:
             id:
@@ -4710,7 +4710,7 @@ components:
               type: boolean
             type:
               type: string
-              const: TITLE
+              const: HEADING
             defaultValue:
               type: string
               minLength: 1
