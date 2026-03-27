@@ -103,6 +103,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
+    case FieldType.TITLE:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.TIME:

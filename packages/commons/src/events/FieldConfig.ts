@@ -360,6 +360,23 @@ const ParagraphConfiguration = z
 
 export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
 
+const TitleConfiguration = z
+  .object({
+    styles: z
+      .object({
+        fontVariant: HtmlFontVariant.optional().describe(
+          'Font variant to use for the paragraph text'
+        ),
+        textAlign: ParagraphTextAlign.optional().describe(
+          'Text alignment for the paragraph'
+        )
+      })
+      .optional()
+  })
+  .default({})
+
+export type TitleConfiguration = z.infer<typeof TitleConfiguration>
+
 const ImageConfiguration = z.object({
   alt: z.string().optional().describe('Alternative text for the image'),
   width: z.string().optional().describe('CSS width value for the image'),
@@ -390,6 +407,14 @@ const Paragraph = BaseField.extend({
 }).describe('A read-only HTML <p> paragraph')
 
 export type Paragraph = z.infer<typeof Paragraph>
+
+const Title = BaseField.extend({
+  type: z.literal(FieldType.TITLE),
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: TitleConfiguration
+}).describe('A read-only title component for form pages')
+
+export type Title = z.infer<typeof Title>
 
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER),
@@ -965,6 +990,7 @@ export const FieldConfig = z
     SelectDateRangeField,
     ImageViewField,
     Paragraph,
+    Title,
     RadioGroup,
     BulletList,
     PageHeader,

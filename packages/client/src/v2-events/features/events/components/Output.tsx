@@ -51,7 +51,8 @@ import {
   isAgeFieldType,
   FieldUpdateValue,
   isCustomFieldType,
-  isImageViewFieldType
+  isImageViewFieldType,
+  isTitleFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -66,6 +67,7 @@ import {
   Select,
   SelectCountry,
   Paragraph,
+  Title,
   Number,
   NumberWithUnit,
   Text,
@@ -147,6 +149,10 @@ export function ValueOutput({
 
   if (isParagraphFieldType(field)) {
     return Paragraph.Output
+  }
+
+  if (isTitleFieldType(field)) {
+    return Title.Output
   }
 
   if (isNumberFieldType(field)) {

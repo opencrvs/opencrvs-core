@@ -55,7 +55,8 @@ import {
   AgeField,
   CustomField,
   HiddenField,
-  ImageViewField
+  ImageViewField,
+  Title
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -159,6 +160,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.TITLE:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
@@ -245,6 +247,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.TITLE:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
@@ -301,6 +304,13 @@ export const isParagraphFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: string; config: Paragraph } => {
   return field.config.type === FieldType.PARAGRAPH
+}
+
+export const isTitleFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: Title } => {
+  return field.config.type === FieldType.TITLE
 }
 
 export const isImageViewFieldType = (field: {
@@ -619,6 +629,7 @@ export type NonInteractiveFieldType =
   | PageHeader
   | ImageViewField
   | Paragraph
+  | Title
   | BulletList
   | DataField
   | AlphaPrintButton
@@ -636,6 +647,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.DIVIDER ||
     field.type === FieldType.PAGE_HEADER ||
     field.type === FieldType.PARAGRAPH ||
+    field.type === FieldType.TITLE ||
     field.type === FieldType.BULLET_LIST ||
     field.type === FieldType.DATA ||
     field.type === FieldType.ALPHA_PRINT_BUTTON ||
