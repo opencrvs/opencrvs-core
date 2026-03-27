@@ -395,38 +395,38 @@ function actionToClientAction(
   | ((eventId: string) => Promise<EventDocument>) {
   switch (action) {
     case ActionType.CREATE:
-      return async () => client.event.create(generator.event.create())
+      return () => client.event.create(generator.event.create())
     case ActionType.DECLARE:
-      return async (eventId: string) =>
+      return (eventId: string) =>
         client.event.actions.declare.request(
           generator.event.actions.declare(eventId, { keepAssignment: true })
         )
     case ActionType.REJECT:
-      return async (eventId: string) =>
+      return (eventId: string) =>
         client.event.actions.reject.request(
           generator.event.actions.reject(eventId, { keepAssignment: true })
         )
     case ActionType.ARCHIVE:
-      return async (eventId: string) =>
+      return (eventId: string) =>
         client.event.actions.archive.request(
           generator.event.actions.archive(eventId, { keepAssignment: true })
         )
     case ActionType.REGISTER:
-      return async (eventId: string) =>
+      return (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
             keepAssignment: true
           })
         )
     case ActionType.PRINT_CERTIFICATE:
-      return async (eventId: string) =>
+      return (eventId: string) =>
         client.event.actions.printCertificate.request(
           generator.event.actions.printCertificate(eventId, {
             keepAssignment: true
           })
         )
     case ActionType.REQUEST_CORRECTION:
-      return async (eventId: string) =>
+      return (eventId: string) =>
         client.event.actions.correction.request.request(
           generator.event.actions.correction.request(eventId, {
             keepAssignment: true
