@@ -15,7 +15,7 @@ export const HeaderContainer = styled.tr<{
   fontVariant: HeaderFontVariant
 }>`
   th {
-    border-bottom: 2px solid ${({ theme }) => theme.colors.grey100};
+    border-bottom: 2px solid ${({ theme }) => theme.colors.grey200};
     padding: 20px 0;
     text-align: left;
     ${({ theme, fontVariant }) => theme.fonts[fontVariant ?? 'reg16']};
