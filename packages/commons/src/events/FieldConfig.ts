@@ -657,19 +657,25 @@ export const DefaultAddressFieldValue = DomesticAddressFieldValue.extend({
 
 export type DefaultAddressFieldValue = z.infer<typeof DefaultAddressFieldValue>
 
-const DomesticAddressField = BaseField.pick({
+const commonDomesticFieldProps = {
   id: true,
-  required: true,
-  conditionals: true
-})
-  .transform((config) => ({
-    ...config,
-    type:
-      config.id === 'country'
-        ? FieldType.COUNTRY
-        : FieldType.ADMINISTRATIVE_AREA
-  }))
-  .openapi({ effectType: 'input', type: 'object' })
+  type: true,
+  label: true,
+  conditionals: true,
+  required: true
+} satisfies { [key in keyof (Country | AdministrativeArea)]?: boolean }
+
+const DomesticAddressField = Country.partial()
+  .pick({
+    ...commonDomesticFieldProps,
+    optionOverrides: true
+  })
+  .required({ id: true, type: true })
+  .or(
+    AdministrativeArea.partial()
+      .pick(commonDomesticFieldProps)
+      .required({ id: true, type: true })
+  )
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),

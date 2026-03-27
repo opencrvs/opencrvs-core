@@ -6,7 +6,7 @@
 
 - More expressive `ADDRESS` field configuration
 
-The `fields` array in `ADDRESS` field configuration now accepts a field-override object, giving you per-level control over `required` and `conditionals`.
+The `fields` array in `ADDRESS` field configuration now accepts a field-override object, giving you per-level control over `required`, `conditionals`, and `label`. Only `id` and `type` are required — all other properties are optional and fall back to sensible defaults: labels default to the value from the country's admin structure configuration, and the country field falls back to a built-in "Country" label.
 
 Previously only a fixed set of string values (`'country'` / `'administrativeArea'`) were accepted. The separate `administrativeLevels` array has been removed in favor of this unified `fields` array.
 
@@ -16,21 +16,24 @@ Previously only a fixed set of string values (`'country'` / `'administrativeArea
   type: FieldType.ADDRESS,
   configuration: {
     fields: [
-      { id: 'country' },           // shorthand – uses defaults
+      { id: 'country', type: FieldType.COUNTRY },           // uses default label
       {
         id: 'province',
+        type: FieldType.ADMINISTRATIVE_AREA,
         required: true,
-        conditionals: []
+        label: { id: 'custom.province', defaultMessage: 'Province', description: '' } // optional override
       },
       {
         id: 'district',
-        required: false,   // override required per level
+        type: FieldType.ADMINISTRATIVE_AREA,
+        required: false,
         conditionals: [{ type: ConditionalType.SHOW, conditional: ... }]
       }
     ]
   }
 }
 ```
+
 > [!IMPORTANT]
 > The `id` of the object must match the administrative hierarchy id defined in `applicationConfig`.
 
@@ -43,6 +46,7 @@ Previously only a fixed set of string values (`'country'` / `'administrativeArea
 - A composite field type (`FIELD_GROUP`) that groups related child fields into a single unit with a shared label, conditionals, and validation.
 
 **Structure:**
+
 ```typescript
 {
   id: 'person.address',
@@ -54,6 +58,7 @@ Previously only a fixed set of string values (`'country'` / `'administrativeArea
   ]
 }
 ```
+
 N.B. Support for `DISPLAY_ON_REVIEW` conditionals in nested fields has not been implemented yet.
 
 ## 1.9.11

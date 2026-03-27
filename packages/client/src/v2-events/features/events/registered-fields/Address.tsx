@@ -218,7 +218,7 @@ function generateAddressFields(
         `Invalid field ${id} in address configuration ${addressConfig.id}`
       )
     }
-    const label = adminItem.label
+    const label = adminConfig.label ?? adminItem.label
 
     const prevItem = index > 0 ? adminConfigs[index - 1] : null
     const parentId = isFirst ? 'country' : (prevItem?.id ?? '')
