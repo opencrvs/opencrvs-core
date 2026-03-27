@@ -60,7 +60,9 @@ export const WithHiddenOption: Story = {
     await userEvent.click(await canvas.findByRole('textbox'))
     await expect(canvas.queryByText('Bangladesh')).toBeInTheDocument()
     await expect(canvas.queryByText('Finland')).not.toBeInTheDocument()
-    await expect(canvas.queryByText('United States of America')).toBeInTheDocument()
+    await expect(
+      canvas.queryByText('United States of America')
+    ).toBeInTheDocument()
   },
   render: function Component(args) {
     return (
