@@ -48,7 +48,12 @@ test('Returns user in correct format', async () => {
 
   mswServer.use(
     http.post(`http://localhost:3030/getUser`, () => {
-      return HttpResponse.json(user)
+      return HttpResponse.json({
+        ...user,
+        signature: {
+          data: user.signature
+        }
+      })
     })
   )
   const fetchedUser = await client.user.list([user.id])
@@ -61,7 +66,7 @@ test('Returns user in correct format', async () => {
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
       type: TokenUserType.enum.user,
-      status: user.status,
+      status: user.status
     })
   ])
 })
@@ -126,7 +131,12 @@ test('Does not return users or systems which are not found', async () => {
     http.post(`http://localhost:3030/getUser`, async ({ request }) => {
       const body = (await request.clone().json()) as { userId: string }
       if (body.userId === user.id) {
-        return HttpResponse.json(user)
+        return HttpResponse.json({
+          ...user,
+          signature: {
+            data: user.signature
+          }
+        })
       }
 
       return HttpResponse.json(

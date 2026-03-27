@@ -25,8 +25,7 @@ import {
   LoadConditionalsResponse,
   LoadFormsResponse,
   LoadHandlebarHelpersResponse,
-  ICertificateData,
-  LoadValidatorsResponse
+  ICertificateData
 } from '@client/utils/referenceApi'
 import { UserDetails } from '@client/utils/userUtils'
 import { ApplicationConfig } from '@opencrvs/commons/client'
@@ -190,14 +189,6 @@ export const facilitiesLoaded = (
   payload: payload
 })
 
-/*
- * Only called from tests atm
- */
-export const setOfflineData = (userDetails: UserDetails): SetOfflineData => ({
-  type: GET_EXISTING_OFFLINE_DATA,
-  payload: userDetails
-})
-
 export const getOfflineDataSuccess = (
   response: string
 ): IGetOfflineDataSuccessAction => ({
@@ -255,16 +246,6 @@ export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
 })
 
-export const validatorsLoaded = (payload: LoadValidatorsResponse) => ({
-  type: 'OFFLINE/VALIDATORS_LOADED' as const,
-  payload: payload
-})
-
-export const validatorsFailed = (error: Error) => ({
-  type: 'OFFLINE/VALIDATORS_FAILED' as const,
-  payload: error
-})
-
 export const handlebarsLoaded = (payload: LoadHandlebarHelpersResponse) => ({
   type: 'OFFLINE/HANDLEBARS_LOADED' as const,
   payload: payload
@@ -310,8 +291,6 @@ export type Action =
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
   | ReturnType<typeof refreshOfflineData>
-  | ReturnType<typeof validatorsLoaded>
-  | ReturnType<typeof validatorsFailed>
   | ReturnType<typeof conditionalsLoaded>
   | ReturnType<typeof conditionalsFailed>
   | ReturnType<typeof handlebarsLoaded>

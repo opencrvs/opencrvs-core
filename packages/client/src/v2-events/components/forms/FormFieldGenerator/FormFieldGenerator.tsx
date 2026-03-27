@@ -45,6 +45,7 @@ export interface FormFieldGeneratorProps {
   onChange: (values: EventState) => void
   readonlyMode?: boolean
   className?: string
+  attachmentPath?: string
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -63,6 +64,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     initialValues,
     className,
     eventConfig,
+    attachmentPath = '',
     fieldsToShowValidationErrors,
     validateAllFields = false,
     readonlyMode,
@@ -169,6 +171,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
 
           return (
             <FormSectionComponent
+              attachmentPath={attachmentPath}
               className={className}
               errors={formikProps.errors}
               eventConfig={eventConfig}

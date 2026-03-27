@@ -9,34 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { GraphQLError } from 'graphql'
-
-export class UnassignError extends GraphQLError {
+export class UnassignError extends Error {
   constructor(message = 'You have been unassigned from this event') {
-    super(message, {
-      extensions: {
-        code: 'UNASSIGNED'
-      }
-    })
+    super(message)
   }
 }
-export class UserInputError extends GraphQLError {
+export class UserInputError extends Error {
   constructor(message = 'Invalid user input', invalidArgs = {}) {
-    super(message, {
-      extensions: {
-        code: 'BAD_USER_INPUT',
-        invalidArgs
-      }
-    })
+    super(message)
   }
 }
 
-export class AuthenticationError extends GraphQLError {
+export class AuthenticationError extends Error {
   constructor(message = 'Unauthorized') {
-    super(message, {
-      extensions: {
-        code: 'UNAUTHENTICATED'
-      }
-    })
+    super(message)
   }
 }

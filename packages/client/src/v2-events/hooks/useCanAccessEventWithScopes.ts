@@ -38,7 +38,7 @@ export function useCanAccessEventWithScopes(
   const locations = getLocations.useSuspenseQuery()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
-  const currentUser = useCurrentUser()
+  const { currentUser } = useCurrentUser()
 
   const { searchEventById } = useEvents()
   const eventResults = searchEventById.useSuspenseQuery(eventId)

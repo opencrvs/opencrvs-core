@@ -55,7 +55,8 @@ import {
   AgeField,
   CustomField,
   HiddenField,
-  ImageViewField
+  ImageViewField,
+  UserRoleField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -99,6 +100,7 @@ import {
   getDynamicAddressFieldValue
 } from './DynamicFieldValue'
 import { ActionType } from './ActionType'
+import { EventConfig } from './EventConfig'
 
 /**
  * FieldTypeMapping.ts should include functions that map field types to different formats dynamically.
@@ -169,6 +171,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
     case FieldType.ID:
     case FieldType.LOADER:
     case FieldType.ALPHA_HIDDEN:
+    case FieldType.USER_ROLE:
       schema = field.required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -230,6 +233,79 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
   return field.required ? schema : schema.nullish()
 }
 
+type FieldTypeValueMap = {
+  [FieldType.DATE]: z.infer<typeof DateValue>
+  [FieldType.AGE]: z.infer<typeof AgeValue>
+  [FieldType.TIME]: z.infer<typeof TimeValue>
+  [FieldType.EMAIL]: z.infer<typeof EmailValue>
+  [FieldType.DATE_RANGE]: z.infer<typeof DateRangeFieldValue>
+  [FieldType.SELECT_DATE_RANGE]: z.infer<typeof SelectDateRangeValue>
+  [FieldType.TEXT]: z.infer<typeof TextValue>
+  [FieldType.TEXTAREA]: z.infer<typeof TextValue>
+  [FieldType.DIVIDER]: z.infer<typeof TextValue>
+  [FieldType.BULLET_LIST]: z.infer<typeof TextValue>
+  [FieldType.PAGE_HEADER]: z.infer<typeof TextValue>
+  [FieldType.LOCATION]: z.infer<typeof TextValue>
+  [FieldType.SELECT]: z.infer<typeof TextValue>
+  [FieldType.COUNTRY]: z.infer<typeof TextValue>
+  [FieldType.RADIO_GROUP]: z.infer<typeof TextValue>
+  [FieldType.PARAGRAPH]: z.infer<typeof TextValue>
+  [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
+  [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof TextValue>
+  [FieldType.FACILITY]: z.infer<typeof TextValue>
+  [FieldType.OFFICE]: z.infer<typeof TextValue>
+  [FieldType.PHONE]: z.infer<typeof TextValue>
+  [FieldType.LINK_BUTTON]: z.infer<typeof TextValue>
+  [FieldType.VERIFICATION_STATUS]: z.infer<typeof TextValue>
+  [FieldType.ID]: z.infer<typeof TextValue>
+  [FieldType.LOADER]: z.infer<typeof TextValue>
+  [FieldType.ALPHA_HIDDEN]: z.infer<typeof TextValue>
+  [FieldType.USER_ROLE]: z.infer<typeof TextValue>
+  [FieldType.NUMBER]: z.infer<typeof NumberFieldValue>
+  [FieldType.NUMBER_WITH_UNIT]: z.infer<typeof NumberWithUnitFieldValue>
+  [FieldType.CHECKBOX]: z.infer<typeof CheckboxFieldValue>
+  [FieldType.SIGNATURE]: z.infer<typeof FileFieldValue>
+  [FieldType.FILE]: z.infer<typeof FileFieldValue>
+  [FieldType.FILE_WITH_OPTIONS]: z.infer<typeof FileFieldWithOptionValue>
+  [FieldType.ADDRESS]: z.infer<DynamicAddressFieldValue>
+  [FieldType.DATA]: z.infer<typeof DataFieldValue>
+  [FieldType.NAME]: z.infer<DynamicNameValue>
+  [FieldType.BUTTON]: z.infer<typeof ButtonFieldValue>
+  [FieldType.ALPHA_PRINT_BUTTON]: z.infer<typeof TextValue>
+  [FieldType.HTTP]: z.infer<typeof HttpFieldUpdateValue>
+  [FieldType.SEARCH]: z.infer<typeof HttpFieldUpdateValue>
+  [FieldType.QUERY_PARAM_READER]: z.infer<
+    typeof QueryParamReaderFieldUpdateValue
+  >
+  [FieldType.QR_READER]: z.infer<typeof QrReaderFieldValue>
+  [FieldType.ID_READER]: z.infer<typeof IdReaderFieldValue>
+  [FieldType._EXPERIMENTAL_CUSTOM]: z.infer<typeof CustomFieldValue>
+}
+
+export type FieldTypeToFieldValue<T extends FieldType> = FieldTypeValueMap[T]
+
+type UnionToIntersection<U> = (
+  U extends unknown ? (x: U) => void : never
+) extends (x: infer I) => void
+  ? I
+  : never
+
+type ExtractFieldMap<T> = T extends {
+  declaration: { pages: readonly (infer Page)[] }
+}
+  ? Page extends { fields: readonly (infer Field)[] }
+    ? Field extends {
+        id: infer Id extends string
+        type: infer Type extends FieldType
+      }
+      ? Record<Id, FieldTypeToFieldValue<Type>>
+      : never
+    : never
+  : never
+
+export type EventConfigToDeclarationFormType<T extends EventConfig> =
+  UnionToIntersection<ExtractFieldMap<T>>
+
 /**
  * Maps complex or nested field types, such as Address fields, to their corresponding empty values.
  */
@@ -273,6 +349,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.ID_READER:
     case FieldType.LOADER:
     case FieldType.ALPHA_HIDDEN:
+    case FieldType.USER_ROLE:
       return null
     case FieldType.ADDRESS:
       return {
@@ -605,6 +682,13 @@ export const isCustomFieldType = (field: {
   value: FieldValue | FieldUpdateValue
 }): field is { value: CustomFieldValue; config: CustomField } => {
   return field.config.type === FieldType._EXPERIMENTAL_CUSTOM
+}
+
+export const isUserRoleFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue | FieldUpdateValue
+}): field is { value: string; config: UserRoleField } => {
+  return field.config.type === FieldType.USER_ROLE
 }
 
 export const isHiddenFieldType = (field: {
