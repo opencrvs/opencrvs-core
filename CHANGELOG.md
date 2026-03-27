@@ -4,6 +4,10 @@
 
 ### Breaking changes
 
+#### FieldType.PARAGRAPH configuration
+
+- `FieldType.PARAGRAPH` field no longer takes in a fontVariant style configuration. If a fontVariant is required, please use the new `FieldType.HEADING` field instead.
+
 #### Location APIs
 
 - **Removed following endpoints from gateway:**
