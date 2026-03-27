@@ -252,6 +252,7 @@ type FieldTypeValueMap = {
   [FieldType.COUNTRY]: z.infer<typeof TextValue>
   [FieldType.RADIO_GROUP]: z.infer<typeof TextValue>
   [FieldType.PARAGRAPH]: z.infer<typeof TextValue>
+  [FieldType.TITLE]: z.infer<typeof TextValue>
   [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
   [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof TextValue>
   [FieldType.FACILITY]: z.infer<typeof TextValue>
