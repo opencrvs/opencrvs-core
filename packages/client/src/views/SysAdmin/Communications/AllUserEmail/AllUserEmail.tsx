@@ -27,9 +27,10 @@ import {
   ResponsiveModal
 } from '@opencrvs/components'
 import styled from 'styled-components'
-import { useLazyQuery } from '@apollo/client'
+import { useMutation } from '@tanstack/react-query'
 import { useDispatch } from 'react-redux'
 import { toggleEmailAllUsersFeedbackToast } from '@client/notification/actions'
+import { trpcClient } from '@client/v2-events/trpc'
 
 const Form = styled.form`
   & > :not(:last-child) {
@@ -87,25 +88,37 @@ const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
     setSubject('')
     setBody('')
   }
+
+  const broadcastMutation = useMutation({
+    mutationFn: () =>
+      trpcClient.notification.broadcast.mutate({
+        subject,
+        body,
+        locale: intl.locale
+      })
+  })
+
   const handleConfirmSubmit = () => {
-    throw new Error('Not implemented yet')
+    hideModal()
+    broadcastMutation.mutate()
   }
 
-  // useEffect(() => {
-  //   if (data) {
-  //     dispatch(
-  //       toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
-  //     )
-  //   }
-  // }, [data, dispatch])
+  useEffect(() => {
+    if (broadcastMutation.isSuccess) {
+      dispatch(
+        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
+      )
+      resetForm()
+    }
+  }, [broadcastMutation.isSuccess, dispatch])
 
-  // useEffect(() => {
-  //   if (error) {
-  //     dispatch(
-  //       toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
-  //     )
-  //   }
-  // }, [error, dispatch])
+  useEffect(() => {
+    if (broadcastMutation.isError) {
+      dispatch(
+        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
+      )
+    }
+  }, [broadcastMutation.isError, dispatch])
 
   return (
     <>
