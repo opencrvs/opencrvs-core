@@ -91,6 +91,40 @@ test('Creates multiple locations under administrative area', async () => {
   expect(locations).toEqual(initialLocations.concat(locationPayload))
 })
 
+test('updates externalId on existing location when re-seeded with a value', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+
+  const locationId = generateUuid()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Location without external id',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: null
+    }
+  ])
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Location without external id',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: 'pcode123'
+    }
+  ])
+
+  const locations = await dataSeedingClient.locations.list()
+  const updated = locations.find((l) => l.id === locationId)
+
+  expect(updated?.externalId).toBe('pcode123')
+})
+
 test('seeding locations is additive, not destructive', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
