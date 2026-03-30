@@ -35,7 +35,6 @@ export interface GQLQuery {
   queryPersonByNidIdentifier?: GQLPerson
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   fetchMarriageRegistration?: GQLMarriageRegistration
-  fetchRecordDetailsForVerification?: GQLRecordDetails
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   getUser?: GQLUser
@@ -253,19 +252,6 @@ export interface GQLMarriageRegistration extends GQLEventRegistration {
   createdAt?: GQLDate
   updatedAt?: GQLDate
   history?: Array<GQLHistory | null>
-}
-
-export type GQLRecordDetails = GQLBirthRegistration | GQLDeathRegistration
-
-/** Use this to resolve union type RecordDetails */
-export type GQLPossibleRecordDetailsTypeNames =
-  | 'BirthRegistration'
-  | 'DeathRegistration'
-
-export interface GQLRecordDetailsNameMap {
-  RecordDetails: GQLRecordDetails
-  BirthRegistration: GQLBirthRegistration
-  DeathRegistration: GQLDeathRegistration
 }
 
 export interface GQLLocation {
@@ -1911,10 +1897,6 @@ export interface GQLResolver {
 
   RegistrationCountResult?: GQLRegistrationCountResultTypeResolver
   MarriageRegistration?: GQLMarriageRegistrationTypeResolver
-  RecordDetails?: {
-    __resolveType: GQLRecordDetailsTypeResolver
-  }
-
   Location?: GQLLocationTypeResolver
   User?: GQLUserTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
@@ -2036,7 +2018,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   fetchMarriageRegistration?: QueryToFetchMarriageRegistrationResolver<TParent>
-  fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
@@ -2287,21 +2268,6 @@ export interface QueryToFetchMarriageRegistrationResolver<
   (
     parent: TParent,
     args: QueryToFetchMarriageRegistrationArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface QueryToFetchRecordDetailsForVerificationArgs {
-  id: string
-}
-export interface QueryToFetchRecordDetailsForVerificationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: QueryToFetchRecordDetailsForVerificationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4308,16 +4274,6 @@ export interface MarriageRegistrationToHistoryResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLRecordDetailsTypeResolver<TParent = any> {
-  (
-    parent: TParent,
-    context: any,
-    info: GraphQLResolveInfo
-  ):
-    | 'BirthRegistration'
-    | 'DeathRegistration'
-    | Promise<'BirthRegistration' | 'DeathRegistration'>
-}
 export interface GQLLocationTypeResolver<TParent = any> {
   id?: LocationToIdResolver<TParent>
   _fhirID?: LocationTo_fhirIDResolver<TParent>

@@ -58,7 +58,7 @@ export default async function authenticateHandler(
   const response: IVerifyResponse = { token }
 
   recordUserAuditEvent(response.token, {
-    operation: 'user.LOGGED_IN',
+    operation: 'user.logged_in',
     requestData: { subjectId: userId },
     responseSummary: {}
   })
