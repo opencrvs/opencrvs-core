@@ -4,6 +4,7 @@
 import type { default as EventActionDraftsTable } from './EventActionDrafts'
 import type { default as LocationsTable } from './Locations'
 import type { default as UserCredentialsTable } from './UserCredentials'
+import type { default as NotificationsTable } from './Notifications'
 import type { default as SystemClientsTable } from './SystemClients'
 import type { default as AdministrativeAreasTable } from './AdministrativeAreas'
 import type { default as EventActionsTable } from './EventActions'
@@ -17,6 +18,8 @@ export default interface AppSchema {
   locations: LocationsTable
 
   userCredentials: UserCredentialsTable
+
+  notifications: NotificationsTable
 
   systemClients: SystemClientsTable
 

@@ -17,6 +17,7 @@ import { workqueueRouter } from './workqueue'
 import { administrativeAreaRouter } from './administrative-areas'
 import { integrationsRouter } from './integrations'
 import { attachmentsRouter } from './attachments'
+import { notificationRouter } from './notification'
 
 export const appRouter = router({
   event: eventRouter,
@@ -25,7 +26,8 @@ export const appRouter = router({
   workqueue: workqueueRouter,
   administrativeAreas: administrativeAreaRouter,
   integrations: integrationsRouter,
-  attachments: attachmentsRouter
+  attachments: attachmentsRouter,
+  notification: notificationRouter
 })
 
 /** @knipignore */
