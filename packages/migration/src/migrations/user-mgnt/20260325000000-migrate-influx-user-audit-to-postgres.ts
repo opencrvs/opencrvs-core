@@ -19,19 +19,19 @@ const EVENTS_POSTGRES_URL =
 
 /** Maps legacy v1 InfluxDB action names to new v2 operation names. */
 const ACTION_TO_OPERATION: Record<string, string> = {
-  LOGGED_IN: 'user.LOGGED_IN',
-  LOGGED_OUT: 'user.LOGGED_OUT',
-  CREATE_USER: 'user.CREATE_USER',
-  EDIT_USER: 'user.EDIT_USER',
-  PASSWORD_CHANGED: 'user.PASSWORD_CHANGED',
-  PASSWORD_RESET: 'user.PASSWORD_RESET',
-  PASSWORD_RESET_BY_ADMIN: 'user.PASSWORD_RESET_BY_ADMIN',
-  PHONE_NUMBER_CHANGED: 'user.PHONE_NUMBER_CHANGED',
-  EMAIL_ADDRESS_CHANGED: 'user.EMAIL_ADDRESS_CHANGED',
-  USERNAME_REMINDER: 'user.USERNAME_REMINDER',
-  USERNAME_REMINDER_BY_ADMIN: 'user.USERNAME_REMINDER_BY_ADMIN',
-  DEACTIVATE: 'user.DEACTIVATE',
-  REACTIVATE: 'user.REACTIVATE'
+  LOGGED_IN: 'user.logged_in',
+  LOGGED_OUT: 'user.logged_out',
+  CREATE_USER: 'user.create_user',
+  EDIT_USER: 'user.edit_user',
+  PASSWORD_CHANGED: 'user.password_changed',
+  PASSWORD_RESET: 'user.password_reset',
+  PASSWORD_RESET_BY_ADMIN: 'user.password_reset_by_admin',
+  PHONE_NUMBER_CHANGED: 'user.phone_number_changed',
+  EMAIL_ADDRESS_CHANGED: 'user.email_address_changed',
+  USERNAME_REMINDER: 'user.username_reminder',
+  USERNAME_REMINDER_BY_ADMIN: 'user.username_reminder_by_admin',
+  DEACTIVATE: 'user.deactivate',
+  REACTIVATE: 'user.reactivate'
 }
 
 /**
