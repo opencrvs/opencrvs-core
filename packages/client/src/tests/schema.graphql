@@ -1347,8 +1347,6 @@ input QuestionnaireQuestionInput {
   value: String
 }
 
-union RecordDetails = BirthRegistration | DeathRegistration
-
 enum RegAction {
   VERIFIED
   ASSIGNED

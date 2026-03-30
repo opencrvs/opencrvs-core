@@ -254,19 +254,6 @@ export interface GQLMarriageRegistration extends GQLEventRegistration {
   history?: Array<GQLHistory | null>
 }
 
-export type GQLRecordDetails = GQLBirthRegistration | GQLDeathRegistration
-
-/** Use this to resolve union type RecordDetails */
-export type GQLPossibleRecordDetailsTypeNames =
-  | 'BirthRegistration'
-  | 'DeathRegistration'
-
-export interface GQLRecordDetailsNameMap {
-  RecordDetails: GQLRecordDetails
-  BirthRegistration: GQLBirthRegistration
-  DeathRegistration: GQLDeathRegistration
-}
-
 export interface GQLLocation {
   id: string
   _fhirID?: string
@@ -1910,10 +1897,6 @@ export interface GQLResolver {
 
   RegistrationCountResult?: GQLRegistrationCountResultTypeResolver
   MarriageRegistration?: GQLMarriageRegistrationTypeResolver
-  RecordDetails?: {
-    __resolveType: GQLRecordDetailsTypeResolver
-  }
-
   Location?: GQLLocationTypeResolver
   User?: GQLUserTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
@@ -2285,21 +2268,6 @@ export interface QueryToFetchMarriageRegistrationResolver<
   (
     parent: TParent,
     args: QueryToFetchMarriageRegistrationArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface QueryToFetchRecordDetailsForVerificationArgs {
-  id: string
-}
-export interface QueryToFetchRecordDetailsForVerificationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: QueryToFetchRecordDetailsForVerificationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4306,16 +4274,6 @@ export interface MarriageRegistrationToHistoryResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLRecordDetailsTypeResolver<TParent = any> {
-  (
-    parent: TParent,
-    context: any,
-    info: GraphQLResolveInfo
-  ):
-    | 'BirthRegistration'
-    | 'DeathRegistration'
-    | Promise<'BirthRegistration' | 'DeathRegistration'>
-}
 export interface GQLLocationTypeResolver<TParent = any> {
   id?: LocationToIdResolver<TParent>
   _fhirID?: LocationTo_fhirIDResolver<TParent>

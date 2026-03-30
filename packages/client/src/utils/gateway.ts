@@ -1437,10 +1437,6 @@ type QueryFetchMonthWiseEventMetricsArgs = {
   timeStart: Scalars['String']
 }
 
-type QueryFetchRecordDetailsForVerificationArgs = {
-  id: Scalars['String']
-}
-
 type QueryFetchRegistrationArgs = {
   id: Scalars['ID']
 }
@@ -1621,8 +1617,6 @@ type QuestionnaireQuestionInput = {
   fieldId?: InputMaybe<Scalars['String']>
   value?: InputMaybe<Scalars['String']>
 }
-
-type RecordDetails = BirthRegistration | DeathRegistration
 
 export enum RegAction {
   ApprovedCorrection = 'APPROVED_CORRECTION',
@@ -7407,10 +7401,6 @@ export type SubmitActivateUserMutation = {
   __typename?: 'Mutation'
   activateUser?: string | null
 }
-
-type FetchRecordDetailsForVerificationQueryVariables = Exact<{
-  id: Scalars['String']
-}>
 
 type FetchViewRecordByCompositionQueryVariables = Exact<{
   id: Scalars['ID']
