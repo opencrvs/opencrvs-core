@@ -27,7 +27,7 @@ export default async function invalidateTokenHandler(
   const userId = getUserIdFromToken(token)
   if (userId) {
     recordUserAuditEvent(token, {
-      operation: 'user.LOGGED_OUT',
+      operation: 'user.logged_out',
       requestData: { subjectId: userId },
       responseSummary: {}
     })
