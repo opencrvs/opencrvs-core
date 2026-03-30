@@ -2,6 +2,10 @@
 
 ## 1.9.12
 
+### Infrastructure
+
+- Introduced `CONFIG_ACTION_CONFIRMATION_TOKEN_EXPIRY_SECONDS` environment variable for the auth service to control the expiry of action confirmation tokens. Defaults to `604800` seconds (7 days).
+
 ### Improvements
 
 - More expressive `ADDRESS` field configuration
