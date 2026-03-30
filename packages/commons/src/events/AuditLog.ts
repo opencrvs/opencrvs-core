@@ -174,7 +174,7 @@ export type AttachmentUploadAuditLog = {
 
 export const UserAuditRecordInput = z.discriminatedUnion('operation', [
   z.object({
-    operation: z.literal('user.CREATE_USER'),
+    operation: z.literal('user.create_user'),
     requestData: z.object({
       subjectId: z.string(),
       role: z.string(),
@@ -183,7 +183,7 @@ export const UserAuditRecordInput = z.discriminatedUnion('operation', [
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.DEACTIVATE'),
+    operation: z.literal('user.deactivate'),
     requestData: z.object({
       subjectId: z.string(),
       reason: z.string(),
@@ -192,7 +192,7 @@ export const UserAuditRecordInput = z.discriminatedUnion('operation', [
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.REACTIVATE'),
+    operation: z.literal('user.reactivate'),
     requestData: z.object({
       subjectId: z.string(),
       reason: z.string(),
@@ -201,52 +201,52 @@ export const UserAuditRecordInput = z.discriminatedUnion('operation', [
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.EDIT_USER'),
+    operation: z.literal('user.edit_user'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.EMAIL_ADDRESS_CHANGED'),
+    operation: z.literal('user.email_address_changed'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({ email: z.string() })
   }),
   z.object({
-    operation: z.literal('user.LOGGED_IN'),
+    operation: z.literal('user.logged_in'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.LOGGED_OUT'),
+    operation: z.literal('user.logged_out'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.PASSWORD_CHANGED'),
+    operation: z.literal('user.password_changed'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.PASSWORD_RESET'),
+    operation: z.literal('user.password_reset'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.PASSWORD_RESET_BY_ADMIN'),
+    operation: z.literal('user.password_reset_by_admin'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.PHONE_NUMBER_CHANGED'),
+    operation: z.literal('user.phone_number_changed'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({ phoneNumber: z.string() })
   }),
   z.object({
-    operation: z.literal('user.USERNAME_REMINDER'),
+    operation: z.literal('user.username_reminder'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({})
   }),
   z.object({
-    operation: z.literal('user.USERNAME_REMINDER_BY_ADMIN'),
+    operation: z.literal('user.username_reminder_by_admin'),
     requestData: z.object({ subjectId: z.string() }),
     responseSummary: z.object({})
   })
