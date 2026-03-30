@@ -76,7 +76,8 @@ import {
   ButtonFieldValue,
   VerificationStatusValue,
   AgeValue,
-  FieldUpdateValue
+  FieldUpdateValue,
+  DateValue
 } from './FieldValue'
 import { FullDocumentPath } from '../documents'
 import {

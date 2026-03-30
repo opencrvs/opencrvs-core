@@ -70,7 +70,7 @@ export type EventConfigInput = Omit<
  *
  * `Event.parse(config)` will throw an error if the configuration is invalid.
  */
-export const EventConfig: z.ZodType<EventConfig, EventConfigInput> = z.object({
+const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
   id: z
     .string()
     .describe(
@@ -124,15 +124,16 @@ export const EventConfig: z.ZodType<EventConfig, EventConfigInput> = z.object({
     )
 })
 
-export const EventConfig: z.ZodType<EventConfig> = _EventConfigBase
-  .superRefine((event, ctx) => {
-    validateAdvancedSearchConfig(event, ctx)
-    validateDateOfEvent(event, ctx)
-    validatePlaceOfEvent(event, ctx)
-    validateActionFlags(event, ctx)
-    validateActionOrder(event, ctx)
-  })
-  .meta({
-    id: 'EventConfig'
-  })
-  .describe('Configuration defining an event type.')
+export const EventConfig: z.ZodType<EventConfig, EventConfigInput> =
+  _EventConfigBase
+    .superRefine((event, ctx) => {
+      validateAdvancedSearchConfig(event, ctx)
+      validateDateOfEvent(event, ctx)
+      validatePlaceOfEvent(event, ctx)
+      validateActionFlags(event, ctx)
+      validateActionOrder(event, ctx)
+    })
+    .meta({
+      id: 'EventConfig'
+    })
+    .describe('Configuration defining an event type.')
