@@ -18,6 +18,7 @@ import {
   countTodayNotifications,
   createNotification
 } from '@events/storage/postgres/events/notifications'
+import { DAILY_NOTIFICATION_LIMIT } from '@events/workers/notificationWorker'
 
 export const notificationRouter = router({
   broadcast: userOnlyProcedure
@@ -35,7 +36,7 @@ export const notificationRouter = router({
       }
 
       const todayCount = await countTodayNotifications()
-      if (todayCount >= 1) {
+      if (todayCount >= DAILY_NOTIFICATION_LIMIT) {
         throw new TRPCError({
           code: 'TOO_MANY_REQUESTS',
           message: 'A broadcast has already been sent today'
