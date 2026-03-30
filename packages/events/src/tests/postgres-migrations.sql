@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
+\restrict sqovC7F8n9k9mwKlFli1VbzfneOvhbrw4Knii8eyqDH3dUAmni5wroszfQyXscX
+
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -25,6 +27,48 @@ CREATE SCHEMA app;
 
 
 ALTER SCHEMA app OWNER TO events_migrator;
+
+--
+-- Name: mongo_fdw; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS mongo_fdw WITH SCHEMA app;
+
+
+--
+-- Name: EXTENSION mongo_fdw; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION mongo_fdw IS 'foreign data wrapper for MongoDB access';
+
+
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
 
 --
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
@@ -50,6 +94,25 @@ CREATE TYPE app.user_type AS ENUM (
 
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
+
+--
+-- Name: mongo; Type: SERVER; Schema: -; Owner: postgres
+--
+
+CREATE SERVER mongo FOREIGN DATA WRAPPER mongo_fdw OPTIONS (
+    address 'mongo1',
+    authentication_database 'admin',
+    port '27017'
+);
+
+
+ALTER SERVER mongo OWNER TO postgres;
+
+--
+-- Name: USER MAPPING postgres SERVER mongo; Type: USER MAPPING; Schema: -; Owner: postgres
+--
+
+CREATE USER MAPPING FOR postgres SERVER mongo;
 
 
 SET default_tablespace = '';
@@ -230,6 +293,77 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 
 --
+-- Name: legacy_practitioners; Type: FOREIGN TABLE; Schema: app; Owner: postgres
+--
+
+CREATE FOREIGN TABLE app.legacy_practitioners (
+    _id name,
+    id text,
+    extension json
+)
+SERVER mongo
+OPTIONS (
+    collection 'Practitioner',
+    database 'hearth-dev'
+);
+
+
+ALTER FOREIGN TABLE app.legacy_practitioners OWNER TO postgres;
+
+--
+-- Name: legacy_systems; Type: FOREIGN TABLE; Schema: app; Owner: postgres
+--
+
+CREATE FOREIGN TABLE app.legacy_systems (
+    _id name,
+    name text,
+    "createdBy" text,
+    scope json,
+    "secretHash" text,
+    salt text,
+    sha_secret text,
+    status text,
+    "creationDate" bigint
+)
+SERVER mongo
+OPTIONS (
+    collection 'systems',
+    database 'user-mgnt'
+);
+
+
+ALTER FOREIGN TABLE app.legacy_systems OWNER TO postgres;
+
+--
+-- Name: legacy_users; Type: FOREIGN TABLE; Schema: app; Owner: postgres
+--
+
+CREATE FOREIGN TABLE app.legacy_users (
+    _id name,
+    name json,
+    username text,
+    "emailForNotification" text,
+    mobile text,
+    "fullHonorificName" text,
+    "passwordHash" text,
+    salt text,
+    role text,
+    "primaryOfficeId" text,
+    "practitionerId" text,
+    status text,
+    "securityQuestionAnswers" json,
+    "avatar.data" text
+)
+SERVER mongo
+OPTIONS (
+    collection 'users',
+    database 'user-mgnt'
+);
+
+
+ALTER FOREIGN TABLE app.legacy_users OWNER TO postgres;
+
+--
 -- Name: locations; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -247,6 +381,43 @@ CREATE TABLE app.locations (
 
 
 ALTER TABLE app.locations OWNER TO events_migrator;
+
+--
+-- Name: notifications; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.notifications (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    subject text NOT NULL,
+    body text NOT NULL,
+    locale text DEFAULT 'en'::text NOT NULL,
+    recipients text[] NOT NULL,
+    created_by uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    status text DEFAULT 'PENDING'::text NOT NULL,
+    progress integer DEFAULT 0 NOT NULL,
+    retry_count integer DEFAULT 0 NOT NULL,
+    error jsonb,
+    sent_at timestamp with time zone,
+    CONSTRAINT notifications_status_check CHECK ((status = ANY (ARRAY['PENDING'::text, 'SENT'::text, 'FAILED'::text])))
+);
+
+
+ALTER TABLE app.notifications OWNER TO events_migrator;
+
+--
+-- Name: COLUMN notifications.recipients; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.notifications.recipients IS 'All BCC recipient emails, snapshotted at creation time.';
+
+
+--
+-- Name: COLUMN notifications.progress; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.notifications.progress IS 'Number of recipients sent so far. Worker resumes from this offset on retry.';
+
 
 --
 -- Name: pgmigrations; Type: TABLE; Schema: app; Owner: events_migrator
@@ -282,6 +453,21 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNER TO events_migrator;
 
 ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
+
+--
+-- Name: pgmigrations_legacy_data_id_seq; Type: SEQUENCE; Schema: app; Owner: postgres
+--
+
+CREATE SEQUENCE app.pgmigrations_legacy_data_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE app.pgmigrations_legacy_data_id_seq OWNER TO postgres;
 
 --
 -- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
@@ -466,6 +652,14 @@ ALTER TABLE ONLY app.locations
 
 
 --
+-- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.notifications
+    ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pgmigrations pgmigrations_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -580,6 +774,13 @@ CREATE INDEX idx_locations_valid_until ON app.locations USING btree (valid_until
 
 
 --
+-- Name: notifications_status_idx; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX notifications_status_idx ON app.notifications USING btree (status) WHERE (status = 'PENDING'::text);
+
+
+--
 -- Name: system_clients_legacy_id_idx; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
@@ -640,6 +841,14 @@ ALTER TABLE ONLY app.event_actions
 
 ALTER TABLE ONLY app.locations
     ADD CONSTRAINT locations_administrative_area_id_fkey FOREIGN KEY (administrative_area_id) REFERENCES app.administrative_areas(id);
+
+
+--
+-- Name: notifications notifications_created_by_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.notifications
+    ADD CONSTRAINT notifications_created_by_fkey FOREIGN KEY (created_by) REFERENCES app.users(id);
 
 
 --
@@ -708,6 +917,13 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 
 
 --
+-- Name: TABLE notifications; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE app.notifications TO events_app;
+
+
+--
 -- Name: TABLE system_clients; Type: ACL; Schema: app; Owner: events_migrator
 --
 
@@ -731,3 +947,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict sqovC7F8n9k9mwKlFli1VbzfneOvhbrw4Knii8eyqDH3dUAmni5wroszfQyXscX
+
