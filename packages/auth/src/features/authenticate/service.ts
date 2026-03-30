@@ -25,6 +25,7 @@ import {
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
 import { logger, UUID, IUserName } from '@opencrvs/commons'
+import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
 import { TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
@@ -272,4 +273,25 @@ export function verifyToken(token: string) {
 
 export function getPublicKey() {
   return publicCert
+}
+
+export async function recordUserAuditEvent(
+  token: string,
+  input: UserAuditLog
+): Promise<void> {
+  try {
+    const client = createTRPCClient<AppRouter>({
+      links: [
+        httpBatchLink({
+          url: env.EVENTS_URL,
+          transformer: superjson,
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]
+    })
+    await client.user.audit.record.mutate(input)
+  } catch (err) {
+    logger.error('Failed to record user audit event', err)
+    throw err
+  }
 }

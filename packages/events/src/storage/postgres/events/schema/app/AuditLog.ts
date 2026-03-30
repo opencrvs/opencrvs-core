@@ -36,6 +36,9 @@ export default interface AuditLogTable {
   >
 
   createdAt: ColumnType<string, string | undefined, string>
+
+  /** Client-supplied idempotency key. Existing rows are backfilled with random UUIDs. */
+  transactionId: ColumnType<string, string | undefined, string>
 }
 
 export type AuditLog = Selectable<AuditLogTable>

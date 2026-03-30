@@ -1222,7 +1222,6 @@ type Query {
     event: String
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
-  fetchRecordDetailsForVerification(id: String!): RecordDetails
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User
@@ -1347,8 +1346,6 @@ input QuestionnaireQuestionInput {
   fieldId: String
   value: String
 }
-
-union RecordDetails = BirthRegistration | DeathRegistration
 
 enum RegAction {
   VERIFIED
