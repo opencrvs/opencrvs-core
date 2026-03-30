@@ -49,6 +49,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 interface Props {
   id: string
   name: string
+  form: EventState
   onBlur: (formikFieldId: string, newTouched: FormState<boolean>) => void
   onChange: (newValue: AddressFieldValue) => void
   touched: IndexMap<FormState<boolean>> | undefined
@@ -533,6 +534,7 @@ function AddressInput(props: Props) {
     onBlur,
     onChange,
     config: addressConfig,
+    form,
     disabled,
     name,
     value = {
@@ -576,7 +578,7 @@ function AddressInput(props: Props) {
       fields={fields}
       // addressType is passed as context to the nested form due to the value
       // being referred in conditionals but not having any associated field
-      formContext={{ addressType: value.addressType }}
+      formContext={{ ...form, addressType: value.addressType }}
       formTouched={nestedTouched}
       formValues={nestedValue}
       validatorContext={validatorContext}
