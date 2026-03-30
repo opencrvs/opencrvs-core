@@ -1378,7 +1378,6 @@ type Query = {
   fetchLocationWiseEventMetrics?: Maybe<Array<LocationWiseEstimationMetric>>
   fetchMarriageRegistration?: Maybe<MarriageRegistration>
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
-  fetchRecordDetailsForVerification?: Maybe<RecordDetails>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
@@ -1436,10 +1435,6 @@ type QueryFetchMonthWiseEventMetricsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
-}
-
-type QueryFetchRecordDetailsForVerificationArgs = {
-  id: Scalars['String']
 }
 
 type QueryFetchRegistrationArgs = {
@@ -1622,8 +1617,6 @@ type QuestionnaireQuestionInput = {
   fieldId?: InputMaybe<Scalars['String']>
   value?: InputMaybe<Scalars['String']>
 }
-
-type RecordDetails = BirthRegistration | DeathRegistration
 
 export enum RegAction {
   ApprovedCorrection = 'APPROVED_CORRECTION',
@@ -7407,137 +7400,6 @@ export type SubmitActivateUserMutationVariables = Exact<{
 export type SubmitActivateUserMutation = {
   __typename?: 'Mutation'
   activateUser?: string | null
-}
-
-type FetchRecordDetailsForVerificationQueryVariables = Exact<{
-  id: Scalars['String']
-}>
-
-type FetchRecordDetailsForVerificationQuery = {
-  __typename?: 'Query'
-  fetchRecordDetailsForVerification?:
-    | {
-        __typename?: 'BirthRegistration'
-        id: string
-        createdAt?: any | null
-        child?: {
-          __typename?: 'Person'
-          birthDate?: PlainDate | null
-          gender?: string | null
-          name?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            familyName?: string | null
-          } | null> | null
-        } | null
-        eventLocation?: {
-          __typename?: 'Location'
-          id: string
-          name?: string | null
-          description?: string | null
-          type?: string | null
-          address?: {
-            __typename?: 'Address'
-            district?: string | null
-            state?: string | null
-            city?: string | null
-            country?: string | null
-            line?: Array<string | null> | null
-          } | null
-        } | null
-        registration?: {
-          __typename?: 'Registration'
-          trackingId?: string | null
-          registrationNumber?: string | null
-          type?: RegistrationType | null
-        } | null
-        history?: Array<{
-          __typename?: 'History'
-          action?: RegAction | null
-          regStatus?: RegStatus | null
-          date?: any | null
-          user?: {
-            __typename?: 'User'
-            primaryOffice: {
-              __typename?: 'Location'
-              hierarchy?: Array<{
-                __typename?: 'Location'
-                id: string
-                name?: string | null
-                alias?: Array<string> | null
-              }> | null
-            }
-            name: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-            }>
-          } | null
-        } | null> | null
-      }
-    | {
-        __typename?: 'DeathRegistration'
-        id: string
-        createdAt?: any | null
-        deceased?: {
-          __typename?: 'Person'
-          birthDate?: PlainDate | null
-          gender?: string | null
-          name?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            familyName?: string | null
-          } | null> | null
-          deceased?: {
-            __typename?: 'Deceased'
-            deathDate?: PlainDate | null
-          } | null
-        } | null
-        eventLocation?: {
-          __typename?: 'Location'
-          id: string
-          name?: string | null
-          description?: string | null
-          type?: string | null
-          address?: {
-            __typename?: 'Address'
-            district?: string | null
-            state?: string | null
-            city?: string | null
-            country?: string | null
-          } | null
-        } | null
-        registration?: {
-          __typename?: 'Registration'
-          trackingId?: string | null
-          registrationNumber?: string | null
-          type?: RegistrationType | null
-        } | null
-        history?: Array<{
-          __typename?: 'History'
-          action?: RegAction | null
-          regStatus?: RegStatus | null
-          date?: any | null
-          user?: {
-            __typename?: 'User'
-            primaryOffice: {
-              __typename?: 'Location'
-              hierarchy?: Array<{
-                __typename?: 'Location'
-                id: string
-                name?: string | null
-                alias?: Array<string> | null
-              }> | null
-            }
-            name: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-            }>
-          } | null
-        } | null> | null
-      }
-    | null
 }
 
 type FetchViewRecordByCompositionQueryVariables = Exact<{
