@@ -35,7 +35,6 @@ export interface GQLQuery {
   queryPersonByNidIdentifier?: GQLPerson
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   fetchMarriageRegistration?: GQLMarriageRegistration
-  fetchRecordDetailsForVerification?: GQLRecordDetails
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   getUser?: GQLUser
@@ -2036,7 +2035,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   fetchMarriageRegistration?: QueryToFetchMarriageRegistrationResolver<TParent>
-  fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
