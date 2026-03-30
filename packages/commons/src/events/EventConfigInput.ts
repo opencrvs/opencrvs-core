@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as z from 'zod/v4'
-import { EventConfig } from './EventConfig'
 import {
   FormPageConfig,
   FormPageConfigInput,
@@ -22,8 +20,6 @@ import {
   DeclarationFormConfig,
   DeclarationFormConfigInput
 } from './FormConfig'
-export type EventConfigInput = z.input<typeof EventConfig>
-
 export const defineDeclarationForm = (
   form: DeclarationFormConfigInput
 ): DeclarationFormConfig => DeclarationFormConfig.parse(form)
