@@ -116,7 +116,12 @@ function buildResponseSummary(
 export const up = async (db: Db, _client: MongoClient) => {
   let rows: InfluxRow[]
   try {
-    rows = (await influxQuery('SELECT * FROM user_audit_event')) as InfluxRow[]
+    const actionFilter = Object.keys(ACTION_TO_OPERATION)
+      .map((a) => `action = '${a}'`)
+      .join(' OR ')
+    rows = (await influxQuery(
+      `SELECT * FROM user_audit_event WHERE ${actionFilter}`
+    )) as InfluxRow[]
   } catch (err) {
     console.log(
       'Could not read user_audit_event from InfluxDB (measurement may not exist):',
