@@ -34,7 +34,7 @@ export function useUserAllowedActions(event: EventIndex) {
   const locations = getLocations.useSuspenseQuery()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
-  const currentUser = useCurrentUser()
+  const { currentUser } = useCurrentUser()
 
   const eventWithHierarchy = buildEventIndexWithHierarchy(event, {
     administrativeAreas,

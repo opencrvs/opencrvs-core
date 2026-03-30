@@ -17,7 +17,7 @@ import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
 import * as routes from '@client/navigation/routes'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
-import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
+import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userEditor/UserEditor'
 import { SCOPES } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components'
 import * as React from 'react'
@@ -108,38 +108,6 @@ export const routesConfig = [
             >
               <TeamSearch />
             </ProtectedRoute>
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.CREATE_USER_ON_LOCATION,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.CREATE_USER_SECTION,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.REVIEW_USER_FORM,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: routes.REVIEW_USER_DETAILS,
-        element: (
-          <TRPCProvider>
-            <CreateNewUser />
           </TRPCProvider>
         )
       }

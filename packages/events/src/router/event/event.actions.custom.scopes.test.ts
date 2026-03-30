@@ -96,7 +96,7 @@ test('Check scopes against event.actions.custom', async () => {
         user,
         scope,
         clientReadingAllEvents,
-        (client) =>
+        async (client) =>
           client.event.actions.custom.request({
             eventId,
             transactionId: getUUID(),

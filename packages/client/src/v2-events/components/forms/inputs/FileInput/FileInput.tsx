@@ -37,6 +37,7 @@ function FileInput({
   label,
   error,
   touched,
+  filePath,
   disabled,
   maxImageSize
 }: {
@@ -48,6 +49,7 @@ function FileInput({
   name: string
   description?: string
   error?: string
+  filePath: string
   label: string
   touched?: boolean
   disabled?: boolean
@@ -59,7 +61,7 @@ function FileInput({
   })
   const { processImageFile } = useImageProcessing()
 
-  const { uploadFile } = useFileUpload(name, {
+  const { uploadFile } = useFileUpload(filePath, name, {
     onSuccess: ({ path, originalFilename, type }) => {
       setFile({
         path,

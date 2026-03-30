@@ -15,7 +15,7 @@ import { getClient } from '@events/storage/postgres/events'
 import { NewSystemClients } from './schema/app/SystemClients'
 import Schema from './schema/Database'
 
-function json<T> (object: T): RawBuilder<T> {
+function json<T>(object: T): RawBuilder<T> {
   return sql`cast (${JSON.stringify(object)} as jsonb)`
 }
 
@@ -43,7 +43,15 @@ export async function listSystemClients(
   const db = trx ?? getClient()
   let query = db
     .selectFrom('systemClients')
-    .select(['id', 'name', 'scopes', 'status', 'legacyId'])
+    .select([
+      'id',
+      'name',
+      'scopes',
+      'status',
+      'legacyId',
+      'createdAt',
+      'createdBy'
+    ])
 
   if (filter?.status) {
     query = query.where('status', '=', filter.status)
@@ -64,14 +72,49 @@ export async function getSystemByLegacyId(
     .executeTakeFirstOrThrow()
 }
 
-export async function getSystemClientById(
-  id: UUID,
-  trx?: Kysely<Schema>
-) {
+export async function getSystemClientById(id: UUID, trx?: Kysely<Schema>) {
   const db = trx ?? getClient()
   return db
     .selectFrom('systemClients')
     .selectAll()
     .where('id', '=', id)
+    .executeTakeFirstOrThrow()
+}
+
+export async function updateSystemClientStatus(
+  id: UUID,
+  status: 'active' | 'disabled',
+  trx?: Kysely<Schema>
+) {
+  const db = trx ?? getClient()
+  return db
+    .updateTable('systemClients')
+    .set({ status })
+    .where('id', '=', id)
+    .returning(['id', 'name', 'scopes', 'status'])
+    .executeTakeFirstOrThrow()
+}
+
+export async function deleteSystemClient(id: UUID, trx?: Kysely<Schema>) {
+  const db = trx ?? getClient()
+  return db
+    .deleteFrom('systemClients')
+    .where('id', '=', id)
+    .returning(['id', 'name'])
+    .executeTakeFirstOrThrow()
+}
+
+export async function refreshSystemClientSecret(
+  id: UUID,
+  secretHash: string,
+  salt: string,
+  trx?: Kysely<Schema>
+) {
+  const db = trx ?? getClient()
+  return db
+    .updateTable('systemClients')
+    .set({ secretHash, salt })
+    .where('id', '=', id)
+    .returning(['id', 'name', 'scopes', 'status'])
     .executeTakeFirstOrThrow()
 }

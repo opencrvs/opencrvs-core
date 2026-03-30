@@ -12,24 +12,24 @@ import {
   TAB_GROUPS,
   WORKQUEUE_TABS
 } from '@client/components/interface/WorkQueueTabs'
-import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { SCOPES } from '@opencrvs/commons/client'
 import { RECORD_DECLARE_SCOPES, usePermissions } from './useAuthorization'
 
 interface Tab {
   name: string
-  scopes?: Scope[]
-  denyScopes?: Scope[]
+  scopes?: string[]
+  denyScopes?: string[]
 }
 
 interface Group {
   group: string
-  scopes?: Scope[]
+  scopes?: string[]
   tabs: Tab[]
 }
 
 interface NavigationConfig {
   name: string
-  scopes?: Scope[]
+  scopes?: string[]
   tabs: Tab[]
 }
 
@@ -133,7 +133,7 @@ const routeAccess: NavigationConfig[] = [
       },
       {
         name: WORKQUEUE_TABS.systems,
-        scopes: [SCOPES.CONFIG_UPDATE_ALL]
+        scopes: [SCOPES.INTEGRATION_CREATE]
       },
       {
         name: WORKQUEUE_TABS.communications,
@@ -172,7 +172,7 @@ const routeAccess: NavigationConfig[] = [
 export function useNavigation() {
   const { hasAnyScope } = usePermissions()
 
-  const hasAccess = (scopes?: Scope[], denyScopes?: Scope[]): boolean => {
+  const hasAccess = (scopes?: string[], denyScopes?: string[]): boolean => {
     const hasRequiredScope =
       !scopes || scopes.length === 0 || hasAnyScope(scopes)
     const hasDeniedScope = denyScopes && hasAnyScope(denyScopes)

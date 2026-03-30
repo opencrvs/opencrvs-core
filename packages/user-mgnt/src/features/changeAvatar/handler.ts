@@ -47,7 +47,6 @@ export default async function changeAvatarHandler(
   }
 
   user.avatar = userUpdateData.avatar
-
   try {
     await User.update({ _id: user._id }, user)
   } catch (err) {

@@ -11,8 +11,7 @@
  */
 
 import { ActionType } from './ActionType'
-import { EventConfig } from './EventConfig'
-import { EventConfigInput } from './EventConfigInput'
+import { EventConfig, EventConfigInput } from './EventConfig'
 
 const IGNORED_EVENT_TYPES = [
   'FOOTBALL_CLUB_MEMBERSHIP',

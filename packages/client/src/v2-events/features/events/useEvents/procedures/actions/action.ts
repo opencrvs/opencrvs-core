@@ -402,7 +402,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
-  // @TODO: consider whether this should be here.
+
   const validatorContext = useValidatorContext()
 
   const allOptions = {
@@ -500,7 +500,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
   mutationName: T
 ) {
   const eventConfigurations = useEventConfigurations()
-  // @TODO: consider whether this should be here.
+
   const validatorContext = useValidatorContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({

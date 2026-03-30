@@ -18,22 +18,15 @@ export function useRoles() {
   const trpc = useTRPC()
   return {
     listRoles: {
-      useQuery: (
-        options?: {
-          enabled?: boolean
-        }
-      ) => {
+      useQuery: (options?: { enabled?: boolean }) => {
         return useQuery(trpc.user.roles.list.queryOptions())
       },
       useSuspenseQuery: () => {
-        return [
-          useSuspenseQuery(trpc.user.roles.list.queryOptions()).data
-        ]
+        return [useSuspenseQuery(trpc.user.roles.list.queryOptions()).data]
       }
     }
   }
 }
-
 
 const messages = defineMessages({
   role: {
