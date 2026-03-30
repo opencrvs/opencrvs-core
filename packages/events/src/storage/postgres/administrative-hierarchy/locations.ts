@@ -52,6 +52,12 @@ export async function setLocationsInTrx(
              THEN excluded.valid_until
              ELSE locations.valid_until
            END`,
+          externalId: () =>
+            sql`CASE
+             WHEN excluded.external_id IS NOT NULL
+             THEN excluded.external_id
+             ELSE locations.external_id
+           END`,
           deletedAt: null
         })
       )
