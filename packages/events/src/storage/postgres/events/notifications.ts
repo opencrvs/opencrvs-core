@@ -11,6 +11,7 @@
 
 import { UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
+import { NOTIFICATION_RETRY_LIMIT } from '@events/workers/notificationWorker'
 
 function startOfToday(): string {
   const d = new Date()
@@ -47,7 +48,7 @@ export async function getNextProcessableNotification() {
     .where((eb) =>
       eb.or([
         eb('status', '=', 'PENDING'),
-        eb.and([eb('status', '=', 'FAILED'), eb('retryCount', '<', 3)])
+        eb.and([eb('status', '=', 'FAILED'), eb('retryCount', '<', NOTIFICATION_RETRY_LIMIT)])
       ])
     )
     .orderBy('createdAt', 'asc')

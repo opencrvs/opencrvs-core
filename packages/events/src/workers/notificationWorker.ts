@@ -26,6 +26,7 @@ import {
 export const BCC_CHUNK_SIZE = 500
 export const POLL_INTERVAL_MS = 30_000
 export const DAILY_NOTIFICATION_LIMIT = 1
+export const NOTIFICATION_RETRY_LIMIT = 3
 
 async function processNextNotification() {
   const notification = await getNextProcessableNotification()
