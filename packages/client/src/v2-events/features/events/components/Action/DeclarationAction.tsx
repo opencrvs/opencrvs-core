@@ -92,20 +92,6 @@ function useActionGuard(
       `Action ${actionType} not available for the event ${event.id} with status ${eventState.status} ${eventState.flags.length > 0 ? `(flags: ${eventState.flags.join(', ')})` : ''}`
     )
   }
-
-  // In the declare flow, user is allowed if they have permission for either DECLARE or NOTIFY;
-  // otherwise strict permission by action type.
-  const isPermitted =
-    actionType === ActionType.DECLARE
-      ? isActionAllowed(ActionType.DECLARE) ||
-        isActionAllowed(ActionType.NOTIFY)
-      : isActionAllowed(actionType)
-
-  if (!isPermitted) {
-    throw new Error(
-      `User does not have permission to perform action ${actionType} on event ${event.id}`
-    )
-  }
 }
 
 /**
