@@ -34,6 +34,10 @@ async function processNextNotification() {
     return
   }
 
+  // PostgreSQL arrays preserve insertion order (elements are stored and accessed
+  // positionally), so slicing by progress offset is safe across retries — the
+  // same index always refers to the same recipient.
+  // https://www.postgresql.org/docs/9.3/arrays.html#AEN6942
   const chunk = notification.recipients.slice(
     notification.progress,
     notification.progress + BCC_CHUNK_SIZE
