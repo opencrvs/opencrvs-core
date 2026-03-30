@@ -22,6 +22,7 @@ import {
   flattenFormState,
   FormState,
   IndexMap,
+  isFieldVisible,
   mapFormState,
   ValidatorContext
 } from '@opencrvs/commons/client'
@@ -156,7 +157,11 @@ export const FormFieldGenerator = forwardRef<
     }))
     const intl = useIntl()
     const getDefaultValues = useDefaultValue()
-    const defaultPageValues = getDefaultValues(fields)
+    const defaultPageValues = getDefaultValues(
+      fields.filter((field) =>
+        isFieldVisible(field, fullForm, validatorContext)
+      )
+    )
 
     const formikCompatibleInitialValues = makeFormFieldIdsFormikCompatible({
       ...defaultPageValues,
