@@ -148,7 +148,8 @@ CREATE TABLE app.audit_log (
     operation text NOT NULL,
     request_data jsonb,
     response_summary jsonb,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    transaction_id text DEFAULT (gen_random_uuid())::text NOT NULL
 );
 
 
@@ -194,6 +195,13 @@ COMMENT ON COLUMN app.audit_log.request_data IS 'JSON blob of the request payloa
 --
 
 COMMENT ON COLUMN app.audit_log.response_summary IS 'Per-endpoint curated summary of the response (e.g. search terms used and count + IDs of results returned). Not the raw response payload.';
+
+
+--
+-- Name: COLUMN audit_log.transaction_id; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.transaction_id IS 'Client-supplied idempotency key. Existing rows are backfilled with random UUIDs.';
 
 
 --
@@ -478,10 +486,10 @@ CREATE TABLE app.system_clients (
     legacy_id text,
     name text NOT NULL,
     scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
-    created_by text NOT NULL,
-    secret_hash text NOT NULL,
-    salt text NOT NULL,
-    sha_secret text NOT NULL,
+    created_by text,
+    secret_hash text,
+    salt text,
+    sha_secret text,
     status text DEFAULT 'active'::text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT system_clients_status_check CHECK ((status = ANY (ARRAY['active'::text, 'disabled'::text])))
@@ -757,6 +765,13 @@ CREATE INDEX idx_audit_log_created_at ON app.audit_log USING btree (created_at);
 --
 
 CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
+
+
+--
+-- Name: idx_audit_log_transaction_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
 
 
 --
