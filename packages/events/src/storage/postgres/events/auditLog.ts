@@ -18,9 +18,7 @@ import { getClient } from '@events/storage/postgres/events'
  * All parameters must be supplied explicitly by the caller —
  * do not pass tokens or context objects directly.
  */
-export async function writeAuditLog(
-  params: AuditLogParams
-) {
+export async function writeAuditLog(params: AuditLogParams) {
   const db = getClient()
   return db
     .insertInto('auditLog')
@@ -32,4 +30,67 @@ export async function writeAuditLog(
       responseSummary: params.responseSummary
     })
     .execute()
+}
+
+interface UserAuditLogQuery {
+  subjectId: string
+  skip?: number
+  count?: number
+  timeStart?: string
+  timeEnd?: string
+}
+
+/**
+ * Reads user audit log entries for a given subject user.
+ * Filters to rows where requestData.subjectId matches and operation starts with 'user.audit.'.
+ */
+export async function queryUserAuditLog({
+  subjectId,
+  skip = 0,
+  count = 10,
+  timeStart,
+  timeEnd
+}: UserAuditLogQuery) {
+  const db = getClient()
+
+  let query = db
+    .selectFrom('auditLog')
+    .selectAll()
+    .where('operation', 'like', 'user.%')
+    .where('clientId', '=', subjectId)
+
+  if (timeStart) {
+    query = query.where('createdAt', '>=', timeStart)
+  }
+
+  if (timeEnd) {
+    query = query.where('createdAt', '<=', timeEnd)
+  }
+
+  const results = await query
+    .orderBy('createdAt', 'desc')
+    .limit(count)
+    .offset(skip)
+    .execute()
+
+  let countQuery = db
+    .selectFrom('auditLog')
+    .select(({ fn }) => [fn.count<string>('id').as('count')])
+    .where('operation', 'like', 'user.%')
+    .where('clientId', '=', subjectId)
+
+  if (timeStart) {
+    countQuery = countQuery.where('createdAt', '>=', timeStart)
+  }
+
+  if (timeEnd) {
+    countQuery = countQuery.where('createdAt', '<=', timeEnd)
+  }
+
+  const totalResult = await countQuery.executeTakeFirstOrThrow()
+
+  return {
+    results,
+    total: Number(totalResult.count)
+  }
 }

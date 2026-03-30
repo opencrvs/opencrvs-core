@@ -26,6 +26,14 @@ jest.mock('@auth/features/verifyCode/service', () => {
   }
 })
 
+jest.mock('@auth/features/authenticate/service', () => {
+  const actual = jest.requireActual('@auth/features/authenticate/service')
+  return {
+    ...actual,
+    recordUserAuditEvent: jest.fn().mockResolvedValue(undefined)
+  }
+})
+
 describe('authenticate handler receives a request', () => {
   let server: AuthServer
 
