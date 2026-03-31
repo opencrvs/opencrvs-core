@@ -922,6 +922,8 @@ components:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
           $ref: "#/components/schemas/ExactUserType"
+        updatedByUserRole:
+          $ref: "#/components/schemas/Exact"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
@@ -14962,6 +14964,8 @@ components:
           $ref: "#/components/schemas/ExactOutput"
         createdByUserType:
           $ref: "#/components/schemas/ExactUserTypeOutput"
+        updatedByUserRole:
+          $ref: "#/components/schemas/ExactOutput"
         createdBy:
           $ref: "#/components/schemas/ExactOutput"
         updatedBy:
