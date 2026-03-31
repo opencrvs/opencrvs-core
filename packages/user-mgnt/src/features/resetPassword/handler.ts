@@ -50,7 +50,7 @@ export default async function resetPasswordInviteHandler(
   }
 
   recordUserAuditEvent(request.headers.authorization, {
-    operation: 'user.PASSWORD_RESET_BY_ADMIN',
+    operation: 'user.password_reset_by_admin',
     requestData: { subjectId: userId },
     responseSummary: {}
   })

@@ -53,7 +53,7 @@ export default async function changePhoneHandler(
     return h.response(err.message).code(400)
   }
   recordUserAuditEvent(request.headers.authorization, {
-    operation: 'user.PHONE_NUMBER_CHANGED',
+    operation: 'user.phone_number_changed',
     requestData: { subjectId: userUpdateData.userId },
     responseSummary: { phoneNumber: userUpdateData.phoneNumber }
   })

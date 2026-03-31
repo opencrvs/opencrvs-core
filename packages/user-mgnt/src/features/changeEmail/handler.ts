@@ -53,7 +53,7 @@ export default async function changeEmailHandler(
     return h.response(err.message).code(400)
   }
   recordUserAuditEvent(request.headers.authorization, {
-    operation: 'user.EMAIL_ADDRESS_CHANGED',
+    operation: 'user.email_address_changed',
     requestData: { subjectId: userUpdateData.userId },
     responseSummary: { email: userUpdateData.email }
   })

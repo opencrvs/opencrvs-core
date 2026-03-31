@@ -118,7 +118,7 @@ export default async function updateUser(
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
 
   recordUserAuditEvent(request.headers.authorization, {
-    operation: 'user.EDIT_USER',
+    operation: 'user.edit_user',
     requestData: { subjectId: user.id },
     responseSummary: {}
   })

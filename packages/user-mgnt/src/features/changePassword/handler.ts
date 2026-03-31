@@ -68,7 +68,7 @@ export default async function changePasswordHandler(
 
   if (request.headers.authorization) {
     recordUserAuditEvent(request.headers.authorization, {
-      operation: 'user.PASSWORD_CHANGED',
+      operation: 'user.password_changed',
       requestData: { subjectId: userUpdateData.userId },
       responseSummary: {}
     })

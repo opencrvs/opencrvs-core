@@ -101,7 +101,7 @@ export default async function createUser(
   )
 
   recordUserAuditEvent(request.headers.authorization, {
-    operation: 'user.CREATE_USER',
+    operation: 'user.create_user',
     requestData: {
       subjectId: userModelObject.id,
       role: user.role,

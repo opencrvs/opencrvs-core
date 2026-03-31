@@ -22,7 +22,7 @@ export function recordUserAuditEvent(token: string, input: UserAuditLog): void {
       httpBatchLink({
         url: env.EVENTS_URL,
         transformer: superjson,
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: token }
       })
     ]
   })
