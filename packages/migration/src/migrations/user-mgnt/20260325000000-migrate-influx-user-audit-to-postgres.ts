@@ -10,15 +10,18 @@
  */
 
 import { Db, MongoClient } from 'mongodb'
-import { Pool } from 'pg'
+import { Pool, PoolClient } from 'pg'
 import { query as influxQuery } from '../../utils/influx-helper.js'
 
 const EVENTS_POSTGRES_URL =
   process.env.EVENTS_POSTGRES_URL ||
-  'postgres://events_app:app_password@localhost:5432/events'
+  'postgres://events_migrator:migrator_password@localhost:5432/events'
 
-/** Maps legacy v1 InfluxDB action names to new v2 operation names. */
-const ACTION_TO_OPERATION: Record<string, string> = {
+const BATCH_SIZE = 500
+const MIGRATION_ID = 'influx-user-audit-to-postgres'
+
+/** Maps legacy InfluxDB user-management action names to v2 operation strings. */
+const USER_ACTION_TO_OPERATION: Record<string, string> = {
   LOGGED_IN: 'user.logged_in',
   LOGGED_OUT: 'user.logged_out',
   CREATE_USER: 'user.create_user',
@@ -33,6 +36,43 @@ const ACTION_TO_OPERATION: Record<string, string> = {
   DEACTIVATE: 'user.deactivate',
   REACTIVATE: 'user.reactivate'
 }
+
+/**
+ * Maps legacy InfluxDB event-action names (written by createUserAuditPointFromFHIR)
+ * to v2 event action operation strings.
+ */
+const EVENT_ACTION_TO_OPERATION: Record<string, string> = {
+  IN_PROGRESS: 'event.actions.notify.request',
+  DECLARED: 'event.actions.declare.request',
+  REGISTERED: 'event.actions.register.request',
+  REJECTED: 'event.actions.reject.request',
+  CORRECTED: 'event.actions.correction.approve.request',
+  REQUESTED_CORRECTION: 'event.actions.correction.request.request',
+  APPROVED_CORRECTION: 'event.actions.correction.approve.request',
+  REJECTED_CORRECTION: 'event.actions.correction.reject.request',
+  VALIDATED: 'event.actions.validate.request',
+  DECLARATION_UPDATED: 'event.actions.edit.request',
+  ASSIGNED: 'event.actions.assign.request',
+  UNASSIGNED: 'event.actions.unassign.request',
+  RETRIEVED: 'event.actions.read.request',
+  VIEWED: 'event.actions.read.request',
+  ARCHIVED: 'event.actions.archive.request',
+  REINSTATED_IN_PROGRESS: 'event.actions.reinstate.request',
+  REINSTATED_DECLARED: 'event.actions.reinstate.request',
+  REINSTATED_REJECTED: 'event.actions.reinstate.request',
+  SENT_FOR_APPROVAL: 'event.actions.validate.request',
+  CERTIFIED: 'event.actions.print_certificate.request',
+  ISSUED: 'event.actions.print_certificate.request',
+  MARKED_AS_DUPLICATE: 'event.actions.mark_as_duplicate.request',
+  MARKED_AS_NOT_DUPLICATE: 'event.actions.mark_as_not_duplicate.request'
+}
+
+const ALL_ACTION_TO_OPERATION: Record<string, string> = {
+  ...USER_ACTION_TO_OPERATION,
+  ...EVENT_ACTION_TO_OPERATION
+}
+
+const EVENT_ACTIONS = new Set(Object.keys(EVENT_ACTION_TO_OPERATION))
 
 /**
  * Admin actions where the actor (practitionerId) is different from the
@@ -55,6 +95,7 @@ type InfluxRow = {
 }
 
 type ParsedData = {
+  // User-management fields
   subjectPractitionerId?: string
   role?: string
   primaryOfficeId?: string
@@ -62,6 +103,9 @@ type ParsedData = {
   comment?: string
   email?: string
   phoneNumber?: string
+  // Event-action fields (written by createUserAuditPointFromFHIR)
+  compositionId?: string
+  trackingId?: string
 }
 
 function parseData(raw: string | null): ParsedData {
@@ -78,6 +122,13 @@ function buildRequestData(
   subjectId: string,
   data: ParsedData
 ): Record<string, unknown> {
+  if (EVENT_ACTIONS.has(action)) {
+    return {
+      eventId: data.compositionId ?? '',
+      actionType: action,
+      transactionId: data.trackingId ?? ''
+    }
+  }
   switch (action) {
     case 'CREATE_USER':
       return {
@@ -113,10 +164,73 @@ function buildResponseSummary(
   }
 }
 
+type InsertRow = {
+  clientId: string
+  operation: string
+  requestData: Record<string, unknown>
+  responseSummary: Record<string, unknown>
+  createdAt: Date
+}
+
+function buildBatchInsertQuery(count: number): string {
+  const valueSets = Array.from(
+    { length: count },
+    (_, i) =>
+      `($${i * 5 + 1}, 'user', $${i * 5 + 2}, $${i * 5 + 3}, $${i * 5 + 4}, $${i * 5 + 5})`
+  )
+  return `INSERT INTO app.audit_log
+            (client_id, client_type, operation, request_data, response_summary, created_at)
+          VALUES ${valueSets.join(', ')}`
+}
+
+async function insertBatch(
+  client: PoolClient,
+  rows: InsertRow[]
+): Promise<void> {
+  if (rows.length === 0) return
+  const values = rows.flatMap((r) => [
+    r.clientId,
+    r.operation,
+    JSON.stringify(r.requestData),
+    JSON.stringify(r.responseSummary),
+    r.createdAt
+  ])
+  await client.query(buildBatchInsertQuery(rows.length), values)
+}
+
+async function ensureProgressTable(pg: Pool): Promise<void> {
+  await pg.query(`
+    CREATE TABLE IF NOT EXISTS app.migration_progress (
+      id                TEXT    PRIMARY KEY,
+      next_batch_offset INTEGER NOT NULL DEFAULT 0,
+      completed         BOOLEAN NOT NULL DEFAULT FALSE
+    )
+  `)
+}
+
+async function getProgress(
+  pg: Pool
+): Promise<{ nextOffset: number; completed: boolean }> {
+  const res = await pg.query<{ next_batch_offset: number; completed: boolean }>(
+    'SELECT next_batch_offset, completed FROM app.migration_progress WHERE id = $1',
+    [MIGRATION_ID]
+  )
+  if (res.rows.length === 0) {
+    await pg.query('INSERT INTO app.migration_progress (id) VALUES ($1)', [
+      MIGRATION_ID
+    ])
+    return { nextOffset: 0, completed: false }
+  }
+  return {
+    nextOffset: res.rows[0].next_batch_offset,
+    completed: res.rows[0].completed
+  }
+}
+
 export const up = async (db: Db, _client: MongoClient) => {
   let rows: InfluxRow[]
   try {
-    const actionFilter = Object.keys(ACTION_TO_OPERATION)
+    const actionFilter = Object.keys(ALL_ACTION_TO_OPERATION)
       .map((a) => `action = '${a}'`)
       .join(' OR ')
     rows = (await influxQuery(
@@ -137,7 +251,7 @@ export const up = async (db: Db, _client: MongoClient) => {
 
   console.log(`Found ${rows.length} user audit events in InfluxDB to migrate`)
 
-  // Collect all practitioner IDs so we can bulk-look up user IDs from MongoDB.
+  // Collect all practitioner IDs for a single bulk MongoDB lookup.
   const practitionerIds = new Set<string>()
   for (const row of rows) {
     if (row.practitionerId && row.practitionerId !== 'undefined') {
@@ -149,7 +263,6 @@ export const up = async (db: Db, _client: MongoClient) => {
     }
   }
 
-  // Build practitionerId → MongoDB _id lookup map.
   const userDocs = await db
     .collection('users')
     .find({ practitionerId: { $in: [...practitionerIds] } })
@@ -163,72 +276,109 @@ export const up = async (db: Db, _client: MongoClient) => {
     userDocs.map((u) => [u.practitionerId, String(u._id)])
   )
 
-  const pg = new Pool({ connectionString: EVENTS_POSTGRES_URL })
+  // Sort by time so offset-based progress tracking is stable across restarts.
+  rows.sort((a, b) => a.time.getTime() - b.time.getTime())
 
+  const pg = new Pool({ connectionString: EVENTS_POSTGRES_URL })
   try {
-    await pg.query('BEGIN')
+    await ensureProgressTable(pg)
+    const { nextOffset, completed } = await getProgress(pg)
+
+    if (completed) {
+      console.log('Migration already completed — skipping')
+      return
+    }
+
+    if (nextOffset > 0) {
+      console.log(
+        `Resuming from offset ${nextOffset} (${rows.length - nextOffset} rows remaining)`
+      )
+    }
 
     let inserted = 0
     let skipped = 0
 
-    for (const row of rows) {
-      const operation = ACTION_TO_OPERATION[row.action]
-      if (!operation) {
-        console.log(`Skipping unknown action: ${row.action}`)
-        skipped++
-        continue
-      }
+    for (let offset = nextOffset; offset < rows.length; offset += BATCH_SIZE) {
+      const batchRows = rows.slice(offset, offset + BATCH_SIZE)
+      const insertRows: InsertRow[] = []
 
-      // Resolve actor userId. Treat the string "undefined" as missing.
-      const rawPractitionerId =
-        row.practitionerId === 'undefined' ? '' : row.practitionerId
-      const actorUserId = rawPractitionerId
-        ? (practitionerToUserId.get(rawPractitionerId) ?? rawPractitionerId)
-        : ''
+      for (const row of batchRows) {
+        const operation = ALL_ACTION_TO_OPERATION[row.action]
+        if (!operation) {
+          skipped++
+          continue
+        }
 
-      const parsed = parseData(row.data)
+        const rawPractitionerId =
+          row.practitionerId === 'undefined' ? '' : row.practitionerId
+        const actorUserId = rawPractitionerId
+          ? (practitionerToUserId.get(rawPractitionerId) ?? rawPractitionerId)
+          : ''
 
-      // Resolve subjectId: for admin actions use subjectPractitionerId from the
-      // data field; for self-service actions the subject is the actor.
-      let subjectId = actorUserId ?? ''
-      if (ADMIN_ACTIONS.has(row.action) && parsed.subjectPractitionerId) {
-        subjectId =
-          practitionerToUserId.get(parsed.subjectPractitionerId) ??
-          parsed.subjectPractitionerId
-      }
+        const parsed = parseData(row.data)
 
-      const requestData = buildRequestData(row.action, subjectId, parsed)
-      const responseSummary = buildResponseSummary(row.action, parsed)
+        let subjectId = actorUserId
+        if (ADMIN_ACTIONS.has(row.action) && parsed.subjectPractitionerId) {
+          subjectId =
+            practitionerToUserId.get(parsed.subjectPractitionerId) ??
+            parsed.subjectPractitionerId
+        }
 
-      await pg.query(
-        `INSERT INTO app.audit_log
-           (client_id, client_type, operation, request_data, response_summary, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [
-          actorUserId,
-          'user',
+        insertRows.push({
+          clientId: actorUserId,
           operation,
-          JSON.stringify(requestData),
-          JSON.stringify(responseSummary),
-          row.time
-        ]
+          requestData: buildRequestData(row.action, subjectId, parsed),
+          responseSummary: buildResponseSummary(row.action, parsed),
+          createdAt: row.time
+        })
+      }
+
+      const pgClient = await pg.connect()
+      try {
+        await pgClient.query('BEGIN')
+        await insertBatch(pgClient, insertRows)
+        // Advance progress within the same transaction so a mid-batch failure
+        // rolls back both the inserts and the progress update together.
+        await pgClient.query(
+          'UPDATE app.migration_progress SET next_batch_offset = $1 WHERE id = $2',
+          [Math.min(offset + BATCH_SIZE, rows.length), MIGRATION_ID]
+        )
+        await pgClient.query('COMMIT')
+        inserted += insertRows.length
+      } catch (err) {
+        await pgClient.query('ROLLBACK')
+        throw err
+      } finally {
+        pgClient.release()
+      }
+
+      console.log(
+        `Batch committed: rows ${offset}–${Math.min(offset + BATCH_SIZE, rows.length) - 1}` +
+          ` (${inserted} inserted so far)`
       )
-      inserted++
     }
 
-    await pg.query('COMMIT')
+    // Mark migration as fully complete.
+    const finalClient = await pg.connect()
+    try {
+      await finalClient.query('BEGIN')
+      await finalClient.query(
+        'UPDATE app.migration_progress SET completed = true WHERE id = $1',
+        [MIGRATION_ID]
+      )
+      await finalClient.query('COMMIT')
+    } finally {
+      finalClient.release()
+    }
+
     console.log(
       `Migration complete: ${inserted} rows inserted, ${skipped} skipped`
     )
-  } catch (err) {
-    await pg.query('ROLLBACK')
-    throw err
   } finally {
     await pg.end()
   }
 }
 
 export const down = async (_db: Db, _client: MongoClient) => {
-  // We can not reliably rollback this migration
-  // because we can not detect which rows came from influxdb
+  // Cannot reliably rollback — cannot distinguish migrated rows from live data
 }
