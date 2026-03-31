@@ -2274,6 +2274,7 @@ components:
                             - TIME
                             - IMAGE_VIEW
                             - PARAGRAPH
+                            - HEADING
                             - PAGE_HEADER
                             - RADIO_GROUP
                             - FILE
@@ -2300,6 +2301,7 @@ components:
                             - ID_READER
                             - LOADER
                             - ALPHA_HIDDEN
+                            - USER_ROLE
                             - CUSTOM
                         label:
                           description: "
@@ -2528,6 +2530,7 @@ components:
                             - TIME
                             - IMAGE_VIEW
                             - PARAGRAPH
+                            - HEADING
                             - PAGE_HEADER
                             - RADIO_GROUP
                             - FILE
@@ -2554,6 +2557,7 @@ components:
                             - ID_READER
                             - LOADER
                             - ALPHA_HIDDEN
+                            - USER_ROLE
                             - CUSTOM
                         label:
                           description: "
@@ -5214,6 +5218,187 @@ components:
                 styles:
                   type: object
                   properties:
+                    hint:
+                      description: When true, paragraph is styled as a hint with grey color
+                      type: boolean
+                    textAlign:
+                      description: Text alignment for the paragraph
+                      type: string
+                      enum:
+                        - left
+                        - center
+                        - right
+                        - start
+                        - end
+                  additionalProperties: false
+              additionalProperties: false
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          additionalProperties: false
+        - description: A read-only heading component for form pages
+          type: object
+          properties:
+            id:
+              description: Unique identifier of the field.
+              type: string
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+            required:
+              description: Indicates whether the field is mandatory.
+              default: false
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+                  additionalProperties: false
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
+              const: HEADING
+            defaultValue:
+              type: string
+              minLength: 1
+            configuration:
+              default: {}
+              type: object
+              properties:
+                styles:
+                  type: object
+                  properties:
                     fontVariant:
                       description: Font variant to use for the paragraph text
                       type: string
@@ -5224,11 +5409,6 @@ components:
                         - reg18
                         - h4
                         - h3
-                        - h2
-                        - h1
-                    hint:
-                      description: When true, paragraph is styled as a hint with grey color
-                      type: boolean
                     textAlign:
                       description: Text alignment for the paragraph
                       type: string
@@ -11222,6 +11402,165 @@ components:
             - label
             - type
           additionalProperties: false
+        - description: A select dropdown that is automatically populated with available
+            user roles
+          type: object
+          properties:
+            id:
+              description: Unique identifier of the field.
+              type: string
+            label:
+              description: Human-readable label of the field.
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              description: Reference to the parent field or fields. When a parent field
+                changes, this field is reset.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+            required:
+              description: Indicates whether the field is mandatory.
+              default: false
+              anyOf:
+                - type: boolean
+                - type: object
+                  properties:
+                    message:
+                      description: Custom required validation message
+                      $ref: "#/components/schemas/TranslationConfig"
+                  required:
+                    - message
+                  additionalProperties: false
+            conditionals:
+              description: Conditions determining when the field is shown or enabled. By
+                default, the field is always shown and enabled.
+              default: []
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+            secured:
+              description: Indicates whether the field is secured. Secured fields are not
+                indexed for search and are only visible when explicitly
+                assigned.
+              default: false
+              type: boolean
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              description: Additional validation rules applied to the field.
+              default: []
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+                additionalProperties: false
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              default: false
+              type: boolean
+            uncorrectable:
+              description: Indicates whether the field can be modified during record
+                correction.
+              default: false
+              type: boolean
+            value:
+              description: Reference to the source field or fields. When a value is defined,
+                it is copied from the parent field when changed. If multiple
+                references are provided, the first truthy value is used.
+              anyOf:
+                - description: Reference to a field by its ID
+                  type: object
+                  properties:
+                    $$field:
+                      description: Unique identifier for the field
+                      type: string
+                    $$subfield:
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                      default: []
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - $$field
+                    - $$subfield
+                  additionalProperties: false
+                - type: array
+                  items:
+                    description: Reference to a field by its ID
+                    type: object
+                    properties:
+                      $$field:
+                        description: Unique identifier for the field
+                        type: string
+                      $$subfield:
+                        description: 'If the FieldValue is an object, subfield can be used to refer to
+                          e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                        default: []
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - $$field
+                      - $$subfield
+                    additionalProperties: false
+            analytics:
+              description: Indicates whether the field is included in analytics. When enabled,
+                its value becomes available in the analytics dashboard.
+              default: false
+              type: boolean
+            type:
+              type: string
+              const: USER_ROLE
+            defaultValue:
+              type: string
+          required:
+            - id
+            - label
+            - type
+          additionalProperties: false
       type: object
     FieldConditional:
       description: Field conditional configuration
@@ -11518,6 +11857,8 @@ components:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
           $ref: "#/components/schemas/ExactUserType"
+        updatedByUserRole:
+          $ref: "#/components/schemas/Exact"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
