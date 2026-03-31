@@ -89,7 +89,7 @@ describe('useNetworkProbe', () => {
     await flushFetch()
     expect(onlineManager.isOnline()).toBe(false)
 
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(5000)
     })
     await flushFetch()
@@ -103,18 +103,18 @@ describe('useNetworkProbe', () => {
     const slowFetch = new Promise<Response>((resolve) => {
       resolveFirst = resolve
     })
-    fetchMock.mockImplementationOnce(() => slowFetch)
+    fetchMock.mockImplementationOnce(async () => slowFetch)
     fetchMock.mockResponseOnce(JSON.stringify(ALL_SERVICES_HEALTHY))
 
     const { unmount } = renderHook(() => useNetworkProbe())
 
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(5000)
     })
 
-    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
 
-    await act(async () => {
+    act(() => {
       resolveFirst(
         new Response(JSON.stringify(ALL_SERVICES_HEALTHY), { status: 200 })
       )
@@ -133,7 +133,7 @@ describe('useNetworkProbe', () => {
 
     const callsAfterOnline = fetchMock.mock.calls.length
 
-    await act(async () => {
+    act(() => {
       vi.advanceTimersByTime(20000)
     })
     await flushFetch()
@@ -142,7 +142,7 @@ describe('useNetworkProbe', () => {
     unmount()
   })
 
-  it('aborts the in-flight fetch and clears the interval on unmount', async () => {
+  it('aborts the in-flight fetch and clears the interval on unmount', () => {
     const abortSpy = vi.fn()
     const controller = { abort: abortSpy, signal: new AbortController().signal }
     const OriginalAbortController = global.AbortController
