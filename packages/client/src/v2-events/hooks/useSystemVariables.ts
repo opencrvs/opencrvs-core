@@ -22,7 +22,8 @@ export function useSystemVariables() {
   const variables = {
     user: {
       ...user,
-      name: getUsersFullName(user.name, 'en')
+      name: getUsersFullName(user.name, 'en'),
+      administrativeAreaId: user.administrativeAreaId ?? undefined
     },
     $window: {
       location: {
