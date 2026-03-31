@@ -602,6 +602,37 @@ describe('omitHiddenPaginatedFields', () => {
       'recommender.id' // recommender.none is true
     ])
   })
+
+  it('removes fields that are hidden (but allows hidden fields with null value) by field conditionals when page conditional is true', () => {
+    const rng = createPrng(101)
+
+    const fields = getDeclarationFields(tennisClubMembershipEvent)
+
+    const declarationConfig = getDeclaration(tennisClubMembershipEvent)
+
+    const declaration = fieldConfigsToActionPayload(fields, rng)
+    const declarationWithoutHiddenFields = omitHiddenPaginatedFields(
+      declarationConfig,
+      { ...declaration, 'recommender.name': null, 'recommender.id': null },
+      {},
+      true
+    )
+
+    const missingKeys = difference(
+      Object.keys(declaration),
+      Object.keys(declarationWithoutHiddenFields)
+    )
+
+    expect(missingKeys).toEqual([
+      'applicant.dob', // dobUnknown is true
+      'applicant.isRecommendedByFieldAgent', // user is not field agent
+      'senior-pass.id', // dob is not before the threshhold
+      'senior-pass.recommender' // dob is not before threshhold
+    ])
+
+    expect(missingKeys).not.toContain('recommender.name')
+    expect(missingKeys).not.toContain('recommender.id')
+  })
 })
 
 describe('getCompleteActionAnnotation', () => {

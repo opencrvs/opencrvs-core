@@ -15,15 +15,7 @@ import bn from 'date-fns/locale/bn'
 import fr from 'date-fns/locale/fr'
 import subYears from 'date-fns/subYears'
 import isValid from 'date-fns/isValid'
-
-/*
- *  The actual type is `${number}-${number}-${number}`
- *  but as Date constructor is way too permissive so
- *  using a custom type to restrict PlainDate's direct usage
- *  with Date
- *  It's of format YYYY-MM-DD
- */
-export type PlainDate = { __type: 'PlainDate' }
+import { PlainDate, plainDateToLocalDate } from '@opencrvs/commons/client'
 
 export const locales: Record<string, Locale> = { en: enGB, bn, fr }
 
@@ -47,12 +39,6 @@ export function isValidPlainDate(rawDate: unknown): rawDate is PlainDate {
     return false
   }
   return true
-}
-
-function plainDateToLocalDate(plainDate: PlainDate) {
-  const rawDate = plainDate as unknown as `${number}-${number}-${number}`
-  const [yyyy, mm, dd] = rawDate.split('-')
-  return new Date(Number(yyyy), Number(mm) - 1, Number(dd))
 }
 
 export function formatPlainDate(

@@ -687,7 +687,10 @@ test('placeOfEvent scope filters out results between locations and administrativ
     ],
     placeOfEventId: addressFieldId
   })
-  await createIndex(getEventIndexName('event-with-optional-address'), getDeclarationFields(eventWithOptionalAddress))
+  await createIndex(
+    getEventIndexName('event-with-optional-address'),
+    getDeclarationFields(eventWithOptionalAddress)
+  )
   mswServer.use(
     http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([eventWithOptionalAddress])

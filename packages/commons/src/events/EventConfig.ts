@@ -70,70 +70,70 @@ export type EventConfigInput = Omit<
  *
  * `Event.parse(config)` will throw an error if the configuration is invalid.
  */
-export const EventConfig: z.ZodType<EventConfig, EventConfigInput> = z
-  .object({
-    id: z
-      .string()
-      .describe(
-        'Machine-readable identifier of the event (e.g. "birth", "death").'
-      ),
-    dateOfEvent: FieldReference.or(EventFieldReference)
-      .optional()
-      .describe(
-        'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
-      ),
-    placeOfEvent: FieldReference.optional().describe(
-      'Reference to the field capturing the place of the event (e.g. place of birth). Defaults to the meta.createdAtLocation if unspecified.'
+const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
+  id: z
+    .string()
+    .describe(
+      'Machine-readable identifier of the event (e.g. "birth", "death").'
     ),
-    title: TranslationConfig.describe(
-      'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
+  dateOfEvent: FieldReference.or(EventFieldReference)
+    .optional()
+    .describe(
+      'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
     ),
-    fallbackTitle: TranslationConfig.optional().describe(
-      'Fallback title shown when the main title resolves to an empty value.'
+  placeOfEvent: FieldReference.optional().describe(
+    'Reference to the field capturing the place of the event (e.g. place of birth). Defaults to the meta.createdAtLocation if unspecified.'
+  ),
+  title: TranslationConfig.describe(
+    'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
+  ),
+  fallbackTitle: TranslationConfig.optional().describe(
+    'Fallback title shown when the main title resolves to an empty value.'
+  ),
+  summary: SummaryConfig.describe(
+    'Summary information displayed in the event overview.'
+  ),
+  label: TranslationConfig.describe('Human-readable label for the event type.'),
+  actions: z
+    .array(ActionConfig)
+    .describe(
+      'Configuration of system-defined actions associated with the event.'
     ),
-    summary: SummaryConfig.describe(
-      'Summary information displayed in the event overview.'
+  actionOrder: z
+    .array(z.string())
+    .optional()
+    .describe(
+      'Order of actions in the action menu. Use either the action type for core actions or the customActionType for custom actions.'
     ),
-    label: TranslationConfig.describe(
-      'Human-readable label for the event type.'
+  declaration: DeclarationFormConfig.describe(
+    'Configuration of the form used to gather event data.'
+  ),
+  advancedSearch: z
+    .array(AdvancedSearchConfig)
+    .optional()
+    .default([])
+    .describe(
+      'Configuration of fields available in the advanced search feature.'
     ),
-    actions: z
-      .array(ActionConfig)
-      .describe(
-        'Configuration of system-defined actions associated with the event.'
-      ),
-    actionOrder: z
-      .array(z.string())
-      .optional()
-      .describe(
-        'Order of actions in the action menu. Use either the action type for core actions or the customActionType for custom actions.'
-      ),
-    declaration: DeclarationFormConfig.describe(
-      'Configuration of the form used to gather event data.'
-    ),
-    advancedSearch: z
-      .array(AdvancedSearchConfig)
-      .optional()
-      .default([])
-      .describe(
-        'Configuration of fields available in the advanced search feature.'
-      ),
-    flags: z
-      .array(FlagConfig)
-      .optional()
-      .default([])
-      .describe(
-        'Configuration of flags associated with the actions of this event type.'
-      )
-  })
-  .superRefine((event, ctx) => {
-    validateAdvancedSearchConfig(event, ctx)
-    validateDateOfEvent(event, ctx)
-    validatePlaceOfEvent(event, ctx)
-    validateActionFlags(event, ctx)
-    validateActionOrder(event, ctx)
-  })
-  .meta({
-    id: 'EventConfig'
-  })
-  .describe('Configuration defining an event type.')
+  flags: z
+    .array(FlagConfig)
+    .optional()
+    .default([])
+    .describe(
+      'Configuration of flags associated with the actions of this event type.'
+    )
+})
+
+export const EventConfig: z.ZodType<EventConfig, EventConfigInput> =
+  _EventConfigBase
+    .superRefine((event, ctx) => {
+      validateAdvancedSearchConfig(event, ctx)
+      validateDateOfEvent(event, ctx)
+      validatePlaceOfEvent(event, ctx)
+      validateActionFlags(event, ctx)
+      validateActionOrder(event, ctx)
+    })
+    .meta({
+      id: 'EventConfig'
+    })
+    .describe('Configuration defining an event type.')

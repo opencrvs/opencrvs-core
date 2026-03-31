@@ -264,6 +264,24 @@ export class LocationSearch extends React.Component<IProps, IState> {
     }
   }
 
+  componentDidUpdate(prevProps: IProps) {
+    // Handle changes to selectedLocation prop
+    if (this.props.selectedLocation !== prevProps.selectedLocation) {
+      if (this.props.selectedLocation) {
+        this.setState({
+          selectedText: this.props.selectedLocation.displayLabel,
+          selectedItem: this.props.selectedLocation
+        })
+      } else {
+        // Clear selection if selectedLocation becomes undefined/null
+        this.setState({
+          selectedText: null,
+          selectedItem: null
+        })
+      }
+    }
+  }
+
   componentWillUnmount() {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout)
