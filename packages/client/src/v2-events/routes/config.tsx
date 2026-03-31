@@ -90,30 +90,38 @@ export const routesConfig = {
   Component: () => {
     useEffect(() => {
       let cancelled = false
+      let intervalId: ReturnType<typeof setInterval> | null = null
+      let probeInProgress = false
+      let currentController: AbortController | null = null
 
       onlineManager.setOnline(false)
 
+      const services = [
+        'auth',
+        'search',
+        'user-mgnt',
+        'metrics',
+        'notification',
+        'countryconfig',
+        'workflow'
+      ]
+
       async function probeNetwork() {
+        if (probeInProgress) {
+          return
+        }
+        probeInProgress = true
         try {
-          const controller = new AbortController()
-          setTimeout(() => controller.abort(), 3000)
+          currentController = new AbortController()
+          setTimeout(() => currentController?.abort(), 3000)
 
           const res = await fetch('/api/ping', {
             method: 'GET',
             cache: 'no-store',
-            signal: controller.signal
+            signal: currentController.signal
           })
 
           const status = await res.json()
-          const services = [
-            'auth',
-            'search',
-            'user-mgnt',
-            'metrics',
-            'notification',
-            'countryconfig',
-            'workflow'
-          ]
 
           const allServicesReady =
             res.ok &&
@@ -123,18 +131,35 @@ export const routesConfig = {
 
           if (!cancelled) {
             onlineManager.setOnline(allServicesReady)
+            if (allServicesReady && intervalId !== null) {
+              clearInterval(intervalId)
+              intervalId = null
+            }
           }
         } catch {
           if (!cancelled) {
             onlineManager.setOnline(false)
           }
+        } finally {
+          probeInProgress = false
+          currentController = null
         }
       }
 
       void probeNetwork()
 
+      intervalId = setInterval(() => {
+        if (!onlineManager.isOnline()) {
+          void probeNetwork()
+        }
+      }, 5000)
+
       return () => {
         cancelled = true
+        currentController?.abort()
+        if (intervalId !== null) {
+          clearInterval(intervalId)
+        }
       }
     }, [])
 
