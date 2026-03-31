@@ -68,7 +68,6 @@ import {
   isHiddenFieldType,
   isAutocompleteFieldType
 } from '@opencrvs/commons/client'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import {
   BulletList,
@@ -80,6 +79,7 @@ import {
   Select,
   SelectCountry,
   Text,
+  TextArea,
   Number,
   AdministrativeArea,
   Divider,
@@ -463,13 +463,11 @@ export const GeneratedInputField = React.memo(
             intl.formatMessage(field.config.configuration.prefix)
           }
         >
-          <TextArea
+          <TextArea.Input
             {...inputProps}
             maxLength={field.config.configuration?.maxLength}
             value={field.value}
-            onChange={(e) =>
-              onFieldValueChange(fieldDefinition.id, e.target.value)
-            }
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>
       )
@@ -667,7 +665,6 @@ export const GeneratedInputField = React.memo(
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             value={field.value ?? []}
             onChange={handleFileWithOptionChange}
           />

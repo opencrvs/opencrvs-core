@@ -11,7 +11,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-interface ITextAreaProps
+export interface ITextAreaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   maxLength?: number
   readonly?: boolean

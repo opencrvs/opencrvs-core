@@ -33,6 +33,7 @@ import { Select } from './Select'
 import { SelectCountry } from './SelectCountry'
 import { SelectDateRangeField } from './SelectDateRangeField'
 import { Text } from './Text'
+import { TextArea } from './TextArea'
 import { TimeField } from './TimeField'
 import { Search } from './Search'
 import { AlphaPrintButton } from './AlphaPrintButton'
@@ -61,6 +62,7 @@ export * from './Select'
 export * from './SelectCountry'
 export * from './SelectDateRangeField'
 export * from './Text'
+export * from './TextArea'
 export * from './TimeField'
 export * from './AlphaPrintButton'
 export * from './LinkButton'
@@ -101,6 +103,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return SelectCountry
     case FieldType.TEXT:
       return Text
+    case FieldType.TEXTAREA:
+      return TextArea
     case FieldType.NUMBER:
       return Number
     case FieldType.NUMBER_WITH_UNIT:
