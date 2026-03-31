@@ -152,14 +152,13 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
     )
 
     await step('fills in age input', async () => {
-      await userEvent.type(
-        await canvas.findByTestId('number__tennis-member____age'),
-        '75'
-      )
+      const ageInput = await canvas.findByTestId('number__tennis-member____age')
+      await userEvent.type(ageInput, '75')
+      ageInput.blur()
     })
 
     await step(
-      'Previous values are visible when checkbox is unchecked',
+      'Previous values are visible when checkbox is unchecked ',
       async () => {
         await fireEvent.click(
           await canvas.findByText('Exact date of birth unknown')
@@ -168,6 +167,19 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
         await canvas.findByDisplayValue(2020)
         await canvas.findByDisplayValue(11)
         await canvas.findByDisplayValue(12)
+
+        await canvas.findByText('Exact date of birth unknown')
+      }
+    )
+
+    await step(
+      'Previous values are visible when checkbox is checked',
+      async () => {
+        await fireEvent.click(
+          await canvas.findByText('Exact date of birth unknown')
+        )
+        await canvas.findByText('Age of the member')
+        await canvas.findByDisplayValue(75)
 
         await canvas.findByText('Exact date of birth unknown')
       }

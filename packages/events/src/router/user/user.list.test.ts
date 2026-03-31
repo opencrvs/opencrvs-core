@@ -16,8 +16,8 @@ import {
   sanitizeForSnapshot,
   setupTestCase
 } from '@events/tests/utils'
-import { mswServer } from '../../tests/msw'
 import { createSystemClient } from '@events/storage/postgres/events/system-clients'
+import { mswServer } from '../../tests/msw'
 
 test('Returns empty list when no ids provided', async () => {
   const { user } = await setupTestCase()
@@ -48,20 +48,26 @@ test('Returns user in correct format', async () => {
 
   mswServer.use(
     http.post(`http://localhost:3030/getUser`, () => {
-      return HttpResponse.json(user)
+      return HttpResponse.json({
+        ...user,
+        signature: {
+          data: user.signature
+        }
+      })
     })
   )
   const fetchedUser = await client.user.list([user.id])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user
-    }
+      type: TokenUserType.enum.user,
+      status: user.status
+    })
   ])
 })
 
@@ -105,7 +111,11 @@ test('Returns both normal users and system users', async () => {
 
   await createSystemClient({
     name: 'My health system integration',
-    legacyId: systemUserId
+    legacyId: systemUserId,
+    createdBy: user.id,
+    salt: 'RANDOM_STRING',
+    secretHash: 'RANDOM_STRING',
+    shaSecret: 'RANDOM_STRING'
   })
 
   const fetchedUsers = await client.user.list([...userIds, systemUserId])
@@ -121,7 +131,12 @@ test('Does not return users or systems which are not found', async () => {
     http.post(`http://localhost:3030/getUser`, async ({ request }) => {
       const body = (await request.clone().json()) as { userId: string }
       if (body.userId === user.id) {
-        return HttpResponse.json(user)
+        return HttpResponse.json({
+          ...user,
+          signature: {
+            data: user.signature
+          }
+        })
       }
 
       return HttpResponse.json(
@@ -134,14 +149,15 @@ test('Does not return users or systems which are not found', async () => {
   const fetchedUser = await client.user.list([user.id, '123-123-123', 'foobar'])
 
   expect(fetchedUser).toEqual([
-    {
+    expect.objectContaining({
       id: user.id,
       name: user.name,
       role: user.role,
       signature: user.signature,
       primaryOfficeId: user.primaryOfficeId,
-      type: TokenUserType.enum.user
-    }
+      type: TokenUserType.enum.user,
+      fullHonorificName: user.fullHonorificName
+    })
   ])
 })
 

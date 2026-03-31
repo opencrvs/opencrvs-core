@@ -57,10 +57,7 @@ export const DASHBOARD = '/performance/dashboard/:id'
 export const TEAM_SEARCH = '/team/search'
 export const TEAM_USER_LIST = '/team/users'
 
-export const CREATE_USER_ON_LOCATION = '/createUserInLocation/:locationId'
-export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'
 export const REVIEW_USER_FORM = '/user/:userId/:sectionId/:groupId'
-export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
 
 export const USER_PROFILE = '/userProfile/:userId'
 

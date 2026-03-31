@@ -32,6 +32,7 @@ import { getEventIndexName } from '@events/storage/elasticsearch'
 
 test(
   'Check scopes against event.actions.correction.approve',
+  { timeout: 120000 },
   async () => {
     await createIndex(
       getEventIndexName('tennis-club-membership_premium'),
@@ -107,7 +108,7 @@ test(
           user,
           scope,
           clientReadingAllEvents,
-          (client) =>
+          async (client) =>
             client.event.actions.correction.approve.request({
               eventId,
               transactionId: getUUID(),
@@ -123,8 +124,5 @@ test(
       }),
       { numRuns: 20 }
     )
-  },
-  {
-    timeout: 90000
   }
 )

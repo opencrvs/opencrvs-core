@@ -12,7 +12,7 @@ import {
   userReferenceFunctions as user,
   resolveJurisdictionReference
 } from './userReferences'
-import { JurisdictionFilter } from '../scopes-v2'
+import { JurisdictionFilter } from '../scopes'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 

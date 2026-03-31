@@ -12,32 +12,27 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
-import { getIndividualNameObj } from '@client/utils/userUtils'
 import { Avatar } from '@client/components/Avatar'
 import { FixedNavigation } from '@client/components/interface/Navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { useIntl } from 'react-intl'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
+import { getUsersFullName } from '@client/v2-events/utils'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)
   const userDetails = useSelector(getUserDetails)
-  const language = useSelector(getLanguage)
   const intl = useIntl()
   const toggleMenu = () => {
     setShowMenu((prevState) => !prevState)
   }
-  let name = ''
-  if (userDetails && userDetails.name) {
-    const nameObj = getIndividualNameObj(userDetails.name, language)
-    name = nameObj
-      ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-      : ''
-  }
+  const name = userDetails
+    ? getUsersFullName(userDetails.name, intl.locale)
+    : ''
 
-  const role =
-    (userDetails?.role && intl.formatMessage(userDetails.role.label)) ?? ''
+  const role = formatUserRole(userDetails?.role, intl)
 
   const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
 

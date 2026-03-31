@@ -21,10 +21,6 @@ import {
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
   SystemVariables,
-  Scope,
-  ActionScopes,
-  ConfigurableActionScopes,
-  parseConfigurableScope,
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
@@ -279,21 +275,13 @@ export enum CoreWorkqueues {
   DRAFT = 'draft'
 }
 
-export function hasOutboxWorkqueue(scopes: Scope[]) {
-  const hasLiteralActionScopes = scopes.some(
-    (scope) => ActionScopes.safeParse(scope).success
-  )
-  const parsedScopes = scopes.map(parseConfigurableScope)
-  const hasConfigurableActionScopes = parsedScopes.some(
-    (scope) => ConfigurableActionScopes.safeParse(scope).success
-  )
+export function hasOutboxWorkqueue(scopes: string[]) {
+  const hasRecordScope = scopes.some((scope) => !!decodeScope(scope))
 
-  const hasV2Scopes = scopes.some((scope) => !!decodeScope(scope))
-
-  return hasLiteralActionScopes || hasConfigurableActionScopes || hasV2Scopes
+  return hasRecordScope
 }
 
-export function hasDraftWorkqueue(scopes: Scope[]) {
+export function hasDraftWorkqueue(scopes: string[]) {
   return (
     getAcceptedScopesByType({
       acceptedScopes: ['record.create'],

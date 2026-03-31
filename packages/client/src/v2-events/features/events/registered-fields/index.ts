@@ -27,6 +27,7 @@ import { NumberWithUnit } from './NumberWithUnit'
 import { PageHeader } from './PageHeader'
 import { AgeField } from './AgeField'
 import { Paragraph } from './Paragraph'
+import { Heading } from './Heading'
 import { RadioGroup } from './RadioGroup'
 import { RegisteredFieldModule } from './RegisteredField'
 import { Select } from './Select'
@@ -41,6 +42,7 @@ import { VerificationStatus } from './VerificationStatus'
 import { QueryParamReader } from './QueryParamReader'
 import { Autocomplete } from './Autocomplete'
 import { ImageView } from './ImageView'
+import { UserRole } from './UserRole'
 
 export * from './Address'
 export * from './AdministrativeArea'
@@ -57,6 +59,7 @@ export * from './Number'
 export * from './NumberWithUnit'
 export * from './PageHeader'
 export * from './Paragraph'
+export * from './Heading'
 export * from './RadioGroup'
 export * from './Select'
 export * from './SelectCountry'
@@ -68,6 +71,7 @@ export * from './LinkButton'
 export * from './VerificationStatus'
 export * from './Autocomplete'
 export * from './ImageView'
+export * from './UserRole'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -113,6 +117,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return PageHeader
     case FieldType.PARAGRAPH:
       return Paragraph
+    case FieldType.HEADING:
+      return Heading
     case FieldType.IMAGE_VIEW:
       return ImageView
     case FieldType.NAME:
@@ -133,6 +139,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
       return QueryParamReader
     case FieldType.AGE:
       return AgeField
+    case FieldType.USER_ROLE:
+      return UserRole
     case FieldType.FILE:
       return File
     case FieldType.FILE_WITH_OPTIONS:

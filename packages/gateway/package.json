@@ -1,21 +1,16 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.9.10",
-  "description": "OpenCRVS API Gateway with GraphQL",
+  "version": "1.9.11",
+  "description": "OpenCRVS API Gateway",
   "license": "MPL-2.0",
   "scripts": {
-    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then npx crlf --set=LF ../../node_modules/graphql-schema-typescript/**/* || npx crlf --set=LF ./node_modules/graphql-schema-typescript/**/* || true; fi",
-    "start": "yarn gen:schema && concurrently \"cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\" \"yarn gen:schema:watch\"",
+    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && jest",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
-    "build": "tsc && copyfiles 'src/**/*.graphql' build/dist",
+    "build": "tsc",
     "build:clean": "rm -rf build",
-    "gen:schema": "node -e \"const importSchema = require('graphql-import').importSchema; console.log(importSchema('src/graphql/index.graphql'))\" > src/graphql/schema.graphql && yarn prettier --write src/graphql/schema.graphql",
-    "gen:types": "graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts --importStatements 'import {Context} from \"./context\"' --contextType Context && yarn prettier --write src/graphql/schema.d.ts",
-    "gen:schema:watch": "nodemon --quiet --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
-    "gen:types:watch": "nodemon --quiet --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
@@ -24,10 +19,6 @@
     "@apollo/server": "^4.11.2",
     "@as-integrations/hapi": "^2.0.1",
     "@elastic/elasticsearch": "8.13.1",
-    "@graphql-tools/graphql-file-loader": "^8.0.3",
-    "@graphql-tools/load": "^8.0.4",
-    "@graphql-tools/schema": "^10.0.8",
-    "@graphql-tools/utils": "^10.5.6",
     "@hapi/h2o2": "^9.1.0",
     "@hapi/hapi": "^20.0.1",
     "@opencrvs/commons": "^1.9.0",
@@ -47,10 +38,6 @@
     "flat": "^5.0.0",
     "fp-ts": "^2.12.3",
     "glob": "^7.1.2",
-    "graphql": "^16.9.0",
-    "graphql-import": "^0.7.0",
-    "graphql-tag": "^2.12.6",
-    "graphql-tools": "^4.0.7",
     "hapi-auth-jwt2": "10.6.0",
     "hapi-boom-decorators": "^3.0.0",
     "hapi-pino": "^9.0.0",
@@ -98,7 +85,6 @@
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.5",
-    "graphql-schema-typescript": "^1.5.0",
     "jest": "29.7.0",
     "jest-fetch-mock": "^2.1.2",
     "lab-transform-typescript": "^3.0.1",
@@ -111,9 +97,6 @@
     "typescript": "5.6.3"
   },
   "lint-staged": {
-    "src/**/*.graphql": [
-      "prettier --write"
-    ],
     "src/**/*.ts": [
       "prettier --write",
       "eslint -c eslint.config.js --fix"

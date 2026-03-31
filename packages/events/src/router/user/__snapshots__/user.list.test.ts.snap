@@ -8,6 +8,7 @@ exports[`Returns both normal users and system users 1`] = `
     "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -20,6 +21,7 @@ exports[`Returns both normal users and system users 1`] = `
     "primaryOfficeId": "0ffbd058-391f-42a3-839f-b6cdd55325db",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
   {
@@ -28,6 +30,7 @@ exports[`Returns both normal users and system users 1`] = `
     "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -40,6 +43,7 @@ exports[`Returns both normal users and system users 1`] = `
     "primaryOfficeId": "71a46e4a-a030-48be-8a60-982d93a8192e",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
   {
@@ -48,6 +52,7 @@ exports[`Returns both normal users and system users 1`] = `
     "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -60,6 +65,7 @@ exports[`Returns both normal users and system users 1`] = `
     "primaryOfficeId": "def971c6-4303-40bf-8822-85468b8ab756",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
   {
@@ -68,6 +74,7 @@ exports[`Returns both normal users and system users 1`] = `
     "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -80,6 +87,7 @@ exports[`Returns both normal users and system users 1`] = `
     "primaryOfficeId": "e0f1460b-9569-49cf-88eb-21e0c5f8c899",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
   {
@@ -88,6 +96,7 @@ exports[`Returns both normal users and system users 1`] = `
     "email": undefined,
     "fullHonorificName": undefined,
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -100,6 +109,7 @@ exports[`Returns both normal users and system users 1`] = `
     "primaryOfficeId": "ea498fc5-6ef8-4027-893f-972dbfe25fb9",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
   {
@@ -119,6 +129,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "email": undefined,
     "fullHonorificName": "4th Class Registration Officer, John Doe",
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -131,6 +142,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "0ffbd058-391f-42a3-839f-b6cdd55325db",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
   {
@@ -139,6 +151,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "email": undefined,
     "fullHonorificName": "5th Class Registration Officer, John Doe",
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -151,6 +164,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "71a46e4a-a030-48be-8a60-982d93a8192e",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
   {
@@ -159,6 +173,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "email": undefined,
     "fullHonorificName": "6th Class Registration Officer, John Doe",
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -171,6 +186,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "def971c6-4303-40bf-8822-85468b8ab756",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
   {
@@ -179,6 +195,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "email": undefined,
     "fullHonorificName": "7th Class Registration Officer, John Doe",
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -191,6 +208,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "e0f1460b-9569-49cf-88eb-21e0c5f8c899",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
   {
@@ -199,6 +217,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "email": undefined,
     "fullHonorificName": "8th Class Registration Officer, John Doe",
     "id": "[sanitized]",
+    "mobile": undefined,
     "name": [
       {
         "family": "Doe",
@@ -211,6 +230,7 @@ exports[`Returns multiple users with honorifics 1`] = `
     "primaryOfficeId": "ea498fc5-6ef8-4027-893f-972dbfe25fb9",
     "role": "REGISTRATION_AGENT",
     "signature": undefined,
+    "status": "active",
     "type": "user",
   },
 ]

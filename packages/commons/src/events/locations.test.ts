@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { RecordScopeV2 } from '../scopes-v2'
 import { createPrng, generateUuid, TestUserRole } from './test.utils'
 import { SystemContext, UserContext } from '../users/User'
 import {
   canAccessEventWithScope,
   EventIndexWithAdministrativeHierarchy
 } from './locations'
+import { RecordScopeV2 } from 'src/scopes'
 
 describe('canAccessEventWithScope()', () => {
   const rng = createPrng(83429)

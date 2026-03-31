@@ -9,94 +9,49 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery } from '@apollo/client'
-import React, { useState } from 'react'
-import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
-import { Navigation } from '@client/components/interface/Navigation'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { IntlShape, useIntl } from 'react-intl'
-import { useNavigate, useParams } from 'react-router-dom'
-import { GET_USER } from '@client/user/queries'
-import { getLocalisedName } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { Navigation } from '@client/components/interface/Navigation'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { useSelector } from 'react-redux'
-import { formatUrl } from '@client/navigation'
-import { Status } from '@client/views/SysAdmin/Team/user/UserList'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { IStoreState } from '@client/store'
+import * as routes from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { userMutations } from '@client/user/mutations'
-import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import {
-  GetUserQuery,
-  GetUserQueryVariables,
-  Location
-} from '@client/utils/gateway'
-import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
+import { IStoreState } from '@client/store'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { ROUTES } from '@client/v2-events/routes'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { Status } from '@client/views/SysAdmin/Team/user/UserList'
+import { User } from '@opencrvs/commons/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import styled from 'styled-components'
-import * as routes from '@client/navigation/routes'
-import { UserSection } from '@client/forms'
 import { stringify } from 'qs'
+import React, { useState } from 'react'
+import { IntlShape, useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
+import styled from 'styled-components'
 import { ProfileState } from '../../profile/profileReducer'
-import { RawScopes } from '@opencrvs/commons/client'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `
-
-const transformUserQueryResult = (
-  userData: NonNullable<GetUserQuery['getUser']>,
-  intl: IntlShape
-) => {
-  const locale = intl.locale
-  return {
-    id: userData.id,
-    primaryOffice: {
-      id: (userData.primaryOffice && userData.primaryOffice.id) || '',
-      searchableText: '',
-      displayLabel:
-        (userData.primaryOffice &&
-          (locale === LANG_EN
-            ? userData.primaryOffice.name
-            : (userData.primaryOffice.alias &&
-                userData.primaryOffice.alias.join(' ')) ||
-              '')) ||
-        ''
-    },
-    name: getLocalisedName(intl, userData.name[0]),
-    role: userData.role,
-    number: userData.mobile,
-    email: userData.email,
-    status: userData.status,
-    underInvestigation: userData.underInvestigation,
-    username: userData.username,
-    nid:
-      userData.identifier?.system === 'NATIONAL_ID'
-        ? userData.identifier.value
-        : EMPTY_STRING,
-    practitionerId: userData.practitionerId,
-    avatar: userData.avatar || undefined,
-    device: userData.device
-  }
-}
 
 /**
  *
@@ -116,8 +71,8 @@ function WithFrame({
   children: React.ReactNode
   isHidden: boolean
   userDetails: ProfileState['userDetails']
-  user: ReturnType<typeof transformUserQueryResult> | null | undefined
-  scope: RawScopes[] | null
+  user: User | undefined
+  scope: string[] | null
   getMenuItems: (
     userId: string,
     status: string
@@ -125,12 +80,7 @@ function WithFrame({
     label: string
     handler: () => void
   }[]
-  canEditUser: (user: {
-    primaryOffice: Location
-    role: {
-      id: string
-    }
-  }) => boolean
+  canEditUser: (user: User) => boolean
   intl: IntlShape
 }) {
   if (isHidden) {
@@ -141,7 +91,9 @@ function WithFrame({
     <Frame
       header={
         <AppBar
-          mobileTitle={user?.name}
+          mobileTitle={
+            user?.name ? getUsersFullName(user.name, intl.locale) : ''
+          }
           desktopLeft={<HistoryNavigator />}
           desktopRight={<ProfileMenu key="profileMenu" />}
           mobileLeft={<HistoryNavigator hideForward />}
@@ -203,15 +155,13 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
   const [toggleUsernameReminder, setToggleUsernameReminder] = useState(false)
   const [toggleResetPassword, setToggleResetPassword] = useState(false)
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
-  const { data, loading, error } = useQuery<
-    GetUserQuery,
-    GetUserQueryVariables
-  >(GET_USER, {
-    variables: { userId: userId! },
-    fetchPolicy: 'cache-and-network'
-  })
-  const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
-  const userRole = user && intl.formatMessage(user.role.label)
+  const { getUser } = useUsers()
+  const { isFetching: loading, error, data } = getUser.useQuery(userId!)
+  const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
+
+  const user = data as User | undefined
+  const userRole = user && formatUserRole(user.role, intl)
   const { canEditUser } = usePermissions()
 
   const toggleUserActivationModal = () => {
@@ -228,17 +178,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const resendInvite = async (userId: string) => {
     try {
-      const res = await userMutations.resendInvite(userId, [
-        {
-          query: GET_USER,
-          variables: {
-            userId: userId
-          }
-        }
-      ])
-      if (res && res.data && res.data.resendInvite) {
-        setShowResendInviteSuccess(true)
-      }
+      throw new Error('Resend invite is currently not implemented')
     } catch (err) {
       setShowResendInviteError(true)
     }
@@ -246,15 +186,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const usernameReminder = async (userId: string) => {
     try {
-      const res = await userMutations.usernameReminderSend(userId, [
-        {
-          query: GET_USER,
-          variables: { userId: userId }
-        }
-      ])
-      if (res && res.data && res.data.usernameReminder) {
-        setShowUsernameReminderSuccess(true)
-      }
+      throw new Error('Username reminder is currently not implemented')
     } catch (err) {
       setShowUsernameReminderError(true)
     }
@@ -262,15 +194,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const resetPassword = async (userId: string) => {
     try {
-      const res = await userMutations.sendResetPasswordInvite(userId, [
-        {
-          query: GET_USER,
-          variables: { userId: userId }
-        }
-      ])
-      if (res && res.data && res.data.resetPasswordInvite) {
-        setShowResetPasswordSuccess(true)
-      }
+      throw new Error('Reset password is currently not implemented')
     } catch (err) {
       setShowResetPasswordError(true)
     }
@@ -282,9 +206,8 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
         handler: () =>
           navigate(
-            formatUrl(routes.REVIEW_USER_DETAILS, {
-              userId,
-              sectionId: UserSection.Preview
+            ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+              userId
             })
           )
       }
@@ -332,6 +255,8 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
     return menuItems
   }
 
+  const userName = user ? getUsersFullName(user.name, intl.locale) : ''
+
   return (
     <WithFrame
       isHidden={!!hideNavigation}
@@ -348,8 +273,8 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
         <GenericErrorToast />
       ) : (
         <Content
-          title={user.name}
-          icon={() => <UserAvatar name={user.name} avatar={user.avatar} />}
+          title={userName}
+          icon={() => <UserAvatar name={userName} avatar={user.avatar} />}
           topActionButtons={
             userDetails && scope
               ? [
@@ -390,12 +315,13 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
                       navigate({
                         pathname: routes.TEAM_USER_LIST,
                         search: stringify({
-                          locationId: user.primaryOffice.id
+                          locationId: user.primaryOfficeId
                         })
                       })
                     }
                   >
-                    {user.primaryOffice && user.primaryOffice.displayLabel}
+                    {locations.get(user.primaryOfficeId)?.name ||
+                      user.primaryOfficeId}
                   </Link>
                 }
               />
@@ -409,28 +335,20 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
               />
             </Summary>
 
-            {user.practitionerId && (
+            {/* {user.practitionerId && (
               <UserAuditHistory
                 practitionerId={user.practitionerId}
-                practitionerName={user.name}
+                practitionerName={userName}
               />
-            )}
+            )} */}
           </>
-          {data.getUser?.id ? (
+          {/* {user.id ? (
             <UserAuditActionModal
               show={modalVisible}
-              userId={data.getUser?.id}
+              userId={user.id}
               onClose={() => toggleUserActivationModal()}
-              onConfirmRefetchQueries={[
-                {
-                  query: GET_USER,
-                  variables: {
-                    userId: userId
-                  }
-                }
-              ]}
             />
-          ) : null}
+          ) : null} */}
           <ResponsiveModal
             id="username-reminder-modal"
             show={toggleUsernameReminder}
@@ -467,7 +385,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
             {intl.formatMessage(
               sysMessages.sendUsernameReminderInviteModalMessage,
               {
-                recipient: deliveryMethod === 'sms' ? user.number : user.email,
+                recipient: deliveryMethod === 'sms' ? user.mobile : user.email,
                 deliveryMethod
               }
             )}
@@ -505,7 +423,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
           >
             {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
               deliveryMethod,
-              recipient: deliveryMethod === 'sms' ? user.number : user.email
+              recipient: deliveryMethod === 'sms' ? user.mobile : user.email
             })}
           </ResponsiveModal>
           {showResendInviteSuccess && (
@@ -535,7 +453,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
               {intl.formatMessage(
                 sysMessages.sendUsernameReminderInviteSuccess,
                 {
-                  name: user.name
+                  name: userName
                 }
               )}
             </Toast>
@@ -549,7 +467,6 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
               {intl.formatMessage(sysMessages.sendUsernameReminderInviteError)}
             </Toast>
           )}
-
           {showResetPasswordSuccess && (
             <Toast
               id="reset_password_success"
@@ -559,7 +476,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
               }}
             >
               {intl.formatMessage(sysMessages.resetPasswordSuccess, {
-                username: user.name
+                username: userName
               })}
             </Toast>
           )}
@@ -571,7 +488,7 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
             >
               {intl.formatMessage(sysMessages.resetPasswordError)}
             </Toast>
-          )}
+          )}{' '}
         </Content>
       )}
     </WithFrame>

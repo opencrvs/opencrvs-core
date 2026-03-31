@@ -114,7 +114,6 @@ export const stringifyEventMetadata = ({
       administrativeAreas
     }),
     assignedTo: findUserById(metadata.assignedTo ?? '', users),
-    // @TODO: DATE_OF_EVENT config needs to be defined some other way and bake it in.
     dateOfEvent: metadata.dateOfEvent
       ? DateField.toCertificateVariables(metadata.dateOfEvent, {
           intl,

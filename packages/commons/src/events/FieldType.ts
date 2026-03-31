@@ -28,6 +28,7 @@ export const FieldType = {
   TIME: 'TIME',
   IMAGE_VIEW: 'IMAGE_VIEW',
   PARAGRAPH: 'PARAGRAPH',
+  HEADING: 'HEADING',
   PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
   FILE: 'FILE',
@@ -57,6 +58,7 @@ export const FieldType = {
   ID_READER: 'ID_READER',
   LOADER: 'LOADER',
   ALPHA_HIDDEN: 'ALPHA_HIDDEN',
+  USER_ROLE: 'USER_ROLE',
   /**
    * @internal
    * @experimental

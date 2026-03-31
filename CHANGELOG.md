@@ -4,6 +4,10 @@
 
 ### Breaking changes
 
+#### FieldType.PARAGRAPH configuration
+
+- `FieldType.PARAGRAPH` field no longer takes in a fontVariant style configuration. If a fontVariant is required, please use the new `FieldType.HEADING` field instead.
+
 #### Location APIs
 
 - **Removed following endpoints from gateway:**
@@ -25,6 +29,9 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 - `actions: [{ type: CtaActionType }]`. is deprecated in favor of `action: { type: CtaActionType }`
 - The `conditionals` option has been removed from workqueue configuration under `action`. This option was previously present but had no effect.
 - The `'DEFAULT'` value is no longer supported in workqueue `action` configuration. Please ensure you specify a valid `CtaActionType` (see [WorkqueueConfig.ts](https://github.com/opencrvs/opencrvs-core/blob/develop/packages/commons/src/events/WorkqueueConfig.ts)).
+- Add support for querying by the declaring or registering user's role to workqueue `query`
+  - `'legalStatuses.DECLARED.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
+  - `'legalStatuses.REGISTERD.createdByRole': { type: 'anyOf', terms: ['MY_ROLE_ID', 'MY_OTHER_ROLE_ID'] }`
 
 ### New features
 
@@ -45,6 +52,34 @@ HTTP input now accepts `field('..')` references in the HTTP body definition.
 - Added experimental ALPHA_HIDDEN form field type, allowing configurable default/derived values and conditional inclusion in form submissions.
 - Added OAuth2 support for `application/x-www-form-urlencoded` content type in auth-service access token endpoints, maintaining backwards compatibility with query parameters. [#11590](https://github.com/opencrvs/opencrvs-core/pull/11590)
 - Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
+- Fixed vulnerabilities on CSP HTTP Header for login page [#12094](https://github.com/opencrvs/opencrvs-core/issues/12094)
+
+## 1.9.11
+
+### New features
+
+- Added support of `updatedByUserRole` for workqueue configuration.
+  Workqueues can now be filtered by a specific role or `user('role')`. [#11848](https://github.com/opencrvs/opencrvs-core/issues/11848)
+
+**Usage example**
+
+```ts
+query: {
+  updatedByUserRole: { type: 'exact', term: user('role') }
+}
+```
+
+### Bug fixes
+
+- Fix newly created drafts in offline mode are not accessible [#11820](https://github.com/opencrvs/opencrvs-core/issues/11820)
+- Fix the rendered date on the review page and the certificate display issue in negative UTC offset time zones. [#11955](https://github.com/opencrvs/opencrvs-core/issues/11955)
+
+### Improvements
+
+- Change reindex call to make operation non-destructive. Create endpoint to track progress of reindex. [#11877](https://github.com/opencrvs/opencrvs-core/issues/11877)
+
+- Explicitly nullify hidden field values to prevent stale data in database and fix incorrect search results [#11695](https://github.com/opencrvs/opencrvs-core/pull/11849)
+- Update accordion behavior on the review page so that only sections containing required or completed fields are expanded by default. [#10133](https://github.com/opencrvs/opencrvs-core/issues/10133)
 
 ## 1.9.10
 

@@ -65,7 +65,7 @@ import {
   FileFieldValue,
   HttpFieldValue
 } from './CompositeFieldValue'
-import { FieldValue } from './FieldValue'
+import { FieldValue, PlainDate } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import * as z from 'zod/v4'
 import { FullDocumentPath } from '../documents'
@@ -197,6 +197,7 @@ function mapFieldTypeToMockValue(
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.PHONE:
@@ -257,8 +258,8 @@ function mapFieldTypeToMockValue(
       return undefined
     case FieldType.DATE_RANGE:
       return {
-        start: '2021-01-01',
-        end: '2021-01-31'
+        start: PlainDate.parse('2021-01-01'),
+        end: PlainDate.parse('2021-01-31')
       }
     case FieldType.CHECKBOX:
       return true
@@ -285,6 +286,8 @@ function mapFieldTypeToMockValue(
       return Object.create(null)
     case FieldType.ID_READER:
       return Object.create(null)
+    case FieldType.USER_ROLE:
+      return TestUserRole.enum.FIELD_AGENT
   }
 }
 
@@ -351,7 +354,8 @@ export function generateActionDeclarationInput(
         ...declaration,
         ...overrides
       },
-      {} // Intentionally empty. Allow generating fields with custom conditionals.
+      {}, // Intentionally empty. Allow generating fields with custom conditionals.
+      true
     )
   }
 

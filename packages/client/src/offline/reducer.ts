@@ -31,7 +31,6 @@ import {
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { isOfflineDataLoaded } from './selectors'
 import { merge } from 'lodash'
@@ -109,7 +108,6 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-  systems: System[]
   config: ApplicationConfig
   anonymousConfig: IApplicationConfigAnonymous
 }
@@ -363,32 +361,16 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
-    case actions.UPDATE_OFFLINE_SYSTEMS: {
-      const newOfflineData = {
-        ...state.offlineData,
-        systems: action.payload.systems
-      }
-
-      return loop(
-        {
-          ...state,
-          offlineData: newOfflineData
-        },
-        Cmd.run(saveOfflineData, { args: [newOfflineData] })
-      )
-    }
-
     /*
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, systems } = action.payload
+      const { certificates, config } = action.payload
       merge(window.config, config)
 
       const newOfflineData = {
         ...state.offlineData,
         config,
-        systems,
         templates: {
           ...state.offlineData.templates,
           certificates: (certificates as ICertificateData[]).map((x) => {
@@ -556,19 +538,6 @@ function reducer(
       const offices = filterLocations(
         action.payload,
         'CRVS_OFFICE'
-        /*
-
-        // This is used to filter office locations available offline
-        // It was important in an older design and may become important again
-
-        {
-          locationLevel: 'id',
-          locationId: isNationalSystemAdmin(state.userDetails)
-            ? undefined
-            : state.userDetails &&
-              state.userDetails.primaryOffice &&
-              state.userDetails.primaryOffice.id
-        }*/
       )
       const activeOffices = Object.fromEntries(
         Object.entries(offices).filter(

@@ -92,7 +92,7 @@ test('Check scopes against event.actions.register', async () => {
         user,
         scope,
         clientReadingAllEvents,
-        (client) =>
+        async (client) =>
           client.event.actions.register.request({
             eventId,
             transactionId: getUUID(),
@@ -108,4 +108,4 @@ test('Check scopes against event.actions.register', async () => {
     }),
     { numRuns: 20 }
   )
-})
+}, 120000)

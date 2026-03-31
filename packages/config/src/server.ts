@@ -13,8 +13,6 @@ import * as Hapi from '@hapi/hapi'
 import { DEFAULT_TIMEOUT } from '@config/config/constants'
 import getRoutes from '@config/config/routes'
 import getPlugins from '@config/config/plugins'
-import * as database from '@config/config/database'
-import * as mongoDirect from '@config/config/hearthClient'
 import { validateFunc, logger } from '@opencrvs/commons'
 import { readFileSync } from 'fs'
 import { badRequest } from '@hapi/boom'
@@ -78,15 +76,11 @@ export async function createServer() {
 
   async function stop() {
     await server.stop()
-    await database.stop()
-    await mongoDirect.stop()
     server.log('info', 'Config server stopped')
   }
 
   async function start() {
     await server.start()
-    await database.start()
-    await mongoDirect.start()
     server.log('info', `Config server started on ${env.HOST}:${env.PORT}`)
   }
 

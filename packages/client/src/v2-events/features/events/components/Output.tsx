@@ -52,7 +52,9 @@ import {
   FieldUpdateValue,
   isCustomFieldType,
   isAutocompleteFieldType,
-  isImageViewFieldType
+  isImageViewFieldType,
+  isHeadingFieldType,
+  isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -67,6 +69,7 @@ import {
   Select,
   SelectCountry,
   Paragraph,
+  Heading,
   Number,
   NumberWithUnit,
   Text,
@@ -75,7 +78,8 @@ import {
   VerificationStatus,
   AgeField,
   Autocomplete,
-  ImageView
+  ImageView,
+  UserRole
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { SignatureField } from '@client/v2-events/components/forms/inputs/SignatureField/SignatureField'
@@ -149,6 +153,10 @@ export function ValueOutput({
 
   if (isParagraphFieldType(field)) {
     return Paragraph.Output
+  }
+
+  if (isHeadingFieldType(field)) {
+    return Heading.Output
   }
 
   if (isNumberFieldType(field)) {
@@ -256,9 +264,12 @@ export function ValueOutput({
       )
     }
 
-    if (isCustomFieldType(field)) {
-      return <Custom.Output {...field.config} value={field.value} />
-    }
+  if (isUserRoleFieldType(field)) {
+    return <UserRole.Output value={field.value} />
+  }
+
+  if (isCustomFieldType(field)) {
+    return <Custom.Output {...field.config} value={field.value} />
   }
 }
 

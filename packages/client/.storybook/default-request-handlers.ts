@@ -1219,7 +1219,7 @@ export const handlers = {
       } else if (userId == generator.user.id.registrationAgent) {
         response = generator.user.registrationAgent().v1
       } else if (userId == generator.user.id.localSystemAdmin) {
-        response = generator.user.localSystemAdmin()
+        response = generator.user.localSystemAdmin().v1
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v1
       } else if (userId == generator.user.id.provincialRegistrar) {
@@ -1246,7 +1246,7 @@ export const handlers = {
       } else if (userId == generator.user.id.registrationAgent) {
         response = generator.user.registrationAgent().v1
       } else if (userId == generator.user.id.localSystemAdmin) {
-        response = generator.user.localSystemAdmin()
+        response = generator.user.localSystemAdmin().v1
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v1
       } else if (userId == generator.user.id.provincialRegistrar) {
@@ -1278,6 +1278,12 @@ export const handlers = {
         response = generator.user.registrationAgent().v2
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v2
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v2
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v2
+      } else if (userId == generator.user.id.localSystemAdmin) {
+        response = generator.user.localSystemAdmin().v2
       } else {
         response = generator.user.localRegistrar().v2
       }
@@ -2211,8 +2217,6 @@ export const handlers = {
 
     http.get('/api/config/config', () => {
       return HttpResponse.json({
-        systems: [],
-
         config: mockOfflineData.config,
         certificates: [
           {
@@ -2357,6 +2361,16 @@ export const handlers = {
     })
   ],
   searchUsers: [
+    tRPCMsw.user.search.query(() => {
+      const generator = testDataGenerator()
+
+      return [
+        generator.user.localSystemAdmin().v2,
+        generator.user.localRegistrar().v2,
+        generator.user.registrationAgent().v2,
+        generator.user.fieldAgent().v2
+      ]
+    }),
     graphql.query('searchUsers', () => {
       const generator = testDataGenerator()
 
@@ -2366,7 +2380,7 @@ export const handlers = {
             totalItems: 4,
             results: [
               {
-                id: generator.user.localSystemAdmin().id as UUID,
+                id: generator.user.localSystemAdmin().v2.id as UUID,
                 name: [
                   {
                     use: 'en',
@@ -2535,7 +2549,7 @@ export const handlers = {
         }
       })
     }),
-    http.post('http://localhost:7070/sendVerifyCode', () => {
+    http.post('/api/gateway/sendVerifyCode', () => {
       const generator = testDataGenerator()
       return HttpResponse.json({
         userId: generator.user.registrationAgent().v2.id,

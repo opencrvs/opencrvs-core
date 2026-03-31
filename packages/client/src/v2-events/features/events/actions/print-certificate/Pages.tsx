@@ -88,6 +88,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
+        attachmentPath={`events/${eventId}/`}
         declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={annotation}
