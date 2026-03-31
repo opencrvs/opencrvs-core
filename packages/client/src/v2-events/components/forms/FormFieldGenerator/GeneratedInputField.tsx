@@ -618,15 +618,11 @@ export const GeneratedInputField = <T extends FieldConfig>(
     )
   }
   if (isCountryFieldType(field)) {
-    const resolvedCountryOptions = field.config.optionOverrides
+    const overrides = field.config.optionOverrides
+    const resolvedCountryOptions = overrides
       ? resolveOptions(
           (countries as SelectOption[]).map((country) => {
-            // tsserver for some reason cannot filter out the undefined
-            // from the type here
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const override = field.config.optionOverrides!.find(
-              (o) => o.value === country.value
-            )
+            const override = overrides.find((o) => o.value === country.value)
             return override
               ? { ...country, conditionals: override.conditionals }
               : country
