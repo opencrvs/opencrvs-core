@@ -14,12 +14,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { within, expect } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
-import {
-  ConditionalType,
-  FieldType,
-  not,
-  alwaysTrue
-} from '@opencrvs/commons/client'
+import { ConditionalType, FieldType, never } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
   FormFieldGeneratorPropsWithoutRef
@@ -81,7 +76,7 @@ export const WithHiddenOption: Story = {
                 conditionals: [
                   {
                     type: ConditionalType.SHOW,
-                    conditional: not(alwaysTrue())
+                    conditional: never()
                   }
                 ]
               }
@@ -126,7 +121,7 @@ export const WithAddressCountryOverride: Story = {
                       conditionals: [
                         {
                           type: ConditionalType.SHOW,
-                          conditional: not(alwaysTrue())
+                          conditional: never()
                         }
                       ]
                     }
@@ -173,7 +168,7 @@ export const WithDisabledOption: Story = {
                 conditionals: [
                   {
                     type: ConditionalType.ENABLE,
-                    conditional: not(alwaysTrue())
+                    conditional: never()
                   }
                 ]
               }
