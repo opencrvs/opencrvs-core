@@ -40,10 +40,8 @@ import {
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import {
-  formattedDuration,
-  plainDateToLocalDate
-} from '@client/utils/date-formatting'
+import { plainDateToLocalDate } from '@opencrvs/commons/client'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,

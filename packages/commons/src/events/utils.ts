@@ -52,12 +52,16 @@ import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
-import { DateValue, SelectDateRangeValue } from './FieldValue'
+import {
+  PlainDate,
+  plainDateToLocalDate,
+  SelectDateRangeValue
+} from './FieldValue'
 import { subDays, subYears, format } from 'date-fns'
 
-export function ageToDate(age: number, asOfDate: DateValue) {
-  const date = new Date(asOfDate)
-  return DateValue.parse(format(subYears(date, age), 'yyyy-MM-dd'))
+export function ageToDate(age: number, asOfDate: PlainDate) {
+  const date = plainDateToLocalDate(asOfDate)
+  return PlainDate.parse(format(subYears(date, age), 'yyyy-MM-dd'))
 }
 
 function isDeclarationActionConfig(
@@ -193,21 +197,34 @@ export function isPageVisible(
 export function omitHiddenFields<T extends EventState | ActionUpdate>(
   fields: FieldConfig[],
   formValues: T,
-  validatorContext: ValidatorContext
+  validatorContext: ValidatorContext,
+  includeHiddenFieldsWithNullValues: boolean = false
 ): Partial<T> {
   const base = cloneDeep(formValues)
 
   // The omitting is done recursively until the object does not change.
   // This is because the previously removed fields might affect the visibility of other fields.
   function fn(prevVisibilityContext: Partial<T>): Partial<T> {
-    const cleaned = omitBy<Partial<T>>(base, (_, fieldId) => {
+    const cleaned = omitBy<Partial<T>>(base, (value, fieldId) => {
       const fieldConfig = fields.filter((f) => f.id === fieldId)
 
-      return fieldConfig.length
-        ? fieldConfig.every(
-            (f) => !isFieldVisible(f, prevVisibilityContext, validatorContext)
-          )
-        : false
+      if (!fieldConfig.length) {
+        return false
+      }
+
+      const isHidden = fieldConfig.every(
+        (f) => !isFieldVisible(f, prevVisibilityContext, validatorContext)
+      )
+
+      if (!isHidden) {
+        return false
+      }
+
+      if (includeHiddenFieldsWithNullValues && value === null) {
+        return false
+      }
+
+      return true
     })
 
     return isEqual(cleaned, prevVisibilityContext) ? cleaned : fn(cleaned)
@@ -219,7 +236,8 @@ export function omitHiddenFields<T extends EventState | ActionUpdate>(
 export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
   formConfig: FormConfig,
   values: T,
-  validatorContext: ValidatorContext
+  validatorContext: ValidatorContext,
+  includeHiddenFieldsWithNullValues: boolean = false
 ) {
   const visibleFields = formConfig.pages
     .filter((p) => isPageVisible(p, values, validatorContext))
@@ -236,7 +254,8 @@ export function omitHiddenPaginatedFields<T extends EventState | ActionUpdate>(
   return omitHiddenFields(
     visibleFields,
     valuesExceptHiddenPage,
-    validatorContext
+    validatorContext,
+    includeHiddenFieldsWithNullValues
   )
 }
 

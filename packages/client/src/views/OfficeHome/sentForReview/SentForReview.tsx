@@ -37,10 +37,8 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
-import {
-  formattedDuration,
-  plainDateToLocalDate
-} from '@client/utils/date-formatting'
+import { plainDateToLocalDate } from '@opencrvs/commons/client'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,

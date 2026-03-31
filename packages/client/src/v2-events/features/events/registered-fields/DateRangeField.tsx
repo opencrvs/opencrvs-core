@@ -16,7 +16,7 @@ import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useState } from 'react'
 import styled from 'styled-components'
 import subYears from 'date-fns/subYears'
-import { DateRangeFieldValue } from '@opencrvs/commons/client'
+import { DateRangeFieldValue, PlainDate } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
@@ -89,7 +89,7 @@ function formatDateRangeLabel(
 }
 
 function extractDateValueFromProps(
-  value?: DateRangeFieldValue
+  value?: string | DateRangeFieldValue
 ): DateRangeInternalValue {
   const dateValue = DateRangeFieldValue.safeParse(value)
 
@@ -111,9 +111,9 @@ function DateRangeInput({
   onChange,
   value,
   ...props
-}: Omit<DateFieldProps, 'value'> & {
-  onChange: (newValue: DateRangeFieldValue) => void
-  value?: DateRangeFieldValue
+}: Omit<DateFieldProps, 'value' | 'onChange'> & {
+  onChange: (newValue: string | DateRangeFieldValue) => void
+  value?: string | DateRangeFieldValue
 }) {
   const intl = useIntl()
   const [dateRange, setDateRange] = useState<DateRangeInternalValue>(
@@ -151,8 +151,8 @@ function DateRangeInput({
 
     if (start && end) {
       onChange({
-        start,
-        end
+        start: PlainDate.parse(start),
+        end: PlainDate.parse(end)
       })
 
       setDateRange((d) => ({

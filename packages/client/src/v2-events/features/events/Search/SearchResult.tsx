@@ -194,7 +194,8 @@ export const SearchResultComponent = ({
   actions = [],
   emptyMessage,
   allowRetry,
-  totalResults
+  totalResults,
+  paginationVisibleOffline = false
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -207,6 +208,7 @@ export const SearchResultComponent = ({
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
   emptyMessage?: TranslationConfig
+  paginationVisibleOffline?: boolean
 }>) => {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
@@ -493,6 +495,7 @@ export const SearchResultComponent = ({
           emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
         }
         paginationId={currentPageNumber}
+        paginationVisibleOffline={paginationVisibleOffline}
         tabBarContent={tabBarContent}
         title={contentTitle}
         totalPages={totalPages}
