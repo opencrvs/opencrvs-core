@@ -12,6 +12,7 @@
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   createEmptyDraft,
   findActiveDraftForEvent,
@@ -37,6 +38,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useToastAndRedirect } from '@client/v2-events/features/events/useToastAndRedirect'
+import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 import {
@@ -63,6 +65,7 @@ function useActionGuard(
   const availableActions = getAvailableActionsForEvent(eventState)
   const { isActionAllowed } = useUserAllowedActions(eventState)
   const { redirectToEventOverviewPage } = useToastAndRedirect()
+  const scopes = useSelector(getScope) ?? []
   // If the action is not available for the event, redirect to the overview page
   if (!availableActions.includes(actionType)) {
     const isProd = import.meta.env.PROD
@@ -97,8 +100,8 @@ function useActionGuard(
   // otherwise strict permission by action type.
   const isPermitted =
     actionType === ActionType.DECLARE
-      ? isActionAllowed(ActionType.DECLARE) ||
-        isActionAllowed(ActionType.NOTIFY)
+      ? scopes.some((scope) => scope.includes('record.declare')) ||
+        scopes.some((scope) => scope.includes('record.notify'))
       : isActionAllowed(actionType)
 
   if (!isPermitted) {
