@@ -59,7 +59,7 @@ export default async function sendUserNameHandler(
   })
 
   await recordUserAuditEvent(request.headers.authorization, {
-    operation: 'user.USERNAME_REMINDER',
+    operation: 'user.username_reminder',
     requestData: {
       subjectId: retrievalStepInformation.userId
     },
