@@ -164,95 +164,101 @@ export function ValueOutput({
   }
 
   if (isFileFieldType(field) || isSignatureFieldType(field)) {
-  if (isSignatureFieldType(field)) {
-    return <SignatureField.Output value={field.value} />
-  }
+    if (isSignatureFieldType(field)) {
+      return <SignatureField.Output value={field.value} />
+    }
 
-  if (isFileFieldType(field)) {
-    return <File.Output {...field} />
-  }
+    if (isFileFieldType(field)) {
+      return <File.Output {...field} />
+    }
 
-  if (isFileFieldWithOptionType(field)) {
-    return <FileWithOption.Output {...field} />
-  }
+    if (isFileFieldWithOptionType(field)) {
+      return <FileWithOption.Output {...field} />
+    }
 
-  if (isBulletListFieldType(field)) {
-    return BulletList.Output
-  }
+    if (isBulletListFieldType(field)) {
+      return BulletList.Output
+    }
 
-  if (isSelectFieldType(field) || isSelectDateRangeFieldType(field)) {
-    return <Select.Output options={field.config.options} value={field.value} />
-  }
+    if (isSelectFieldType(field) || isSelectDateRangeFieldType(field)) {
+      return (
+        <Select.Output options={field.config.options} value={field.value} />
+      )
+    }
 
-  if (isCountryFieldType(field)) {
-    return <SelectCountry.Output value={field.value} />
-  }
+    if (isCountryFieldType(field)) {
+      return <SelectCountry.Output value={field.value} />
+    }
 
-  if (isCheckboxFieldType(field)) {
-    return (
-      <Checkbox.Output required={!!field.config.required} value={field.value} />
-    )
-  }
+    if (isCheckboxFieldType(field)) {
+      return (
+        <Checkbox.Output
+          required={!!field.config.required}
+          value={field.value}
+        />
+      )
+    }
 
-  if (isAddressFieldType(field)) {
-    return (
-      <Address.Output
-        configuration={field.config}
-        lineSeparator={searchMode === true ? ', ' : undefined}
-        value={field.value}
-      />
-    )
-  }
+    if (isAddressFieldType(field)) {
+      return (
+        <Address.Output
+          configuration={field.config}
+          lineSeparator={searchMode === true ? ', ' : undefined}
+          value={field.value}
+        />
+      )
+    }
 
-  if (isRadioGroupFieldType(field)) {
-    return (
-      <RadioGroup.Output options={field.config.options} value={field.value} />
-    )
-  }
+    if (isRadioGroupFieldType(field)) {
+      return (
+        <RadioGroup.Output options={field.config.options} value={field.value} />
+      )
+    }
 
-  if (isNameFieldType(field)) {
-    return <Name.Output configuration={field.config} value={field.value} />
-  }
+    if (isNameFieldType(field)) {
+      return <Name.Output configuration={field.config} value={field.value} />
+    }
 
-  if (isAdministrativeAreaFieldType(field)) {
-    return <AdministrativeArea.Output value={field.value} />
-  }
+    if (isAdministrativeAreaFieldType(field)) {
+      return <AdministrativeArea.Output value={field.value} />
+    }
 
-  if (
-    isOfficeFieldType(field) ||
-    isLocationFieldType(field) ||
-    isFacilityFieldType(field)
-  ) {
-    return <LocationSearch.Output value={field.value} />
-  }
+    if (
+      isOfficeFieldType(field) ||
+      isLocationFieldType(field) ||
+      isFacilityFieldType(field)
+    ) {
+      return <LocationSearch.Output value={field.value} />
+    }
 
-  if (isDividerFieldType(field)) {
-    return Divider.Output
-  }
+    if (isDividerFieldType(field)) {
+      return Divider.Output
+    }
 
-  if (isVerificationStatusType(field)) {
-    return (
-      <VerificationStatus.Output
-        configuration={field.config.configuration}
-        id={field.config.id}
-        value={field.value ?? 'pending'}
-      />
-    )
-  }
+    if (isVerificationStatusType(field)) {
+      return (
+        <VerificationStatus.Output
+          configuration={field.config.configuration}
+          id={field.config.id}
+          value={field.value ?? 'pending'}
+        />
+      )
+    }
 
-  // For FieldType.DATA, the eventConfig is required
-  if (isDataFieldType(field) && eventConfig) {
-    return (
-      <Data.Output
-        eventConfig={eventConfig}
-        field={field.config}
-        value={field.value}
-      />
-    )
-  }
+    // For FieldType.DATA, the eventConfig is required
+    if (isDataFieldType(field) && eventConfig) {
+      return (
+        <Data.Output
+          eventConfig={eventConfig}
+          field={field.config}
+          value={field.value}
+        />
+      )
+    }
 
-  if (isCustomFieldType(field)) {
-    return <Custom.Output {...field.config} value={field.value} />
+    if (isCustomFieldType(field)) {
+      return <Custom.Output {...field.config} value={field.value} />
+    }
   }
 }
 
