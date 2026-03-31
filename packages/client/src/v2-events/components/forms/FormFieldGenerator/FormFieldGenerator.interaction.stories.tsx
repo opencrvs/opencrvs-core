@@ -449,6 +449,87 @@ export const RemovesErrorOnParentChange: Story = {
   }
 }
 
+const sameIdConditionalFields = [
+  {
+    id: 'form.value',
+    type: FieldType.TEXT,
+    defaultValue: 'hello',
+    label: generateTranslationConfig('Greeting'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: not(field('form.toggle').isEqualTo(true))
+      }
+    ]
+  },
+  {
+    id: 'form.value',
+    type: FieldType.TEXT,
+    defaultValue: 'goodbye',
+    label: generateTranslationConfig('Greeting'),
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: field('form.toggle').isEqualTo(true)
+      }
+    ]
+  }
+] satisfies FieldConfig[]
+
+/**
+ * Test case for a bug where hidden field default values were overwriting visible field defaults
+ * due to field order in the reduce operation used to build form state.
+ */
+export const VisibleFieldDefaultIsUsed: Story = {
+  name: 'Visible field default value is applied, not hidden field default',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={sameIdConditionalFields}
+        id="my-form"
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    // fieldA (default='hello') is visible; fieldB (default='goodbye') is hidden but defined last.
+    // Without the fix, fieldB's default overwrites fieldA's → input shows 'goodbye'.
+    await expect(await canvas.findByTestId('text__form____value')).toHaveValue(
+      'hello'
+    )
+  }
+}
+
+export const AlternateVariantDefaultIsUsed: Story = {
+  name: 'Alternate variant default value is applied when that variant is visible',
+  parameters: {
+    layout: 'centered',
+    chromatic: { disableSnapshot: true }
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        {...args}
+        fields={sameIdConditionalFields}
+        formValues={{ 'form.toggle': true }}
+        id="my-form"
+      />
+    )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    // fieldB (default='goodbye') is visible; fieldA (default='hello') is hidden.
+    await expect(await canvas.findByTestId('text__form____value')).toHaveValue(
+      'goodbye'
+    )
+  }
+}
+
 export const CustomRequiredValidationMessage: Story = {
   name: 'Custom required validation message',
   parameters: {
