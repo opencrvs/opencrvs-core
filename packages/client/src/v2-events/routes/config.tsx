@@ -85,83 +85,95 @@ function PrefetchQueries() {
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
 
+const PING_SERVICES = [
+  'auth',
+  'search',
+  'user-mgnt',
+  'metrics',
+  'notification',
+  'countryconfig',
+  'workflow'
+] as const
+
+export function useNetworkProbe() {
+  useEffect(() => {
+    let cancelled = false
+    let intervalId: ReturnType<typeof setInterval> | null = null
+    let probeInProgress = false
+    let currentController: AbortController | null = null
+    let abortTimeoutId: ReturnType<typeof setTimeout> | null = null
+
+    onlineManager.setOnline(false)
+
+    async function probeNetwork() {
+      if (probeInProgress) {
+        return
+      }
+      probeInProgress = true
+      try {
+        currentController = new AbortController()
+        abortTimeoutId = setTimeout(() => currentController?.abort(), 3000)
+
+        const res = await fetch('/api/ping', {
+          method: 'GET',
+          cache: 'no-store',
+          signal: currentController.signal
+        })
+
+        const status = await res.json()
+
+        const allServicesReady =
+          res.ok &&
+          PING_SERVICES.every((service) => {
+            return status[service] === true
+          })
+
+        if (!cancelled) {
+          onlineManager.setOnline(allServicesReady)
+          if (allServicesReady && intervalId !== null) {
+            clearInterval(intervalId)
+            intervalId = null
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          onlineManager.setOnline(false)
+        }
+      } finally {
+        if (abortTimeoutId !== null) {
+          clearTimeout(abortTimeoutId)
+          abortTimeoutId = null
+        }
+        probeInProgress = false
+        currentController = null
+      }
+    }
+
+    void probeNetwork()
+
+    intervalId = setInterval(() => {
+      if (!onlineManager.isOnline()) {
+        void probeNetwork()
+      }
+    }, 5000)
+
+    return () => {
+      cancelled = true
+      currentController?.abort()
+      if (abortTimeoutId !== null) {
+        clearTimeout(abortTimeoutId)
+      }
+      if (intervalId !== null) {
+        clearInterval(intervalId)
+      }
+    }
+  }, [])
+}
+
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
-    useEffect(() => {
-      let cancelled = false
-      let intervalId: ReturnType<typeof setInterval> | null = null
-      let probeInProgress = false
-      let currentController: AbortController | null = null
-
-      onlineManager.setOnline(false)
-
-      const services = [
-        'auth',
-        'search',
-        'user-mgnt',
-        'metrics',
-        'notification',
-        'countryconfig',
-        'workflow'
-      ]
-
-      async function probeNetwork() {
-        if (probeInProgress) {
-          return
-        }
-        probeInProgress = true
-        try {
-          currentController = new AbortController()
-          setTimeout(() => currentController?.abort(), 3000)
-
-          const res = await fetch('/api/ping', {
-            method: 'GET',
-            cache: 'no-store',
-            signal: currentController.signal
-          })
-
-          const status = await res.json()
-
-          const allServicesReady =
-            res.ok &&
-            services.every((service) => {
-              return status[service] === true
-            })
-
-          if (!cancelled) {
-            onlineManager.setOnline(allServicesReady)
-            if (allServicesReady && intervalId !== null) {
-              clearInterval(intervalId)
-              intervalId = null
-            }
-          }
-        } catch {
-          if (!cancelled) {
-            onlineManager.setOnline(false)
-          }
-        } finally {
-          probeInProgress = false
-          currentController = null
-        }
-      }
-
-      void probeNetwork()
-
-      intervalId = setInterval(() => {
-        if (!onlineManager.isOnline()) {
-          void probeNetwork()
-        }
-      }, 5000)
-
-      return () => {
-        cancelled = true
-        currentController?.abort()
-        if (intervalId !== null) {
-          clearInterval(intervalId)
-        }
-      }
-    }, [])
+    useNetworkProbe()
 
     const currentUser = useSelector(getUserDetails)
 
