@@ -9,9 +9,45 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Kysely } from 'kysely'
+import { getClient } from '@events/storage/postgres/events'
 import { NewUsers } from './schema/app/Users'
 import Schema from './schema/Database'
 import { NewUserCredentials } from './schema/app/UserCredentials'
+
+interface SecurityQuestion {
+  questionKey: string
+  answerHash: string
+}
+
+export async function getUserByMobileOrEmail(
+  params: { mobile: string } | { email: string }
+) {
+  const db = getClient()
+  const query = db
+    .selectFrom('users')
+    .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
+    .select([
+      'users.id',
+      'users.firstname',
+      'users.surname',
+      'users.mobile',
+      'users.email',
+      'users.role',
+      'users.status',
+      'userCredentials.username',
+      'userCredentials.securityQuestions'
+    ])
+
+  if ('mobile' in params) {
+    return query.where('users.mobile', '=', params.mobile).executeTakeFirst()
+  }
+
+  return query
+    .where('users.email', '=', params.email.toLowerCase())
+    .executeTakeFirst()
+}
+
+export type { SecurityQuestion }
 
 export async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {
   const { id } = await trx
