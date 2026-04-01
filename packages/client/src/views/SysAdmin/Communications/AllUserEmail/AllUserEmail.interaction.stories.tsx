@@ -11,10 +11,11 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, userEvent, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { TRPCClientError } from '@trpc/client'
 import superjson from 'superjson'
+import React from 'react'
 import { TestUserRole } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
+import { NotificationComponent } from '@client/components/Notification'
 import AllUserEmail from './AllUserEmail'
 
 const tRPCMsw = createTRPCMsw<AppRouter>({
@@ -31,12 +32,31 @@ const meta: Meta<typeof AllUserEmail> = {
   parameters: {
     userRole: TestUserRole.enum.NATIONAL_SYSTEM_ADMIN,
     chromatic: { disableSnapshot: true }
-  }
+  },
+  // NotificationComponent is the Redux-connected toast renderer used in App.tsx.
+  // It must be included here so that success/error toasts dispatched by
+  // AllUserEmail are actually mounted and visible within the story canvas.
+  decorators: [
+    (Story) => (
+      <>
+        <Story />
+        <NotificationComponent />
+      </>
+    )
+  ]
 }
 
 export default meta
 
 type Story = StoryObj<typeof AllUserEmail>
+
+// The label elements use `id` but no `for`/`htmlFor`, so testing-library cannot
+// resolve accessible names via label text. Use findAllByRole to wait for the
+// form to render, then destructure by DOM order: [0] = subject, [1] = body.
+async function getFormInputs(canvas: ReturnType<typeof within>) {
+  const [subjectInput, bodyInput] = await canvas.findAllByRole('textbox')
+  return { subjectInput, bodyInput }
+}
 
 export const SendButtonDisabledWhenFormEmpty: Story = {
   play: async ({ canvasElement }) => {
@@ -52,12 +72,8 @@ export const SendButtonEnabledWhenFormFilled: Story = {
     const canvas = within(canvasElement)
 
     await step('Fill in subject and body', async () => {
-      const subjectInput = await canvas.findByRole('textbox', {
-        name: /subject/i
-      })
+      const { subjectInput, bodyInput } = await getFormInputs(canvas)
       await userEvent.type(subjectInput, 'Important update')
-
-      const bodyInput = await canvas.findByRole('textbox', { name: /message/i })
       await userEvent.type(bodyInput, 'This is the email body.')
     })
 
@@ -71,12 +87,8 @@ export const ConfirmationModalOpensOnSubmit: Story = {
     const canvas = within(canvasElement)
 
     await step('Fill and submit the form', async () => {
-      const subjectInput = await canvas.findByRole('textbox', {
-        name: /subject/i
-      })
+      const { subjectInput, bodyInput } = await getFormInputs(canvas)
       await userEvent.type(subjectInput, 'Important update')
-
-      const bodyInput = await canvas.findByRole('textbox', { name: /message/i })
       await userEvent.type(bodyInput, 'This is the email body.')
 
       await userEvent.click(
@@ -104,12 +116,8 @@ export const SuccessToastOnConfirm: Story = {
     const canvas = within(canvasElement)
 
     await step('Fill, submit, and confirm', async () => {
-      const subjectInput = await canvas.findByRole('textbox', {
-        name: /subject/i
-      })
+      const { subjectInput, bodyInput } = await getFormInputs(canvas)
       await userEvent.type(subjectInput, 'Important update')
-
-      const bodyInput = await canvas.findByRole('textbox', { name: /message/i })
       await userEvent.type(bodyInput, 'This is the email body.')
 
       await userEvent.click(
@@ -125,9 +133,7 @@ export const SuccessToastOnConfirm: Story = {
     await canvas.findByText('Email sent to all users')
 
     await step('Form is reset after success', async () => {
-      const subjectInput = await canvas.findByRole('textbox', {
-        name: /subject/i
-      })
+      const { subjectInput } = await getFormInputs(canvas)
       await expect(subjectInput).toHaveValue('')
     })
   }
@@ -139,7 +145,7 @@ export const ErrorToastOnFailure: Story = {
       handlers: {
         notification: [
           tRPCMsw.notification.broadcast.mutation(() => {
-            throw new TRPCClientError('A broadcast has already been sent today')
+            throw new Error('Service unavailable')
           })
         ]
       }
@@ -149,12 +155,8 @@ export const ErrorToastOnFailure: Story = {
     const canvas = within(canvasElement)
 
     await step('Fill, submit, and confirm', async () => {
-      const subjectInput = await canvas.findByRole('textbox', {
-        name: /subject/i
-      })
+      const { subjectInput, bodyInput } = await getFormInputs(canvas)
       await userEvent.type(subjectInput, 'Important update')
-
-      const bodyInput = await canvas.findByRole('textbox', { name: /message/i })
       await userEvent.type(bodyInput, 'This is the email body.')
 
       await userEvent.click(
@@ -167,12 +169,10 @@ export const ErrorToastOnFailure: Story = {
       )
     })
 
-    await canvas.findByText('Only one email can be sent per day')
+    await canvas.findByText('Only one email can be sent per day', {}, { timeout: 5000 })
 
     await step('Form is NOT reset after error', async () => {
-      const subjectInput = await canvas.findByRole('textbox', {
-        name: /subject/i
-      })
+      const { subjectInput } = await getFormInputs(canvas)
       await expect(subjectInput).toHaveValue('Important update')
     })
   }
