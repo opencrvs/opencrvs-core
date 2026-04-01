@@ -139,7 +139,6 @@ async function getUsers(token: string) {
   const parsedRoles = RoleSchema(eventIds).safeParse(await rolesResponse.json())
 
   if (!parsedRoles.success) {
-    console.log('parsedRoles. :>> ', parsedRoles.error)
     raise(
       fromZodError(parsedRoles.error, {
         prefix: `Validation failed for roles returned from ${rolesUrl}`
