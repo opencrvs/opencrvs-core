@@ -110,11 +110,19 @@ const LegacyRecordScope = z
     "Scopes used to check user's permission to perform actions on a record."
   )
 
+export const DashboardScope = z.object({
+  type: z.literal('dashboard.view'),
+  options: z.object({
+    id: z.array(z.string())
+  })
+})
+
 /**
  * @deprecated - will be removed in v2.1.
  */
 const ConfigurableRawScopes = z.discriminatedUnion('type', [
   SearchScope,
+  DashboardScope,
   LegacyRecordScope,
   PrintCertifiedCopiesScope,
   CreateUserScope,
@@ -125,7 +133,10 @@ const ConfigurableRawScopes = z.discriminatedUnion('type', [
 type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
 type ConfigurableScopeType = ConfigurableRawScopes['type']
 
-type ConfigurableScopes = Exclude<ConfigurableRawScopes, { type: 'search' }>
+type ConfigurableScopes = Exclude<
+  ConfigurableRawScopes,
+  { type: 'search' } | { type: 'dashboard.view' }
+>
 
 type FlattenedSearchScope = {
   type: 'search'

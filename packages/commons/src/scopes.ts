@@ -261,13 +261,6 @@ export const RecordScopeTypeV2 = z.enum([
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
-export const DashboardScope = z.object({
-  type: z.literal('dashboard.view'),
-  options: z.object({
-    id: z.array(z.string())
-  })
-})
-
 const scopeByEvent = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
   .preprocess(

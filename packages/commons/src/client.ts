@@ -29,5 +29,6 @@ export * from './icons'
 /** @knipignore */
 export {
   findScope,
-  parseConfigurableScope
+  parseConfigurableScope,
+  DashboardScope
 } from './scopes.deprecated.do-not-use'
