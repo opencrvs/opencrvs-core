@@ -569,7 +569,13 @@ export type Checkbox = z.infer<typeof Checkbox>
 
 const Country = BaseField.extend({
   type: z.literal(FieldType.COUNTRY),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  optionOverrides: z
+    .array(SelectOption.omit({ label: true }))
+    .optional()
+    .describe(
+      'Conditionals for specific countries. Countries not listed are always shown and enabled.'
+    )
 }).describe('Country select field')
 
 export type Country = z.infer<typeof Country>
@@ -651,19 +657,25 @@ export const DefaultAddressFieldValue = DomesticAddressFieldValue.extend({
 
 export type DefaultAddressFieldValue = z.infer<typeof DefaultAddressFieldValue>
 
-const DomesticAddressField = BaseField.pick({
+const commonDomesticFieldProps = {
   id: true,
-  required: true,
-  conditionals: true
-})
-  .transform((config) => ({
-    ...config,
-    type:
-      config.id === 'country'
-        ? FieldType.COUNTRY
-        : FieldType.ADMINISTRATIVE_AREA
-  }))
-  .openapi({ effectType: 'input', type: 'object' })
+  type: true,
+  label: true,
+  conditionals: true,
+  required: true
+} satisfies { [key in keyof (Country | AdministrativeArea)]?: boolean }
+
+const DomesticAddressField = Country.partial()
+  .pick({
+    ...commonDomesticFieldProps,
+    optionOverrides: true
+  })
+  .required({ id: true, type: true })
+  .or(
+    AdministrativeArea.partial()
+      .pick(commonDomesticFieldProps)
+      .required({ id: true, type: true })
+  )
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
