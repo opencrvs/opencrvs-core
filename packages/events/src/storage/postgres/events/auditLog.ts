@@ -56,7 +56,6 @@ export async function queryUserAuditLog({
   let query = db
     .selectFrom('auditLog')
     .selectAll()
-    .where('operation', 'like', 'user.%')
     .where('clientId', '=', subjectId)
 
   if (timeStart) {
