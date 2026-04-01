@@ -25,6 +25,7 @@ import {
 } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 export function declareActionProcedures() {
   const requireScopesMiddleware = middleware.canAccessEventWithScopes(
@@ -74,6 +75,22 @@ export function declareActionProcedures() {
           config,
           DeclareActionInput
         )
+
+        await writeAuditLog({
+          clientId: user.id,
+          clientType: user.type,
+          operation: 'event.actions.declare.request',
+          requestData: {
+            eventId: input.eventId,
+            actionType: ActionType.DECLARE,
+            transactionId: input.transactionId
+          },
+          responseSummary: {
+            eventId: declaredEvent.id,
+            eventType: declaredEvent.type,
+            trackingId: declaredEvent.trackingId
+          }
+        })
 
         const dedupConfig = config.actions.find(
           (action) => action.type === input.type
