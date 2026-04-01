@@ -15,37 +15,29 @@ function stripBucketPrefix(path: string): string {
   return path.startsWith('/ocrvs/') ? path.replace('/ocrvs/', '/') : path
 }
 
-export const up = async (db: Db, client: MongoClient) => {
-  const session = client.startSession()
+export const up = async (db: Db, _client: MongoClient) => {
+  const practitioners = db.collection('Practitioner').find({
+    'extension.valueAttachment.url': { $regex: '^/ocrvs/' }
+  })
 
-  try {
-    await session.withTransaction(async () => {
-      const practitioners = db.collection('Practitioner').find({
-        'extension.valueAttachment.url': { $regex: '^/ocrvs/' }
+  for await (const practitioner of practitioners) {
+    const update: Record<string, any> = {}
+
+    if (Array.isArray(practitioner.extension)) {
+      practitioner.extension.forEach((ext: any, idx: number) => {
+        const url = ext?.valueAttachment?.url
+        if (url?.startsWith('/ocrvs/')) {
+          update[`extension.${idx}.valueAttachment.url`] =
+            stripBucketPrefix(url)
+        }
       })
+    }
 
-      for await (const practitioner of practitioners) {
-        const update: Record<string, any> = {}
-
-        if (Array.isArray(practitioner.extension)) {
-          practitioner.extension.forEach((ext: any, idx: number) => {
-            const url = ext?.valueAttachment?.url
-            if (url?.startsWith('/ocrvs/')) {
-              update[`extension.${idx}.valueAttachment.url`] =
-                stripBucketPrefix(url)
-            }
-          })
-        }
-
-        if (Object.keys(update).length > 0) {
-          await db
-            .collection('Practitioner')
-            .updateOne({ _id: practitioner._id }, { $set: update }, { session })
-        }
-      }
-    })
-  } finally {
-    await session.endSession()
+    if (Object.keys(update).length > 0) {
+      await db
+        .collection('Practitioner')
+        .updateOne({ _id: practitioner._id }, { $set: update })
+    }
   }
 }
 
