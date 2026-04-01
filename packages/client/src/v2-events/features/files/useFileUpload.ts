@@ -159,12 +159,15 @@ export function useFileUpload(
     mutationFn: async (variables: UploadFileParams) =>
       uploadFile({ ...variables, meta: { ...variables.meta } }),
     mutationKey: [UPLOAD_MUTATION_KEY, uniqueIdentifier],
-    onMutate: async ({ file, meta, path: dir }: UploadFileParams) => {
+    onMutate: async ({ file, meta }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
-      const path = joinValues([dir, temporaryFilename], '/') as DocumentPath
+      const filePath = joinValues(
+        [path.replace(/\/$/, ''), temporaryFilename],
+        '/'
+      ) as DocumentPath
 
-      await cacheFile({ url: path, file })
+      await cacheFile({ url: filePath, file })
 
       // NOTE: In the long run, client should not reverse-engineer the file path.
       // It should be read from the server response.
@@ -172,7 +175,7 @@ export function useFileUpload(
         ...file,
         originalFilename: file.name,
         type: file.type,
-        path: path,
+        path: filePath,
         id: meta.referenceId
       })
     }
