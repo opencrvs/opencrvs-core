@@ -4,6 +4,7 @@ CREATE FOREIGN TABLE legacy_users(
   name json,
   username text,
   "emailForNotification" text,
+  email text,
   mobile text,
   "fullHonorificName" text,
   "passwordHash" text,
