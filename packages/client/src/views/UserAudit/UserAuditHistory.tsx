@@ -34,7 +34,9 @@ import { useTRPC } from '@client/v2-events/trpc'
 import { Link } from '@opencrvs/components'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@client/v2-events/routes'
-import { UUID } from '@opencrvs/commons/client'
+import { getAcceptedScopesByType, UUID } from '@opencrvs/commons/client'
+import { useSelector } from 'react-redux'
+import { getScope } from '@client/profile/profileSelectors'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -104,6 +106,13 @@ type State = {
 }
 
 function UserAuditHistoryComponent(props: Props) {
+  const scopes = useSelector(getScope) ?? []
+  const hasRecordRead =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.read'],
+      scopes
+    }).length > 0
+
   const [state, setState] = useState<State>({
     timeStart: subMonths(new Date(Date.now()), 1),
     timeEnd: new Date(Date.now()),
@@ -221,6 +230,7 @@ function UserAuditHistoryComponent(props: Props) {
           const trackingId = getTrackingId(entry)
           const eventId = UUID.safeParse(getEventId(entry))?.data
           if (trackingId === '-' || !eventId) return trackingId
+          if (!hasRecordRead) return trackingId
           return (
             <Link
               font="bold14"
