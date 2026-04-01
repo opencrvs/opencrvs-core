@@ -52,6 +52,14 @@ import { PerformanceNavigationGroup } from './PerformanceNavigationGroup'
 
 const SCREEN_LOCK = 'screenLock'
 
+function subscribeOnlineStatus(cb: () => void) {
+  return onlineManager.subscribe(cb)
+}
+
+function getOnlineSnapshot() {
+  return onlineManager.isOnline()
+}
+
 function Workqueues({
   workqueues,
   currentWorkqueueSlug,
@@ -111,12 +119,11 @@ export const SidebarComponent = ({
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
-  const [isOnline, setIsOnline] = React.useState(onlineManager.isOnline())
-  React.useEffect(() => {
-    return onlineManager.subscribe(() => {
-      setIsOnline(onlineManager.isOnline())
-    })
-  }, [])
+  const isOnline = React.useSyncExternalStore(
+    subscribeOnlineStatus,
+    getOnlineSnapshot,
+    () => true
+  )
 
   let name = ''
   if (userDetails?.name) {

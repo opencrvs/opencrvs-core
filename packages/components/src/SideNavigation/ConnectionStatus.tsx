@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 interface ConnectionStatusProps {
   isOnline?: boolean
+  className?: string
 }
 
 const Dot = styled.span<{ isOnline: boolean }>`
@@ -23,14 +24,14 @@ const Label = styled.span`
 const Container = styled.div`
   display: flex;
   align-items: center;
-  padding: 8px 0;
 `
 
 export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
-  isOnline = false
+  isOnline = false,
+  className
 }) => {
   return (
-    <Container>
+    <Container className={className}>
       <Dot isOnline={isOnline} />
       <Label>{isOnline ? 'Online' : 'Offline'}</Label>
     </Container>

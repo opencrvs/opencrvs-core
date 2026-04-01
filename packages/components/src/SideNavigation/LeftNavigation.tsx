@@ -93,6 +93,10 @@ const VersionText = styled.span`
   text-transform: uppercase;
 `
 
+const StyledConnectionStatus = styled(ConnectionStatus)`
+  margin-bottom: 8px;
+`
+
 const Container = styled.div`
   flex: 0 0 auto;
 `
@@ -123,7 +127,7 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       <MenuItem>{props.children && props.children}</MenuItem>
       <Container>
         <VersionCard>
-          <ConnectionStatus isOnline={props.isOnline} />
+          <StyledConnectionStatus isOnline={props.isOnline} />
           {props.warning}
           <VersionText>OpenCRVS v{props.applicationVersion}</VersionText>
         </VersionCard>
