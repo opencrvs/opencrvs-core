@@ -31,6 +31,10 @@ import format from '@client/utils/date-formatting'
 import { Text } from '@opencrvs/components/lib/Text'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import { useTRPC } from '@client/v2-events/trpc'
+import { Link } from '@opencrvs/components'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@client/v2-events/routes'
+import { UUID } from '@opencrvs/commons/client'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -79,7 +83,7 @@ type Props = WrappedComponentProps &
 
 enum SORTED_COLUMN {
   ACTION = 'actionDescriptionString',
-  RECORD = 'trackingIdString',
+  RECORD = 'trackingId',
   DATE = 'auditTimeValue'
 }
 
@@ -111,6 +115,7 @@ function UserAuditHistoryComponent(props: Props) {
     actionDetailsData: null
   })
 
+  const navigate = useNavigate()
   const trpc = useTRPC()
   const { data, isLoading, isError } = useQuery(
     trpc.user.audit.list.queryOptions({
@@ -189,6 +194,13 @@ function UserAuditHistoryComponent(props: Props) {
     return trackingId || '-'
   }
 
+  function getEventId(entry: AuditEntry): string | undefined {
+    return (
+      (entry.responseSummary?.eventId as string | undefined) ??
+      (entry.requestData?.eventId as string | undefined)
+    )
+  }
+
   function getActionMessage(entry: AuditEntry) {
     const actionDescriptor = getUserAuditDescription(entry.operation)
     return actionDescriptor
@@ -200,13 +212,26 @@ function UserAuditHistoryComponent(props: Props) {
     return orderBy(
       results.map((entry) => ({
         actionDescription: (
-          <BoldContent onClick={() => toggleActionDetails(entry)}>
+          <Link font="bold14" onClick={() => toggleActionDetails(entry)}>
             {getActionMessage(entry)}
-          </BoldContent>
+          </Link>
         ),
         actionDescriptionString: getActionMessage(entry),
-        trackingId: getTrackingId(entry),
-        trackingIdString: getTrackingId(entry),
+        trackingId: (() => {
+          const trackingId = getTrackingId(entry)
+          const eventId = UUID.safeParse(getEventId(entry))?.data
+          if (trackingId === '-' || !eventId) return trackingId
+          return (
+            <Link
+              font="bold14"
+              onClick={() =>
+                navigate(ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }))
+              }
+            >
+              {trackingId}
+            </Link>
+          )
+        })(),
         auditTime: format(new Date(entry.createdAt), 'MMMM dd, yyyy hh:mm a'),
         auditTimeValue: new Date(entry.createdAt)
       })),
