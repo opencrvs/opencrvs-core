@@ -31,6 +31,9 @@ function NumberInput({ value, disabled, ...props }: NumberInputProps) {
 
   const allowOnlyPositive = props.min !== undefined && props.min >= 0
 
+  React.useEffect(() => {
+    setInputValue(value ?? undefined)
+  }, [value])
   return (
     <TextInputComponent
       type={'number'}
@@ -73,7 +76,7 @@ export const Number = {
     return (
       <>
         {prefix && intl.formatMessage(prefix)}
-        {value.toString() || ''}
+        {value ? value.toString() : ''}
         {postfix && intl.formatMessage(postfix)}
       </>
     )

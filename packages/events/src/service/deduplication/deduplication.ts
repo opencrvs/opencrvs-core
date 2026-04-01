@@ -18,7 +18,7 @@ import {
   FieldValue,
   EventConfig,
   getDeclarationFieldById,
-  DateValue,
+  PlainDate,
   FieldType,
   extractPotentialDuplicatesFromActions,
   EventDocument
@@ -172,7 +172,7 @@ export function generateElasticsearchQuery(
       }
     }
     case 'dateRange': {
-      const dateValue = DateValue.safeParse(queryValue)
+      const dateValue = PlainDate.safeParse(queryValue)
       if (!dateValue.success) {
         logger.warn(
           queryValue,

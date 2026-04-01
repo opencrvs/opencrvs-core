@@ -62,7 +62,7 @@ import {
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
-  DateValue,
+  PlainDate,
   EmailValue,
   FieldValue,
   FieldUpdateValueSchema,
@@ -76,7 +76,8 @@ import {
   ButtonFieldValue,
   VerificationStatusValue,
   AgeValue,
-  FieldUpdateValue
+  FieldUpdateValue,
+  DateValue
 } from './FieldValue'
 import { FullDocumentPath } from '../documents'
 import {
@@ -135,7 +136,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
 
   switch (field.type) {
     case FieldType.DATE:
-      schema = DateValue
+      schema = PlainDate
       break
     case FieldType.AGE:
       schema = AgeValue

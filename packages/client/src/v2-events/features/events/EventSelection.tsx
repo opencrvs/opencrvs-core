@@ -31,7 +31,7 @@ import {
 import { ROUTES } from '@client/v2-events/routes'
 
 import { createTemporaryId } from '@client/v2-events/utils'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
@@ -86,6 +86,7 @@ function EventSelector() {
   const clearForm = useEventFormData((state) => state.clear)
   const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
+  const user = useSelector(getUserDetails)
 
   const acceptedScopes = getAcceptedScopesByType({
     acceptedScopes: ACTION_SCOPE_MAP[ActionType.CREATE],
@@ -111,7 +112,8 @@ function EventSelector() {
 
     createEvent.mutate({
       type: eventType,
-      transactionId
+      transactionId,
+      createdAtLocation: user?.primaryOfficeId
     })
 
     clearForm()
