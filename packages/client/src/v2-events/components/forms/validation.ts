@@ -114,7 +114,11 @@ export function validationErrorsInActionFormExist({
     })
 
   const hasAnnotationValidationErrors = Object.values(
-    getValidationErrorsForForm(reviewFields, visibleAnnotationFields, context)
+    getValidationErrorsForForm(
+      reviewFields,
+      { ...formWithoutHiddenFields, ...visibleAnnotationFields },
+      context
+    )
   ).some((fieldErrors) => flattenFormState(fieldErrors ?? []).length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors
