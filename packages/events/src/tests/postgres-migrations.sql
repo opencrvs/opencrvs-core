@@ -2,7 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict sqovC7F8n9k9mwKlFli1VbzfneOvhbrw4Knii8eyqDH3dUAmni5wroszfQyXscX
 
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
 -- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
@@ -29,17 +28,13 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
--- Name: mongo_fdw; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE EXTENSION IF NOT EXISTS mongo_fdw WITH SCHEMA app;
 
 
 --
--- Name: EXTENSION mongo_fdw; Type: COMMENT; Schema: -; Owner: 
 --
 
-COMMENT ON EXTENSION mongo_fdw IS 'foreign data wrapper for MongoDB access';
 
 
 --
@@ -96,23 +91,14 @@ CREATE TYPE app.user_type AS ENUM (
 ALTER TYPE app.user_type OWNER TO events_migrator;
 
 --
--- Name: mongo; Type: SERVER; Schema: -; Owner: postgres
 --
 
-CREATE SERVER mongo FOREIGN DATA WRAPPER mongo_fdw OPTIONS (
-    address 'mongo1',
-    authentication_database 'admin',
-    port '27017'
-);
 
 
-ALTER SERVER mongo OWNER TO postgres;
 
 --
--- Name: USER MAPPING postgres SERVER mongo; Type: USER MAPPING; Schema: -; Owner: postgres
 --
 
-CREATE USER MAPPING FOR postgres SERVER mongo;
 
 
 SET default_tablespace = '';
@@ -148,8 +134,7 @@ CREATE TABLE app.audit_log (
     operation text NOT NULL,
     request_data jsonb,
     response_summary jsonb,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    transaction_id text DEFAULT (gen_random_uuid())::text NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -195,13 +180,6 @@ COMMENT ON COLUMN app.audit_log.request_data IS 'JSON blob of the request payloa
 --
 
 COMMENT ON COLUMN app.audit_log.response_summary IS 'Per-endpoint curated summary of the response (e.g. search terms used and count + IDs of results returned). Not the raw response payload.';
-
-
---
--- Name: COLUMN audit_log.transaction_id; Type: COMMENT; Schema: app; Owner: events_migrator
---
-
-COMMENT ON COLUMN app.audit_log.transaction_id IS 'Client-supplied idempotency key. Existing rows are backfilled with random UUIDs.';
 
 
 --
@@ -301,75 +279,22 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 
 --
--- Name: legacy_practitioners; Type: FOREIGN TABLE; Schema: app; Owner: postgres
 --
 
-CREATE FOREIGN TABLE app.legacy_practitioners (
-    _id name,
-    id text,
-    extension json
-)
-SERVER mongo
-OPTIONS (
-    collection 'Practitioner',
-    database 'hearth-dev'
-);
 
 
-ALTER FOREIGN TABLE app.legacy_practitioners OWNER TO postgres;
 
 --
--- Name: legacy_systems; Type: FOREIGN TABLE; Schema: app; Owner: postgres
 --
 
-CREATE FOREIGN TABLE app.legacy_systems (
-    _id name,
-    name text,
-    "createdBy" text,
-    scope json,
-    "secretHash" text,
-    salt text,
-    sha_secret text,
-    status text,
-    "creationDate" bigint
-)
-SERVER mongo
-OPTIONS (
-    collection 'systems',
-    database 'user-mgnt'
-);
 
 
-ALTER FOREIGN TABLE app.legacy_systems OWNER TO postgres;
 
 --
--- Name: legacy_users; Type: FOREIGN TABLE; Schema: app; Owner: postgres
 --
 
-CREATE FOREIGN TABLE app.legacy_users (
-    _id name,
-    name json,
-    username text,
-    "emailForNotification" text,
-    mobile text,
-    "fullHonorificName" text,
-    "passwordHash" text,
-    salt text,
-    role text,
-    "primaryOfficeId" text,
-    "practitionerId" text,
-    status text,
-    "securityQuestionAnswers" json,
-    "avatar.data" text
-)
-SERVER mongo
-OPTIONS (
-    collection 'users',
-    database 'user-mgnt'
-);
 
 
-ALTER FOREIGN TABLE app.legacy_users OWNER TO postgres;
 
 --
 -- Name: locations; Type: TABLE; Schema: app; Owner: events_migrator
@@ -486,10 +411,10 @@ CREATE TABLE app.system_clients (
     legacy_id text,
     name text NOT NULL,
     scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
-    created_by text,
-    secret_hash text,
-    salt text,
-    sha_secret text,
+    created_by text NOT NULL,
+    secret_hash text NOT NULL,
+    salt text NOT NULL,
+    sha_secret text NOT NULL,
     status text DEFAULT 'active'::text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT system_clients_status_check CHECK ((status = ANY (ARRAY['active'::text, 'disabled'::text])))
@@ -768,13 +693,6 @@ CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
 
 
 --
--- Name: idx_audit_log_transaction_id; Type: INDEX; Schema: app; Owner: events_migrator
---
-
-CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
-
-
---
 -- Name: idx_event_tracking_id; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
@@ -963,5 +881,4 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict sqovC7F8n9k9mwKlFli1VbzfneOvhbrw4Knii8eyqDH3dUAmni5wroszfQyXscX
 
