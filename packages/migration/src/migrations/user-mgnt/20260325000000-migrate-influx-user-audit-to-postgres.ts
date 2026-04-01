@@ -228,44 +228,24 @@ async function getProgress(
 }
 
 export const up = async (db: Db, _client: MongoClient) => {
-  let rows: InfluxRow[]
-  try {
-    const actionFilter = Object.keys(ALL_ACTION_TO_OPERATION)
-      .map((a) => `action = '${a}'`)
-      .join(' OR ')
-    rows = (await influxQuery(
-      `SELECT * FROM user_audit_event WHERE ${actionFilter}`
-    )) as InfluxRow[]
-  } catch (err) {
-    console.log(
-      'Could not read user_audit_event from InfluxDB (measurement may not exist):',
-      (err as Error).message
-    )
-    return
-  }
+  const actionFilter = Object.keys(ALL_ACTION_TO_OPERATION)
+    .map((a) => `action = '${a}'`)
+    .join(' OR ')
 
-  if (!rows || rows.length === 0) {
-    console.log('No user_audit_event rows in InfluxDB — nothing to migrate')
-    return
-  }
-
-  console.log(`Found ${rows.length} user audit events in InfluxDB to migrate`)
-
-  // Collect all practitioner IDs for a single bulk MongoDB lookup.
-  const practitionerIds = new Set<string>()
-  for (const row of rows) {
-    if (row.practitionerId && row.practitionerId !== 'undefined') {
-      practitionerIds.add(row.practitionerId)
-    }
-    const parsed = parseData(row.data)
-    if (parsed.subjectPractitionerId) {
-      practitionerIds.add(parsed.subjectPractitionerId)
-    }
-  }
-
-  const userDocs = await db
+  // Pre-load the full practitionerId → MongoDB _id map once, before the loop.
+  //
+  // Why not do this per-batch? Cardinality:
+  //   - Users: typically thousands (e.g. 10 000 × ~50 bytes ≈ 500 KB) — fits
+  //     easily in memory and requires only one round-trip to MongoDB.
+  //   - Audit rows: can be millions. Loading them all at once would cost
+  //     ~630 bytes/row × 3 000 000 rows ≈ 1.9 GB — well above Node's default
+  //     ~1.5 GB heap limit, causing an OOM crash before migration even starts.
+  //
+  // By separating the two concerns we keep the user map in memory (small) while
+  // streaming audit rows in BATCH_SIZE pages (constant memory per page).
+  const allUserDocs = await db
     .collection('users')
-    .find({ practitionerId: { $in: [...practitionerIds] } })
+    .find({})
     .project<{ _id: unknown; practitionerId: string }>({
       _id: 1,
       practitionerId: 1
@@ -273,11 +253,14 @@ export const up = async (db: Db, _client: MongoClient) => {
     .toArray()
 
   const practitionerToUserId = new Map<string, string>(
-    userDocs.map((u) => [u.practitionerId, String(u._id)])
+    allUserDocs
+      .filter((u) => u.practitionerId)
+      .map((u) => [u.practitionerId, String(u._id)])
   )
 
-  // Sort by time so offset-based progress tracking is stable across restarts.
-  rows.sort((a, b) => a.time.getTime() - b.time.getTime())
+  console.log(
+    `Loaded ${practitionerToUserId.size} users from MongoDB for ID resolution`
+  )
 
   const pg = new Pool({ connectionString: EVENTS_POSTGRES_URL })
   try {
@@ -290,19 +273,40 @@ export const up = async (db: Db, _client: MongoClient) => {
     }
 
     if (nextOffset > 0) {
-      console.log(
-        `Resuming from offset ${nextOffset} (${rows.length - nextOffset} rows remaining)`
-      )
+      console.log(`Resuming from InfluxDB OFFSET ${nextOffset}`)
     }
 
     let inserted = 0
     let skipped = 0
 
-    for (let offset = nextOffset; offset < rows.length; offset += BATCH_SIZE) {
-      const batchRows = rows.slice(offset, offset + BATCH_SIZE)
+    // Read InfluxDB in pages of BATCH_SIZE using LIMIT/OFFSET.
+    //
+    // `ORDER BY time ASC` makes the result set stable across restarts so
+    // next_batch_offset stored in Postgres always maps to the same InfluxDB
+    // rows regardless of when the migration is re-run.
+    for (let offset = nextOffset; ; offset += BATCH_SIZE) {
+      let page: InfluxRow[]
+      try {
+        page = (await influxQuery(
+          `SELECT * FROM user_audit_event WHERE ${actionFilter}` +
+            ` ORDER BY time ASC LIMIT ${BATCH_SIZE} OFFSET ${offset}`
+        )) as InfluxRow[]
+      } catch (err) {
+        console.log(
+          'Could not read user_audit_event from InfluxDB (measurement may not exist):',
+          (err as Error).message
+        )
+        return
+      }
+
+      if (!page || page.length === 0) {
+        // Empty page means we've consumed all rows.
+        break
+      }
+
       const insertRows: InsertRow[] = []
 
-      for (const row of batchRows) {
+      for (const row of page) {
         const operation = ALL_ACTION_TO_OPERATION[row.action]
         if (!operation) {
           skipped++
@@ -341,7 +345,7 @@ export const up = async (db: Db, _client: MongoClient) => {
         // rolls back both the inserts and the progress update together.
         await pgClient.query(
           'UPDATE app.migration_progress SET next_batch_offset = $1 WHERE id = $2',
-          [Math.min(offset + BATCH_SIZE, rows.length), MIGRATION_ID]
+          [offset + BATCH_SIZE, MIGRATION_ID]
         )
         await pgClient.query('COMMIT')
         inserted += insertRows.length
@@ -353,9 +357,14 @@ export const up = async (db: Db, _client: MongoClient) => {
       }
 
       console.log(
-        `Batch committed: rows ${offset}–${Math.min(offset + BATCH_SIZE, rows.length) - 1}` +
-          ` (${inserted} inserted so far)`
+        `Batch committed: InfluxDB offset ${offset}–${offset + page.length - 1}` +
+          ` (${inserted} inserted, ${skipped} skipped so far)`
       )
+
+      // If this page was smaller than BATCH_SIZE we've reached the last page.
+      if (page.length < BATCH_SIZE) {
+        break
+      }
     }
 
     // Mark migration as fully complete.
