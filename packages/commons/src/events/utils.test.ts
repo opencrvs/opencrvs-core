@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import { UUID } from '../uuid'
 import { cloneDeep, difference } from 'lodash'
 import { Action, ActionDocument, ActionStatus } from './ActionDocument'
@@ -30,7 +32,6 @@ import {
   tennisClubMembershipEvent
 } from '../client'
 import { generateActionDocument } from './test.utils'
- 
 
 const commonAction = {
   status: 'Requested' as const,

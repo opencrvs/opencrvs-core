@@ -56,7 +56,7 @@ const FileSchema = z
 const Payload = z.object({
   file: FileSchema,
   transactionId: z.string(),
-  path: z.string().optional().default('/')
+  path: z.string().optional().default('')
 })
 
 /**
@@ -75,14 +75,16 @@ export async function fileUploadHandler(
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
-  const filePath = joinUrlPaths(path, filename)
+  const filePath = (path
+    ? joinUrlPaths(path, filename)
+    : filename) as DocumentPath
 
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId,
     ...(filename.endsWith('.pdf') && { 'content-type': 'application/pdf' })
   })
 
-  return filePath as DocumentPath
+  return filePath
 }
 
 export async function fileExistsHandler(

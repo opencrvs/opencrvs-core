@@ -48,7 +48,7 @@ export const DocumentPath = z
   .string()
   .brand('DocumentPath')
   .describe(
-    'A full identifier starting from the root of the S3 bucket, e.g. /document-id.jpg or /directory/document-id.jpg but never /bucket-name/document-id.jpg'
+    'A relative path within the S3 bucket, never starting with /. e.g. document-id.jpg or directory/document-id.jpg. The document service constructs the full /bucket/path internally.'
   )
 
 export type DocumentPath = z.infer<typeof DocumentPath>

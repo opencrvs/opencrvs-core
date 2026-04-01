@@ -159,11 +159,10 @@ export function useFileUpload(
     mutationFn: async (variables: UploadFileParams) =>
       uploadFile({ ...variables, meta: { ...variables.meta } }),
     mutationKey: [UPLOAD_MUTATION_KEY, uniqueIdentifier],
-    onMutate: async ({ file, meta, eventId: dir }: UploadFileParams) => {
+    onMutate: async ({ file, meta, path: dir }: UploadFileParams) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
-      const path = ('/' +
-        joinValues([dir, temporaryFilename], '/')) as DocumentPath
+      const path = joinValues([dir, temporaryFilename], '/') as DocumentPath
 
       await cacheFile({ url: path, file })
 
@@ -173,7 +172,7 @@ export function useFileUpload(
         ...file,
         originalFilename: file.name,
         type: file.type,
-        path: fullPath,
+        path: path,
         id: meta.referenceId
       })
     }

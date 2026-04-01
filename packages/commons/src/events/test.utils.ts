@@ -463,7 +463,7 @@ export function eventPayloadGenerator(
             },
             'applicant.dob': '2020-01-02',
             'applicant.image': {
-              path: '/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png' as DocumentPath,
+              path: 'e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png' as DocumentPath,
               originalFilename: 'Screenshot.png',
               type: 'image/png'
             }

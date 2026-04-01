@@ -248,7 +248,7 @@ describe('fileUploadHandler', () => {
 
     const [bucket, filename] = minioPutMock.mock.calls[0]
     expect(bucket).toBe(MINIO_BUCKET)
-    expect(filename).toBe(`/${transactionId}.txt`)
+    expect(filename).toBe(`${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })
