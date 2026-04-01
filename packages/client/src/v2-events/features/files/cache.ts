@@ -35,8 +35,7 @@ export function getFilepathsFromActionDocument(
     ] as const satisfies readonly (keyof typeof metadata)[]
     const metadataSignatureFilepaths = signatureKeys
       .map((key) => metadata[key])
-      .filter((value): value is string => !!value)
-      .map((value) => value as DocumentPath)
+      .filter((value): value is DocumentPath => !!value)
 
     const actionFilePaths = [...declarationValues, ...annotationValues].flatMap(
       (value) => {

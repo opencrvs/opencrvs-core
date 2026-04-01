@@ -15,10 +15,12 @@ import { DocumentPath } from '@opencrvs/commons/client'
 export const CACHE_NAME = 'workbox-runtime'
 
 /**
- * Sets file to **BROWSER** cache with given filename
+ * Sets file to **BROWSER** cache with given filename.
+ * Normalizes url to an absolute path (prepends / if missing).
  * @see CACHE_NAME
  */
 export async function cacheFile({ url, file }: { url: string; file: File }) {
+  const normalizedUrl = url.startsWith('/') ? url : `/${url}`
   const temporaryBlob = new Blob([file], { type: file.type })
   const cacheKeys = await caches.keys()
 
@@ -35,16 +37,18 @@ export async function cacheFile({ url, file }: { url: string; file: File }) {
   const cache = await caches.open(cacheKey)
 
   return cache.put(
-    url,
+    normalizedUrl,
     new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
   )
 }
 
 /**
  * Removes given file from the **BROWSER** cache.
+ * Normalizes the path to an absolute URL (prepends / if missing).
  * @see CACHE_NAME
  */
 export async function removeCached(filename: DocumentPath) {
+  const normalizedUrl = filename.startsWith('/') ? filename : `/${filename}`
   const cacheKeys = await caches.keys()
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
@@ -57,7 +61,7 @@ export async function removeCached(filename: DocumentPath) {
   }
 
   const cache = await caches.open(cacheKey)
-  return cache.delete(filename, {
+  return cache.delete(normalizedUrl, {
     ignoreSearch: true
   })
 }

@@ -23,7 +23,7 @@ describe('getFilepathsFromActionDocument', () => {
         configuration: tennisClubMembershipEvent,
         action: ActionType.DECLARE,
         defaults: {
-          createdBySignature: 'signature.png'
+          createdBySignature: 'signature.png' as DocumentPath
         },
         declarationOverrides: {
           'applicant.image': {
