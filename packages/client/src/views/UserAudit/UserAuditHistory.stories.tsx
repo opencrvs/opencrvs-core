@@ -17,7 +17,7 @@ import { TestUserRole } from '@opencrvs/commons/client'
 import { TRPCProvider } from '../../v2-events/trpc'
 
 const meta: Meta<typeof UserAuditHistory> = {
-  title: 'UserAudit/With recor.read scope',
+  title: 'UserAudit/UserAuditHistory',
   component: UserAuditHistory,
   parameters: {
     userRole: TestUserRole.enum.LOCAL_REGISTRAR
