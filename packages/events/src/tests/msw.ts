@@ -77,6 +77,9 @@ const handlers = [
       return HttpResponse.json(filenames)
     }
   ),
+  http.get(`${env.COUNTRY_CONFIG_URL}/config/roles`, () => {
+    return HttpResponse.json([])
+  }),
   http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
     return HttpResponse.json([
       tennisClubMembershipEventWithCustomAction,
