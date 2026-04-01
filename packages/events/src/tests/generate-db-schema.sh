@@ -13,6 +13,11 @@
 #
 # Output: src/tests/postgres-migrations.sql
 
+# pg_dump runs inside a Docker container, so "localhost" refers to the container
+# itself rather than the host machine. On macOS, Docker Desktop provides the
+# special DNS name host.docker.internal for this. On Linux, Docker creates a
+# bridge network (docker0) and assigns the host the gateway IP 172.17.0.1 by
+# default, which is how containers reach the host machine.
 if [[ $OSTYPE == darwin* ]]; then
   HOST=host.docker.internal
 else
