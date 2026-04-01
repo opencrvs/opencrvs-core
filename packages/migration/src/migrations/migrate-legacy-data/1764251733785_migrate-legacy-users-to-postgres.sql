@@ -8,7 +8,7 @@ SELECT
   lu."fullHonorificName" AS full_honorific_name,
   lu.role AS role,
   lu.status AS status,
-  LOWER(lu."emailForNotification") AS email,
+  LOWER(COALESCE(NULLIF(lu."emailForNotification", ''), NULLIF(lu.email, ''))) AS email,
   lu.mobile AS mobile,
 regexp_replace(
     (SELECT
