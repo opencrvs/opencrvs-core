@@ -6447,9 +6447,9 @@ components:
               type: object
               properties:
                 path:
-                  description: A full identifier starting from the root of the S3 bucket, e.g.
-                    /document-id.jpg or /directory/document-id.jpg but never
-                    /bucket-name/document-id.jpg
+                  description: A relative path within the S3 bucket, never starting with /. e.g.
+                    document-id.jpg or directory/document-id.jpg. The document
+                    service constructs the full /bucket/path internally.
                   type: string
                 originalFilename:
                   type: string
@@ -8243,9 +8243,9 @@ components:
                 type: object
                 properties:
                   path:
-                    description: A full identifier starting from the root of the S3 bucket, e.g.
-                      /document-id.jpg or /directory/document-id.jpg but never
-                      /bucket-name/document-id.jpg
+                    description: A relative path within the S3 bucket, never starting with /. e.g.
+                      document-id.jpg or directory/document-id.jpg. The document
+                      service constructs the full /bucket/path internally.
                     type: string
                   originalFilename:
                     type: string
@@ -12291,9 +12291,10 @@ components:
                   createdBySignature:
                     description: Reference to the signature of the user who created the action.
                     anyOf:
-                      - description: A full identifier starting from the root of the S3 bucket, e.g.
-                          /document-id.jpg or /directory/document-id.jpg but
-                          never /bucket-name/document-id.jpg
+                      - description: A relative path within the S3 bucket, never starting with /. e.g.
+                          document-id.jpg or directory/document-id.jpg. The
+                          document service constructs the full /bucket/path
+                          internally.
                         type: string
                       - type: "null"
                   createdAtLocation:
@@ -12422,9 +12423,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -12518,9 +12519,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -12625,9 +12626,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -12743,9 +12744,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -12839,9 +12840,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -12945,9 +12946,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13052,9 +13053,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13148,9 +13149,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13248,9 +13249,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13344,9 +13345,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13444,9 +13445,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13540,9 +13541,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13639,9 +13640,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13749,9 +13750,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13845,9 +13846,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -13949,9 +13950,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -14045,9 +14046,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -14149,9 +14150,9 @@ components:
         createdBySignature:
           description: Reference to the signature of the user who created the action.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         createdAtLocation:
@@ -14380,9 +14381,9 @@ components:
         createdBySignature:
           description: Signature of the user who created the event.
           anyOf:
-            - description: A full identifier starting from the root of the S3 bucket, e.g.
-                /document-id.jpg or /directory/document-id.jpg but never
-                /bucket-name/document-id.jpg
+            - description: A relative path within the S3 bucket, never starting with /. e.g.
+                document-id.jpg or directory/document-id.jpg. The document
+                service constructs the full /bucket/path internally.
               type: string
             - type: "null"
         updatedAtLocation:
@@ -14546,9 +14547,10 @@ components:
                   - type: object
                     properties:
                       path:
-                        description: A full identifier starting from the root of the S3 bucket, e.g.
-                          /document-id.jpg or /directory/document-id.jpg but
-                          never /bucket-name/document-id.jpg
+                        description: A relative path within the S3 bucket, never starting with /. e.g.
+                          document-id.jpg or directory/document-id.jpg. The
+                          document service constructs the full /bucket/path
+                          internally.
                         type: string
                       originalFilename:
                         type: string
@@ -14564,9 +14566,10 @@ components:
                       type: object
                       properties:
                         path:
-                          description: A full identifier starting from the root of the S3 bucket, e.g.
-                            /document-id.jpg or /directory/document-id.jpg but
-                            never /bucket-name/document-id.jpg
+                          description: A relative path within the S3 bucket, never starting with /. e.g.
+                            document-id.jpg or directory/document-id.jpg. The
+                            document service constructs the full /bucket/path
+                            internally.
                           type: string
                         originalFilename:
                           type: string
@@ -14789,10 +14792,11 @@ components:
                             - type: object
                               properties:
                                 path:
-                                  description: A full identifier starting from the root of the S3 bucket, e.g.
-                                    /document-id.jpg or
-                                    /directory/document-id.jpg but never
-                                    /bucket-name/document-id.jpg
+                                  description: A relative path within the S3 bucket, never starting with /. e.g.
+                                    document-id.jpg or
+                                    directory/document-id.jpg. The document
+                                    service constructs the full /bucket/path
+                                    internally.
                                   type: string
                                 originalFilename:
                                   type: string
@@ -14808,10 +14812,11 @@ components:
                                 type: object
                                 properties:
                                   path:
-                                    description: A full identifier starting from the root of the S3 bucket, e.g.
-                                      /document-id.jpg or
-                                      /directory/document-id.jpg but never
-                                      /bucket-name/document-id.jpg
+                                    description: A relative path within the S3 bucket, never starting with /. e.g.
+                                      document-id.jpg or
+                                      directory/document-id.jpg. The document
+                                      service constructs the full /bucket/path
+                                      internally.
                                     type: string
                                   originalFilename:
                                     type: string
