@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
+import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import superjson from 'superjson'
 import { env } from '@auth/environment'
-import { resolve } from 'url'
 import { redis } from '@auth/database'
 import { IUserName } from '@opencrvs/commons'
+import { AppRouter } from '@opencrvs/events/src/router'
 
 export const RETRIEVAL_FLOW_USER_NAME = 'username'
 export const RETRIEVAL_FLOW_PASSWORD = 'password'
@@ -22,30 +23,31 @@ export enum RetrievalSteps {
   NUMBER_VERIFIED = 'NUMBER_VERIFIED',
   SECURITY_Q_VERIFIED = 'SECURITY_Q_VERIFIED'
 }
+
+const eventsClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson
+    })
+  ]
+})
+
 export async function verifyUser(mobile?: string, email?: string) {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/verifyUser')
+  const result = await eventsClient.user.verifyUser.mutate(
+    mobile ? { mobile } : { email: email! }
+  )
 
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ mobile, email }),
-    headers: { 'Content-Type': 'application/json' }
-  })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  const body = await res.json()
   return {
-    userId: body.id,
-    username: body.username,
-    userFullName: body.name,
-    scope: body.scope,
-    status: body.status,
-    mobile: body.mobile,
-    email: body.email,
-    securityQuestionKey: body.securityQuestionKey,
-    practitionerId: body.practitionerId
+    userId: result.id,
+    username: result.username,
+    userFullName: result.name,
+    scope: result.scope,
+    status: result.status,
+    mobile: result.mobile,
+    email: result.email,
+    securityQuestionKey: result.securityQuestionKey,
+    practitionerId: undefined
   }
 }
 

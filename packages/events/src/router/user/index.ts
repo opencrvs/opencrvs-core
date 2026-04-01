@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
+import { UserAuditRecordInput } from '@opencrvs/commons/events'
 import {
   AuditLogEntrySchema,
   UserAuditRecordInput
@@ -24,11 +25,16 @@ import {
 } from '@opencrvs/commons'
 import { allowedWithAnyOfScopes } from '@events/router/middleware'
 import {
+  publicProcedure,
   router,
   userAndSystemProcedure,
   userOnlyProcedure
 } from '@events/router/trpc'
 import { getRoles } from '@events/service/config/config'
+import {
+  getUserByMobileOrEmail,
+  SecurityQuestion
+} from '@events/storage/postgres/events/users'
 import { getUserActions } from '@events/service/events/user/actions'
 import {
   queryUserAuditLog,
@@ -106,7 +112,73 @@ const UserSearch = z.object({
   sortOrder: z.enum(['asc', 'desc'])
 })
 
+const VerifyUserOutput = z.object({
+  id: z.string(),
+  username: z.string(),
+  mobile: z.string().optional(),
+  email: z.string().optional(),
+  status: z.string(),
+  name: z.array(
+    z.object({
+      use: z.string(),
+      given: z.array(z.string()),
+      family: z.string()
+    })
+  ),
+  securityQuestionKey: z.string(),
+  scope: z.array(z.string())
+})
+
 export const userRouter = router({
+  verifyUser: publicProcedure
+    .input(
+      z
+        .object({ mobile: z.string().optional(), email: z.string().optional() })
+        .refine((d) => d.mobile || d.email, 'mobile or email required')
+    )
+    .output(VerifyUserOutput)
+    .mutation(async ({ input }) => {
+      const user = await getUserByMobileOrEmail(
+        input.mobile ? { mobile: input.mobile } : { email: input.email ?? '' }
+      )
+
+      if (!user) {
+        // Don't reveal whether the account exists
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      const questions = user.securityQuestions as SecurityQuestion[]
+
+      if (!Array.isArray(questions) || questions.length === 0) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: "User doesn't have security questions"
+        })
+      }
+
+      const securityQuestionKey =
+        questions[Math.floor(Math.random() * questions.length)].questionKey
+
+      const roles = await getRoles()
+      const scope = roles.find((r) => r.id === user.role)?.scopes ?? []
+
+      return {
+        id: user.id,
+        username: user.username,
+        mobile: user.mobile ?? undefined,
+        email: user.email ?? undefined,
+        status: user.status,
+        name: [
+          {
+            use: 'en',
+            given: [user.firstname ?? ''],
+            family: user.surname ?? ''
+          }
+        ],
+        securityQuestionKey,
+        scope
+      }
+    }),
   get: userOnlyProcedure
     .input(z.string())
     .output(UserOrSystem)

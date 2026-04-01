@@ -135,12 +135,11 @@ export async function getInMemoryWorkqueueConfigurations(
   return inMemoryWorkqueueConfigurations
 }
 
-
-export async function getRoles(token: TokenWithBearer) {
+export async function getRoles(token?: TokenWithBearer) {
   const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: token
+      ...(token && { Authorization: token })
     }
   })
 
@@ -150,4 +149,3 @@ export async function getRoles(token: TokenWithBearer) {
 
   return array(Role).parse(await res.json())
 }
-
