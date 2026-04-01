@@ -495,7 +495,27 @@ export const handlers = {
       if (response) {
         return response
       }
-      return new HttpResponse(TestImage.Box, {
+
+      const url = new URL(request.request.url)
+
+      const basename = url.pathname.split('/').pop()
+
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = TestImage.Tree
+          break
+        case 'fish.svg':
+          file = TestImage.Fish
+          break
+        case 'mountain.svg':
+          file = TestImage.Mountain
+          break
+        default:
+          file = TestImage.Box
+      }
+
+      return new HttpResponse(file, {
         headers: {
           'Content-Type': 'image/svg+xml',
           'Cache-Control': 'no-cache'
