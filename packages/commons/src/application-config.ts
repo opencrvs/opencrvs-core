@@ -106,8 +106,7 @@ export const ClientConfig = z.object({
     z.object({
       id: z.string(),
       title: TranslationConfig,
-      url: z.string(),
-      origin: z.string()
+      url: z.string()
     })
   ),
   FEATURES: z

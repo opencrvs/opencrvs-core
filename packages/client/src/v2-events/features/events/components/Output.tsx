@@ -264,12 +264,13 @@ export function ValueOutput({
       )
     }
 
-  if (isUserRoleFieldType(field)) {
-    return <UserRole.Output value={field.value} />
-  }
+    if (isUserRoleFieldType(field)) {
+      return <UserRole.Output value={field.value} />
+    }
 
-  if (isCustomFieldType(field)) {
-    return <Custom.Output {...field.config} value={field.value} />
+    if (isCustomFieldType(field)) {
+      return <Custom.Output {...field.config} value={field.value} />
+    }
   }
 }
 

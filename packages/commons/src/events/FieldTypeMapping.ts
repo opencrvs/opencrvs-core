@@ -259,6 +259,7 @@ type FieldTypeValueMap = {
   [FieldType.RADIO_GROUP]: z.infer<typeof TextValue>
   [FieldType.PARAGRAPH]: z.infer<typeof TextValue>
   [FieldType.HEADING]: z.infer<typeof TextValue>
+  [FieldType.AUTOCOMPLETE]: z.infer<typeof AutocompleteValue>
   [FieldType.IMAGE_VIEW]: z.infer<typeof TextValue>
   [FieldType.ADMINISTRATIVE_AREA]: z.infer<typeof TextValue>
   [FieldType.FACILITY]: z.infer<typeof TextValue>
