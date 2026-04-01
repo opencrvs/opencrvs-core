@@ -27,4 +27,7 @@ export { TriggerEvent } from './notification'
 export * from './application-config'
 export * from './icons'
 /** @knipignore */
-export { findScope } from './scopes.deprecated.do-not-use'
+export {
+  findScope,
+  parseConfigurableScope
+} from './scopes.deprecated.do-not-use'
