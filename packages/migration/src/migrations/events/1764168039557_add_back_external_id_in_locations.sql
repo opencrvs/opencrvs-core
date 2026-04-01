@@ -1,5 +1,5 @@
 -- Up Migration
-ALTER TABLE locations ADD COLUMN external_id text UNIQUE;
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS external_id text UNIQUE;
 
 -- Down Migration
 
