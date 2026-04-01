@@ -18,5 +18,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS system_clients_legacy_id_idx ON system_clients
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON system_clients TO ${EVENTS_DB_USER};
 
+ALTER TABLE system_clients OWNER TO ${EVENTS_MIGRATION_USER};
+
 -- Down Migration
 DROP TABLE system_clients;
