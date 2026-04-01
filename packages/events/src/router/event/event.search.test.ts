@@ -19,6 +19,7 @@ import {
   AddressFieldUpdateValue,
   AddressType,
   createPrng,
+  encodeScope,
   EventStatus,
   generateActionDocument,
   getCurrentEventState,
@@ -43,8 +44,18 @@ import {
 test('User without any search scopes should not see any events', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -90,10 +101,24 @@ test('User without any search scopes should not see any events', async () => {
 test('Returns empty list when no events match search criteria', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const initialData = {
@@ -143,8 +168,12 @@ test('Throws when searching without payload', async () => {
   const { user } = await setupTestCase()
 
   const client = createTestClient(user, [
-    'search.birth',
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   await expect(
@@ -158,8 +187,12 @@ test('Throws when searching by unrelated properties', async () => {
   const { user } = await setupTestCase()
 
   const client = createTestClient(user, [
-    'search.birth',
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   await expect(
@@ -180,8 +213,12 @@ test('Throws when searching with empty clauses', async () => {
   const { user } = await setupTestCase()
 
   const client = createTestClient(user, [
-    'search.birth',
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   await expect(
@@ -197,8 +234,12 @@ test('Throws when searching with empty clauses', async () => {
 test('Throws when date field is invalid', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   await expect(
@@ -221,8 +262,12 @@ test('Throws when date field is invalid', async () => {
 test('Throws when one of the date range fields has invalid date', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   await expect(
@@ -247,7 +292,12 @@ test('Returns events based on the updatedAt column', async () => {
   const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
     SCOPES.RECORD_IMPORT,
     ...TEST_USER_DEFAULT_SCOPES
   ])
@@ -377,7 +427,12 @@ test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column',
   const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
     SCOPES.RECORD_IMPORT,
     ...TEST_USER_DEFAULT_SCOPES
   ])
@@ -447,10 +502,24 @@ test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column',
 test('Returns events that match the name field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const record1 = {
@@ -539,10 +608,24 @@ test('Returns events that match the name field criteria of applicant', async () 
 test('Should not match partially when searching with emails against name field', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const record1 = {
@@ -590,10 +673,24 @@ test('Should not match partially when searching with emails against name field',
 test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const record1 = {
@@ -671,10 +768,24 @@ test('Returns events that match date of birth of applicant', async () => {
 test('Does not return events when searching with a similar but different date of birth', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const record1 = {
@@ -746,10 +857,24 @@ test('Does not return events when searching with a similar but different date of
 test('Returns single document after creation', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -798,10 +923,24 @@ test('Returns single document after creation', async () => {
 test('Returns multiple documents after creation', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const event1 = await client.event.create(generator.event.create())
@@ -893,6 +1032,86 @@ test('Returns multiple documents after creation', async () => {
   expect(response).toHaveLength(2)
 })
 
+test('Search by legalStatuses.DECLARED.createdByRole', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Doe'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+        streetLevelDetails: {
+          state: 'state',
+          district2: 'district2'
+        }
+      }
+    }
+  })
+
+  await client.event.actions.declare.request(data)
+
+  const { results: response1 } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          'legalStatuses.DECLARED.createdByRole': {
+            type: 'anyOf',
+            terms: ['REGISTRATION_AGENT']
+          }
+        }
+      ]
+    }
+  })
+
+  expect(response1).toHaveLength(1)
+
+  const { results: response2 } = await client.event.search({
+    query: {
+      type: 'and',
+      clauses: [
+        {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          'legalStatuses.DECLARED.createdByRole': {
+            type: 'anyOf',
+            terms: ['OTHER_ROLE']
+          }
+        }
+      ]
+    }
+  })
+  expect(response2).toHaveLength(0) // no documents should be returned
+})
+
 test('Returns correctly based on registration location even when a parent administrative area level is used for searching', async () => {
   const { user, generator, seed, locations } = await setupTestCase()
 
@@ -915,9 +1134,24 @@ test('Returns correctly based on registration location even when a parent admini
   await seed.locations(newLocations)
 
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -998,7 +1232,12 @@ test('Search by legalStatuses.DECLARED.createdAtLocation when a redeclaration ac
 
   const otherClient = createTestClient(userFromOtherOffice, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   const form = {
@@ -1060,10 +1299,24 @@ test('Search by legalStatuses.DECLARED.createdAtLocation when a redeclaration ac
 test('Returns no documents when search params are not matched', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const event1 = await client.event.create(generator.event.create())
@@ -1157,10 +1410,24 @@ test('Returns no documents when search params are not matched', async () => {
 test('Throws error when search params are not matching proper schema', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const event = await client.event.create(generator.event.create())
@@ -1206,10 +1473,24 @@ test('Throws error when search params are not matching proper schema', async () 
 test('Returns events assigned to a specific user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const WindmillVillage = {
@@ -1304,7 +1585,12 @@ test('Returns relevant events in right order', async () => {
 
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   // Until we have a way to reindex from mongodb, we create events through API.
@@ -1410,11 +1696,17 @@ test('Returns relevant events in right order', async () => {
   )
 })
 
-test('User with my-jurisdiction scope only sees events from their primary office', async () => {
+test('User with "location" scope only sees events from their primary office', async () => {
   const { user, generator, locations } = await setupTestCase(5541)
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   const ownOfficeId = user.primaryOfficeId
@@ -1431,7 +1723,13 @@ test('User with my-jurisdiction scope only sees events from their primary office
 
   const otherClient = createTestClient(userFromOtherOffice, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   // Create an event from another office
@@ -1452,30 +1750,52 @@ test('User with my-jurisdiction scope only sees events from their primary office
   ).toMatchSnapshot()
 })
 
-test('User with my-jurisdiction scope only sees events created by system user to their primary office', async () => {
+test('User with "location" scope only sees events created by system user to their primary office', async () => {
   const { user, generator, locations } = await setupTestCase(5541)
 
-  const client = createSystemTestClient('test-system', [
-    `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-    `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+  const systemClient = createSystemTestClient('test-system', [
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.notify',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   const ownOfficeId = user.primaryOfficeId
 
-  const ownLocationEvent = await client.event.create(generator.event.create())
-  const otherLocationEvent = await client.event.create(generator.event.create())
+  const ownLocationEvent = await systemClient.event.create({
+    ...generator.event.create(),
+    createdAtLocation: ownOfficeId
+  })
+  const otherLocationEvent = await systemClient.event.create({
+    ...generator.event.create(),
+    createdAtLocation: locations[1].id
+  })
 
   const userClient = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
-  await client.event.actions.notify.request({
+  await systemClient.event.actions.notify.request({
     ...generator.event.actions.notify(ownLocationEvent.id),
     createdAtLocation: ownOfficeId
   })
 
-  await client.event.actions.notify.request({
+  await systemClient.event.actions.notify.request({
     ...generator.event.actions.notify(otherLocationEvent.id),
     createdAtLocation: locations[1].id
   })
@@ -1499,7 +1819,13 @@ test('User without an event in the scope should not be able to view events of th
   const { user, generator, locations } = await setupTestCase(5541)
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=birth,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: ['birth'],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   await createEvent(client, generator, [ActionType.DECLARE])
@@ -1513,7 +1839,13 @@ test('User without an event in the scope should not be able to view events of th
 
   const otherClient = createTestClient(userFromOtherOffice, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   // Create an event from another office
@@ -1530,12 +1862,18 @@ test('User without an event in the scope should not be able to view events of th
   expect(events).toHaveLength(0)
 })
 
-test('User with my-jurisdiction scope can see events from other offices based on their scopes', async () => {
+test('User with "location" scope can see events from other offices based on their scopes', async () => {
   const { user: userA, locations } = await setupTestCase(6003)
 
   const clientA = createTestClient(userA, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   const { user: userB, generator: generatorB } = await setupTestCase(6004)
@@ -1546,7 +1884,13 @@ test('User with my-jurisdiction scope can see events from other offices based on
 
   const clientB = createTestClient(userBOverride, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   // Only user B creates event
@@ -1581,10 +1925,25 @@ test('Does not return events of tennis club membership when scopes are not avail
   const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
-    'search[event=birth,access=all]',
-    'search.death',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: ['birth']
+      }
+    }),
+
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await createEvent(client, generator, [ActionType.DECLARE])
@@ -1603,13 +1962,24 @@ test('User with "all" scope sees events from all offices', async () => {
   const { user: userA, generator: generatorA } = await setupTestCase(6005)
   const clientA = createTestClient(userA, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   const { user: userB, generator: generatorB } = await setupTestCase(6006)
   const clientB = createTestClient(userB, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   await createEvent(clientA, generatorA, [ActionType.DECLARE])
@@ -1632,14 +2002,31 @@ test('User with both "all" and "my-jurisdiction" scopes sees all matching events
   const { user, generator } = await setupTestCase(6007)
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=all]',
-    'search[event=birth,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: ['birth'],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   const { generator: tennisGen, user: otherUser } = await setupTestCase(6008)
   const otherClient = createTestClient(otherUser, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   await createEvent(client, generator, [ActionType.DECLARE])
@@ -1661,7 +2048,13 @@ test('User only sees tennis club membership events within their jurisdiction', a
 
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=my-jurisdiction]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP],
+        placeOfEvent: 'location'
+      }
+    })
   ])
 
   // Create 2 events in user's own jurisdiction
@@ -1672,7 +2065,12 @@ test('User only sees tennis club membership events within their jurisdiction', a
   const userOtherOffice = { ...user, primaryOfficeId: otherOfficeId }
   const clientOtherOffice = createTestClient(userOtherOffice, [
     ...TEST_USER_DEFAULT_SCOPES,
-    'search[event=tennis-club-membership,access=all]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    })
   ])
 
   await createEvent(clientOtherOffice, generator, [ActionType.DECLARE])
@@ -1709,9 +2107,24 @@ test('User only sees tennis club membership events within their jurisdiction', a
 test('Returns paginated results when limit and size parameters are provided', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const totalNumberOfRecords = 5
@@ -1848,7 +2261,9 @@ test('System integration with record search scope is allowed to search any recor
   await createEvent(otherClient, otherGen, [ActionType.DECLARE])
 
   const recordSearchClient = createSystemTestClient('test-system', [
-    SCOPES.RECORDSEARCH
+    encodeScope({
+      type: 'record.search'
+    })
   ])
   const { results } = await recordSearchClient.event.search({
     query: {
@@ -1893,9 +2308,24 @@ test('System integration without record search scope is not allowed to search an
 test('Returns events using nested AND/OR query combinations', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   const record1 = {
@@ -2042,9 +2472,24 @@ test('Search response contains single UUIDs for location fields, not arrays', as
   const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
-    'search[event=tennis-club-membership,access=all]',
-    'record.create[event=birth|death|tennis-club-membership]',
-    'record.declare[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [TENNIS_CLUB_MEMBERSHIP]
+      }
+    }),
+    encodeScope({
+      type: 'record.create',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    }),
+    encodeScope({
+      type: 'record.declare',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
   const initialData = {
     'applicant.name': {

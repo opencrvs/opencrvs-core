@@ -10,12 +10,45 @@
  */
 
 import {
-  findScope,
-  parseConfigurableScope,
   parseLiteralScope,
-  SCOPES
+  SCOPES,
+  decodeScope,
+  encodeScope,
+  v1ScopeToV2Scope,
+  getScopeOptionValue,
+  JurisdictionFilter,
+  ScopesWithDeclaredOptions,
+  ScopesWithFullOptions,
+  ScopesWithPlaceEventOptions,
+  migrateV1ScopesToV2
 } from './scopes'
-import { decodeScope, encodeScope, v1ScopeToV2Scope } from './scopes-v2'
+import {
+  findScope,
+  parseConfigurableScope
+} from './scopes.deprecated.do-not-use'
+
+describe('getScopeOptionValue()', () => {
+  it('should return the default value if the scope option is not set', () => {
+    const scope = {
+      type: 'record.create'
+    } as const
+
+    const result = getScopeOptionValue(scope, 'placeOfEvent')
+    expect(result).toEqual('all')
+  })
+
+  it('should return the value if the scope option is set', () => {
+    const scope = {
+      type: 'record.create',
+      options: {
+        placeOfEvent: JurisdictionFilter.enum.administrativeArea
+      }
+    } as const
+
+    const result = getScopeOptionValue(scope, 'placeOfEvent')
+    expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
+  })
+})
 
 describe('findScope()', () => {
   const userScopes = [
@@ -34,10 +67,10 @@ describe('findScope()', () => {
   })
 
   it('successfully finds a configurable scope, even if config value includes special characters', () => {
-    const result = findScope(userScopes, 'record.notify')
+    const result = findScope(userScopes, 'user.create')
     expect(result).toEqual({
-      type: 'record.notify',
-      options: { event: ['birth'] }
+      type: 'user.create',
+      options: { role: ['first-role', 'second-role'] }
     })
   })
 
@@ -93,124 +126,261 @@ describe('parseConfigurableScope()', () => {
     expect(result).toEqual(undefined)
   })
 
-  it('should return undefined for an invalid scope with search', () => {
-    const scope = 'search[event=]'
-    const result = parseConfigurableScope(scope)
-    expect(result).toEqual(undefined)
-  })
-
-  it('should return scope for a valid scope with search', () => {
-    const tennisScope = 'search[event=tennis-club-membership,access=all]'
-    const birthScope = 'search[event=birth,access=all]'
-
-    expect(parseConfigurableScope(tennisScope)).toEqual({
-      type: 'search',
+  it('should return scope for a valid scope with print-certified-copies', () => {
+    const scope1 =
+      'record.registered.print-certified-copies[event=tennis-club-membership,templates=v2.tennis-club-membership-certificate-alpha]' // valid scope with templateIds option
+    expect(parseConfigurableScope(scope1)).toEqual({
+      type: 'record.registered.print-certified-copies',
       options: {
         event: ['tennis-club-membership'],
-        access: ['all']
+        templates: ['v2.tennis-club-membership-certificate-alpha']
       }
     })
 
-    expect(parseConfigurableScope(birthScope)).toEqual({
-      type: 'search',
-      options: {
-        event: ['birth'],
-        access: ['all']
-      }
-    })
+    const scope2 =
+      'record.registered.print-certified-copies[event=tennis-club-membership]' // valid because templates is optional
 
-    const mergedScopes = findScope([tennisScope, birthScope], 'search')
-    expect(mergedScopes).toEqual({
-      type: 'search',
-      options: { 'tennis-club-membership': 'all', birth: 'all' }
+    expect(parseConfigurableScope(scope2)).toEqual({
+      type: 'record.registered.print-certified-copies',
+      options: { event: ['tennis-club-membership'] }
     })
-  })
-
-  it('should return scope for a valid scope with search for different jurisdiction', () => {
-    const tennisScope =
-      'search[event=tennis-club-membership,access=my-jurisdiction]'
-    const birthScope = 'search[event=birth,access=all]'
-
-    expect(parseConfigurableScope(tennisScope)).toEqual({
-      type: 'search',
-      options: {
-        event: ['tennis-club-membership'],
-        access: ['my-jurisdiction']
-      }
-    })
-
-    expect(parseConfigurableScope(birthScope)).toEqual({
-      type: 'search',
-      options: {
-        event: ['birth'],
-        access: ['all']
-      }
-    })
-    const mergedScopes = findScope([tennisScope, birthScope], 'search')
-    expect(mergedScopes).toEqual({
-      type: 'search',
-      options: { 'tennis-club-membership': 'my-jurisdiction', birth: 'all' }
-    })
-  })
-
-  it('should return scope for a valid scope with search for a single event', () => {
-    const scope = 'search[event=tennis-club-membership,access=all]'
-    expect(parseConfigurableScope(scope)).toEqual({
-      type: 'search',
-      options: {
-        event: ['tennis-club-membership'],
-        access: ['all']
-      }
-    })
-    const foundScopes = findScope([scope], 'search')
-    expect(foundScopes).toEqual({
-      type: 'search',
-      options: { 'tennis-club-membership': 'all' }
-    })
-  })
-
-  it('should return undefined for odd jurisdiction id', () => {
-    const scope1 = 'search[event=tennis-club-membership,access=random]'
-    expect(parseConfigurableScope(scope1)).toEqual(undefined)
-
-    const scope2 = 'search[event=tennis-club-membership,access=alls]'
-    expect(parseConfigurableScope(scope2)).toEqual(undefined)
 
     const scope3 =
-      'search[event=tennis-club-membership,access=my-jurisdictions]'
+      'record.registered.print-certified-copies[event=tennis-club-membership,templates=]' // invalid because templates is empty
+
     expect(parseConfigurableScope(scope3)).toEqual(undefined)
 
-    const mergedScopes = findScope([scope1, scope2, scope3], 'search')
-    expect(mergedScopes).toEqual(undefined)
+    const scope4 =
+      'record.registered.print-certified-copies[event=tennis-club-membership,templates=v2.tennis-club-membership-certificate-alpha|v2.birth]' // valid scope with multiple templateIds option
+
+    expect(parseConfigurableScope(scope4)).toEqual({
+      type: 'record.registered.print-certified-copies',
+      options: {
+        event: ['tennis-club-membership'],
+        templates: ['v2.tennis-club-membership-certificate-alpha', 'v2.birth']
+      }
+    })
   })
 })
 
 describe('2.0 scopes', () => {
-  it('encodeScope()', () => {
-    const encodedScope = encodeScope({
-      type: 'record.create',
+  it('Strips out scope options unavailable for the "placeEvent" scope types', () => {
+    const placeEventScopes = ScopesWithPlaceEventOptions.options.map((type) =>
+      encodeScope({
+        type,
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
+          declaredBy: 'user' as const,
+          declaredIn: 'administrativeArea' as const,
+          registeredBy: 'user' as const,
+          registeredIn: 'administrativeArea' as const
+        }
+      })
+    )
+
+    expect(placeEventScopes.map(decodeScope)).toEqual([
+      {
+        options: { event: ['birth', 'death'], placeOfEvent: 'location' },
+        type: 'record.create'
+      },
+      {
+        options: { event: ['birth', 'death'], placeOfEvent: 'location' },
+        type: 'record.declare'
+      },
+      {
+        options: { event: ['birth', 'death'], placeOfEvent: 'location' },
+        type: 'record.notify'
+      }
+    ])
+  })
+
+  it('Strips out scope options unavailable for the "declared" scope types', () => {
+    const declaredEventOptions = ScopesWithDeclaredOptions.options.map((type) =>
+      encodeScope({
+        type,
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location' as const,
+          declaredBy: 'user' as const,
+          declaredIn: 'administrativeArea' as const,
+          // @ts-expect-error - intentionally include irrelevant options to test that they are stripped out
+          registeredBy: 'user' as const,
+          registeredIn: 'administrativeArea' as const
+        }
+      })
+    )
+
+    expect(declaredEventOptions.map(decodeScope)).toEqual([
+      {
+        type: 'record.edit',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      },
+      {
+        type: 'record.reject',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      },
+      {
+        type: 'record.archive',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      },
+      {
+        type: 'record.review-duplicates',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      },
+      {
+        type: 'record.register',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user'
+        }
+      }
+    ])
+  })
+
+  it('Keeps all scope options for the "full" scope types', () => {
+    const fullEventOptions = ScopesWithFullOptions.options.map((type) =>
+      encodeScope({
+        type,
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location' as const,
+          declaredBy: 'user' as const,
+          declaredIn: 'administrativeArea' as const,
+          registeredBy: 'user' as const,
+          registeredIn: 'administrativeArea' as const
+        }
+      })
+    )
+
+    expect(fullEventOptions.map(decodeScope)).toEqual([
+      {
+        type: 'record.search',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.read',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.request-correction',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.correct',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      },
+      {
+        type: 'record.unassign-others',
+        options: {
+          event: ['birth', 'death'],
+          placeOfEvent: 'location',
+          declaredIn: 'administrativeArea',
+          declaredBy: 'user',
+          registeredIn: 'administrativeArea',
+          registeredBy: 'user'
+        }
+      }
+    ])
+  })
+
+  it('Supports templates option for record.print-certified-copies', () => {
+    const scopeWithTemplates = encodeScope({
+      type: 'record.print-certified-copies',
       options: {
         event: ['birth', 'death'],
-        declaredBy: 'user',
-        declaredIn: 'administrativeArea'
+        placeOfEvent: 'location' as const,
+        declaredBy: 'user' as const,
+        declaredIn: 'administrativeArea' as const,
+        registeredBy: 'user' as const,
+        registeredIn: 'administrativeArea' as const,
+        templates: ['cert-1', 'cert-2']
       }
     })
 
-    expect(encodedScope).toBe(
-      'type=record.create&event=birth,death&declaredBy=user&declaredIn=administrativeArea'
+    expect(decodeScope(scopeWithTemplates)).toEqual({
+      type: 'record.print-certified-copies',
+      options: {
+        event: ['birth', 'death'],
+        placeOfEvent: 'location',
+        declaredIn: 'administrativeArea',
+        declaredBy: 'user',
+        registeredIn: 'administrativeArea',
+        registeredBy: 'user',
+        templates: ['cert-1', 'cert-2']
+      }
+    })
+  })
+
+  it('V1 record.registered.print-certified-copies with templates migrates to V2 with templates preserved', () => {
+    const v1Scope =
+      'record.registered.print-certified-copies[event=birth|death,templates=cert-1|cert-2]'
+
+    expect(v1ScopeToV2Scope(v1Scope)).toEqual(
+      'type=record.print-certified-copies&event=birth,death&templates=cert-1,cert-2'
     )
   })
 
-  it('decodeScope()', () => {
-    const encodedScope =
-      'type=record.create&event=birth,death&declaredBy=user&declaredIn=administrativeArea'
-
-    expect(decodeScope(encodedScope)).toEqual({
-      type: 'record.create',
+  it('Should decode scope with single event & template', () => {
+    const scope =
+      'type=record.print-certified-copies&event=tennis-club-membership&templates=v2.tennis-club-membership-certificate-alpha'
+    const decodedScope = decodeScope(scope)
+    expect(decodedScope).toEqual({
+      type: 'record.print-certified-copies',
       options: {
-        event: ['birth', 'death'],
-        declaredBy: 'user',
-        declaredIn: 'administrativeArea'
+        event: ['tennis-club-membership'],
+        templates: ['v2.tennis-club-membership-certificate-alpha']
       }
     })
   })
@@ -223,18 +393,10 @@ it('transform v1 scope to v2', () => {
      * except for workque scope that has an extra workqueue: all-events
      */
     localRegistrar: [
-      SCOPES.RECORD_DECLARATION_EDIT,
-      SCOPES.RECORD_REVIEW_DUPLICATES,
-      SCOPES.RECORD_DECLARATION_REINSTATE,
-      SCOPES.RECORD_CONFIRM_REGISTRATION,
-      SCOPES.RECORD_REJECT_REGISTRATION,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE,
       'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
       'search[event=birth,access=all]',
       'search[event=death,access=all]',
@@ -253,15 +415,10 @@ it('transform v1 scope to v2', () => {
       'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
     ],
     registrationAgent: [
-      SCOPES.RECORD_DECLARATION_EDIT,
-      SCOPES.RECORD_DECLARATION_REINSTATE,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
       SCOPES.USER_READ_ONLY_MY_AUDIT,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE,
       'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
       'search[event=birth,access=all]',
       'search[event=death,access=all]',
@@ -276,10 +433,6 @@ it('transform v1 scope to v2', () => {
       'record.registered.request-correction[event=birth|death|tennis-club-membership]'
     ],
     fieldAgent: [
-      SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE,
       'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
       'search[event=birth,access=all]',
       'search[event=death,access=all]',
@@ -326,4 +479,78 @@ it('transform v1 scope to v2', () => {
   )
 
   expect(scopeMapping).toMatchSnapshot()
+})
+
+it('migrate v1 scopes to v2', () => {
+  // Mix of deprecated, upgraded and unchanged scopes
+  const v1Scopes = [
+    SCOPES.RECORD_DECLARATION_EDIT,
+    SCOPES.RECORD_REVIEW_DUPLICATES,
+    SCOPES.RECORD_DECLARATION_REINSTATE,
+    SCOPES.RECORD_CONFIRM_REGISTRATION,
+    SCOPES.RECORD_REJECT_REGISTRATION,
+    SCOPES.PERFORMANCE_READ,
+    SCOPES.PERFORMANCE_READ_DASHBOARDS,
+    SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
+    SCOPES.SEARCH_BIRTH,
+    SCOPES.SEARCH_DEATH,
+    SCOPES.SEARCH_MARRIAGE,
+    SCOPES.USER_READ_MY_OFFICE,
+    SCOPES.USER_READ_MY_JURISDICTION,
+    SCOPES.USER_UPDATE_MY_JURISDICTION,
+    SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
+    SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
+    SCOPES.USER_READ_ONLY_MY_AUDIT,
+    SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+    'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
+    'search[event=birth,access=all]',
+    'search[event=death,access=all]',
+    'search[event=tennis-club-membership,access=all]',
+    'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
+    'record.create[event=birth|death|tennis-club-membership]',
+    'record.read[event=birth|death|tennis-club-membership]',
+    'record.declare[event=birth|death|tennis-club-membership]',
+    'record.declared.reject[event=birth|death|tennis-club-membership]',
+    'record.declared.archive[event=birth|death|tennis-club-membership]',
+    'record.declared.validate[event=birth|death|tennis-club-membership]',
+    'record.register[event=birth|death|tennis-club-membership]',
+    'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]',
+    'record.registered.correct[event=birth|death|tennis-club-membership]',
+    'record.unassign-others[event=birth|death|tennis-club-membership]',
+    'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
+  ]
+
+  expect(v1Scopes).toHaveLength(34)
+
+  const v2Scopes = migrateV1ScopesToV2(v1Scopes)
+  expect(v2Scopes).toHaveLength(26)
+
+  expect(v2Scopes).toEqual([
+    'performance.read',
+    'performance.read-dashboards',
+    'profile.electronic-signature',
+    'user.read:my-office',
+    'user.read:my-jurisdiction',
+    'user.update:my-jurisdiction',
+    'organisation.read-locations:my-jurisdiction',
+    'performance.vital-statistics-export',
+    'user.read:only-my-audit',
+    'organisation.read-locations:my-office',
+    'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
+    'type=record.search&event=birth&placeOfEvent=all',
+    'type=record.search&event=death&placeOfEvent=all',
+    'type=record.search&event=tennis-club-membership&placeOfEvent=all',
+    'type=record.search&event=FOOTBALL_CLUB_MEMBERSHIP&placeOfEvent=all',
+    'type=record.create&event=birth,death,tennis-club-membership',
+    'type=record.read&event=birth,death,tennis-club-membership',
+    'type=record.declare&event=birth,death,tennis-club-membership',
+    'type=record.reject&event=birth,death,tennis-club-membership',
+    'type=record.archive&event=birth,death,tennis-club-membership',
+    'type=record.custom-action&event=birth,death,tennis-club-membership&customActionTypes=VALIDATE_DECLARATION',
+    'type=record.register&event=birth,death,tennis-club-membership',
+    'type=record.print-certified-copies&event=birth,death,tennis-club-membership',
+    'type=record.correct&event=birth,death,tennis-club-membership',
+    'type=record.unassign-others&event=birth,death,tennis-club-membership',
+    'type=record.review-duplicates&event=birth,death,tennis-club-membership'
+  ])
 })

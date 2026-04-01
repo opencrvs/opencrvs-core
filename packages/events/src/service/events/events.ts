@@ -205,11 +205,13 @@ function generateTrackingId(): string {
 export async function createEvent({
   eventInput,
   user,
-  transactionId
+  transactionId,
+  createdAtLocation
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
   transactionId: string
+  createdAtLocation?: UUID | null | undefined
   config: EventConfig
 }): Promise<EventDocument> {
   const isSystem = user.type === TokenUserType.enum.system
@@ -218,15 +220,17 @@ export async function createEvent({
     ? eventsRepo.getOrCreateEvent // System users create events without assignment
     : eventsRepo.getOrCreateEventAndAssign
 
+  const eventLocation = isSystem ? createdAtLocation : user.primaryOfficeId
   const event = await getOrCreateEvent({
     eventType: eventInput.type,
     transactionId: transactionId,
     trackingId: generateTrackingId(),
     createdBy: user.id,
     createdByUserType: user.type,
-    createdByRole: user.role,
+    createdByRole:
+      user.type === TokenUserType.enum.user ? user.role : undefined,
     createdBySignature: user.signature,
-    createdAtLocation: user.primaryOfficeId
+    createdAtLocation: eventLocation
   })
 
   return event
@@ -266,11 +270,14 @@ export function buildAction(
     annotation: input.annotation,
     ...('content' in input ? { content: input.content } : {}),
     createdBy: user.id,
-    createdByRole: user.role,
+    createdByRole:
+      user.type === TokenUserType.enum.user ? user.role : undefined,
     createdByUserType: user.type,
     createdBySignature: user.signature,
     createdAtLocation:
-      user.type === 'system' ? input.createdAtLocation : user.primaryOfficeId,
+      user.type === TokenUserType.enum.system
+        ? input.createdAtLocation
+        : user.primaryOfficeId,
     originalActionId: input.originalActionId
   }
   switch (input.type) {

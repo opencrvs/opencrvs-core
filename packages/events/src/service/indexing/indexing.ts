@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,12 +10,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { type estypes } from '@elastic/elasticsearch'
+import { estypes } from '@elastic/elasticsearch'
 import * as z from 'zod/v4'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
-  AgeValue,
   AddressFieldValue,
   EventConfig,
   EventDocument,
@@ -26,12 +26,15 @@ import {
   getDeclarationFields,
   WorkqueueCountInput,
   getEventConfigById,
-  SearchScopeAccessLevels,
   SearchQuery,
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
-import { logger, RecordScopeV2 } from '@opencrvs/commons'
+import {
+  EventIndexWithAdministrativeHierarchy,
+  logger,
+  RecordScopeV2
+} from '@opencrvs/commons'
 import {
   getEventAliasName,
   getEventIndexName,
@@ -43,13 +46,15 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
-  EventIndexWithAdministrativeHierarchy,
   getEventIndexWithAdministrativeHierarchy,
   getEventIndexWithoutLocationHierarchy,
   NAME_QUERY_KEY,
+  AGE_DOB_QUERY_KEY,
   removeSecuredFields,
+  IndexedAgeFieldValue,
   resolveRecordActionScopeToIds,
-  valueFromTotal
+  valueFromTotal,
+  IndexedNameFieldValue
 } from './utils'
 import {
   buildElasticQueryFromSearchPayload,
@@ -97,6 +102,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.DATE_RANGE:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.TIME:
@@ -137,6 +143,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.BUTTON:
     case FieldType.ALPHA_PRINT_BUTTON:
     case FieldType.ID:
+    case FieldType.USER_ROLE:
     case FieldType.PHONE:
     case FieldType.VERIFICATION_STATUS:
       return { type: 'keyword' }
@@ -170,9 +177,10 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: {
           age: { type: 'double' },
-          asOfDateRef: { type: 'keyword' }
+          asOfDateRef: { type: 'keyword' },
+          [AGE_DOB_QUERY_KEY]: { type: 'date' }
         } satisfies {
-          [K in keyof AgeValue]: estypes.MappingProperty
+          [K in keyof Required<IndexedAgeFieldValue>]: estypes.MappingProperty
         }
       }
     case FieldType.SIGNATURE:
@@ -190,8 +198,11 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: {
           firstname: { type: 'text', analyzer: 'classic' },
+          middlename: { type: 'text', analyzer: 'classic' },
           surname: { type: 'text', analyzer: 'classic' },
           [NAME_QUERY_KEY]: { type: 'text', analyzer: 'classic' }
+        } satisfies {
+          [K in keyof Required<IndexedNameFieldValue>]: estypes.MappingProperty
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
@@ -207,23 +218,24 @@ function mapFieldTypeToElasticsearch(
     case FieldType.SEARCH:
     case FieldType.ID_READER:
     case FieldType.QR_READER:
+    /**
+     * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
+     * The field still lands in `_source`.
+     */
     case FieldType.HTTP:
     case FieldType.LINK_BUTTON:
     case FieldType.QUERY_PARAM_READER:
+    /** Images are not indexed as they're currently asserted read-only. */
+    case FieldType.IMAGE_VIEW:
     case FieldType.LOADER:
-      /**
-       * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
-       * The field still lands in `_source`.
-       */
       return {
         type: 'object',
         enabled: false
       }
+    /**
+     * Custom fields are not indexed as their structure is unknown.
+     */
     case FieldType._EXPERIMENTAL_CUSTOM:
-      /**
-       * Custom fields are not indexed as their structure is unknown.
-       */
-
       return {
         type: 'object',
         enabled: false
@@ -256,7 +268,8 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
 
 export async function createIndex(
   indexName: string,
-  formFields: FieldConfig[]
+  formFields: FieldConfig[],
+  addAlias: boolean = true
 ) {
   const client = getOrCreateClient()
 
@@ -273,6 +286,7 @@ export async function createIndex(
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
           updatedAtLocation: { type: 'keyword' },
+          placeOfEvent: { type: 'keyword' },
           updatedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
@@ -331,31 +345,34 @@ export async function createIndex(
     }
   })
 
-  return ensureAlias(indexName)
+  if (addAlias) {
+    await ensureAlias(indexName)
+  }
 }
 
-export async function ensureIndexExists(
-  eventConfiguration: EventConfig,
-  { overwrite }: { overwrite?: boolean } = { overwrite: false }
-) {
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
 
-  if (!hasEventsIndex) {
+  const isAlreadyWriteAlias = await esClient.indices.existsAlias({
+    name: indexName
+  })
+  if (isAlreadyWriteAlias) {
+    logger.info(
+      `Write alias ${indexName} already exists — index setup already complete`
+    )
+    return
+  }
+
+  const hasConcreteIndex = await esClient.indices.exists({ index: indexName })
+
+  if (!hasConcreteIndex) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    logger.info(`Index ${indexName} already exists.`)
-    if (overwrite) {
-      logger.info(`. - Overwriting index ${indexName}`)
-      await esClient.indices.delete({ index: indexName })
-      await createIndex(indexName, getDeclarationFields(eventConfiguration))
-    }
+    logger.info(`Index ${indexName} already exists as a concrete index.`)
+    await ensureAlias(indexName)
   }
-  return ensureAlias(indexName)
 }
 
 type _Combine<
@@ -369,15 +386,20 @@ export type BulkResponse = estypes.BulkResponse
 
 export async function indexEventsInBulk(
   batch: EventDocument[],
-  configs: EventConfig[]
+  configs: EventConfig[],
+
+  indexNameOverrides?: Map<string, string>
 ) {
   const esClient = getOrCreateClient()
 
   const locationHierarchyCache = new Map<string, string[]>()
+  const hiearchyResolutionStarted = new Date()
+
   const indexedDocs = await Promise.all(
     batch.map(async (doc) => {
       const config = getEventConfigById(configs, doc.type)
       const eventIndex = eventToEventIndex(doc, config)
+
       const eventIndexWithLocationHierarchy =
         await getEventIndexWithAdministrativeHierarchy(
           config,
@@ -385,21 +407,50 @@ export async function indexEventsInBulk(
           locationHierarchyCache
         )
       return [
-        { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+        {
+          index: {
+            _index:
+              indexNameOverrides?.get(doc.type) ?? getEventIndexName(doc.type),
+            _id: doc.id
+          }
+        },
         eventIndexWithLocationHierarchy
       ]
     })
   )
+  const batchId = batch[0]?.id ?? 'unknown'
+  logger.info(
+    `Batch ${batchId}: Resolving admin hierarchy took ${new Date().valueOf() - hiearchyResolutionStarted.valueOf()} ms`
+  )
 
   const body = indexedDocs.flat()
+  const start = new Date()
+  const response = await esClient.bulk({ refresh: false, body })
+  logger.info(
+    `Batch ${batchId}: Bulk indexing took ${new Date().valueOf() - start.valueOf()} ms`
+  )
+  if (response.errors) {
+    const failures = response.items
+      .filter((item) => item.index?.error)
+      .map((item) => ({
+        id: item.index?._id,
+        index: item.index?._index,
+        error: item.index?.error
+      }))
+    logger.error(
+      `Bulk indexing had ${failures.length} failure(s) out of ${batch.length} documents`,
+      { failures }
+    )
+  }
 
-  return esClient.bulk({ refresh: false, body })
+  return response
 }
 
 export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
   const eventIndex = eventToEventIndex(event, config)
+
   const eventIndexWithAdministrativeHierarchy =
     await getEventIndexWithAdministrativeHierarchy(config, eventIndex)
   return esClient.index<EventIndexWithAdministrativeHierarchy>({
@@ -475,28 +526,24 @@ export async function getIndexedEvents(
 export async function findRecordsByQuery({
   search,
   eventConfigs,
-  options,
   user,
   acceptedScopes
 }: {
   search: SearchQuery
   eventConfigs: EventConfig[]
-  options?: Record<string, SearchScopeAccessLevels>
   user: TrpcUserContext
-  acceptedScopes?: RecordScopeV2[]
+  acceptedScopes: RecordScopeV2[]
 }) {
   const esClient = getOrCreateClient()
 
   const { query, limit, offset } = search
 
-  const resolvedScopes = acceptedScopes?.map((scope) =>
+  const resolvedScopes = acceptedScopes.map((scope) =>
     resolveRecordActionScopeToIds(scope, user)
   )
 
   const esQuery = withJurisdictionFilters({
     query: await buildElasticQueryFromSearchPayload(query, eventConfigs),
-    options,
-    userOfficeId: user.primaryOfficeId,
     scopesV2: resolvedScopes
   })
 
@@ -553,21 +600,34 @@ const MsearchResponseSchema = z.object({
   })
 })
 
-export async function getEventCount(
-  queries: WorkqueueCountInput,
-  eventConfigs: EventConfig[],
-  options: Record<string, SearchScopeAccessLevels>,
-  userOfficeId: string | undefined
-) {
+export async function getEventCount({
+  queries,
+  eventConfigs,
+  user,
+  acceptedScopes
+}: {
+  queries: WorkqueueCountInput
+  eventConfigs: EventConfig[]
+  user: TrpcUserContext
+  acceptedScopes: RecordScopeV2[]
+}) {
   const esClient = getOrCreateClient()
+
+  const resolvedScopes = acceptedScopes.map((scope) =>
+    resolveRecordActionScopeToIds(scope, user)
+  )
 
   const esQueries = queries.map(async (query) =>
     buildElasticQueryFromSearchPayload(query.query, eventConfigs)
   )
 
   const filteredQueries = (await Promise.all(esQueries)).map((query) =>
-    withJurisdictionFilters({ query, options, userOfficeId })
+    withJurisdictionFilters({
+      query,
+      scopesV2: resolvedScopes
+    })
   )
+
   const { responses } = await esClient.msearch({
     searches: filteredQueries.flatMap((query) => [
       { index: getEventAliasName() },

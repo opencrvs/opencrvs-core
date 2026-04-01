@@ -14,7 +14,6 @@ import React from 'react'
 import { within, expect, fn } from '@storybook/test'
 import { userEvent } from '@storybook/testing-library'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS } from '../../../../tests/v2-events/administrative-hierarchy-mock'
 // NOTE: If you do not import from index, you might encounter: ReferenceError: Cannot access 'LocationSearch' before initialization
 import { LocationSearch } from '.'
 
@@ -39,21 +38,8 @@ export const LocationSearchInput: StoryObj<typeof LocationSearch.Input> = {
   },
   args: {
     id: 'location-search',
-    searchableResource: ['locations', 'facilities', 'offices'],
+    locationTypes: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
     value: ''
-  }
-}
-
-export const LocationSearchInputWithAdministrativeAreaId: StoryObj<
-  typeof LocationSearch.Input
-> = {
-  render: (props) => {
-    return <LocationSearch.Input {...props} />
-  },
-  args: {
-    id: 'location-search',
-    searchableResource: ['locations', 'facilities', 'offices'],
-    value: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS[0].id
   }
 }
 
@@ -69,34 +55,36 @@ export const LocationSearchInputWithActiveLocations: StoryObj<
   },
   args: {
     id: 'location-search',
-    searchableResource: ['facilities'],
+    locationTypes: ['HEALTH_FACILITY'],
     value: 'abc',
     onChange: fn()
   },
   play: async ({ canvasElement, step, args }) => {
-    await step('Locations starting with "i" are visible', async () => {
-      const canvas = within(canvasElement)
-      const input =
-        await canvas.findByTestId<HTMLInputElement>('location-search')
+    await step(
+      'Locations with the letter "i" in them are visible',
+      async () => {
+        const canvas = within(canvasElement)
+        const input = await canvas.findByRole('combobox')
 
-      await userEvent.type(input, 'i')
-      input.blur()
+        await userEvent.type(input, 'i')
 
-      await expect(args.onChange).toHaveBeenCalled()
-      await expect(args.onChange).toHaveBeenCalledWith(undefined)
+        await expect(
+          canvas.findByText('Ibombo Rural Health Centre')
+        ).resolves.toBeInTheDocument()
 
-      await expect(
-        canvas.findByText('Ibombo Rural Health Centre')
-      ).resolves.toBeInTheDocument()
+        await expect(
+          canvas.findByText('Ipongo Rural Health Centre')
+        ).resolves.toBeInTheDocument()
 
-      await expect(
-        canvas.findByText('Ipongo Rural Health Centre')
-      ).resolves.toBeInTheDocument()
+        await expect(
+          canvas.findByText('Itumbwe Health Post')
+        ).resolves.toBeInTheDocument()
 
-      await expect(
-        canvas.findByText('Itumbwe Health Post')
-      ).resolves.toBeInTheDocument()
-    })
+        await expect(
+          canvas.queryByText('Golden Valley Rural Health Centre')
+        ).not.toBeInTheDocument()
+      }
+    )
   }
 }
 
@@ -111,21 +99,16 @@ export const LocationSearchInputInvalid: StoryObj<typeof LocationSearch.Input> =
     },
     args: {
       id: 'location-search',
-      searchableResource: ['locations', 'facilities', 'offices'],
+      locationTypes: ['HEALTH_FACILITY', 'CRVS_OFFICE'],
       value: 'abc',
       onChange: fn()
     },
     play: async ({ canvasElement, step, args }) => {
       await step('Modal has scope based on content', async () => {
         const canvas = within(canvasElement)
-        const input =
-          await canvas.findByTestId<HTMLInputElement>('location-search')
+        const input = await canvas.findByRole('combobox')
 
         await userEvent.type(input, 'abc')
-        input.blur()
-
-        await expect(args.onChange).toHaveBeenCalled()
-        await expect(args.onChange).toHaveBeenCalledWith(undefined)
       })
     }
   }

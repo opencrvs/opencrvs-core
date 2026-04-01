@@ -16,7 +16,9 @@ import { getClient } from '@events/storage/postgres/events'
 import { NewLocations } from '../events/schema/app/Locations'
 import Schema from '../events/schema/Database'
 
-const INSERT_MAX_CHUNK_SIZE = 10000
+// This used to be 10k but was decreased due to postgres throwing error on large location amount in data seeding:
+// "bind message has ... parameter formats but 0 parameters"
+const INSERT_MAX_CHUNK_SIZE = 1000
 
 export async function setLocationsInTrx(
   trx: Kysely<Schema>,
@@ -49,6 +51,12 @@ export async function setLocationsInTrx(
              WHEN excluded.valid_until IS NOT NULL
              THEN excluded.valid_until
              ELSE locations.valid_until
+           END`,
+          externalId: () =>
+            sql`CASE
+             WHEN excluded.external_id IS NOT NULL
+             THEN excluded.external_id
+             ELSE locations.external_id
            END`,
           deletedAt: null
         })

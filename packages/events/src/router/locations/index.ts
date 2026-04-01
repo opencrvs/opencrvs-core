@@ -13,6 +13,7 @@ import * as z from 'zod/v4'
 import { Location, SCOPES, UUID } from '@opencrvs/commons'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import {
+  getLocationById,
   getLocationHierarchy,
   getLocations,
   setLocations
@@ -21,6 +22,16 @@ import { requiresAnyOfScopes } from '../middleware'
 
 export const locationRouter = router({
   list: userAndSystemProcedure
+    .meta({
+      openapi: {
+        summary: 'List locations',
+        description: 'Retrieve a list of locations based on provided filters.',
+        method: 'GET',
+        path: '/locations',
+        tags: ['locations'],
+        protect: true
+      }
+    })
     .input(
       z
         .object({
@@ -49,6 +60,10 @@ export const locationRouter = router({
     .mutation(async ({ input }) => {
       await setLocations(input)
     }),
+  get: userAndSystemProcedure
+    .input(z.object({ id: UUID }))
+    .output(Location)
+    .query(async ({ input }) => getLocationById(input.id)),
   getLocationHierarchy: userAndSystemProcedure
     .input(z.object({ locationId: UUID }))
     .output(z.array(UUID))

@@ -174,14 +174,17 @@ export const QueryExpression = z
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
-    'legalStatuses.REGISTERED.acceptedAt': z.optional(DateCondition),
     'legalStatuses.DECLARED.createdAtLocation': z.optional(Within).nullable(),
+    'legalStatuses.DECLARED.createdByRole': z.optional(AnyOf),
+    'legalStatuses.REGISTERED.acceptedAt': z.optional(DateCondition),
     'legalStatuses.REGISTERED.createdAtLocation': z.optional(Within).nullable(),
+    'legalStatuses.REGISTERED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
     createdAtLocation: z.optional(Within),
     updatedAtLocation: z.optional(Within),
     assignedTo: z.optional(Exact),
     createdByUserType: z.optional(ExactUserType),
+    updatedByUserRole: z.optional(Exact),
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
@@ -284,11 +287,3 @@ export type SearchQuery = z.infer<typeof SearchQuery>
 
 export type QueryType = z.infer<typeof QueryType>
 export type QueryExpression = z.infer<typeof QueryExpression>
-
-export const SearchScopeAccessLevels = {
-  MY_JURISDICTION: 'my-jurisdiction',
-  ALL: 'all'
-} as const
-
-export type SearchScopeAccessLevels =
-  (typeof SearchScopeAccessLevels)[keyof typeof SearchScopeAccessLevels]

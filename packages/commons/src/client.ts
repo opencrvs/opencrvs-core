@@ -11,15 +11,24 @@
 export * from './search'
 export * from './events'
 export * from './scopes'
+export * from './roles'
 export * from './documents'
 export * from './uuid'
 export * from './utils'
 export * from './conditionals/validate'
 export { DEFAULT_ROLES_DEFINITION } from './authentication'
 export * from './fixtures'
-export * from './users/User'
+export * from './users'
 export * from './authentication'
 export * from './url'
 export * from './events/serializers/user/serializer'
 export * from './events/serializers/date/serializer'
 export { TriggerEvent } from './notification'
+export * from './application-config'
+export * from './icons'
+/** @knipignore */
+export {
+  findScope,
+  parseConfigurableScope,
+  DashboardScope
+} from './scopes.deprecated.do-not-use'

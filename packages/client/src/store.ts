@@ -29,10 +29,7 @@ import {
 } from '@client/notification/reducer'
 import { IOfflineDataState, offlineDataReducer } from '@client/offline/reducer'
 import { profileReducer, ProfileState } from '@client/profile/profileReducer'
-import {
-  IReviewFormState,
-  reviewReducer
-} from '@opencrvs/client/src/forms/register/reviewReducer'
+
 import {
   advancedSearchParamReducer,
   IAdvancedSearchParamState
@@ -40,7 +37,6 @@ import {
 import { IUserFormState, userFormReducer } from '@client/user/userReducer'
 import * as Sentry from '@sentry/react'
 import createSentryMiddleware from 'redux-sentry-middleware'
-import { submissionMiddleware } from './declarations/submissionMiddleware'
 import { workqueueReducer, WorkqueueState } from './workqueue'
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
 import {
@@ -54,7 +50,6 @@ export interface IStoreState {
   declarationsState: IDeclarationsState
   registerForm: IRegisterFormState
   notification: NotificationState
-  reviewForm: IReviewFormState
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
@@ -75,7 +70,6 @@ export const createStore = (): { store: AppStore } => {
     declarationsState: declarationsReducer,
     registerForm: registerFormReducer,
     notification: notificationReducer,
-    reviewForm: reviewReducer,
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: workqueueReducer,
@@ -84,7 +78,6 @@ export const createStore = (): { store: AppStore } => {
   })
   // @ts-ignore
   const enhancer = compose(
-    applyMiddleware(submissionMiddleware),
     install(config),
     applyMiddleware(persistenceMiddleware),
     // @ts-ignore types are not correct for this module yet

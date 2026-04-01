@@ -9,9 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import React, { useCallback, useEffect, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, omit, get, compact } from 'lodash'
+import {
+  cloneDeep,
+  isEqual,
+  set,
+  omit,
+  get,
+  compact,
+  uniqBy,
+  isNil
+} from 'lodash'
 import styled, { keyframes } from 'styled-components'
 import {
   EventState,
@@ -25,11 +36,11 @@ import {
   isNonInteractiveFieldType,
   InteractiveFieldType,
   FieldReference,
-  omitHiddenFields,
   isFieldEnabled,
   ValidatorContext,
   isFieldVisible,
-  findAllFields
+  findAllFields,
+  omitHiddenPaginatedFields
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
@@ -40,6 +51,7 @@ import {
 import { useOnlineStatus } from '@client/utils'
 import { handleDefaultValue } from '@client/v2-events/hooks/useDefaultValues'
 import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -53,6 +65,7 @@ type AllProps = {
   fields: FieldConfig[]
   className?: string
   readonlyMode?: boolean
+  attachmentPath: string
   errors: IndexMap<string>
   /**
    * Update the form values in the non-formik state.
@@ -121,7 +134,7 @@ function resolveFieldReferenceValue(
 ): FieldValue | undefined {
   const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible($$field)
 
-  return $$subfield && $$subfield.length > 0
+  return $$subfield.length > 0
     ? get(fieldValues[referenceKeyInFormikFormat], $$subfield)
     : fieldValues[referenceKeyInFormikFormat]
 }
@@ -149,6 +162,56 @@ function getParentsOfListenerFields(fields: FieldConfig[]) {
   return fieldsByParentId
 }
 
+/**
+ * Applies visibility transitions to fieldValues in place.
+ * Fields that became hidden are set to null (and their value cached).
+ * Fields that became visible have their cached value restored.
+ */
+function applyVisibilityTransitions(
+  eventConfig: EventConfig,
+  prevForm: EventState,
+  currentForm: EventState,
+  fieldValues: Record<string, FieldValue>,
+  validatorContext: ValidatorContext,
+  cacheHiddenFieldValue: (key: string, value: FieldValue) => void,
+  popHiddenFieldValue: (key: string) => FieldValue | undefined
+): void {
+  const prevCleaned = omitHiddenPaginatedFields(
+    eventConfig.declaration,
+    prevForm,
+    validatorContext
+  )
+  const currentCleaned = omitHiddenPaginatedFields(
+    eventConfig.declaration,
+    currentForm,
+    validatorContext
+  )
+
+  const newHiddenKeys = Object.keys(prevCleaned).filter(
+    (key) => !(key in currentCleaned)
+  )
+  const newVisibleKeys = Object.keys(currentCleaned).filter(
+    (key) => !(key in prevCleaned)
+  )
+
+  // When a field transitions from visible to hidden, cache its value and clear it
+  newHiddenKeys.forEach((key) => {
+    const fieldValue = get(prevCleaned, key)
+    if (!isNil(fieldValue)) {
+      cacheHiddenFieldValue(key, fieldValue)
+      set(fieldValues, makeFormFieldIdFormikCompatible(key), null)
+    }
+  })
+
+  // When a field transitions from hidden to visible, restore its cached value
+  newVisibleKeys.forEach((key) => {
+    const cachedValue = popHiddenFieldValue(key)
+    if (cachedValue !== undefined) {
+      set(fieldValues, makeFormFieldIdFormikCompatible(key), cachedValue)
+    }
+  })
+}
+
 // @TODO: Clarify and unify the naming of the props. What is from formik and what is from the state.
 export function FormSectionComponent({
   values,
@@ -166,6 +229,7 @@ export function FormSectionComponent({
   onChange,
   resetForm,
   setErrors,
+  attachmentPath,
   validateAllFields,
   fieldsToShowValidationErrors,
   onAllFieldsValidated,
@@ -178,6 +242,8 @@ export function FormSectionComponent({
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
 
+  const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
+
   const systemVariables = useSystemVariables()
 
   const fieldsWithFormikSeparator = fieldsWithDotSeparator.map((field) => ({
@@ -185,9 +251,14 @@ export function FormSectionComponent({
     id: makeFormFieldIdFormikCompatible(field.id)
   }))
 
-  const allFieldsWithDotSeparator = eventConfig
-    ? findAllFields(eventConfig)
-    : fieldsWithDotSeparator
+  // We want to include both the fields from event config and the fields passed as 'fieldsWithFormikSeparator' prop
+  // Since the 'fieldsWithFormikSeparator' can contain 'child' fields not defined in the event config, such as Address or Name sub fields
+  const allEventConfigFields = eventConfig ? findAllFields(eventConfig) : []
+  const allFieldsWithDotSeparator = uniqBy(
+    fieldsWithDotSeparator.concat(allEventConfigFields),
+    'id'
+  )
+
   const listenerFieldsByParentId = getParentsOfListenerFields(
     allFieldsWithDotSeparator
   )
@@ -312,6 +383,31 @@ export function FormSectionComponent({
         )
       }
 
+      if (eventConfig) {
+        const prevForm = {
+          ...initialValues,
+          ...makeFormikFieldIdsOpenCRVSCompatible(
+            makeDatesFormatted(fieldsWithDotSeparator, values)
+          )
+        }
+        const currentForm = {
+          ...initialValues,
+          ...makeFormikFieldIdsOpenCRVSCompatible(
+            makeDatesFormatted(fieldsWithDotSeparator, updatedValues)
+          )
+        }
+
+        applyVisibilityTransitions(
+          eventConfig,
+          prevForm,
+          currentForm,
+          updatedValues,
+          validatorContext,
+          cacheHiddenFieldValue,
+          popHiddenFieldValue
+        )
+      }
+
       const formikListenerFieldIds = listenerFields.map((child) =>
         makeFormFieldIdFormikCompatible(child.id)
       )
@@ -332,7 +428,13 @@ export function FormSectionComponent({
       errorsWithDotSeparator,
       setErrors,
       setAllTouchedFields,
-      setValueForListenerField
+      setValueForListenerField,
+      eventConfig,
+      initialValues,
+      fieldsWithDotSeparator,
+      validatorContext,
+      cacheHiddenFieldValue,
+      popHiddenFieldValue
     ]
   )
 
@@ -341,6 +443,13 @@ export function FormSectionComponent({
       const updatedValues = cloneDeep(values)
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
       const updatedTouched = cloneDeep(touched)
+
+      const prevForm = {
+        ...initialValues,
+        ...makeFormikFieldIdsOpenCRVSCompatible(
+          makeDatesFormatted(fieldsWithDotSeparator, values)
+        )
+      }
 
       for (const { name: formikFieldId, value } of newValues) {
         set(updatedValues, formikFieldId, value)
@@ -358,6 +467,25 @@ export function FormSectionComponent({
         }
       }
 
+      if (eventConfig) {
+        const currentForm = {
+          ...initialValues,
+          ...makeFormikFieldIdsOpenCRVSCompatible(
+            makeDatesFormatted(fieldsWithDotSeparator, updatedValues)
+          )
+        }
+
+        applyVisibilityTransitions(
+          eventConfig,
+          prevForm,
+          currentForm,
+          updatedValues,
+          validatorContext,
+          cacheHiddenFieldValue,
+          popHiddenFieldValue
+        )
+      }
+
       void setErrors(updatedErrors)
       void setValues(updatedValues)
       void setTouched(updatedTouched)
@@ -372,7 +500,13 @@ export function FormSectionComponent({
       errorsWithDotSeparator,
       setErrors,
       setAllTouchedFields,
-      setValueForListenerField
+      setValueForListenerField,
+      initialValues,
+      fieldsWithDotSeparator,
+      eventConfig,
+      validatorContext,
+      cacheHiddenFieldValue,
+      popHiddenFieldValue
     ]
   )
 
@@ -439,31 +573,15 @@ export function FormSectionComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validateAllFields])
 
-  /*
-   * For the conditional check data, we want to only include values from visible fields so values of hidden fields don’t affect them.
-   *
-   * You might wonder why values of hidden fields aren’t filtered out completely earlier.
-   * That’s intentional — we persist their values so if the fields become visible again, the previous values are restored instead of resetting.
-   */
-  const declarationFields = eventConfig?.declaration.pages.flatMap(
-    (p) => p.fields
-  )
-  const allFields = [...(declarationFields ?? []), ...fieldsWithDotSeparator]
-  const visibleFieldValues = omitHiddenFields(
-    allFields,
-    completeForm,
-    validatorContext
-  )
-
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, visibleFieldValues, validatorContext)) {
+        if (!isFieldVisible(field, completeForm, validatorContext)) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, visibleFieldValues, validatorContext) ||
+          !isFieldEnabled(field, completeForm, validatorContext) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]
@@ -478,8 +596,10 @@ export function FormSectionComponent({
               {({ field: formikField }: FieldProps) => (
                 <GeneratedInputField
                   allKnownFields={allFieldsWithDotSeparator}
+                  attachmentPath={attachmentPath}
                   disabled={isDisabled}
                   error={isDisabled ? '' : error}
+                  eventConfig={eventConfig}
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}

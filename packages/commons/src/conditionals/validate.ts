@@ -22,7 +22,7 @@ import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import {
-  DateValue,
+  PlainDate,
   FieldUpdateValue,
   FieldValue,
   AgeValue
@@ -31,7 +31,13 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { ITokenPayload } from '../authentication'
 import { UUID } from '../uuid'
 import { ageToDate } from '../events/utils'
-import { ActionConfig, ActionType, EventIndex, EventDocument } from '../client'
+import {
+  ActionConfig,
+  ActionType,
+  EventIndex,
+  EventDocument,
+  EventConfig
+} from '../client'
 
 const ajv = new Ajv({
   $data: true,
@@ -196,32 +202,70 @@ ajv.addKeyword({
   }
 })
 
+let schemasCompiled = false
+
+/**
+ * Precompiles action conditional schemas from the event configurations to improve performance of condition validation later on.
+ * Best called once on application startup before any condition validation is done.
+ */
+export function precompileActionSchemas(eventConfigurations: EventConfig[]) {
+  if (schemasCompiled) {
+    return
+  }
+
+  schemasCompiled = true
+
+  for (const config of eventConfigurations) {
+    for (const action of config.actions) {
+      if (action.conditionals) {
+        for (const conditional of action.conditionals) {
+          const schema = conditional.conditional
+          if (schema.$id && !ajv.getSchema(schema.$id)) {
+            ajv.compile(schema)
+          }
+        }
+      }
+    }
+  }
+}
+
+function isAgeValue(value: unknown): value is AgeValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'age' in value &&
+    typeof value.age === 'number'
+  )
+}
+
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
-  if ('$form' in data) {
-    data.$form = Object.fromEntries(
-      Object.entries(data.$form).map(([key, value]) => {
-        const maybeAgeValue = AgeValue.safeParse(value)
-        if (maybeAgeValue.success) {
-          const age = maybeAgeValue.data.age
-          const maybeAsOfDate = DateValue.safeParse(
-            data.$form[maybeAgeValue.data.asOfDateRef]
-          )
 
-          return [
-            key,
-            {
-              age,
-              dob: ageToDate(
-                age,
-                maybeAsOfDate.success ? maybeAsOfDate.data : data.$now
-              )
-            }
-          ]
-        }
+  if ('$form' in data) {
+    const entries = Object.entries(data.$form).map(([key, value]) => {
+      // This was previously checked with AgeValue.safeParse(), but due to performance issues we need to check "manually".
+      if (!isAgeValue(value)) {
         return [key, value]
-      })
-    )
+      }
+
+      const age = value.age
+      const maybeAsOfDate = PlainDate.safeParse(data.$form[value.asOfDateRef])
+
+      return [
+        key,
+        {
+          age,
+          dob: ageToDate(
+            age,
+            maybeAsOfDate.success
+              ? maybeAsOfDate.data
+              : PlainDate.parse(data.$now)
+          )
+        }
+      ]
+    })
+
+    data.$form = Object.fromEntries(entries)
   }
 
   const result = validator(data) as boolean
@@ -484,7 +528,6 @@ function zodToIntlErrorMap(
 
   switch (issue.code) {
     case 'too_small': {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (issue.message === undefined) {
         return createIntlError(requiredMessage)
       }

@@ -26,7 +26,9 @@ export const FieldType = {
   DATE_RANGE: 'DATE_RANGE', // // Internal use, only for search functionality
   SELECT_DATE_RANGE: 'SELECT_DATE_RANGE', // Internal use, only for search functionality
   TIME: 'TIME',
+  IMAGE_VIEW: 'IMAGE_VIEW',
   PARAGRAPH: 'PARAGRAPH',
+  HEADING: 'HEADING',
   PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
   FILE: 'FILE',
@@ -38,7 +40,9 @@ export const FieldType = {
   LOCATION: 'LOCATION',
   DIVIDER: 'DIVIDER',
   ADMINISTRATIVE_AREA: 'ADMINISTRATIVE_AREA',
+  /** @deprecated Use FieldType.LOCATION with locationTypes: ['HEALTH_FACILITY'] */
   FACILITY: 'FACILITY',
+  /** @deprecated Use FieldType.LOCATION with locationTypes: ['CRVS_OFFICE'] */
   OFFICE: 'OFFICE',
   SIGNATURE: 'SIGNATURE',
   DATA: 'DATA',
@@ -54,6 +58,7 @@ export const FieldType = {
   ID_READER: 'ID_READER',
   LOADER: 'LOADER',
   ALPHA_HIDDEN: 'ALPHA_HIDDEN',
+  USER_ROLE: 'USER_ROLE',
   /**
    * @internal
    * @experimental
@@ -96,11 +101,13 @@ export const FieldTypesToHideInReview = [
   FieldType.BULLET_LIST,
   FieldType.DIVIDER,
   FieldType.PAGE_HEADER,
+  FieldType.IMAGE_VIEW,
   FieldType.PARAGRAPH,
   FieldType.ID_READER,
   FieldType.LOADER,
   FieldType.HTTP,
   FieldType.QUERY_PARAM_READER,
   FieldType.DATA,
+  FieldType.ALPHA_PRINT_BUTTON,
   FieldType.ALPHA_HIDDEN
 ]

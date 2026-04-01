@@ -102,7 +102,7 @@ import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
-import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
+import { InformativeRadioGroup } from './InformativeRadioGroup'
 import { DocumentUploaderWithOption } from './DocumentUploadField/DocumentUploaderWithOption'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -795,11 +795,11 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-export const mapFieldsToValues = (
+const mapFieldsToValues = (
   fields: IFormField[],
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
-) =>
-  fields.reduce((memo, field) => {
+) => {
+  return fields.reduce((memo, field) => {
     let fieldInitialValue = handleInitialValue(
       field.initialValue as InitialValue,
       ...evalParams
@@ -834,6 +834,7 @@ export const mapFieldsToValues = (
 
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
+}
 
 type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 interface IFormSectionProps {
@@ -869,7 +870,7 @@ interface IQueryData {
   [key: string]: any
 }
 
-export interface ITouchedNestedFields {
+interface ITouchedNestedFields {
   value: boolean
   nestedFields: {
     [fieldName: string]: boolean

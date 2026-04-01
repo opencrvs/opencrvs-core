@@ -11,18 +11,21 @@
 import _ from 'lodash'
 import { type estypes } from '@elastic/elasticsearch'
 import {
-  ActionCreationMetadata,
   AddressFieldValue,
   AddressType,
+  ageToDate,
+  AgeValue,
+  PlainDate,
   EventConfig,
   EventIndex,
+  EventState,
   FieldType,
   FieldValue,
   getDeclarationFieldById,
+  isAgeFieldType,
   isNameFieldType,
   NameFieldValue,
   QueryInputType,
-  RegistrationCreationMetadata,
   UUID
 } from '@opencrvs/commons/events'
 import {
@@ -37,6 +40,7 @@ import { TrpcUserContext } from '../../context'
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
 export const NAME_QUERY_KEY = '__fullname'
+export const AGE_DOB_QUERY_KEY = '__derived_dob'
 
 export function encodeFieldId(fieldId: string) {
   return fieldId.replaceAll('.', FIELD_ID_SEPARATOR)
@@ -46,14 +50,19 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
-type IndexedNameFieldValue = NameFieldValue & {
+export type IndexedNameFieldValue = NameFieldValue & {
   [NAME_QUERY_KEY]?: string
+}
+
+export type IndexedAgeFieldValue = AgeValue & {
+  [AGE_DOB_QUERY_KEY]?: string
 }
 
 function addIndexFieldsToValue(
   eventConfig: EventConfig,
   fieldId: string,
-  value: FieldValue
+  value: FieldValue,
+  declaration: EventState
 ) {
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
 
@@ -62,6 +71,17 @@ function addIndexFieldsToValue(
       ...field.value,
       [NAME_QUERY_KEY]: Object.values(field.value).join(' ')
     } satisfies IndexedNameFieldValue
+  }
+  if (isAgeFieldType(field) && field.value) {
+    const maybeAsOfDate = PlainDate.safeParse(
+      declaration[field.value.asOfDateRef]
+    )
+    if (maybeAsOfDate.success) {
+      return {
+        ...field.value,
+        [AGE_DOB_QUERY_KEY]: ageToDate(field.value.age, maybeAsOfDate.data)
+      } satisfies IndexedAgeFieldValue
+    }
   }
 
   return value
@@ -76,7 +96,12 @@ export function encodeEventIndex(
     declaration: Object.entries(event.declaration).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [encodeFieldId(key)]: addIndexFieldsToValue(eventConfig, key, value)
+        [encodeFieldId(key)]: addIndexFieldsToValue(
+          eventConfig,
+          key,
+          value,
+          event.declaration
+        )
       }),
       {}
     )
@@ -94,6 +119,17 @@ function isIndexedNameFieldValue(
   )
 }
 
+function isIndexedAgeFieldValue(
+  value: FieldValue
+): value is IndexedAgeFieldValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    AGE_DOB_QUERY_KEY in value &&
+    typeof value[AGE_DOB_QUERY_KEY] === 'string'
+  )
+}
+
 function stripIndexFieldsFromValue(
   eventConfig: EventConfig,
   fieldId: string,
@@ -103,6 +139,9 @@ function stripIndexFieldsFromValue(
 
   if (isIndexedNameFieldValue(field.value)) {
     return _.omit(field.value, [NAME_QUERY_KEY])
+  }
+  if (isIndexedAgeFieldValue(field.value)) {
+    return _.omit(field.value, [AGE_DOB_QUERY_KEY])
   }
 
   return value
@@ -179,36 +218,6 @@ export function getEventIndexWithoutLocationHierarchy(
   }
 
   return event
-}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type WrapArrayPreserveNullish<V> = V extends readonly any[]
-  ? V
-  : NonNullable<V>[] | Extract<V, null | undefined>
-
-/**
- * For type T, convert fields K to arrays. If field is string, convert to string[].
- */
-type ToArrayFields<T, K extends PropertyKey> = T extends unknown
-  ? T extends object
-    ? { [P in keyof T]: P extends K ? WrapArrayPreserveNullish<T[P]> : T[P] }
-    : T
-  : never
-
-/**
- * Event index type where all location fields are arrays representing full location hierarchy.
- */
-export type EventIndexWithAdministrativeHierarchy = Omit<
-  ToArrayFields<EventIndex, 'createdAtLocation' | 'updatedAtLocation'>,
-  'legalStatuses'
-> & {
-  legalStatuses: {
-    DECLARED:
-      | ToArrayFields<ActionCreationMetadata, 'createdAtLocation'>
-      | undefined
-    REGISTERED:
-      | ToArrayFields<RegistrationCreationMetadata, 'createdAtLocation'>
-      | undefined
-  }
 }
 
 /**
@@ -369,6 +378,10 @@ export function nameQueryKey(fieldName: string) {
   return `${fieldName}.${NAME_QUERY_KEY}`
 }
 
+export function ageQueryKey(fieldName: string) {
+  return `${fieldName}.${AGE_DOB_QUERY_KEY}`
+}
+
 export function generateQueryForAddressField(
   fieldId: string,
   search: QueryInputType
@@ -450,25 +463,34 @@ function getLocationIdsFromScopeOptions(
   throw new Error(`Unknown jurisdiction filter: ${filter}`)
 }
 
+/**
+ *
+ * @param scope V2 scope
+ * @param user User context
+ * @returns Resolves location-based scope options to actual IDs based on user context.
+ */
 export function resolveRecordActionScopeToIds(
   scope: RecordScopeV2,
   user: TrpcUserContext
 ): ResolvedRecordScopeV2 {
-  const { type, options } = scope
-  return {
+  const { type } = scope
+
+  // We parse on the next step, and by default fields that do not match, are stripped out.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const options = scope.options as any
+  const resolved = ResolvedRecordScopeV2.parse({
     type,
     options: {
-      event: options.event,
-      eventLocation: getLocationIdsFromScopeOptions(
-        options.eventLocation,
-        user
-      ),
-      declaredIn: getLocationIdsFromScopeOptions(options.declaredIn, user),
+      event: options?.event,
+      placeOfEvent: getLocationIdsFromScopeOptions(options?.placeOfEvent, user),
+      declaredIn: getLocationIdsFromScopeOptions(options?.declaredIn, user),
       declaredBy:
-        options.declaredBy === UserFilter.enum.user ? user.id : undefined,
-      registeredIn: getLocationIdsFromScopeOptions(options.registeredIn, user),
+        options?.declaredBy === UserFilter.enum.user ? user.id : undefined,
+      registeredIn: getLocationIdsFromScopeOptions(options?.registeredIn, user),
       registeredBy:
-        options.registeredBy === UserFilter.enum.user ? user.id : undefined
+        options?.registeredBy === UserFilter.enum.user ? user.id : undefined
     }
-  }
+  })
+
+  return resolved
 }

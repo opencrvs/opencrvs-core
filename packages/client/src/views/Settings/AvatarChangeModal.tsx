@@ -10,30 +10,27 @@
  */
 import * as React from 'react'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import {
   PrimaryButton,
   TertiaryButton,
   LinkButton
 } from '@opencrvs/components/lib/buttons'
-import { gql } from '@apollo/client'
 import Cropper from 'react-easy-crop'
 import type { Point, Area, Size } from 'react-easy-crop'
-import { Mutation } from '@apollo/client/react/components'
-import styled, { withTheme } from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IStoreState } from '@client/store'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { ImageLoader } from './ImageLoader'
 import { getCroppedImage, IImage } from '@client/utils/imageUtils'
-import {
-  withOnlineStatus,
-  IOnlineStatusProps
-} from '@client/views/OfficeHome/LoadingIndicator'
+
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { Square } from '@opencrvs/components/lib/icons'
-import { UserDetails } from '@client/utils/userUtils'
+import { useOnlineStatus } from '@client/utils'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { getFullDocumentPath, cacheFile } from '@client/v2-events/cache'
 
 const Container = styled.div`
   align-self: center;
@@ -86,32 +83,20 @@ const DefaultImage = styled.div<{ width: number; height: number }>`
   background-color: ${({ theme }) => theme.colors.grey100};
 `
 
-const Error = styled.div`
+const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.negative};
 `
 
-export const changeAvatarMutation = gql`
-  mutation changeAvatar($userId: String!, $avatar: AvatarInput!) {
-    changeAvatar(userId: $userId, avatar: $avatar) {
-      type
-      data
-    }
-  }
-`
-
-type IProps = IntlShapeProps &
-  IOnlineStatusProps & {
-    theme: ITheme
-    showChangeAvatar: boolean
-    cancelAvatarChangeModal: () => void
-    imgSrc: IImage
-    onImgSrcChanged: (img: IImage) => void
-    error: string
-    onErrorChanged: (error: string) => void
-    onConfirmAvatarChange: () => void
-    onAvatarChanged: (img: IImage) => void
-    userDetails: UserDetails | null
-  }
+interface IProps {
+  showChangeAvatar: boolean
+  cancelAvatarChangeModal: () => void
+  imgSrc: IImage
+  onImgSrcChanged: (img: IImage) => void
+  error: string
+  onErrorChanged: (error: string) => void
+  onConfirmAvatarChange: () => void
+  onAvatarChanged: (img: string) => void
+}
 
 const DEFAULT_SIZE: Size = {
   height: 0,
@@ -153,18 +138,19 @@ function useCropSize(breakpoint: number) {
 
 function AvatarChangeModalComp({
   showChangeAvatar,
-  intl,
   cancelAvatarChangeModal,
   imgSrc,
   onImgSrcChanged: setImgSrc,
   error,
   onErrorChanged: setError,
   onConfirmAvatarChange,
-  onAvatarChanged,
-  isOnline,
-  theme,
-  userDetails
+  onAvatarChanged
 }: IProps) {
+  const intl = useIntl()
+  const theme = useTheme() as ITheme
+  const isOnline = useOnlineStatus()
+  const userDetails = useSelector(getUserDetails)
+  const { changeAvatar: changeAvatarMutation } = useUsers()
   const [crop, setCrop] = React.useState<Point>(DEFAULT_CROP)
   const [zoom, setZoom] = React.useState<number>(1)
   const [croppedArea, setCroppedArea] = React.useState<Area>(DEFAULT_AREA)
@@ -183,6 +169,47 @@ function AvatarChangeModalComp({
     reset()
   }
 
+  const { uploadFileAsync } = useFileUpload(
+    `users/${userDetails?.id}`,
+    userDetails?.id || '',
+    {}
+  )
+  const handleApply = async () => {
+    const croppedImage = await getCroppedImage(imgSrc, croppedArea)
+
+    if (!userDetails) {
+      throw new Error(
+        'User details not in the scope of avatar change modal. This should never happen'
+      )
+    }
+
+    if (!croppedImage) {
+      setError(intl.formatMessage(messages.avatarProcessingError))
+      return
+    }
+    const { url } = await uploadFileAsync(croppedImage, userDetails.id)
+    if (userDetails && userDetails.id && croppedImage) {
+      changeAvatarMutation.mutate(
+        {
+          userId: userDetails.id,
+          avatar: {
+            data: url,
+            type: croppedImage.type
+          }
+        },
+        {
+          onSuccess: (data) => {
+            const fullUrl = getFullDocumentPath(url)
+            cacheFile({ url: fullUrl, file: croppedImage })
+            onAvatarChanged(fullUrl)
+            reset()
+          }
+        }
+      )
+      onConfirmAvatarChange()
+    }
+  }
+
   return (
     <ResponsiveModal
       id="ChangeAvatarModal"
@@ -194,51 +221,20 @@ function AvatarChangeModalComp({
         <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
-        <Mutation<{ changeAvatar: IImage }, { userId: string; avatar: IImage }>
-          key="change-avatar-mutation"
-          mutation={changeAvatarMutation}
-          onCompleted={({ changeAvatar: avatar }) => {
-            onAvatarChanged(avatar)
-            reset()
-          }}
+        <PrimaryButton
+          key="apply"
+          id="apply_change"
+          disabled={!isOnline || !!error}
+          onClick={handleApply}
         >
-          {(changeAvatar) => {
-            return (
-              <PrimaryButton
-                key="apply"
-                id="apply_change"
-                disabled={!isOnline || !!error}
-                onClick={async () => {
-                  const croppedImage = await getCroppedImage(
-                    imgSrc,
-                    croppedArea
-                  )
-                  if (
-                    userDetails &&
-                    userDetails.userMgntUserID &&
-                    croppedImage
-                  ) {
-                    changeAvatar({
-                      variables: {
-                        userId: userDetails.userMgntUserID,
-                        avatar: croppedImage
-                      }
-                    })
-                    onConfirmAvatarChange()
-                  }
-                }}
-              >
-                {intl.formatMessage(buttonMessages.apply)}
-              </PrimaryButton>
-            )
-          }}
-        </Mutation>
+          {intl.formatMessage(buttonMessages.apply)}
+        </PrimaryButton>
       ]}
       handleClose={handleCancel}
     >
       <Description>
         {!error && intl.formatMessage(messages.resizeAvatar)}
-        {error && <Error>{error}</Error>}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
         <ImageLoader
           onImageLoaded={(image) => {
             reset()
@@ -286,12 +282,4 @@ function AvatarChangeModalComp({
   )
 }
 
-const mapStateToProps = (state: IStoreState) => {
-  return {
-    userDetails: getUserDetails(state)
-  }
-}
-
-export const AvatarChangeModal = connect(mapStateToProps)(
-  injectIntl(withTheme(withOnlineStatus(AvatarChangeModalComp)))
-)
+export const AvatarChangeModal = AvatarChangeModalComp

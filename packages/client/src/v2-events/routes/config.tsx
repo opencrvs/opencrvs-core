@@ -13,6 +13,7 @@ import React, { useEffect } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
+import { onlineManager } from '@tanstack/react-query'
 import { ActionType, SCOPES } from '@opencrvs/commons/client'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
@@ -45,6 +46,11 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { SettingsPage } from '@client/v2-events/features/settings/Settings'
 import { TeamPage } from '@client/v2-events/features/team/Team'
 import { OrganisationPage } from '@client/v2-events/features/organisation/Organisation'
+import {
+  CreateNewUser,
+  EditUser,
+  ReviewUser
+} from '@client/views/SysAdmin/Team/user/userEditor/UserEditor'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
@@ -100,6 +106,45 @@ function PrefetchQueries() {
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
+    useEffect(() => {
+      let cancelled = false
+
+      onlineManager.setOnline(false)
+
+      async function probeNetwork() {
+        try {
+          const controller = new AbortController()
+          setTimeout(() => controller.abort(), 3000)
+
+          const res = await fetch('/api/ping', {
+            method: 'GET',
+            cache: 'no-store',
+            signal: controller.signal
+          })
+
+          if (!res.ok) {
+            throw new Error('Network probe failed')
+          }
+
+          await res.json()
+
+          if (!cancelled) {
+            onlineManager.setOnline(true)
+          }
+        } catch {
+          if (!cancelled) {
+            onlineManager.setOnline(false)
+          }
+        }
+      }
+
+      void probeNetwork()
+
+      return () => {
+        cancelled = true
+      }
+    }, [])
+
     const currentUser = useSelector(getUserDetails)
 
     if (!currentUser) {
@@ -257,6 +302,26 @@ export const routesConfig = {
       element: <SettingsPage />
     },
     {
+      path: ROUTES.V2.SETTINGS.USER.VIEW.path,
+      element: (
+        <WorkqueueLayout>
+          <UserAudit hideNavigation={true} />
+        </WorkqueueLayout>
+      )
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.CREATE.path,
+      element: <CreateNewUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.EDIT.path,
+      element: <EditUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.REVIEW.path,
+      element: <ReviewUser />
+    },
+    {
       path: ROUTES.V2.DASHBOARD.path,
       element: (
         <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
@@ -280,14 +345,6 @@ export const routesConfig = {
         >
           <TeamPage />
         </ProtectedRoute>
-      )
-    },
-    {
-      path: ROUTES.V2.path + V1_LEGACY_ROUTES.USER_PROFILE,
-      element: (
-        <WorkqueueLayout>
-          <UserAudit hideNavigation={true} />
-        </WorkqueueLayout>
       )
     },
     {

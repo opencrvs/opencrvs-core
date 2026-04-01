@@ -32,9 +32,10 @@ import {
   EventStatus,
   AdvancedSearchConfigWithFieldsResolved,
   METADATA_FIELD_PREFIX,
-  ValidatorContext
+  ValidatorContext,
+  getAcceptedScopesByType
 } from '@opencrvs/commons/client'
-import { findScope, getAllUniqueFields } from '@opencrvs/commons/client'
+import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
@@ -75,7 +76,7 @@ const defaultSearchFieldGenerator: Record<
       id: 'advancedSearch.registeredAtLocation.helperText'
     },
     configuration: {
-      searchableResource: ['locations', 'offices']
+      locationTypes: ['ADMIN_STRUCTURE', 'CRVS_OFFICE']
     }
   }),
   'event.legalStatuses.REGISTERED.acceptedAt': (_) => ({
@@ -762,11 +763,18 @@ export function buildQuickSearchQuery(
  */
 export function checkScopeForEventSearch(eventId: string) {
   const scopes = useSelector(getScope)
-  const searchScopes = findScope(scopes ?? [], 'search')
 
-  const isEventSearchAllowed =
-    searchScopes &&
-    Object.keys(searchScopes.options).some((id) => eventId === id)
+  const searchScopes = getAcceptedScopesByType({
+    acceptedScopes: ['record.search'],
+    scopes: scopes ?? []
+  })
+
+  const isEventSearchAllowed = searchScopes.some(
+    (scope) =>
+      scope.options?.event?.includes(eventId) ||
+      // Unless specified, event search is allowed for all events
+      scope.options?.event === undefined
+  )
 
   return isEventSearchAllowed
 }

@@ -32,7 +32,7 @@ export async function cacheUsersFromEventDocument(
   await cacheUsers(userIds)
 }
 
-export async function cacheUsersFromEventIndices(eventIndices: EventIndex[]) {
+async function cacheUsersFromEventIndices(eventIndices: EventIndex[]) {
   const userIds = uniq(
     flatten(eventIndices.map((eventIndex) => findUserIdsFromIndex(eventIndex)))
   )

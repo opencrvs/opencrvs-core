@@ -1,4 +1,3 @@
- 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,7 +17,8 @@ import {
   Flag,
   getCurrentEventState,
   createPrng,
-  generateActionDuplicateDeclarationInput
+  generateActionDuplicateDeclarationInput,
+  encodeScope
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
@@ -43,7 +43,12 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -93,7 +98,12 @@ test('Does not add any flags when accepted form countryconfig', async () => {
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -143,7 +153,12 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -193,7 +208,12 @@ test(`Adds ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.REQUEST
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [
@@ -227,7 +247,12 @@ test(`Removes ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.APPR
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [
@@ -289,7 +314,18 @@ test(`Adds ${InherentFlags.INCOMPLETE} flag after ${ActionType.NOTIFY} is called
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    }),
+    encodeScope({
+      type: 'record.notify',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [])
@@ -318,7 +354,18 @@ test(`Removes ${InherentFlags.INCOMPLETE} flag after ${ActionType.EDIT} + ${Acti
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    }),
+    encodeScope({
+      type: 'record.notify',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [])
@@ -367,7 +414,12 @@ test(`Adds ${InherentFlags.REJECTED} flag after ${ActionType.REJECT} is called`,
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -395,7 +447,12 @@ test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.EDIT} + ${Action
   const { type } = generator.event.create()
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
-    `search[event=${type},access=all]`
+    encodeScope({
+      type: 'record.search',
+      options: {
+        event: [type]
+      }
+    })
   ])
 
   const event = await createEvent(client, generator, [ActionType.DECLARE])
@@ -441,7 +498,7 @@ test(`Removes ${InherentFlags.REJECTED} flag after ${ActionType.EDIT} + ${Action
 suite(InherentFlags.POTENTIAL_DUPLICATE, () => {
   beforeEach(() => {
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([
           tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
         ])

@@ -11,6 +11,7 @@
 
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import { useField } from 'formik'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
@@ -75,6 +76,7 @@ function DocumentUploaderWithOption({
   acceptedFileTypes = [],
   options,
   error,
+  filePath,
   hideOnEmptyOption,
   autoSelectOnlyOption,
   maxFileSize,
@@ -85,20 +87,22 @@ function DocumentUploaderWithOption({
   disabled?: boolean
   acceptedFileTypes?: MimeType[]
   options: SelectOption[]
-  value: FileFieldWithOptionValue
+  value?: FileFieldWithOptionValue
   onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
+  filePath: string
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
   maxFileSize: number
   maxImageSize?: FileUploadWithOptions['configuration']['maxImageSize']
 }) {
+  const [, , helpers] = useField(name)
   const intl = useIntlWithFormData()
   const documentTypeRequiredErrorMessage = intl.formatMessage(
     DocumentTypeRequiredError
   )
 
-  const [files, setFiles] = useState(value)
+  const [files, setFiles] = useState(value || [])
   const [filesBeingProcessed, setFilesBeingProcessed] = useState<
     Array<{ label: string }>
   >([])
@@ -115,7 +119,7 @@ function DocumentUploaderWithOption({
     useState<FileFieldValueWithOption | null>(null)
   const { processImageFile } = useImageProcessing()
 
-  const { uploadFile } = useFileUpload(name, {
+  const { uploadFile } = useFileUpload(filePath, name, {
     onSuccess: ({ type, originalFilename, path, id }) => {
       const newFile = {
         path,
@@ -195,6 +199,7 @@ function DocumentUploaderWithOption({
         description={description}
         disabled={disabled}
         error={error}
+        filePath={filePath}
         label={
           typeof onlyOption.label === 'string'
             ? onlyOption.label
@@ -202,7 +207,7 @@ function DocumentUploaderWithOption({
         }
         maxFileSize={maxFileSize}
         name={name}
-        value={value[0]}
+        value={value?.[0]}
         width={'full'}
         onChange={(file) => {
           if (file) {
@@ -221,7 +226,7 @@ function DocumentUploaderWithOption({
     setSelectedOption(remainingOptions[0].value)
   }
 
-  const errorMessage = error || unselectedOptionError || fileChangeError || ''
+  const errorMessage = unselectedOptionError || fileChangeError || ''
 
   return (
     <UploadWrapper>
@@ -250,6 +255,7 @@ function DocumentUploaderWithOption({
             type={'SELECT'}
             value={selectedOption}
             onChange={(val) => {
+              void helpers.setTouched(true)
               setSelectedOption(val)
               setUnselectedOptionError('')
             }}

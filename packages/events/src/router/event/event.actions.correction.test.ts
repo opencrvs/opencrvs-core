@@ -16,6 +16,7 @@ import {
   ActionType,
   AddressType,
   createPrng,
+  encodeScope,
   EventDocument,
   EventState,
   generateActionDeclarationInput,
@@ -74,7 +75,12 @@ test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing requ
 test(`${ActionType.APPROVE_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.registered.correct[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.correct',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(
@@ -105,7 +111,12 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
 test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.registered.correct[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.correct',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(
@@ -159,6 +170,7 @@ test(`REQUEST_CORRECTION validation error message contains all the offending fie
     declaration: {
       'applicant.dob': '02-02',
       'applicant.dobUnknown': false,
+      'applicant.age': null,
       'recommender.none': true
     }
   })
@@ -212,6 +224,7 @@ test(`REQUEST_CORRECTION Skips required field validation when they are condition
   const form = {
     'applicant.dob': '2024-02-01',
     'applicant.dobUnknown': false,
+    'applicant.age': null,
     'applicant.name': {
       firstname: 'John',
       surname: 'Doe'

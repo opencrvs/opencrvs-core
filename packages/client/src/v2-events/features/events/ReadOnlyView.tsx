@@ -10,15 +10,25 @@
  */
 
 import React, { useEffect, useMemo } from 'react'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useNavigate } from 'react-router-dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
 import {
   ActionType,
   applyDraftToEventIndex,
+  EventState,
+  getActionAnnotationFields,
   getDeclaration,
   getOrThrow,
-  getCurrentEventState
+  getCurrentEventState,
+  UUID,
+  getAssignmentStatus,
+  AssignmentStatus
 } from '@opencrvs/commons/client'
+import { getAnnotationForActionType } from '@client/v2-events/features/events/components/Action/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -28,11 +38,11 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useAuthentication } from '@client/utils/userUtils'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+
+import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 import { removeCachedFiles } from '../files/cache'
 
-function ReadonlyView() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
+function ReadonlyViewContent({ eventId }: { eventId: UUID }) {
   const events = useEvents()
   const event = events.getEvent.useGetOrDownloadEvent(eventId)
   const validatorContext = useValidatorContext(event)
@@ -62,17 +72,32 @@ function ReadonlyView() {
     authentication.sub
   )
 
-  const actionConfiguration = configuration.actions.find(
-    (a) => a.type === ActionType.READ
-  )
-  if (!actionConfiguration) {
-    throw new Error('Action configuration not found')
-  }
-
-  const { title, fields } = actionConfiguration.review
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const formConfig = getDeclaration(configuration)
+
+  const annotation = useMemo((): EventState | undefined => {
+    // Collect annotations from all past non-READ actions that have annotation fields
+    const pastActionsWithAnnotation = configuration.actions
+      .filter((a) => a.type !== ActionType.READ)
+      .filter((a) => getActionAnnotationFields(a).length > 0)
+      .reduce<EventState>(
+        (acc, actionConfig) => ({
+          ...acc,
+          ...getAnnotationForActionType({
+            event,
+
+            actionType: actionConfig.type,
+            draft
+          })
+        }),
+        {}
+      )
+
+    return Object.keys(pastActionsWithAnnotation).length > 0
+      ? pastActionsWithAnnotation
+      : undefined
+  }, [configuration.actions, event, draft])
 
   useEffect(() => {
     return () => {
@@ -85,9 +110,19 @@ function ReadonlyView() {
     }
   }, [event, assignmentStatus])
 
+  const actionConfiguration = configuration.actions.find(
+    (a) => a.type === ActionType.READ
+  )
+  if (!actionConfiguration) {
+    throw new Error('Action configuration not found')
+  }
+
+  const { title, fields } = actionConfiguration.review
+
   return (
     <ReviewComponent.Body
       readonlyMode
+      annotation={annotation}
       form={eventStateWithDraft.declaration}
       formConfig={formConfig}
       reviewFields={fields}
@@ -96,6 +131,22 @@ function ReadonlyView() {
       onEdit={noop}
     />
   )
+}
+
+function ReadonlyView() {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT.RECORD)
+  const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT.RECORD)
+  const navigate = useNavigate()
+  const { canAccessEventWithScopes } = useCanAccessEventWithScopes(eventId, [
+    'record.read'
+  ])
+
+  if (!canAccessEventWithScopes()) {
+    navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { workqueue }))
+    return null
+  }
+
+  return <ReadonlyViewContent eventId={eventId} />
 }
 
 export const ReadonlyViewIndex = withSuspense(ReadonlyView)

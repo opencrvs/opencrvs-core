@@ -1,11 +1,11 @@
 {
   "name": "@opencrvs/events",
-  "version": "1.9.6",
+  "version": "1.9.11",
   "description": "OpenCRVS Events service",
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon -r tsconfig-paths/register src/index.ts",
+    "start": "concurrently 'cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon -r tsconfig-paths/register src/index.ts' 'tsc -w -p tsconfig.router.json --preserveWatchOutput'",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && vitest run --coverage",
     "test:watch": "vitest",
@@ -13,6 +13,7 @@
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.router.json",
+    "build:types": "tsc -p tsconfig.router.json",
     "build:clean": "rm -rf build",
     "generate-db-types": "kanel && prettier src/storage/postgres/events/schema --write",
     "generate-db-schema": "docker run --rm postgres:17.6 pg_dump postgres://events_migrator:migrator_password@$( [[ '$OSTYPE' == darwin* ]] && echo host.docker.internal || echo 172.17.0.1 ):5432/events -s > src/tests/postgres-migrations.sql --exclude-schema=analytics"
@@ -21,6 +22,8 @@
     "@elastic/elasticsearch": "8.16.2",
     "@opencrvs/commons": "^1.9.0",
     "@trpc/server": "11.4.3",
+    "bcryptjs": "^2.4.3",
+    "@types/bcryptjs": "^2.4.2",
     "@types/luxon": "^3.6.2",
     "@types/pg": "^8.15.4",
     "@types/pg-cursor": "^2.7.2",
@@ -40,7 +43,8 @@
     "trpc-to-openapi": "^3.1.0",
     "tsconfig-paths": "^3.13.0",
     "zod": "^4.1.12",
-    "zod-openapi": "^5.4.3"
+    "zod-openapi": "^5.4.3",
+    "zod-form-data": "3.0.1"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.7",
@@ -72,7 +76,13 @@
     "typescript": "5.6.3",
     "vite-tsconfig-paths": "^3.5.0",
     "vitest": "^2.1.5",
-    "yaml": "^2.7.1"
+    "yaml": "^2.7.1",
+    "@types/busboy": "*"
+  },
+  "exports": {
+    "./src/router": {
+      "types": "./build/types/router.d.ts"
+    }
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

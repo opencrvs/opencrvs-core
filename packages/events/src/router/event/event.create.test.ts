@@ -10,7 +10,12 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
+import {
+  ActionType,
+  generateUuid,
+  TENNIS_CLUB_MEMBERSHIP
+} from '@opencrvs/commons/events'
+import { encodeScope } from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
@@ -31,7 +36,9 @@ describe('event.create', () => {
     test(`allows access with required scope`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        'record.create[event=birth|death|tennis-club-membership]'
+        encodeScope({
+          type: 'record.create'
+        })
       ])
 
       await expect(
@@ -42,7 +49,10 @@ describe('event.create', () => {
     test('dont allow access with API scope with incorrect event type', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        `record.create[event=some-event-type]`
+        encodeScope({
+          type: 'record.create',
+          options: { event: ['some-event-type'] }
+        })
       ])
 
       await expect(
@@ -53,8 +63,10 @@ describe('event.create', () => {
     test('allows access with API scope with correct event type', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`,
-        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
+        encodeScope({
+          type: 'record.create',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
       ])
 
       await expect(
@@ -65,10 +77,19 @@ describe('event.create', () => {
 
   test('event can be created and fetched', async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+      }),
+      encodeScope({
+        type: 'record.read',
+        options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+      })
+    ])
     const event = await client.event.create(generator.event.create())
 
-    const fetchedEvent = await client.event.get(event.id)
+    const fetchedEvent = await client.event.get({ eventId: event.id })
 
     const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
     expect(fetchedEventWithoutReadAction).toEqual(event.actions)
@@ -85,19 +106,33 @@ describe('event.create', () => {
 
   test('created event should have be assigned a random 6 character tracking ID', async () => {
     const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create',
+        options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+      }),
+      encodeScope({
+        type: 'record.read',
+        options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+      })
+    ])
     const event = await client.event.create(generator.event.create())
 
     // trackingId should be 6 characters long and include only uppercase letters and numbers
     expect(event.trackingId).toMatch(/^[A-Z0-9]{6}$/)
 
-    const fetchedEvent = await client.event.get(event.id)
+    const fetchedEvent = await client.event.get({ eventId: event.id })
     expect(fetchedEvent.trackingId).toMatch(/^[A-Z0-9]{6}$/)
   })
 
   test('creating an event is an idempotent operation', async () => {
     const { user, generator, eventsDb } = await setupTestCase()
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.create'
+      })
+    ])
+
     const payload = generator.event.create()
     await client.event.create(payload)
     await client.event.create(payload)
@@ -108,7 +143,10 @@ describe('event.create', () => {
   test('event with unknown type cannot be created', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
-      'record.create[event=EVENT_TYPE_THAT_DOES_NOT_EXIST]'
+      encodeScope({
+        type: 'record.create',
+        options: { event: ['EVENT_TYPE_THAT_DOES_NOT_EXIST'] }
+      })
     ])
     await expect(
       client.event.create(
@@ -128,24 +166,103 @@ describe('event.create', () => {
       ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 
-    test('event created by system user should not have assignment action', async () => {
-      const { generator, user } = await setupTestCase()
-      const systemClient = createSystemTestClient('test-system', [
-        `record.create[event=${TENNIS_CLUB_MEMBERSHIP}]`
+    test('should not allow system user to create event if createdAtLocation is not defined', async () => {
+      const { generator } = await setupTestCase()
+      const client = createSystemTestClient('test-system', [
+        encodeScope({
+          type: 'record.create',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
       ])
-      const event = await systemClient.event.create(generator.event.create())
+
+      await expect(
+        client.event.create(generator.event.create())
+      ).rejects.toMatchObject(
+        new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'createdAtLocation is required and must be a valid location id'
+        })
+      )
+    })
+
+    test('should prevent system user to create event when createdAtLocation is invalid', async () => {
+      const { generator } = await setupTestCase()
+      const client = createSystemTestClient('test-system', [
+        encodeScope({
+          type: 'record.create',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
+      ])
+
+      await expect(
+        client.event.create({
+          ...generator.event.create(),
+          createdAtLocation: generateUuid()
+        })
+      ).rejects.toMatchObject(
+        new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'createdAtLocation must be a valid location id'
+        })
+      )
+    })
+
+    test('should allow system user to create when createdAtLocation is defined', async () => {
+      const { generator, locations } = await setupTestCase()
+      const client = createSystemTestClient('test-system', [
+        encodeScope({
+          type: 'record.create',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
+      ])
+
+      const response = await client.event.create({
+        ...generator.event.create(),
+        createdAtLocation: locations[0].id
+      })
+
+      expect(response.actions).toBeDefined()
+
+      expect(response.actions.length).toEqual(1)
+      expect(response.actions).toEqual([
+        expect.objectContaining({
+          type: ActionType.CREATE,
+          createdAtLocation: locations[0].id
+        })
+      ])
+    })
+
+    test('event created by system user should not have assignment action', async () => {
+      const { generator, user, locations } = await setupTestCase()
+      const systemClient = createSystemTestClient('test-system', [
+        encodeScope({
+          type: 'record.create',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
+      ])
+      const event = await systemClient.event.create({
+        ...generator.event.create(),
+        createdAtLocation: locations[0].id
+      })
 
       const userClient = createTestClient(user, [
-        `record.read[event=${TENNIS_CLUB_MEMBERSHIP}]`
+        encodeScope({
+          type: 'record.read',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
       ])
 
-      const fetchedEvent = await userClient.event.get(event.id)
+      const fetchedEvent = await userClient.event.get({ eventId: event.id })
 
       const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
       expect(fetchedEventWithoutReadAction).toEqual(event.actions)
       expect(fetchedEvent.actions.length).toEqual(2)
       expect(fetchedEvent.actions).toEqual([
-        expect.objectContaining({ type: ActionType.CREATE }),
+        expect.objectContaining({
+          type: ActionType.CREATE,
+          createdAtLocation: locations[0].id
+        }),
         expect.objectContaining({ type: ActionType.READ })
       ])
     })

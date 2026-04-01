@@ -39,7 +39,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { hasDeclarationFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
@@ -100,7 +100,7 @@ export function Summary() {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const userMayCorrect = isActionAllowed(ActionType.APPROVE_CORRECTION)
 
   const submitCorrection = React.useCallback(() => {
@@ -133,12 +133,18 @@ export function Summary() {
 
     const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
 
+    const uncorrectableFieldIds = getDeclarationFields(eventConfiguration)
+      .filter((f) => f.uncorrectable)
+      .map((f) => f.id)
+
     const mutationPayload = {
       eventId,
-      declaration: {
-        ...formWithOnlyChangedValues,
-        ...nullifiedHiddenValues
-      },
+      declaration: Object.fromEntries(
+        Object.entries({
+          ...formWithOnlyChangedValues,
+          ...nullifiedHiddenValues
+        }).filter(([key]) => !uncorrectableFieldIds.includes(key))
+      ),
       transactionId: generateTransactionId(),
       annotation,
       event,

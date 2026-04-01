@@ -26,13 +26,8 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { storage } from '@client/storage'
-import {
-  ALLOWED_STATUS_FOR_RETRY,
-  INPROGRESS_STATUS
-} from '@client/SubmissionController'
-import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
+
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { EventType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -49,7 +44,6 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { useNavigation } from '@client/hooks/useNavigation'
 import {
   TAB_GROUPS,
   WORKQUEUE_TABS
@@ -192,19 +186,12 @@ const NavigationView = (props: IFullProps) => {
   )
   const runningVer = String(localStorage.getItem('running-version'))
 
-  const isOnePrintInAdvanceOn = Object.values(EventType).some(
-    (event: EventType) => {
-      const upperCaseEvent = event.toUpperCase() as Uppercase<EventType>
-      return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
-    }
-  )
-
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
       return
     }
     updateRegistrarWorkqueue(
-      userDetails.practitionerId,
+      userDetails.id,
       10 // Page size shouldn't matter here as we're only interested in totals
     )
   }, [userDetails, updateRegistrarWorkqueue, loadWorkqueueStatuses])
@@ -230,20 +217,12 @@ const NavigationView = (props: IFullProps) => {
     sentForReview: !initialSyncDone
       ? 0
       : filteredData.sentForReviewTab?.totalItems || 0,
-    externalValidation:
-      window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
-        ? 0
-        : filteredData.externalValidationTab?.totalItems || 0,
     readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
     readyToIssue: !initialSyncDone ? 0 : filteredData.issueTab?.totalItems || 0,
     outbox: storedDeclarations.filter((draft) =>
-      (
-        [
-          ...ALLOWED_STATUS_FOR_RETRY,
-          ...INPROGRESS_STATUS,
-          SUBMISSION_STATUS.FAILED
-        ] as SUBMISSION_STATUS[]
-      ).includes(draft.submissionStatus as SUBMISSION_STATUS)
+      ([SUBMISSION_STATUS.FAILED] as SUBMISSION_STATUS[]).includes(
+        draft.submissionStatus as SUBMISSION_STATUS
+      )
     ).length
   }
 
@@ -401,26 +380,6 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE &&
-            hasAccess(WORKQUEUE_TABS.externalValidation) && (
-              <NavigationItem
-                icon={() => <Icon name="Files" size="small" />}
-                id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
-                label={intl.formatMessage(
-                  navigationMessages[WORKQUEUE_TABS.externalValidation]
-                )}
-                count={declarationCount.externalValidation}
-                isSelected={tabId === WORKQUEUE_TABS.externalValidation}
-                onClick={() => {
-                  props.router.navigate(
-                    generateGoToHomeTabUrl({
-                      tabId: WORKQUEUE_TABS.externalValidation
-                    })
-                  )
-                  menuCollapse && menuCollapse()
-                }}
-              />
-            )}
           {hasAccess(WORKQUEUE_TABS.readyToPrint) && (
             <NavigationItem
               icon={() => <Icon name="Printer" size="small" />}
@@ -441,7 +400,7 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {isOnePrintInAdvanceOn && hasAccess(WORKQUEUE_TABS.readyToIssue) && (
+          {hasAccess(WORKQUEUE_TABS.readyToIssue) && (
             <NavigationItem
               icon={() => <Icon name="Handshake" size="small" />}
               id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
@@ -496,11 +455,11 @@ const NavigationView = (props: IFullProps) => {
                     navigationMessages[WORKQUEUE_TABS.team]
                   )}
                   onClick={() => {
-                    if (userDetails && userDetails.primaryOffice) {
+                    if (userDetails && userDetails.primaryOfficeId) {
                       props.router.navigate({
                         pathname: routes.TEAM_USER_LIST,
                         search: stringify({
-                          locationId: userDetails.primaryOffice.id
+                          locationId: userDetails.primaryOfficeId
                         })
                       })
                     }
@@ -622,50 +581,6 @@ const NavigationView = (props: IFullProps) => {
         </NavigationGroup>
       )}
 
-      <NavigationGroup>
-        {userDetails?.searches && userDetails.searches.length > 0 ? (
-          userDetails.searches.map((bookmarkResult) => {
-            return (
-              <NavigationItem
-                key={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
-                icon={() => (
-                  <Icon
-                    name="Star"
-                    color="yellow"
-                    size="small"
-                    weight="fill"
-                  ></Icon>
-                )}
-                id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
-                label={bookmarkResult.name}
-                disabled={
-                  advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.router.location.pathname === ADVANCED_SEARCH_RESULT
-                }
-                onClick={() => {
-                  const filteredParam = omit(
-                    bookmarkResult.parameters,
-                    '__typename'
-                  ) as IAdvancedSearchParamState
-                  setAdvancedSearchParam({
-                    ...filteredParam,
-                    searchId: bookmarkResult?.searchId,
-                    bookmarkName: bookmarkResult?.name
-                  })
-
-                  router.navigate(routes.ADVANCED_SEARCH_RESULT)
-                }}
-                isSelected={
-                  advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.router.location.pathname === ADVANCED_SEARCH_RESULT
-                }
-              />
-            )
-          })
-        ) : (
-          <></>
-        )}
-      </NavigationGroup>
       <NavigationGroup>
         {menuCollapse && getSettingsAndLogout(props)}
       </NavigationGroup>

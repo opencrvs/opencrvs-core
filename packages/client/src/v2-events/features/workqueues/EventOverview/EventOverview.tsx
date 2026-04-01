@@ -63,16 +63,14 @@ function EventOverviewFull({ event }: { event: EventDocument }) {
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { flags, legalStatuses, potentialDuplicates, ...flattenedEventIndex } =
-    {
-      ...flattenEventIndex(eventWithDrafts),
-      // drafts should not affect the status of the event
-      // so the status and flags are taken from the eventIndex
-      'event.status': status,
-      'event.assignedTo': assignedTo,
-      flags: eventIndex.flags
-    }
-
+  const { flags, ...flattenedEventIndex } = {
+    ...flattenEventIndex(eventWithDrafts),
+    // drafts should not affect the status of the event
+    // so the status and flags are taken from the eventIndex
+    'event.status': status,
+    'event.assignedTo': assignedTo,
+    flags: eventIndex.flags
+  }
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 
@@ -118,15 +116,14 @@ function EventOverviewProtected({ eventIndex }: { eventIndex: EventIndex }) {
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { flags, legalStatuses, potentialDuplicates, ...flattenedEventIndex } =
-    {
-      ...flattenEventIndex(eventWithDrafts),
-      // drafts should not affect the status of the event
-      // so the status and flags are taken from the eventIndex
-      'event.status': status,
-      'event.assignedTo': assignedTo,
-      flags: eventIndex.flags
-    }
+  const { flags, ...flattenedEventIndex } = {
+    ...flattenEventIndex(eventWithDrafts),
+    // drafts should not affect the status of the event
+    // so the status and flags are taken from the eventIndex
+    'event.status': status,
+    'event.assignedTo': assignedTo,
+    flags: eventIndex.flags
+  }
 
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
@@ -165,11 +162,7 @@ function EventOverviewContainer() {
       {shouldShowFullOverview ? (
         <EventOverviewFull event={fullEvent} />
       ) : (
-        <EventOverviewProtected
-          eventIndex={eventIndex}
-          // @TODO: Is this needed after new event overview UI?
-          // onAction={getEventQuery.refetch}
-        />
+        <EventOverviewProtected eventIndex={eventIndex} />
       )}
     </>
   )

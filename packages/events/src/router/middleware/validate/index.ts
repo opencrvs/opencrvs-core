@@ -10,6 +10,7 @@
  */
 import {
   MiddlewareFunction,
+  MiddlewareResult,
   TRPCError
 } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
@@ -43,7 +44,10 @@ import {
   runFieldValidations,
   runStructuralValidations,
   ValidatorContext,
-  getCustomActionFields
+  getCustomActionFields,
+  EventInput,
+  UUID,
+  getDeclarationFieldById
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -55,7 +59,8 @@ import {
   getValidatorContext,
   getInvalidUpdateKeys,
   getVerificationPageErrors,
-  throwWhenNotEmpty
+  throwWhenNotEmpty,
+  omitUncorrectableFields
 } from './utils'
 
 export function getFieldErrors(
@@ -131,17 +136,37 @@ function validateDeclarationUpdateAction({
    * We need to validate the update against the cleaned declaration, which is a merged version of the previous declaration and the update.
    */
 
+  const declarationConfig = getDeclaration(eventConfig)
   // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
   const previousDeclaration = getCurrentEventState(
     event,
     eventConfig
   ).declaration
+
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
-  const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
+  const mergedDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
-  const declarationConfig = getDeclaration(eventConfig)
+  // 2. Check for any invalid key that doesn't exist in declaration config
+  // getDeclarationFieldById will throw if any field is not in the declaration config
+  Object.keys(mergedDeclaration).forEach((key) => {
+    getDeclarationFieldById(eventConfig, key)
+  })
 
-  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
+  // For REQUEST_CORRECTION, `previousDeclaration` may contain uncorrectable fields that are conditionally hidden.
+  // When merged into `completeDeclaration`, these hidden uncorrectable fields would incorrectly trigger
+  // "Hidden or disabled field should not receive a value" error during invalid key check.
+  // We cannot resolve this by sending them as null in `declarationUpdate` either,
+  // because `validateCorrectableFields` below rejects any uncorrectable field in a REQUEST_CORRECTION.
+  // Stripping uncorrectable fields from `completeDeclaration` (which is previousDeclaration + declarationUpdate) entirely is the only clean solution —
+  // and it's safe because `validateCorrectableFields` already catches the case where
+  // the client wrongly includes uncorrectable fields in `declarationUpdate`.
+  const completeDeclaration = deepDropNulls(
+    actionType === ActionType.REQUEST_CORRECTION
+      ? omitUncorrectableFields(eventConfig, mergedDeclaration)
+      : mergedDeclaration
+  )
+
+  // 3. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
   // (e.g. when dob is unknown and user has send the age previously. Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
@@ -149,10 +174,14 @@ function validateDeclarationUpdateAction({
     context
   )
 
-  // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
-  // Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
+  // 4. When the submitted declaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // Only check keys from declarationUpdate (the client's input), not fields inherited from the previous state
+  // that may have become hidden due to changes in the current update.
+  const declarationUpdateOnlyComplete = Object.fromEntries(
+    Object.entries(completeDeclaration).filter(([key]) => key in declarationUpdate)
+  )
   const invalidKeys = getInvalidUpdateKeys({
-    update: declarationUpdate,
+    update: declarationUpdateOnlyComplete,
     cleaned: cleanedDeclaration
   })
 
@@ -160,7 +189,7 @@ function validateDeclarationUpdateAction({
     return invalidKeys
   }
 
-  // 4. Validate declaration update against conditional rules, taking into account conditional pages.
+  // 5. Validate declaration update against conditional rules, taking into account conditional pages.
   const allVisiblePageFields = declarationConfig.pages
     .filter((page) => isPageVisible(page, cleanedDeclaration, context))
     .flatMap((page) => page.fields)
@@ -174,7 +203,7 @@ function validateDeclarationUpdateAction({
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
-  // 5. Validate against action review fields, if applicable
+  // 6. Validate against action review fields, if applicable
   const reviewFields = declarationActionParse.success
     ? getActionReviewFields(eventConfig, declarationActionParse.data)
     : []
@@ -460,13 +489,18 @@ export const validateAction: MiddlewareFunction<
 
 // When performing actions via REST API, we need to ensure that a valid 'createdAtLocation' is provided in the payload.
 // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
-export const requireLocationForSystemUserAction: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext,
-  ActionInputWithType
-> = async ({ input, next, ctx }) => {
+// eslint-disable-next-line no-restricted-syntax
+const requireCreatedAtLocationForSystemUser = async <
+  T extends { createdAtLocation?: UUID | null | undefined }
+>({
+  input,
+  next,
+  ctx
+}: {
+  input: T
+  next: () => Promise<MiddlewareResult<TrpcContext>>
+  ctx: TrpcContext
+}) => {
   const { user } = ctx
 
   if (user.type !== 'system') {
@@ -488,6 +522,7 @@ export const requireLocationForSystemUserAction: MiddlewareFunction<
   }
 
   const isLocationId = await locationExists(input.createdAtLocation)
+
   if (!isLocationId) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -497,3 +532,19 @@ export const requireLocationForSystemUserAction: MiddlewareFunction<
 
   return next()
 }
+
+export const requireLocationForSystemUserEventCreate: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  EventInput
+> = requireCreatedAtLocationForSystemUser
+
+export const requireLocationForSystemUserAction: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  ActionInputWithType
+> = requireCreatedAtLocationForSystemUser

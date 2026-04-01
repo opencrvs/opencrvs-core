@@ -35,6 +35,7 @@ import {
   isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
+  isHeadingFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
   isSignatureFieldType,
@@ -66,7 +67,10 @@ import {
   isNumberWithUnitFieldType,
   isCustomFieldType,
   isHiddenFieldType,
-  isAutocompleteFieldType
+  EventConfig,
+  isImageViewFieldType,
+  isAutocompleteFieldType,
+  isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -85,13 +89,16 @@ import {
   Divider,
   PageHeader,
   Paragraph,
+  Heading,
   SelectDateRangeField,
   TimeField,
   Button,
   AlphaPrintButton,
   Http,
   LinkButton,
-  VerificationStatus
+  VerificationStatus,
+  ImageView,
+  UserRole
 } from '@client/v2-events/features/events/registered-fields'
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
 import { Data } from '@client/v2-events/features/events/registered-fields/Data'
@@ -120,6 +127,7 @@ import {
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
   fieldDefinition: T
+  eventConfig?: EventConfig
   /** non-native onChange. Updates Formik state by updating the value and its dependencies */
   onFieldValueChange: (name: string, value: FieldValue | undefined) => void
   /** Optional callback that is called whenever any field value changes.
@@ -144,11 +152,13 @@ interface GeneratedInputFieldProps<T extends FieldConfig> {
   readonlyMode?: boolean
   allKnownFields: FieldConfig[]
   validatorContext: ValidatorContext
+  attachmentPath: string
 }
 
 export const GeneratedInputField = React.memo(
   <T extends FieldConfig>({
     fieldDefinition,
+    eventConfig,
     validatorContext,
     onBlur,
     onFieldValueChange,
@@ -159,6 +169,7 @@ export const GeneratedInputField = React.memo(
     value,
     form,
     disabled,
+    attachmentPath,
     readonlyMode
   }: GeneratedInputFieldProps<T>) => {
     const intl = useIntl()
@@ -227,10 +238,15 @@ export const GeneratedInputField = React.memo(
 
       return (
         // We are showing errors to underlying text input, so we need to ignore them here
-        <InputField {...omit(field.inputFieldProps, 'error')}>
+        <InputField
+          {...(field.config.configuration?.showParentFieldError
+            ? field.inputFieldProps
+            : omit(field.inputFieldProps, 'error'))}
+        >
           <Name.Input
             configuration={field.config.configuration}
             disabled={disabled}
+            eventConfig={eventConfig}
             id={fieldDefinition.id}
             validation={validation}
             validatorContext={validatorContext}
@@ -360,6 +376,15 @@ export const GeneratedInputField = React.memo(
       )
     }
 
+    if (isImageViewFieldType(field)) {
+      return (
+        <ImageView.Input
+          configuration={field.config.configuration}
+          value={field.value}
+        />
+      )
+    }
+
     if (isParagraphFieldType(field)) {
       // @todo: is this even needed?
       const message = intl.formatMessage(fieldDefinition.label, {
@@ -368,6 +393,19 @@ export const GeneratedInputField = React.memo(
 
       return (
         <Paragraph.Input
+          configuration={field.config.configuration}
+          message={message}
+        />
+      )
+    }
+
+    if (isHeadingFieldType(field)) {
+      const message = intl.formatMessage(fieldDefinition.label, {
+        [fieldDefinition.id]: field.value
+      })
+
+      return (
+        <Heading.Input
           configuration={field.config.configuration}
           message={message}
         />
@@ -487,6 +525,7 @@ export const GeneratedInputField = React.memo(
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
             disabled={disabled}
             error={inputFieldProps.error}
+            filePath={attachmentPath}
             label={uploadedFileNameLabel}
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
@@ -512,6 +551,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             configuration={field.config.configuration}
             disabled={disabled}
+            eventConfig={eventConfig}
             validatorContext={validatorContext}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
@@ -576,6 +616,7 @@ export const GeneratedInputField = React.memo(
           <SignatureField.Input
             {...field.config}
             disabled={disabled}
+            filePath={attachmentPath}
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
@@ -598,6 +639,7 @@ export const GeneratedInputField = React.memo(
           <AdministrativeArea.Input
             {...field.config}
             disabled={disabled}
+            eventType={eventConfig?.id}
             partOf={typeof partOf === 'string' ? partOf : null}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -612,11 +654,8 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
-            searchableResource={
-              field.config.configuration.searchableResource.length > 0
-                ? field.config.configuration.searchableResource
-                : ['locations']
-            }
+            eventType={eventConfig?.id}
+            locationTypes={field.config.configuration.locationTypes}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -631,7 +670,8 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
-            searchableResource={['offices']}
+            eventType={eventConfig?.id}
+            locationTypes={['CRVS_OFFICE']}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -646,7 +686,8 @@ export const GeneratedInputField = React.memo(
           <LocationSearch.Input
             {...field.config}
             disabled={disabled}
-            searchableResource={['facilities']}
+            eventType={eventConfig?.id}
+            locationTypes={['HEALTH_FACILITY']}
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -654,9 +695,11 @@ export const GeneratedInputField = React.memo(
         </InputField>
       )
     }
+
     if (isDividerFieldType(field)) {
       return <Divider.Input />
     }
+
     if (isFileFieldWithOptionType(field)) {
       return (
         <InputField {...inputFieldProps}>
@@ -664,11 +707,11 @@ export const GeneratedInputField = React.memo(
             {...inputProps}
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
             error={inputFieldProps.error}
+            filePath={attachmentPath}
             maxFileSize={field.config.configuration.maxFileSize}
             maxImageSize={field.config.configuration.maxImageSize}
             options={field.config.options}
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            value={field.value ?? []}
+            value={field.value}
             onChange={handleFileWithOptionChange}
           />
         </InputField>
@@ -726,7 +769,14 @@ export const GeneratedInputField = React.memo(
             form
           )}
           form={form}
-          parentValue={form[field.config.configuration.trigger.$$field]}
+          trigger={
+            field.config.configuration.trigger
+              ? {
+                  mode: 'onChange',
+                  value: form[field.config.configuration.trigger.$$field]
+                }
+              : { mode: 'onMount' }
+          }
           onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
@@ -744,12 +794,20 @@ export const GeneratedInputField = React.memo(
       )
     }
     if (isSearchFieldType(field)) {
+      const {
+        label: inputLabel,
+        helperText,
+        ...restInputFieldProps
+      } = inputFieldProps
+
       return (
-        <InputField {...inputFieldProps}>
+        <InputField {...restInputFieldProps}>
           <Search.Input
             key={fieldDefinition.id}
             configuration={field.config.configuration}
             form={form}
+            helperText={fieldDefinition.helperText}
+            label={inputLabel}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
@@ -856,6 +914,19 @@ export const GeneratedInputField = React.memo(
           {...inputProps}
           value={field.value as string | undefined}
         />
+      )
+    }
+
+    if (isUserRoleFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <UserRole.Input
+            {...field.config}
+            id={field.config.id}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
 

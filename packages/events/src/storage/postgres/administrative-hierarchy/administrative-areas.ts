@@ -47,7 +47,7 @@ export async function getAdministrativeAreas({
   return query.execute()
 }
 
-const INSERT_MAX_CHUNK_SIZE = 10000
+const INSERT_MAX_CHUNK_SIZE = 1000
 
 export async function setAdministrativeAreasInTrx(
   trx: Kysely<Schema>,
@@ -87,6 +87,12 @@ export async function setAdministrativeAreasInTrx(
              WHEN excluded.valid_until IS NOT NULL
              THEN excluded.valid_until
              ELSE administrative_areas.valid_until
+           END`,
+          externalId: () =>
+            sql`CASE
+             WHEN excluded.external_id IS NOT NULL
+             THEN excluded.external_id
+             ELSE administrative_areas.external_id
            END`,
           deletedAt: null
         })

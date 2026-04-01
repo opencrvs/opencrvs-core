@@ -29,13 +29,13 @@ import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
-import { ITokenPayload } from '@opencrvs/commons/client'
+import { ITokenPayload, User } from '@opencrvs/commons/client'
 
 export type ProfileState = {
   authenticated: boolean
   tokenPayload: ITokenPayload | null
   userDetailsFetched: boolean
-  userDetails: UserDetails | null
+  userDetails: User | null
   nonce: string
 }
 
@@ -76,17 +76,14 @@ export const profileReducer: LoopReducer<
                 if (shouldRedirectBack) {
                   const baseUrl = window.location.origin
                   const restUrl = window.location.href.replace(baseUrl, '')
-                  const redirectToURL = new URL(
+                  const params =
                     restUrl === '/'
                       ? `?lang=${getState().i18n.language}`
-                      : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`,
-                    window.config.LOGIN_URL
-                  ).toString()
-
-                  window.location.assign(redirectToURL)
+                      : `?lang=${getState().i18n.language}&redirectTo=${restUrl}`
+                  window.location.assign(`/login${params}`)
                 } else {
                   window.location.assign(
-                    `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
+                    `/login?lang=${getState().i18n.language}`
                   )
                 }
               },
@@ -132,29 +129,18 @@ export const profileReducer: LoopReducer<
         ])
       )
     case actions.SET_USER_DETAILS:
-      const result = action.payload
-      const data = result && result.data
-
-      if (data && data.getUser) {
-        const userDetails = data.getUser
-
-        return loop(
-          {
-            ...state,
-            userDetailsFetched: true,
-            userDetails
-          },
-          Cmd.list([
-            Cmd.run(() => storeUserDetails(userDetails)),
-            Cmd.action(actions.userDetailsAvailable(userDetails))
-          ])
-        )
-      } else {
-        return {
+      const userDetails = action.payload
+      return loop(
+        {
           ...state,
-          userDetailsFetched: false
-        }
-      }
+          userDetailsFetched: true,
+          userDetails
+        },
+        Cmd.list([
+          Cmd.run(() => storeUserDetails(userDetails)),
+          Cmd.action(actions.userDetailsAvailable(userDetails))
+        ])
+      )
     case actions.MODIFY_USER_DETAILS:
       const modifiedDetails = action.payload
       if (state.userDetails) {
@@ -197,7 +183,7 @@ export const profileReducer: LoopReducer<
         state.tokenPayload &&
         (!userDetailsCollection ||
           'systemRole' in userDetailsCollection ||
-          userDetailsCollection.userMgntUserID !== state.tokenPayload.sub)
+          userDetailsCollection.id !== state.tokenPayload.sub)
       ) {
         return loop(
           {

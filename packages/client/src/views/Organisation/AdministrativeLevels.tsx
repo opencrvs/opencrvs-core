@@ -32,12 +32,7 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'querystring'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import {
-  AdministrativeArea,
-  Location,
-  LocationType,
-  UUID
-} from '@opencrvs/commons/client'
+import { AdministrativeArea, Location, UUID } from '@opencrvs/commons/client'
 import { useAdministrativeAreas } from '../../v2-events/hooks/useAdministrativeAreas'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
@@ -160,6 +155,10 @@ export function AdministrativeLevels({
 
   const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
+
+  React.useEffect(() => {
+    setCurrentPageNumber(1)
+  }, [locationId])
 
   const changeLevelAction = (
     e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,

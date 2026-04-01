@@ -29,20 +29,12 @@ export const PORT = env.PORT
 export const HOSTNAME = env.DOMAIN
 export const LOGIN_URL = env.LOGIN_URL
 export const CLIENT_APP_URL = env.CLIENT_APP_URL
-export const FHIR_URL = env.FHIR_URL.endsWith('/')
-  ? env.FHIR_URL
-  : env.FHIR_URL + '/'
+
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
-export const SEARCH_URL = env.SEARCH_URL
-export const METRICS_URL = env.METRICS_URL
 export const AUTH_URL = env.AUTH_URL
-export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
-export const WEBHOOKS_URL = env.WEBHOOKS_URL
 export const APPLICATION_CONFIG_URL = env.APPLICATION_CONFIG_URL.endsWith('/')
   ? env.APPLICATION_CONFIG_URL
   : env.APPLICATION_CONFIG_URL + '/'
-export const NOTIFICATION_URL = env.NOTIFICATION_URL
-export const WORKFLOW_URL = env.WORKFLOW_URL
 export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 export const DOCUMENTS_URL = env.DOCUMENTS_URL
 export const DISABLE_RATE_LIMIT = env.DISABLE_RATE_LIMIT
@@ -56,3 +48,4 @@ export const CONFIG_SMS_CODE_EXPIRY_SECONDS = env.CONFIG_SMS_CODE_EXPIRY_SECONDS
 export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS =
   env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
 export const MINIO_BUCKET = env.MINIO_BUCKET
+export const RECORD_SEARCH_QUOTA = env.RECORD_SEARCH_QUOTA

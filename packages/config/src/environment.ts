@@ -25,8 +25,5 @@ export const env = cleanEnv(process.env, {
   SENTRY_DSN: str({ default: undefined }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }),
-  MONGO_URL: url({ devDefault: 'mongodb://localhost/application-config' }),
-  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
-  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
-  HEARTH_MONGO_URL: url({ devDefault: 'mongodb://localhost/hearth-dev' })
+  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' })
 })

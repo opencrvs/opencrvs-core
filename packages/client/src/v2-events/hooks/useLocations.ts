@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { Location, UUID } from '@opencrvs/commons/client'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
@@ -61,6 +61,15 @@ export function useLocations() {
           locationArray.map((location) => [location.id, location])
         )
         return locationMap
+      }
+    },
+    getLocation: {
+      useQuery: (id: string) => {
+        const { queryFn, ...options } = trpc.locations.get.queryOptions({ id })
+        return useQuery({
+          ...options,
+          queryKey: trpc.locations.get.queryKey({ id })
+        })
       }
     }
   }

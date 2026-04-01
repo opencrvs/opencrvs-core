@@ -11,19 +11,16 @@
 import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
-import { parseGQLResponse, raise, delay } from './utils'
-import { print } from 'graphql'
-import gql from 'graphql-tag'
-import { EventConfig, joinUrl } from '@opencrvs/commons'
+import { raise } from './utils'
 import {
-  parseLiteralScope,
+  decodeScope,
+  EventConfig,
+  joinUrl,
   parseConfigurableScope
-} from '@opencrvs/commons/authentication'
+} from '@opencrvs/commons'
+import { parseLiteralScope } from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 import { createClient } from '@opencrvs/toolkit/api'
-
-const MAX_RETRY = 5
-const RETRY_DELAY_IN_MILLISECONDS = 5000
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
@@ -36,10 +33,15 @@ const RoleSchema = (eventIds: string[]) =>
       }),
       scopes: z.array(
         z.string().superRefine((scope, ctx) => {
-          const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedLiteralScope = parseLiteralScope(scope)
+          const parsedConfigurableScope = parseConfigurableScope(scope)
+          const parsedV2Scopes = decodeScope(scope)
 
-          if (!parsedConfigurableScope && !parsedLiteralScope) {
+          if (
+            !parsedLiteralScope &&
+            !parsedConfigurableScope &&
+            !parsedV2Scopes
+          ) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
@@ -47,17 +49,20 @@ const RoleSchema = (eventIds: string[]) =>
             return
           }
 
-          if (parsedConfigurableScope?.type === 'search') {
-            const options = parsedConfigurableScope.options
-            const invalidEventIds = options.event.filter(
-              (id) => !eventIds.includes(id)
-            )
+          if (parsedV2Scopes?.type) {
+            const options = parsedV2Scopes.options
 
-            if (invalidEventIds.length > 0) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
-              })
+            if (options?.event && Array.isArray(options.event)) {
+              const invalidEventIds = options.event.filter(
+                (id) => !eventIds.includes(id)
+              )
+
+              if (invalidEventIds.length > 0) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: `Scope "${scope}" contains invalid event IDs: ${invalidEventIds.join(', ')}`
+                })
+              }
             }
           }
         })
@@ -86,24 +91,8 @@ const UserSchema = z.array(
   )
 )
 
-const searchUserQuery = print(gql`
-  query searchUsers($username: String) {
-    searchUsers(username: $username) {
-      totalItems
-    }
-  }
-`)
-
-const createUserMutation = print(gql`
-  mutation createOrUpdateUser($user: UserInput!) {
-    createOrUpdateUser(user: $user) {
-      username
-    }
-  }
-`)
-
 async function getUsers(token: string) {
-  const url = new URL('users', env.COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('config/users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -127,8 +116,8 @@ async function getUsers(token: string) {
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'roles')
-  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'events')
+  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/roles')
+  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'config/events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
     fetch(rolesUrl),
@@ -195,39 +184,21 @@ async function userAlreadyExists(
   token: string,
   username: string
 ): Promise<boolean> {
-  const searchResponse = await fetch(`${env.GATEWAY_HOST}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      query: searchUserQuery,
-      variables: {
-        username
-      }
-    })
+  const url = new URL('events', env.GATEWAY_HOST).toString()
+  const client = createClient(url, `Bearer ${token}`)
+  const res = await client.user.search.query({
+    username,
+    count: 1,
+    skip: 0,
+    sortOrder: 'asc'
   })
-  const parsedSearchResponse = parseGQLResponse<{
-    searchUsers: { totalItems?: number }
-  }>(await searchResponse.json())
-  return Boolean(parsedSearchResponse.searchUsers.totalItems)
+  return Boolean(res.length)
 }
 
-async function callCreateUserMutation(token: string, userPayload: unknown) {
-  return fetch(`${env.GATEWAY_HOST}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      query: createUserMutation,
-      variables: {
-        user: userPayload
-      }
-    })
-  })
+async function createUser(token: string, userPayload: any) {
+  const url = new URL('events', env.GATEWAY_HOST).toString()
+  const client = createClient(url, `Bearer ${token}`)
+  return client.user.create.mutate(userPayload)
 }
 
 export async function seedUsers(token: string) {
@@ -263,33 +234,15 @@ export async function seedUsers(token: string) {
       name: [
         {
           use: 'en',
-          familyName,
-          firstNames: givenNames
+          family: familyName,
+          given: [givenNames]
         }
       ],
       ...(env.ACTIVATE_USERS && { status: 'active' }),
-      primaryOffice: primaryOffice.id,
+      primaryOfficeId: primaryOffice.id,
       username
     }
-    let tryNumber = 0
-    let jsonRes
-    let res
 
-    do {
-      ++tryNumber
-      if (tryNumber > 1) {
-        await delay(RETRY_DELAY_IN_MILLISECONDS)
-        // eslint-disable-next-line no-console
-        console.log('Trying again for time: ', tryNumber)
-      }
-      res = await callCreateUserMutation(token, userPayload)
-      jsonRes = await res.json()
-    } while (
-      tryNumber < MAX_RETRY &&
-      'errors' in jsonRes &&
-      jsonRes.errors[0].extensions?.code === 'INTERNAL_SERVER_ERROR'
-    )
-
-    parseGQLResponse(jsonRes)
+    await createUser(token, userPayload)
   }
 }

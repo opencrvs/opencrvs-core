@@ -20,17 +20,15 @@ import styled from 'styled-components'
 import {
   applyDraftToEventIndex,
   deepDropNulls,
-  EventConfig,
-  EventIndex,
   EventStatus
 } from '@opencrvs/commons/client'
 import {
-  APP_BAR_HEIGHT,
   AppBar,
   Button,
   Frame,
   Stack,
-  Icon
+  Icon,
+  DividerVertical
 } from '@opencrvs/components'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -45,32 +43,40 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { EventOverviewProvider } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useCanAccessEventWithScopes } from '@client/v2-events/hooks/useCanAccessEventWithScopes'
 
 const Tab = styled.button`
   border: none;
   background: none;
-  color: ${({ theme }) => theme.colors.supportingCopy};
+  color: ${({ theme }) => theme.colors.grey500};
   ${({ theme }) => theme.fonts.bold16};
   cursor: pointer;
   height: 100%;
   box-sizing: border-box;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.copy};
+    color: ${({ theme }) => theme.colors.primary};
+    border-bottom: 3px solid ${({ theme }) => theme.colors.grey300};
+    border-top: 3px solid transparent;
   }
 
   &.active {
-    color: ${({ theme }) => theme.colors.copy};
+    color: ${({ theme }) => theme.colors.primary};
     border-bottom: 3px solid ${({ theme }) => theme.colors.primary};
     border-top: 3px solid transparent;
   }
 `
 
 const TabContainer = styled(Stack)`
-  height: ${APP_BAR_HEIGHT};
+  height: 56px;
+  width: 100%;
 `
 
 const messages = defineMessages({
+  summary: {
+    id: 'events.overview.tabs.summary',
+    defaultMessage: 'Summary'
+  },
   record: {
     id: 'events.overview.tabs.record',
     defaultMessage: 'Record'
@@ -81,19 +87,15 @@ const messages = defineMessages({
   }
 })
 
-function EventOverviewTabs({
-  configuration,
-  event
-}: {
-  configuration: EventConfig
-  event: EventIndex
-}) {
+function EventOverviewTabs() {
   const intl = useIntl()
   const navigate = useNavigate()
   const location = useLocation()
-
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const [{ workqueue }] = useTypedSearchParams(ROUTES.V2.EVENTS.EVENT)
+  const { canAccessEventWithScopes } = useCanAccessEventWithScopes(eventId, [
+    'record.read'
+  ])
 
   const isActive = (pattern: string) => {
     return !!matchPath({ path: pattern, end: true }, location.pathname)
@@ -106,17 +108,26 @@ function EventOverviewTabs({
         onClick={() => {
           navigate(ROUTES.V2.EVENTS.EVENT.buildPath({ eventId }, { workqueue }))
         }}
-      >{`${intl.formatMessage(configuration.label)} • ${event.trackingId}`}</Tab>
-      <Tab
-        className={isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''}
-        onClick={() => {
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath({ eventId }, { workqueue })
-          )
-        }}
       >
-        {intl.formatMessage(messages.record)}
+        {intl.formatMessage(messages.summary)}
       </Tab>
+      {canAccessEventWithScopes() && (
+        <Tab
+          className={
+            isActive(ROUTES.V2.EVENTS.EVENT.RECORD.path) ? 'active' : ''
+          }
+          onClick={() => {
+            navigate(
+              ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
+                { eventId },
+                { workqueue }
+              )
+            )
+          }}
+        >
+          {intl.formatMessage(messages.record)}
+        </Tab>
+      )}
       <Tab
         className={isActive(ROUTES.V2.EVENTS.EVENT.AUDIT.path) ? 'active' : ''}
         onClick={() => {
@@ -130,12 +141,6 @@ function EventOverviewTabs({
     </TabContainer>
   )
 }
-
-const ExitButtonContainer = styled.div`
-  border-left: 1px solid ${({ theme }) => theme.colors.grey200};
-  padding-left: 8px;
-  margin-left: 6px;
-`
 
 export function EventOverviewLayout({
   children
@@ -184,21 +189,43 @@ export function EventOverviewLayout({
     <Frame
       header={
         <AppBar
-          desktopLeft={
-            <EventOverviewTabs
-              configuration={eventConfiguration}
-              event={event}
-            />
-          }
+          appBarRowTwo={<EventOverviewTabs />}
+          desktopCenter={<EventOverviewTabs />}
           desktopRight={
             <Stack>
-              <ActionMenu eventId={eventId} />
               <DownloadButton
                 key={`DownloadButton-${eventId}`}
                 event={eventIndexWithDraftApplied}
                 isDraft={isDraft}
               />
-              <ExitButtonContainer>
+              <ActionMenu eventId={eventId} />
+              <DividerVertical />
+              <Button
+                data-testid="exit-event"
+                size="small"
+                type="icon"
+                onClick={exit}
+              >
+                <Icon name="X" />
+              </Button>
+            </Stack>
+          }
+          desktopTitle={
+            flattenedIntl.formatMessage(
+              eventConfiguration.title,
+              flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
+            ) || intl.formatMessage(recordAuditMessages.noName)
+          }
+          mobileRight={
+            <>
+              <Stack>
+                <DownloadButton
+                  key={`DownloadButton-${eventId}`}
+                  event={eventIndexWithDraftApplied}
+                  isDraft={isDraft}
+                />
+                <ActionMenu eventId={eventId} />
+                <DividerVertical />
                 <Button
                   data-testid="exit-event"
                   size="small"
@@ -207,22 +234,7 @@ export function EventOverviewLayout({
                 >
                   <Icon name="X" />
                 </Button>
-              </ExitButtonContainer>
-            </Stack>
-          }
-          mobileLeft={
-            <Button type={'icon'} onClick={exit}>
-              <Icon name="X" />
-            </Button>
-          }
-          mobileRight={
-            <>
-              <ActionMenu eventId={eventId} />
-              <DownloadButton
-                key={`DownloadButton-${eventId}`}
-                event={eventIndexWithDraftApplied}
-                isDraft={isDraft}
-              />
+              </Stack>
             </>
           }
           mobileTitle={

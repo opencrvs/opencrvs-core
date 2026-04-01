@@ -17,6 +17,7 @@ import {
   IFormFieldMutationMapFunction,
   IFormFieldQueryMapFunction,
   IFormSection,
+  IFormSectionData,
   TransformedData
 } from '@client/forms'
 import { sectionTransformer } from '@client/forms/register/mappings/query'
@@ -39,8 +40,7 @@ import {
   EventSearchSet
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
-import { get, isEmpty } from 'lodash'
+import { get, isEmpty, isEqual } from 'lodash'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -174,7 +174,63 @@ function isMetaTypeField(field: IFormField): boolean {
     isFieldHttp(field) || isFieldLinkButton(field) || isFieldIDReader(field)
   )
 }
-export function getChangedValues(
+
+function hasNestedDataChanged(
+  nestedFieldData: IFormData,
+  previousNestedFieldData: IFormData
+) {
+  if (nestedFieldData.value === previousNestedFieldData.value) {
+    for (const key of Object.keys(nestedFieldData.nestedFields)) {
+      if (
+        !previousNestedFieldData.nestedFields[key] &&
+        nestedFieldData.nestedFields[key] === ''
+      ) {
+        continue
+      }
+      if (
+        nestedFieldData.nestedFields[key] !==
+        previousNestedFieldData.nestedFields[key]
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+  return true
+}
+
+function hasFieldChanged(
+  field: IFormField,
+  sectionData: IFormSectionData,
+  originalSectionData?: IFormSectionData
+) {
+  if (!originalSectionData) {
+    const isCustomSection = sectionData && sectionData[field.name]
+    if (isCustomSection) return true
+    return false
+  }
+  if (sectionData[field.name] && (sectionData[field.name] as IFormData).value) {
+    return hasNestedDataChanged(
+      sectionData[field.name] as IFormData,
+      originalSectionData[field.name] as IFormData
+    )
+  }
+  /*
+   * data section might have some values as empty string
+   * whereas original data section have them as undefined
+   */
+  if (!originalSectionData[field.name] && sectionData[field.name] === '') {
+    return false
+  }
+
+  if (Array.isArray(sectionData[field.name])) {
+    return !isEqual(sectionData[field.name], originalSectionData[field.name])
+  }
+  return sectionData[field.name] !== originalSectionData[field.name]
+}
+
+
+function getChangedValues(
   formDefinition: IForm,
   declaration: IDeclaration,
   offlineCountryConfig: IOfflineData,
@@ -233,156 +289,6 @@ export function getChangedValues(
   })
 
   return changedValues
-}
-
-export const draftToGqlTransformer = (
-  formDefinition: IForm,
-  currentFormData: IFormData,
-  draftId: string,
-  userDetails: UserDetails | null,
-  offlineCountryConfig: IOfflineData,
-  previousFormData: IFormData | undefined
-) => {
-  if (!formDefinition.sections) {
-    throw new Error('Sections are missing in form definition')
-  }
-
-  const transformedData: TransformedData = { createdAt: new Date() }
-  const inCompleteFieldList: string[] = []
-  formDefinition.sections.forEach((section) => {
-    if (!currentFormData[section.id]) {
-      currentFormData[section.id] = {}
-    }
-    if (!transformedData[section.id]) {
-      transformedData[section.id] = {}
-    }
-    getVisibleSectionGroupsBasedOnConditions(
-      section,
-      currentFormData[section.id],
-      currentFormData,
-      userDetails
-    ).forEach((groupDef) => {
-      groupDef.fields.forEach((fieldDef) => {
-        const conditionalActions: string[] = getConditionalActionsForField(
-          fieldDef,
-          currentFormData[section.id],
-          offlineCountryConfig,
-          currentFormData,
-          userDetails
-        )
-        if (
-          fieldDef.required &&
-          // do not count value even if it is required when the field is a button
-          !isFieldButton(fieldDef) &&
-          !conditionalActions.includes('hide') &&
-          !conditionalActions.includes('disable') &&
-          (currentFormData[section.id][fieldDef.name] === undefined ||
-            currentFormData[section.id][fieldDef.name] === '')
-        ) {
-          /* eslint-disable no-console */
-          console.error(
-            `Data is missing for a required field: ${fieldDef.name}` +
-              ` on section ${section.id}`
-          )
-          /* eslint-enable no-console */
-          inCompleteFieldList.push(
-            `${section.id}/${groupDef.id}/${fieldDef.name}`
-          )
-          return
-        }
-
-        /*
-         * Ideally all the changed fields should be included in the
-         * transformedData but due to how we use the "hide" conditional
-         * action to only visually hide the fields but the data is still
-         * present in the formData, we need to exclude those.
-         * This is for TEXT fields only
-         */
-        if (
-          (!conditionalActions.includes('hide') &&
-            previousFormData &&
-            hasFieldChanged(
-              fieldDef,
-              currentFormData[section.id],
-              previousFormData[section.id]
-            ) &&
-            fieldDef.type === 'TEXT') ||
-          (currentFormData[section.id][fieldDef.name] !== null &&
-            currentFormData[section.id][fieldDef.name] !== undefined &&
-            currentFormData[section.id][fieldDef.name] !== '' &&
-            (!conditionalActions.includes('hide') ||
-              fieldDef.name === 'detailsExist')) // https://github.com/opencrvs/opencrvs-core/issues/7821#issuecomment-2514398986
-        ) {
-          if (fieldDef.mapping && fieldDef.mapping.mutation) {
-            fieldDef.mapping.mutation(
-              transformedData,
-              currentFormData,
-              section.id,
-              fieldDef
-            )
-            nestedFieldsMapping(
-              transformedData,
-              currentFormData,
-              section.id,
-              fieldDef,
-              'mutation'
-            )
-          } else {
-            transformedData[section.id][fieldDef.name] =
-              currentFormData[section.id][fieldDef.name]
-          }
-        }
-      })
-    })
-    if (currentFormData[section.id]._fhirID) {
-      transformedData[section.id]._fhirID = currentFormData[section.id]._fhirID
-    }
-    if (section.mapping && section.mapping.mutation) {
-      section.mapping.mutation(transformedData, currentFormData, section.id)
-    }
-    if (
-      transformedData[section.id] &&
-      Object.keys(transformedData[section.id]).length < 1
-    ) {
-      delete transformedData[section.id]
-    }
-  })
-  if (currentFormData._fhirIDMap) {
-    transformedData._fhirIDMap = currentFormData._fhirIDMap
-  }
-  if (inCompleteFieldList && inCompleteFieldList.length > 0) {
-    if (transformedData.registration) {
-      transformedData.registration.inCompleteFields =
-        inCompleteFieldList.join(',')
-    } else {
-      transformedData.registration = {
-        inCompleteFields: inCompleteFieldList.join(',')
-      }
-    }
-  }
-  if (draftId) {
-    if (transformedData.registration) {
-      transformedData.registration.draftId = draftId
-    } else {
-      transformedData.registration = { draftId }
-    }
-  }
-  return transformedData
-}
-
-export const appendGqlMetadataFromDraft = (
-  draft: IDeclaration,
-  gqlDetails: TransformedData
-) => {
-  const { timeLoggedMS } = draft
-
-  if (!gqlDetails.registration.status) {
-    gqlDetails.registration.status = []
-  }
-  if (!gqlDetails.registration.status[0]) {
-    gqlDetails.registration.status[0] = {}
-  }
-  gqlDetails.registration.status[0].timeLoggedMS = timeLoggedMS
 }
 
 export const gqlToDraftTransformer = (
@@ -498,25 +404,8 @@ export const gqlToDraftTransformer = (
   }
 
   if (queryData.user?.role) {
-    transformedData.user.role = queryData.user.role.id
+    transformedData.user.role = queryData.user.role
   }
 
   return transformedData
-}
-
-export function getPotentialDuplicateIds(
-  eventRegistration: EventRegistration | EventSearchSet | null
-) {
-  const duplicates = eventRegistration?.registration?.duplicates
-  if (duplicates && duplicates[0] && typeof duplicates[0] === 'object') {
-    return (eventRegistration?.registration?.duplicates as DuplicatesInfo[])
-      .filter(
-        (duplicate): duplicate is IDuplicates => !!duplicate.compositionId
-      )
-      .map(({ compositionId }) => compositionId)
-  } else if (duplicates && typeof duplicates[0] === 'string') {
-    return (eventRegistration?.registration?.duplicates as string[]).filter(
-      (duplicate): duplicate is string => !!duplicate
-    )
-  }
 }

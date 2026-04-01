@@ -18,6 +18,7 @@ export const env = cleanEnv(process.env, {
   AUTH_HOST: str({ default: '0.0.0.0' }),
   AUTH_PORT: port({ default: 4040 }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
   DOMAIN: str({ devDefault: '*' }),
   COUNTRY_CONFIG_URL_EXTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for external requests (CORS whitelist)
@@ -31,5 +32,6 @@ export const env = cleanEnv(process.env, {
 
   CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
-  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }) // 10 minutes
+  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
+  CONFIG_REINDEX_TOKEN_EXPIRY_SECONDS: num({ default: 3600 }) // 1 hour
 })

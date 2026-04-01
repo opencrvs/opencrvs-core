@@ -26,10 +26,12 @@ import {
   EventConfig,
   getOrThrow,
   getAcceptedActions,
-  SystemRole,
   getUUID,
   UUID,
-  PrintCertificateAction
+  PrintCertificateAction,
+  TokenUserType,
+  User,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -57,7 +59,7 @@ import { validationErrorsInActionFormExist } from '@client/v2-events/components/
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useOnlineStatus } from '@client/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { useUserAllowedActions } from '@client/v2-events/features/workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { useUserAllowedActions } from '@client/v2-events/features/workqueues/Actions/useUserAllowedActions'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { useAdministrativeAreas } from '../../../../hooks/useAdministrativeAreas'
 
@@ -163,10 +165,12 @@ export function Review() {
 
   const { getEvent, onlineActions } = useEvents()
   const fullEvent = getEvent.getFromCache(eventId)
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const fullEventIndex = getCurrentEventState(fullEvent, eventConfiguration)
   const validatorContext = useValidatorContext(fullEvent)
   const actions = getAcceptedActions(fullEvent)
 
-  const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
+  const userIds = getUserIdsFromActions(actions)
 
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
@@ -181,9 +185,8 @@ export function Review() {
     (template) => template.id === templateId
   )
 
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
-  const { isActionAllowed } = useUserAllowedActions(fullEvent.type)
+  const { isActionAllowed } = useUserAllowedActions(fullEventIndex)
   const userDetails = useSelector(getUserDetails)
   const { isPending } = onlineActions.printCertificate
 
@@ -191,7 +194,9 @@ export function Review() {
     throw new Error('User details are not available')
   }
 
-  const userFromUsersList = users.find((user) => user.id === userDetails.id)
+  const userFromUsersList = users.find((user) => user.id === userDetails.id) as
+    | User
+    | undefined
   if (!userFromUsersList) {
     throw new Error(`User with id ${userDetails.id} not found in users list`)
   }
@@ -200,7 +205,7 @@ export function Review() {
     type: ActionType.PRINT_CERTIFICATE,
     id: getUUID(),
     transactionId: getUUID(),
-    createdByUserType: 'user',
+    createdByUserType: TokenUserType.enum.user,
     createdAt: new Date().toISOString(),
     createdBy: userFromUsersList.id,
     createdByRole: userFromUsersList.role,
@@ -209,7 +214,7 @@ export function Review() {
     annotation,
     originalActionId: null,
     createdBySignature: userFromUsersList.signature,
-    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    createdAtLocation: userDetails.primaryOfficeId,
     content: {
       templateId: certificateConfig?.id
     }

@@ -14,13 +14,8 @@ import React, { useState } from 'react'
 import Bowser from 'bowser'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Query } from '@client/components/Query'
-import { GET_USER_AUDIT_LOG } from '@client/user/queries'
+
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import type {
-  GQLUserAuditLogItemWithComposition,
-  GQLUserAuditLogResultItem,
-  GQLUserAuditLogResultSet
-} from '@client/utils/gateway-deprecated-do-not-use'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
@@ -29,12 +24,9 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { orderBy } from 'lodash'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
+
 import subMonths from 'date-fns/subMonths'
-import {
-  IOnlineStatusProps,
-  withOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
+
 import {
   GetUserAuditLogQuery,
   UserAuditLogResultItem,
@@ -52,8 +44,18 @@ import { formatUrl } from '@client/navigation'
 import { config } from '@client/config'
 import { ROUTES } from '@client/v2-events/routes'
 import { UUID } from '@opencrvs/commons/client'
+import { useOnlineStatus } from '@client/utils'
 
 const DEFAULT_LIST_SIZE = 10
+function withOnlineStatus<T>(
+  WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
+) {
+  return function WithOnlineStatus(props: T) {
+    const isOnline = useOnlineStatus()
+
+    return <WrappedComponent isOnline={isOnline} {...props} />
+  }
+}
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -96,9 +98,14 @@ enum SORTED_COLUMN {
   DATE = 'auditTimeValue',
   DEVICE = 'deviceIpAddress'
 }
-
+type IOnlineStatusProps = {
+  isOnline: boolean
+}
 const ADMIN_ACTIONS = ['DEACTIVATE', 'REACTIVATE', 'EDIT_USER', 'CREATE_USER']
-
+enum SORT_ORDER {
+  ASCENDING = 'asc',
+  DESCENDING = 'desc'
+}
 type State = {
   timeStart: Date
   timeEnd: Date
@@ -108,12 +115,6 @@ type State = {
   currentPageNumber: number
   showModal: boolean
   actionDetailsData: UserAuditLogResultItem | null
-}
-
-const isUserAuditItemWithDeclarationDetails = (
-  item: GQLUserAuditLogResultItem
-): item is GQLUserAuditLogItemWithComposition => {
-  return 'data' in item
 }
 
 function UserAuditHistoryComponent(props: Props) {
@@ -234,83 +235,12 @@ function UserAuditHistoryComponent(props: Props) {
       const actionMessage = getActionMessage(userAuditItem)
 
       return {
-        actionDescription: !isUserAuditItemWithDeclarationDetails(
-          userAuditItem
-        ) ? (
-          <Link
-            font="bold14"
-            onClick={() => {
-              toggleActionDetails(userAuditItem)
-            }}
-          >
-            {actionMessage}
-          </Link>
-        ) : canSearchRecords &&
-          !ADMIN_ACTIONS.includes(userAuditItem.action) ? (
-          <Link
-            font="bold14"
-            onClick={() => {
-              toggleActionDetails(userAuditItem)
-            }}
-          >
-            {actionMessage}
-          </Link>
-        ) : (
-          <BoldContent>{actionMessage}</BoldContent>
-        ),
+        actionDescription: 'TODO',
+        actionDescriptionWithAuditTime: 'TODO',
 
-        actionDescriptionWithAuditTime:
-          isUserAuditItemWithDeclarationDetails(userAuditItem) === undefined ? (
-            <Link
-              onClick={() => {
-                toggleActionDetails(userAuditItem)
-              }}
-            >
-              {actionMessage}
-            </Link>
-          ) : canSearchRecords ? (
-            <Link
-              onClick={() => {
-                toggleActionDetails(userAuditItem)
-              }}
-            >
-              {actionMessage}
-            </Link>
-          ) : (
-            <BoldContent>{actionMessage}</BoldContent>
-          ),
-        trackingId:
-          isUserAuditItemWithDeclarationDetails(userAuditItem) &&
-          canSearchRecords ? (
-            <Link
-              font="bold14"
-              /** When running V2 first, it is impossible to get back and forth to legacy events. At this stage country has already migrated, or should have never used v1 alongside of v2 */
-              disabled={config.FEATURES.V2_EVENTS && !userAuditItem.isV2}
-              onClick={() =>
-                userAuditItem.isV2
-                  ? navigate(
-                      ROUTES.V2.EVENTS.EVENT.buildPath({
-                        eventId: userAuditItem.data.compositionId as UUID
-                      })
-                    )
-                  : navigate(
-                      formatUrl(routes.DECLARATION_RECORD_AUDIT, {
-                        tab: 'printTab',
-                        declarationId: userAuditItem.data.compositionId as UUID
-                      })
-                    )
-              }
-            >
-              {userAuditItem.data.trackingId}
-            </Link>
-          ) : isUserAuditItemWithDeclarationDetails(userAuditItem) ? (
-            <AuditContent>{userAuditItem.data.trackingId}</AuditContent>
-          ) : null,
-
+        trackingId: 'TODO',
         deviceIpAddress: getIpAdress(userAuditItem),
-        trackingIdString: isUserAuditItemWithDeclarationDetails(userAuditItem)
-          ? userAuditItem.data.trackingId
-          : null,
+        trackingIdString: 'TODO',
         auditTime: format(
           new Date(userAuditItem.time),
           'MMMM dd, yyyy hh:mm a'
@@ -363,80 +293,73 @@ function UserAuditHistoryComponent(props: Props) {
             />
           </HistoryHeader>
           <>
-            <Query<GetUserAuditLogQuery>
-              query={GET_USER_AUDIT_LOG}
-              variables={{
-                practitionerId: practitionerId,
-                count: DEFAULT_LIST_SIZE,
-                skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1),
-                timeStart: timeStart,
-                timeEnd: timeEnd
-              }}
-              fetchPolicy={'no-cache'}
-            >
-              {({ data, loading, error }) => {
-                if (error || !data || !data.getUserAuditLog) {
-                  return getLoadingAuditListView(error ? true : false)
-                } else {
-                  const totalItems = Number(
-                    (data &&
-                      data.getUserAuditLog &&
-                      data.getUserAuditLog.total) ||
-                      0
-                  )
+            {(() => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const data = null as any
+              const loading = false
+              const error = false
 
-                  return (
-                    <TableDiv>
-                      <Table
-                        columns={getAuditColumns()}
-                        content={getAuditData(data.getUserAuditLog)}
-                        noResultText={intl.formatMessage(messages.noAuditFound)}
-                        fixedWidth={1088}
-                        isLoading={loading}
-                        hideTableHeader={
-                          state.viewportWidth <= theme.grid.breakpoints.md
-                        }
-                        pageSize={DEFAULT_LIST_SIZE}
-                      />
-                      <Pagination
-                        currentPage={state.currentPageNumber}
-                        totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
-                        onPageChange={(page: number) =>
-                          setState((prevState) => ({
-                            ...prevState,
-                            currentPageNumber: page
-                          }))
-                        }
-                      />
+              if (error || !data || !data.getUserAuditLog) {
+                return getLoadingAuditListView(error ? true : false)
+              } else {
+                const totalItems = Number(
+                  (data &&
+                    data.getUserAuditLog &&
+                    data.getUserAuditLog.total) ||
+                    0
+                )
 
-                      {state.actionDetailsData && (
-                        <ResponsiveModal
-                          actions={[]}
-                          handleClose={() => toggleActionDetails(null)}
-                          show={state.showModal}
-                          responsive={true}
-                          title={getActionMessage(state.actionDetailsData)}
-                          width={1024}
-                          autoHeight={true}
-                        >
-                          <>
-                            <AuditContent>
-                              {props.practitionerName} -{' '}
-                              {format(
-                                new Date(state.actionDetailsData.time),
-                                'MMMM dd, yyyy hh:mm a'
-                              )}{' '}
-                              {' | '}
-                              {getIpAdress(state.actionDetailsData)}
-                            </AuditContent>
-                          </>
-                        </ResponsiveModal>
-                      )}
-                    </TableDiv>
-                  )
-                }
-              }}
-            </Query>
+                return (
+                  <TableDiv>
+                    <Table
+                      columns={getAuditColumns()}
+                      content={getAuditData(data.getUserAuditLog)}
+                      noResultText={intl.formatMessage(messages.noAuditFound)}
+                      fixedWidth={1088}
+                      isLoading={loading}
+                      hideTableHeader={
+                        state.viewportWidth <= theme.grid.breakpoints.md
+                      }
+                      pageSize={DEFAULT_LIST_SIZE}
+                    />
+                    <Pagination
+                      currentPage={state.currentPageNumber}
+                      totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
+                      onPageChange={(page: number) =>
+                        setState((prevState) => ({
+                          ...prevState,
+                          currentPageNumber: page
+                        }))
+                      }
+                    />
+
+                    {state.actionDetailsData && (
+                      <ResponsiveModal
+                        actions={[]}
+                        handleClose={() => toggleActionDetails(null)}
+                        show={state.showModal}
+                        responsive={true}
+                        title={getActionMessage(state.actionDetailsData)}
+                        width={1024}
+                        autoHeight={true}
+                      >
+                        <>
+                          <AuditContent>
+                            {props.practitionerName} -{' '}
+                            {format(
+                              new Date(state.actionDetailsData.time),
+                              'MMMM dd, yyyy hh:mm a'
+                            )}{' '}
+                            {' | '}
+                            {getIpAdress(state.actionDetailsData)}
+                          </AuditContent>
+                        </>
+                      </ResponsiveModal>
+                    )}
+                  </TableDiv>
+                )
+              }
+            })()}
           </>
         </>
       </>

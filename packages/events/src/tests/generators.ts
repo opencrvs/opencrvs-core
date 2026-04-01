@@ -10,22 +10,21 @@
  */
 
 import {
-  getUUID,
-  eventPayloadGenerator,
-  UUID,
-  TestUserRole,
-  EventConfig,
-  Location,
-  LocationType,
-  generateUuid,
-  pickRandom,
+  AdministrativeArea,
   createPrng,
+  EventConfig,
+  eventPayloadGenerator,
   generateTrackingId,
-  AdministrativeArea
+  generateUuid,
+  getUUID,
+  Location,
+  pickRandom,
+  TestUserRole,
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons'
-import { setLocations } from '../service/locations/locations'
 import { setAdministrativeAreas } from '../service/administrative-areas'
-
+import { setLocations } from '../service/locations/locations'
 interface Name {
   use: string
   given: string[]
@@ -38,6 +37,7 @@ export interface CreatedUser {
   role: string
   name: Array<Name>
   fullHonorificName?: string
+  administrativeAreaId?: UUID | null
 }
 
 interface CreateUser {
@@ -60,6 +60,9 @@ export function payloadGenerator(
       role: input.role ?? TestUserRole.enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId,
+      avatar: 'avatar.jpg',
+      status: 'active',
+      type: TokenUserType.enum.user,
       administrativeAreaId: input.administrativeAreaId,
       fullHonorificName: input.fullHonorificName
     })
@@ -75,10 +78,7 @@ export function payloadGenerator(
           administrativeAreaId: null,
           validUntil: null,
           externalId: generateTrackingId(prng) + generateTrackingId(prng),
-          locationType: pickRandom(prng, [
-            LocationType.enum.CRVS_OFFICE,
-            LocationType.enum.HEALTH_FACILITY
-          ])
+          locationType: pickRandom(prng, ['CRVS_OFFICE', 'HEALTH_FACILITY'])
         })) satisfies Location[]
       }
 
@@ -90,7 +90,7 @@ export function payloadGenerator(
         externalId:
           location.externalId ??
           generateTrackingId(prng) + generateTrackingId(prng),
-        locationType: LocationType.enum.CRVS_OFFICE
+        locationType: 'CRVS_OFFICE'
       })) as Location[]
     }
   }
@@ -146,6 +146,7 @@ export function seeder() {
       primaryOfficeId: user.primaryOfficeId,
       administrativeAreaId: user.administrativeAreaId ?? null,
       name: user.name,
+      status: 'active',
       fullHonorificName: user.fullHonorificName,
       role: user.role as TestUserRole,
       id: user.id ?? getUUID()
@@ -164,33 +165,56 @@ export function seeder() {
 }
 
 /**
- * Creates test locations (CRVS offices and Health Facilities) under each provided administrative area.
+ * Creates test locations (CRVS offices and Health Facilities) under each provided administrative area and **at the country level**.
  */
 function generateTestLocations(
   administrativeAreas: AdministrativeArea[],
   rng: () => number
 ): Location[] {
-  return administrativeAreas.flatMap((admin) => {
-    const crvs = {
-      name: `${admin.name} CRVS Office`,
-      locationType: LocationType.enum.CRVS_OFFICE,
-      administrativeAreaId: admin.id,
+  const locationsUnderAdministrativeAreas = administrativeAreas.flatMap(
+    (admin) => {
+      const crvs = {
+        name: `${admin.name} CRVS Office`,
+        locationType: 'CRVS_OFFICE',
+        administrativeAreaId: admin.id,
+        id: generateUuid(rng),
+        validUntil: null,
+        externalId: generateUuid(rng)
+      } satisfies Location
+
+      const health = {
+        name: `${admin.name} Health Facility`,
+        locationType: 'HEALTH_FACILITY',
+        administrativeAreaId: admin.id,
+        id: generateUuid(rng),
+        validUntil: null,
+        externalId: generateUuid(rng)
+      } satisfies Location
+
+      return [crvs, health]
+    }
+  )
+
+  const locationsUnderCountry = [
+    {
+      name: `Country-level CRVS Office`,
+      locationType: 'CRVS_OFFICE',
+      administrativeAreaId: null,
       id: generateUuid(rng),
       validUntil: null,
       externalId: generateUuid(rng)
-    } satisfies Location
-
-    const health = {
-      name: `${admin.name} Health Facility`,
-      locationType: LocationType.enum.HEALTH_FACILITY,
-      administrativeAreaId: admin.id,
+    },
+    {
+      name: `Country-level Health Facility`,
+      locationType: 'HEALTH_FACILITY',
+      administrativeAreaId: null,
       id: generateUuid(rng),
       validUntil: null,
       externalId: generateUuid(rng)
-    } satisfies Location
+    }
+  ] satisfies Location[]
 
-    return [crvs, health]
-  })
+  return [...locationsUnderAdministrativeAreas, ...locationsUnderCountry]
 }
 
 function generateTestAdministrativeAreas() {
@@ -292,8 +316,28 @@ function generateTestUsersForLocations(
 }
 /**
  * Sets up a realistic hierarchy of administrative areas, offices, and users for testing scopes.
- * Each location has two users assigned to it. Hiearchies include cases where some levels are skipped or do not exist.
+ * Administrative Hierarchy:
  *
+ * COUNTRY LEVEL
+ * ├── Country-level CRVS Office (no administrative area - directly under country)
+ * ├── Country-level Health Facility (no administrative area - directly under country)
+ * ├── Province A
+ * │   └── District A
+ * │       └── Village A
+ * ├── Province B
+ * │   └── Village B (skips district level)
+ * └── District C (no parent - directly under country)
+ *
+ * Each administrative area has 2 locations:
+ * - CRVS Office
+ * - Health Facility
+ *
+ * Country level has 2 locations:
+ * - Country-level CRVS Office
+ * - Country-level Health Facility
+ *
+ * Each location has 2 users (Mirella-X and Jonathan-X)
+ * Total: 6 administrative areas, 14 locations, 28 users
  */
 export async function setupHierarchyWithUsers() {
   const rng = createPrng(1234)
@@ -309,7 +353,7 @@ export async function setupHierarchyWithUsers() {
   await seed.locations(locations)
 
   expect(administrativeAreas.length).toBe(6)
-  expect(locations.length).toBe(12) // 6 admin areas x 2 offices each
+  expect(locations.length).toBe(14) // 6 admin areas x 2 locations each + 2 country level locations
 
   const locationById = new Map(locations.map((o) => [o.id, o]))
   const administrativeAreaById = new Map(
@@ -322,15 +366,19 @@ export async function setupHierarchyWithUsers() {
   // Helper to check if an office is under a given administrative area. Used for testing propositions.
   function isUnderAdministrativeArea(
     locationId: UUID,
-    administrativeAreaId: UUID | null | undefined
+    administrativeAreaId: UUID | null
   ): boolean {
     const current = locationById.get(locationId)
     if (!current) {
       return false
     }
 
-    let locationAdministrativeAreaId: UUID | null | undefined =
-      current.administrativeAreaId
+    let locationAdministrativeAreaId: UUID | null = current.administrativeAreaId
+
+    // means that given administrativeAreaId is null (country-level)
+    if (administrativeAreaId === null) {
+      return true
+    }
 
     while (locationAdministrativeAreaId) {
       if (locationAdministrativeAreaId === administrativeAreaId) {

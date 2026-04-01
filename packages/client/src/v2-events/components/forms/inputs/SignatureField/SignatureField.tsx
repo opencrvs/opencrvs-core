@@ -45,6 +45,7 @@ interface SignatureFieldProps {
   onChange: (value: FileFieldValue | null) => void
   required?: boolean
   maxFileSize: number
+  filePath: string
   acceptedFileTypes?: MimeType[]
   modalTitle: string
   disabled?: boolean
@@ -69,6 +70,7 @@ function SignatureFieldInput({
   onChange,
   required,
   name,
+  filePath,
   modalTitle,
   maxFileSize,
   acceptedFileTypes = ['image/png'],
@@ -80,7 +82,7 @@ function SignatureFieldInput({
   const [signature, setSignature] = useState<FileFieldValue | undefined>(value)
   const [touched, setTouched] = useState(false)
 
-  const { uploadFile } = useFileUpload(name, {
+  const { uploadFile } = useFileUpload(filePath, name, {
     onSuccess: ({ path, originalFilename, type }) => {
       setSignature({
         path,
@@ -205,6 +207,23 @@ function SignatureFieldInput({
   )
 }
 
+const SignatureOutputPreview = styled(SignaturePreview)`
+  max-width: 100%;
+`
+
+function SignatureOutput({ value }: { value?: FileFieldValue }) {
+  if (!value) {
+    return null
+  }
+  return (
+    <SignatureOutputPreview
+      alt="Signature preview"
+      src={getUnsignedFileUrl(value.path)}
+    />
+  )
+}
+
 export const SignatureField = {
-  Input: SignatureFieldInput
+  Input: SignatureFieldInput,
+  Output: SignatureOutput
 }

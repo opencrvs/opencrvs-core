@@ -28,7 +28,6 @@ import {
 } from '@opencrvs/components'
 import styled from 'styled-components'
 import { useLazyQuery } from '@apollo/client'
-import { EMAIL_ALL_USERS } from '@client/views/SysAdmin/Communications/AllUserEmail/queries'
 import { useDispatch } from 'react-redux'
 import { toggleEmailAllUsersFeedbackToast } from '@client/notification/actions'
 
@@ -81,7 +80,7 @@ const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false)
-  const [sendEmail, { data, error }] = useLazyQuery(EMAIL_ALL_USERS)
+
   const dispatch = useDispatch()
   const hideModal = () => setConfirmationModalOpen(false)
   const resetForm = () => {
@@ -89,32 +88,24 @@ const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
     setBody('')
   }
   const handleConfirmSubmit = () => {
-    sendEmail({
-      variables: {
-        subject,
-        body,
-        locale: intl.locale
-      }
-    })
-    hideModal()
-    resetForm()
+    throw new Error('Not implemented yet')
   }
 
-  useEffect(() => {
-    if (data) {
-      dispatch(
-        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
-      )
-    }
-  }, [data, dispatch])
+  // useEffect(() => {
+  //   if (data) {
+  //     dispatch(
+  //       toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
+  //     )
+  //   }
+  // }, [data, dispatch])
 
-  useEffect(() => {
-    if (error) {
-      dispatch(
-        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
-      )
-    }
-  }, [error, dispatch])
+  // useEffect(() => {
+  //   if (error) {
+  //     dispatch(
+  //       toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
+  //     )
+  //   }
+  // }, [error, dispatch])
 
   return (
     <>

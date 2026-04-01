@@ -10,23 +10,11 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import {
-  EventIndex,
-  WorkqueueActionsWithDefault,
-  isMetaAction,
-  getOrThrow,
-  ActionType
-} from '@opencrvs/commons/client'
+import { EventIndex, WorkqueueActionType } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
-import { useAuthentication } from '@client/utils/userUtils'
-import { ROUTES } from '@client/v2-events/routes'
-import {
-  useAllowedActionConfigurations,
-  reviewLabel
-} from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 import { withSuspense } from '../../../components/withSuspense'
+import { useGetWorkqueueActionConfiguration } from '../../workqueues/Actions/useGetActionConfiguration'
 
 const StyledButton = styled(Button)`
   max-width: 150px;
@@ -37,6 +25,8 @@ const StyledButton = styled(Button)`
 `
 
 /**
+ * Component rendering CTA button for an event in search result.
+ *
  * @returns next available action cta based on the given event.
  */
 function ActionCtaComponent({
@@ -45,42 +35,12 @@ function ActionCtaComponent({
   redirectParam
 }: {
   event: EventIndex
-  actionType: WorkqueueActionsWithDefault
+  actionType: WorkqueueActionType
   redirectParam?: string
 }) {
   const intl = useIntl()
-  const maybeAuth = useAuthentication()
-  const auth = getOrThrow(
-    maybeAuth,
-    'Authentication is not available but is required'
-  )
-  const navigate = useNavigate()
 
-  const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
-
-  const config =
-    actionType === 'DEFAULT'
-      ? allowedActionConfigs.find(({ type }) => !isMetaAction(type))
-      : // If action type is not allowed, we don't provide it.
-        allowedActionConfigs.find((item) => item.type === actionType)
-
-  if (!config || actionType === ActionType.READ) {
-    return (
-      <StyledButton
-        type="primary"
-        onClick={() => {
-          navigate(
-            ROUTES.V2.EVENTS.EVENT.RECORD.buildPath(
-              { eventId: event.id },
-              { workqueue: redirectParam }
-            )
-          )
-        }}
-      >
-        {intl.formatMessage(reviewLabel)}
-      </StyledButton>
-    )
-  }
+  const config = useGetWorkqueueActionConfiguration(event, actionType)
 
   return (
     <StyledButton

@@ -22,7 +22,7 @@ import {
 } from './CountryConfigQueryInput'
 import { AvailableIcons } from '../icons'
 import { QueryType } from './EventIndex'
-import { ActionType, workqueueActions } from './ActionType'
+import { WorkqueueActionType } from './ActionType'
 
 export const mandatoryColumns = defineWorkqueuesColumns([
   {
@@ -43,16 +43,6 @@ export const mandatoryColumns = defineWorkqueuesColumns([
   }
 ])
 
-export const WorkqueueActionsWithDefault = z.enum([
-  ...workqueueActions.options,
-  'DEFAULT',
-  ActionType.READ
-] as const)
-
-export type WorkqueueActionsWithDefault = z.infer<
-  typeof WorkqueueActionsWithDefault
->
-
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
  */
@@ -63,11 +53,12 @@ export const WorkqueueConfig = z
       'Title of the workflow (both in navigation and on the page)'
     ),
     query: CountryConfigQueryType,
-    /** This action object used to contain a conditionals option, but it was not used anywhere.
-     *  It's also debatable whether it should be an array, or just a single action. */
-    actions: z
-      .array(z.object({ type: WorkqueueActionsWithDefault }))
-      .describe('Workqueue call-to-action button configuration.'),
+    action: z
+      .object({ type: WorkqueueActionType })
+      .optional()
+      .describe(
+        'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
+      ),
     columns: z.array(WorkqueueColumn).default(mandatoryColumns),
     icon: AvailableIcons,
     emptyMessage: TranslationConfig.optional()
@@ -85,9 +76,12 @@ export const WorkqueueConfigInput = z.object({
     'Title of the workflow (both in navigation and on the page)'
   ),
   query: CountryConfigQueryInputType,
-  actions: z
-    .array(z.object({ type: WorkqueueActionsWithDefault }))
-    .describe('Workqueue call-to-action button configuration.'),
+  action: z
+    .object({ type: WorkqueueActionType })
+    .optional()
+    .describe(
+      'Workqueue call-to-action button configuration. This determines the quick action button shown on each event card and the action taken when the button is clicked.'
+    ),
   columns: z.array(WorkqueueColumn).default(mandatoryColumns),
   icon: AvailableIcons,
   emptyMessage: TranslationConfig.optional()

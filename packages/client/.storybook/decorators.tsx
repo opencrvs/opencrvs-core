@@ -69,6 +69,10 @@ export function getTestValidatorContext(
     token = generator.user.token.localSystemAdmin
   } else if (userRole === TestUserRole.enum.REGISTRATION_AGENT) {
     token = generator.user.token.registrationAgent
+  } else if (userRole === TestUserRole.enum.COMMUNITY_LEADER) {
+    token = generator.user.token.communityLeader
+  } else if (userRole === TestUserRole.enum.PROVINCIAL_REGISTRAR) {
+    token = generator.user.token.provincialRegistrar
   } else {
     token = generator.user.token.localRegistrar
   }

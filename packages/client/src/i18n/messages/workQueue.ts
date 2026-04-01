@@ -77,4 +77,4 @@ const messagesToDefine: IWorkQueueMessages = {
   }
 }
 
-export const wqMessages: IWorkQueueMessages = defineMessages(messagesToDefine)
+const wqMessages: IWorkQueueMessages = defineMessages(messagesToDefine)

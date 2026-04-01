@@ -10,9 +10,10 @@
  */
 
 import { useSelector } from 'react-redux'
+import { User } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getOfflineData } from '@client/offline/selectors'
-import { getAdminLevelHierarchy, getUsersFullName } from '../utils'
+import { getAdminLevelHierarchy } from '../utils'
 import { useLocations } from './useLocations'
 import { useUsers } from './useUsers'
 import { useAdministrativeAreas } from './useAdministrativeAreas'
@@ -23,7 +24,7 @@ export function useCurrentUser() {
 
   const loggedInUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
-  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '')
+  const [user] = getUser.useSuspenseQuery(loggedInUser?.id ?? '') as [User]
 
   const { getLocations } = useLocations()
   const { getAdministrativeAreas } = useAdministrativeAreas()
@@ -31,7 +32,18 @@ export function useCurrentUser() {
   const locations = getLocations.useSuspenseQuery()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
 
-  const name = getUsersFullName(user.name, 'en')
+  const sharedFields = {
+    id: user.id,
+    name: user.name,
+    role: user.role,
+    type: user.type,
+    mobile: user.mobile,
+    avatar: user.avatar,
+    status: user.status,
+    primaryOfficeId: user.primaryOfficeId,
+    administrativeAreaId: user.administrativeAreaId ?? undefined,
+    signature: user.signature
+  }
 
   if (user.primaryOfficeId) {
     const primaryOfficeLocation = locations.get(user.primaryOfficeId)
@@ -46,16 +58,14 @@ export function useCurrentUser() {
       adminLevelIds
     )
     return {
-      id: user.id,
-      name,
-      role: user.role,
-      ...adminLevels
+      currentUser: {
+        ...sharedFields,
+        ...adminLevels
+      } satisfies User
     }
   }
 
   return {
-    id: user.id,
-    name,
-    role: user.role
+    currentUser: sharedFields satisfies User
   }
 }

@@ -11,10 +11,37 @@
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
-
-import { RawScopes, Scope, SCOPES } from './scopes'
+import { SCOPES, encodeScope, RecordScopeV2, decodeScope } from './scopes'
 import { UUID } from './uuid'
 export * from './scopes'
+
+/**
+ * Returns an array of accepted scopes from a JWT token, filtered by the given accepted scope types.
+ *
+ * @param token - The JWT token containing scope definitions.
+ * @param acceptedScopes - An array of acceptable scope types to filter by.
+ * @returns An array of parsed RecordScopeV2 objects that are found in the token and match the accepted scope types.
+ */
+export function getAcceptedScopesFromToken<T extends RecordScopeV2['type']>(
+  token: string,
+  acceptedScopes: T[]
+): Array<Extract<RecordScopeV2, { type: T }>> {
+  const tokenScopes = getScopes(token)
+
+  return tokenScopes
+    .map((scope) => {
+      const parsedScope = decodeScope(scope)
+      return parsedScope &&
+        // Cast to string[] because Array<T>.includes requires exactly T, but
+        // parsedScope.type is the full RecordScopeV2['type'] union (wider than T).
+        (acceptedScopes as string[]).includes(parsedScope.type)
+        ? parsedScope
+        : null
+    })
+    .filter(
+      (scope): scope is Extract<RecordScopeV2, { type: T }> => scope !== null
+    )
+}
 
 export const DEFAULT_ROLES_DEFINITION = [
   {
@@ -25,16 +52,18 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.fieldAgent'
     },
     scopes: [
-      `record.create[event=birth|death|tennis-club-membership]`,
-      'record.declare[event=birth|death|tennis-club-membership]',
-      SCOPES.RECORD_DECLARE_BIRTH,
-      SCOPES.RECORD_DECLARE_DEATH,
-      SCOPES.RECORD_DECLARE_MARRIAGE,
-      SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      })
     ]
   },
   {
@@ -45,24 +74,22 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.registrationAgent'
     },
     scopes: [
-      `record.create[event=birth|death|tennis-club-membership]`,
-      'record.declare[event=birth|death|tennis-club-membership]',
-      SCOPES.RECORD_DECLARE_BIRTH,
-      SCOPES.RECORD_DECLARE_DEATH,
-      SCOPES.RECORD_DECLARE_MARRIAGE,
-      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-      SCOPES.RECORD_DECLARATION_ARCHIVE,
-      SCOPES.RECORD_DECLARATION_REINSTATE,
-      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
     ]
   },
   {
@@ -73,27 +100,29 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localRegistrar'
     },
     scopes: [
-      `record.create[event=birth|death|tennis-club-membership]`,
-      'record.declare[event=birth|death|tennis-club-membership]',
-      SCOPES.RECORD_DECLARE_BIRTH,
-      SCOPES.RECORD_DECLARE_DEATH,
-      SCOPES.RECORD_DECLARE_MARRIAGE,
-      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-      SCOPES.RECORD_REVIEW_DUPLICATES,
-      'record.declared.review-duplicates[event=birth|death|tennis-club-membership]',
-      SCOPES.RECORD_DECLARATION_ARCHIVE,
-      SCOPES.RECORD_DECLARATION_REINSTATE,
-      SCOPES.RECORD_REGISTER,
-      SCOPES.RECORD_REGISTRATION_CORRECT,
-      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.review-duplicates',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.ORGANISATION_READ_LOCATIONS,
       SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_MARRIAGE
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
     ]
   },
   {
@@ -111,7 +140,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-      // 'organisation.read-users' ?
     ]
   },
   {
@@ -147,7 +175,7 @@ export const DEFAULT_ROLES_DEFINITION = [
 ] satisfies Array<{
   id: string
   label: { defaultMessage: string; description: string; id: string }
-  scopes: Scope[]
+  scopes: string[]
 }>
 
 /*
@@ -162,8 +190,8 @@ export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: Scope[]
-  role: string
+  scope: string[]
+  role?: string
   userType: TokenUserType
   eventId?: UUID
   actionId?: UUID
@@ -178,14 +206,14 @@ export function setBearerForToken(token: string) {
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
-export function getScopes(token: string): RawScopes[] {
+export function getScopes(token: string): string[] {
   const authHeader = { Authorization: setBearerForToken(token) }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
 
   return tokenPayload.scope || []
 }
 
-export function hasScope(token: string, scope: Scope) {
+export function hasScope(token: string, scope: string) {
   return getScopes(token).includes(scope)
 }
 
@@ -204,6 +232,19 @@ export const getTokenPayload = (token: string): ITokenPayload => {
 export const getUserId = (token: TokenWithBearer): string => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
   return z.string().parse(tokenPayload.sub)
+}
+
+/**
+ * Extracts the subject (user ID) from a raw JWT string (without Bearer prefix).
+ * Returns null if the token cannot be decoded.
+ */
+export const getUserIdFromToken = (token: string): string | null => {
+  try {
+    const payload = decode(token) as { sub?: string }
+    return payload.sub ?? null
+  } catch {
+    return null
+  }
 }
 
 export const getUserTypeFromToken = (token: TokenWithBearer): TokenUserType => {

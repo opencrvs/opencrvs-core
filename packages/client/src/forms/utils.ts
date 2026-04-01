@@ -93,17 +93,14 @@ import { memoize } from 'lodash'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { Conditional } from './conditionals'
 
-export const VIEW_TYPE = {
+const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
   PREVIEW: 'preview',
   HIDDEN: 'hidden'
 }
 
-const REGISTRATION_TARGET_DAYS =
-  window.config &&
-  window.config.BIRTH &&
-  window.config.BIRTH.REGISTRATION_TARGET
+const REGISTRATION_TARGET_DAYS = 30
 
 interface IRange {
   start: number
@@ -118,10 +115,13 @@ const internationaliseOptions = (
   return options.map((opt) => {
     return {
       ...opt,
-      label: intl.formatMessage(
-        opt.label,
-        'param' in opt ? opt.param : undefined
-      )
+      label:
+        typeof opt.label === 'string'
+          ? opt.label
+          : intl.formatMessage(
+              opt.label,
+              'param' in opt ? opt.param : undefined
+            )
     }
   })
 }
@@ -335,7 +335,7 @@ export const getFieldValidation = (
   return validator
 }
 
-export function getNextSectionIds(
+function getNextSectionIds(
   sections: IFormSection[],
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
@@ -385,7 +385,7 @@ export function getNextSectionIds(
   }
 }
 
-export const getVisibleGroupFields = (group: IFormSectionGroup) => {
+const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
 
@@ -548,7 +548,7 @@ export const getFieldOptionsByValueMapper = (
   return items
 }
 
-export const diffDoB = (doB: string) => {
+const diffDoB = (doB: string) => {
   if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB))
     return 'withinTargetdays'
   const todaysDate = new Date()
@@ -570,7 +570,7 @@ export const diffDoB = (doB: string) => {
   return valueWithinRange ? valueWithinRange.value : ''
 }
 
-export function isCityLocation(
+function isCityLocation(
   locations: { [key: string]: ILocation },
   locationId: string
 ): boolean {
@@ -586,7 +586,7 @@ export function isCityLocation(
   }
 }
 
-export function isDefaultCountry(countryCode: string): boolean {
+function isDefaultCountry(countryCode: string): boolean {
   return countryCode === window.config.COUNTRY.toUpperCase()
 }
 
@@ -713,7 +713,7 @@ export const getVisibleOptions = (
   })
 }
 
-export const getSectionFields = (
+const getSectionFields = (
   section: IFormSection,
   values?: IFormSectionData,
   draftData?: IFormData
