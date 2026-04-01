@@ -23,8 +23,8 @@ import {
   updateNotificationProgress
 } from '@events/storage/postgres/events/notifications'
 
-export const BCC_CHUNK_SIZE = 500
-export const POLL_INTERVAL_MS = 30_000
+const BCC_CHUNK_SIZE = 500
+const POLL_INTERVAL_MS = 30_000
 export const DAILY_NOTIFICATION_LIMIT = 1
 export const NOTIFICATION_RETRY_LIMIT = 3
 
