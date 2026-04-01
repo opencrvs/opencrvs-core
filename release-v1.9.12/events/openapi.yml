@@ -840,7 +840,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 3de02e19-628c-4898-869e-97a000d47bb3
+                transactionId: dca0de62-1d80-466a-adba-eff2a034de5e
                 type: birth
       responses:
         "200":
@@ -926,7 +926,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 32e5e0c2-ee5d-4943-ab8c-8ac9f9f4d596
+                transactionId: f20bbf40-85ba-461a-801a-3c85d36dd077
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2731,7 +2731,124 @@ components:
                 fields:
                   type: array
                   items:
-                    type: object
+                    anyOf:
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the field.
+                          type:
+                            type: string
+                            enum:
+                              - COUNTRY
+                          label:
+                            description: Human-readable label of the field.
+                            allOf:
+                              - $ref: "#/components/schemas/TranslationConfig"
+                          conditionals:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/FieldConditional"
+                            default: *a11
+                            description: Conditions determining when the field is shown or enabled. By
+                              default, the field is always shown and enabled.
+                          required:
+                            anyOf:
+                              - type: boolean
+                              - type: object
+                                properties:
+                                  message:
+                                    description: Custom required validation message
+                                    allOf:
+                                      - $ref: "#/components/schemas/TranslationConfig"
+                                required:
+                                  - message
+                            default: false
+                            description: Indicates whether the field is mandatory.
+                          optionOverrides:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                value:
+                                  type: string
+                                  description: The value of the option
+                                conditionals:
+                                  type: array
+                                  items:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - SHOW
+                                          conditional:
+                                            $ref: "#/components/schemas/Conditional"
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'SHOW' conditional is defined, the component is shown to the
+                                          user only if the condition is met
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - ENABLE
+                                          conditional:
+                                            $ref: "#/components/schemas/Conditional"
+                                        required:
+                                          - type
+                                          - conditional
+                                        description: If 'ENABLE' conditional is defined, the component is enabled only
+                                          if the condition is met
+                                  default: *a3
+                              required:
+                                - value
+                            description: Conditionals for specific countries. Countries not listed are
+                              always shown and enabled.
+                        required:
+                          - id
+                          - type
+                        description: Country select field
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                            description: Unique identifier of the field.
+                          type:
+                            type: string
+                            enum:
+                              - ADMINISTRATIVE_AREA
+                          label:
+                            description: Human-readable label of the field.
+                            allOf:
+                              - $ref: "#/components/schemas/TranslationConfig"
+                          conditionals:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/FieldConditional"
+                            default: *a11
+                            description: Conditions determining when the field is shown or enabled. By
+                              default, the field is always shown and enabled.
+                          required:
+                            anyOf:
+                              - type: boolean
+                              - type: object
+                                properties:
+                                  message:
+                                    description: Custom required validation message
+                                    allOf:
+                                      - $ref: "#/components/schemas/TranslationConfig"
+                                required:
+                                  - message
+                            default: false
+                            description: Indicates whether the field is mandatory.
+                        required:
+                          - id
+                          - type
+                        description: Administrative area input field e.g. facility, office
                 streetAddressForm:
                   type: array
                   items:
@@ -6500,6 +6617,49 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            optionOverrides:
+              type: array
+              items:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    description: The value of the option
+                  conditionals:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - SHOW
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'SHOW' conditional is defined, the component is shown to the
+                            user only if the condition is met
+                        - type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - ENABLE
+                            conditional:
+                              $ref: "#/components/schemas/Conditional"
+                          required:
+                            - type
+                            - conditional
+                          description: If 'ENABLE' conditional is defined, the component is enabled only
+                            if the condition is met
+                    default: *a3
+                required:
+                  - value
+              description: Conditionals for specific countries. Countries not listed are
+                always shown and enabled.
           required:
             - id
             - label
