@@ -46,6 +46,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ProfileState } from '../../profile/profileReducer'
+import { UserAuditHistory } from './UserAuditHistory'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -335,12 +336,9 @@ export const UserAudit = ({ hideNavigation }: { hideNavigation?: boolean }) => {
               />
             </Summary>
 
-            {/* {user.practitionerId && (
-              <UserAuditHistory
-                practitionerId={user.practitionerId}
-                practitionerName={userName}
-              />
-            )} */}
+            {user.id && (
+              <UserAuditHistory userId={user.id} userName={userName} />
+            )}
           </>
           {/* {user.id ? (
             <UserAuditActionModal
