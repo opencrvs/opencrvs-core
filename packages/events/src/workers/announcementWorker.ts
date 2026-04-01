@@ -17,20 +17,20 @@ import {
 import { env } from '@events/environment'
 import { getClient } from '@events/storage/postgres/events'
 import {
-  getNextProcessableNotification,
-  markNotificationFailed,
-  markNotificationSent,
-  updateNotificationProgress
-} from '@events/storage/postgres/events/notifications'
+  getNextProcessableAnnouncement,
+  markAnnouncementFailed,
+  markAnnouncementSent,
+  updateAnnouncementProgress
+} from '@events/storage/postgres/events/announcements'
 
 const POLL_INTERVAL_MS = 30_000
 export const BCC_CHUNK_SIZE = 500
-export const DAILY_NOTIFICATION_LIMIT = 1
-export const NOTIFICATION_RETRY_LIMIT = 3
+export const DAILY_ANNOUNCEMENT_LIMIT = 1
+export const ANNOUNCEMENT_RETRY_LIMIT = 3
 
-export async function processNextNotification() {
-  const notification = await getNextProcessableNotification()
-  if (!notification) {
+export async function processNextAnnouncement() {
+  const announcement = await getNextProcessableAnnouncement()
+  if (!announcement) {
     return
   }
 
@@ -38,42 +38,42 @@ export async function processNextNotification() {
   // positionally), so slicing by progress offset is safe across retries — the
   // same index always refers to the same recipient.
   // https://www.postgresql.org/docs/9.3/arrays.html#AEN6942
-  const chunk = notification.recipients.slice(
-    notification.progress,
-    notification.progress + BCC_CHUNK_SIZE
+  const chunk = announcement.recipients.slice(
+    announcement.progress,
+    announcement.progress + BCC_CHUNK_SIZE
   )
 
   if (chunk.length === 0) {
-    await markNotificationSent(notification.id)
+    await markAnnouncementSent(announcement.id)
     return
   }
 
   const admin = await getClient()
     .selectFrom('users')
     .select('email')
-    .where('id', '=', notification.createdBy)
+    .where('id', '=', announcement.createdBy)
     .executeTakeFirst()
 
   if (!admin?.email) {
     logger.error(
-      `Notification worker: admin user ${notification.createdBy} has no email — cannot dispatch notification ${notification.id}`
+      `Announcement worker: admin user ${announcement.createdBy} has no email — cannot dispatch announcement ${announcement.id}`
     )
-    await markNotificationFailed(notification.id, {
+    await markAnnouncementFailed(announcement.id, {
       message: 'Admin user has no email address'
     })
     return
   }
 
   logger.info(
-    `Notification worker: dispatching chunk of ${chunk.length} recipients for notification ${notification.id} (progress ${notification.progress})`
+    `Announcement worker: dispatching chunk of ${chunk.length} recipients for announcement ${announcement.id} (progress ${announcement.progress})`
   )
 
   try {
     const res = await triggerUserEventNotification({
       event: TriggerEvent.ALL_USER_NOTIFICATION,
       payload: {
-        subject: notification.subject,
-        body: notification.body,
+        subject: announcement.subject,
+        body: announcement.body,
         recipient: {
           email: admin.email,
           bcc: chunk.filter((e) => e !== admin.email)
@@ -84,32 +84,32 @@ export async function processNextNotification() {
     })
 
     if (res.ok) {
-      const newProgress = notification.progress + chunk.length
-      if (newProgress >= notification.recipients.length) {
-        await markNotificationSent(notification.id)
+      const newProgress = announcement.progress + chunk.length
+      if (newProgress >= announcement.recipients.length) {
+        await markAnnouncementSent(announcement.id)
         logger.info(
-          `Notification worker: notification ${notification.id} fully sent`
+          `Announcement worker: announcement ${announcement.id} fully sent`
         )
       } else {
-        await updateNotificationProgress(notification.id, newProgress)
+        await updateAnnouncementProgress(announcement.id, newProgress)
       }
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const error = (await res.json()) as Record<string, any>
       logger.error(
-        `Notification worker: dispatch failed for notification ${notification.id}: ${JSON.stringify(error)}`
+        `Announcement worker: dispatch failed for announcement ${announcement.id}: ${JSON.stringify(error)}`
       )
-      await markNotificationFailed(notification.id, error)
+      await markAnnouncementFailed(announcement.id, error)
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     logger.error(
-      `Notification worker: unexpected error for notification ${notification.id}: ${message}`
+      `Announcement worker: unexpected error for announcement ${announcement.id}: ${message}`
     )
-    await markNotificationFailed(notification.id, { message })
+    await markAnnouncementFailed(announcement.id, { message })
   }
 }
 
-export function startNotificationWorker() {
-  setInterval(() => void processNextNotification(), POLL_INTERVAL_MS)
+export function startAnnouncementWorker() {
+  setInterval(() => void processNextAnnouncement(), POLL_INTERVAL_MS)
 }

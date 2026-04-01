@@ -104,8 +104,8 @@ export const SuccessToastOnConfirm: Story = {
   parameters: {
     msw: {
       handlers: {
-        notification: [
-          tRPCMsw.notification.broadcast.mutation(() => ({
+        announcement: [
+          tRPCMsw.announcement.broadcast.mutation(() => ({
             success: true
           }))
         ]
@@ -143,8 +143,8 @@ export const ErrorToastOnFailure: Story = {
   parameters: {
     msw: {
       handlers: {
-        notification: [
-          tRPCMsw.notification.broadcast.mutation(() => {
+        announcement: [
+          tRPCMsw.announcement.broadcast.mutation(() => {
             throw new Error('Service unavailable')
           })
         ]
@@ -169,7 +169,11 @@ export const ErrorToastOnFailure: Story = {
       )
     })
 
-    await canvas.findByText('Only one email can be sent per day', {}, { timeout: 5000 })
+    await canvas.findByText(
+      'Only one email can be sent per day',
+      {},
+      { timeout: 5000 }
+    )
 
     await step('Form is NOT reset after error', async () => {
       const { subjectInput } = await getFormInputs(canvas)

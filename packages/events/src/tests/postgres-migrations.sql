@@ -28,16 +28,6 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO events_migrator;
 
 --
---
-
-
-
---
---
-
-
-
---
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -90,17 +80,6 @@ CREATE TYPE app.user_type AS ENUM (
 
 ALTER TYPE app.user_type OWNER TO events_migrator;
 
---
---
-
-
-
-
---
---
-
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -124,6 +103,43 @@ CREATE TABLE app.administrative_areas (
 ALTER TABLE app.administrative_areas OWNER TO events_migrator;
 
 --
+-- Name: announcements; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.announcements (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    subject text NOT NULL,
+    body text NOT NULL,
+    locale text DEFAULT 'en'::text NOT NULL,
+    recipients text[] NOT NULL,
+    created_by uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    status text DEFAULT 'PENDING'::text NOT NULL,
+    progress integer DEFAULT 0 NOT NULL,
+    retry_count integer DEFAULT 0 NOT NULL,
+    error jsonb,
+    sent_at timestamp with time zone,
+    CONSTRAINT announcements_status_check CHECK ((status = ANY (ARRAY['PENDING'::text, 'SENT'::text, 'FAILED'::text])))
+);
+
+
+ALTER TABLE app.announcements OWNER TO events_migrator;
+
+--
+-- Name: COLUMN announcements.recipients; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.announcements.recipients IS 'All BCC recipient emails, snapshotted at creation time.';
+
+
+--
+-- Name: COLUMN announcements.progress; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.announcements.progress IS 'Number of recipients sent so far. Worker resumes from this offset on retry.';
+
+
+--
 -- Name: audit_log; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -134,7 +150,8 @@ CREATE TABLE app.audit_log (
     operation text NOT NULL,
     request_data jsonb,
     response_summary jsonb,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    transaction_id text DEFAULT (gen_random_uuid())::text NOT NULL
 );
 
 
@@ -180,6 +197,13 @@ COMMENT ON COLUMN app.audit_log.request_data IS 'JSON blob of the request payloa
 --
 
 COMMENT ON COLUMN app.audit_log.response_summary IS 'Per-endpoint curated summary of the response (e.g. search terms used and count + IDs of results returned). Not the raw response payload.';
+
+
+--
+-- Name: COLUMN audit_log.transaction_id; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.transaction_id IS 'Client-supplied idempotency key. Existing rows are backfilled with random UUIDs.';
 
 
 --
@@ -279,24 +303,6 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 
 --
---
-
-
-
-
---
---
-
-
-
-
---
---
-
-
-
-
---
 -- Name: locations; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -314,43 +320,6 @@ CREATE TABLE app.locations (
 
 
 ALTER TABLE app.locations OWNER TO events_migrator;
-
---
--- Name: notifications; Type: TABLE; Schema: app; Owner: events_migrator
---
-
-CREATE TABLE app.notifications (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    subject text NOT NULL,
-    body text NOT NULL,
-    locale text DEFAULT 'en'::text NOT NULL,
-    recipients text[] NOT NULL,
-    created_by uuid NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    status text DEFAULT 'PENDING'::text NOT NULL,
-    progress integer DEFAULT 0 NOT NULL,
-    retry_count integer DEFAULT 0 NOT NULL,
-    error jsonb,
-    sent_at timestamp with time zone,
-    CONSTRAINT notifications_status_check CHECK ((status = ANY (ARRAY['PENDING'::text, 'SENT'::text, 'FAILED'::text])))
-);
-
-
-ALTER TABLE app.notifications OWNER TO events_migrator;
-
---
--- Name: COLUMN notifications.recipients; Type: COMMENT; Schema: app; Owner: events_migrator
---
-
-COMMENT ON COLUMN app.notifications.recipients IS 'All BCC recipient emails, snapshotted at creation time.';
-
-
---
--- Name: COLUMN notifications.progress; Type: COMMENT; Schema: app; Owner: events_migrator
---
-
-COMMENT ON COLUMN app.notifications.progress IS 'Number of recipients sent so far. Worker resumes from this offset on retry.';
-
 
 --
 -- Name: pgmigrations; Type: TABLE; Schema: app; Owner: events_migrator
@@ -386,21 +355,6 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNER TO events_migrator;
 
 ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
-
---
--- Name: pgmigrations_legacy_data_id_seq; Type: SEQUENCE; Schema: app; Owner: postgres
---
-
-CREATE SEQUENCE app.pgmigrations_legacy_data_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE app.pgmigrations_legacy_data_id_seq OWNER TO postgres;
 
 --
 -- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
@@ -497,6 +451,14 @@ ALTER TABLE ONLY app.administrative_areas
 
 
 --
+-- Name: announcements announcements_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.announcements
+    ADD CONSTRAINT announcements_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -585,14 +547,6 @@ ALTER TABLE ONLY app.locations
 
 
 --
--- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.notifications
-    ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
-
-
---
 -- Name: pgmigrations pgmigrations_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -665,6 +619,13 @@ ALTER TABLE ONLY app.users
 
 
 --
+-- Name: announcements_status_idx; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX announcements_status_idx ON app.announcements USING btree (status) WHERE (status = 'PENDING'::text);
+
+
+--
 -- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
@@ -693,6 +654,13 @@ CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
 
 
 --
+-- Name: idx_audit_log_transaction_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
+
+
+--
 -- Name: idx_event_tracking_id; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
@@ -704,13 +672,6 @@ CREATE INDEX idx_event_tracking_id ON app.events USING btree (tracking_id);
 --
 
 CREATE INDEX idx_locations_valid_until ON app.locations USING btree (valid_until);
-
-
---
--- Name: notifications_status_idx; Type: INDEX; Schema: app; Owner: events_migrator
---
-
-CREATE INDEX notifications_status_idx ON app.notifications USING btree (status) WHERE (status = 'PENDING'::text);
 
 
 --
@@ -726,6 +687,14 @@ CREATE UNIQUE INDEX system_clients_legacy_id_idx ON app.system_clients USING btr
 
 ALTER TABLE ONLY app.administrative_areas
     ADD CONSTRAINT administrative_areas_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES app.administrative_areas(id);
+
+
+--
+-- Name: announcements announcements_created_by_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.announcements
+    ADD CONSTRAINT announcements_created_by_fkey FOREIGN KEY (created_by) REFERENCES app.users(id);
 
 
 --
@@ -777,14 +746,6 @@ ALTER TABLE ONLY app.locations
 
 
 --
--- Name: notifications notifications_created_by_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.notifications
-    ADD CONSTRAINT notifications_created_by_fkey FOREIGN KEY (created_by) REFERENCES app.users(id);
-
-
---
 -- Name: user_credentials user_credentials_user_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -812,6 +773,13 @@ GRANT USAGE ON SCHEMA app TO events_app;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.administrative_areas TO events_app;
+
+
+--
+-- Name: TABLE announcements; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE app.announcements TO events_app;
 
 
 --
@@ -847,13 +815,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.events TO events_app;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
-
-
---
--- Name: TABLE notifications; Type: ACL; Schema: app; Owner: events_migrator
---
-
-GRANT SELECT,INSERT,UPDATE ON TABLE app.notifications TO events_app;
 
 
 --

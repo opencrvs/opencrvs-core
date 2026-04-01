@@ -15,14 +15,14 @@ import { SCOPES, UUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import {
-  countTodayNotifications,
-  getNextProcessableNotification
-} from '@events/storage/postgres/events/notifications'
+  countTodayAnnouncements,
+  getNextProcessableAnnouncement
+} from '@events/storage/postgres/events/announcements'
 import {
   BCC_CHUNK_SIZE,
-  NOTIFICATION_RETRY_LIMIT,
-  processNextNotification
-} from '@events/workers/notificationWorker'
+  ANNOUNCEMENT_RETRY_LIMIT,
+  processNextAnnouncement
+} from '@events/workers/announcementWorker'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
 
@@ -46,13 +46,13 @@ async function insertUser(
     .executeTakeFirstOrThrow() as Promise<{ id: UUID }>
 }
 
-async function insertNotification(
+async function insertAnnouncement(
   eventsDb: ReturnType<typeof getClient>,
   createdBy: UUID,
   overrides: { status?: string; retryCount?: number; createdAt?: string } = {}
 ) {
   return eventsDb
-    .insertInto('notifications')
+    .insertInto('announcements')
     .values({
       subject: 'Test Subject',
       body: 'Test Body',
@@ -77,14 +77,14 @@ async function insertAdminWithEmail(
   return { id: result.id as UUID, email }
 }
 
-describe('notification.broadcast', () => {
+describe('announcement.broadcast', () => {
   describe('authorization', () => {
     test('rejects with FORBIDDEN if caller lacks CONFIG_UPDATE_ALL scope', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [])
 
       await expect(
-        client.notification.broadcast({
+        client.announcement.broadcast({
           subject: 'Test',
           body: 'Test body',
           locale: 'en'
@@ -98,7 +98,7 @@ describe('notification.broadcast', () => {
     const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
 
     await expect(
-      client.notification.broadcast({
+      client.announcement.broadcast({
         subject: 'Test',
         body: 'Test body',
         locale: 'en'
@@ -123,7 +123,7 @@ describe('notification.broadcast', () => {
     const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
 
     await expect(
-      client.notification.broadcast({
+      client.announcement.broadcast({
         subject: 'Test',
         body: 'Test body',
         locale: 'en'
@@ -136,7 +136,7 @@ describe('notification.broadcast', () => {
     )
   })
 
-  test('rejects with TOO_MANY_REQUESTS if a notification was already sent today', async () => {
+  test('rejects with TOO_MANY_REQUESTS if an announcement was already sent today', async () => {
     const { user, eventsDb, locations } = await setupTestCase()
 
     await eventsDb
@@ -160,14 +160,14 @@ describe('notification.broadcast', () => {
 
     const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
 
-    await client.notification.broadcast({
+    await client.announcement.broadcast({
       subject: 'First',
       body: 'First body',
       locale: 'en'
     })
 
     await expect(
-      client.notification.broadcast({
+      client.announcement.broadcast({
         subject: 'Second',
         body: 'Second body',
         locale: 'en'
@@ -175,7 +175,7 @@ describe('notification.broadcast', () => {
     ).rejects.toMatchObject({ code: 'TOO_MANY_REQUESTS' })
   })
 
-  test('creates a PENDING notification row with correct data and returns { success: true }', async () => {
+  test('creates a PENDING announcement row with correct data and returns { success: true }', async () => {
     const { user, eventsDb, locations } = await setupTestCase()
 
     await eventsDb
@@ -205,7 +205,7 @@ describe('notification.broadcast', () => {
 
     const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
 
-    const result = await client.notification.broadcast({
+    const result = await client.announcement.broadcast({
       subject: 'Hello',
       body: 'World',
       locale: 'fr'
@@ -213,96 +213,96 @@ describe('notification.broadcast', () => {
 
     expect(result).toEqual({ success: true })
 
-    const notification = await eventsDb
-      .selectFrom('notifications')
+    const announcement = await eventsDb
+      .selectFrom('announcements')
       .selectAll()
       .executeTakeFirstOrThrow()
 
-    expect(notification.status).toBe('PENDING')
-    expect(notification.subject).toBe('Hello')
-    expect(notification.body).toBe('World')
-    expect(notification.locale).toBe('fr')
-    expect(notification.recipients).toEqual(
+    expect(announcement.status).toBe('PENDING')
+    expect(announcement.subject).toBe('Hello')
+    expect(announcement.body).toBe('World')
+    expect(announcement.locale).toBe('fr')
+    expect(announcement.recipients).toEqual(
       expect.arrayContaining(['user1@test.com', 'user2@test.com'])
     )
   })
 })
 
-describe('getNextProcessableNotification', () => {
-  test('returns PENDING notifications', async () => {
+describe('getNextProcessableAnnouncement', () => {
+  test('returns PENDING announcements', async () => {
     const { eventsDb, locations } = await setupTestCase()
     const { id: userId } = await insertUser(eventsDb, locations[0].id)
-    await insertNotification(eventsDb, userId, { status: 'PENDING' })
+    await insertAnnouncement(eventsDb, userId, { status: 'PENDING' })
 
-    const result = await getNextProcessableNotification()
+    const result = await getNextProcessableAnnouncement()
     expect(result).not.toBeUndefined()
     expect(result?.status).toBe('PENDING')
   })
 
-  test('returns FAILED notifications under the retry limit', async () => {
+  test('returns FAILED announcements under the retry limit', async () => {
     const { eventsDb, locations } = await setupTestCase()
     const { id: userId } = await insertUser(eventsDb, locations[0].id)
-    await insertNotification(eventsDb, userId, {
+    await insertAnnouncement(eventsDb, userId, {
       status: 'FAILED',
-      retryCount: NOTIFICATION_RETRY_LIMIT - 1
+      retryCount: ANNOUNCEMENT_RETRY_LIMIT - 1
     })
 
-    const result = await getNextProcessableNotification()
+    const result = await getNextProcessableAnnouncement()
     expect(result).not.toBeUndefined()
     expect(result?.status).toBe('FAILED')
   })
 
-  test('ignores FAILED notifications at or above the retry limit', async () => {
+  test('ignores FAILED announcements at or above the retry limit', async () => {
     const { eventsDb, locations } = await setupTestCase()
     const { id: userId } = await insertUser(eventsDb, locations[0].id)
-    await insertNotification(eventsDb, userId, {
+    await insertAnnouncement(eventsDb, userId, {
       status: 'FAILED',
-      retryCount: NOTIFICATION_RETRY_LIMIT
+      retryCount: ANNOUNCEMENT_RETRY_LIMIT
     })
 
-    const result = await getNextProcessableNotification()
+    const result = await getNextProcessableAnnouncement()
     expect(result).toBeUndefined()
   })
 
-  test('ignores SENT notifications', async () => {
+  test('ignores SENT announcements', async () => {
     const { eventsDb, locations } = await setupTestCase()
     const { id: userId } = await insertUser(eventsDb, locations[0].id)
-    await insertNotification(eventsDb, userId, { status: 'SENT' })
+    await insertAnnouncement(eventsDb, userId, { status: 'SENT' })
 
-    const result = await getNextProcessableNotification()
+    const result = await getNextProcessableAnnouncement()
     expect(result).toBeUndefined()
   })
 })
 
-describe('countTodayNotifications', () => {
+describe('countTodayAnnouncements', () => {
   test('counts only non-FAILED rows created today', async () => {
     const { eventsDb, locations } = await setupTestCase()
     const { id: userId } = await insertUser(eventsDb, locations[0].id)
 
-    await insertNotification(eventsDb, userId, { status: 'SENT' })
+    await insertAnnouncement(eventsDb, userId, { status: 'SENT' })
 
     const yesterday = new Date()
     yesterday.setUTCDate(yesterday.getUTCDate() - 1)
-    await insertNotification(eventsDb, userId, {
+    await insertAnnouncement(eventsDb, userId, {
       status: 'SENT',
       createdAt: yesterday.toISOString()
     })
 
-    const count = await countTodayNotifications()
+    const count = await countTodayAnnouncements()
     expect(count).toBe(1)
   })
 
   test('does not count FAILED rows', async () => {
     const { eventsDb, locations } = await setupTestCase()
     const { id: userId } = await insertUser(eventsDb, locations[0].id)
-    await insertNotification(eventsDb, userId, { status: 'FAILED' })
+    await insertAnnouncement(eventsDb, userId, { status: 'FAILED' })
 
-    const count = await countTodayNotifications()
+    const count = await countTodayAnnouncements()
     expect(count).toBe(0)
   })
 })
 
-describe('processNextNotification', () => {
+describe('processNextAnnouncement', () => {
   const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/triggers/user/all-user-notification`
 
   test('sends all recipients in a single call when under the chunk size', async () => {
@@ -311,7 +311,7 @@ describe('processNextNotification', () => {
 
     const recipients = generateEmails(3)
     await eventsDb
-      .insertInto('notifications')
+      .insertInto('announcements')
       .values({ subject: 'Hi', body: 'Body', recipients, createdBy: userId })
       .execute()
 
@@ -324,14 +324,14 @@ describe('processNextNotification', () => {
       })
     )
 
-    await processNextNotification()
+    await processNextAnnouncement()
 
-    const notification = await eventsDb
-      .selectFrom('notifications')
+    const announcement = await eventsDb
+      .selectFrom('announcements')
       .selectAll()
       .executeTakeFirstOrThrow()
 
-    expect(notification.status).toBe('SENT')
+    expect(announcement.status).toBe('SENT')
     expect(capturedBcc).toEqual(expect.arrayContaining(recipients))
   })
 
@@ -341,7 +341,7 @@ describe('processNextNotification', () => {
 
     const recipients = generateEmails(BCC_CHUNK_SIZE + 1)
     await eventsDb
-      .insertInto('notifications')
+      .insertInto('announcements')
       .values({ subject: 'Hi', body: 'Body', recipients, createdBy: userId })
       .execute()
 
@@ -354,10 +354,10 @@ describe('processNextNotification', () => {
       })
     )
 
-    await processNextNotification()
+    await processNextAnnouncement()
 
     const afterFirstChunk = await eventsDb
-      .selectFrom('notifications')
+      .selectFrom('announcements')
       .selectAll()
       .executeTakeFirstOrThrow()
 
@@ -365,10 +365,10 @@ describe('processNextNotification', () => {
     expect(afterFirstChunk.progress).toBe(BCC_CHUNK_SIZE)
     expect(dispatchedBccSizes).toEqual([BCC_CHUNK_SIZE])
 
-    await processNextNotification()
+    await processNextAnnouncement()
 
     const afterSecondChunk = await eventsDb
-      .selectFrom('notifications')
+      .selectFrom('announcements')
       .selectAll()
       .executeTakeFirstOrThrow()
 
@@ -376,12 +376,12 @@ describe('processNextNotification', () => {
     expect(dispatchedBccSizes).toEqual([BCC_CHUNK_SIZE, 1])
   })
 
-  test('marks notification as FAILED and increments retryCount when dispatch fails', async () => {
+  test('marks announcement as FAILED and increments retryCount when dispatch fails', async () => {
     const { eventsDb, locations } = await setupTestCase()
     const { id: userId } = await insertAdminWithEmail(eventsDb, locations[0].id)
 
     await eventsDb
-      .insertInto('notifications')
+      .insertInto('announcements')
       .values({
         subject: 'Hi',
         body: 'Body',
@@ -394,14 +394,14 @@ describe('processNextNotification', () => {
       http.post(ALL_USER_NOTIFICATION_URL, () => HttpResponse.error())
     )
 
-    await processNextNotification()
+    await processNextAnnouncement()
 
-    const notification = await eventsDb
-      .selectFrom('notifications')
+    const announcement = await eventsDb
+      .selectFrom('announcements')
       .selectAll()
       .executeTakeFirstOrThrow()
 
-    expect(notification.status).toBe('FAILED')
-    expect(notification.retryCount).toBe(1)
+    expect(announcement.status).toBe('FAILED')
+    expect(announcement.retryCount).toBe(1)
   })
 })

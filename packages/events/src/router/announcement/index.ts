@@ -15,12 +15,12 @@ import { hasScope, SCOPES } from '@opencrvs/commons'
 import { router, userOnlyProcedure } from '@events/router/trpc'
 import { getClient } from '@events/storage/postgres/events'
 import {
-  countTodayNotifications,
-  createNotification
-} from '@events/storage/postgres/events/notifications'
-import { DAILY_NOTIFICATION_LIMIT } from '@events/workers/notificationWorker'
+  countTodayAnnouncements,
+  createAnnouncement
+} from '@events/storage/postgres/events/announcements'
+import { DAILY_ANNOUNCEMENT_LIMIT } from '@events/workers/announcementWorker'
 
-export const notificationRouter = router({
+export const announcementRouter = router({
   broadcast: userOnlyProcedure
     .input(
       z.object({
@@ -35,8 +35,8 @@ export const notificationRouter = router({
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
 
-      const todayCount = await countTodayNotifications()
-      if (todayCount >= DAILY_NOTIFICATION_LIMIT) {
+      const todayCount = await countTodayAnnouncements()
+      if (todayCount >= DAILY_ANNOUNCEMENT_LIMIT) {
         throw new TRPCError({
           code: 'TOO_MANY_REQUESTS',
           message: 'A broadcast has already been sent today'
@@ -76,7 +76,7 @@ export const notificationRouter = router({
         })
       }
 
-      await createNotification({
+      await createAnnouncement({
         subject: input.subject,
         body: input.body,
         locale: input.locale,

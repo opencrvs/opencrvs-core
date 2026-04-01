@@ -11,18 +11,18 @@
 
 import { UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
-import { NOTIFICATION_RETRY_LIMIT } from '@events/workers/notificationWorker'
+import { ANNOUNCEMENT_RETRY_LIMIT } from '@events/workers/announcementWorker'
+import { NewAnnouncements } from './schema/app/Announcements'
 
 function startOfToday(): string {
   const d = new Date()
   d.setUTCHours(0, 0, 0, 0)
   return d.toISOString()
 }
-import { NewNotifications } from './schema/app/Notifications'
 
-export async function createNotification(
+export async function createAnnouncement(
   params: Omit<
-    NewNotifications,
+    NewAnnouncements,
     | 'id'
     | 'createdAt'
     | 'status'
@@ -34,21 +34,24 @@ export async function createNotification(
 ) {
   const db = getClient()
   return db
-    .insertInto('notifications')
+    .insertInto('announcements')
     .values(params)
     .returning('id')
     .executeTakeFirstOrThrow()
 }
 
-export async function getNextProcessableNotification() {
+export async function getNextProcessableAnnouncement() {
   const db = getClient()
   return db
-    .selectFrom('notifications')
+    .selectFrom('announcements')
     .selectAll()
     .where((eb) =>
       eb.or([
         eb('status', '=', 'PENDING'),
-        eb.and([eb('status', '=', 'FAILED'), eb('retryCount', '<', NOTIFICATION_RETRY_LIMIT)])
+        eb.and([
+          eb('status', '=', 'FAILED'),
+          eb('retryCount', '<', ANNOUNCEMENT_RETRY_LIMIT)
+        ])
       ])
     )
     .orderBy('createdAt', 'asc')
@@ -56,32 +59,32 @@ export async function getNextProcessableNotification() {
     .executeTakeFirst()
 }
 
-export async function updateNotificationProgress(id: UUID, progress: number) {
+export async function updateAnnouncementProgress(id: UUID, progress: number) {
   const db = getClient()
   return db
-    .updateTable('notifications')
+    .updateTable('announcements')
     .set({ progress })
     .where('id', '=', id)
     .execute()
 }
 
-export async function markNotificationSent(id: UUID) {
+export async function markAnnouncementSent(id: UUID) {
   const db = getClient()
   return db
-    .updateTable('notifications')
+    .updateTable('announcements')
     .set({ status: 'SENT', sentAt: new Date().toISOString() })
     .where('id', '=', id)
     .execute()
 }
 
-export async function markNotificationFailed(
+export async function markAnnouncementFailed(
   id: UUID,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: Record<string, any>
 ) {
   const db = getClient()
   return db
-    .updateTable('notifications')
+    .updateTable('announcements')
     .set((eb) => ({
       status: 'FAILED',
       retryCount: eb('retryCount', '+', 1),
@@ -91,10 +94,10 @@ export async function markNotificationFailed(
     .execute()
 }
 
-export async function countTodayNotifications() {
+export async function countTodayAnnouncements() {
   const db = getClient()
   const result = await db
-    .selectFrom('notifications')
+    .selectFrom('announcements')
     .select((eb) => eb.fn.countAll<number>().as('count'))
     .where('status', '!=', 'FAILED')
     .where('createdAt', '>=', startOfToday())

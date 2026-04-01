@@ -91,7 +91,7 @@ const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
 
   const broadcastMutation = useMutation({
     mutationFn: () =>
-      trpcClient.notification.broadcast.mutate({
+      trpcClient.announcement.broadcast.mutate({
         subject,
         body,
         locale: intl.locale

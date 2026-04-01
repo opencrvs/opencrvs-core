@@ -4,8 +4,8 @@
 import type { UUID } from '@opencrvs/commons'
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely'
 
-/** Represents the table app.notifications */
-export default interface NotificationsTable {
+/** Represents the table app.announcements */
+export default interface AnnouncementsTable {
   id: ColumnType<UUID, UUID | undefined, UUID>
 
   subject: ColumnType<string, string, string>
@@ -37,8 +37,8 @@ export default interface NotificationsTable {
   sentAt: ColumnType<string | null, string | null, string | null>
 }
 
-export type Notifications = Selectable<NotificationsTable>
+export type Announcements = Selectable<AnnouncementsTable>
 
-export type NewNotifications = Insertable<NotificationsTable>
+export type NewAnnouncements = Insertable<AnnouncementsTable>
 
-export type NotificationsUpdate = Updateable<NotificationsTable>
+export type AnnouncementsUpdate = Updateable<AnnouncementsTable>
