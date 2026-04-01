@@ -46,7 +46,7 @@ Previously only a fixed set of string values (`'country'` / `'administrativeArea
 ### New features
 
 - Support for conditional actions "ENABLE" and "SHOW" in SELECT field options to allow the options to be hidden/disabled conditionally.
-- `COUNTRY` field now supports `optionOverrides` to conditionally hide or disable specific country options using "SHOW" and "ENABLE" conditionals.
+- `COUNTRY` field now supports `optionOverrides` to conditionally hide or disable specific country options using "SHOW" and "ENABLE" conditionals. It can be used independently in a COUNTRY field or in a nested Address subfield.
 - A composite field type (`FIELD_GROUP`) that groups related child fields into a single unit with a shared label, conditionals, and validation.
 
 **Structure:**
@@ -64,6 +64,11 @@ Previously only a fixed set of string values (`'country'` / `'administrativeArea
 ```
 
 N.B. Support for `DISPLAY_ON_REVIEW` conditionals in nested fields has not been implemented yet.
+
+### Bug fixes
+
+- Allow nested address fields to use the outer form values in conditionals.
+- Skip hidden fields when generating default values. Note: `defaultValue` only applies on the first mount of a form page — after that the field's value takes precedence, even if the `defaultValue` changes across field versions. [#11476](https://github.com/opencrvs/opencrvs-core/issues/11476)
 
 ## 1.9.11
 
