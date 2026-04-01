@@ -71,13 +71,10 @@ export const BackgroundConfig = z
     backgroundImage: z.string().optional(),
     imageFit: z.string().optional()
   })
-  .refine((data) => {
-    if (!data.backgroundColor && !data.backgroundImage) {
-      throw new Error(
-        'backgroundColor and backgroundImage cannot be empty at the same time'
-      )
-    }
-  })
+  .refine(
+    (data) => !!(data.backgroundColor || data.backgroundImage),
+    'backgroundColor and backgroundImage cannot be empty at the same time'
+  )
 
 export const LoginConfig = z.object({
   COUNTRY: z.string(),

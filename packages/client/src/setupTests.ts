@@ -16,7 +16,6 @@ import { referenceApi } from './utils/referenceApi'
 import 'core-js/features/array/flat'
 // eslint-disable-next-line import/no-unassigned-import
 import 'jsdom-worker'
-import { userQueries } from './user/queries'
 import { mockOfflineData } from './tests/mock-offline-data'
 // eslint-disable-next-line import/no-unassigned-import
 import './tests/queryMock'
@@ -182,7 +181,6 @@ console.warn = warn
 console.error = error
 console.debug = debug
 queries.fetchUserDetails = vi.fn()
-userQueries.searchUsers = vi.fn()
 
 vi.doMock(
   '@client/utils/referenceApi',

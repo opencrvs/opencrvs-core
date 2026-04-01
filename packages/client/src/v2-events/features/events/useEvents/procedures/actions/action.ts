@@ -100,7 +100,8 @@ function getCleanedDeclarationDiff({
     return omitHiddenPaginatedFields(
       eventConfiguration.declaration,
       declarationDiff,
-      validatorContext
+      validatorContext,
+      true
     )
   }
 
@@ -109,17 +110,23 @@ function getCleanedDeclarationDiff({
   const merged = deepMerge(originalDeclaration, declarationDiff)
 
   // Remove any hidden/paginated fields from the merged declaration
+  // But retain hidden fields with empty values indicating they should be removed.
+  // Because hidden fields with values in current event state causes confusion and bug in search endpoint
   // (Ensures we only consider fields relevant to the event configuration)
-  const cleanedDeclaration = omitHiddenPaginatedFields(
-    eventConfiguration.declaration,
-    merged,
-    validatorContext
-  )
+  const cleanedDeclarationWithHiddenFieldsWithNullValues =
+    omitHiddenPaginatedFields(
+      eventConfiguration.declaration,
+      merged,
+      validatorContext,
+      true
+    )
 
   // From the update, keep only fields that are valid in the cleaned declaration
   // (Prevents applying updates to hidden/invalid fields)
   return Object.fromEntries(
-    Object.entries(declarationDiff).filter(([key]) => key in cleanedDeclaration)
+    Object.entries(declarationDiff).filter(
+      ([key]) => key in cleanedDeclarationWithHiddenFieldsWithNullValues
+    )
   )
 }
 
@@ -402,7 +409,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   trpcProcedure: P
 ) {
   const eventConfigurations = useEventConfigurations()
-  // @TODO: consider whether this should be here.
+
   const validatorContext = useValidatorContext()
 
   const allOptions = {
@@ -500,7 +507,7 @@ export function useEventCustomAction<T extends CustomMutationKeys>(
   mutationName: T
 ) {
   const eventConfigurations = useEventConfigurations()
-  // @TODO: consider whether this should be here.
+
   const validatorContext = useValidatorContext()
   const mutationKey = customMutationKeys[mutationName]
   const mutation = useMutation({

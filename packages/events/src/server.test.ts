@@ -95,7 +95,9 @@ test('Server starts up and returns an event based on context dependency values',
   const mockUserResponse = {
     primaryOfficeId: locations[0].id,
     role: TestUserRole.enum.LOCAL_REGISTRAR,
-    signature: '/ocrvs/my-signature.png'
+    signature: {
+      data: 'my-signature.png'
+    }
   }
 
   mswServer.use(

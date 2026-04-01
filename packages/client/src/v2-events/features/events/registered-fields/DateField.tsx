@@ -16,8 +16,9 @@ import { useField } from 'formik'
 import {
   DateField as DateFieldType,
   DatetimeValue,
-  DateValue,
-  SerializedNowDateTime
+  PlainDate,
+  SerializedNowDateTime,
+  plainDateToLocalDate
 } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
@@ -46,7 +47,7 @@ function resolveNowForDateInput(value: string | SerializedNowDateTime): string {
     return `${year}-${month}-${day}`
   }
 
-  return value.toString()
+  return typeof value === 'string' ? value : ''
 }
 
 function DateInput({
@@ -112,11 +113,11 @@ function DateInput({
 
 function DateOutput({ value }: { value?: string }) {
   const intl = useIntl()
-  const parsed = DateValue.safeParse(value)
+  const parsed = PlainDate.safeParse(value)
 
   if (parsed.success) {
     return format(
-      new Date(parsed.data),
+      plainDateToLocalDate(parsed.data),
       intl.formatMessage(messages.dateFormat)
     )
   }
@@ -128,12 +129,19 @@ function stringify(
   value: string | undefined,
   context: StringifierContext<DateFieldType>
 ) {
-  // We should allow parsing valid datetimes into the configured date format.
-  const parsed = DateValue.or(DatetimeValue).safeParse(value)
-
-  if (parsed.success) {
+  const parsedDate = PlainDate.safeParse(value)
+  if (parsedDate.success) {
     return format(
-      new Date(parsed.data),
+      plainDateToLocalDate(parsedDate.data),
+      context.intl.formatMessage(messages.dateFormat)
+    )
+  }
+
+  // DatetimeValue includes explicit timezone info, so new Date() is safe here.
+  const parsedDatetime = DatetimeValue.safeParse(value)
+  if (parsedDatetime.success) {
+    return format(
+      new Date(parsedDatetime.data),
       context.intl.formatMessage(messages.dateFormat)
     )
   }

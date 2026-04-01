@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import * as z from 'zod/v4'
 import { TokenUserType } from '../authentication'
 
 /**
@@ -107,6 +108,59 @@ export type IntegrationCreateAuditLog = {
   }
 }
 
+export type IntegrationRefreshTokenAuditLog = {
+  operation: 'integrations.refreshToken'
+  requestData: {
+    clientId: string
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
+export type IntegrationDeactivateAuditLog = {
+  operation: 'integrations.deactivate'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    id: string
+    status: string
+  }
+}
+
+export type IntegrationActivateAuditLog = {
+  operation: 'integrations.activate'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    id: string
+    status: string
+  }
+}
+
+export type IntegrationDeleteAuditLog = {
+  operation: 'integrations.delete'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    id: string
+    name: string
+  }
+}
+
+export type IntegrationRefreshSecretAuditLog = {
+  operation: 'integrations.refreshSecret'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
 export type AttachmentUploadAuditLog = {
   operation: 'attachments.upload'
   requestData: {
@@ -117,6 +171,88 @@ export type AttachmentUploadAuditLog = {
     fileUrl: string
   }
 }
+
+export const UserAuditRecordInput = z.discriminatedUnion('operation', [
+  z.object({
+    operation: z.literal('user.create_user'),
+    requestData: z.object({
+      subjectId: z.string(),
+      role: z.string(),
+      primaryOfficeId: z.string()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.deactivate'),
+    requestData: z.object({
+      subjectId: z.string(),
+      reason: z.string(),
+      comment: z.string().optional()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.reactivate'),
+    requestData: z.object({
+      subjectId: z.string(),
+      reason: z.string(),
+      comment: z.string().optional()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.edit_user'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.email_address_changed'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({ email: z.string() })
+  }),
+  z.object({
+    operation: z.literal('user.logged_in'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.logged_out'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.password_changed'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.password_reset'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.password_reset_by_admin'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.phone_number_changed'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({ phoneNumber: z.string() })
+  }),
+  z.object({
+    operation: z.literal('user.username_reminder'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.username_reminder_by_admin'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  })
+])
+
+export type UserAuditLog = z.infer<typeof UserAuditRecordInput>
 
 /**
  * Union of all audit log entry variants.
@@ -130,7 +266,17 @@ export type AuditLogOperation =
   | EventSearchAuditLog
   | EventActionAuditLog
   | IntegrationCreateAuditLog
+  | IntegrationDeactivateAuditLog
+  | IntegrationActivateAuditLog
+  | IntegrationDeleteAuditLog
+  | IntegrationRefreshSecretAuditLog
   | AttachmentUploadAuditLog
+  | UserAuditLog
+  | IntegrationCreateAuditLog
+  | IntegrationRefreshTokenAuditLog
+  | IntegrationDeactivateAuditLog
+  | IntegrationActivateAuditLog
+  | IntegrationDeleteAuditLog
 
 /**
  * Parameters for writing an audit log entry.

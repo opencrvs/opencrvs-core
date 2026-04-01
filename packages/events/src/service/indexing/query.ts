@@ -189,6 +189,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       case 'assignedTo':
       case 'createdBy':
       case 'updatedBy':
+      case 'updatedByUserRole':
       case 'createdByUserType':
       case 'legalStatuses.REGISTERED.registrationNumber': {
         const value = clause[key]
@@ -345,7 +346,6 @@ export function withJurisdictionFilters({
           case 'event':
             must.push({
               terms: {
-                // @TODO: Clarify why V1 had 1-tuple.
                 type: Array.isArray(value) ? value : [value]
               }
             })

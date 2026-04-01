@@ -379,12 +379,12 @@ const messagesToDefine: IUserMessages = {
     id: 'phone.label.verify'
   },
   confirmationPhoneMsg: {
-    defaultMessage: 'A confirmational SMS has been sent to {num}',
+    defaultMessage: 'Verification code has been sent to {email}',
     description: 'Confirmation phone number message',
     id: 'phone.label.confirmation'
   },
   confirmationEmailMsg: {
-    defaultMessage: 'A confirmational SMS has been sent to {email}',
+    defaultMessage: 'Verification code has been sent to {email}',
     description: 'Confirmation email address message',
     id: 'email.label.confirmation'
   },

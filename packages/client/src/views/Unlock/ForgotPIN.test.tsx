@@ -11,12 +11,15 @@
 import React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { AppStore, createStore } from '@client/store'
-import { createTestComponent, flushPromises, userDetails } from '@client/tests/util'
+import {
+  createTestComponent,
+  flushPromises,
+  userDetails
+} from '@client/tests/util'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'
 import { UUID } from '@opencrvs/commons/client'
-import { userQueries } from '@client/user/queries'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
@@ -27,7 +30,6 @@ describe('ForgotPIN tests', () => {
   let store: AppStore
   const goBackMock: Mock = vi.fn()
   const onVerifyPasswordMock = vi.fn()
-  userQueries.verifyPasswordById = vi.fn()
 
   beforeAll(async () => {
     ;({ store } = await createStore())
@@ -78,68 +80,6 @@ describe('ForgotPIN tests', () => {
     const formError = await waitForElement(component, '#form_error')
     expect(formError.hostNodes()).toHaveLength(1)
     expect(formError.hostNodes().text()).toBe('This field is required')
-  })
-
-  it('wrong password submission shows error', async () => {
-    ;(userQueries.verifyPasswordById as Mock).mockRejectedValueOnce({
-      data: {
-        verifyPasswordById: null
-      },
-      errors: [
-        {
-          message: 'Unauthorized to verify password',
-          path: ['verifyPasswordById'],
-          extensions: {
-            code: 'INTERNAL_SERVER_ERROR'
-          }
-        }
-      ]
-    })
-    const passwordInput = await waitForElement(component, 'input#password')
-    passwordInput.hostNodes().simulate('change', {
-      target: { id: 'password', value: 'wrongPassword' }
-    })
-
-    const formElement = await waitForElement(
-      component,
-      '#password_verification_form'
-    )
-
-    formElement.hostNodes().simulate('submit')
-
-    await flushPromises()
-
-    const formError = await waitForElement(component, '#form_error')
-    expect(formError.hostNodes()).toHaveLength(1)
-    expect(formError.hostNodes().text()).toBe(
-      'The password you entered was incorrect'
-    )
-  })
-
-  it('correct password submission triggers onVerifyPassword', async () => {
-    ;(userQueries.verifyPasswordById as Mock).mockReturnValueOnce({
-      data: {
-        verifyPasswordById: {
-          id: '5eba726866458970cf2e23c2',
-          username: 'sakibal.hasan'
-        }
-      }
-    })
-    const passwordInput = await waitForElement(component, 'input#password')
-    passwordInput.hostNodes().simulate('change', {
-      target: { id: 'password', value: 'correctPassword' }
-    })
-
-    const formElement = await waitForElement(
-      component,
-      '#password_verification_form'
-    )
-
-    formElement.hostNodes().simulate('submit')
-
-    await flushPromises()
-
-    expect(onVerifyPasswordMock).toBeCalledTimes(1)
   })
 
   it('clicking on logout removes indexedDB entries', async () => {

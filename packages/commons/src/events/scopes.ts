@@ -9,18 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { intersection } from 'lodash'
-import {
-  ConfigurableScopeType,
-  getAuthorizedEventsFromScopes,
-  Scope,
-  findScopes
-} from '../scopes'
+
 import {
   ClientSpecificAction,
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes-v2'
+import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes'
 import {
   EventIndexWithAdministrativeHierarchy,
   userCanAccessEventWithScopes
@@ -57,22 +52,8 @@ export const ACTION_SCOPE_MAP = {
   [ActionType.CUSTOM]: []
 } satisfies Record<DisplayableAction, RecordScopeTypeV2[] | AlwaysAllowed>
 
-export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
+export function hasAnyOfScopes(a: string[], b: string[]) {
   return intersection(a, b).length > 0
-}
-
-export function configurableEventScopeAllowed(
-  scopes: Scope[],
-  allowedConfigurableScopes: ConfigurableScopeType[],
-  eventType: string
-) {
-  // Find the scopes that are authorized for the given action
-  const parsedScopes = allowedConfigurableScopes.flatMap((scope) =>
-    findScopes(scopes, scope)
-  )
-
-  const authorizedEvents = getAuthorizedEventsFromScopes(parsedScopes)
-  return authorizedEvents.includes(eventType)
 }
 
 export const AssignmentStatus = {
@@ -105,7 +86,7 @@ export function getAssignmentStatus(
  * (hardcoded, non-configurable) and V2 scopes, which validate event type, jurisdiction,
  * and user context via {@link userCanAccessEventWithScopes}.
  *
- * @param {Scope[]} scopes - The raw encoded scope strings the user possesses (from JWT).
+ * @param {string[]} scopes - The raw encoded scope strings the user possesses (from JWT).
  * @param {DisplayableAction} action - The action to check authorization for.
  * @param {EventIndexWithAdministrativeHierarchy} event - The event with resolved administrative hierarchy.
  * @param {UserContext} currentUser - The current user's context used for V2 scope validation.
@@ -117,7 +98,7 @@ export function isActionInScope({
   event,
   currentUser
 }: {
-  scopes: Scope[]
+  scopes: string[]
   action: DisplayableAction
   event: EventIndexWithAdministrativeHierarchy
   currentUser: UserContext
@@ -132,47 +113,33 @@ export function isActionInScope({
     action === ActionType.UNASSIGN &&
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS
 
-  const allowedConfigurableScopes = isUnassigningOthers
-    ? ['record.unassign-others']
+  const acceptedScopes = isUnassigningOthers
+    ? (['record.unassign-others'] as RecordScopeTypeV2[])
     : ACTION_SCOPE_MAP[action]
 
   // 'null' means that the action is always allowed
-  if (allowedConfigurableScopes === null) {
+  if (acceptedScopes === null) {
     return true
   }
 
   // Empty array means that the action is never allowed
-  if (!allowedConfigurableScopes.length) {
+  if (!acceptedScopes.length) {
     return false
   }
 
-  const isAllowedByLegacyScope = configurableEventScopeAllowed(
-    scopes,
-    // @ts-expect-error - TODO: remove legacy scopes once evrything is migrated to V2
-    allowedConfigurableScopes,
-    event.type
-  )
-
-  // @TODO
-  // NOTE: This is a temporary measure to allow for the transition to V2 scopes.
-  // This will be unified to single check once the V1 scopes are fully deprecated and removed.
   const matchingScopes = getAcceptedScopesByType({
-    acceptedScopes: allowedConfigurableScopes as RecordScopeTypeV2[],
+    acceptedScopes,
     scopes
   })
 
-  const isAllowedByV2Scope = userCanAccessEventWithScopes(
-    event,
-    matchingScopes,
-    {
-      id: currentUser.id,
-      primaryOfficeId: currentUser.primaryOfficeId,
-      administrativeAreaId: currentUser.administrativeAreaId ?? null,
-      role: currentUser.role,
-      signature: currentUser.signature,
-      type: currentUser.type
-    }
-  )
+  const canAccess = userCanAccessEventWithScopes(event, matchingScopes, {
+    id: currentUser.id,
+    primaryOfficeId: currentUser.primaryOfficeId,
+    administrativeAreaId: currentUser.administrativeAreaId ?? null,
+    role: currentUser.role,
+    signature: currentUser.signature,
+    type: currentUser.type
+  })
 
-  return isAllowedByLegacyScope || isAllowedByV2Scope
+  return canAccess
 }

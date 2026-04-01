@@ -56,6 +56,24 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: administrative_areas; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.administrative_areas (
+    id uuid NOT NULL,
+    name text NOT NULL,
+    parent_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    valid_until timestamp with time zone,
+    external_id text
+);
+
+
+ALTER TABLE app.administrative_areas OWNER TO events_migrator;
+
+--
 -- Name: audit_log; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -66,7 +84,8 @@ CREATE TABLE app.audit_log (
     operation text NOT NULL,
     request_data jsonb,
     response_summary jsonb,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    transaction_id text DEFAULT (gen_random_uuid())::text NOT NULL
 );
 
 
@@ -115,22 +134,11 @@ COMMENT ON COLUMN app.audit_log.response_summary IS 'Per-endpoint curated summar
 
 
 --
--- Name: administrative_areas; Type: TABLE; Schema: app; Owner: events_migrator
+-- Name: COLUMN audit_log.transaction_id; Type: COMMENT; Schema: app; Owner: events_migrator
 --
 
-CREATE TABLE app.administrative_areas (
-    id uuid NOT NULL,
-    name text NOT NULL,
-    parent_id uuid,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp with time zone,
-    valid_until timestamp with time zone,
-    external_id text
-);
+COMMENT ON COLUMN app.audit_log.transaction_id IS 'Client-supplied idempotency key. Existing rows are backfilled with random UUIDs.';
 
-
-ALTER TABLE app.administrative_areas OWNER TO events_migrator;
 
 --
 -- Name: event_action_drafts; Type: TABLE; Schema: app; Owner: events_migrator
@@ -283,6 +291,27 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
 
 --
+-- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.system_clients (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    legacy_id text,
+    name text NOT NULL,
+    scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
+    created_by text,
+    secret_hash text,
+    salt text,
+    sha_secret text,
+    status text DEFAULT 'active'::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT system_clients_status_check CHECK ((status = ANY (ARRAY['active'::text, 'disabled'::text])))
+);
+
+
+ALTER TABLE app.system_clients OWNER TO events_migrator;
+
+--
 -- Name: user_credentials; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -333,40 +362,10 @@ COMMENT ON COLUMN app.users.legacy_id IS 'References the user id from the legacy
 
 
 --
--- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
---
-
-CREATE TABLE app.system_clients (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    legacy_id text,
-    name text NOT NULL,
-    scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
-    created_by text,
-    secret_hash text,
-    salt text,
-    sha_secret text,
-    status text DEFAULT 'active'::text NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT system_clients_status_check CHECK ((status = ANY (ARRAY['active'::text, 'disabled'::text])))
-);
-
-
-ALTER TABLE app.system_clients OWNER TO events_migrator;
-
-
---
 -- Name: pgmigrations id; Type: DEFAULT; Schema: app; Owner: events_migrator
 --
 
 ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmigrations_id_seq'::regclass);
-
-
---
--- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.audit_log
-    ADD CONSTRAINT audit_log_pkey PRIMARY KEY (id);
 
 
 --
@@ -383,6 +382,14 @@ ALTER TABLE ONLY app.administrative_areas
 
 ALTER TABLE ONLY app.administrative_areas
     ADD CONSTRAINT administrative_areas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.audit_log
+    ADD CONSTRAINT audit_log_pkey PRIMARY KEY (id);
 
 
 --
@@ -474,6 +481,22 @@ ALTER TABLE ONLY app.pgmigrations
 
 
 --
+-- Name: system_clients system_clients_legacy_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_clients
+    ADD CONSTRAINT system_clients_legacy_id_key UNIQUE (legacy_id);
+
+
+--
+-- Name: system_clients system_clients_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_clients
+    ADD CONSTRAINT system_clients_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_credentials user_credentials_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -522,18 +545,10 @@ ALTER TABLE ONLY app.users
 
 
 --
--- Name: system_clients system_clients_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+-- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
-ALTER TABLE ONLY app.system_clients
-    ADD CONSTRAINT system_clients_pkey PRIMARY KEY (id);
-
-
---
--- Name: system_clients_legacy_id_idx; Type: INDEX; Schema: app; Owner: events_migrator
---
-
-CREATE UNIQUE INDEX system_clients_legacy_id_idx ON app.system_clients USING btree (legacy_id) WHERE (legacy_id IS NOT NULL);
+CREATE INDEX idx_action_created_by ON app.event_actions USING btree (created_by);
 
 
 --
@@ -558,10 +573,10 @@ CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
 
 
 --
--- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
+-- Name: idx_audit_log_transaction_id; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
-CREATE INDEX idx_action_created_by ON app.event_actions USING btree (created_by);
+CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
 
 
 --
@@ -576,6 +591,13 @@ CREATE INDEX idx_event_tracking_id ON app.events USING btree (tracking_id);
 --
 
 CREATE INDEX idx_locations_valid_until ON app.locations USING btree (valid_until);
+
+
+--
+-- Name: system_clients_legacy_id_idx; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE UNIQUE INDEX system_clients_legacy_id_idx ON app.system_clients USING btree (legacy_id) WHERE (legacy_id IS NOT NULL);
 
 
 --
@@ -658,17 +680,17 @@ GRANT USAGE ON SCHEMA app TO events_app;
 
 
 --
--- Name: TABLE audit_log; Type: ACL; Schema: app; Owner: events_migrator
---
-
-GRANT SELECT,INSERT ON TABLE app.audit_log TO events_app;
-
-
---
 -- Name: TABLE administrative_areas; Type: ACL; Schema: app; Owner: events_migrator
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.administrative_areas TO events_app;
+
+
+--
+-- Name: TABLE audit_log; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT ON TABLE app.audit_log TO events_app;
 
 
 --
@@ -700,6 +722,13 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 
 
 --
+-- Name: TABLE system_clients; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_clients TO events_app;
+
+
+--
 -- Name: TABLE user_credentials; Type: ACL; Schema: app; Owner: events_migrator
 --
 
@@ -711,13 +740,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.user_credentials TO events_app;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
-
-
---
--- Name: TABLE system_clients; Type: ACL; Schema: app; Owner: events_migrator
---
-
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_clients TO events_app;
 
 
 --

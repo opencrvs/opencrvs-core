@@ -13,10 +13,21 @@ import { randomUUID } from 'crypto'
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
 import { SCOPES, UUID } from '@opencrvs/commons'
-import { publicProcedure, router, userAndSystemProcedure } from '@events/router/trpc'
+import {
+  publicProcedure,
+  router,
+  userAndSystemProcedure
+} from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
-import { createSystemClient, getSystemClientById, listSystemClients } from '@events/storage/postgres/events/system-clients'
+import {
+  createSystemClient,
+  getSystemClientById,
+  listSystemClients,
+  updateSystemClientStatus,
+  deleteSystemClient,
+  refreshSystemClientSecret
+} from '@events/storage/postgres/events/system-clients'
 import { compare, generateSaltedHash } from '@events/service/auth/hash'
 
 const CreateIntegrationInput = z.object({
@@ -41,7 +52,9 @@ const ListIntegrationsOutput = z.array(
     id: z.string(),
     name: z.string(),
     scopes: z.array(z.string()),
-    status: z.string()
+    status: z.string(),
+    createdAt: z.iso.datetime(),
+    createdBy: z.string()
   })
 )
 
@@ -54,6 +67,36 @@ const AuthenticateSystemOutput = z.object({
   id: UUID,
   status: z.string(),
   scope: z.array(z.string())
+})
+
+const IntegrationIdInput = z.object({
+  id: UUID
+})
+
+const GetIntegrationOutput = z.object({
+  id: z.string(),
+  name: z.string(),
+  scopes: z.array(z.string()),
+  status: z.string(),
+  shaSecret: z.string().nullable(),
+  createdAt: z.string(),
+  createdBy: z.string()
+})
+
+const ToggleStatusOutput = z.object({
+  id: z.string(),
+  name: z.string(),
+  status: z.string()
+})
+
+const DeleteOutput = z.object({
+  id: z.string(),
+  name: z.string()
+})
+
+const RefreshSecretOutput = z.object({
+  clientId: z.string(),
+  clientSecret: z.string()
 })
 
 export const integrationsRouter = router({
@@ -136,11 +179,106 @@ export const integrationsRouter = router({
     .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
     .query(async ({ input }) => {
       const rows = await listSystemClients(input ?? undefined)
+
       return rows.map((row) => ({
         id: row.id,
         name: row.name,
         scopes: row.scopes as string[],
-        status: row.status
+        status: row.status,
+        createdAt: row.createdAt,
+        createdBy: row.createdBy
       }))
+    }),
+
+  get: userAndSystemProcedure
+    .input(IntegrationIdInput)
+    .output(GetIntegrationOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .query(async ({ input }) => {
+      const row = await getSystemClientById(input.id)
+      return {
+        id: row.id,
+        name: row.name,
+        scopes: row.scopes as string[],
+        status: row.status,
+        shaSecret: row.shaSecret,
+        createdAt: row.createdAt,
+        createdBy: row.createdBy
+      }
+    }),
+
+  deactivate: userAndSystemProcedure
+    .input(IntegrationIdInput)
+    .output(ToggleStatusOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .mutation(async ({ input, ctx }) => {
+      const row = await updateSystemClientStatus(input.id, 'disabled')
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.deactivate',
+        requestData: { id: input.id },
+        responseSummary: { id: row.id, status: row.status }
+      })
+
+      return { id: row.id, name: row.name, status: row.status }
+    }),
+
+  activate: userAndSystemProcedure
+    .input(IntegrationIdInput)
+    .output(ToggleStatusOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .mutation(async ({ input, ctx }) => {
+      const row = await updateSystemClientStatus(input.id, 'active')
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.activate',
+        requestData: { id: input.id },
+        responseSummary: { id: row.id, status: row.status }
+      })
+
+      return { id: row.id, name: row.name, status: row.status }
+    }),
+
+  delete: userAndSystemProcedure
+    .input(IntegrationIdInput)
+    .output(DeleteOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .mutation(async ({ input, ctx }) => {
+      const row = await deleteSystemClient(input.id)
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.delete',
+        requestData: { id: input.id },
+        responseSummary: { id: row.id, name: row.name }
+      })
+
+      return { id: row.id, name: row.name }
+    }),
+
+  refreshSecret: userAndSystemProcedure
+    .input(IntegrationIdInput)
+    .output(RefreshSecretOutput)
+    .use(requiresAnyOfScopes([SCOPES.INTEGRATION_CREATE]))
+    .mutation(async ({ input, ctx }) => {
+      const clientSecret = randomUUID()
+      const { hash: secretHash, salt } = await generateSaltedHash(clientSecret)
+
+      await refreshSystemClientSecret(input.id, secretHash, salt)
+
+      await writeAuditLog({
+        clientId: ctx.user.id,
+        clientType: ctx.user.type,
+        operation: 'integrations.refreshSecret',
+        requestData: { id: input.id },
+        responseSummary: { clientId: input.id }
+      })
+
+      return { clientId: input.id, clientSecret }
     })
 })

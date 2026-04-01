@@ -12,15 +12,16 @@
 import fetch from 'node-fetch'
 import { z } from 'zod'
 import {
-  joinUrl,
   DocumentPath,
-  UUID,
   IUserName,
-  UserOrSystem,
-  User,
   TokenUserType,
-  logger,
-  isUUID
+  UUID,
+  User,
+  UserInput,
+  UserOrSystem,
+  isUUID,
+  joinUrl,
+  logger
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
@@ -28,35 +29,16 @@ import {
   getSystemClientById
 } from '@events/storage/postgres/events/system-clients'
 
-export const UserInput = z.object({
-  name: z.array(
-    z.object({
-      use: z.string(),
-      given: z.array(z.string()),
-      family: z.string()
-    })
-  ),
-  // @TODO: Separate from "create user from client"
-  username: z.string().optional(),
-  email: z.string(),
-  mobile: z.string().optional(),
-  fullHonorificName: z.string().optional(),
-  emailForNotification: z.string().optional(),
-  // @TODO: Separate from "create user from client"
-  password: z.string().optional(),
-  role: z.string(),
-  primaryOfficeId: z.string(),
-  device: z.string().optional(),
-  status: z.enum(['active', 'pending']).optional()
-})
-
 type UserAPIResult = {
   id: string
   avatar?: {
     data: DocumentPath
     type: string
   }
-  signature?: DocumentPath
+  signature?: {
+    data: DocumentPath
+    type: string
+  }
   device?: string
   name: IUserName[]
   username: string
@@ -74,6 +56,7 @@ type UserAPIResult = {
 type SearchUsersPayload = {
   username?: string
   mobile?: string
+  email?: string
   status?: string
   primaryOfficeId?: string
   locationId?: string
@@ -90,7 +73,7 @@ export type SearchUsersResult = {
 export async function getLegacyUser(
   userId: string,
   token: string
-): Promise<UserAPIResult> {
+): Promise<User & { username: string }> {
   const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getUser').href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
@@ -106,7 +89,27 @@ export async function getLegacyUser(
     )
   }
 
-  return res.json() as Promise<UserAPIResult>
+  const legacyUser = (await res.json()) as UserAPIResult
+
+  return {
+    type: TokenUserType.enum.user,
+    id: legacyUser.id,
+    name: legacyUser.name,
+    role: legacyUser.role,
+    email: legacyUser.email,
+    mobile: legacyUser.mobile,
+    username: legacyUser.username,
+    status: legacyUser.status as User['status'],
+    signature: legacyUser.signature?.data
+      ? legacyUser.signature.data
+      : undefined,
+    avatar: legacyUser.avatar?.data ? legacyUser.avatar.data : undefined,
+    primaryOfficeId: legacyUser.primaryOfficeId,
+    device: legacyUser.device ? legacyUser.device : undefined,
+    fullHonorificName: legacyUser.fullHonorificName
+      ? legacyUser.fullHonorificName
+      : undefined
+  }
 }
 
 export async function findUserOrSystem(
@@ -114,26 +117,7 @@ export async function findUserOrSystem(
   token: string
 ): Promise<UserOrSystem | undefined> {
   try {
-    const user = await getLegacyUser(id, token)
-
-    return {
-      type: TokenUserType.enum.user,
-      id: user.id,
-      name: user.name,
-      role: user.role,
-      email: user.email,
-      mobile: user.mobile,
-      status: user.status as User['status'],
-      signature: user.signature ? (user.signature as DocumentPath) : undefined,
-      avatar: user.avatar?.data
-        ? (user.avatar.data as DocumentPath)
-        : undefined,
-      primaryOfficeId: user.primaryOfficeId,
-      device: user.device ? user.device : undefined,
-      fullHonorificName: user.fullHonorificName
-        ? user.fullHonorificName
-        : undefined
-    }
+    return await getLegacyUser(id, token)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
     logger.info(`No user found for id: ${id}. Will look for a system instead.`)
@@ -202,7 +186,7 @@ export async function searchUsers(
     id: user.id,
     name: user.name,
     role: user.role,
-    signature: user.signature ? user.signature : undefined,
+    signature: user.signature?.data ? user.signature.data : undefined,
     avatar: user.avatar?.data ? user.avatar.data : undefined,
     primaryOfficeId: user.primaryOfficeId,
     status: user.status as User['status'],
@@ -215,10 +199,45 @@ export async function searchUsers(
 
 type CreateUserPayload = z.infer<typeof UserInput>
 
+export async function updateUser(
+  input: CreateUserPayload & { id: string },
+  token: string
+): Promise<User> {
+  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'updateUser').href, {
+    method: 'POST',
+    body: JSON.stringify({
+      ...input,
+      signature: input.signature && {
+        type: input.signature.type,
+        data: input.signature.path
+      }
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to update user. Error: ${res.status} status received`
+    )
+  }
+
+  const user = await getUser(input.id, token)
+  return user
+}
+
 export async function createUser(input: CreateUserPayload, token: string) {
   const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'createUser').href, {
     method: 'POST',
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      signature: input.signature && {
+        type: input.signature.type,
+        data: input.signature.path
+      }
+    }),
     headers: {
       'Content-Type': 'application/json',
       Authorization: token
@@ -233,6 +252,28 @@ export async function createUser(input: CreateUserPayload, token: string) {
 
   const response = (await res.json()) as UserAPIResult
   return getUser(response.id, token)
+}
+
+export async function changeUserPassword(
+  payload: { userId: string; existingPassword: string; password: string },
+  token: string
+): Promise<void> {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPassword').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `Unable to change password. Error: ${res.status} status received`
+    )
+  }
 }
 
 export async function activateUser(
@@ -253,10 +294,78 @@ export async function activateUser(
 
   if (!res.ok) {
     throw new Error(
-      `Unable to activate user. Error: ${res.status} status received`
+      `Unable to change password. Error: ${res.status} status received`
+    )
+  }
+}
+
+export async function changeUserPhone(
+  payload: { userId: string; phoneNumber: string },
+  token: string
+): Promise<void> {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPhone').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to change phone number. Error: ${res.status} status received`
+    )
+  }
+}
+
+export async function changeUserEmail(
+  payload: { userId: string; email: string },
+  token: string
+): Promise<void> {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserEmail').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to change email. Error: ${res.status} status received`
+    )
+  }
+}
+
+export async function changeUserAvatar(
+  payload: { userId: string; avatar: { type: string; data: string } },
+  token: string
+) {
+  const res = await fetch(
+    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserAvatar').href,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to change avatar. Error: ${res.status} status received`
     )
   }
 
-  const response = (await res.json()) as UserAPIResult
-  return response
+  return res
 }

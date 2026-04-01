@@ -15,7 +15,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
-  DateValue,
+  PlainDate,
   NumberFieldValue,
   NonEmptyTextValue,
   TextValue,
@@ -264,7 +264,7 @@ export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: SerializedNowDateTime.or(DateValue)
+  defaultValue: SerializedNowDateTime.or(PlainDate)
     .optional()
     .describe('Default date value(yyyy-MM-dd)'),
   configuration: z
@@ -343,9 +343,6 @@ const ParagraphConfiguration = z
   .object({
     styles: z
       .object({
-        fontVariant: HtmlFontVariant.optional().describe(
-          'Font variant to use for the paragraph text'
-        ),
         hint: z
           .boolean()
           .optional()
@@ -359,6 +356,27 @@ const ParagraphConfiguration = z
   .default({})
 
 export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
+
+const HeadingFontVariant = HtmlFontVariant.exclude(['h1', 'h2'])
+
+type HeadingFontVariant = z.infer<typeof HeadingFontVariant>
+
+const HeadingConfiguration = z
+  .object({
+    styles: z
+      .object({
+        fontVariant: HeadingFontVariant.optional().describe(
+          'Font variant to use for the paragraph text'
+        ),
+        textAlign: ParagraphTextAlign.optional().describe(
+          'Text alignment for the paragraph'
+        )
+      })
+      .optional()
+  })
+  .default({})
+
+export type HeadingConfiguration = z.infer<typeof HeadingConfiguration>
 
 const ImageConfiguration = z.object({
   alt: z.string().optional().describe('Alternative text for the image'),
@@ -390,6 +408,14 @@ const Paragraph = BaseField.extend({
 }).describe('A read-only HTML <p> paragraph')
 
 export type Paragraph = z.infer<typeof Paragraph>
+
+const Heading = BaseField.extend({
+  type: z.literal(FieldType.HEADING),
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: HeadingConfiguration
+}).describe('A read-only heading component for form pages')
+
+export type Heading = z.infer<typeof Heading>
 
 const PageHeader = BaseField.extend({
   type: z.literal(FieldType.PAGE_HEADER),
@@ -951,6 +977,15 @@ const HiddenField = BaseField.extend({
 
 export type HiddenField = z.infer<typeof HiddenField>
 
+const UserRoleField = BaseField.extend({
+  type: z.literal(FieldType.USER_ROLE),
+  defaultValue: TextValue.optional()
+}).describe(
+  'A select dropdown that is automatically populated with available user roles'
+)
+
+export type UserRoleField = z.infer<typeof UserRoleField>
+
 export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
@@ -965,6 +1000,7 @@ export const FieldConfig = z
     SelectDateRangeField,
     ImageViewField,
     Paragraph,
+    Heading,
     RadioGroup,
     BulletList,
     PageHeader,
@@ -995,7 +1031,8 @@ export const FieldConfig = z
     LoaderField,
     SearchField,
     CustomField,
-    HiddenField
+    HiddenField,
+    UserRoleField
   ])
   .meta({
     description: 'Form field configuration',

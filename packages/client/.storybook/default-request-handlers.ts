@@ -2265,8 +2265,6 @@ export const handlers = {
 
     http.get('/api/config/config', () => {
       return HttpResponse.json({
-        systems: [],
-
         config: mockOfflineData.config,
         certificates: [
           {

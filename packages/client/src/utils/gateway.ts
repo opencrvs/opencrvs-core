@@ -14,7 +14,7 @@
  */
 
 /* eslint-disable */
-import { PlainDate } from '@client/utils/date-formatting'
+import { PlainDate } from '@opencrvs/commons/client'
 
 export type Maybe<T> = T | null
 type InputMaybe<T> = Maybe<T>
@@ -972,7 +972,6 @@ type Mutation = {
   markMarriageAsValidated?: Maybe<Scalars['ID']>
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
-  registerSystem?: Maybe<SystemSecret>
   rejectRegistration: Scalars['ID']
   rejectRegistrationCorrection: Scalars['ID']
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
@@ -1197,10 +1196,6 @@ type MutationRefreshSystemSecretArgs = {
   clientId: Scalars['String']
 }
 
-type MutationRegisterSystemArgs = {
-  system?: InputMaybe<SystemInput>
-}
-
 type MutationRejectRegistrationArgs = {
   details: RejectRegistrationInput
   id: Scalars['ID']
@@ -1383,7 +1378,6 @@ type Query = {
   fetchLocationWiseEventMetrics?: Maybe<Array<LocationWiseEstimationMetric>>
   fetchMarriageRegistration?: Maybe<MarriageRegistration>
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
-  fetchRecordDetailsForVerification?: Maybe<RecordDetails>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
@@ -1441,10 +1435,6 @@ type QueryFetchMonthWiseEventMetricsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
-}
-
-type QueryFetchRecordDetailsForVerificationArgs = {
-  id: Scalars['String']
 }
 
 type QueryFetchRegistrationArgs = {
@@ -1627,8 +1617,6 @@ type QuestionnaireQuestionInput = {
   fieldId?: InputMaybe<Scalars['String']>
   value?: InputMaybe<Scalars['String']>
 }
-
-type RecordDetails = BirthRegistration | DeathRegistration
 
 export enum RegAction {
   ApprovedCorrection = 'APPROVED_CORRECTION',
@@ -1923,9 +1911,7 @@ export type System = {
 }
 
 type SystemInput = {
-  integratingSystemType?: InputMaybe<IntegratingSystemType>
   name: Scalars['String']
-  settings?: InputMaybe<SystemSettingsInput>
   type: SystemType
 }
 
@@ -7039,149 +7025,6 @@ type EmailAllUsersQuery = {
   } | null
 }
 
-export type RegisterSystemMutationVariables = Exact<{
-  system?: InputMaybe<SystemInput>
-}>
-
-export type RegisterSystemMutation = {
-  __typename?: 'Mutation'
-  registerSystem?: {
-    __typename?: 'SystemSecret'
-    clientSecret: string
-    system: {
-      __typename?: 'System'
-      _id: string
-      clientId: string
-      name: string
-      shaSecret: string
-      status: SystemStatus
-      type: SystemType
-      integratingSystemType?: IntegratingSystemType | null
-      settings?: {
-        __typename?: 'SystemSettings'
-        webhook?: Array<{
-          __typename?: 'WebhookPermission'
-          event: string
-          permissions: Array<string>
-        }> | null
-      } | null
-    }
-  } | null
-}
-
-export type DeactivateSystemMutationVariables = Exact<{
-  clientId: Scalars['ID']
-}>
-
-export type DeactivateSystemMutation = {
-  __typename?: 'Mutation'
-  deactivateSystem?: {
-    __typename?: 'System'
-    _id: string
-    clientId: string
-    name: string
-    shaSecret: string
-    status: SystemStatus
-    type: SystemType
-    settings?: {
-      __typename?: 'SystemSettings'
-      webhook?: Array<{
-        __typename?: 'WebhookPermission'
-        event: string
-        permissions: Array<string>
-      }> | null
-    } | null
-  } | null
-}
-
-export type ReactivateSystemMutationVariables = Exact<{
-  clientId: Scalars['ID']
-}>
-
-export type ReactivateSystemMutation = {
-  __typename?: 'Mutation'
-  reactivateSystem?: {
-    __typename?: 'System'
-    _id: string
-    clientId: string
-    name: string
-    shaSecret: string
-    status: SystemStatus
-    type: SystemType
-    settings?: {
-      __typename?: 'SystemSettings'
-      webhook?: Array<{
-        __typename?: 'WebhookPermission'
-        event: string
-        permissions: Array<string>
-      }> | null
-    } | null
-  } | null
-}
-
-export type RefreshSystemSecretMutationVariables = Exact<{
-  clientId: Scalars['String']
-}>
-
-export type RefreshSystemSecretMutation = {
-  __typename?: 'Mutation'
-  refreshSystemSecret?: {
-    __typename?: 'SystemSecret'
-    clientSecret: string
-    system: {
-      __typename?: 'System'
-      _id: string
-      clientId: string
-      name: string
-      shaSecret: string
-      status: SystemStatus
-      type: SystemType
-    }
-  } | null
-}
-
-export type UpdatePermissionsMutationVariables = Exact<{
-  setting: UpdatePermissionsInput
-}>
-
-export type UpdatePermissionsMutation = {
-  __typename?: 'Mutation'
-  updatePermissions?: {
-    __typename?: 'System'
-    _id: string
-    clientId: string
-    name: string
-    shaSecret: string
-    status: SystemStatus
-    type: SystemType
-    settings?: {
-      __typename?: 'SystemSettings'
-      webhook?: Array<{
-        __typename?: 'WebhookPermission'
-        event: string
-        permissions: Array<string>
-      }> | null
-    } | null
-  } | null
-}
-
-export type DeleteSystemMutationVariables = Exact<{
-  clientId: Scalars['ID']
-}>
-
-export type DeleteSystemMutation = {
-  __typename?: 'Mutation'
-  deleteSystem?: {
-    __typename?: 'System'
-    _id: string
-    clientId: string
-    name: string
-    shaSecret: string
-    status: SystemStatus
-    type: SystemType
-  } | null
-}
-
 type GetTotalCorrectionsQueryVariables = Exact<{
   event: Scalars['String']
   timeStart: Scalars['String']
@@ -7557,137 +7400,6 @@ export type SubmitActivateUserMutationVariables = Exact<{
 export type SubmitActivateUserMutation = {
   __typename?: 'Mutation'
   activateUser?: string | null
-}
-
-type FetchRecordDetailsForVerificationQueryVariables = Exact<{
-  id: Scalars['String']
-}>
-
-type FetchRecordDetailsForVerificationQuery = {
-  __typename?: 'Query'
-  fetchRecordDetailsForVerification?:
-    | {
-        __typename?: 'BirthRegistration'
-        id: string
-        createdAt?: any | null
-        child?: {
-          __typename?: 'Person'
-          birthDate?: PlainDate | null
-          gender?: string | null
-          name?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            familyName?: string | null
-          } | null> | null
-        } | null
-        eventLocation?: {
-          __typename?: 'Location'
-          id: string
-          name?: string | null
-          description?: string | null
-          type?: string | null
-          address?: {
-            __typename?: 'Address'
-            district?: string | null
-            state?: string | null
-            city?: string | null
-            country?: string | null
-            line?: Array<string | null> | null
-          } | null
-        } | null
-        registration?: {
-          __typename?: 'Registration'
-          trackingId?: string | null
-          registrationNumber?: string | null
-          type?: RegistrationType | null
-        } | null
-        history?: Array<{
-          __typename?: 'History'
-          action?: RegAction | null
-          regStatus?: RegStatus | null
-          date?: any | null
-          user?: {
-            __typename?: 'User'
-            primaryOffice: {
-              __typename?: 'Location'
-              hierarchy?: Array<{
-                __typename?: 'Location'
-                id: string
-                name?: string | null
-                alias?: Array<string> | null
-              }> | null
-            }
-            name: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-            }>
-          } | null
-        } | null> | null
-      }
-    | {
-        __typename?: 'DeathRegistration'
-        id: string
-        createdAt?: any | null
-        deceased?: {
-          __typename?: 'Person'
-          birthDate?: PlainDate | null
-          gender?: string | null
-          name?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            familyName?: string | null
-          } | null> | null
-          deceased?: {
-            __typename?: 'Deceased'
-            deathDate?: PlainDate | null
-          } | null
-        } | null
-        eventLocation?: {
-          __typename?: 'Location'
-          id: string
-          name?: string | null
-          description?: string | null
-          type?: string | null
-          address?: {
-            __typename?: 'Address'
-            district?: string | null
-            state?: string | null
-            city?: string | null
-            country?: string | null
-          } | null
-        } | null
-        registration?: {
-          __typename?: 'Registration'
-          trackingId?: string | null
-          registrationNumber?: string | null
-          type?: RegistrationType | null
-        } | null
-        history?: Array<{
-          __typename?: 'History'
-          action?: RegAction | null
-          regStatus?: RegStatus | null
-          date?: any | null
-          user?: {
-            __typename?: 'User'
-            primaryOffice: {
-              __typename?: 'Location'
-              hierarchy?: Array<{
-                __typename?: 'Location'
-                id: string
-                name?: string | null
-                alias?: Array<string> | null
-              }> | null
-            }
-            name: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-            }>
-          } | null
-        } | null> | null
-      }
-    | null
 }
 
 type FetchViewRecordByCompositionQueryVariables = Exact<{

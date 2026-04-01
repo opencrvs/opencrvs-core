@@ -12,6 +12,7 @@
 import { deepDropNulls, getCurrentEventState } from '.'
 import { tennisClubMembershipEvent } from '../../fixtures'
 import { getUUID, UUID } from '../../uuid'
+import { DocumentPath } from '../../documents'
 import { ActionStatus, EventState } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
@@ -194,7 +195,7 @@ describe('getCurrentEventState()', () => {
         createdBy: 'user1',
         createdByUserType: TokenUserType.enum.user,
         createdAtLocation: getUUID(),
-        createdBySignature: 'signature.png',
+        createdBySignature: 'signature.png' as DocumentPath,
         createdByRole: 'FIELD_AGENT'
       }
     })
@@ -209,7 +210,7 @@ describe('getCurrentEventState()', () => {
         createdBy: 'user1',
         createdByUserType: TokenUserType.enum.user,
         createdAtLocation: getUUID(),
-        createdBySignature: 'signature.png',
+        createdBySignature: 'signature.png' as DocumentPath,
         createdByRole: 'FIELD_AGENT'
       }
     })
@@ -224,7 +225,7 @@ describe('getCurrentEventState()', () => {
         createdBy: 'computer1',
         createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location2' as UUID,
-        createdBySignature: 'signature-2.png',
+        createdBySignature: 'signature-2.png' as DocumentPath,
         createdByRole: '3RD_PARTY_API',
         originalActionId: declareRequestAction.id
       }
@@ -240,7 +241,7 @@ describe('getCurrentEventState()', () => {
         createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location4' as UUID,
         createdByRole: 'LOCAL_REGISTRAR',
-        createdBySignature: 'signature-3.png'
+        createdBySignature: 'signature-3.png' as DocumentPath
       }
     })
 
@@ -253,7 +254,7 @@ describe('getCurrentEventState()', () => {
         createdBy: 'computer2',
         createdByUserType: TokenUserType.enum.user,
         createdAtLocation: 'location5' as UUID,
-        createdBySignature: 'signature-4.png',
+        createdBySignature: 'signature-4.png' as DocumentPath,
         createdByRole: '3RD_PARTY_API',
         registrationNumber: '123456789',
         originalActionId: registerRequestAction.id
@@ -335,7 +336,7 @@ describe('getCurrentEventState()', () => {
         createdAt: '2023-01-01T00:00:00.000Z',
         createdByUserType: TokenUserType.enum.user,
         createdBy: 'user1',
-        createdBySignature: 'signature.png',
+        createdBySignature: 'signature.png' as DocumentPath,
         createdAtLocation: getUUID(),
         createdByRole: 'FIELD_AGENT'
       }
@@ -350,7 +351,7 @@ describe('getCurrentEventState()', () => {
         createdAt: '2023-02-01T00:00:00.000Z',
         createdByUserType: TokenUserType.enum.user,
         createdBy: 'user1',
-        createdBySignature: 'signature.png',
+        createdBySignature: 'signature.png' as DocumentPath,
         createdAtLocation: getUUID(),
         createdByRole: 'FIELD_AGENT'
       }
@@ -364,7 +365,7 @@ describe('getCurrentEventState()', () => {
         createdAt: '2023-05-01T00:00:00.000Z',
         createdByUserType: TokenUserType.enum.user,
         createdBy: 'user3',
-        createdBySignature: 'signature-3.png',
+        createdBySignature: 'signature-3.png' as DocumentPath,
         createdAtLocation: 'location4' as UUID,
         createdByRole: 'LOCAL_REGISTRAR',
         registrationNumber: '123456789'
@@ -728,7 +729,7 @@ describe('correction requests', () => {
             createdByRole: 'some-role',
             createdByUserType: TokenUserType.enum.user,
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
-            createdBySignature: 'signature.png',
+            createdBySignature: 'signature.png' as DocumentPath,
             id: '63d19916-dcc8-4cf2-8161-eab9989765e8' as UUID,
             declaration: {},
             status: ActionStatus.Accepted,
@@ -747,7 +748,7 @@ describe('correction requests', () => {
             createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:39.161Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
-            createdBySignature: 'signature.png',
+            createdBySignature: 'signature.png' as DocumentPath,
             id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
@@ -760,7 +761,7 @@ describe('correction requests', () => {
             createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:40.182Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
-            createdBySignature: 'signature.png',
+            createdBySignature: 'signature.png' as DocumentPath,
             id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
@@ -778,7 +779,7 @@ describe('correction requests', () => {
             createdByRole: 'some-role',
             createdAt: '2025-01-23T02:21:41.206Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
-            createdBySignature: 'signature.png',
+            createdBySignature: 'signature.png' as DocumentPath,
             id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
@@ -812,7 +813,7 @@ describe('correction requests', () => {
             createdByRole: 'some-role',
             createdByUserType: TokenUserType.enum.user,
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
-            createdBySignature: 'signature.png',
+            createdBySignature: 'signature.png' as DocumentPath,
             id: '63d19916-dcc8-4cf2-8161-eab9989765e8' as UUID,
             declaration: {},
             status: ActionStatus.Accepted,
@@ -828,7 +829,7 @@ describe('correction requests', () => {
             type: 'DECLARE',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdBySignature: 'signature.png',
+            createdBySignature: 'signature.png' as DocumentPath,
             createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:39.161Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
@@ -841,7 +842,7 @@ describe('correction requests', () => {
             type: 'REGISTER',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdBySignature: 'signature.png',
+            createdBySignature: 'signature.png' as DocumentPath,
             createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:40.182Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
@@ -859,7 +860,7 @@ describe('correction requests', () => {
             type: 'REQUEST_CORRECTION',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdBySignature: 'signature.png',
+            createdBySignature: 'signature.png' as DocumentPath,
             createdByUserType: TokenUserType.enum.user,
             createdAt: '2025-01-23T02:21:41.206Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
@@ -874,7 +875,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdByUserType: TokenUserType.enum.user,
-            createdBySignature: 'signature.png',
+            createdBySignature: 'signature.png' as DocumentPath,
             createdAt: '2025-01-23T02:21:42.230Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             id: '94d5a963-0125-4d31-85f0-6d77080758f4' as UUID,

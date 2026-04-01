@@ -110,11 +110,13 @@ type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny chan
     ? T
     : T extends DocumentPath
       ? T
-      : T extends (infer U)[]
-        ? NonNullableDeep<U>[]
-        : T extends object
-          ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-          : NonNullable<T>
+      : T extends string
+        ? NonNullable<T>
+        : T extends (infer U)[]
+          ? NonNullableDeep<U>[]
+          : T extends object
+            ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+            : NonNullable<T>
 
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values

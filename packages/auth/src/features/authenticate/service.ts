@@ -25,8 +25,9 @@ import {
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
 import { logger, UUID, IUserName } from '@opencrvs/commons'
+import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -63,7 +64,7 @@ export interface IAuthentication {
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: Scope[]
+  scope: string[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -273,4 +274,25 @@ export function verifyToken(token: string) {
 
 export function getPublicKey() {
   return publicCert
+}
+
+export async function recordUserAuditEvent(
+  token: string,
+  input: UserAuditLog
+): Promise<void> {
+  try {
+    const client = createTRPCClient<AppRouter>({
+      links: [
+        httpBatchLink({
+          url: env.EVENTS_URL,
+          transformer: superjson,
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]
+    })
+    await client.user.audit.record.mutate(input)
+  } catch (err) {
+    logger.error('Failed to record user audit event', err)
+    throw err
+  }
 }
