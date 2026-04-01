@@ -41,8 +41,7 @@ interface UserAuditLogQuery {
 }
 
 /**
- * Reads user audit log entries for a given subject user.
- * Filters to rows where requestData.subjectId matches and operation starts with 'user.audit.'.
+ * Reads all audit log entries performed by a given user.
  */
 export async function queryUserAuditLog({
   subjectId,
@@ -75,7 +74,6 @@ export async function queryUserAuditLog({
   let countQuery = db
     .selectFrom('auditLog')
     .select(({ fn }) => [fn.count<string>('id').as('count')])
-    .where('operation', 'like', 'user.%')
     .where('clientId', '=', subjectId)
 
   if (timeStart) {
