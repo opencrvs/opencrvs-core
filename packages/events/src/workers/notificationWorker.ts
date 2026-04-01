@@ -23,12 +23,12 @@ import {
   updateNotificationProgress
 } from '@events/storage/postgres/events/notifications'
 
-const BCC_CHUNK_SIZE = 500
 const POLL_INTERVAL_MS = 30_000
+export const BCC_CHUNK_SIZE = 500
 export const DAILY_NOTIFICATION_LIMIT = 1
 export const NOTIFICATION_RETRY_LIMIT = 3
 
-async function processNextNotification() {
+export async function processNextNotification() {
   const notification = await getNextProcessableNotification()
   if (!notification) {
     return

@@ -10,6 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import { SCOPES, UUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
@@ -17,7 +18,17 @@ import {
   countTodayNotifications,
   getNextProcessableNotification
 } from '@events/storage/postgres/events/notifications'
-import { NOTIFICATION_RETRY_LIMIT } from '@events/workers/notificationWorker'
+import {
+  BCC_CHUNK_SIZE,
+  NOTIFICATION_RETRY_LIMIT,
+  processNextNotification
+} from '@events/workers/notificationWorker'
+import { env } from '@events/environment'
+import { mswServer } from '@events/tests/msw'
+
+function generateEmails(count: number): string[] {
+  return Array.from({ length: count }, (_, i) => `user${i}@test.com`)
+}
 
 async function insertUser(
   eventsDb: ReturnType<typeof getClient>,
@@ -25,7 +36,12 @@ async function insertUser(
 ): Promise<{ id: UUID }> {
   return eventsDb
     .insertInto('users')
-    .values({ role: 'ADMIN', status: 'active', officeId })
+    .values({
+      role: 'ADMIN',
+      status: 'active',
+      mobile: '+1234567890',
+      officeId
+    })
     .returning('id')
     .executeTakeFirstOrThrow() as Promise<{ id: UUID }>
 }
@@ -46,6 +62,19 @@ async function insertNotification(
     })
     .returning('id')
     .executeTakeFirstOrThrow()
+}
+
+async function insertAdminWithEmail(
+  eventsDb: ReturnType<typeof getClient>,
+  officeId: UUID
+): Promise<{ id: UUID; email: string }> {
+  const email = 'admin@test.com'
+  const result = await eventsDb
+    .insertInto('users')
+    .values({ role: 'ADMIN', status: 'active', email, officeId })
+    .returning('id')
+    .executeTakeFirstOrThrow()
+  return { id: result.id as UUID, email }
 }
 
 describe('notification.broadcast', () => {
@@ -74,7 +103,7 @@ describe('notification.broadcast', () => {
         body: 'Test body',
         locale: 'en'
       })
-    ).rejects.toMatchObject(new TRPCError({ code: 'NOT_FOUND' }))
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
   })
 
   test('rejects with NOT_FOUND if no active users with email addresses exist', async () => {
@@ -86,6 +115,7 @@ describe('notification.broadcast', () => {
         legacyId: user.id,
         role: user.role,
         status: 'active',
+        mobile: '+1234567890',
         officeId: locations[0].id
       })
       .execute()
@@ -116,6 +146,7 @@ describe('notification.broadcast', () => {
           legacyId: user.id,
           role: user.role,
           status: 'active',
+          mobile: '+1234567890',
           officeId: locations[0].id
         },
         {
@@ -141,7 +172,7 @@ describe('notification.broadcast', () => {
         body: 'Second body',
         locale: 'en'
       })
-    ).rejects.toMatchObject(new TRPCError({ code: 'TOO_MANY_REQUESTS' }))
+    ).rejects.toMatchObject({ code: 'TOO_MANY_REQUESTS' })
   })
 
   test('creates a PENDING notification row with correct data and returns { success: true }', async () => {
@@ -154,6 +185,7 @@ describe('notification.broadcast', () => {
           legacyId: user.id,
           role: user.role,
           status: 'active',
+          mobile: '+1234567890',
           officeId: locations[0].id
         },
         {
@@ -267,5 +299,109 @@ describe('countTodayNotifications', () => {
 
     const count = await countTodayNotifications()
     expect(count).toBe(0)
+  })
+})
+
+describe('processNextNotification', () => {
+  const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/triggers/user/all-user-notification`
+
+  test('sends all recipients in a single call when under the chunk size', async () => {
+    const { eventsDb, locations } = await setupTestCase()
+    const { id: userId } = await insertAdminWithEmail(eventsDb, locations[0].id)
+
+    const recipients = generateEmails(3)
+    await eventsDb
+      .insertInto('notifications')
+      .values({ subject: 'Hi', body: 'Body', recipients, createdBy: userId })
+      .execute()
+
+    const capturedBcc: string[] = []
+    mswServer.use(
+      http.post(ALL_USER_NOTIFICATION_URL, async ({ request }) => {
+        const body = (await request.json()) as { recipient: { bcc: string[] } }
+        capturedBcc.push(...body.recipient.bcc)
+        return HttpResponse.json({ ok: true })
+      })
+    )
+
+    await processNextNotification()
+
+    const notification = await eventsDb
+      .selectFrom('notifications')
+      .selectAll()
+      .executeTakeFirstOrThrow()
+
+    expect(notification.status).toBe('SENT')
+    expect(capturedBcc).toEqual(expect.arrayContaining(recipients))
+  })
+
+  test('sends recipients in chunks of BCC_CHUNK_SIZE and updates progress after each', async () => {
+    const { eventsDb, locations } = await setupTestCase()
+    const { id: userId } = await insertAdminWithEmail(eventsDb, locations[0].id)
+
+    const recipients = generateEmails(BCC_CHUNK_SIZE + 1)
+    await eventsDb
+      .insertInto('notifications')
+      .values({ subject: 'Hi', body: 'Body', recipients, createdBy: userId })
+      .execute()
+
+    const dispatchedBccSizes: number[] = []
+    mswServer.use(
+      http.post(ALL_USER_NOTIFICATION_URL, async ({ request }) => {
+        const body = (await request.json()) as { recipient: { bcc: string[] } }
+        dispatchedBccSizes.push(body.recipient.bcc.length)
+        return HttpResponse.json({ ok: true })
+      })
+    )
+
+    await processNextNotification()
+
+    const afterFirstChunk = await eventsDb
+      .selectFrom('notifications')
+      .selectAll()
+      .executeTakeFirstOrThrow()
+
+    expect(afterFirstChunk.status).toBe('PENDING')
+    expect(afterFirstChunk.progress).toBe(BCC_CHUNK_SIZE)
+    expect(dispatchedBccSizes).toEqual([BCC_CHUNK_SIZE])
+
+    await processNextNotification()
+
+    const afterSecondChunk = await eventsDb
+      .selectFrom('notifications')
+      .selectAll()
+      .executeTakeFirstOrThrow()
+
+    expect(afterSecondChunk.status).toBe('SENT')
+    expect(dispatchedBccSizes).toEqual([BCC_CHUNK_SIZE, 1])
+  })
+
+  test('marks notification as FAILED and increments retryCount when dispatch fails', async () => {
+    const { eventsDb, locations } = await setupTestCase()
+    const { id: userId } = await insertAdminWithEmail(eventsDb, locations[0].id)
+
+    await eventsDb
+      .insertInto('notifications')
+      .values({
+        subject: 'Hi',
+        body: 'Body',
+        recipients: generateEmails(1),
+        createdBy: userId
+      })
+      .execute()
+
+    mswServer.use(
+      http.post(ALL_USER_NOTIFICATION_URL, () => HttpResponse.error())
+    )
+
+    await processNextNotification()
+
+    const notification = await eventsDb
+      .selectFrom('notifications')
+      .selectAll()
+      .executeTakeFirstOrThrow()
+
+    expect(notification.status).toBe('FAILED')
+    expect(notification.retryCount).toBe(1)
   })
 })
