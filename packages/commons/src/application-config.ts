@@ -95,8 +95,6 @@ export const defineLoginConfig = (
 }
 
 export const ClientConfig = z.object({
-  MINIO_URL: z.string(),
-  MINIO_BASE_URL: z.string(),
   COUNTRY: z.string(),
   LANGUAGES: z.array(z.string()),
   SENTRY: z.string(),
