@@ -10,14 +10,18 @@
  */
 
 import { Db, MongoClient } from 'mongodb'
+import { MINIO_BUCKET } from '../../utils/minio-helper.js'
 
 function stripBucketPrefix(path: string): string {
-  return path.startsWith('/ocrvs/') ? path.replace('/ocrvs/', '') : path
+  const prefix = `/${MINIO_BUCKET}/`
+  return path.startsWith(prefix) ? path.replace(prefix, '') : path
 }
 
 export const up = async (db: Db, _client: MongoClient) => {
+  const prefix = `/${MINIO_BUCKET}/`
+
   const practitioners = db.collection('Practitioner').find({
-    'extension.valueAttachment.url': { $regex: '^/ocrvs/' }
+    'extension.valueAttachment.url': { $regex: `^${prefix}` }
   })
 
   for await (const practitioner of practitioners) {
@@ -26,7 +30,7 @@ export const up = async (db: Db, _client: MongoClient) => {
     if (Array.isArray(practitioner.extension)) {
       practitioner.extension.forEach((ext: any, idx: number) => {
         const url = ext?.valueAttachment?.url
-        if (url?.startsWith('/ocrvs/')) {
+        if (url?.startsWith(prefix)) {
           update[`extension.${idx}.valueAttachment.url`] =
             stripBucketPrefix(url)
         }
@@ -42,5 +46,5 @@ export const up = async (db: Db, _client: MongoClient) => {
 }
 
 export const down = async (_db: Db, _client: MongoClient) => {
-  // no-op: cannot restore "/ocrvs/" bucket prefix reliably
+  // no-op:
 }
