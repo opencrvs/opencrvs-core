@@ -20,6 +20,7 @@ import { DividerVertical } from '@opencrvs/components/lib/Divider'
 import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { useState } from 'react'
+import { toFileUrl } from '@client/v2-events/cache'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -144,7 +145,7 @@ export const DocumentPreview = ({
           <PanViewer
             key={Math.random()}
             id="document_image"
-            image={previewImage.data}
+            image={toFileUrl(previewImage.data as DocumentPath)}
             zoom={zoom}
             rotation={rotation}
           />
