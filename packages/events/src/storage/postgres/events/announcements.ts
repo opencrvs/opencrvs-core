@@ -94,6 +94,13 @@ export async function markAnnouncementFailed(
     .execute()
 }
 
+/**
+ * Counts non-FAILED announcements created since midnight UTC today.
+ *
+ * FAILED rows are excluded so that if a broadcast fails the admin can retry
+ * the same day. PENDING and SENT rows count toward the daily limit to
+ * prevent duplicate sends.
+ */
 export async function countTodayAnnouncements() {
   const db = getClient()
   const result = await db
