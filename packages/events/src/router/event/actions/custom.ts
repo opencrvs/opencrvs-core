@@ -90,14 +90,10 @@ export function customActionProcedures() {
           requestData: {
             eventId: input.eventId,
             actionType: ActionType.CUSTOM,
+            eventType: result.type,
             transactionId: input.transactionId,
             customAction: input.customActionType
           },
-          responseSummary: {
-            eventId: result.id,
-            eventType: result.type,
-            trackingId: result.trackingId
-          }
         })
 
         return result

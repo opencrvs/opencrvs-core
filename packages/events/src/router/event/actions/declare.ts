@@ -83,13 +83,9 @@ export function declareActionProcedures() {
           requestData: {
             eventId: input.eventId,
             actionType: ActionType.DECLARE,
+            eventType: declaredEvent.type,
             transactionId: input.transactionId
           },
-          responseSummary: {
-            eventId: declaredEvent.id,
-            eventType: declaredEvent.type,
-            trackingId: declaredEvent.trackingId
-          }
         })
 
         const dedupConfig = config.actions.find(

@@ -80,13 +80,17 @@ const auditRouter = router({
     )
     .use(userCanReadOtherUser)
     .query(async ({ input }) => {
-      return queryUserAuditLog({
+      const { results, total } = await queryUserAuditLog({
         subjectId: input.userId,
         skip: input.skip,
         count: input.count,
         timeStart: input.timeStart,
         timeEnd: input.timeEnd
       })
+      return {
+        results: results.map((r) => AuditLogEntrySchema.parse(r)),
+        total
+      }
     })
 })
 

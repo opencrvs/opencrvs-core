@@ -182,7 +182,6 @@ export const eventRouter = router({
         },
         responseSummary: {
           eventId: result.id,
-          eventType: result.type,
           trackingId: result.trackingId
         }
       })
@@ -231,7 +230,6 @@ export const eventRouter = router({
         operation: 'event.get',
         requestData: { eventId },
         responseSummary: {
-          eventId: updatedEvent.id,
           eventType: updatedEvent.type,
           trackingId: updatedEvent.trackingId
         }
@@ -338,13 +336,9 @@ export const eventRouter = router({
             requestData: {
               eventId: input.eventId,
               actionType: ActionType.ASSIGN,
+              eventType: result.type,
               transactionId: input.transactionId
             },
-            responseSummary: {
-              eventId: result.id,
-              eventType: result.type,
-              trackingId: result.trackingId
-            }
           })
           return result
         }),
@@ -361,13 +355,9 @@ export const eventRouter = router({
             requestData: {
               eventId: input.eventId,
               actionType: ActionType.UNASSIGN,
+              eventType: result.type,
               transactionId: input.transactionId
             },
-            responseSummary: {
-              eventId: result.id,
-              eventType: result.type,
-              trackingId: result.trackingId
-            }
           })
           return result
         })
@@ -406,13 +396,9 @@ export const eventRouter = router({
             requestData: {
               eventId: options.input.eventId,
               actionType: ActionType.MARK_AS_DUPLICATE,
+              eventType: result.type,
               transactionId: options.input.transactionId
             },
-            responseSummary: {
-              eventId: result.id,
-              eventType: result.type,
-              trackingId: result.trackingId
-            }
           })
           return result
         }),
@@ -440,13 +426,9 @@ export const eventRouter = router({
             requestData: {
               eventId: options.input.eventId,
               actionType: ActionType.MARK_AS_NOT_DUPLICATE,
+              eventType: result.type,
               transactionId: options.input.transactionId
             },
-            responseSummary: {
-              eventId: result.id,
-              eventType: result.type,
-              trackingId: result.trackingId
-            }
           })
           return result
         })

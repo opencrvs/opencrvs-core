@@ -417,13 +417,9 @@ export function getDefaultActionProcedures(
             requestData: {
               eventId,
               actionType,
+              eventType: result.type,
               transactionId: input.transactionId
             },
-            responseSummary: {
-              eventId: result.id,
-              eventType: result.type,
-              trackingId: result.trackingId
-            }
           })
         }
 

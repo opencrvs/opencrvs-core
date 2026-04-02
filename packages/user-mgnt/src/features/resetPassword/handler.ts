@@ -52,7 +52,6 @@ export default async function resetPasswordInviteHandler(
   recordUserAuditEvent(request.headers.authorization, {
     operation: 'user.password_reset_by_admin',
     requestData: { subjectId: userId },
-    responseSummary: {}
   })
 
   randomPassword = generateRandomPassword(hasDemoScope(request))

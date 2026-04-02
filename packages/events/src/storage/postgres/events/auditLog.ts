@@ -27,7 +27,8 @@ export async function writeAuditLog(params: AuditLogParams) {
       clientType: params.clientType,
       operation: params.operation,
       requestData: params.requestData,
-      responseSummary: params.responseSummary
+      responseSummary:
+        'responseSummary' in params ? params.responseSummary : null
     })
     .execute()
 }

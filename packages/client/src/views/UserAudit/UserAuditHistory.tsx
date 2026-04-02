@@ -42,6 +42,7 @@ import {
   EventCustomActionAuditLog,
   getAcceptedScopesByType,
   getActionConfig,
+  getEventConfigById,
   UUID
 } from '@opencrvs/commons/client'
 
@@ -53,6 +54,7 @@ type EventActionLikeAuditLogParams = (
   Pick<AuditLogParams, 'clientId' | 'clientType'>
 import { useSelector } from 'react-redux'
 import { getScope } from '@client/profile/profileSelectors'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -108,6 +110,8 @@ type State = {
 }
 
 function UserAuditHistoryComponent(props: Props) {
+  const eventConfigurations = useEventConfigurations()
+
   const scopes = useSelector(getScope) ?? []
   const hasRecordRead =
     getAcceptedScopesByType({
@@ -128,7 +132,6 @@ function UserAuditHistoryComponent(props: Props) {
 
   const navigate = useNavigate()
   const trpc = useTRPC()
-  const { data: eventConfigs } = useQuery(trpc.event.config.get.queryOptions())
   const { data, isLoading, isError } = useQuery(
     trpc.user.audit.list.queryOptions({
       userId: props.userId,
@@ -200,15 +203,13 @@ function UserAuditHistoryComponent(props: Props) {
   }
 
   function getTrackingId(entry: EventActionLikeAuditLogParams): string {
-    const trackingId =
-      entry.responseSummary.trackingId ?? entry.requestData.transactionId
-    return trackingId || '-'
+    return entry.requestData.transactionId || '-'
   }
 
   function getEventId(
     entry: EventActionLikeAuditLogParams
   ): string | undefined {
-    return entry.responseSummary.eventId ?? entry.requestData.eventId
+    return entry.requestData.eventId
   }
 
   function isEventActionEntry(
@@ -219,23 +220,21 @@ function UserAuditHistoryComponent(props: Props) {
 
   function getActionMessage(entry: AuditLogEntry) {
     if (entry.operation === 'event.actions.custom.request') {
-      const eventConfig = eventConfigs?.find(
-        (c) => c.id === entry.responseSummary.eventType
+      const eventConfig = getEventConfigById(
+        eventConfigurations,
+        entry.requestData.eventType
       )
-      const actionConfig =
-        eventConfig &&
-        getActionConfig({
-          eventConfiguration: eventConfig,
-          actionType: ActionType.CUSTOM,
-          customActionType: entry.requestData.customAction
-        })
+
+      const actionConfig = getActionConfig({
+        eventConfiguration: eventConfig,
+        actionType: ActionType.CUSTOM,
+        customActionType: entry.requestData.customAction
+      })
       if (actionConfig?.type === ActionType.CUSTOM) {
         return props.intl.formatMessage(actionConfig.auditHistoryLabel)
       }
-      return props.intl.formatMessage(messages.customActionAuditAction, {
-        customActionType:
-          entry.requestData.customAction ?? entry.requestData.actionType
-      })
+      // This will not be needed once getActionConfig() returns typed config
+      return entry.requestData.customAction
     }
     const actionDescriptor = getUserAuditDescription(entry.operation)
     return actionDescriptor
