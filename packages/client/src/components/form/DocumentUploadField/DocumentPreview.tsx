@@ -21,6 +21,7 @@ import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanC
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { useState } from 'react'
 import { toFileUrl } from '@client/v2-events/cache'
+import { DocumentPath } from '@opencrvs/commons/client'
 
 const ViewerWrapper = styled.div`
   position: fixed;
