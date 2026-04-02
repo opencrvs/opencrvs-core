@@ -111,5 +111,11 @@ export async function processNextAnnouncement() {
 }
 
 export function startAnnouncementWorker() {
-  setInterval(() => void processNextAnnouncement(), POLL_INTERVAL_MS)
+  setInterval(() => {
+    processNextAnnouncement().catch((err) => {
+      logger.error(
+        `Announcement worker: unhandled error in poll: ${err instanceof Error ? err.message : String(err)}`
+      )
+    })
+  }, POLL_INTERVAL_MS)
 }
