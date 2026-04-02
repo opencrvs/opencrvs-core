@@ -24,7 +24,7 @@ export type IUserName = {
 }
 
 export const User = z.object({
-  id: z.string(),
+  id: UUID,
   name: z.array(
     z.object({
       use: z.string(),
