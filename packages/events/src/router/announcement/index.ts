@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
-import { hasScope, SCOPES } from '@opencrvs/commons'
+import { hasScope, logger, SCOPES } from '@opencrvs/commons'
 import { router, userOnlyProcedure } from '@events/router/trpc'
 import { getClient } from '@events/storage/postgres/events'
 import {
@@ -19,7 +19,10 @@ import {
   countTodayAnnouncements,
   createAnnouncement
 } from '@events/storage/postgres/events/announcements'
-import { DAILY_ANNOUNCEMENT_LIMIT } from '@events/workers/announcementWorker'
+import {
+  DAILY_ANNOUNCEMENT_LIMIT,
+  processNextAnnouncement
+} from '@events/workers/announcementWorker'
 
 export const announcementRouter = router({
   broadcast: userOnlyProcedure
@@ -77,6 +80,12 @@ export const announcementRouter = router({
         locale: input.locale,
         recipients,
         createdBy: admin.id
+      })
+
+      processNextAnnouncement().catch((err) => {
+        logger.error(
+          `Announcement worker: post-broadcast trigger failed: ${err instanceof Error ? err.message : String(err)}`
+        )
       })
 
       return { success: true }

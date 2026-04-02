@@ -111,6 +111,11 @@ export async function processNextAnnouncement() {
 }
 
 export function startAnnouncementWorker() {
+  processNextAnnouncement().catch((err) => {
+    logger.error(
+      `Announcement worker: startup run failed: ${err instanceof Error ? err.message : String(err)}`
+    )
+  })
   setInterval(() => {
     processNextAnnouncement().catch((err) => {
       logger.error(
