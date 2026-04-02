@@ -46,8 +46,7 @@ export async function verifyUser(mobile?: string, email?: string) {
     status: result.status,
     mobile: result.mobile,
     email: result.email,
-    securityQuestionKey: result.securityQuestionKey,
-    practitionerId: undefined
+    securityQuestionKey: result.securityQuestionKey
   }
 }
 
@@ -60,7 +59,6 @@ export interface IRetrievalStepInformation {
   securityQuestionKey: string
   scope: string[]
   status: RetrievalSteps
-  practitionerId: string
 }
 export async function storeRetrievalStepInformation(
   nonce: string,
