@@ -46,6 +46,9 @@ export const announcementRouter = router({
 
       const db = getClient()
 
+      // TODO: replace with getUserById(ctx.user.id) once mongo user references
+      // are removed and ctx.user.id is a postgres UUID directly.
+      // https://github.com/opencrvs/opencrvs-core/issues/11885
       const admin = await db
         .selectFrom('users')
         .select('id')
