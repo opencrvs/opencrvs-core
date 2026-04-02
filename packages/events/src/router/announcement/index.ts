@@ -25,8 +25,8 @@ export const announcementRouter = router({
   broadcast: userOnlyProcedure
     .input(
       z.object({
-        subject: z.string(),
-        body: z.string(),
+        subject: z.string().min(1),
+        body: z.string().min(1),
         locale: z.string()
       })
     )

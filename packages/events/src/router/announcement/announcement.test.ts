@@ -136,6 +136,68 @@ describe('announcement.broadcast', () => {
     )
   })
 
+  test('rejects with BAD_REQUEST if subject is empty', async () => {
+    const { user, eventsDb, locations } = await setupTestCase()
+
+    await eventsDb
+      .insertInto('users')
+      .values([
+        {
+          legacyId: user.id,
+          role: user.role,
+          status: 'active',
+          mobile: '+1234567890',
+          officeId: locations[0].id
+        },
+        {
+          role: 'REGISTRATION_AGENT',
+          status: 'active',
+          email: 'recipient@test.com',
+          officeId: locations[0].id
+        }
+      ])
+      .execute()
+
+    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+
+    await expect(
+      client.announcement.broadcast({ subject: '', body: 'Body', locale: 'en' })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+  })
+
+  test('rejects with BAD_REQUEST if body is empty', async () => {
+    const { user, eventsDb, locations } = await setupTestCase()
+
+    await eventsDb
+      .insertInto('users')
+      .values([
+        {
+          legacyId: user.id,
+          role: user.role,
+          status: 'active',
+          mobile: '+1234567890',
+          officeId: locations[0].id
+        },
+        {
+          role: 'REGISTRATION_AGENT',
+          status: 'active',
+          email: 'recipient@test.com',
+          officeId: locations[0].id
+        }
+      ])
+      .execute()
+
+    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+
+    await expect(
+      client.announcement.broadcast({
+        subject: 'Subject',
+        body: '',
+        locale: 'en'
+      })
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
+  })
+
   test('rejects with TOO_MANY_REQUESTS if an announcement was already sent today', async () => {
     const { user, eventsDb, locations } = await setupTestCase()
 
