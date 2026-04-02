@@ -104,3 +104,16 @@ export async function countTodayAnnouncements() {
     .executeTakeFirstOrThrow()
   return Number(result.count)
 }
+
+/** Returns the emails of all active users that have an email address. */
+export async function collectActiveRecipientEmails(): Promise<string[]> {
+  const db = getClient()
+  const users = await db
+    .selectFrom('users')
+    .select('email')
+    .where('status', '=', 'active')
+    .where('email', 'is not', null)
+    .execute()
+
+  return users.map((u) => u.email).filter((e): e is string => e !== null)
+}

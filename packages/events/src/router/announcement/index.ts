@@ -15,6 +15,7 @@ import { hasScope, SCOPES } from '@opencrvs/commons'
 import { router, userOnlyProcedure } from '@events/router/trpc'
 import { getClient } from '@events/storage/postgres/events'
 import {
+  collectActiveRecipientEmails,
   countTodayAnnouncements,
   createAnnouncement
 } from '@events/storage/postgres/events/announcements'
@@ -58,16 +59,7 @@ export const announcementRouter = router({
         })
       }
 
-      const activeUsers = await db
-        .selectFrom('users')
-        .select('email')
-        .where('status', '=', 'active')
-        .where('email', 'is not', null)
-        .execute()
-
-      const recipients = activeUsers
-        .map((u) => u.email)
-        .filter((e): e is string => e !== null)
+      const recipients = await collectActiveRecipientEmails()
 
       if (recipients.length === 0) {
         throw new TRPCError({
