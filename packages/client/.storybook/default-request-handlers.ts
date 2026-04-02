@@ -1059,155 +1059,93 @@ export const handlers = {
     })
   ],
   user: [
-    graphql.query('getUserAuditLog', (input) => {
-      const start = input.variables.skip || 0
-      const end = start + (input.variables.count || 10)
-      const total = 11
-      return HttpResponse.json({
-        data: {
-          getUserAuditLog: {
-            total,
-            results: [
-              {
-                time: '2025-10-03T10:46:49.362Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_OUT',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              },
-              {
-                time: '2025-10-03T10:44:55.012Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_IN',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              },
-              {
-                time: '2025-10-03T10:44:49.362Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_OUT',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              },
-              {
-                time: '2025-10-03T10:43:16.704Z',
-                userAgent:
-                  'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'ASSIGNED',
-                isV2: null,
-                data: {
-                  compositionId: '0458a3ba-3f30-4345-be16-9ec81aa39b89',
-                  trackingId: 'BSK4XRC',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: '68df9529f8f3a73007a44264',
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'ASSIGNED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:23:45.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:23:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:22:10.128Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_IN',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              }
-            ].slice(start, Math.min(end, total)),
-            __typename: 'UserAuditLogResultSet'
-          }
+    tRPCMsw.user.audit.list.query((input) => {
+      const skip = input.skip ?? 0
+      const count = input.count ?? 10
+      const allResults = [
+        {
+          id: '1',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'user.logged_out',
+          requestData: { subjectId: input.userId },
+          responseSummary: {},
+          createdAt: '2025-10-03T10:46:49.362Z'
+        },
+        {
+          id: '2',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'user.logged_in',
+          requestData: { subjectId: input.userId },
+          responseSummary: {},
+          createdAt: '2025-10-03T10:44:55.012Z'
+        },
+        {
+          id: '3',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'event.actions.assign.request',
+          requestData: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            actionType: 'ASSIGN',
+            transactionId: 'BSK4XRC'
+          },
+          responseSummary: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            eventType: 'birth',
+            trackingId: 'BSK4XRC'
+          },
+          createdAt: '2025-10-03T10:43:16.704Z'
+        },
+        {
+          id: '4',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'event.actions.declare.request',
+          requestData: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            actionType: 'DECLARE',
+            transactionId: 'MOX89J'
+          },
+          responseSummary: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            eventType: 'birth',
+            trackingId: 'MOX89J'
+          },
+          createdAt: '2025-10-03T09:24:25.604Z'
+        },
+        {
+          id: '5',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'event.actions.register.request',
+          requestData: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            actionType: 'REGISTER',
+            transactionId: 'MOX89J'
+          },
+          responseSummary: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            eventType: 'birth',
+            trackingId: 'MOX89J'
+          },
+          createdAt: '2025-10-03T09:23:45.604Z'
+        },
+        {
+          id: '6',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'user.logged_in',
+          requestData: { subjectId: input.userId },
+          responseSummary: {},
+          createdAt: '2025-10-03T09:22:10.128Z'
         }
-      })
+      ]
+      return {
+        results: allResults.slice(skip, skip + count),
+        total: allResults.length
+      }
     }),
     graphql.query('fetchUser', (input) => {
       const userId = input.variables.userId
