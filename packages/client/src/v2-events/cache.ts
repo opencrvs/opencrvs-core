@@ -15,6 +15,21 @@ import { DocumentPath } from '@opencrvs/commons/client'
 export const CACHE_NAME = 'workbox-runtime'
 
 /**
+ * Converts a DocumentPath to an absolute URL suitable for use in `src` attributes,
+ * `fetch()` calls, and other URL contexts in the browser.
+ *
+ * DocumentPath is a bucket-relative path (e.g. "events/eventId/file.jpg").
+ * Browsers resolve relative URLs against the current page URL, which would be incorrect.
+ * Files are stored in the service worker cache under their absolute path (with a leading "/"),
+ * so rendering must use the same form to get a cache hit from the service worker.
+ *
+ * @see cacheFile — stores files under the same normalized URL format.
+ */
+export function toFileUrl(path: DocumentPath): string {
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+/**
  * Sets file to **BROWSER** cache with given filename.
  * Normalizes url to an absolute path (prepends / if missing).
  * @see CACHE_NAME

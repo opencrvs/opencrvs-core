@@ -23,6 +23,7 @@ import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanC
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { toFileUrl } from '@client/v2-events/cache'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -153,7 +154,7 @@ export function ImagePreview({
         <PanViewer
           key={Math.random()}
           id="document_image"
-          image={previewImage.path}
+          image={toFileUrl(previewImage.path)}
           rotation={rotation}
           zoom={zoom}
         />

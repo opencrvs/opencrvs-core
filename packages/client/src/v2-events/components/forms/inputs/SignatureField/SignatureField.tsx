@@ -25,7 +25,7 @@ import {
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { cacheFile } from '@client/v2-events/cache'
+import { cacheFile, toFileUrl } from '@client/v2-events/cache'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
 
@@ -150,7 +150,9 @@ function SignatureFieldInput({
           </Stack>
         </>
       )}
-      {signature && <SignaturePreview alt={modalTitle} src={signature.path} />}
+      {signature && (
+        <SignaturePreview alt={modalTitle} src={toFileUrl(signature.path)} />
+      )}
       {signature && !disabled && (
         <Button
           size="medium"
@@ -210,7 +212,12 @@ function SignatureOutput({ value }: { value?: FileFieldValue }) {
   if (!value) {
     return null
   }
-  return <SignatureOutputPreview alt="Signature preview" src={value.path} />
+  return (
+    <SignatureOutputPreview
+      alt="Signature preview"
+      src={toFileUrl(value.path)}
+    />
+  )
 }
 
 export const SignatureField = {

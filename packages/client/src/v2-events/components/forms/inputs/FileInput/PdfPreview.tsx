@@ -19,6 +19,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { DividerVertical } from '@opencrvs/components/lib/Divider'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { toFileUrl } from '@client/v2-events/cache'
 import { SimplePdfPreview } from './SimplePdfPreview'
 
 const ViewerWrapper = styled.div`
@@ -55,7 +56,7 @@ export function PdfPreview({
   disableDelete,
   id
 }: IProps) {
-  const fileUrl = previewImage.path
+  const fileUrl = toFileUrl(previewImage.path)
 
   return (
     <ViewerWrapper id={id ?? 'preview_image_field'}>

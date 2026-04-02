@@ -52,7 +52,9 @@ const PanViewer: React.FC<IProps> = ({ image, zoom, rotation }) => {
         key={dx}
       >
         <img
-          src={image}
+          // Ensure the path is absolute so the browser resolves it against the
+          // origin, not the current page URL. Files are cached under "/${path}".
+          src={image.startsWith('/') ? image : `/${image}`}
           alt="Supporting Document"
           style={{ transform: `rotate(${rotation}deg)` }}
         />
