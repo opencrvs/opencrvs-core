@@ -54,7 +54,7 @@ export const announcementRouter = router({
       // https://github.com/opencrvs/opencrvs-core/issues/11885
       const admin = await db
         .selectFrom('users')
-        .select('id')
+        .select(['id', 'email'])
         .where('legacyId', '=', ctx.user.id)
         .executeTakeFirst()
 
@@ -65,7 +65,9 @@ export const announcementRouter = router({
         })
       }
 
-      const recipients = await collectActiveRecipientEmails()
+      const recipients = (await collectActiveRecipientEmails()).filter(
+        (e) => e !== admin.email
+      )
 
       if (recipients.length === 0) {
         throw new TRPCError({
