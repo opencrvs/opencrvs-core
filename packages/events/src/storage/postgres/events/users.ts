@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Kysely } from 'kysely'
+import { UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
 import { NewUsers } from './schema/app/Users'
 import Schema from './schema/Database'
@@ -48,6 +49,20 @@ export async function getUserByMobileOrEmail(
 }
 
 export type { SecurityQuestion }
+
+export async function getUserCredentialsByUserId(userId: string) {
+  const db = getClient()
+  return db
+    .selectFrom('users')
+    .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
+    .select([
+      'users.id',
+      'userCredentials.salt',
+      'userCredentials.securityQuestions'
+    ])
+    .where('users.id', '=', userId as UUID)
+    .executeTakeFirst()
+}
 
 export async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {
   const { id } = await trx

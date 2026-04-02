@@ -31,8 +31,10 @@ import {
   userOnlyProcedure
 } from '@events/router/trpc'
 import { getRoles } from '@events/service/config/config'
+import { generateHash } from '@events/service/auth/hash'
 import {
   getUserByMobileOrEmail,
+  getUserCredentialsByUserId,
   SecurityQuestion
 } from '@events/storage/postgres/events/users'
 import { getUserActions } from '@events/service/events/user/actions'
@@ -130,6 +132,51 @@ const VerifyUserOutput = z.object({
 })
 
 export const userRouter = router({
+  verifySecurityAnswer: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        questionKey: z.string(),
+        answer: z.string()
+      })
+    )
+    .output(z.object({ matched: z.boolean(), questionKey: z.string() }))
+    .mutation(async ({ input }) => {
+      const record = await getUserCredentialsByUserId(input.userId)
+
+      if (!record) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      const questions = record.securityQuestions as SecurityQuestion[]
+
+      if (!Array.isArray(questions) || questions.length === 0) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: "User doesn't have security questions"
+        })
+      }
+
+      const matched = (
+        await Promise.all(
+          questions.map(async (q) => {
+            if (q.questionKey !== input.questionKey) { return false }
+            const hash = await generateHash(
+              input.answer.toLowerCase(),
+              record.salt
+            )
+            return hash === q.answerHash
+          })
+        )
+      ).some(Boolean)
+
+      const questionKey = matched
+        ? input.questionKey
+        : (questions.find((q) => q.questionKey !== input.questionKey)
+            ?.questionKey ?? input.questionKey)
+
+      return { matched, questionKey }
+    }),
   verifyUser: publicProcedure
     .input(
       z
