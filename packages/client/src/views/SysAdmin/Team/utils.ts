@@ -11,7 +11,7 @@
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
-import { AdministrativeArea, joinValues, UUID } from '@opencrvs/commons/client'
+import { AdministrativeArea, UUID } from '@opencrvs/commons/client'
 import { getAdministrativeAreaHierarchy } from '../../../v2-events/utils'
 
 export enum UserStatus {
@@ -21,45 +21,42 @@ export enum UserStatus {
   DISABLED
 }
 
-const AuditDescriptionMapping: {
-  [key: string]: MessageDescriptor
-} = {
-  IN_PROGRESS: messages.inProgressAuditAction,
-  DECLARED: messages.declaredAuditAction,
-  VALIDATED: messages.validatedAuditAction,
-  DECLARATION_UPDATED: messages.updatedAuditAction,
-  REGISTERED: messages.registeredAuditAction,
-  REJECTED: messages.rejectedAuditAction,
-  CERTIFIED: messages.certifiedAuditAction,
-  ISSUED: messages.issuedAuditAction,
-  ASSIGNED: messages.assignedAuditAction,
-  UNASSIGNED: messages.unAssignedAuditAction,
-  CORRECTED: messages.correctedAuditAction,
-  REQUESTED_CORRECTION: messages.requestedCorrectionAuditAction,
-  APPROVED_CORRECTION: messages.approvedCorrectionAuditAction,
-  REJECTED_CORRECTION: messages.rejectedCorrectedAuditAction,
-  ARCHIVED: messages.archivedAuditAction,
-  LOGGED_IN: messages.loggedInAuditAction,
-  LOGGED_OUT: messages.loggedOutAuditAction,
-  PHONE_NUMBER_CHANGED: messages.phoneNumberChangedAuditAction,
-  EMAIL_ADDRESS_CHANGED: messages.emailAddressChangedAuditAction,
-  PASSWORD_CHANGED: messages.passwordChangedAuditAction,
-  DEACTIVATE: messages.deactivateAuditAction,
-  REACTIVATE: messages.reactivateAuditAction,
-  EDIT_USER: messages.editUserAuditAction,
-  CREATE_USER: messages.createUserAuditAction,
-  PASSWORD_RESET: messages.passwordResetAuditAction,
-  USERNAME_REMINDER: messages.userNameReminderAuditAction,
-  USERNAME_REMINDER_BY_ADMIN: messages.usernameReminderByAdmin,
-  PASSWORD_RESET_BY_ADMIN: messages.passwordResetByAdmin,
-  RETRIEVED: messages.retrievedAuditAction,
-  VIEWED: messages.viewedAuditAction,
-  REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
-  REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
-  REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
-  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction,
-  MARKED_AS_DUPLICATE: messages.markedAsDuplicate,
-  MARKED_AS_NOT_DUPLICATE: messages.markedAsNotDuplicate
+const AuditDescriptionMapping: Record<string, MessageDescriptor> = {
+  // User management operations
+  'user.logged_in': messages.loggedInAuditAction,
+  'user.logged_out': messages.loggedOutAuditAction,
+  'user.create_user': messages.createUserAuditAction,
+  'user.edit_user': messages.editUserAuditAction,
+  'user.password_changed': messages.passwordChangedAuditAction,
+  'user.password_reset': messages.passwordResetAuditAction,
+  'user.password_reset_by_admin': messages.passwordResetByAdmin,
+  'user.phone_number_changed': messages.phoneNumberChangedAuditAction,
+  'user.email_address_changed': messages.emailAddressChangedAuditAction,
+  'user.username_reminder': messages.userNameReminderAuditAction,
+  'user.username_reminder_by_admin': messages.usernameReminderByAdmin,
+  'user.deactivate': messages.deactivateAuditAction,
+  'user.reactivate': messages.reactivateAuditAction,
+  // Event action operations
+  'event.actions.notify.request': messages.inProgressAuditAction,
+  'event.actions.declare.request': messages.declaredAuditAction,
+  'event.actions.register.request': messages.registeredAuditAction,
+  'event.actions.reject.request': messages.rejectedAuditAction,
+  'event.actions.validate.request': messages.validatedAuditAction,
+  'event.actions.edit.request': messages.updatedAuditAction,
+  'event.actions.assign.request': messages.assignedAuditAction,
+  'event.actions.unassign.request': messages.unAssignedAuditAction,
+  'event.actions.read.request': messages.viewedAuditAction,
+  'event.actions.archive.request': messages.archivedAuditAction,
+  'event.actions.reinstate.request': messages.reInstatedInProgressAuditAction,
+  'event.actions.print_certificate.request': messages.certifiedAuditAction,
+  'event.actions.correction.request.request':
+    messages.requestedCorrectionAuditAction,
+  'event.actions.correction.approve.request':
+    messages.approvedCorrectionAuditAction,
+  'event.actions.correction.reject.request':
+    messages.rejectedCorrectedAuditAction,
+  'event.actions.mark_as_duplicate.request': messages.markedAsDuplicate,
+  'event.actions.mark_as_not_duplicate.request': messages.markedAsNotDuplicate
 }
 
 export const getAddressName = (
