@@ -89,7 +89,7 @@ const VersionCard = styled.div`
 `
 
 const VersionText = styled.span`
-  font-weight: 600;
+  ${({ theme }) => theme.fonts.bold14};
   text-transform: uppercase;
 `
 
