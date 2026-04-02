@@ -8,13 +8,13 @@ UPDATE event_actions
 SET declaration = regexp_replace(
         declaration::text,
         '"/ocrvs/',
-        '"/',
+        '"',
         'g'
     )::jsonb,
     annotation = regexp_replace(
         annotation::text,
         '"/ocrvs/',
-        '"/',
+        '"',
         'g'
     )::jsonb
 WHERE declaration::text LIKE '%"/ocrvs/%'
@@ -28,13 +28,13 @@ UPDATE event_action_drafts
 SET declaration = regexp_replace(
         declaration::text,
         '"/ocrvs/',
-        '"/',
+        '"',
         'g'
     )::jsonb,
     annotation = regexp_replace(
         annotation::text,
         '"/ocrvs/',
-        '"/',
+        '"',
         'g'
     )::jsonb
 WHERE declaration::text LIKE '%"/ocrvs/%'
