@@ -144,19 +144,23 @@ describe('Route authorization', () => {
 
     expect(res.statusCode).toBe(401)
   })
-  it('Tests the health check for all the service', async () => {
+  it('returns success: false when events service is unhealthy', async () => {
+    fetch.mockResponseOnce('', { status: 503 })
     const res = await server.app.inject({
       method: 'GET',
       url: '/ping'
     })
-    expect(res.result).toEqual({
-      auth: false,
-      search: false,
-      'user-mgnt': false,
-      metrics: false,
-      notification: false,
-      countryconfig: false,
-      workflow: false
+    expect(res.statusCode).toBe(503)
+    expect(res.result).toEqual({ success: false })
+  })
+
+  it('returns success: true when events service is healthy', async () => {
+    fetch.mockResponseOnce('', { status: 200 })
+    const res = await server.app.inject({
+      method: 'GET',
+      url: '/ping'
     })
+    expect(res.statusCode).toBe(200)
+    expect(res.result).toEqual({ success: true })
   })
 })

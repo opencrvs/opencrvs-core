@@ -13,7 +13,7 @@ import { EVENTS_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 
 export default async function healthCheckHandler(
-  request: Hapi.Request,
+  _request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
