@@ -22,15 +22,6 @@ import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
-export const RECORD_DECLARE_SCOPES = [
-  SCOPES.RECORD_DECLARE_BIRTH,
-  SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
-  SCOPES.RECORD_DECLARE_DEATH,
-  SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
-  SCOPES.RECORD_DECLARE_MARRIAGE,
-  SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
-]
-
 export function usePermissions() {
   const userScopes = useSelector(getScope)
 

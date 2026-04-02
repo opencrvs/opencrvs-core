@@ -17,8 +17,6 @@ import { parseConfigurableScope } from './scopes.deprecated.do-not-use'
 export const SCOPES = {
   // TODO v1.8 legacy scopes
   BYPASSRATELIMIT: 'bypassratelimit',
-  REGISTER: 'register',
-  DEMO: 'demo',
   CONFIG: 'config',
 
   // systems / integrations
@@ -30,28 +28,6 @@ export const SCOPES = {
   RECORD_EXPORT: 'record.export',
   RECORD_REINDEX: 'record.reindex',
   INTEGRATION_CREATE: 'integration.create',
-
-  // declare
-  RECORD_DECLARE_BIRTH: 'record.declare-birth',
-  RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
-  RECORD_DECLARE_DEATH: 'record.declare-death',
-  RECORD_DECLARE_DEATH_MY_JURISDICTION: 'record.declare-death:my-jurisdiction',
-  RECORD_DECLARE_MARRIAGE: 'record.declare-marriage',
-  RECORD_DECLARE_MARRIAGE_MY_JURISDICTION:
-    'record.declare-marriage:my-jurisdiction',
-  RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
-
-  // @todo: should this record be removed from events v2?
-  RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
-  RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
-
-  // validate
-  RECORD_SUBMIT_FOR_APPROVAL: 'record.declaration-submit-for-approval',
-  RECORD_SUBMIT_FOR_UPDATES: 'record.declaration-submit-for-updates',
-  RECORD_DECLARATION_EDIT: 'record.declaration-edit',
-  RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
-  RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
-  RECORD_DECLARATION_REINSTATE: 'record.declaration-reinstate',
 
   // register
   RECORD_REGISTER: 'record.register',
@@ -118,8 +94,6 @@ export const SCOPES = {
 // Legacy scopes
 const LegacyScopes = z.union([
   z.literal(SCOPES.BYPASSRATELIMIT),
-  z.literal(SCOPES.REGISTER),
-  z.literal(SCOPES.DEMO),
   z.literal(SCOPES.CONFIG)
 ])
 

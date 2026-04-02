@@ -13,18 +13,12 @@ import {
   WORKQUEUE_TABS
 } from '@client/components/interface/WorkQueueTabs'
 import { SCOPES } from '@opencrvs/commons/client'
-import { RECORD_DECLARE_SCOPES, usePermissions } from './useAuthorization'
+import { usePermissions } from './useAuthorization'
 
 interface Tab {
   name: string
   scopes?: string[]
   denyScopes?: string[]
-}
-
-interface Group {
-  group: string
-  scopes?: string[]
-  tabs: Tab[]
 }
 
 interface NavigationConfig {
@@ -35,73 +29,6 @@ interface NavigationConfig {
 
 // TODO Potentially get this from country config
 const routeAccess: NavigationConfig[] = [
-  {
-    name: TAB_GROUPS.declarations,
-    tabs: [
-      {
-        name: WORKQUEUE_TABS.myDrafts,
-        scopes: RECORD_DECLARE_SCOPES
-      },
-      {
-        name: WORKQUEUE_TABS.inProgress,
-        scopes: [
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-          SCOPES.RECORD_REGISTER
-        ]
-      },
-      {
-        name: WORKQUEUE_TABS.sentForReview,
-        scopes: [SCOPES.RECORD_SUBMIT_FOR_REVIEW]
-      },
-      {
-        name: WORKQUEUE_TABS.sentForApproval,
-        scopes: [
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
-        ]
-      },
-      {
-        name: WORKQUEUE_TABS.requiresUpdate,
-        scopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES]
-      },
-      {
-        name: WORKQUEUE_TABS.readyForReview,
-        scopes: [
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-          SCOPES.RECORD_REGISTER
-        ]
-      },
-      {
-        name: WORKQUEUE_TABS.readyToPrint,
-        scopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]
-      },
-      {
-        name: WORKQUEUE_TABS.externalValidation,
-        scopes: [SCOPES.RECORD_REGISTER]
-      },
-      {
-        name: WORKQUEUE_TABS.readyToIssue,
-        scopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]
-      },
-      {
-        name: WORKQUEUE_TABS.outbox,
-        scopes: [
-          SCOPES.RECORD_SUBMIT_INCOMPLETE,
-          SCOPES.RECORD_SUBMIT_FOR_REVIEW,
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-          SCOPES.RECORD_REVIEW_DUPLICATES,
-          SCOPES.RECORD_REGISTER,
-          SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-          SCOPES.RECORD_REGISTRATION_CORRECT,
-          SCOPES.RECORD_DECLARATION_ARCHIVE,
-          SCOPES.RECORD_DECLARATION_REINSTATE
-        ]
-      }
-    ]
-  },
   {
     name: TAB_GROUPS.organisations,
     scopes: [
