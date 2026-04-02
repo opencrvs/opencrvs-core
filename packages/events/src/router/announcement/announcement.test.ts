@@ -237,6 +237,44 @@ describe('announcement.broadcast', () => {
     ).rejects.toMatchObject({ code: 'TOO_MANY_REQUESTS' })
   })
 
+  test('allows broadcast when only FAILED announcements exist today', async () => {
+    const { user, eventsDb, locations } = await setupTestCase()
+
+    const adminResult = await eventsDb
+      .insertInto('users')
+      .values([
+        {
+          legacyId: user.id,
+          role: user.role,
+          status: 'active',
+          mobile: '+1234567890',
+          officeId: locations[0].id
+        },
+        {
+          role: 'REGISTRATION_AGENT',
+          status: 'active',
+          email: 'recipient@test.com',
+          officeId: locations[0].id
+        }
+      ])
+      .returning('id')
+      .executeTakeFirstOrThrow()
+
+    await insertAnnouncement(eventsDb, adminResult.id as UUID, {
+      status: 'FAILED'
+    })
+
+    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+
+    await expect(
+      client.announcement.broadcast({
+        subject: 'Retry',
+        body: 'Retry body',
+        locale: 'en'
+      })
+    ).resolves.toEqual({ success: true })
+  })
+
   test('creates a PENDING announcement row with correct data and returns { success: true }', async () => {
     const { user, eventsDb, locations } = await setupTestCase()
 
