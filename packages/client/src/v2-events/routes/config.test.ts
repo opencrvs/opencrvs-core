@@ -16,16 +16,6 @@ import { useNetworkProbe } from './config'
 const fetchMock = createFetchMock(vi)
 fetchMock.enableMocks()
 
-const ALL_SERVICES_HEALTHY = {
-  auth: true,
-  search: true,
-  'user-mgnt': true,
-  metrics: true,
-  notification: true,
-  countryconfig: true,
-  workflow: true
-}
-
 // fetch-mock resolves as microtasks; act() flushes them without advancing fake timers
 async function flushFetch() {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -43,8 +33,8 @@ afterEach(() => {
 })
 
 describe('useNetworkProbe', () => {
-  it('sets offline immediately on mount, then online when all services are healthy', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify(ALL_SERVICES_HEALTHY))
+  it('sets offline immediately on mount, then online when ping succeeds', async () => {
+    fetchMock.mockResponseOnce('', { status: 200 })
 
     const { unmount } = renderHook(() => useNetworkProbe())
 
@@ -56,10 +46,8 @@ describe('useNetworkProbe', () => {
     unmount()
   })
 
-  it('remains offline when a service is not ready', async () => {
-    fetchMock.mockResponseOnce(
-      JSON.stringify({ ...ALL_SERVICES_HEALTHY, metrics: false })
-    )
+  it('remains offline when ping returns a non-ok status', async () => {
+    fetchMock.mockResponseOnce('', { status: 503 })
 
     const { unmount } = renderHook(() => useNetworkProbe())
 
@@ -82,7 +70,7 @@ describe('useNetworkProbe', () => {
 
   it('retries the probe every 5 seconds while offline', async () => {
     fetchMock.mockRejectOnce(new Error('Network error'))
-    fetchMock.mockResponseOnce(JSON.stringify(ALL_SERVICES_HEALTHY))
+    fetchMock.mockResponseOnce('', { status: 200 })
 
     const { unmount } = renderHook(() => useNetworkProbe())
 
@@ -104,7 +92,7 @@ describe('useNetworkProbe', () => {
       resolveFirst = resolve
     })
     fetchMock.mockImplementationOnce(async () => slowFetch)
-    fetchMock.mockResponseOnce(JSON.stringify(ALL_SERVICES_HEALTHY))
+    fetchMock.mockResponseOnce('', { status: 200 })
 
     const { unmount } = renderHook(() => useNetworkProbe())
 
@@ -115,16 +103,14 @@ describe('useNetworkProbe', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
 
     act(() => {
-      resolveFirst(
-        new Response(JSON.stringify(ALL_SERVICES_HEALTHY), { status: 200 })
-      )
+      resolveFirst(new Response('', { status: 200 }))
     })
     await flushFetch()
     unmount()
   })
 
   it('clears the retry interval once online', async () => {
-    fetchMock.mockResponse(JSON.stringify(ALL_SERVICES_HEALTHY))
+    fetchMock.mockResponse('', { status: 200 })
 
     const { unmount } = renderHook(() => useNetworkProbe())
 
@@ -150,7 +136,7 @@ describe('useNetworkProbe', () => {
       () => controller
     ) as unknown as typeof AbortController
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/promise-function-async
     fetchMock.mockImplementationOnce(() => new Promise<Response>(() => {}))
 
     const { unmount } = renderHook(() => useNetworkProbe())

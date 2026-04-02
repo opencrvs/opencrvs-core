@@ -45,6 +45,7 @@ export const NOTIFICATION_URL = env.NOTIFICATION_URL
 export const WORKFLOW_URL = env.WORKFLOW_URL
 export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 export const DOCUMENTS_URL = env.DOCUMENTS_URL
+export const EVENTS_URL = env.EVENTS_URL
 export const DISABLE_RATE_LIMIT = env.DISABLE_RATE_LIMIT
 export const SENTRY_DSN = env.SENTRY_DSN
 export const PRODUCTION = env.isProd

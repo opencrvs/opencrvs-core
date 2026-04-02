@@ -85,16 +85,6 @@ function PrefetchQueries() {
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
 
-const PING_SERVICES = [
-  'auth',
-  'search',
-  'user-mgnt',
-  'metrics',
-  'notification',
-  'countryconfig',
-  'workflow'
-] as const
-
 export function useNetworkProbe() {
   useEffect(() => {
     let cancelled = false
@@ -120,17 +110,9 @@ export function useNetworkProbe() {
           signal: currentController.signal
         })
 
-        const status = await res.json()
-
-        const allServicesReady =
-          res.ok &&
-          PING_SERVICES.every((service) => {
-            return status[service] === true
-          })
-
         if (!cancelled) {
-          onlineManager.setOnline(allServicesReady)
-          if (allServicesReady && intervalId !== null) {
+          onlineManager.setOnline(res.ok)
+          if (res.ok && intervalId !== null) {
             clearInterval(intervalId)
             intervalId = null
           }
