@@ -34,7 +34,23 @@ import { useTRPC } from '@client/v2-events/trpc'
 import { Link } from '@opencrvs/components'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@client/v2-events/routes'
-import { getAcceptedScopesByType, UUID } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  AuditLogEntry,
+  AuditLogParams,
+  EventActionAuditLog,
+  EventCustomActionAuditLog,
+  getAcceptedScopesByType,
+  getActionConfig,
+  UUID
+} from '@opencrvs/commons/client'
+
+/** Audit log entries that carry a full event response summary (eventId, trackingId). */
+type EventActionLikeAuditLogParams = (
+  | EventActionAuditLog
+  | EventCustomActionAuditLog
+) &
+  Pick<AuditLogParams, 'clientId' | 'clientType'>
 import { useSelector } from 'react-redux'
 import { getScope } from '@client/profile/profileSelectors'
 
@@ -58,20 +74,6 @@ const RecentActionsHolder = styled.div`
 const AuditContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
 `
-
-const BoldContent = styled.div`
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bold14};
-`
-
-type AuditEntry = {
-  id: string
-  clientId: string
-  operation: string
-  requestData: Record<string, unknown> | null
-  responseSummary: Record<string, unknown> | null
-  createdAt: string
-}
 
 interface IBaseProp {
   userId: string
@@ -102,7 +104,7 @@ type State = {
   sortedColumn: SORTED_COLUMN
   currentPageNumber: number
   showModal: boolean
-  actionDetailsData: AuditEntry | null
+  actionDetailsData: AuditLogEntry | null
 }
 
 function UserAuditHistoryComponent(props: Props) {
@@ -126,6 +128,7 @@ function UserAuditHistoryComponent(props: Props) {
 
   const navigate = useNavigate()
   const trpc = useTRPC()
+  const { data: eventConfigs } = useQuery(trpc.event.config.get.queryOptions())
   const { data, isLoading, isError } = useQuery(
     trpc.user.audit.list.queryOptions({
       userId: props.userId,
@@ -188,7 +191,7 @@ function UserAuditHistoryComponent(props: Props) {
     ]
   }
 
-  const toggleActionDetails = (actionItem: AuditEntry | null) => {
+  const toggleActionDetails = (actionItem: AuditLogEntry | null) => {
     setState((prevState) => ({
       ...prevState,
       actionDetailsData: actionItem,
@@ -196,28 +199,51 @@ function UserAuditHistoryComponent(props: Props) {
     }))
   }
 
-  function getTrackingId(entry: AuditEntry): string {
+  function getTrackingId(entry: EventActionLikeAuditLogParams): string {
     const trackingId =
-      (entry.responseSummary?.trackingId as string | undefined) ??
-      (entry.requestData?.transactionId as string | undefined)
+      entry.responseSummary.trackingId ?? entry.requestData.transactionId
     return trackingId || '-'
   }
 
-  function getEventId(entry: AuditEntry): string | undefined {
-    return (
-      (entry.responseSummary?.eventId as string | undefined) ??
-      (entry.requestData?.eventId as string | undefined)
-    )
+  function getEventId(
+    entry: EventActionLikeAuditLogParams
+  ): string | undefined {
+    return entry.responseSummary.eventId ?? entry.requestData.eventId
   }
 
-  function getActionMessage(entry: AuditEntry) {
+  function isEventActionEntry(
+    entry: AuditLogEntry
+  ): entry is EventActionLikeAuditLogParams & { createdAt: string } {
+    return entry.operation.startsWith('event.actions.')
+  }
+
+  function getActionMessage(entry: AuditLogEntry) {
+    if (entry.operation === 'event.actions.custom.request') {
+      const eventConfig = eventConfigs?.find(
+        (c) => c.id === entry.responseSummary.eventType
+      )
+      const actionConfig =
+        eventConfig &&
+        getActionConfig({
+          eventConfiguration: eventConfig,
+          actionType: ActionType.CUSTOM,
+          customActionType: entry.requestData.customAction
+        })
+      if (actionConfig?.type === ActionType.CUSTOM) {
+        return props.intl.formatMessage(actionConfig.auditHistoryLabel)
+      }
+      return props.intl.formatMessage(messages.customActionAuditAction, {
+        customActionType:
+          entry.requestData.customAction ?? entry.requestData.actionType
+      })
+    }
     const actionDescriptor = getUserAuditDescription(entry.operation)
     return actionDescriptor
       ? props.intl.formatMessage(actionDescriptor)
       : entry.operation
   }
 
-  function getAuditData(results: AuditEntry[]) {
+  function getAuditData(results: AuditLogEntry[]) {
     return orderBy(
       results.map((entry) => ({
         actionDescription: (
@@ -227,6 +253,7 @@ function UserAuditHistoryComponent(props: Props) {
         ),
         actionDescriptionString: getActionMessage(entry),
         trackingId: (() => {
+          if (!isEventActionEntry(entry)) return '-'
           const trackingId = getTrackingId(entry)
           const eventId = UUID.safeParse(getEventId(entry))?.data
           if (trackingId === '-' || !eventId) return trackingId
@@ -291,7 +318,7 @@ function UserAuditHistoryComponent(props: Props) {
         <TableDiv>
           <Table
             columns={getAuditColumns()}
-            content={getAuditData(data.results as AuditEntry[])}
+            content={getAuditData(data.results as AuditLogEntry[])}
             noResultText={intl.formatMessage(messages.noAuditFound)}
             fixedWidth={1088}
             isLoading={isLoading}

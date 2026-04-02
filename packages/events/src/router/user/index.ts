@@ -10,8 +10,11 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { UserAuditRecordInput } from '@opencrvs/commons/events'
 import * as z from 'zod/v4'
+import {
+  AuditLogEntrySchema,
+  UserAuditRecordInput
+} from '@opencrvs/commons/events'
 import {
   logger,
   personNameFromV1ToV2,
@@ -60,16 +63,6 @@ const UserAuditListQuery = z.object({
   timeEnd: z.string().optional()
 })
 
-const AuditLogEntry = z.object({
-  id: z.string(),
-  clientId: z.string(),
-  clientType: z.string(),
-  operation: z.string(),
-  requestData: z.record(z.string(), z.unknown()).nullable(),
-  responseSummary: z.record(z.string(), z.unknown()).nullable(),
-  createdAt: z.string()
-})
-
 const auditRouter = router({
   record: userAndSystemProcedure
     .input(UserAuditRecordInput)
@@ -82,7 +75,9 @@ const auditRouter = router({
     }),
   list: userOnlyProcedure
     .input(UserAuditListQuery)
-    .output(z.object({ results: z.array(AuditLogEntry), total: z.number() }))
+    .output(
+      z.object({ results: z.array(AuditLogEntrySchema), total: z.number() })
+    )
     .use(userCanReadOtherUser)
     .query(async ({ input }) => {
       return queryUserAuditLog({

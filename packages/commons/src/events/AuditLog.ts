@@ -15,7 +15,7 @@ import { TokenUserType } from '../authentication'
 /**
  * Shared response summary shape for operations that return an event document.
  */
-type EventResponseSummary = {
+export type EventResponseSummary = {
   eventId: string
   eventType: string
   trackingId: string
@@ -78,6 +78,12 @@ export type EventActionAuditLog = {
     | 'event.actions.mark_as_duplicate.request'
     | 'event.actions.mark_as_not_duplicate.request'
   requestData: ActionAuditLogRequestData
+  responseSummary: EventResponseSummary
+}
+
+export type EventCustomActionAuditLog = {
+  operation: 'event.actions.custom.request'
+  requestData: ActionAuditLogRequestData & { customAction: string }
   responseSummary: EventResponseSummary
 }
 
@@ -249,6 +255,7 @@ export type AuditLogOperation =
   | EventGetAuditLog
   | EventSearchAuditLog
   | EventActionAuditLog
+  | EventCustomActionAuditLog
   | IntegrationCreateAuditLog
   | IntegrationDeactivateAuditLog
   | IntegrationActivateAuditLog
@@ -269,4 +276,28 @@ export type AuditLogOperation =
 export type AuditLogParams = AuditLogOperation & {
   clientId: string
   clientType: TokenUserType
+}
+
+/**
+ * Zod schema for a persisted audit log entry as returned from the database.
+ * `requestData` and `responseSummary` are stored as JSON columns so they are
+ * typed loosely here. Use `AuditLogEntry` (the TypeScript type) on the client
+ * after casting the result to get the properly discriminated union types.
+ */
+export const AuditLogEntrySchema = z.object({
+  id: z.string(),
+  clientId: z.string(),
+  clientType: TokenUserType,
+  operation: z.string(),
+  requestData: z.record(z.string(), z.unknown()).nullable(),
+  responseSummary: z.record(z.string(), z.unknown()).nullable(),
+  createdAt: z.string()
+})
+
+/**
+ * A persisted audit log entry as returned from the database.
+ * Extends AuditLogParams with `createdAt`, which is added by Postgres on insert.
+ */
+export type AuditLogEntry = AuditLogParams & {
+  createdAt: string
 }
