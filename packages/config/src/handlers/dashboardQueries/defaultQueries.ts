@@ -774,7 +774,7 @@ const populationEstimatesPerDay = () => ({
   ]
 })
 
-const REFRESH_AFTER_IN_MINUTE = env.isProd && !env.QA_ENV ? 1440 : 5
+const REFRESH_AFTER_IN_MINUTE = env.DASHBOARD_REFRESH_MINUTES
 
 export function defaultQueries() {
   const lastUpdatedAt = subMinutes(

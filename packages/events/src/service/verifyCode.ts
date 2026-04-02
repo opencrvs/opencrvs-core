@@ -14,7 +14,6 @@ import {
   TriggerEvent,
   triggerUserEventNotification,
   NameFieldValue,
-  getScopes,
   logger
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
@@ -86,8 +85,7 @@ export async function generateAndSendVerificationCode({
   phoneNumber?: string
   email?: string
 }): Promise<void> {
-  const scopes = getScopes(token)
-  const isDemoUser = scopes.includes('demo')
+  const isDemoUser = !env.TWO_FA_ENABLED
 
   let verificationCode: string
   if (isDemoUser) {

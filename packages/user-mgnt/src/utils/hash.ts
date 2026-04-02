@@ -16,11 +16,7 @@ interface ISaltedHash {
   salt: string
 }
 
-export function generateRandomPassword(demoUser?: boolean) {
-  if (!!demoUser) {
-    return 'test'
-  }
-
+export function generateRandomPassword() {
   const length = 6
   const charset =
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'

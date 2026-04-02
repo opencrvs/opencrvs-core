@@ -16,7 +16,7 @@ import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
 import { sendCredentialsNotification } from '@user-mgnt/features/createUser/service'
 
 interface IResendInvitePayload {
@@ -36,7 +36,7 @@ export default async function resendInvite(
     throw unauthorized()
   }
 
-  randomPassword = generateRandomPassword(hasDemoScope(request))
+  randomPassword = generateRandomPassword()
   const { hash, salt } = generateSaltedHash(randomPassword)
 
   user.passwordHash = hash

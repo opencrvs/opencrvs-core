@@ -223,7 +223,7 @@ export async function generateAndSendVerificationCode(
   email?: string,
   role?: string | number
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1 || env.QA_ENV
+  const isDemoUser = !env.TWO_FA_ENABLED
   logger.info(
     `Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')} Role: ${role}`
   )

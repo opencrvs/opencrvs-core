@@ -27,7 +27,7 @@ import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
 import * as _ from 'lodash'
 import uuid from 'uuid/v4'
 
@@ -59,7 +59,7 @@ export default async function createUser(
   try {
     user.status = user.status ?? statuses.PENDING
 
-    password = user.password ?? generateRandomPassword(hasDemoScope(request))
+    password = user.password ?? generateRandomPassword()
 
     const { hash, salt } = generateSaltedHash(password)
     user.salt = salt

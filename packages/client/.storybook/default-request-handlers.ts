@@ -121,7 +121,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -142,7 +141,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -163,7 +161,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -184,7 +181,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -205,7 +201,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -234,7 +229,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -269,7 +263,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -288,7 +281,6 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -309,7 +301,6 @@ export const handlers = {
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
                 'config.update:all',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -325,7 +316,6 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -361,7 +351,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             }
@@ -554,7 +543,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -575,7 +563,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -596,7 +583,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -617,7 +603,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -638,7 +623,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -667,7 +651,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -703,7 +686,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -722,7 +704,6 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -743,7 +724,6 @@ export const handlers = {
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
                 'config.update:all',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -759,7 +739,6 @@ export const handlers = {
                 'performance.read',
                 'performance.read-dashboards',
                 'performance.vital-statistics-export',
-                'demo'
               ],
               __typename: 'UserRole'
             },
@@ -795,7 +774,6 @@ export const handlers = {
                 'search.birth',
                 'search.death',
                 'search.marriage',
-                'demo'
               ],
               __typename: 'UserRole'
             }

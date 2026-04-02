@@ -16,7 +16,7 @@ import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
+import { getUserId, statuses } from '@user-mgnt/utils/userUtils'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 import {
   triggerUserEventNotification,
@@ -55,7 +55,7 @@ export default async function resetPasswordInviteHandler(
     responseSummary: {}
   })
 
-  randomPassword = generateRandomPassword(hasDemoScope(request))
+  randomPassword = generateRandomPassword()
   const { hash, salt } = generateSaltedHash(randomPassword)
 
   user.passwordHash = hash

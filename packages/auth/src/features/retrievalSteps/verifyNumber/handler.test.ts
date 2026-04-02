@@ -36,7 +36,7 @@ describe('verifyNumber handler receives a request', () => {
         id: '1',
         username: 'fake_user_name',
         status: 'active',
-        scope: ['demo'],
+        scope: [],
         mobile: '+8801711111111',
         securityQuestionKey: 'dummyKey'
       })

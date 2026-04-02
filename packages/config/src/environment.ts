@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { cleanEnv, str, port, url, bool } from 'envalid'
+import { cleanEnv, str, port, url, bool, num } from 'envalid'
 
 export const env = cleanEnv(process.env, {
   HOST: str({ devDefault: 'localhost' }),
@@ -16,7 +16,11 @@ export const env = cleanEnv(process.env, {
   LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
   CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
   PORT: port({ default: 2021 }),
-  QA_ENV: bool({ default: false }),
+  DASHBOARD_REFRESH_MINUTES: num({
+    devDefault: 5,
+    default: 1440,
+    desc: 'Number of minutes between dashboard data refresh cycles'
+  }),
   CHECK_INVALID_TOKEN: bool({
     devDefault: false,
     desc: `Check if the token has been invalided in the auth service before it has expired`
