@@ -76,6 +76,7 @@ export async function processNextAnnouncement() {
         body: announcement.body,
         recipient: {
           email: admin.email,
+          // admin is the TO: recipient — exclude from BCC to avoid sending a duplicate
           bcc: chunk.filter((e) => e !== admin.email)
         }
       },
