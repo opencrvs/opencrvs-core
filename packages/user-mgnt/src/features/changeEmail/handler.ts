@@ -14,9 +14,7 @@ import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { logger } from '@opencrvs/commons'
 import { statuses } from '@user-mgnt/utils/userUtils'
-import { resolve } from 'url'
-import fetch from 'node-fetch'
-import { METRICS_URL } from '@user-mgnt/constants'
+import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 
 interface IChangeEmailPayload {
   userId: string
@@ -29,10 +27,6 @@ export default async function changeEmailHandler(
 ) {
   const userUpdateData = request.payload as IChangeEmailPayload
   const user: IUserModel | null = await User.findById(userUpdateData.userId)
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
   if (!user) {
     logger.error(
       `No user details found by given userid: ${userUpdateData.userId}`
@@ -58,44 +52,12 @@ export default async function changeEmailHandler(
     // return 400 if there is a validation error when updating to mongo
     return h.response(err.message).code(400)
   }
-  try {
-    await postUserActionToMetrics(
-      'EMAIL_ADDRESS_CHANGED',
-      request.headers.authorization,
-      remoteAddress,
-      userAgent
-    )
-  } catch (err) {
-    logger.error(err)
-  }
-  return h.response().code(200)
-}
-
-export async function postUserActionToMetrics(
-  action: string,
-  token: string,
-  remoteAddress: string,
-  userAgent: string,
-  practitionerId?: string,
-  subjectPractitionerId?: string
-) {
-  const url = resolve(METRICS_URL, '/audit/events')
-  const body = {
-    action,
-    practitionerId,
-    ...(subjectPractitionerId && { additionalData: { subjectPractitionerId } })
-  }
-  const authentication = 'Bearer ' + token
-  await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authentication,
-      'x-real-ip': remoteAddress,
-      'x-real-user-agent': userAgent
-    }
+  recordUserAuditEvent(request.headers.authorization, {
+    operation: 'user.email_address_changed',
+    requestData: { subjectId: userUpdateData.userId },
+    responseSummary: { email: userUpdateData.email }
   })
+  return h.response().code(200)
 }
 
 export const changeEmailRequestSchema = Joi.object({
