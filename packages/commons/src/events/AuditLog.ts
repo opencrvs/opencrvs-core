@@ -265,10 +265,6 @@ export type AuditLogOperation =
   | EventGetAuditLog
   | EventSearchAuditLog
   | EventActionAuditLog
-  | IntegrationCreateAuditLog
-  | IntegrationDeactivateAuditLog
-  | IntegrationActivateAuditLog
-  | IntegrationDeleteAuditLog
   | IntegrationRefreshSecretAuditLog
   | AttachmentUploadAuditLog
   | UserAuditLog
