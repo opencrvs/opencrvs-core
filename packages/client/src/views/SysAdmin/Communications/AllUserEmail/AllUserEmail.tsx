@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
@@ -95,30 +95,24 @@ const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
         subject,
         body,
         locale: intl.locale
-      })
+      }),
+    onSuccess: () => {
+      dispatch(
+        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
+      )
+      resetForm()
+    },
+    onError: () => {
+      dispatch(
+        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
+      )
+    }
   })
 
   const handleConfirmSubmit = () => {
     hideModal()
     broadcastMutation.mutate()
   }
-
-  useEffect(() => {
-    if (broadcastMutation.isSuccess) {
-      dispatch(
-        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
-      )
-      resetForm()
-    }
-  }, [broadcastMutation.isSuccess, dispatch])
-
-  useEffect(() => {
-    if (broadcastMutation.isError) {
-      dispatch(
-        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
-      )
-    }
-  }, [broadcastMutation.isError, dispatch])
 
   return (
     <>
