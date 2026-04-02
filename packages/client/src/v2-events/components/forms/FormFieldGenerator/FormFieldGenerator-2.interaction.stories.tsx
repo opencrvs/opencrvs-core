@@ -147,7 +147,11 @@ const fields = [
     signaturePromptLabel: generateTranslationConfig(
       'Please sign inside the box'
     ),
-    defaultValue: 'Signed by Applicant',
+    defaultValue: {
+      path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+      type: 'image/png',
+      originalFilename: 'signature-review____signature-1773128010978.png'
+    },
     configuration: { maxFileSize: 1024, acceptedFileTypes: ['image/png'] }
   },
 
@@ -419,7 +423,11 @@ const declaration = {
     type: 'image/png',
     originalFilename: 'profile.png'
   },
-  'applicant.signature': 'Signed by Applicant',
+  'applicant.signature': {
+    path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+    type: 'image/png',
+    originalFilename: 'signature-review____signature-1773128010978.png'
+  },
   'applicant.email': 'applicant@example.com',
   'applicant.phone': '+8801712345678',
   'applicant.password': 'StrongPassword123!',
