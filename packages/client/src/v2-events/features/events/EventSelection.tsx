@@ -93,11 +93,6 @@ function EventSelector() {
     scopes
   })
 
-  const acceptedScopes = getAcceptedScopesByType({
-    acceptedScopes: ACTION_SCOPE_MAP[ActionType.CREATE],
-    scopes
-  })
-
   const allowedEventConfigurations = eventConfigurations.filter(({ id }) =>
     canUserCreateEvent(acceptedScopes, id)
   )

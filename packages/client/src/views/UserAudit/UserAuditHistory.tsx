@@ -39,15 +39,6 @@ import { useSelector } from 'react-redux'
 import { getScope } from '@client/profile/profileSelectors'
 
 const DEFAULT_LIST_SIZE = 10
-function withOnlineStatus<T>(
-  WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
-) {
-  return function WithOnlineStatus(props: T) {
-    const isOnline = useOnlineStatus()
-
-    return <WrappedComponent isOnline={isOnline} {...props} />
-  }
-}
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -97,10 +88,12 @@ enum SORTED_COLUMN {
   RECORD = 'trackingId',
   DATE = 'auditTimeValue'
 }
+
 enum SORT_ORDER {
   ASCENDING = 'asc',
   DESCENDING = 'desc'
 }
+
 type State = {
   timeStart: Date
   timeEnd: Date
