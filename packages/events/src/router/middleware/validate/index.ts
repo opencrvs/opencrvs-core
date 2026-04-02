@@ -212,7 +212,7 @@ function validateDeclarationUpdateAction({
 
   const annotationErrors = getFieldErrors(
     reviewFields,
-    visibleAnnotationFields,
+    { ...cleanedDeclaration, ...visibleAnnotationFields },
     context,
     {}
   )
