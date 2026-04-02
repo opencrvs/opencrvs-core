@@ -30,7 +30,7 @@ import {
 } from '@events/storage/postgres/events/system-clients'
 
 type UserAPIResult = {
-  id: UUID
+  id: string
   avatar?: {
     data: FullDocumentPath
     type: string

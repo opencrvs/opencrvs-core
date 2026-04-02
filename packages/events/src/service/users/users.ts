@@ -24,12 +24,12 @@ import { findUserOrSystem } from './api'
 export const getUsersById = async (
   ids: string[],
   token: string
-): Promise<User[]> => {
+): Promise<UserOrSystem[]> => {
   const users = await Promise.all(
     ids.map(async (id) => findUserOrSystem(id, token))
   )
 
-  return users.filter((user): user is User => !!user)
+  return users.filter((user) => user !== undefined)
 }
 
 export function isUser(userOrSystem: UserOrSystem): userOrSystem is User {

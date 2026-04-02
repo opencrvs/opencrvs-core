@@ -13,13 +13,13 @@ import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import { hasScope, SCOPES } from '@opencrvs/commons'
 import { router, userOnlyProcedure } from '@events/router/trpc'
+import { getClient } from '@events/storage/postgres/events'
 import {
   collectActiveRecipientEmails,
   countTodayAnnouncements,
   createAnnouncement
 } from '@events/storage/postgres/events/announcements'
 import { DAILY_ANNOUNCEMENT_LIMIT } from '@events/workers/announcementWorker'
-import { getUsersById } from '@events/service/users/users'
 
 export const announcementRouter = router({
   broadcast: userOnlyProcedure
@@ -44,7 +44,13 @@ export const announcementRouter = router({
         })
       }
 
-      const [admin] = await getUsersById([ctx.user.id], ctx.token)
+      const db = getClient()
+
+      const admin = await db
+        .selectFrom('users')
+        .select('id')
+        .where('legacyId', '=', ctx.user.id)
+        .executeTakeFirst()
 
       if (!admin) {
         throw new TRPCError({
