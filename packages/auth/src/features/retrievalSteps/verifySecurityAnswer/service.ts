@@ -8,9 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
+import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import superjson from 'superjson'
 import { env } from '@auth/environment'
-import { resolve } from 'url'
+import { AppRouter } from '@opencrvs/events/src/router'
+
+const eventsClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson
+    })
+  ]
+})
 
 export interface IVerifySecurityAnswerResponse {
   matched: boolean
@@ -22,20 +32,9 @@ export async function verifySecurityAnswer(
   questionKey: string,
   answer: string
 ): Promise<IVerifySecurityAnswerResponse> {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/verifySecurityAnswer')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ userId, questionKey, answer }),
-    headers: { 'Content-Type': 'application/json' }
+  return eventsClient.user.verifySecurityAnswer.mutate({
+    userId,
+    questionKey,
+    answer
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
-  const body = await res.json()
-  return {
-    matched: body.matched,
-    questionKey: body.questionKey
-  }
 }
