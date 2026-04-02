@@ -17,17 +17,16 @@ interface ConnectionStatusProps {
 }
 
 const Dot = styled.span<{ isOnline: boolean }>`
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background-color: ${({ isOnline, theme }) =>
     isOnline ? theme.colors.green : theme.colors.red};
-  display: inline-block;
-  margin-right: 8px;
+  margin-right: 4px;
 `
 
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.reg14};
+  ${({ theme }) => theme.fonts.reg12};
   color: ${({ theme }) => theme.colors.grey500};
 `
 

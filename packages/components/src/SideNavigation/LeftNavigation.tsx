@@ -80,7 +80,6 @@ const ApplicationName = styled.div`
 
 const VersionCard = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
-  ${({ theme }) => theme.fonts.reg14};
   height: auto;
   padding: 16px;
   background-color: ${({ theme }) => theme.colors.grey50};
@@ -89,12 +88,8 @@ const VersionCard = styled.div`
 `
 
 const VersionText = styled.span`
-  ${({ theme }) => theme.fonts.bold14};
+  ${({ theme }) => theme.fonts.bold10};
   text-transform: uppercase;
-`
-
-const StyledConnectionStatus = styled(ConnectionStatus)`
-  margin-bottom: 8px;
 `
 
 const Container = styled.div`
@@ -127,7 +122,7 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       <MenuItem>{props.children && props.children}</MenuItem>
       <Container>
         <VersionCard>
-          <StyledConnectionStatus isOnline={props.isOnline} />
+          <ConnectionStatus isOnline={props.isOnline} />
           {props.warning}
           <VersionText>OpenCRVS v{props.applicationVersion}</VersionText>
         </VersionCard>
