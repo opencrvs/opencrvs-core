@@ -79,8 +79,7 @@ export async function processNextAnnouncement() {
           bcc: chunk.filter((e) => e !== admin.email)
         }
       },
-      countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: `Bearer ${process.env.AUTH_TOKEN ?? ''}` }
+      countryConfigUrl: env.COUNTRY_CONFIG_URL
     })
 
     if (res.ok) {
