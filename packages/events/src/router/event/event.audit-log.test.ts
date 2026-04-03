@@ -123,7 +123,7 @@ describe('audit log', () => {
         createdAtLocation: locations[0].id
       })
 
-      const result = await client.event.actions.notify.request({
+      await client.event.actions.notify.request({
         ...generator.event.actions.notify(event.id),
         createdAtLocation: locations[0].id
       })
