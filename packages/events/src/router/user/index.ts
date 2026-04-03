@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import { UserAuditRecordInput } from '@opencrvs/commons/events'
@@ -291,7 +292,7 @@ export const userRouter = router({
   get: userOnlyProcedure
     .input(z.string())
     .output(UserOrSystem)
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input }) => {
       const users = await getUsersById([input])
       if (users.length === 0) {
         throw new TRPCError({ code: 'NOT_FOUND' })
@@ -366,7 +367,7 @@ export const userRouter = router({
   list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
-    .query(async ({ input, ctx }) => getUsersById(input)),
+    .query(async ({ input }) => getUsersById(input)),
   search: userAndSystemProcedure
     .input(UserSearch)
     .output(z.array(UserOrSystem))

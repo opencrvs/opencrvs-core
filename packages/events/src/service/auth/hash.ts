@@ -28,7 +28,10 @@ export async function compare(password: string, hash: string) {
   })
 }
 
-export async function generateHash(content: string, salt: string): Promise<string> {
+export async function generateHash(
+  content: string,
+  salt: string
+): Promise<string> {
   return new Promise((resolve, reject) => {
     bcrypt.hash(content, salt, (err, hash) => {
       if (err) {
@@ -39,7 +42,9 @@ export async function generateHash(content: string, salt: string): Promise<strin
   })
 }
 
-export async function generateSaltedHash(password: string): Promise<SaltedHash> {
+export async function generateSaltedHash(
+  password: string
+): Promise<SaltedHash> {
   const salt = await new Promise<string>((resolve, reject) => {
     bcrypt.genSalt(10, (err, generatedSalt) => {
       if (err) {
