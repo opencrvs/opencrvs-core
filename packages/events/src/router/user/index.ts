@@ -50,7 +50,7 @@ import {
   changeUserEmail,
   changeUserPhone,
   createUser,
-  getLegacyUser,
+  getUser,
   searchUsers,
   updateUser
 } from '@events/service/users/api'
@@ -429,7 +429,7 @@ export const userRouter = router({
     .mutation(async ({ input, ctx }) => {
       const nonce = generateNonce()
       const rawToken = ctx.token.replace('Bearer ', '')
-      const user = await getLegacyUser(ctx.user.id, ctx.token)
+      const user = await getUser(ctx.user.id)
 
       await generateAndSendVerificationCode({
         nonce,
