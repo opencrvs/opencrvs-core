@@ -112,8 +112,7 @@ describe('username reminder', () => {
           username: 'fake_user_name',
           mobile: '123123123',
           securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
-          scope: [],
-          practitionerId: 'bf2b13cb-77e7-42b8-b2c3-22a2623eadcf'
+          scope: []
         }
       )
 
