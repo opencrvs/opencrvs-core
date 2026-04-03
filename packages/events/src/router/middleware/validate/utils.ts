@@ -13,6 +13,9 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionUpdate,
   errorMessages,
+  EventConfig,
+  EventState,
+  getDeclarationFields,
   ValidatorContext
 } from '@opencrvs/commons/events'
 import { getOrThrow, flattenEntries } from '@opencrvs/commons'
@@ -50,6 +53,21 @@ export function throwWhenNotEmpty(errors: unknown[]) {
       message: JSON.stringify(errors)
     })
   }
+}
+
+export function omitUncorrectableFields(
+  eventConfig: EventConfig,
+  declaration: EventState
+) {
+  const formFields = getDeclarationFields(eventConfig)
+
+  const uncorrectableIds = new Set(
+    formFields.filter((field) => field.uncorrectable).map((field) => field.id)
+  )
+
+  return Object.fromEntries(
+    Object.entries(declaration).filter(([key]) => !uncorrectableIds.has(key))
+  )
 }
 
 /**

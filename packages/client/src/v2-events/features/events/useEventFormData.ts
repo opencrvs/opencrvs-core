@@ -10,7 +10,7 @@
  */
 import { create } from 'zustand'
 import { FormikTouched } from 'formik'
-import { EventState } from '@opencrvs/commons/client'
+import { EventState, FieldValue } from '@opencrvs/commons/client'
 
 interface EventFormData {
   formValues: null | EventState
@@ -19,6 +19,9 @@ interface EventFormData {
   getTouchedFields: () => Record<string, boolean>
   touchedFields: FormikTouched<EventState>
   setAllTouchedFields: (touchedFields: FormikTouched<EventState>) => void
+  hiddenFieldCache: null | EventState
+  cacheHiddenFieldValue: (fieldId: string, value: FieldValue) => void
+  popHiddenFieldValue: (fieldId: string) => FieldValue
   clear: () => void
 }
 
@@ -45,6 +48,7 @@ export const useEventFormData = create<EventFormData>()((set, get) => {
   return {
     formValues: {},
     touchedFields: {},
+    hiddenFieldCache: {},
 
     getFormValues: (initialValues?: EventState) =>
       get().formValues || initialValues || {},
@@ -61,8 +65,29 @@ export const useEventFormData = create<EventFormData>()((set, get) => {
         Object.entries(get().getFormValues()).map(([key]) => [key, true])
       ),
 
+    cacheHiddenFieldValue: (fieldId: string, value: FieldValue) => {
+      set((state) => ({
+        hiddenFieldCache: {
+          ...state.hiddenFieldCache,
+          [fieldId]: value
+        }
+      }))
+    },
+
+    popHiddenFieldValue: (fieldId: string) => {
+      const state = get()
+      const value = state.hiddenFieldCache?.[fieldId]
+
+      if (value !== undefined && state.hiddenFieldCache) {
+        const { [fieldId]: _, ...rest } = state.hiddenFieldCache
+        set(() => ({ hiddenFieldCache: rest }))
+      }
+
+      return value
+    },
+
     clear: () => {
-      set(() => ({ formValues: {}, touchedFields: {} }))
+      set(() => ({ formValues: {}, touchedFields: {}, hiddenFieldCache: {} }))
     }
   }
 })

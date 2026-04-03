@@ -60,7 +60,9 @@ export function useCurrentUser() {
     return {
       currentUser: {
         ...sharedFields,
-        ...adminLevels
+        ...adminLevels,
+        administrativeAreaId:
+          user.administrativeAreaId ?? officeAdministrativeAreaId
       } satisfies User
     }
   }

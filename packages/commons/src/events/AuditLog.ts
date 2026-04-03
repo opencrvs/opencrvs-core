@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import * as z from 'zod/v4'
 import { TokenUserType } from '../authentication'
 
 /**
@@ -57,41 +58,25 @@ type ActionAuditLogRequestData = {
   transactionId: string
 }
 
-export type EventNotifyAuditLog = {
-  operation: 'event.actions.notify.request'
-  requestData: ActionAuditLogRequestData
-  responseSummary: EventResponseSummary
-}
-
-export type EventCorrectionRequestAuditLog = {
-  operation: 'event.actions.correction.request.request'
-  requestData: ActionAuditLogRequestData
-  responseSummary: EventResponseSummary
-}
-
-export type EventCorrectionApproveAuditLog = {
-  operation: 'event.actions.correction.approve.request'
-  requestData: ActionAuditLogRequestData
-  responseSummary: EventResponseSummary
-}
-
-export type EventCorrectionRejectAuditLog = {
-  operation: 'event.actions.correction.reject.request'
-  requestData: ActionAuditLogRequestData
-  responseSummary: EventResponseSummary
-}
-
-/**
- * All event action audit log variants share the same requestData and responseSummary shapes.
- * Defined as a single type with a union operation field so call sites can pass a
- * union-typed operation string without needing a type cast.
- */
 export type EventActionAuditLog = {
   operation:
-    | EventNotifyAuditLog['operation']
-    | EventCorrectionRequestAuditLog['operation']
-    | EventCorrectionApproveAuditLog['operation']
-    | EventCorrectionRejectAuditLog['operation']
+    | 'event.actions.notify.request'
+    | 'event.actions.declare.request'
+    | 'event.actions.register.request'
+    | 'event.actions.reject.request'
+    | 'event.actions.validate.request'
+    | 'event.actions.edit.request'
+    | 'event.actions.assign.request'
+    | 'event.actions.unassign.request'
+    | 'event.actions.read.request'
+    | 'event.actions.archive.request'
+    | 'event.actions.reinstate.request'
+    | 'event.actions.print_certificate.request'
+    | 'event.actions.correction.request.request'
+    | 'event.actions.correction.approve.request'
+    | 'event.actions.correction.reject.request'
+    | 'event.actions.mark_as_duplicate.request'
+    | 'event.actions.mark_as_not_duplicate.request'
   requestData: ActionAuditLogRequestData
   responseSummary: EventResponseSummary
 }
@@ -171,6 +156,88 @@ export type AttachmentUploadAuditLog = {
   }
 }
 
+export const UserAuditRecordInput = z.discriminatedUnion('operation', [
+  z.object({
+    operation: z.literal('user.create_user'),
+    requestData: z.object({
+      subjectId: z.string(),
+      role: z.string(),
+      primaryOfficeId: z.string()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.deactivate'),
+    requestData: z.object({
+      subjectId: z.string(),
+      reason: z.string(),
+      comment: z.string().optional()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.reactivate'),
+    requestData: z.object({
+      subjectId: z.string(),
+      reason: z.string(),
+      comment: z.string().optional()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.edit_user'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.email_address_changed'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({ email: z.string() })
+  }),
+  z.object({
+    operation: z.literal('user.logged_in'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.logged_out'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.password_changed'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.password_reset'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.password_reset_by_admin'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.phone_number_changed'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({ phoneNumber: z.string() })
+  }),
+  z.object({
+    operation: z.literal('user.username_reminder'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.username_reminder_by_admin'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  })
+])
+
+export type UserAuditLog = z.infer<typeof UserAuditRecordInput>
+
 /**
  * Union of all audit log entry variants.
  * Each variant narrows the `operation`, `requestData`, and `responseSummary` fields together.
@@ -188,6 +255,7 @@ export type AuditLogOperation =
   | IntegrationDeleteAuditLog
   | IntegrationRefreshSecretAuditLog
   | AttachmentUploadAuditLog
+  | UserAuditLog
   | IntegrationCreateAuditLog
   | IntegrationRefreshTokenAuditLog
   | IntegrationDeactivateAuditLog

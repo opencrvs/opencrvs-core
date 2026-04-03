@@ -15,7 +15,7 @@ import {
   AddressType,
   ageToDate,
   AgeValue,
-  DateValue,
+  PlainDate,
   EventConfig,
   EventIndex,
   EventState,
@@ -73,7 +73,7 @@ function addIndexFieldsToValue(
     } satisfies IndexedNameFieldValue
   }
   if (isAgeFieldType(field) && field.value) {
-    const maybeAsOfDate = DateValue.safeParse(
+    const maybeAsOfDate = PlainDate.safeParse(
       declaration[field.value.asOfDateRef]
     )
     if (maybeAsOfDate.success) {

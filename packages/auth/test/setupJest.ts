@@ -37,7 +37,6 @@ const mock = {
 }
 
 jest.setMock('src/database', mock)
-jest.setMock('src/metrics', { postUserActionToMetrics: jest.fn() })
 
 process.env.CERT_PRIVATE_KEY_PATH = join(__dirname, './cert.key')
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')

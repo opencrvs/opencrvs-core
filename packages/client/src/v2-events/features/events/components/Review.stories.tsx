@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { fireEvent, within } from '@storybook/test'
+import { fireEvent, within, expect } from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'
@@ -35,6 +35,7 @@ import {
 } from '../../../../../.storybook/decorators'
 import { RejectionState, Review } from './Review'
 
+/* eslint-disable max-lines */
 const mockDeclaration = {
   'applicant.name': {
     firstname: 'John',
@@ -352,6 +353,113 @@ export const ReviewWithConditionallyHiddenFields: Story = {
         {modal}
       </Review.Body>
     )
+  }
+}
+
+const singlePageFormWithRequiredField = defineDeclarationForm({
+  label: {
+    id: 'accordion.test.form.label',
+    defaultMessage: 'Accordion test form',
+    description: ''
+  },
+  pages: [
+    {
+      id: 'page1',
+      title: {
+        id: 'accordion.test.page1.title',
+        defaultMessage: 'Section with required field',
+        description: ''
+      },
+      fields: [
+        {
+          id: 'required-field',
+          type: FieldType.TEXT,
+          required: true,
+          conditionals: [],
+          label: {
+            id: 'accordion.test.required-field.label',
+            defaultMessage: 'Required field',
+            description: ''
+          }
+        }
+      ]
+    }
+  ]
+})
+
+const singlePageFormWithOptionalField = defineDeclarationForm({
+  label: {
+    id: 'accordion.test.optional.form.label',
+    defaultMessage: 'Accordion test form with optional fields',
+    description: ''
+  },
+  pages: [
+    {
+      id: 'page1',
+      title: {
+        id: 'accordion.test.optional.page1.title',
+        defaultMessage: 'Section with optional field',
+        description: ''
+      },
+      fields: [
+        {
+          id: 'optional-field',
+          type: FieldType.TEXT,
+          required: false,
+          conditionals: [],
+          label: {
+            id: 'accordion.test.optional-field.label',
+            defaultMessage: 'Optional field',
+            description: ''
+          }
+        }
+      ]
+    }
+  ]
+})
+
+export const AccordionExpandedWhenPageHasRequiredFields: Story = {
+  name: 'Accordion: expanded when page has required fields',
+  args: {
+    form: {},
+    formConfig: singlePageFormWithRequiredField,
+    title: 'Accordion expand test - required fields'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    // Page has required fields, so accordion should be expanded even with no values
+    await expect(await canvas.findByText('Hide')).toBeInTheDocument()
+    await expect(canvas.queryByText('Show')).not.toBeInTheDocument()
+  }
+}
+
+export const AccordionExpandedWhenFieldsAreCompleted: Story = {
+  name: 'Accordion: expanded when fields have values',
+  args: {
+    form: { 'optional-field': 'some value' },
+    formConfig: singlePageFormWithOptionalField,
+    title: 'Accordion expand test - completed fields'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    // Page has no required fields but a field has a value, so accordion should be expanded
+    await expect(await canvas.findByText('Hide')).toBeInTheDocument()
+    await expect(canvas.queryByText('Show')).not.toBeInTheDocument()
+  }
+}
+
+export const AccordionCollapsedWhenNoRequiredFieldsAndNoValues: Story = {
+  name: 'Accordion: collapsed when no required fields and no values',
+  args: {
+    form: {},
+    formConfig: singlePageFormWithOptionalField,
+    title: 'Accordion collapse test'
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    // Page has no required fields and no values, so accordion should be collapsed
+    await expect(await canvas.findByText('Show')).toBeInTheDocument()
+    await expect(canvas.queryByText('Hide')).not.toBeInTheDocument()
   }
 }
 
