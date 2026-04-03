@@ -11,7 +11,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, fn } from '@storybook/test'
+import { expect } from '@storybook/test'
 import { userEvent, waitFor, within } from '@storybook/testing-library'
 import React from 'react'
 import * as selectEvent from 'react-select-event'
@@ -28,16 +28,18 @@ import {
   FieldValue,
   AddressFieldValue
 } from '@opencrvs/commons/client'
-import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import {
+  FormFieldGenerator,
+  FormFieldGeneratorPropsWithoutRef
+} from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getOfflineData } from '@client/offline/selectors'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
 import { Address } from './Address'
 
-const meta: Meta<typeof FormFieldGenerator> = {
+const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
   title: 'Inputs/Address/Interaction',
-  args: { onChange: fn() },
   decorators: [
     (Story, context) => (
       <TRPCProvider>
@@ -53,6 +55,7 @@ export default meta
 const StyledFormFieldGenerator = styled(FormFieldGenerator)`
   width: 400px;
 `
+type Story = StoryObj<FormFieldGeneratorPropsWithoutRef>
 
 function isInternationalAddress() {
   return and(
@@ -290,7 +293,7 @@ const streetAddressConfigs = [
   }
 ]
 
-export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
+export const AddressFieldInteraction: Story = {
   name: 'Domestic',
   parameters: {
     layout: 'centered'
@@ -366,15 +369,12 @@ export const AddressFieldInteraction: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
 }
 
-export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
+export const GenericAddressFields: Story = {
   name: 'International',
   parameters: {
     layout: 'centered'
@@ -460,17 +460,12 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
 }
 
-export const AddressFieldInteractionDomesticToInternational: StoryObj<
-  typeof FormFieldGenerator
-> = {
+export const AddressFieldInteractionDomesticToInternational: Story = {
   name: 'Switch between Domestic and International',
   parameters: {
     layout: 'centered'
@@ -608,9 +603,6 @@ export const AddressFieldInteractionDomesticToInternational: StoryObj<
           }
         ]}
         id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
       />
     )
   }
@@ -629,7 +621,7 @@ interface ResolvedAddress {
   }
 }
 
-export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
+export const ToCertificateVariables: Story = {
   name: 'Certificate Variables',
   parameters: {
     layout: 'centered'
@@ -638,7 +630,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
     const intl = useIntl()
     const [formData, setFormData] = React.useState<Record<string, FieldValue>>({
       'storybook.address': {
-        country: 'FAR',
+        country: 'BGD',
         administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
         addressType: 'DOMESTIC'
       }
@@ -668,9 +660,9 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
               }
             }
           ]}
+          formValues={formData}
           id="my-form"
-          initialValues={formData}
-          onChange={(data) => {
+          onFormChange={(data) => {
             setFormData((prev) => ({ ...prev, ...data }))
             const address = AddressFieldValue.safeParse(
               data['storybook.address']
@@ -751,7 +743,7 @@ export const ToCertificateVariables: StoryObj<typeof FormFieldGenerator> = {
       await userEvent.type(residentialArea, 'Mirpur')
 
       await expect(canvas.queryByTestId('country')).toHaveTextContent(
-        'Farajaland'
+        'Bangladesh'
       )
       await expect(canvas.queryByTestId('addressType')).toHaveTextContent(
         'DOMESTIC'

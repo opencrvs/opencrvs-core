@@ -168,6 +168,20 @@ function mapFieldTypeToMockValue(
   rng: () => number
 ): FieldValue {
   switch (field.type) {
+    case FieldType.FIELD_GROUP: {
+      const nestedValue: Record<string, FieldValue> = field.fields.reduce(
+        (acc, subfield, index) => ({
+          ...acc,
+          [subfield.id]: mapFieldTypeToMockValue(
+            subfield,
+            i * 1000 + index,
+            rng
+          )
+        }),
+        {}
+      )
+      return nestedValue
+    }
     case FieldType.DIVIDER:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:

@@ -44,6 +44,7 @@ import {
   runFieldValidations,
   runStructuralValidations,
   ValidatorContext,
+  flattenFormState,
   getDeclarationFieldById
 } from '@opencrvs/commons/events'
 
@@ -97,11 +98,14 @@ export function getFieldErrors(
 
   // For visible fields, run the field validations as configured
   const visibleFieldErrors = visibleFields.flatMap((field) => {
-    const fieldErrors = runFieldValidations({
-      field,
-      values: data,
-      context
-    })
+    const fieldErrors = flattenFormState(
+      runFieldValidations({
+        field,
+        value: data[field.id],
+        form: data,
+        context
+      })
+    ).flatMap(([, errors]) => errors)
 
     return fieldErrors.map((error) => ({
       message: error.message.defaultMessage,
@@ -208,7 +212,7 @@ function validateDeclarationUpdateAction({
 
   const annotationErrors = getFieldErrors(
     reviewFields,
-    visibleAnnotationFields,
+    { ...cleanedDeclaration, ...visibleAnnotationFields },
     context,
     {}
   )

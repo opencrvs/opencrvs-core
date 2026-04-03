@@ -10,9 +10,8 @@
  */
 
 import React, { createContext, useContext } from 'react'
-import { User } from '@opencrvs/commons/client'
+import { IndexMap, User } from '@opencrvs/commons/client'
 import { ILocation } from '@client/offline/reducer'
-import { IndexMap } from '@client/utils'
 
 const EventOverviewContext = createContext<{
   findUser: (id: string) => User | undefined

@@ -14,19 +14,21 @@ import {
   EventState,
   isPageVisible,
   FormConfig,
-  IndexMap,
   runStructuralValidations,
   ValidatorContext,
   runFieldValidations,
   omitHiddenFields,
-  omitHiddenPaginatedFields
+  omitHiddenPaginatedFields,
+  FormState,
+  flattenFormState,
+  IndexMap
 } from '@opencrvs/commons/client'
 
-interface FieldError {
+interface ErrorMessage {
   message: MessageDescriptor
 }
 
-export type IntlErrors = IndexMap<FieldError[]>
+export type IntlErrors = IndexMap<FormState<ErrorMessage[]>>
 
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
@@ -34,7 +36,7 @@ export function getValidationErrorsForForm(
   context: ValidatorContext
 ) {
   return fields.reduce((errorsForAllFields: IntlErrors, field) => {
-    if ((errorsForAllFields[field.id] ?? []).length > 0) {
+    if (flattenFormState(errorsForAllFields[field.id] ?? []).length > 0) {
       return errorsForAllFields
     }
 
@@ -42,7 +44,8 @@ export function getValidationErrorsForForm(
       ...errorsForAllFields,
       [field.id]: runFieldValidations({
         field,
-        values,
+        value: values[field.id],
+        form: values,
         context
       })
     }
@@ -55,7 +58,7 @@ export function getStructuralValidationErrorsForForm(
   context: ValidatorContext
 ) {
   return fields.reduce((errorsForAllFields: IntlErrors, field) => {
-    if ((errorsForAllFields[field.id] ?? []).length > 0) {
+    if (flattenFormState(errorsForAllFields[field.id] ?? []).length > 0) {
       return errorsForAllFields
     }
 
@@ -106,13 +109,17 @@ export function validationErrorsInActionFormExist({
       )
 
       return Object.values(formErrors).some(
-        (fieldErrors) => (fieldErrors ?? []).length > 0
+        (fieldErrors) => flattenFormState(fieldErrors ?? []).length > 0
       )
     })
 
   const hasAnnotationValidationErrors = Object.values(
-    getValidationErrorsForForm(reviewFields, visibleAnnotationFields, context)
-  ).some((fieldErrors) => (fieldErrors ?? []).length > 0)
+    getValidationErrorsForForm(
+      reviewFields,
+      { ...formWithoutHiddenFields, ...visibleAnnotationFields },
+      context
+    )
+  ).some((fieldErrors) => flattenFormState(fieldErrors ?? []).length > 0)
 
   return hasValidationErrors || hasAnnotationValidationErrors
 }
