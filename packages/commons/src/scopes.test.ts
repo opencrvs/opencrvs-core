@@ -484,6 +484,9 @@ it('transform v1 scope to v2', () => {
 it('migrate v1 scopes to v2', () => {
   // Mix of deprecated, upgraded and unchanged scopes
   const v1Scopes = [
+    SCOPES.RECORD_DECLARATION_EDIT,
+    SCOPES.RECORD_REVIEW_DUPLICATES,
+    SCOPES.RECORD_DECLARATION_REINSTATE,
     SCOPES.RECORD_CONFIRM_REGISTRATION,
     SCOPES.RECORD_REJECT_REGISTRATION,
     SCOPES.PERFORMANCE_READ,
