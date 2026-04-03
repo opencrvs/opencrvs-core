@@ -10,10 +10,7 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import {
-  DEFAULT_ROLES_DEFINITION,
-  SCOPES
-} from '@opencrvs/commons/authentication'
+import { DEFAULT_ROLES_DEFINITION } from '../scopes/service'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as fetchAny.FetchMock
 import { AuthenticateResponse } from '@auth/features/authenticate/handler'

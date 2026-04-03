@@ -11,9 +11,8 @@
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
-import { SCOPES, encodeScope, RecordScopeV2, decodeScope } from './scopes'
+import { RecordScopeV2, decodeScope } from './scopes'
 import { UUID } from './uuid'
-export * from './scopes'
 
 /**
  * Returns an array of accepted scopes from a JWT token, filtered by the given accepted scope types.
@@ -42,141 +41,6 @@ export function getAcceptedScopesFromToken<T extends RecordScopeV2['type']>(
       (scope): scope is Extract<RecordScopeV2, { type: T }> => scope !== null
     )
 }
-
-export const DEFAULT_ROLES_DEFINITION = [
-  {
-    id: 'FIELD_AGENT',
-    label: {
-      defaultMessage: 'Field Agent',
-      description: 'Name for user role Field Agent',
-      id: 'userRole.fieldAgent'
-    },
-    scopes: [
-      encodeScope({
-        type: 'record.create',
-        options: {
-          event: ['birth', 'death', 'tennis-club-membership']
-        }
-      }),
-      encodeScope({
-        type: 'record.declare',
-        options: {
-          event: ['birth', 'death', 'tennis-club-membership']
-        }
-      })
-    ]
-  },
-  {
-    id: 'REGISTRATION_AGENT',
-    label: {
-      defaultMessage: 'Registration Agent',
-      description: 'Name for user role Registration Agent',
-      id: 'userRole.registrationAgent'
-    },
-    scopes: [
-      encodeScope({
-        type: 'record.create',
-        options: {
-          event: ['birth', 'death', 'tennis-club-membership']
-        }
-      }),
-      encodeScope({
-        type: 'record.declare',
-        options: {
-          event: ['birth', 'death', 'tennis-club-membership']
-        }
-      }),
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
-    ]
-  },
-  {
-    id: 'LOCAL_REGISTRAR',
-    label: {
-      defaultMessage: 'Local Registrar',
-      description: 'Name for user role Local Registrar',
-      id: 'userRole.localRegistrar'
-    },
-    scopes: [
-      encodeScope({
-        type: 'record.create',
-        options: {
-          event: ['birth', 'death', 'tennis-club-membership']
-        }
-      }),
-      encodeScope({
-        type: 'record.declare',
-        options: {
-          event: ['birth', 'death', 'tennis-club-membership']
-        }
-      }),
-      encodeScope({
-        type: 'record.review-duplicates',
-        options: {
-          event: ['birth', 'death', 'tennis-club-membership']
-        }
-      }),
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
-    ]
-  },
-  {
-    id: 'LOCAL_SYSTEM_ADMIN',
-    label: {
-      defaultMessage: 'Local System Admin',
-      description: 'Name for user role Local System Admin',
-      id: 'userRole.localSystemAdmin'
-    },
-    scopes: [
-      SCOPES.USER_READ_MY_OFFICE,
-      SCOPES.USER_CREATE_MY_JURISDICTION,
-      SCOPES.USER_UPDATE_MY_JURISDICTION,
-      SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-    ]
-  },
-  {
-    id: 'NATIONAL_SYSTEM_ADMIN',
-    label: {
-      defaultMessage: 'National System Admin',
-      description: 'Name for user role National System Admin',
-      id: 'userRole.nationalSystemAdmin'
-    },
-    scopes: [
-      SCOPES.USER_CREATE,
-      SCOPES.USER_READ,
-      SCOPES.USER_UPDATE,
-      SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-    ]
-  },
-  {
-    id: 'PERFORMANCE_MANAGER',
-    label: {
-      defaultMessage: 'Performance Manager',
-      description: 'Name for user role Performance Manager',
-      id: 'userRole.performanceManager'
-    },
-    scopes: [
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
-    ]
-  }
-] satisfies Array<{
-  id: string
-  label: { defaultMessage: string; description: string; id: string }
-  scopes: string[]
-}>
 
 /*
  * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.

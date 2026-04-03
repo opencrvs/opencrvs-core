@@ -11,7 +11,7 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
 import { createServer, AuthServer } from '@auth/server'
-import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
+import { DEFAULT_ROLES_DEFINITION } from '../scopes/service'
 
 const fetch = fetchAny as fetchAny.FetchMock
 describe('authenticate handler receives a request', () => {

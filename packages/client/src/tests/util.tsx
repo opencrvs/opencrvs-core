@@ -24,7 +24,6 @@ import { EventType, FetchUserQuery, Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import {
-  DEFAULT_ROLES_DEFINITION,
   SCOPES,
   TestUserRole,
   TokenUserType,
@@ -987,12 +986,6 @@ export async function createTestComponent(
   }
 
   return { component: mount(<PropProxy />, options), router }
-}
-
-const mockRoles = {
-  data: {
-    getUserRoles: DEFAULT_ROLES_DEFINITION
-  }
 }
 
 export {
