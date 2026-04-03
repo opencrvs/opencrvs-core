@@ -34,7 +34,7 @@ export const User = z.object({
   ),
   role: z.string(),
   avatar: DocumentPath.optional(),
-  signature: DocumentPath.optional().describe(
+  signature: DocumentPath.nullish().describe(
     'Storage key for the user signature. e.g. signature.png'
   ),
   primaryOfficeId: UUID,
