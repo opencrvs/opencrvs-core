@@ -19,6 +19,7 @@ import { unauthorized } from '@hapi/boom'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { logger } from '@opencrvs/commons'
+import { encodeScope } from '@opencrvs/commons/client'
 
 interface IAuthPayload {
   username: string
@@ -44,7 +45,7 @@ export default async function authenticateSuperUserHandler(
   }
 
   const SUPER_ADMIN_SCOPES = [
-    SCOPES.BYPASSRATELIMIT,
+    encodeScope({ type: 'bypassratelimit' }),
     SCOPES.USER_CREATE,
     SCOPES.USER_DATA_SEEDING,
     SCOPES.INTEGRATION_CREATE

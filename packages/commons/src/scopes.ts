@@ -13,6 +13,7 @@ import * as z from 'zod/v4'
 import * as qs from 'qs'
 import { UUID } from './uuid'
 import { parseConfigurableScope } from './scopes.deprecated.do-not-use'
+import { getScopes } from './authentication'
 
 /** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
 export const SCOPES = {
@@ -253,6 +254,12 @@ export const RecordScopeTypeV2 = z.enum([
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
+export const ScopeType = z.enum([
+  'bypassratelimit',
+  ...RecordScopeTypeV2.options
+])
+export type ScopeType = z.infer<typeof ScopeType>
+
 const scopeByEvent = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
   .preprocess(
@@ -435,12 +442,18 @@ export const ResolvedRecordScopeV2 = z
   ])
   .describe('Resolved scope with location/user IDs instead of filters.')
 
+export const Scope = z.union([
+  z.object({ type: z.literal('bypassratelimit') }),
+  ...RecordScopeV2.options
+])
+export type Scope = z.infer<typeof Scope>
+
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
 export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
-const flattenScope = (scope: RecordScopeV2) => ({
+const flattenScope = (scope: Scope) => ({
   type: scope.type,
-  ...scope.options
+  ...('options' in scope ? scope.options : {})
 })
 
 const unflattenScope = (input: Record<string, unknown>) => {
@@ -448,7 +461,7 @@ const unflattenScope = (input: Record<string, unknown>) => {
   return { type, options }
 }
 
-export const encodeScope = (scope: RecordScopeV2): string => {
+export const encodeScope = (scope: Scope): string => {
   const flattened = flattenScope(scope)
 
   return qs.stringify(flattened, {
@@ -589,7 +602,7 @@ export function getAcceptedScopesByType({
   acceptedScopes,
   scopes
 }: {
-  acceptedScopes: RecordScopeTypeV2[]
+  acceptedScopes: ScopeType[]
   scopes: string[]
 }): RecordScopeV2[] {
   return scopes
@@ -603,6 +616,33 @@ export function getAcceptedScopesByType({
         : null
     })
     .filter((scope): scope is RecordScopeV2 => scope !== null)
+}
+
+/**
+ * Checks if the provided token contains any of the accepted scopes.
+ *
+ * @param {string} token - The authentication JWT token.
+ * @param {ScopeType[]} scopes - An array of scope types to check for.
+ * @returns {boolean} True if the token contains at least one of the accepted scopes, false otherwise.
+ */
+export function hasAnyScope(token: string, scopes: ScopeType[]) {
+  const foundScopes = getAcceptedScopesByType({
+    acceptedScopes: scopes,
+    scopes: getScopes(token)
+  })
+
+  return foundScopes.length > 0
+}
+
+/**
+ * Checks if the provided token has the given scope.
+ *
+ * @param {string} token - The authentication JWT token.
+ * @param {ScopeType} acceptedScope - The scope type to check for.
+ * @returns {boolean} True if the token contains the specified scope.
+ */
+export function hasScope(token: string, scope: ScopeType) {
+  return hasAnyScope(token, [scope])
 }
 
 /**
