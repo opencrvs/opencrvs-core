@@ -69,6 +69,7 @@ N.B. Support for `DISPLAY_ON_REVIEW` conditionals in nested fields has not been 
 
 - Allow nested address fields to use the outer form values in conditionals.
 - Skip hidden fields when generating default values. Note: `defaultValue` only applies on the first mount of a form page — after that the field's value takes precedence, even if the `defaultValue` changes across field versions. [#11476](https://github.com/opencrvs/opencrvs-core/issues/11476)
+- Review page field conditionals have no access to form data, only review page form data. [#11410](https://github.com/opencrvs/opencrvs-core/issues/11410)
 
 ## 1.9.11
 
