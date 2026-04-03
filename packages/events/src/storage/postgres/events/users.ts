@@ -57,11 +57,22 @@ export async function getUserCredentialsByUserId(userId: string) {
     .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
     .select([
       'users.id',
+      'users.status',
       'userCredentials.salt',
+      'userCredentials.passwordHash',
       'userCredentials.securityQuestions'
     ])
     .where('users.id', '=', userId as UUID)
     .executeTakeFirst()
+}
+
+export async function updatePasswordHash(userId: string, passwordHash: string) {
+  const db = getClient()
+  return db
+    .updateTable('userCredentials')
+    .set({ passwordHash })
+    .where('userId', '=', userId as UUID)
+    .execute()
 }
 
 export async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {

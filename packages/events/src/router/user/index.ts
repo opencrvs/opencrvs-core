@@ -35,6 +35,7 @@ import { generateHash } from '@events/service/auth/hash'
 import {
   getUserByMobileOrEmail,
   getUserCredentialsByUserId,
+  updatePasswordHash,
   SecurityQuestion
 } from '@events/storage/postgres/events/users'
 import { getUserActions } from '@events/service/events/user/actions'
@@ -46,7 +47,6 @@ import {
   activateUser,
   changeUserAvatar,
   changeUserEmail,
-  changeUserPassword,
   changeUserPhone,
   createUser,
   getLegacyUser,
@@ -160,7 +160,9 @@ export const userRouter = router({
       const matched = (
         await Promise.all(
           questions.map(async (q) => {
-            if (q.questionKey !== input.questionKey) { return false }
+            if (q.questionKey !== input.questionKey) {
+              return false
+            }
             const hash = await generateHash(
               input.answer.toLowerCase(),
               record.salt
@@ -318,22 +320,46 @@ export const userRouter = router({
   roles: router({
     list: userOnlyProcedure.query(async ({ ctx }) => getRoles(ctx.token))
   }),
-  changePassword: userOnlyProcedure
+  changePassword: publicProcedure
     .input(
       z.object({
         userId: z.string(),
-        existingPassword: z.string(),
+        existingPassword: z.string().optional(),
         password: z.string()
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      if (input.userId !== ctx.user.id) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: "Not allowed to change another user's password"
-        })
+    .mutation(async ({ input }) => {
+      const record = await getUserCredentialsByUserId(input.userId)
+
+      if (!record) {
+        logger.error(`No user details found by given userid: ${input.userId}`)
+        // Don't return a 404 as this gives away that this user account exists
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
-      await changeUserPassword(input, ctx.token)
+
+      if (input.existingPassword) {
+        if (record.status !== 'active') {
+          logger.error(
+            `User is not in active state for given userid: ${input.userId}`
+          )
+          // Don't return a 404 as this gives away that this user account exists
+          throw new TRPCError({ code: 'UNAUTHORIZED' })
+        }
+        const existingHash = await generateHash(
+          input.existingPassword,
+          record.salt
+        )
+        if (existingHash !== record.passwordHash) {
+          logger.error(
+            `Password didn't match for given userid: ${input.userId}`
+          )
+          // Don't return a 404 as this gives away that this user account exists
+          throw new TRPCError({ code: 'UNAUTHORIZED' })
+        }
+      }
+
+      const newHash = await generateHash(input.password, record.salt)
+      const result = await updatePasswordHash(input.userId, newHash)
     }),
   sendVerifyCode: userOnlyProcedure
     .input(
