@@ -20,7 +20,7 @@ import {
   NOTIFICATION_API_USER_AUDIENCE
 } from '@auth/constants'
 import * as oauthResponse from './responses'
-import { SCOPES, TokenUserType } from '@opencrvs/commons/authentication'
+import { TokenUserType, SCOPES } from '@opencrvs/commons'
 import { getParam } from './utils'
 
 export async function clientCredentialsHandler(

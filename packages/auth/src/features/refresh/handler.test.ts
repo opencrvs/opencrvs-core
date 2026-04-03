@@ -10,10 +10,12 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import { DEFAULT_ROLES_DEFINITION } from '../scopes/service'
+import { SCOPES } from '@opencrvs/commons'
 import * as fetchAny from 'jest-fetch-mock'
-const fetch = fetchAny as fetchAny.FetchMock
 import { AuthenticateResponse } from '@auth/features/authenticate/handler'
+
+import { DEFAULT_ROLES_DEFINITION } from '../scopes/service'
+const fetch = fetchAny as fetchAny.FetchMock
 
 jest.mock('@auth/features/verifyCode/service', () => {
   const actual = jest.requireActual('@auth/features/verifyCode/service')

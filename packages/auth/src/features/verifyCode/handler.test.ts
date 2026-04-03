@@ -10,11 +10,9 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import {
-  DEFAULT_ROLES_DEFINITION,
-  SCOPES
-} from '@opencrvs/commons/authentication'
+import { SCOPES } from '@opencrvs/commons'
 import * as fetchMock from 'jest-fetch-mock'
+import { DEFAULT_ROLES_DEFINITION } from '../scopes/service'
 
 jest.mock('@opencrvs/commons', () => {
   const actual = jest.requireActual('@opencrvs/commons')
