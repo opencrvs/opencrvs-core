@@ -34,6 +34,7 @@ import {
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
   V2_DEFAULT_MOCK_LOCATIONS
 } from '@client/tests/v2-events/administrative-hierarchy-mock'
+import { AuditLogEntry } from '@opencrvs/commons'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -1062,83 +1063,71 @@ export const handlers = {
     tRPCMsw.user.audit.list.query((input) => {
       const skip = input.skip ?? 0
       const count = input.count ?? 10
-      const allResults = [
+      const allResults: AuditLogEntry[] = [
         {
           id: '1',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'user.logged_out',
           requestData: { subjectId: input.userId },
-          responseSummary: {},
           createdAt: '2025-10-03T10:46:49.362Z'
         },
         {
           id: '2',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'user.logged_in',
           requestData: { subjectId: input.userId },
-          responseSummary: {},
           createdAt: '2025-10-03T10:44:55.012Z'
         },
         {
           id: '3',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'event.actions.assign.request',
           requestData: {
             eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             actionType: 'ASSIGN',
-            transactionId: 'BSK4XRC'
-          },
-          responseSummary: {
-            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             eventType: 'birth',
-            trackingId: 'BSK4XRC'
+            trackingId: 'BSK4XRC',
+            transactionId: 'a2407b61b7fe-ea2d18f5-d6e7-4d18-a323'
           },
           createdAt: '2025-10-03T10:43:16.704Z'
         },
         {
           id: '4',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'event.actions.declare.request',
           requestData: {
             eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             actionType: 'DECLARE',
-            transactionId: 'MOX89J'
-          },
-          responseSummary: {
-            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             eventType: 'birth',
-            trackingId: 'MOX89J'
+            trackingId: 'MOX89J',
+            transactionId: 'a2407b61b7fe-ea2d18f5-d6e7-4d18-a323'
           },
           createdAt: '2025-10-03T09:24:25.604Z'
         },
         {
           id: '5',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'event.actions.register.request',
           requestData: {
             eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             actionType: 'REGISTER',
-            transactionId: 'MOX89J'
-          },
-          responseSummary: {
-            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
             eventType: 'birth',
-            trackingId: 'MOX89J'
+            trackingId: 'MOX89J',
+            transactionId: 'a2407b61b7fe-ea2d18f5-d6e7-4d18-a323'
           },
           createdAt: '2025-10-03T09:23:45.604Z'
         },
         {
           id: '6',
           clientId: input.userId,
-          clientType: 'user',
+          clientType: 'user' as const,
           operation: 'user.logged_in',
           requestData: { subjectId: input.userId },
-          responseSummary: {},
           createdAt: '2025-10-03T09:22:10.128Z'
         }
       ]
