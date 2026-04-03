@@ -58,6 +58,12 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 
 const DEFAULT_LIST_SIZE = 10
 
+const OPERATIONS_TO_HIDE = [
+  'event.search',
+  'event.actions.assign.request',
+  'event.actions.unassign.request'
+]
+
 const TableDiv = styled.div`
   overflow: auto;
 `
@@ -138,6 +144,7 @@ function UserAuditHistoryComponent(props: Props) {
       timeStart: state.timeStart.toISOString(),
       timeEnd: state.timeEnd.toISOString(),
       skip: (state.currentPageNumber - 1) * DEFAULT_LIST_SIZE,
+      excludeOperations: OPERATIONS_TO_HIDE,
       count: DEFAULT_LIST_SIZE
     })
   )

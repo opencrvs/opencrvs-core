@@ -60,7 +60,8 @@ const UserAuditListQuery = z.object({
   skip: z.number().optional().default(0),
   count: z.number().optional().default(10),
   timeStart: z.string().optional(),
-  timeEnd: z.string().optional()
+  timeEnd: z.string().optional(),
+  excludeOperations: z.array(z.string()).optional().default([])
 })
 
 const auditRouter = router({
@@ -85,7 +86,8 @@ const auditRouter = router({
         skip: input.skip,
         count: input.count,
         timeStart: input.timeStart,
-        timeEnd: input.timeEnd
+        timeEnd: input.timeEnd,
+        excludeOperations: input.excludeOperations
       })
       return {
         results: results.map((r) => AuditLogEntrySchema.parse(r)),
