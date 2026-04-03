@@ -8,29 +8,28 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
+import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import superjson from 'superjson'
 import { env } from '@auth/environment'
-import { resolve } from 'url'
+import { AppRouter } from '@opencrvs/events/src/router'
+
+const eventsClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson
+    })
+  ]
+})
 
 export async function changePassword(
   userId: string,
   password: string,
-  remoteAddress: string,
-  userAgent: string
+  existingPassword?: string
 ) {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/changePassword')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ userId, password }),
-    headers: {
-      'Content-Type': 'application/json',
-      'x-real-ip': remoteAddress,
-      'x-real-user-agent': userAgent
-    }
+  await eventsClient.user.changePassword.mutate({
+    userId,
+    password,
+    existingPassword
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
 }
