@@ -27,14 +27,14 @@ import {
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
   libraryMembershipEvent,
-  TestUserRole
+  TestUserRole,
+  AuditLogEntry
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
   V2_DEFAULT_MOCK_LOCATIONS
 } from '@client/tests/v2-events/administrative-hierarchy-mock'
-import { AuditLogEntry } from '@opencrvs/commons'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
