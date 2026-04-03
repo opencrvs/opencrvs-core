@@ -44,6 +44,7 @@ const EventGetEntrySchema = AuditLogEntryBase.extend({
 
 const EventSearchEntrySchema = AuditLogEntryBase.extend({
   operation: z.literal('event.search'),
+  clientType: z.literal('system'),
   requestData: z.object({
     query: z.record(z.string(), z.unknown()).nullable(),
     limit: z.number().nullable(),

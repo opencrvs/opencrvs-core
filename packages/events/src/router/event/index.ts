@@ -465,20 +465,22 @@ export const eventRouter = router({
         acceptedScopes: ctx.acceptedScopes
       })
 
-      await writeAuditLog({
-        clientId: ctx.user.id,
-        clientType: ctx.user.type,
-        operation: 'event.search',
-        requestData: {
-          query: input.query,
-          limit: input.limit,
-          offset: input.offset
-        },
-        responseSummary: {
-          total: result.total,
-          eventIds: result.results.map((r) => r.id)
-        }
-      })
+      if (ctx.user.type === 'system') {
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'event.search',
+          requestData: {
+            query: input.query,
+            limit: input.limit,
+            offset: input.offset
+          },
+          responseSummary: {
+            total: result.total,
+            eventIds: result.results.map((r) => r.id)
+          }
+        })
+      }
 
       return result
     }),
