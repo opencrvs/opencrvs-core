@@ -8,9 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { JWT_ISSUER } from '@auth/constants'
-import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
@@ -81,19 +79,10 @@ export async function authenticate(
   username: string,
   password: string
 ): Promise<IAuthentication> {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/verifyPassword')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ username, password }),
-    headers: { 'Content-Type': 'application/json' }
+  const body = await eventsClient.user.verifyPassword.mutate({
+    username,
+    password
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  const body = await res.json()
 
   return {
     name: body.name,
