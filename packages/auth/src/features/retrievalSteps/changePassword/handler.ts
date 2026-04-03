@@ -19,6 +19,8 @@ import {
   RetrievalSteps,
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
+import { postUserActionToMetrics } from '@auth/metrics'
+import { logger } from '@opencrvs/commons'
 
 interface IPayload {
   newPassword: string
@@ -45,12 +47,28 @@ export default async function changePasswordHandler(
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-  await changePassword(
-    retrievalStepInformation.userId,
-    payload.newPassword,
-    remoteAddress,
-    userAgent
-  )
+  await changePassword(retrievalStepInformation.userId, payload.newPassword)
+
+  try {
+    if (!request.headers.authorization) {
+      await postUserActionToMetrics(
+        'PASSWORD_RESET',
+        request.headers.authorization,
+        remoteAddress,
+        userAgent
+      )
+    } else {
+      await postUserActionToMetrics(
+        'PASSWORD_CHANGED',
+        request.headers.authorization,
+        remoteAddress,
+        userAgent
+      )
+    }
+  } catch (err) {
+    logger.error(err.message)
+  }
+
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)
 }
