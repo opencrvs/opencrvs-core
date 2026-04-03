@@ -107,15 +107,14 @@ export async function getUser(
 }
 
 export async function findUserOrSystem(
-  id: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _token: string
+  id: string
 ): Promise<UserOrSystem | undefined> {
   try {
     return await getUser(id)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_) {
-    logger.info(`No user found for id: ${id}. Will look for a system instead.`)
+  } catch (e) {
+    logger.info(
+      `No user found for id: ${id}. Will look for a system instead. Error: ${e instanceof Error ? e.message : String(e)}`
+    )
   }
 
   try {
@@ -129,10 +128,9 @@ export async function findUserOrSystem(
       legacyId: system.legacyId ? system.legacyId : undefined,
       name: system.name
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     logger.info(
-      `No system found for id: ${id}. User/system has probably been removed. Will return undefined.`
+      `No system found for id: ${id}. User/system has probably been removed. Will return undefined. Error: ${e instanceof Error ? e.message : String(e)}`
     )
   }
 

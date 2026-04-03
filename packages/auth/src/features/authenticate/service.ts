@@ -302,3 +302,21 @@ export async function recordUserAuditEvent(
     throw err
   }
 }
+
+export async function recordAnonymousUserAuditEvent(
+  input: UserAuditLog
+): Promise<void> {
+  try {
+    const client = createTRPCClient<AppRouter>({
+      links: [
+        httpBatchLink({
+          url: env.EVENTS_URL,
+          transformer: superjson
+        })
+      ]
+    })
+    await client.user.audit.anonymousRecord.mutate(input)
+  } catch (err) {
+    logger.error('Failed to record anonymous user audit event', err)
+  }
+}

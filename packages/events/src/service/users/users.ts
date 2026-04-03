@@ -21,13 +21,8 @@ import { findUserOrSystem } from './api'
  * @param token - Authorization token for API requests
  * @returns Array of found users. If no users are found for some ids, we leave them out of the result.
  */
-export const getUsersById = async (
-  ids: string[],
-  token: string
-): Promise<UserOrSystem[]> => {
-  const users = await Promise.all(
-    ids.map(async (id) => findUserOrSystem(id, token))
-  )
+export const getUsersById = async (ids: string[]): Promise<UserOrSystem[]> => {
+  const users = await Promise.all(ids.map(async (id) => findUserOrSystem(id)))
 
   return users.filter((user) => user !== undefined)
 }
