@@ -50,6 +50,26 @@ export async function getUserByMobileOrEmail(
 
 export type { SecurityQuestion }
 
+export async function getUserByUsername(username: string) {
+  const db = getClient()
+  return db
+    .selectFrom('users')
+    .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
+    .select([
+      'users.id',
+      'users.firstname',
+      'users.surname',
+      'users.mobile',
+      'users.email',
+      'users.role',
+      'users.status',
+      'userCredentials.salt',
+      'userCredentials.passwordHash'
+    ])
+    .where('userCredentials.username', '=', username)
+    .executeTakeFirst()
+}
+
 export async function getUserCredentialsByUserId(userId: string) {
   const db = getClient()
   return db
