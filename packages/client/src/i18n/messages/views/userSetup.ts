@@ -453,6 +453,11 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for marked as not duplicate in audit action',
     id: 'user.profile.auditList.markedAsNotDuplicate'
   },
+  createdAuditAction: {
+    defaultMessage: 'Created',
+    description: 'Description for created audit action',
+    id: 'user.profile.auditList.created'
+  },
   searchAuditAction: {
     defaultMessage: 'Searched record',
     description: 'Description for search audit action',

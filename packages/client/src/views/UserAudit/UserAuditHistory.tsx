@@ -202,14 +202,28 @@ function UserAuditHistoryComponent(props: Props) {
     }))
   }
 
-  function getTrackingId(entry: EventActionLikeAuditLogParams): string {
-    return entry.requestData.transactionId || '-'
-  }
-
-  function getEventId(
-    entry: EventActionLikeAuditLogParams
-  ): string | undefined {
-    return entry.requestData.eventId
+  function getTrackingIdAndEventId(entry: AuditLogEntry) {
+    if (entry.operation === 'event.create') {
+      return {
+        trackingId: entry.responseSummary.trackingId || '-',
+        eventId: UUID.safeParse(entry.responseSummary.eventId)?.data
+      }
+    }
+    if (entry.operation === 'event.get') {
+      return {
+        trackingId: entry.responseSummary.trackingId || '-',
+        eventId: UUID.safeParse(entry.requestData.eventId)?.data
+      }
+    }
+    if (isEventActionEntry(entry)) {
+      return {
+        trackingId: entry.requestData.trackingId || '-',
+        eventId: UUID.safeParse(entry.requestData.eventId)?.data
+      }
+    }
+    return {
+      trackingId: '-'
+    }
   }
 
   function isEventActionEntry(
@@ -252,9 +266,7 @@ function UserAuditHistoryComponent(props: Props) {
         ),
         actionDescriptionString: getActionMessage(entry),
         trackingId: (() => {
-          if (!isEventActionEntry(entry)) return '-'
-          const trackingId = getTrackingId(entry)
-          const eventId = UUID.safeParse(getEventId(entry))?.data
+          const { trackingId, eventId } = getTrackingIdAndEventId(entry)
           if (trackingId === '-' || !eventId) return trackingId
           if (!hasRecordRead) return trackingId
           return (

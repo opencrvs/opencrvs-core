@@ -418,8 +418,9 @@ export function getDefaultActionProcedures(
               eventId,
               actionType,
               eventType: result.type,
+              trackingId: result.trackingId,
               transactionId: input.transactionId
-            },
+            }
           })
         }
 

@@ -337,8 +337,9 @@ export const eventRouter = router({
               eventId: input.eventId,
               actionType: ActionType.ASSIGN,
               eventType: result.type,
+              trackingId: result.trackingId,
               transactionId: input.transactionId
-            },
+            }
           })
           return result
         }),
@@ -356,8 +357,9 @@ export const eventRouter = router({
               eventId: input.eventId,
               actionType: ActionType.UNASSIGN,
               eventType: result.type,
+              trackingId: result.trackingId,
               transactionId: input.transactionId
-            },
+            }
           })
           return result
         })
@@ -397,8 +399,9 @@ export const eventRouter = router({
               eventId: options.input.eventId,
               actionType: ActionType.MARK_AS_DUPLICATE,
               eventType: result.type,
+              trackingId: result.trackingId,
               transactionId: options.input.transactionId
-            },
+            }
           })
           return result
         }),
@@ -427,8 +430,9 @@ export const eventRouter = router({
               eventId: options.input.eventId,
               actionType: ActionType.MARK_AS_NOT_DUPLICATE,
               eventType: result.type,
+              trackingId: result.trackingId,
               transactionId: options.input.transactionId
-            },
+            }
           })
           return result
         })

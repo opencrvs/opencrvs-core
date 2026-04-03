@@ -81,6 +81,7 @@ const EventActionEntrySchema = AuditLogEntryBase.extend({
     eventId: z.string(),
     actionType: z.string(),
     eventType: z.string(),
+    trackingId: z.string(),
     transactionId: z.string()
   })
 })
@@ -92,6 +93,7 @@ const EventCustomActionEntrySchema = AuditLogEntryBase.extend({
     actionType: z.literal(ActionType.CUSTOM),
     customAction: z.string(),
     eventType: z.string(),
+    trackingId: z.string(),
     transactionId: z.string()
   })
 })

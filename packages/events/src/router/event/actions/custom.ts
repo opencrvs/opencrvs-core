@@ -91,9 +91,10 @@ export function customActionProcedures() {
             eventId: input.eventId,
             actionType: ActionType.CUSTOM,
             eventType: result.type,
+            trackingId: result.trackingId,
             transactionId: input.transactionId,
             customAction: input.customActionType
-          },
+          }
         })
 
         return result
