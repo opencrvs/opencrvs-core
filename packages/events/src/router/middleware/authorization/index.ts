@@ -364,7 +364,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  const otherUser = await findUserOrSystem(input.userId, token)
+  const otherUser = await findUserOrSystem(input.userId)
 
   // Don't reveal the existence of the user
   if (!otherUser) {
