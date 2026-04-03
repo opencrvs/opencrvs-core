@@ -34,6 +34,7 @@ import { getRoles } from '@events/service/config/config'
 import { generateHash } from '@events/service/auth/hash'
 import {
   getUserByMobileOrEmail,
+  getUserByUsername,
   getUserCredentialsByUserId,
   updatePasswordHash,
   SecurityQuestion
@@ -132,6 +133,56 @@ const VerifyUserOutput = z.object({
 })
 
 export const userRouter = router({
+  verifyPassword: publicProcedure
+    .input(
+      z.object({
+        username: z.string(),
+        password: z.string()
+      })
+    )
+    .output(
+      z.object({
+        id: z.string(),
+        name: z.array(
+          z.object({
+            use: z.string(),
+            given: z.array(z.string()),
+            family: z.string()
+          })
+        ),
+        mobile: z.string().optional(),
+        email: z.string().optional(),
+        status: z.string(),
+        role: z.string()
+      })
+    )
+    .mutation(async ({ input }) => {
+      const user = await getUserByUsername(input.username)
+
+      if (!user) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      const hash = await generateHash(input.password, user.salt)
+      if (hash !== user.passwordHash) {
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      return {
+        id: user.id,
+        name: [
+          {
+            use: 'en',
+            given: [user.firstname ?? ''],
+            family: user.surname ?? ''
+          }
+        ],
+        mobile: user.mobile ?? undefined,
+        email: user.email ?? undefined,
+        status: user.status,
+        role: user.role
+      }
+    }),
   verifySecurityAnswer: publicProcedure
     .input(
       z.object({
@@ -359,7 +410,7 @@ export const userRouter = router({
       }
 
       const newHash = await generateHash(input.password, record.salt)
-      const result = await updatePasswordHash(input.userId, newHash)
+      await updatePasswordHash(input.userId, newHash)
     }),
   sendVerifyCode: userOnlyProcedure
     .input(
