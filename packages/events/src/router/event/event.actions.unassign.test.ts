@@ -14,8 +14,7 @@ import {
   ActionStatus,
   ActionType,
   encodeScope,
-  getUUID,
-  SCOPES
+  getUUID
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 

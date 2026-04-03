@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAuthHeader, UUID } from '@opencrvs/commons'
-
-import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
 import decode from 'jwt-decode'
 
 export interface ITokenPayload {
@@ -22,18 +20,6 @@ export interface ITokenPayload {
   recordId?: UUID
 }
 
-export function scopesInclude(
-  scopes:
-    | string[]
-    | undefined /* @todo remove undefined variant and make scope a required field for users */,
-  scope: string
-) {
-  if (!scopes) {
-    return false
-  }
-  return scopes.includes(scope)
-}
-
 export function hasScope(authHeader: IAuthHeader, scope: string) {
   if (!authHeader || !authHeader.Authorization) {
     return false
@@ -43,20 +29,7 @@ export function hasScope(authHeader: IAuthHeader, scope: string) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
-export function inScope(authHeader: IAuthHeader, scopes: string[]) {
-  const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
-  return !!matchedScope
-}
-
-export function isTokenOwner(authHeader: IAuthHeader, userId: string) {
-  if (!authHeader || !authHeader.Authorization) {
-    return false
-  }
-  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
-  return (tokenPayload.sub && tokenPayload.sub === userId) || false
-}
-
-export const getTokenPayload = (token: string): ITokenPayload => {
+const getTokenPayload = (token: string): ITokenPayload => {
   let decoded: ITokenPayload
   try {
     decoded = decode(token)
@@ -66,34 +39,4 @@ export const getTokenPayload = (token: string): ITokenPayload => {
     )
   }
   return decoded
-}
-
-export const hasRecordAccess = (authHeader: IAuthHeader, recordId: string) => {
-  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
-  return tokenPayload.recordId === recordId
-}
-
-export const getUserId = (authHeader: IAuthHeader): string => {
-  if (!authHeader || !authHeader.Authorization) {
-    throw new Error(`getUserId: Error occurred during token decode`)
-  }
-  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
-  return tokenPayload.sub
-}
-
-export async function isOfficeUnderJurisdiction(
-  officeId: UUID,
-  otherOfficeId: UUID,
-  authHeader: IAuthHeader
-) {
-  const officeLocation = await fetchLocation(officeId, authHeader)
-  const parentLocationId = officeLocation.administrativeAreaId
-  if (!parentLocationId) {
-    return false
-  }
-  const otherOfficeHierarchy = await fetchLocationHierarchy(
-    otherOfficeId,
-    authHeader
-  )
-  return otherOfficeHierarchy.includes(parentLocationId)
 }

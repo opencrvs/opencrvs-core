@@ -209,18 +209,11 @@ export function parseLiteralScope(scope: string) {
   const maybeLiteralScope = LiteralScopes.safeParse(scope)
 
   if (maybeLiteralScope.success) {
-    return {
-      type: maybeLiteralScope.data
-    }
+    return { type: maybeLiteralScope.data }
   }
 
   return
 }
-
-/*
- * V2 file will be unified with the scopes during 2.0 development.
- * We separate scope changes to phases in order to not block other development.
- */
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
