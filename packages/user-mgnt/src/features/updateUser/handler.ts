@@ -14,9 +14,10 @@ import {
   isBase64FileString,
   triggerUserEventNotification,
   personNameFromV1ToV2,
-  findScope
+  findScope,
+  getScopes,
+  SCOPES
 } from '@opencrvs/commons'
-import { getScopes, SCOPES } from '@opencrvs/commons/authentication'
 import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 import {
   generateUsername,
