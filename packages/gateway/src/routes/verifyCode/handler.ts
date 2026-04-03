@@ -156,15 +156,15 @@ export async function generateAndSendVerificationCode(
   mobile?: string,
   email?: string
 ) {
-  const isDemoUser = !env.TWO_FA_ENABLED
+  const isTwoFADisabled = !env.TWO_FA_ENABLED
   logger.info(
-    `isDemoUser,
+    `isTwoFADisabled,
       ${JSON.stringify({
-        isDemoUser: isDemoUser
+        isTwoFADisabled: isTwoFADisabled
       })}`
   )
   let verificationCode
-  if (isDemoUser) {
+  if (isTwoFADisabled) {
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
@@ -180,7 +180,7 @@ export async function generateAndSendVerificationCode(
           })}`
     )
   } else {
-    if (isDemoUser) {
+    if (isTwoFADisabled) {
       throw unauthorized()
     } else {
       await sendVerificationCode(

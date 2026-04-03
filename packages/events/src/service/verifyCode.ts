@@ -85,10 +85,10 @@ export async function generateAndSendVerificationCode({
   phoneNumber?: string
   email?: string
 }): Promise<void> {
-  const isDemoUser = !env.TWO_FA_ENABLED
+  const isTwoFADisabled = !env.TWO_FA_ENABLED
 
   let verificationCode: string
-  if (isDemoUser) {
+  if (isTwoFADisabled) {
     verificationCode = '000000'
     storeVerificationCode(nonce, verificationCode)
   } else {
@@ -104,8 +104,8 @@ export async function generateAndSendVerificationCode({
       })}`
     )
   } else {
-    if (isDemoUser) {
-      throw new Error('Demo users are not allowed in production')
+    if (isTwoFADisabled) {
+      throw new Error('2FA cannot be disabled in production')
     }
 
     await triggerUserEventNotification({

@@ -16,6 +16,7 @@ import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
+import { env } from '@user-mgnt/environment'
 import { getUserId, statuses } from '@user-mgnt/utils/userUtils'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 import {
@@ -55,7 +56,9 @@ export default async function resetPasswordInviteHandler(
     responseSummary: {}
   })
 
-  randomPassword = generateRandomPassword()
+  // DEFAULT_USER_PASSWORD allows QA/dev environments to set a predictable password
+  // for manually created users when SMS/email delivery is unavailable.
+  randomPassword = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
   const { hash, salt } = generateSaltedHash(randomPassword)
 
   user.passwordHash = hash

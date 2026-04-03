@@ -20,5 +20,6 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ default: undefined }),
-  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' })
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
+  DEFAULT_USER_PASSWORD: str({ devDefault: 'test', default: undefined })
 })

@@ -223,12 +223,12 @@ export async function generateAndSendVerificationCode(
   email?: string,
   role?: string | number
 ) {
-  const isDemoUser = !env.TWO_FA_ENABLED
+  const isTwoFADisabled = !env.TWO_FA_ENABLED
   logger.info(
-    `Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')} Role: ${role}`
+    `2FA disabled: ${isTwoFADisabled}. Scopes: ${scope.join(', ')} Role: ${role}`
   )
   let verificationCode
-  if (isDemoUser) {
+  if (isTwoFADisabled) {
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
