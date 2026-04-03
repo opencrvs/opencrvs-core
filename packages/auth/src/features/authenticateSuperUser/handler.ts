@@ -17,8 +17,7 @@ import {
 } from '@auth/features/authenticate/service'
 import { unauthorized } from '@hapi/boom'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
-import { logger, SCOPES } from '@opencrvs/commons'
-import { encodeScope } from '@opencrvs/commons/client'
+import { logger, SCOPES, encodeScope } from '@opencrvs/commons'
 
 interface IAuthPayload {
   username: string
