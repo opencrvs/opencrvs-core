@@ -24,9 +24,8 @@ import {
   UserContext
 } from '@opencrvs/commons'
 export { SystemContext, UserContext }
-import { getLegacyUser } from './service/users/api'
-import { getLocationById } from './service/locations/locations'
 import { env } from './environment'
+import { getUser } from './service/users/api'
 
 export const TrpcContext = z.object({
   token: TokenWithBearer,
@@ -143,10 +142,8 @@ async function resolveUserDetails(
       })
     }
 
-    const { primaryOfficeId, role, signature, username } = await getLegacyUser(
-      userId,
-      token
-    )
+    const { primaryOfficeId, role, signature, username, administrativeAreaId } =
+      await getUser(userId)
 
     if (username === SEEDER_SUPER_ADMIN) {
       logger.warn(
@@ -161,19 +158,17 @@ async function resolveUserDetails(
       })
     }
 
-    // @TODO: We should get this from a single source. Waiting for user migration.
-    const location = await getLocationById(primaryOfficeId)
     return UserContext.parse({
       type: userType,
       id: userId,
       primaryOfficeId,
-      administrativeAreaId: location.administrativeAreaId,
+      administrativeAreaId,
       signature,
       role
     })
   } catch (error) {
     logger.error(
-      `Error retrieving user details for ${userType} ${userId}: ${JSON.stringify(error)}`
+      `Error retrieving user details for ${userType} ${userId}: ${error}}`
     )
 
     throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })

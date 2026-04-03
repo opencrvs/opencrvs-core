@@ -28,6 +28,7 @@ import {
   getSystemByLegacyId,
   getSystemClientById
 } from '@events/storage/postgres/events/system-clients'
+import { getUserById } from '@events/storage/postgres/events/users'
 
 type UserAPIResult = {
   id: string
@@ -71,54 +72,47 @@ export type SearchUsersResult = {
   results: UserAPIResult[]
 }
 
-export async function getLegacyUser(
-  userId: string,
-  token: string
+export async function getUser(
+  userId: string
 ): Promise<User & { username: string }> {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'getUser').href, {
-    method: 'POST',
-    body: JSON.stringify({ userId }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
+  const user = await getUserById(userId)
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to retrieve user details. Error: ${res.status} status received`
-    )
+  if (!user) {
+    throw new Error(`User not found: ${userId}`)
   }
 
-  const legacyUser = (await res.json()) as UserAPIResult
-
-  return {
+  const result = {
     type: TokenUserType.enum.user,
-    id: legacyUser.id,
-    name: legacyUser.name,
-    role: legacyUser.role,
-    email: legacyUser.email,
-    mobile: legacyUser.mobile,
-    username: legacyUser.username,
-    status: legacyUser.status as User['status'],
-    signature: legacyUser.signature?.data
-      ? legacyUser.signature.data
+    id: user.id,
+    name: [
+      { use: 'en', given: [user.firstname ?? ''], family: user.surname ?? '' }
+    ],
+    role: user.role,
+    email: user.email ?? undefined,
+    mobile: user.mobile ?? undefined,
+    username: user.username,
+    status: user.status as User['status'],
+    signature: user.signaturePath
+      ? (user.signaturePath as FullDocumentPath)
       : undefined,
-    avatar: legacyUser.avatar?.data ? legacyUser.avatar.data : undefined,
-    primaryOfficeId: legacyUser.primaryOfficeId,
-    device: legacyUser.device ? legacyUser.device : undefined,
-    fullHonorificName: legacyUser.fullHonorificName
-      ? legacyUser.fullHonorificName
-      : undefined
+    avatar: user.profileImagePath
+      ? (user.profileImagePath as FullDocumentPath)
+      : undefined,
+    primaryOfficeId: user.officeId,
+    administrativeAreaId: user.administrativeAreaId ?? undefined,
+    fullHonorificName: user.fullHonorificName ?? undefined
   }
+
+  return result
 }
 
 export async function findUserOrSystem(
   id: string,
-  token: string
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _token: string
 ): Promise<UserOrSystem | undefined> {
   try {
-    return await getLegacyUser(id, token)
+    return await getUser(id)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
     logger.info(`No user found for id: ${id}. Will look for a system instead.`)
@@ -143,19 +137,6 @@ export async function findUserOrSystem(
   }
 
   return
-}
-
-async function getUser(id: string, token: string): Promise<User> {
-  const userOrSystem = await findUserOrSystem(id, token)
-  if (!userOrSystem) {
-    throw new Error(`No user or system found for id: ${id}`)
-  }
-
-  if (userOrSystem.type === TokenUserType.enum.system) {
-    throw new Error(`The id: ${id} belongs to a system, not a user`)
-  }
-
-  return userOrSystem
 }
 
 export async function searchUsers(
@@ -225,8 +206,7 @@ export async function updateUser(
     )
   }
 
-  const user = await getUser(input.id, token)
-  return user
+  return getUser(input.id)
 }
 
 export async function createUser(input: CreateUserPayload, token: string) {
@@ -252,7 +232,7 @@ export async function createUser(input: CreateUserPayload, token: string) {
   }
 
   const response = (await res.json()) as UserAPIResult
-  return getUser(response.id, token)
+  return getUser(response.id)
 }
 
 export async function changeUserPassword(
