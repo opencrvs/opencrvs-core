@@ -233,28 +233,6 @@ export async function createUser(input: CreateUserPayload, token: string) {
   return getUser(response.id)
 }
 
-export async function changeUserPassword(
-  payload: { userId: string; existingPassword: string; password: string },
-  token: string
-): Promise<void> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPassword').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change password. Error: ${res.status} status received`
-    )
-  }
-}
-
 export async function activateUser(
   input: { userId: string; password: string; securityQNAs: unknown[] },
   token: string
