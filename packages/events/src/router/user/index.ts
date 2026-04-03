@@ -73,6 +73,15 @@ const UserAuditListQuery = z.object({
 })
 
 const auditRouter = router({
+  anonymousRecord: publicProcedure
+    .input(UserAuditRecordInput)
+    .mutation(async ({ input, ctx }) => {
+      await writeAuditLog({
+        ...input,
+        clientId: ctx.user?.id ?? input.requestData.subjectId,
+        clientType: ctx.user?.type ?? 'user'
+      })
+    }),
   record: userAndSystemProcedure
     .input(UserAuditRecordInput)
     .mutation(async ({ input, ctx }) => {
@@ -283,7 +292,7 @@ export const userRouter = router({
     .input(z.string())
     .output(UserOrSystem)
     .query(async ({ input, ctx }) => {
-      const users = await getUsersById([input], ctx.token)
+      const users = await getUsersById([input])
       if (users.length === 0) {
         throw new TRPCError({ code: 'NOT_FOUND' })
       }
@@ -357,7 +366,7 @@ export const userRouter = router({
   list: userOnlyProcedure
     .input(z.array(z.string()))
     .output(z.array(UserOrSystem))
-    .query(async ({ input, ctx }) => getUsersById(input, ctx.token)),
+    .query(async ({ input, ctx }) => getUsersById(input)),
   search: userAndSystemProcedure
     .input(UserSearch)
     .output(z.array(UserOrSystem))
@@ -472,7 +481,7 @@ export const userRouter = router({
         })
       }
 
-      const [user] = await getUsersById([input.userId], ctx.token)
+      const [user] = await getUsersById([input.userId])
 
       if (!isUser(user)) {
         logger.error(`Failed to change phone number: Subject is a system user`)
