@@ -213,7 +213,8 @@ export function getScopes(token: string): string[] {
   return tokenPayload.scope || []
 }
 
-export function hasScope(token: string, scope: string) {
+/** @deprecated todo cihan remove */
+export function hasScopeOld(token: string, scope: string) {
   return getScopes(token).includes(scope)
 }
 

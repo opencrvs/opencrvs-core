@@ -27,7 +27,7 @@ import {
   UUID,
   EventDocument,
   getTokenPayload,
-  hasScope,
+  hasScopeOld,
   SCOPES,
   hasAnyOfScopes,
   getCurrentEventState,
@@ -388,7 +388,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  if (hasScope(token, SCOPES.USER_READ)) {
+  if (hasScopeOld(token, SCOPES.USER_READ)) {
     return next()
   }
 
@@ -412,14 +412,14 @@ export const userCanReadOtherUser: MiddlewareFunction<
     : true
 
   if (
-    hasScope(token, SCOPES.USER_READ_MY_JURISDICTION) &&
+    hasScopeOld(token, SCOPES.USER_READ_MY_JURISDICTION) &&
     isUnderJurisdiction
   ) {
     return next()
   }
 
   if (
-    hasScope(token, SCOPES.USER_READ_ONLY_MY_AUDIT) &&
+    hasScopeOld(token, SCOPES.USER_READ_ONLY_MY_AUDIT) &&
     userReading.id === otherUser.id
   ) {
     return next()

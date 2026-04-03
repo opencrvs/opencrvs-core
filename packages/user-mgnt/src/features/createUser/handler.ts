@@ -13,7 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import {
   findScope,
   getScopes,
-  hasScope,
+  hasScopeOld,
   logger,
   SCOPES
 } from '@opencrvs/commons'
@@ -39,7 +39,7 @@ export default async function createUser(
 
   const scopes = getScopes(request.headers.authorization)
   const creatableRoleIds = findScope(scopes, 'user.create')?.options?.role
-  const isDataSeeder = hasScope(
+  const isDataSeeder = hasScopeOld(
     request.headers.authorization,
     SCOPES.USER_DATA_SEEDING
   )
