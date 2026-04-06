@@ -223,7 +223,10 @@ function createTokenExchangeTestToken(
 ): TokenWithBearer {
   const token = jwt.sign(
     {
-      scope: [],
+      scope: [
+        encodeScope({ type: 'record.confirm-registration' }),
+        encodeScope({ type: 'record.reject-registration' })
+      ],
       sub: userId,
       userType: TokenUserType.enum.user,
       eventId,

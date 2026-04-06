@@ -39,7 +39,8 @@ import {
   userCanAccessEventWithScopes,
   getAcceptedScopesFromToken,
   ScopeType,
-  hasAnyScope
+  hasAnyScope,
+  hasScope
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -215,15 +216,12 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   TrpcContext,
   AsyncActionConfirmationResponseSchema
 > = async ({ next, ctx, input }) => {
-  const {
-    eventId: grantedEventId,
-    actionId: grantedActionId,
-    scope
-  } = getTokenPayload(ctx.token)
+  const { token } = ctx
+  const { eventId, actionId } = getTokenPayload(token)
 
   const hasConfirmAndRejectScope =
-    scope.includes('record.confirm-registration') &&
-    scope.includes('record.reject-registration')
+    hasScope(token, 'record.confirm-registration') &&
+    hasScope(token, 'record.reject-registration')
 
   if (!hasConfirmAndRejectScope) {
     throw new TRPCError({
@@ -232,7 +230,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
     })
   }
 
-  const isActionConfirmationToken = grantedEventId && grantedActionId
+  const isActionConfirmationToken = eventId && actionId
 
   if (!isActionConfirmationToken) {
     throw new TRPCError({
@@ -241,7 +239,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
     })
   }
 
-  if (grantedEventId !== input.eventId || grantedActionId !== input.actionId) {
+  if (eventId !== input.eventId || actionId !== input.actionId) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 

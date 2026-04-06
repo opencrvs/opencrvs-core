@@ -151,13 +151,20 @@ export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
 /** Plain scopes are scopes that dont have any options available. */
 const PlainScopeType = z.enum([
+  // System scopes
   'bypassratelimit',
+  'record.reindex',
   'notification-api',
-  'record.import',
-  'integration.create',
   'user.data-seeding',
+  'integration.create',
+  'record.import',
+
+  // User scopes
   'user.create',
-  'record.reindex'
+
+  // Scopes used exlusively by countryconfig integration token
+  'record.confirm-registration',
+  'record.reject-registration'
 ])
 
 export const ScopeType = z.union([PlainScopeType, RecordScopeTypeV2])
