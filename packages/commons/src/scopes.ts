@@ -25,9 +25,9 @@ export const SCOPES = {
   // NOT MIGRATED
 
   // systems / integrations
-  RECORD_EXPORT: 'record.export',
   RECORD_REINDEX: 'record.reindex',
   INTEGRATION_CREATE: 'integration.create',
+  RECORD_IMPORT: 'record.import',
 
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
