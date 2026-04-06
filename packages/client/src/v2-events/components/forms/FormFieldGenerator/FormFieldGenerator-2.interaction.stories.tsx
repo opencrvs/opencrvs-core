@@ -24,6 +24,7 @@ import {
   EventState,
   generateTranslationConfig,
   UUID,
+  DocumentPath,
   PlainDate
 } from '@opencrvs/commons/client'
 
@@ -127,7 +128,7 @@ const fields = [
     type: FieldType.FILE,
     label: generateTranslationConfig('Applicant Photo'),
     defaultValue: {
-      path: '/uploads/photo.png',
+      path: 'uploads/photo.png' as DocumentPath,
       type: 'image/png',
       originalFilename: 'profile.png'
     },
@@ -146,7 +147,11 @@ const fields = [
     signaturePromptLabel: generateTranslationConfig(
       'Please sign inside the box'
     ),
-    defaultValue: 'Signed by Applicant',
+    defaultValue: {
+      path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+      type: 'image/png',
+      originalFilename: 'signature-review____signature-1773128010978.png'
+    },
     configuration: { maxFileSize: 1024, acceptedFileTypes: ['image/png'] }
   },
 
@@ -240,7 +245,7 @@ const fields = [
     ],
     defaultValue: [
       {
-        path: '/uploads/nid.png',
+        path: 'uploads/nid.png' as DocumentPath,
         type: 'image/png',
         originalFilename: 'nid.png',
         option: 'nidCopy'
@@ -414,11 +419,15 @@ const declaration = {
   'applicant.age': 30,
   'applicant.bio': 'Short biography about the applicant...',
   'applicant.photo': {
-    path: '/uploads/photo.png',
+    path: 'uploads/photo.png' as DocumentPath,
     type: 'image/png',
     originalFilename: 'profile.png'
   },
-  'applicant.signature': 'Signed by Applicant',
+  'applicant.signature': {
+    path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
+    type: 'image/png',
+    originalFilename: 'signature-review____signature-1773128010978.png'
+  },
   'applicant.email': 'applicant@example.com',
   'applicant.phone': '+8801712345678',
   'applicant.password': 'StrongPassword123!',
@@ -432,7 +441,7 @@ const declaration = {
   },
   'applicant.documents': [
     {
-      path: '/uploads/nid.png',
+      path: 'uploads/nid.png' as DocumentPath,
       type: 'image/png',
       originalFilename: 'nid.png',
       option: 'nidCopy'

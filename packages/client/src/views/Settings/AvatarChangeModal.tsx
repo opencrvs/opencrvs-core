@@ -30,7 +30,7 @@ import { Square } from '@opencrvs/components/lib/icons'
 import { useOnlineStatus } from '@client/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { getFullDocumentPath, cacheFile } from '@client/v2-events/cache'
+import { cacheFile } from '@client/v2-events/cache'
 
 const Container = styled.div`
   align-self: center;
@@ -199,9 +199,8 @@ function AvatarChangeModalComp({
         },
         {
           onSuccess: (data) => {
-            const fullUrl = getFullDocumentPath(url)
-            cacheFile({ url: fullUrl, file: croppedImage })
-            onAvatarChanged(fullUrl)
+            cacheFile({ url, file: croppedImage })
+            onAvatarChanged(url)
             reset()
           }
         }
