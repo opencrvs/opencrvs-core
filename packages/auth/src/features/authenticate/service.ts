@@ -157,8 +157,8 @@ export async function createTokenForActionConfirmation(
   return sign(
     {
       scope: [
-        encodeScope('record.confirm-registration'),
-        encodeScope('record.reject-registration'),
+        encodeScope({ type: 'record.confirm-registration' }),
+        encodeScope({ type: 'record.reject-registration' }),
         userRejectScope
       ].filter(Boolean),
       eventId: 'eventId' in input ? input.eventId : undefined,
