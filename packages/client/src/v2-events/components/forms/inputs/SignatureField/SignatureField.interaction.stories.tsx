@@ -287,17 +287,35 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
                 }
               })
             }),
-            http.get('http://localhost:3535/ocrvs/:eventId/:id', async () => {
-              spies.getImage++
-              const response = await fetch(signaturePngBase64)
-              const binary = new Uint8Array(await response.arrayBuffer())
 
-              return new HttpResponse(binary, {
-                headers: {
-                  'Content-Type': MimeType.enum['image/png'],
-                  'Cache-Control': 'no-cache'
-                }
-              })
+            http.get('/:id', async (request) => {
+              const { id } = request.params
+              spies.getImage++
+              if (id && typeof id === 'string' && id.startsWith('signature')) {
+                spies.getImage++
+                const response = await fetch(signaturePngBase64)
+                const binary = new Uint8Array(await response.arrayBuffer())
+                return new HttpResponse(binary, {
+                  headers: {
+                    'Content-Type': MimeType.enum['image/png'],
+                    'Cache-Control': 'no-cache'
+                  }
+                })
+              }
+            }),
+            http.get('/:eventId/:id', async (request) => {
+              const { eventId, id } = request.params
+              if (eventId === '123-abcd-213') {
+                spies.getImage++
+                const response = await fetch(signaturePngBase64)
+                const binary = new Uint8Array(await response.arrayBuffer())
+                return new HttpResponse(binary, {
+                  headers: {
+                    'Content-Type': MimeType.enum['image/png'],
+                    'Cache-Control': 'no-cache'
+                  }
+                })
+              }
             })
           ]
         }
