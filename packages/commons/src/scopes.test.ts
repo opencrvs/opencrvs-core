@@ -498,7 +498,7 @@ it('migrate v1 scopes to v2', () => {
     'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
   ]
 
-  expect(v1Scopes).toHaveLength(27)
+  expect(v1Scopes).toHaveLength(26)
 
   const v2Scopes = migrateV1ScopesToV2(v1Scopes)
   expect(v2Scopes).toHaveLength(26)
