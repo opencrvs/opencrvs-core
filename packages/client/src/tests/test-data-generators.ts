@@ -501,12 +501,8 @@ export function testDataGenerator(rngSeed?: number) {
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
         SCOPES.USER_READ_ONLY_MY_AUDIT,
-        encodeScope({
-          type: 'record.search'
-        }),
-        encodeScope({
-          type: 'record.create'
-        }),
+        encodeScope({ type: 'record.search' }),
+        encodeScope({ type: 'record.create' }),
         encodeScope({
           type: 'record.read',
           options: {
@@ -519,33 +515,15 @@ export function testDataGenerator(rngSeed?: number) {
             ]
           }
         }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-        encodeScope({
-          type: 'record.reject'
-        }),
-        encodeScope({
-          type: 'record.archive'
-        }),
-        encodeScope({
-          type: 'record.register'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        }),
-        encodeScope({
-          type: 'record.print-certified-copies'
-        }),
-        encodeScope({
-          type: 'record.correct'
-        }),
-        encodeScope({
-          type: 'record.unassign-others'
-        }),
-        encodeScope({
-          type: 'record.review-duplicates'
-        }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.reject' }),
+        encodeScope({ type: 'record.archive' }),
+        encodeScope({ type: 'record.register' }),
+        encodeScope({ type: 'record.edit' }),
+        encodeScope({ type: 'record.print-certified-copies' }),
+        encodeScope({ type: 'record.correct' }),
+        encodeScope({ type: 'record.unassign-others' }),
+        encodeScope({ type: 'record.review-duplicates' }),
         encodeScope({
           type: 'record.custom-action',
           options: {
@@ -574,48 +552,22 @@ export function testDataGenerator(rngSeed?: number) {
             ]
           }
         }),
-        encodeScope({
-          type: 'record.read'
-        }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-        encodeScope({
-          type: 'record.reject'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        }),
-        encodeScope({
-          type: 'record.archive'
-        }),
-        encodeScope({
-          type: 'record.print-certified-copies'
-        }),
-        encodeScope({
-          type: 'record.request-correction'
-        })
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.reject' }),
+        encodeScope({ type: 'record.edit' }),
+        encodeScope({ type: 'record.archive' }),
+        encodeScope({ type: 'record.print-certified-copies' }),
+        encodeScope({ type: 'record.request-correction' })
       ],
       fieldAgent: [
         'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
-        encodeScope({
-          type: 'record.search'
-        }),
-        encodeScope({
-          type: 'record.create'
-        }),
-        encodeScope({
-          type: 'record.read'
-        }),
-        encodeScope({
-          type: 'record.notify'
-        }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        })
+        encodeScope({ type: 'record.search' }),
+        encodeScope({ type: 'record.create' }),
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.notify' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.edit' })
       ],
       localSystemAdmin: [
         SCOPES.USER_READ_MY_OFFICE,
@@ -634,13 +586,8 @@ export function testDataGenerator(rngSeed?: number) {
        * record.create has placeOfEvent: 'location' so the field is fully locked.
        */
       communityLeader: [
-        SCOPES.SEARCH_BIRTH,
-        SCOPES.SEARCH_DEATH,
-        SCOPES.SEARCH_MARRIAGE,
         'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
-        encodeScope({
-          type: 'record.search'
-        }),
+        encodeScope({ type: 'record.search' }),
         encodeScope({
           type: 'record.create',
           options: {
@@ -653,15 +600,9 @@ export function testDataGenerator(rngSeed?: number) {
             placeOfEvent: JurisdictionFilter.enum.location
           }
         }),
-        encodeScope({
-          type: 'record.read'
-        }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        })
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.edit' })
       ],
       /**
        * PROVINCIAL_REGISTRAR: jurisdiction locked to their administrative area (province).
@@ -674,9 +615,7 @@ export function testDataGenerator(rngSeed?: number) {
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
         SCOPES.USER_READ_ONLY_MY_AUDIT,
-        encodeScope({
-          type: 'record.search'
-        }),
+        encodeScope({ type: 'record.search' }),
         encodeScope({
           type: 'record.create',
           options: {
@@ -689,37 +628,16 @@ export function testDataGenerator(rngSeed?: number) {
             placeOfEvent: JurisdictionFilter.enum.administrativeArea
           }
         }),
-        encodeScope({
-          type: 'record.read'
-        }),
-        encodeScope({
-          type: 'record.declare'
-        }),
-
-        encodeScope({
-          type: 'record.reject'
-        }),
-        encodeScope({
-          type: 'record.archive'
-        }),
-        encodeScope({
-          type: 'record.register'
-        }),
-        encodeScope({
-          type: 'record.edit'
-        }),
-        encodeScope({
-          type: 'record.print-certified-copies'
-        }),
-        encodeScope({
-          type: 'record.correct'
-        }),
-        encodeScope({
-          type: 'record.unassign-others'
-        }),
-        encodeScope({
-          type: 'record.review-duplicates'
-        })
+        encodeScope({ type: 'record.read' }),
+        encodeScope({ type: 'record.declare' }),
+        encodeScope({ type: 'record.reject' }),
+        encodeScope({ type: 'record.archive' }),
+        encodeScope({ type: 'record.register' }),
+        encodeScope({ type: 'record.edit' }),
+        encodeScope({ type: 'record.print-certified-copies' }),
+        encodeScope({ type: 'record.correct' }),
+        encodeScope({ type: 'record.unassign-others' }),
+        encodeScope({ type: 'record.review-duplicates' })
       ],
       nationalSystemAdmin: [
         SCOPES.CONFIG_UPDATE_ALL,

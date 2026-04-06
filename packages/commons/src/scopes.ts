@@ -43,17 +43,6 @@ export const SCOPES = {
   RECORD_CONFIRM_REGISTRATION: 'record.confirm-registration',
   RECORD_REJECT_REGISTRATION: 'record.reject-registration',
 
-  // search
-  SEARCH_BIRTH_MY_JURISDICTION: 'search.birth:my-jurisdiction',
-  SEARCH_BIRTH: 'search.birth',
-  SEARCH_DEATH_MY_JURISDICTION: 'search.death:my-jurisdiction',
-  SEARCH_DEATH: 'search.death',
-  SEARCH_MARRIAGE_MY_JURISDICTION: 'search.marriage:my-jurisdiction',
-  SEARCH_MARRIAGE: 'search.marriage',
-
-  // audit v1.8
-  RECORD_READ: 'record.read',
-
   // profile
   PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
 
@@ -89,28 +78,19 @@ export const SCOPES = {
   ATTACHMENT_UPLOAD: 'attachment.upload'
 } as const
 
-// Systems / integrations
-const IntegrationScopes = z.union([z.literal(SCOPES.INTEGRATION_CREATE)])
-
-// Performance
-const PerformanceScopes = z.union([
-  z.literal(SCOPES.PERFORMANCE_READ),
-  z.literal(SCOPES.PERFORMANCE_READ_DASHBOARDS),
-  z.literal(SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS)
-])
-
-// Organisation
-const OrganisationScopes = z.union([
-  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS),
-  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
-  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)
-])
-
-// User
 /**
  * @deprecated - will be removed in v2.1.
  */
-const UserScopes = z.union([
+const LiteralScopes = z.union([
+  z.literal(SCOPES.INTEGRATION_CREATE),
+  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
+  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
+  z.literal(SCOPES.PERFORMANCE_READ),
+  z.literal(SCOPES.PERFORMANCE_READ_DASHBOARDS),
+  z.literal(SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS),
+  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS),
+  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
+  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),
   z.literal(SCOPES.USER_READ),
   z.literal(SCOPES.USER_READ_MY_OFFICE),
   z.literal(SCOPES.USER_READ_MY_JURISDICTION),
@@ -118,41 +98,10 @@ const UserScopes = z.union([
   z.literal(SCOPES.USER_CREATE),
   z.literal(SCOPES.USER_CREATE_MY_JURISDICTION),
   z.literal(SCOPES.USER_UPDATE),
-  z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION)
-])
-
-// Config
-/**
- * @deprecated - will be removed in v2.1.
- */
-const ConfigScope = z.literal(SCOPES.CONFIG_UPDATE_ALL)
-
-// Data seeding
-/**
- * @deprecated - will be removed in v2.1.
- */
-const DataSeedingScope = z.literal(SCOPES.USER_DATA_SEEDING)
-
-// Attachment
-/**
- * @deprecated - will be removed in v2.1.
- */
-const AttachmentScope = z.literal(SCOPES.ATTACHMENT_UPLOAD)
-
-// Combine all
-/**
- * @deprecated - will be removed in v2.1.
- */
-const LiteralScopes = z.union([
-  IntegrationScopes,
-  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
-  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
-  PerformanceScopes,
-  OrganisationScopes,
-  UserScopes,
-  ConfigScope,
-  DataSeedingScope,
-  AttachmentScope,
+  z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION),
+  z.literal(SCOPES.CONFIG_UPDATE_ALL),
+  z.literal(SCOPES.USER_DATA_SEEDING),
+  z.literal(SCOPES.ATTACHMENT_UPLOAD),
   z.literal(SCOPES.RECORD_REINDEX)
 ])
 

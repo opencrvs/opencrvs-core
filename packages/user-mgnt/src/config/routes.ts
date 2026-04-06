@@ -373,16 +373,7 @@ export const getRoutes = () => {
       path: '/searches',
       handler: createSearchHandler,
       options: {
-        auth: {
-          scope: [
-            SCOPES.SEARCH_BIRTH,
-            SCOPES.SEARCH_DEATH,
-            SCOPES.SEARCH_MARRIAGE,
-            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-          ]
-        },
+        auth: { scope: [] },
         validate: {
           payload: createSearchrequestSchema
         },
@@ -394,16 +385,7 @@ export const getRoutes = () => {
       path: '/searches',
       handler: removeSearchHandler,
       options: {
-        auth: {
-          scope: [
-            SCOPES.SEARCH_BIRTH,
-            SCOPES.SEARCH_DEATH,
-            SCOPES.SEARCH_MARRIAGE,
-            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-          ]
-        },
+        auth: { scope: [] },
         validate: {
           payload: removeSearchrequestSchema
         },

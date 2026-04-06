@@ -10,7 +10,7 @@
  */
 
 import { http, HttpResponse } from 'msw'
-import { SCOPES, TokenUserType } from '@opencrvs/commons'
+import { encodeScope, SCOPES, TokenUserType } from '@opencrvs/commons'
 import { server } from '@events/server'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
@@ -72,7 +72,7 @@ describe('POST /attachments', () => {
 
     const token = createTestToken({
       userId: user.id,
-      scopes: [SCOPES.RECORD_READ],
+      scopes: [encodeScope({ type: 'record.read' })],
       userType: TokenUserType.enum.user,
       role: user.role
     })

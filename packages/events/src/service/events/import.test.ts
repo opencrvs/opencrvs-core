@@ -57,7 +57,7 @@ describe('bulkImport', () => {
     const { user } = await setupTestCase()
     const client = createSystemTestClient('test-system', [
       encodeScope({ type: 'record.import' }),
-      SCOPES.RECORD_READ,
+      encodeScope({ type: 'record.read' }),
       encodeScope({
         type: 'record.search',
         options: {
