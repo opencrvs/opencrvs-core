@@ -22,12 +22,12 @@ export const SCOPES = {
   BYPASSRATELIMIT: 'bypassratelimit',
   CONFIG: 'config',
   RECORD_REINDEX: 'record.reindex',
+  RECORD_IMPORT: 'record.import',
 
   // NOT MIGRATED
 
   // systems / integrations
   INTEGRATION_CREATE: 'integration.create',
-  RECORD_IMPORT: 'record.import',
 
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
@@ -176,7 +176,8 @@ const LiteralScopes = z.union([
   UserScopes,
   ConfigScope,
   DataSeedingScope,
-  AttachmentScope
+  AttachmentScope,
+  z.literal(SCOPES.RECORD_REINDEX)
 ])
 
 /**
@@ -464,7 +465,7 @@ export const decodeScope = (query: string) => {
   })
 
   const unflattenedScope = unflattenScope(scope)
-  return RecordScopeV2.safeParse(unflattenedScope)?.data
+  return Scope.safeParse(unflattenedScope)?.data
 }
 
 /** If a certain scope option is not set, we use the default value. */

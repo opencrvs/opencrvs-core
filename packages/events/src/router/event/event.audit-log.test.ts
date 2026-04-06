@@ -214,7 +214,7 @@ describe('audit log', () => {
 
       const result = await client.integrations.create({
         name: 'My Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       const db = getClient()
@@ -228,7 +228,7 @@ describe('audit log', () => {
       expect(logs[0].operation).toBe('integrations.create')
       expect(logs[0].requestData).toMatchObject({
         name: 'My Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
       expect(logs[0].responseSummary).toMatchObject({
         clientId: result.clientId
@@ -243,7 +243,7 @@ describe('audit log', () => {
 
       await client.integrations.create({
         name: 'My Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       const db = getClient()

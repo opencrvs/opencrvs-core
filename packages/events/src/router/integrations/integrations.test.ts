@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getUUID, SCOPES, UUID } from '@opencrvs/commons'
+import { getUUID, SCOPES, UUID, encodeScope } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { createSystemTestClient } from '@events/tests/utils'
 
@@ -25,7 +25,7 @@ describe('integrations', () => {
 
       const result = await client.integrations.create({
         name: 'My Test Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       expect(result).toHaveProperty('clientId')
@@ -44,7 +44,7 @@ describe('integrations', () => {
 
       const result = await client.integrations.create({
         name: 'DB Check Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       const db = getClient()
@@ -56,7 +56,7 @@ describe('integrations', () => {
 
       expect(rows).toHaveLength(1)
       expect(rows[0].name).toBe('DB Check Integration')
-      expect(rows[0].scopes).toEqual([SCOPES.RECORD_IMPORT])
+      expect(rows[0].scopes).toEqual([encodeScope({ type: 'record.import' })])
       expect(rows[0].status).toBe('active')
       expect(rows[0].secretHash).toBeTruthy()
       expect(rows[0].salt).toBeTruthy()
@@ -71,7 +71,7 @@ describe('integrations', () => {
 
       const result = await client.integrations.create({
         name: 'Audit Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       const db = getClient()
@@ -85,7 +85,7 @@ describe('integrations', () => {
       expect(logs).toHaveLength(1)
       expect(logs[0].requestData).toMatchObject({
         name: 'Audit Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
       expect(logs[0].responseSummary).toMatchObject({
         clientId: result.clientId
@@ -116,11 +116,11 @@ describe('integrations', () => {
 
       await client.integrations.create({
         name: 'Integration A',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
       await client.integrations.create({
         name: 'Integration B',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       const result = await client.integrations.list()
@@ -147,13 +147,13 @@ describe('integrations', () => {
 
       await client.integrations.create({
         name: 'Active Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       // Manually set one to disabled to test filtering
       const created = await client.integrations.create({
         name: 'Disabled Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       const db = getClient()
@@ -184,7 +184,7 @@ describe('integrations', () => {
 
       const created = await client.integrations.create({
         name: 'Auth Integration',
-        scopes: [SCOPES.RECORD_IMPORT]
+        scopes: [encodeScope({ type: 'record.import' })]
       })
 
       const result = await client.integrations.authenticate({
@@ -194,7 +194,7 @@ describe('integrations', () => {
 
       expect(result.id).toBe(created.clientId)
       expect(result.status).toBe('active')
-      expect(result.scope).toContain(SCOPES.RECORD_IMPORT)
+      expect(result.scope).toContain(encodeScope({ type: 'record.import' }))
     })
   })
 })

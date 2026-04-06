@@ -10,7 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { getUUID, SCOPES } from '@opencrvs/commons'
+import { getUUID } from '@opencrvs/commons'
 import { logger } from '@opencrvs/commons'
 import {
   ActionStatus,
@@ -32,7 +32,6 @@ import {
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { EventIdParam } from '@events/router/middleware'
-import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import {
   userOnlyProcedure,
   router,
@@ -497,7 +496,7 @@ export const eventRouter = router({
       return result
     }),
   bulkImport: userAndSystemProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+    .use(middleware.allowedWithAnyOfScopes(['record.import']))
     .input(z.array(EventDocument))
     .output(z.any())
     .mutation(async ({ input, ctx }) => bulkImportEvents(input, ctx.token))

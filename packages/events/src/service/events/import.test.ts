@@ -36,7 +36,9 @@ describe('bulkImport', () => {
 
   test('allows access with import scope', async () => {
     const { user } = await setupTestCase()
-    const client = createSystemTestClient('test-system', [SCOPES.RECORD_IMPORT])
+    const client = createSystemTestClient('test-system', [
+      encodeScope({ type: 'record.import' })
+    ])
 
     await expect(
       client.event.bulkImport([
@@ -54,7 +56,7 @@ describe('bulkImport', () => {
   test('importing events indexes them into Elasticsearch at the next refresh', async () => {
     const { user } = await setupTestCase()
     const client = createSystemTestClient('test-system', [
-      SCOPES.RECORD_IMPORT,
+      encodeScope({ type: 'record.import' }),
       SCOPES.RECORD_READ,
       encodeScope({
         type: 'record.search',
