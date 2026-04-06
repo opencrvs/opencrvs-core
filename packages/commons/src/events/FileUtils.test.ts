@@ -61,7 +61,7 @@ test('file references finder returns all file references from action document', 
           },
           'senior-pass.id': '23423423423',
           'applicant.image': {
-            path: '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+            path: '105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
             type: 'image/jpeg',
             originalFilename: 'IMG_5601 2.jpeg'
           },
@@ -69,7 +69,7 @@ test('file references finder returns all file references from action document', 
         },
         annotation: {
           'review.signature': {
-            path: '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png',
+            path: '105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png',
             type: 'image/png',
             originalFilename: 'signature-review____signature-1758182094797.png'
           }
@@ -82,8 +82,8 @@ test('file references finder returns all file references from action document', 
   } as EventDocument
 
   expect(getFilePathsFromEvent(data)).toEqual([
-    '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
-    '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
+    '105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+    '105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
   ])
 })
 test('file references finder considers files in a rejected action as existing file references', () => {
@@ -135,7 +135,7 @@ test('file references finder considers files in a rejected action as existing fi
           },
           'senior-pass.id': '23423423423',
           'applicant.image': {
-            path: '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+            path: '105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
             type: 'image/jpeg',
             originalFilename: 'IMG_5601 2.jpeg'
           },
@@ -143,7 +143,7 @@ test('file references finder considers files in a rejected action as existing fi
         },
         annotation: {
           'review.signature': {
-            path: '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png',
+            path: '105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png',
             type: 'image/png',
             originalFilename: 'signature-review____signature-1758182094797.png'
           }
@@ -168,7 +168,7 @@ test('file references finder considers files in a rejected action as existing fi
   } as EventDocument
 
   expect(getFilePathsFromEvent(data)).toEqual([
-    '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
-    '/ocrvs/105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
+    '105b69b3-415f-4e53-b912-ef71484cb6c0/e1fb6470-a836-4346-b46b-982304eb25df.jpeg',
+    '105b69b3-415f-4e53-b912-ef71484cb6c0/ff45a750-d09e-4d06-b2c7-eda3f4b32417.png'
   ])
 })

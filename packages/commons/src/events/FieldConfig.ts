@@ -20,11 +20,11 @@ import {
   NonEmptyTextValue,
   TextValue,
   DateRangeFieldValue,
-  SignatureFieldValue,
   SelectDateRangeValue,
   TimeValue,
   ButtonFieldValue,
-  VerificationStatusValue
+  VerificationStatusValue,
+  FieldValue
 } from './FieldValue'
 import {
   CustomFieldValue,
@@ -231,7 +231,7 @@ const SignatureField = BaseField.extend({
   signaturePromptLabel: TranslationConfig.describe(
     'Title of the signature modal'
   ),
-  defaultValue: SignatureFieldValue.optional(),
+  defaultValue: FieldValue.optional(),
   configuration: z
     .object({
       maxFileSize: z

@@ -35,7 +35,8 @@ import {
   AdministrativeArea,
   getActionAnnotationFields,
   FieldUpdateValue,
-  FieldConfig
+  FieldConfig,
+  DocumentPath
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -211,13 +212,8 @@ export const stringifyEventMetadata = ({
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
               metadata.legalStatuses.REGISTERED.registrationNumber,
-            createdBySignature: metadata.legalStatuses.REGISTERED
-              .createdBySignature
-              ? new URL(
-                  metadata.legalStatuses.REGISTERED.createdBySignature,
-                  window.config.MINIO_BASE_URL
-                ).href
-              : undefined
+            createdBySignature:
+              metadata.legalStatuses.REGISTERED.createdBySignature
           }
         : null
     },

@@ -58,3 +58,4 @@ export * from './event'
 export * from './locations'
 
 export { UUID } from '../uuid'
+export { DocumentPath } from '../documents'
