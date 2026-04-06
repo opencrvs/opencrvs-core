@@ -104,6 +104,38 @@ test('Creates multiple administrative areas under parent administrative area', a
   )
 })
 
+test('updates externalId on existing administrative area when re-seeded with a value', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+
+  const areaId = generateUuid()
+
+  await dataSeedingClient.administrativeAreas.set([
+    {
+      id: areaId,
+      parentId: null,
+      name: 'Area without external id',
+      validUntil: null,
+      externalId: null
+    }
+  ])
+
+  await dataSeedingClient.administrativeAreas.set([
+    {
+      id: areaId,
+      parentId: null,
+      name: 'Area without external id',
+      validUntil: null,
+      externalId: 'adminpcode123'
+    }
+  ])
+
+  const areas = await dataSeedingClient.administrativeAreas.list()
+  const updated = areas.find((a) => a.id === areaId)
+
+  expect(updated?.externalId).toBe('adminpcode123')
+})
+
 test('seeding administrative areas is additive, not destructive', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])

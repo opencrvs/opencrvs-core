@@ -182,7 +182,6 @@ export const eventRouter = router({
         },
         responseSummary: {
           eventId: result.id,
-          eventType: result.type,
           trackingId: result.trackingId
         }
       })
@@ -231,7 +230,6 @@ export const eventRouter = router({
         operation: 'event.get',
         requestData: { eventId },
         responseSummary: {
-          eventId: updatedEvent.id,
           eventType: updatedEvent.type,
           trackingId: updatedEvent.trackingId
         }
@@ -330,14 +328,40 @@ export const eventRouter = router({
         .use(middleware.validateAction)
         .mutation(async ({ ctx, input }) => {
           const { user, token } = ctx
-          return assignRecord({ input, user, token })
+          const result = await assignRecord({ input, user, token })
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: 'event.actions.assign.request',
+            requestData: {
+              eventId: input.eventId,
+              actionType: ActionType.ASSIGN,
+              eventType: result.type,
+              trackingId: result.trackingId,
+              transactionId: input.transactionId
+            }
+          })
+          return result
         }),
       unassign: userOnlyProcedure
         .input(UnassignActionInput)
         .use(middleware.validateAction)
         .mutation(async ({ input, ctx }) => {
           const { user, token } = ctx
-          return unassignRecord({ input, user, token })
+          const result = await unassignRecord({ input, user, token })
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: 'event.actions.unassign.request',
+            requestData: {
+              eventId: input.eventId,
+              actionType: ActionType.UNASSIGN,
+              eventType: result.type,
+              trackingId: result.trackingId,
+              transactionId: input.transactionId
+            }
+          })
+          return result
         })
     }),
     correction: router({
@@ -354,35 +378,63 @@ export const eventRouter = router({
         .input(MarkAsDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
+          const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
           const configuration = await getEventConfigurationById({
-            token: options.ctx.token,
+            token,
             eventType: event.type
           })
-          return markAsDuplicate(
+          const result = await markAsDuplicate(
             event,
             options.input,
-            options.ctx.user,
-            options.ctx.token,
+            user,
+            token,
             configuration
           )
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: 'event.actions.mark_as_duplicate.request',
+            requestData: {
+              eventId: options.input.eventId,
+              actionType: ActionType.MARK_AS_DUPLICATE,
+              eventType: result.type,
+              trackingId: result.trackingId,
+              transactionId: options.input.transactionId
+            }
+          })
+          return result
         }),
       markNotDuplicate: userOnlyProcedure
         .input(MarkNotDuplicateActionInput)
         .use(middleware.validateAction)
         .mutation(async (options) => {
+          const { user, token } = options.ctx
           const event = await getEventById(options.input.eventId)
           const configuration = await getEventConfigurationById({
-            token: options.ctx.token,
+            token,
             eventType: event.type
           })
-          return markNotDuplicate(
+          const result = await markNotDuplicate(
             event,
             options.input,
-            options.ctx.user,
-            options.ctx.token,
+            user,
+            token,
             configuration
           )
+          await writeAuditLog({
+            clientId: user.id,
+            clientType: user.type,
+            operation: 'event.actions.mark_as_not_duplicate.request',
+            requestData: {
+              eventId: options.input.eventId,
+              actionType: ActionType.MARK_AS_NOT_DUPLICATE,
+              eventType: result.type,
+              trackingId: result.trackingId,
+              transactionId: options.input.transactionId
+            }
+          })
+          return result
         })
     })
   }),
@@ -413,20 +465,22 @@ export const eventRouter = router({
         acceptedScopes: ctx.acceptedScopes
       })
 
-      await writeAuditLog({
-        clientId: ctx.user.id,
-        clientType: ctx.user.type,
-        operation: 'event.search',
-        requestData: {
-          query: input.query,
-          limit: input.limit,
-          offset: input.offset
-        },
-        responseSummary: {
-          total: result.total,
-          eventIds: result.results.map((r) => r.id)
-        }
-      })
+      if (ctx.user.type === 'system') {
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'event.search',
+          requestData: {
+            query: input.query,
+            limit: input.limit,
+            offset: input.offset
+          },
+          responseSummary: {
+            total: result.total,
+            eventIds: result.results.map((r) => r.id)
+          }
+        })
+      }
 
       return result
     }),

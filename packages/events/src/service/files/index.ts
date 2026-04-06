@@ -14,14 +14,14 @@ import { zfd } from 'zod-form-data'
 import * as z from 'zod/v4'
 import FormData from 'form-data'
 import {
-  FullDocumentPath,
+  DocumentPath,
   getFilePathsFromEvent,
   joinUrlPaths,
   EventDocument
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-export async function deleteFile(path: FullDocumentPath, token: string) {
+export async function deleteFile(path: DocumentPath | string, token: string) {
   const res = await fetch(
     new URL(joinUrlPaths('/files', path), env.DOCUMENTS_URL),
     {
@@ -34,7 +34,7 @@ export async function deleteFile(path: FullDocumentPath, token: string) {
 
   return res.ok
 }
-export async function fileExists(path: FullDocumentPath, token: string) {
+export async function fileExists(path: DocumentPath | string, token: string) {
   const res = await fetch(
     new URL(joinUrlPaths('/files', path), env.DOCUMENTS_URL),
     {
@@ -71,7 +71,7 @@ export async function listFiles(path: string, token: string) {
     throw new Error(`Failed to list files in ${path}`)
   }
 
-  return res.json() as Promise<string[]>
+  return res.json() as Promise<DocumentPath[]>
 }
 
 export async function cleanupUnreferencedFiles(
@@ -86,7 +86,7 @@ export async function cleanupUnreferencedFiles(
   )
 
   return Promise.all(
-    filesToDelete.map(async (file: string) => deleteFile(file, token))
+    filesToDelete.map(async (file: DocumentPath) => deleteFile(file, token))
   )
 }
 
@@ -101,10 +101,14 @@ export async function uploadFile(
   token: string
 ): Promise<string> {
   const form = new FormData()
-  form.append('file', Readable.from(Buffer.from(await input.file.arrayBuffer())), {
-    filename: input.file.name,
-    contentType: input.file.type
-  })
+  form.append(
+    'file',
+    Readable.from(Buffer.from(await input.file.arrayBuffer())),
+    {
+      filename: input.file.name,
+      contentType: input.file.type
+    }
+  )
   form.append('transactionId', input.transactionId)
   if (input.path) {
     form.append('path', input.path)

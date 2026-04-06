@@ -12,6 +12,10 @@
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import {
+  AuditLogEntrySchema,
+  UserAuditRecordInput
+} from '@opencrvs/commons/events'
+import {
   logger,
   personNameFromV1ToV2,
   SCOPES,
@@ -27,6 +31,10 @@ import {
 } from '@events/router/trpc'
 import { getRoles } from '@events/service/config/config'
 import { getUserActions } from '@events/service/events/user/actions'
+import {
+  queryUserAuditLog,
+  writeAuditLog
+} from '@events/storage/postgres/events/auditLog'
 import {
   activateUser,
   changeUserAvatar,
@@ -46,6 +54,47 @@ import {
 } from '@events/service/verifyCode'
 import { UserActionsQuery } from '@events/storage/postgres/events/actions'
 import { userCanReadOtherUser } from '../middleware'
+
+const UserAuditListQuery = z.object({
+  userId: z.string(),
+  skip: z.number().optional().default(0),
+  count: z.number().optional().default(10),
+  timeStart: z.string().optional(),
+  timeEnd: z.string().optional(),
+  excludeOperations: z.array(z.string()).optional().default([])
+})
+
+const auditRouter = router({
+  record: userAndSystemProcedure
+    .input(UserAuditRecordInput)
+    .mutation(async ({ input, ctx }) => {
+      await writeAuditLog({
+        ...input,
+        clientId: ctx.user.id,
+        clientType: ctx.user.type
+      })
+    }),
+  list: userOnlyProcedure
+    .input(UserAuditListQuery)
+    .output(
+      z.object({ results: z.array(AuditLogEntrySchema), total: z.number() })
+    )
+    .use(userCanReadOtherUser)
+    .query(async ({ input }) => {
+      const { results, total } = await queryUserAuditLog({
+        subjectId: input.userId,
+        skip: input.skip,
+        count: input.count,
+        timeStart: input.timeStart,
+        timeEnd: input.timeEnd,
+        excludeOperations: input.excludeOperations
+      })
+      return {
+        results: results.map((r) => AuditLogEntrySchema.parse(r)),
+        total
+      }
+    })
+})
 
 const UserSearch = z.object({
   username: z.string().optional(),
@@ -360,5 +409,6 @@ export const userRouter = router({
     .input(z.any())
     .mutation(async ({ input, ctx }) => {
       return activateUser(input, ctx.token)
-    })
+    }),
+  audit: auditRouter
 })

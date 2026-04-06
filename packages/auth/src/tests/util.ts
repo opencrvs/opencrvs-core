@@ -27,7 +27,6 @@ export function createProductionEnvironmentServer() {
     COUNTRY_CONFIG_URL_INTERNAL: 'http://localhost:3040/',
     DOMAIN: '*',
     LOGIN_URL: 'http://localhost:3020/',
-    METRICS_URL: 'http://localhost:1050',
     REDIS_HOST: 'localhost',
     USER_MANAGEMENT_URL: 'http://localhost:3030/'
   })

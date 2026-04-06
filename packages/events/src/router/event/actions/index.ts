@@ -171,6 +171,12 @@ const AUDIT_LOG_OPERATION_MAP: Partial<
   Record<keyof typeof ACTION_PROCEDURE_CONFIG, EventActionAuditLog['operation']>
 > = {
   [ActionType.NOTIFY]: 'event.actions.notify.request',
+  [ActionType.DECLARE]: 'event.actions.declare.request',
+  [ActionType.REGISTER]: 'event.actions.register.request',
+  [ActionType.REJECT]: 'event.actions.reject.request',
+  [ActionType.ARCHIVE]: 'event.actions.archive.request',
+  [ActionType.PRINT_CERTIFICATE]: 'event.actions.print_certificate.request',
+  [ActionType.EDIT]: 'event.actions.edit.request',
   [ActionType.REQUEST_CORRECTION]: 'event.actions.correction.request.request',
   [ActionType.APPROVE_CORRECTION]: 'event.actions.correction.approve.request',
   [ActionType.REJECT_CORRECTION]: 'event.actions.correction.reject.request'
@@ -411,12 +417,9 @@ export function getDefaultActionProcedures(
             requestData: {
               eventId,
               actionType,
-              transactionId: input.transactionId
-            },
-            responseSummary: {
-              eventId: result.id,
               eventType: result.type,
-              trackingId: result.trackingId
+              trackingId: result.trackingId,
+              transactionId: input.transactionId
             }
           })
         }

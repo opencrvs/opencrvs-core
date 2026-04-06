@@ -17,17 +17,17 @@ import {
   logger,
   SCOPES
 } from '@opencrvs/commons'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 import {
   generateUsername,
   sendCredentialsNotification
 } from '@user-mgnt/features/createUser/service'
-import User, { IUser, IUserModel } from '@user-mgnt/model/user'
+import User, { IUser } from '@user-mgnt/model/user'
 import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
+import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import * as _ from 'lodash'
 import uuid from 'uuid/v4'
 
@@ -100,26 +100,14 @@ export default async function createUser(
     user.emailForNotification
   )
 
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
-
-  try {
-    const systemAdminUser: IUserModel | null = await User.findById(
-      getUserId({ Authorization: request.headers.authorization })
-    )
-    await postUserActionToMetrics(
-      'CREATE_USER',
-      request.headers.authorization,
-      remoteAddress,
-      userAgent,
-      systemAdminUser?.practitionerId,
-      practitionerId
-    )
-  } catch (err) {
-    logger.error(err.message)
-  }
+  recordUserAuditEvent(request.headers.authorization, {
+    operation: 'user.create_user',
+    requestData: {
+      subjectId: userModelObject.id,
+      role: user.role,
+      primaryOfficeId: user.primaryOfficeId
+    },
+  })
 
   const createdUser = userModelObject.toObject()
   const resUser = {

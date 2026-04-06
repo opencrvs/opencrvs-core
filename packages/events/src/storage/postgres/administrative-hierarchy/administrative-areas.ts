@@ -88,6 +88,12 @@ export async function setAdministrativeAreasInTrx(
              THEN excluded.valid_until
              ELSE administrative_areas.valid_until
            END`,
+          externalId: () =>
+            sql`CASE
+             WHEN excluded.external_id IS NOT NULL
+             THEN excluded.external_id
+             ELSE administrative_areas.external_id
+           END`,
           deletedAt: null
         })
       )

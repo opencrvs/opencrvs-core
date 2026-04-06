@@ -20,7 +20,6 @@ function ParagraphInput({
   message: string
   configuration: ParagraphConfiguration
 }) {
-  const fontVariant = configuration.styles?.fontVariant
   const hint = configuration.styles?.hint
   const textAlign = configuration.styles?.textAlign
 
@@ -29,7 +28,7 @@ function ParagraphInput({
       align={textAlign}
       color={hint ? 'grey500' : 'copy'}
       element="p"
-      variant={fontVariant ?? 'reg16'}
+      variant="reg16"
     >
       <span dangerouslySetInnerHTML={{ __html: message }} />
     </TextComponent>

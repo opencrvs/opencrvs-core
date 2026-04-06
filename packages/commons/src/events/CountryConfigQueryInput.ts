@@ -55,6 +55,7 @@ export const SerializedQueryExpression = z
     updatedAtLocation: z.optional(
       z.union([SerializableWithin, SerializableExact])
     ),
+    updatedByUserRole: z.optional(SerializableExact),
     assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(SerializableExact),
     createdByUserType: ExactUserType,
