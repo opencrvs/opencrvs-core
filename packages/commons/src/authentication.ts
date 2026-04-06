@@ -13,6 +13,7 @@ import { Nominal } from './nominal'
 import * as z from 'zod/v4'
 import { RecordScopeV2, decodeScope } from './scopes'
 import { UUID } from './uuid'
+export * from './scopes'
 
 /**
  * Returns an array of accepted scopes from a JWT token, filtered by the given accepted scope types.
