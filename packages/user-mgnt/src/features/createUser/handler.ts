@@ -107,7 +107,6 @@ export default async function createUser(
       role: user.role,
       primaryOfficeId: user.primaryOfficeId
     },
-    responseSummary: {}
   })
 
   const createdUser = userModelObject.toObject()

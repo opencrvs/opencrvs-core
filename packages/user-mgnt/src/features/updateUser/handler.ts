@@ -121,7 +121,6 @@ export default async function updateUser(
   recordUserAuditEvent(request.headers.authorization, {
     operation: 'user.edit_user',
     requestData: { subjectId: user.id },
-    responseSummary: {}
   })
 
   return h.response(resUser).code(201)
