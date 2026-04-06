@@ -182,7 +182,6 @@ export const eventRouter = router({
         },
         responseSummary: {
           eventId: result.id,
-          eventType: result.type,
           trackingId: result.trackingId
         }
       })
@@ -231,7 +230,6 @@ export const eventRouter = router({
         operation: 'event.get',
         requestData: { eventId },
         responseSummary: {
-          eventId: updatedEvent.id,
           eventType: updatedEvent.type,
           trackingId: updatedEvent.trackingId
         }
@@ -338,12 +336,9 @@ export const eventRouter = router({
             requestData: {
               eventId: input.eventId,
               actionType: ActionType.ASSIGN,
-              transactionId: input.transactionId
-            },
-            responseSummary: {
-              eventId: result.id,
               eventType: result.type,
-              trackingId: result.trackingId
+              trackingId: result.trackingId,
+              transactionId: input.transactionId
             }
           })
           return result
@@ -361,12 +356,9 @@ export const eventRouter = router({
             requestData: {
               eventId: input.eventId,
               actionType: ActionType.UNASSIGN,
-              transactionId: input.transactionId
-            },
-            responseSummary: {
-              eventId: result.id,
               eventType: result.type,
-              trackingId: result.trackingId
+              trackingId: result.trackingId,
+              transactionId: input.transactionId
             }
           })
           return result
@@ -406,12 +398,9 @@ export const eventRouter = router({
             requestData: {
               eventId: options.input.eventId,
               actionType: ActionType.MARK_AS_DUPLICATE,
-              transactionId: options.input.transactionId
-            },
-            responseSummary: {
-              eventId: result.id,
               eventType: result.type,
-              trackingId: result.trackingId
+              trackingId: result.trackingId,
+              transactionId: options.input.transactionId
             }
           })
           return result
@@ -440,12 +429,9 @@ export const eventRouter = router({
             requestData: {
               eventId: options.input.eventId,
               actionType: ActionType.MARK_AS_NOT_DUPLICATE,
-              transactionId: options.input.transactionId
-            },
-            responseSummary: {
-              eventId: result.id,
               eventType: result.type,
-              trackingId: result.trackingId
+              trackingId: result.trackingId,
+              transactionId: options.input.transactionId
             }
           })
           return result
@@ -479,20 +465,22 @@ export const eventRouter = router({
         acceptedScopes: ctx.acceptedScopes
       })
 
-      await writeAuditLog({
-        clientId: ctx.user.id,
-        clientType: ctx.user.type,
-        operation: 'event.search',
-        requestData: {
-          query: input.query,
-          limit: input.limit,
-          offset: input.offset
-        },
-        responseSummary: {
-          total: result.total,
-          eventIds: result.results.map((r) => r.id)
-        }
-      })
+      if (ctx.user.type === 'system') {
+        await writeAuditLog({
+          clientId: ctx.user.id,
+          clientType: ctx.user.type,
+          operation: 'event.search',
+          requestData: {
+            query: input.query,
+            limit: input.limit,
+            offset: input.offset
+          },
+          responseSummary: {
+            total: result.total,
+            eventIds: result.results.map((r) => r.id)
+          }
+        })
+      }
 
       return result
     }),
