@@ -50,6 +50,10 @@ const RoleSchema = (eventIds: string[]) =>
           }
 
           if (parsedV2Scopes?.type) {
+            if (!('options' in parsedV2Scopes)) {
+              return
+            }
+
             const options = parsedV2Scopes.options
 
             if (options?.event && Array.isArray(options.event)) {
