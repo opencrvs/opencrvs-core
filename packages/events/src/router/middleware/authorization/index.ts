@@ -37,7 +37,9 @@ import {
   canUserCreateEvent,
   getEventConfigById,
   userCanAccessEventWithScopes,
-  getAcceptedScopesFromToken
+  getAcceptedScopesFromToken,
+  ScopeType,
+  hasAnyScope
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -82,6 +84,38 @@ export function requiresAnyOfScopes(scopes: string[]) {
 
     // If the user has any of the allowed plain scopes, allow access
     if (inScope(token, scopes)) {
+      return opts.next()
+    }
+
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  return fn
+}
+
+/**
+ * Middleware to check if the user has any of the specified allowed scopes.
+ *
+ * Checks the given list of scope types against the scopes in the user's JWT token.
+ * If at least one of the provided scopes is found, access is granted and
+ * the middleware passes control to the next step. Otherwise, a TRPCError
+ * with code 'FORBIDDEN' is thrown.
+ *
+ * @param {ScopeType[]} scopes - Array of allowed scope types.
+ * @returns {MiddlewareFunction} TRPC-compatible middleware function.
+ */
+export function allowedWithAnyOfScopes(scopes: ScopeType[]) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext,
+    unknown
+  > = async (opts) => {
+    const { token } = opts.ctx
+
+    // If the user has any of the allowed plain scopes, allow access
+    if (hasAnyScope(token, scopes)) {
       return opts.next()
     }
 
@@ -358,7 +392,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
 
   // Throw early to avoid mistakes in the logic below.
   // There are test cases for each but better safe than sorry.
-  const hasAnyScope = hasAnyOfScopes(
+  const scopeFound = hasAnyOfScopes(
     [
       SCOPES.USER_READ,
       SCOPES.USER_READ_MY_OFFICE,
@@ -368,7 +402,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
     getScopes(token)
   )
 
-  if (!hasAnyScope) {
+  if (!scopeFound) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 

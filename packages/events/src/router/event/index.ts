@@ -83,7 +83,7 @@ export const eventRouter = router({
           })
           .optional()
       )
-      .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
+      .use(middleware.allowedWithAnyOfScopes(['record.reindex']))
       .output(z.void())
       .meta({
         openapi: {
@@ -112,7 +112,7 @@ export const eventRouter = router({
           tags: ['events']
         }
       })
-      .use(requiresAnyOfScopes([SCOPES.RECORD_REINDEX]))
+      .use(middleware.allowedWithAnyOfScopes(['record.reindex']))
       .input(
         z
           .object({ limit: z.number().int().min(1).max(100).optional() })

@@ -21,11 +21,11 @@ export const SCOPES = {
   // MIGRATED
   BYPASSRATELIMIT: 'bypassratelimit',
   CONFIG: 'config',
+  RECORD_REINDEX: 'record.reindex',
 
   // NOT MIGRATED
 
   // systems / integrations
-  RECORD_REINDEX: 'record.reindex',
   INTEGRATION_CREATE: 'integration.create',
   RECORD_IMPORT: 'record.import',
 
@@ -116,9 +116,6 @@ export const SCOPES = {
 // Systems / integrations
 const IntegrationScopes = z.union([z.literal(SCOPES.INTEGRATION_CREATE)])
 
-// Internal operations
-const InternalOperationsScopes = z.union([z.literal(SCOPES.RECORD_REINDEX)])
-
 // Performance
 const PerformanceScopes = z.union([
   z.literal(SCOPES.PERFORMANCE_READ),
@@ -179,7 +176,6 @@ const LiteralScopes = z.union([
   UserScopes,
   ConfigScope,
   DataSeedingScope,
-  InternalOperationsScopes,
   AttachmentScope
 ])
 
@@ -241,7 +237,8 @@ const PlainScopeType = z.enum([
   'record.import',
   'integration.create',
   'user.data-seeding',
-  'user.create'
+  'user.create',
+  'record.reindex'
 ])
 
 export const ScopeType = z.union([PlainScopeType, RecordScopeTypeV2])

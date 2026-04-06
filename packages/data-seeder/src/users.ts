@@ -12,8 +12,12 @@ import fetch from 'node-fetch'
 import { env } from './environment'
 import { z } from 'zod'
 import { raise } from './utils'
-import { decodeScope, EventConfig, joinUrl } from '@opencrvs/commons'
-import { parseLiteralScope } from '@opencrvs/commons/authentication'
+import {
+  decodeScope,
+  EventConfig,
+  joinUrl,
+  parseLiteralScope
+} from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
 import { createClient } from '@opencrvs/toolkit/api'
 import { parseConfigurableScope } from '@opencrvs/toolkit/scopes'

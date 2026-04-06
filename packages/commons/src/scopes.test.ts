@@ -10,7 +10,6 @@
  */
 
 import {
-  parseLiteralScope,
   SCOPES,
   decodeScope,
   encodeScope,
@@ -77,19 +76,6 @@ describe('findScope()', () => {
   it('returns undefined if the scope is not found', () => {
     const result = findScope(userScopes, 'user.edit')
     expect(result).toEqual(undefined)
-  })
-})
-
-describe('parseLiteralScope()', () => {
-  it('should not be able to parse a configurable scope', () => {
-    const scope = 'user.create[role=foo|bar]'
-    const result = parseLiteralScope(scope)
-    expect(result).toEqual(undefined)
-  })
-
-  it('should successfully parse a literal scope', () => {
-    const result = parseLiteralScope(SCOPES.USER_CREATE)
-    expect(result).toEqual({ type: 'user.create:all' })
   })
 })
 
@@ -463,7 +449,7 @@ it('transform v1 scope to v2', () => {
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
       SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
-      SCOPES.RECORD_REINDEX,
+      encodeScope({ type: 'record.reindex' }),
       'user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]',
       'user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]'
     ]
