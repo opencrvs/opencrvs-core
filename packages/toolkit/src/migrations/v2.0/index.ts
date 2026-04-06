@@ -12,6 +12,12 @@
 import { main as removeReviewFromRegisterAction } from './remove-review-from-register-action'
 import { main as makeBuiltInValidateActionsCustom } from './make-built-in-validate-actions-custom'
 import { main as removeDeleteActions } from './remove-delete-actions'
+import { main as convertParagraphToHeading } from './convert-paragraph-to-heading'
+import { main as migrateValidatedWorkqueueStatusToFlag } from './migrate-validated-workqueue-status-to-flag'
+import { main as addBirthCertificateIssuanceFlag } from './add-birth-certificate-issuance-flag'
+import { main as removePendingCertificationFlag } from './remove-pending-certification-flag'
+import { main as renameLocationParentId } from './rename-location-parent-id'
+import { main as renameApiPaths } from './rename-api-paths'
 
 console.log('Upgrading from v1.9 to v2.0')
 
@@ -19,6 +25,12 @@ async function run() {
   await removeReviewFromRegisterAction()
   await makeBuiltInValidateActionsCustom()
   await removeDeleteActions()
+  await convertParagraphToHeading()
+  await migrateValidatedWorkqueueStatusToFlag()
+  await addBirthCertificateIssuanceFlag()
+  await removePendingCertificationFlag()
+  await renameLocationParentId()
+  await renameApiPaths()
 }
 
 run().catch((err) => {

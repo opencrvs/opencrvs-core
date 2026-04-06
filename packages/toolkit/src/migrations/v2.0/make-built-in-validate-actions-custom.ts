@@ -24,19 +24,60 @@
  *   - Adds a `customActionType: 'VALIDATE_DECLARATION'` property to those objects
  *   - Adds an `auditHistoryLabel` intl descriptor whose `id` is derived from the
  *     root `type` value of the `defineConfig` config object
+ *   - Removes the `deduplication` property from those objects
  *   - Replaces `review: { fields: <value> }` with `form: <value>`, or
  *     `review: <expr>` with `form: <expr>.fields` when the value is not an inline object
  *   - Saves the modified files in-place
  */
 
-import { Project, SyntaxKind, ObjectLiteralExpression, Node } from 'ts-morph'
+import {
+  Project,
+  SyntaxKind,
+  ObjectLiteralExpression,
+  Node,
+  SourceFile
+} from 'ts-morph'
 import path from 'path'
+
+const TOOLKIT_EVENTS_MODULE = '@opencrvs/toolkit/events'
+
+const REQUIRED_SYMBOLS = [
+  'ConditionalType',
+  'and',
+  'status',
+  'not',
+  'flag',
+  'InherentFlags'
+]
+
+function ensureImports(sourceFile: SourceFile): void {
+  const existingImport = sourceFile.getImportDeclaration(
+    (decl) => decl.getModuleSpecifierValue() === TOOLKIT_EVENTS_MODULE
+  )
+
+  if (existingImport) {
+    const existingNames = new Set(
+      existingImport.getNamedImports().map((ni) => ni.getName())
+    )
+    for (const name of REQUIRED_SYMBOLS) {
+      if (!existingNames.has(name)) {
+        existingImport.addNamedImport(name)
+      }
+    }
+  } else {
+    sourceFile.addImportDeclaration({
+      moduleSpecifier: TOOLKIT_EVENTS_MODULE,
+      namedImports: REQUIRED_SYMBOLS
+    })
+  }
+}
 
 const DEFINE_CONFIG_NAME = 'defineConfig'
 const ACTIONS_PROPERTY_NAME = 'actions'
 const TYPE_PROPERTY_NAME = 'type'
 const CUSTOM_ACTION_TYPE_PROPERTY_NAME = 'customActionType'
 const AUDIT_HISTORY_LABEL_PROPERTY_NAME = 'auditHistoryLabel'
+const DEDUPLICATION_PROPERTY_NAME = 'deduplication'
 const REVIEW_PROPERTY_NAME = 'review'
 const FIELDS_PROPERTY_NAME = 'fields'
 const FORM_PROPERTY_NAME = 'form'
@@ -143,6 +184,52 @@ function transformValidateActionToCustom(
     })
   }
 
+  // Add supportingCopy intl descriptor if not already present
+  if (!obj.getProperty('supportingCopy')) {
+    const supportingCopyId = `event.${eventType}.custom.action.validate-declaration.supportingCopy`
+    obj.addPropertyAssignment({
+      name: 'supportingCopy',
+      initializer: `{
+  defaultMessage:
+    'Approving this declaration confirms it as legally accepted and eligible for registration.',
+  description:
+    'This is the supporting copy for the Validate declaration -action',
+  id: '${supportingCopyId}'
+}`
+    })
+  }
+
+  // Add conditionals if not already present
+  if (!obj.getProperty('conditionals')) {
+    obj.addPropertyAssignment({
+      name: 'conditionals',
+      initializer: `[
+  {
+    type: ConditionalType.SHOW,
+    conditional: and(status('DECLARED'), not(flag('validated')))
+  },
+  {
+    type: ConditionalType.ENABLE,
+    conditional: not(flag(InherentFlags.POTENTIAL_DUPLICATE))
+  }
+]`
+    })
+  }
+
+  // Add flags if not already present
+  if (!obj.getProperty('flags')) {
+    obj.addPropertyAssignment({
+      name: 'flags',
+      initializer: `[{ id: 'validated', operation: 'add' }]`
+    })
+  }
+
+  // Remove the `deduplication` property if present
+  const deduplicationProperty = obj.getProperty(DEDUPLICATION_PROPERTY_NAME)
+  if (deduplicationProperty) {
+    deduplicationProperty.remove()
+  }
+
   // Replace `review` with `form`:
   //   - `review: { fields: <value> }` → `form: <value>`
   //   - `review: <expr>`              → `form: <expr>.fields`
@@ -226,6 +313,8 @@ function processFile(filePath: string, project: Project): number {
     }
 
     // Iterate over every element in the `actions` array
+    let fileNeedsImports = false
+    let configHadValidateAction = false
     for (const element of actionsInitializer.getElements()) {
       if (!Node.isObjectLiteralExpression(element)) continue
 
@@ -235,10 +324,38 @@ function processFile(filePath: string, project: Project): number {
       )
       if (wasTransformed) {
         transformedCount++
+        fileNeedsImports = true
+        configHadValidateAction = true
         console.log(
           `  [${path.relative(process.cwd(), filePath)}] Transformed VALIDATE action to CUSTOM with customActionType: '${VALIDATE_DECLARATION_VALUE}'`
         )
       }
+    }
+
+    // Add top-level flags array to the config object if a VALIDATE action was found
+    if (configHadValidateAction && !configArg.getProperty('flags')) {
+      const resolvedEventType = eventType ?? 'unknown'
+      configArg.addPropertyAssignment({
+        name: 'flags',
+        initializer: `[
+  {
+    id: 'validated',
+    label: {
+      id: 'event.${resolvedEventType}.flag.validated',
+      defaultMessage: 'Validated',
+      description: 'Flag label for validated'
+    },
+    requiresAction: true
+  }
+]`
+      })
+      console.log(
+        `  [${path.relative(process.cwd(), filePath)}] Added top-level 'flags' array to defineConfig`
+      )
+    }
+
+    if (fileNeedsImports) {
+      ensureImports(sourceFile)
     }
   }
 
