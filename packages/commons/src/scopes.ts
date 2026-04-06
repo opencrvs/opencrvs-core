@@ -114,17 +114,10 @@ export const SCOPES = {
 } as const
 
 // Systems / integrations
-const IntegrationScopes = z.union([
-  z.literal(SCOPES.NOTIFICATION_API),
-  z.literal(SCOPES.RECORDSEARCH),
-  z.literal(SCOPES.INTEGRATION_CREATE)
-])
+const IntegrationScopes = z.union([z.literal(SCOPES.INTEGRATION_CREATE)])
 
 // Internal operations
-const InternalOperationsScopes = z.union([
-  z.literal(SCOPES.RECORD_REINDEX),
-  z.literal(SCOPES.RECORD_IMPORT)
-])
+const InternalOperationsScopes = z.union([z.literal(SCOPES.RECORD_REINDEX)])
 
 // Performance
 const PerformanceScopes = z.union([
@@ -245,7 +238,10 @@ export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 const PlainScopeType = z.enum([
   'bypassratelimit',
   'notification-api',
-  'record.import'
+  'record.import',
+  'integration.create',
+  'user.data-seeding',
+  'user.create'
 ])
 
 export const ScopeType = z.union([PlainScopeType, RecordScopeTypeV2])
