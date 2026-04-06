@@ -12,7 +12,7 @@ import { redis } from '@gateway/utils/redis'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 import { get } from 'lodash'
 import { DISABLE_RATE_LIMIT } from './constants'
-import { hasScope, ScopeType } from '@opencrvs/commons'
+import { hasScope } from '@opencrvs/commons'
 
 /**
  * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
@@ -89,9 +89,7 @@ export const rateLimitedRoute =
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
-    if (
-      hasScope(args[0].headers.authorization, ScopeType.enum.bypassratelimit)
-    ) {
+    if (hasScope(args[0].headers.authorization, 'bypassratelimit')) {
       return fn(...args)
     }
 

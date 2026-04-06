@@ -20,9 +20,8 @@ import {
   NOTIFICATION_API_USER_AUDIENCE
 } from '@auth/constants'
 import * as oauthResponse from './responses'
-import { TokenUserType, hasScope } from '@opencrvs/commons'
+import { TokenUserType, hasScope, encodeScope } from '@opencrvs/commons'
 import { getParam } from './utils'
-import { encodeScope } from '@opencrvs/commons/client'
 
 export async function clientCredentialsHandler(
   request: Hapi.Request,
