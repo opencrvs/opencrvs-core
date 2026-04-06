@@ -6,12 +6,7 @@
 
 #### Scheduler service removed
 
-The `scheduler` package and its Docker service have been removed. The service previously ran two scheduled cron jobs:
-
-- `refreshPerformanceData` — triggered a Metabase data refresh via the metrics service
-- `runVSExport` — triggered a vital statistics export via the metrics service
-
-If you relied on these scheduled jobs, you will need to trigger them externally or replace them with an alternative scheduling mechanism.
+The `scheduler` package and its Docker service have been removed. The service ran two nightly cron jobs (`refreshPerformanceData`, `runVSExport`) that called endpoints on the metrics service which have since been deprecated. No replacement is needed.
 
 #### FieldType.PARAGRAPH configuration
 
