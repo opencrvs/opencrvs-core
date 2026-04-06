@@ -11,7 +11,6 @@
 
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
-import { UserAuditRecordInput } from '@opencrvs/commons/events'
 import {
   AuditLogEntrySchema,
   UserAuditRecordInput
