@@ -29,7 +29,6 @@ export default async function invalidateTokenHandler(
     recordUserAuditEvent(token, {
       operation: 'user.logged_out',
       requestData: { subjectId: userId },
-      responseSummary: {}
     })
   }
 
