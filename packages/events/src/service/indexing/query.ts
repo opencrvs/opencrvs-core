@@ -209,7 +209,11 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       case 'updatedAtLocation':
       case 'legalStatuses.DECLARED.createdAtLocation':
       case 'legalStatuses.REGISTERED.createdAtLocation': {
-        must.push({ term: { [key]: clause[key].location } })
+        if (clause[key].type === 'exact') {
+          must.push({ term: { [key]: clause[key].term } })
+        } else if (clause[key].type === 'within') {
+          must.push({ term: { [key]: clause[key].location } })
+        }
         break
       }
       case 'legalStatuses.DECLARED.createdByRole':

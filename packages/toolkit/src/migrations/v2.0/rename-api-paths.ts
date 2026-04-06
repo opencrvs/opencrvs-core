@@ -28,19 +28,19 @@
  *   values are the new path strings. Exact string matching is used — no wildcards.
  */
 
-import {
-  Project,
-  SyntaxKind,
-  ObjectLiteralExpression,
-  Node
-} from 'ts-morph'
+import { Project, SyntaxKind, ObjectLiteralExpression, Node } from 'ts-morph'
 import path from 'path'
 
 // ─── Path rename table ────────────────────────────────────────────────────────
 // Add new renames here as further API paths are changed between versions.
 
 const PATH_RENAMES: Record<string, string> = {
-  '/events': '/config/events'
+  '/events': '/config/events',
+  '/application-config': '/config/application',
+  '/workqueue': '/config/workqueues',
+  '/locations': '/config/locations',
+  '/users': '/config/users',
+  '/roles': '/config/roles'
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -78,13 +78,16 @@ function isRouteConfig(obj: ObjectLiteralExpression): boolean {
   if (!methodInit) return false
 
   if (Node.isStringLiteral(methodInit)) {
-    if (!HTTP_VERBS.has(methodInit.getLiteralValue().toUpperCase())) return false
+    if (!HTTP_VERBS.has(methodInit.getLiteralValue().toUpperCase()))
+      return false
   } else if (Node.isArrayLiteralExpression(methodInit)) {
-    const allVerbs = methodInit.getElements().every(
-      (el) =>
-        Node.isStringLiteral(el) &&
-        HTTP_VERBS.has(el.getLiteralValue().toUpperCase())
-    )
+    const allVerbs = methodInit
+      .getElements()
+      .every(
+        (el) =>
+          Node.isStringLiteral(el) &&
+          HTTP_VERBS.has(el.getLiteralValue().toUpperCase())
+      )
     if (!allVerbs) return false
   } else {
     return false
