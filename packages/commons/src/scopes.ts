@@ -29,30 +29,6 @@ export const SCOPES = {
   // systems / integrations
   INTEGRATION_CREATE: 'integration.create',
 
-  // declare
-  RECORD_DECLARE_BIRTH: 'record.declare-birth',
-  RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
-  RECORD_DECLARE_DEATH: 'record.declare-death',
-  RECORD_DECLARE_DEATH_MY_JURISDICTION: 'record.declare-death:my-jurisdiction',
-  RECORD_DECLARE_MARRIAGE: 'record.declare-marriage',
-  RECORD_DECLARE_MARRIAGE_MY_JURISDICTION:
-    'record.declare-marriage:my-jurisdiction',
-  RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
-
-  // @todo: should this record be removed from events v2?
-  RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
-  RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
-
-  // validate
-  RECORD_SUBMIT_FOR_APPROVAL: 'record.declaration-submit-for-approval',
-  RECORD_SUBMIT_FOR_UPDATES: 'record.declaration-submit-for-updates',
-  RECORD_DECLARATION_EDIT: 'record.declaration-edit',
-  RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
-  RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
-  RECORD_DECLARATION_REINSTATE: 'record.declaration-reinstate',
-
-  // register
-  RECORD_REGISTER: 'record.register',
   /**
    * This scope is used to **print and **issue certified copies of a record
    * after it has been registered. Previously Registrars had this permission.
