@@ -255,7 +255,7 @@ async function insertBatch(
     r.clientId,
     r.operation,
     JSON.stringify(r.requestData),
-    'responseSummary' in r ? JSON.stringify(r.responseSummary) : '',
+    'responseSummary' in r ? JSON.stringify(r.responseSummary) : '{}',
     r.createdAt
   ])
   await client.query(buildBatchInsertQuery(rows.length), values)
