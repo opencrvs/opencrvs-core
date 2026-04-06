@@ -18,6 +18,7 @@ import { main as addBirthCertificateIssuanceFlag } from './add-birth-certificate
 import { main as removePendingCertificationFlag } from './remove-pending-certification-flag'
 import { main as renameLocationParentId } from './rename-location-parent-id'
 import { main as renameApiPaths } from './rename-api-paths'
+import { main as convertConfigFilesToTs } from './convert-config-files-to-ts'
 
 console.log('Upgrading from v1.9 to v2.0')
 
@@ -31,6 +32,7 @@ async function run() {
   await removePendingCertificationFlag()
   await renameLocationParentId()
   await renameApiPaths()
+  await convertConfigFilesToTs()
 }
 
 run().catch((err) => {
