@@ -12,7 +12,7 @@
 import fetch from 'node-fetch'
 import { z } from 'zod'
 import {
-  FullDocumentPath,
+  DocumentPath,
   IUserName,
   TokenUserType,
   UUID,
@@ -32,11 +32,11 @@ import {
 type UserAPIResult = {
   id: string
   avatar?: {
-    data: FullDocumentPath
+    data: DocumentPath
     type: string
   }
   signature?: {
-    data: FullDocumentPath
+    data: DocumentPath
     type: string
   }
   device?: string

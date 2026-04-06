@@ -101,6 +101,64 @@ describe('fileExistsHandler', () => {
 
     expect(res.statusCode).toBe(200)
   })
+
+  it('Handles missing bucket from file paths with multiple directories', async () => {
+    const path = 'event-12345'
+    const transactionId = 'transaction-12345'
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url: `/files/${path}/${transactionId}.txt`,
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    const [bucket, filename] = minioStatMock.mock.calls[0]
+    expect(bucket).toBe(MINIO_BUCKET)
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('Handles missing bucket from file', async () => {
+    const path = 'event-12345'
+    const transactionId = 'transaction-12345'
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url: `/files/${path}/${transactionId}.txt`,
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    const [bucket, filename] = minioStatMock.mock.calls[0]
+    expect(bucket).toBe(MINIO_BUCKET)
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('handles explicit "/" without bucket as start of of file path', async () => {
+    const path = 'event-12345'
+    const transactionId = 'transaction-12345'
+
+    const res = await server.server.inject({
+      method: 'GET',
+      // double slash is handled
+      url: `/files//${path}/${transactionId}.txt`,
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+
+    const [bucket, filename] = minioStatMock.mock.calls[0]
+    expect(bucket).toBe(MINIO_BUCKET)
+    expect(filename).toBe(`${path}/${transactionId}.txt`)
+
+    expect(res.statusCode).toBe(200)
+  })
 })
 
 describe('fileUploadHandler', () => {
@@ -158,7 +216,7 @@ describe('fileUploadHandler', () => {
       }
     })
 
-    expect(res.payload).toEqual(`/${MINIO_BUCKET}/${path}/${transactionId}.txt`)
+    expect(res.payload).toEqual(`${path}/${transactionId}.txt`)
 
     const [bucket, filename] = minioPutMock.mock.calls[0]
     expect(bucket).toBe(MINIO_BUCKET)
@@ -167,7 +225,7 @@ describe('fileUploadHandler', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('adds bucket to file path', async () => {
+  it('returns file path without bucket prefix', async () => {
     const transactionId = 'transaction-2'
     const body =
       `--${boundary}${CRLF}` +
@@ -186,11 +244,11 @@ describe('fileUploadHandler', () => {
       }
     })
 
-    expect(res.payload).toEqual(`/${MINIO_BUCKET}/${transactionId}.txt`)
+    expect(res.payload).toEqual(`${transactionId}.txt`)
 
     const [bucket, filename] = minioPutMock.mock.calls[0]
     expect(bucket).toBe(MINIO_BUCKET)
-    expect(filename).toBe(`/${transactionId}.txt`)
+    expect(filename).toBe(`${transactionId}.txt`)
 
     expect(res.statusCode).toBe(200)
   })

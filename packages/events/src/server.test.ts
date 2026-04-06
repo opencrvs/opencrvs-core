@@ -96,7 +96,7 @@ test('Server starts up and returns an event based on context dependency values',
     primaryOfficeId: locations[0].id,
     role: TestUserRole.enum.LOCAL_REGISTRAR,
     signature: {
-      data: '/ocrvs/my-signature.png'
+      data: 'my-signature.png'
     }
   }
 
@@ -127,9 +127,7 @@ test('Server starts up and returns an event based on context dependency values',
 
   expect(createAction.type).toEqual(ActionType.CREATE)
   expect(createAction.createdBy).toEqual(userId)
-  expect(createAction.createdBySignature).toEqual(
-    mockUserResponse.signature.data
-  )
+  expect(createAction.createdBySignature).toEqual('my-signature.png')
   expect(createAction.createdAtLocation).toEqual(
     mockUserResponse.primaryOfficeId
   )
@@ -161,7 +159,7 @@ test('Server will accept requests after error', async () => {
       return HttpResponse.json({
         primaryOfficeId: locations[0].id,
         role: TestUserRole.enum.LOCAL_REGISTRAR,
-        signature: '/ocrvs/my-signature.png'
+        signature: 'my-signature.png'
       })
     })
   )
