@@ -4,6 +4,15 @@
 
 ### Breaking changes
 
+#### Scheduler service removed
+
+The `scheduler` package and its Docker service have been removed. The service previously ran two scheduled cron jobs:
+
+- `refreshPerformanceData` — triggered a Metabase data refresh via the metrics service
+- `runVSExport` — triggered a vital statistics export via the metrics service
+
+If you relied on these scheduled jobs, you will need to trigger them externally or replace them with an alternative scheduling mechanism.
+
 #### FieldType.PARAGRAPH configuration
 
 - `FieldType.PARAGRAPH` field no longer takes in a fontVariant style configuration. If a fontVariant is required, please use the new `FieldType.HEADING` field instead.
