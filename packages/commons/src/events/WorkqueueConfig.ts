@@ -101,7 +101,29 @@ export function defineWorkqueue(workqueueInput: WorkqueueConfigInput) {
   return WorkqueueConfig.parse({ ...workqueueInput, query })
 }
 
-export function defineWorkqueues(workqueues: WorkqueueConfigInput[]) {
+function warnOnConfigurationIssues(
+  workqueue: WorkqueueConfigInputWithV19Compat
+) {
+  if (workqueue.actions) {
+    console.warn(
+      `
+       ************** WARNING **************
+       Workqueue "actions" are deprecated.
+       Use "triggers" instead.
+       ************** WARNING **************
+      `
+    )
+  }
+}
+
+type WorkqueueConfigInputWithV19Compat = WorkqueueConfigInput & {
+  actions?: unknown[]
+}
+
+export function defineWorkqueues(
+  workqueues: WorkqueueConfigInputWithV19Compat[]
+) {
+  workqueues.forEach(warnOnConfigurationIssues)
   return workqueues.map((workqueue) => defineWorkqueue(workqueue))
 }
 

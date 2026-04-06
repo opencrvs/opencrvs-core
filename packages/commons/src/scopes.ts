@@ -13,6 +13,7 @@ import * as z from 'zod/v4'
 import * as qs from 'qs'
 import { UUID } from './uuid'
 import { parseConfigurableScope } from './scopes.deprecated.do-not-use'
+import { Role } from './roles'
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
@@ -260,6 +261,7 @@ export const RecordScopeTypeV2 = z.enum([
 ])
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
+export type Scope = RecordScopeTypeV2
 
 const scopeByEvent = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
@@ -662,4 +664,8 @@ export function migrateV1ScopesToV2(scopes: string[]): string[] {
       }
     })
     .filter((scope): scope is string => !!scope)
+}
+
+export function defineRoles(roles: Role[]) {
+  return roles
 }

@@ -27,10 +27,14 @@ const SerializableExact = z.object({
   term: z.union([z.string(), SerializedUserField])
 })
 
+export type SerializableExact = z.infer<typeof SerializableExact>
+
 const SerializableWithin = z.object({
   type: z.literal('within'),
   location: z.union([z.string(), SerializedUserField])
 })
+
+export type SerializableWithin = z.infer<typeof SerializableWithin>
 
 export const SerializedQueryExpression = z
   .object({
@@ -45,8 +49,12 @@ export const SerializedQueryExpression = z
       z.optional(SerializableWithin),
     'legalStatuses.REGISTERED.createdByRole': z.optional(AnyOf),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
-    createdAtLocation: z.optional(SerializableWithin),
-    updatedAtLocation: z.optional(SerializableWithin),
+    createdAtLocation: z.optional(
+      z.union([SerializableWithin, SerializableExact])
+    ),
+    updatedAtLocation: z.optional(
+      z.union([SerializableWithin, SerializableExact])
+    ),
     assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(SerializableExact),
     createdByUserType: ExactUserType,
