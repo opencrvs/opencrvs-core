@@ -1,6 +1,6 @@
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * License, v. 2.0. If a copy of the MPL wsatisfies not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
  * OpenCRVS is also distributed under the terms of the Civil Registration
@@ -9,6 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import type {
+  EventActionAuditLog,
+  UserAuditLog
+} from '@opencrvs/commons/events'
 import { Db, MongoClient } from 'mongodb'
 import { Pool, PoolClient } from 'pg'
 import { query as influxQuery } from '../../utils/influx-helper.js'
@@ -21,7 +25,7 @@ const BATCH_SIZE = 500
 const MIGRATION_ID = 'influx-user-audit-to-postgres'
 
 /** Maps legacy InfluxDB user-management action names to v2 operation strings. */
-const USER_ACTION_TO_OPERATION: Record<string, string> = {
+const USER_ACTION_TO_OPERATION: Record<string, UserAuditLog['operation']> = {
   LOGGED_IN: 'user.logged_in',
   LOGGED_OUT: 'user.logged_out',
   CREATE_USER: 'user.create_user',
@@ -41,7 +45,10 @@ const USER_ACTION_TO_OPERATION: Record<string, string> = {
  * Maps legacy InfluxDB event-action names (written by createUserAuditPointFromFHIR)
  * to v2 event action operation strings.
  */
-const EVENT_ACTION_TO_OPERATION: Record<string, string> = {
+const EVENT_ACTION_TO_OPERATION: Record<
+  string,
+  EventActionAuditLog['operation']
+> = {
   IN_PROGRESS: 'event.actions.notify.request',
   DECLARED: 'event.actions.declare.request',
   REGISTERED: 'event.actions.register.request',
@@ -67,12 +74,25 @@ const EVENT_ACTION_TO_OPERATION: Record<string, string> = {
   MARKED_AS_NOT_DUPLICATE: 'event.actions.mark_as_not_duplicate.request'
 }
 
-const ALL_ACTION_TO_OPERATION: Record<string, string> = {
+const ALL_ACTION_TO_OPERATION: Record<
+  string,
+  UserAuditLog['operation'] | EventActionAuditLog['operation']
+> = {
   ...USER_ACTION_TO_OPERATION,
   ...EVENT_ACTION_TO_OPERATION
 }
 
-const EVENT_ACTIONS = new Set(Object.keys(EVENT_ACTION_TO_OPERATION))
+function isEventActionOperation(
+  op: UserAuditLog['operation'] | EventActionAuditLog['operation']
+): op is EventActionAuditLog['operation'] {
+  return op.startsWith('event.')
+}
+
+function isUserOperation(
+  op: UserAuditLog['operation'] | EventActionAuditLog['operation']
+): op is UserAuditLog['operation'] {
+  return op.startsWith('user.')
+}
 
 /**
  * Admin actions where the actor (practitionerId) is different from the
@@ -111,65 +131,108 @@ type ParsedData = {
 function parseData(raw: string | null): ParsedData {
   if (!raw) return {}
   try {
-    return JSON.parse(raw) as ParsedData
+    return JSON.parse(raw) satisfies ParsedData
   } catch {
     return {}
   }
 }
 
-function buildRequestData(
-  action: string,
-  subjectId: string,
-  data: ParsedData
-): Record<string, unknown> {
-  if (EVENT_ACTIONS.has(action)) {
-    return {
-      eventId: data.compositionId ?? '',
-      actionType: action,
-      transactionId: data.trackingId ?? ''
-    }
-  }
-  switch (action) {
-    case 'CREATE_USER':
-      return {
-        subjectId,
-        role: data.role ?? '',
-        primaryOfficeId: data.primaryOfficeId ?? ''
-      }
-    case 'DEACTIVATE':
-    case 'REACTIVATE': {
-      const rd: Record<string, unknown> = {
-        subjectId,
-        reason: data.reason ?? ''
-      }
-      if (data.comment !== undefined) rd.comment = data.comment
-      return rd
-    }
-    default:
-      return { subjectId }
-  }
-}
-
-function buildResponseSummary(
-  action: string,
-  data: ParsedData
-): Record<string, unknown> {
-  switch (action) {
-    case 'EMAIL_ADDRESS_CHANGED':
-      return { email: data.email ?? '' }
-    case 'PHONE_NUMBER_CHANGED':
-      return { phoneNumber: data.phoneNumber ?? '' }
-    default:
-      return {}
-  }
-}
-
-type InsertRow = {
+// EventActionAuditLog (built) shape:
+//   requestData:     { eventId, actionType, transactionId }
+//   responseSummary: { eventId, eventType, trackingId }
+type EventActionInsertRow = {
   clientId: string
-  operation: string
-  requestData: Record<string, unknown>
-  responseSummary: Record<string, unknown>
   createdAt: Date
+} & Pick<EventActionAuditLog, 'operation' | 'requestData'>
+
+// UserAuditLog variants all carry responseSummary (empty {} or with fields).
+type UserInsertRow = {
+  clientId: string
+  createdAt: Date
+} & UserAuditLog
+
+type InsertRow = UserInsertRow | EventActionInsertRow
+
+function buildEventActionRow(
+  row: InfluxRow,
+  actorUserId: string,
+  data: ParsedData,
+  operation: EventActionAuditLog['operation']
+): EventActionInsertRow {
+  return {
+    clientId: actorUserId,
+    createdAt: row.time,
+    operation,
+    requestData: {
+      eventId: data.compositionId ?? '',
+      actionType: row.action,
+      transactionId: '', // tRPC transaction ID; not stored in InfluxDB
+      eventType: '', // event type (birth/death/…); not stored in InfluxDB
+      trackingId: data.trackingId ?? ''
+    }
+  }
+}
+
+function buildUserRow(
+  row: InfluxRow,
+  actorUserId: string,
+  subjectId: string,
+  data: ParsedData,
+  operation: UserAuditLog['operation']
+): UserInsertRow {
+  const clientId = actorUserId
+  const createdAt = row.time
+  switch (operation) {
+    case 'user.create_user':
+      return {
+        clientId,
+        createdAt,
+        operation,
+        requestData: {
+          subjectId,
+          role: data.role ?? '',
+          primaryOfficeId: data.primaryOfficeId ?? ''
+        }
+      } satisfies UserInsertRow
+    case 'user.deactivate':
+    case 'user.reactivate': {
+      const requestData: {
+        subjectId: string
+        reason: string
+        comment?: string
+      } = { subjectId, reason: data.reason ?? '' }
+      if (data.comment !== undefined) requestData.comment = data.comment
+      return {
+        clientId,
+        createdAt,
+        operation,
+        requestData
+      } satisfies UserInsertRow
+    }
+    case 'user.email_address_changed':
+      return {
+        clientId,
+        createdAt,
+        operation,
+        requestData: { subjectId },
+        responseSummary: { email: data.email ?? '' }
+      }
+    case 'user.phone_number_changed':
+      return {
+        clientId,
+        createdAt,
+        operation,
+        requestData: { subjectId },
+        responseSummary: { phoneNumber: data.phoneNumber ?? '' }
+      }
+    default:
+      return {
+        clientId,
+        createdAt,
+        operation,
+        requestData: { subjectId }
+      } satisfies UserInsertRow
+  }
 }
 
 function buildBatchInsertQuery(count: number): string {
@@ -192,7 +255,7 @@ async function insertBatch(
     r.clientId,
     r.operation,
     JSON.stringify(r.requestData),
-    JSON.stringify(r.responseSummary),
+    'responseSummary' in r ? JSON.stringify(r.responseSummary) : '',
     r.createdAt
   ])
   await client.query(buildBatchInsertQuery(rows.length), values)
@@ -328,13 +391,22 @@ export const up = async (db: Db, _client: MongoClient) => {
             parsed.subjectPractitionerId
         }
 
-        insertRows.push({
-          clientId: actorUserId,
-          operation,
-          requestData: buildRequestData(row.action, subjectId, parsed),
-          responseSummary: buildResponseSummary(row.action, parsed),
-          createdAt: row.time
-        })
+        let insertRow: InsertRow
+        if (isEventActionOperation(operation)) {
+          insertRow = buildEventActionRow(row, actorUserId, parsed, operation)
+        } else if (isUserOperation(operation)) {
+          insertRow = buildUserRow(
+            row,
+            actorUserId,
+            subjectId,
+            parsed,
+            operation
+          )
+        } else {
+          skipped++
+          continue
+        }
+        insertRows.push(insertRow)
       }
 
       const pgClient = await pg.connect()
@@ -361,13 +433,13 @@ export const up = async (db: Db, _client: MongoClient) => {
           ` (${inserted} inserted, ${skipped} skipped so far)`
       )
 
-      // If this page was smaller than BATCH_SIZE we've reached the last page.
+      // If this page wsatisfies smaller than BATCH_SIZE we've reached the last page.
       if (page.length < BATCH_SIZE) {
         break
       }
     }
 
-    // Mark migration as fully complete.
+    // Mark migration satisfies fully complete.
     const finalClient = await pg.connect()
     try {
       await finalClient.query('BEGIN')
