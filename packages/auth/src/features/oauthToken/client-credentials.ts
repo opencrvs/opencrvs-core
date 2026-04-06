@@ -20,8 +20,9 @@ import {
   NOTIFICATION_API_USER_AUDIENCE
 } from '@auth/constants'
 import * as oauthResponse from './responses'
-import { TokenUserType, SCOPES } from '@opencrvs/commons'
+import { TokenUserType, hasScope } from '@opencrvs/commons'
 import { getParam } from './utils'
+import { encodeScope } from '@opencrvs/commons/client'
 
 export async function clientCredentialsHandler(
   request: Hapi.Request,
@@ -45,9 +46,7 @@ export async function clientCredentialsHandler(
     return oauthResponse.invalidClient(h)
   }
 
-  const isNotificationAPIUser = result.scope.includes(SCOPES.NOTIFICATION_API)
-  const isImportExportClient = result.scope.includes(SCOPES.RECORD_IMPORT)
-
+  // TODO CIHAN: do we need this?
   /**
    * Intermediary step to convert any legacy scopes to the new format.
    * For example, 'record.create' becomes 'type=record.create' to align with the new scope format.
@@ -57,19 +56,30 @@ export async function clientCredentialsHandler(
   const v2Scopes = result.scope.map((s) => {
     // Intentionally verbose for clarity.
     if (s === 'record.search') {
-      return 'type=record.search'
+      return encodeScope({ type: 'record.search' })
     }
 
     if (s === 'record.read') {
-      return 'type=record.read'
+      return encodeScope({ type: 'record.read' })
     }
 
     if (s === 'record.create') {
-      return 'type=record.create'
+      return encodeScope({ type: 'record.create' })
+    }
+
+    if (s === 'notification-api') {
+      return encodeScope({ type: 'notification-api' })
+    }
+
+    if (s === 'record.import') {
+      return encodeScope({ type: 'record.import' })
     }
 
     return s
   })
+
+  const isNotificationAPIUser = hasScope(v2Scopes, 'notification-api')
+  const isImportExportClient = hasScope(v2Scopes, 'record.import')
 
   const token = await createToken(
     result.systemId,

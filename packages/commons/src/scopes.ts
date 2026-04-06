@@ -15,20 +15,16 @@ import { UUID } from './uuid'
 import { parseConfigurableScope } from './scopes.deprecated.do-not-use'
 import { getScopes } from './authentication'
 
+// TODO CIHAN: rename this to ensure its not being used anywhere except migrations
 /** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
 export const SCOPES = {
-  // TODO v1.8 legacy scopes
+  // MIGRATED
   BYPASSRATELIMIT: 'bypassratelimit',
-  REGISTER: 'register',
-  DEMO: 'demo',
   CONFIG: 'config',
 
+  // NOT MIGRATED
+
   // systems / integrations
-  WEBHOOK: 'webhook',
-  NATIONALID: 'nationalId',
-  NOTIFICATION_API: 'notification-api',
-  RECORDSEARCH: 'recordsearch',
-  RECORD_IMPORT: 'record.import',
   RECORD_EXPORT: 'record.export',
   RECORD_REINDEX: 'record.reindex',
   INTEGRATION_CREATE: 'integration.create',
@@ -117,16 +113,8 @@ export const SCOPES = {
   ATTACHMENT_UPLOAD: 'attachment.upload'
 } as const
 
-// Legacy scopes
-const LegacyScopes = z.union([
-  z.literal(SCOPES.BYPASSRATELIMIT),
-  z.literal(SCOPES.CONFIG)
-])
-
 // Systems / integrations
 const IntegrationScopes = z.union([
-  z.literal(SCOPES.WEBHOOK),
-  z.literal(SCOPES.NATIONALID),
   z.literal(SCOPES.NOTIFICATION_API),
   z.literal(SCOPES.RECORDSEARCH),
   z.literal(SCOPES.INTEGRATION_CREATE)
@@ -190,7 +178,6 @@ const AttachmentScope = z.literal(SCOPES.ATTACHMENT_UPLOAD)
  * @deprecated - will be removed in v2.1.
  */
 const LiteralScopes = z.union([
-  LegacyScopes,
   IntegrationScopes,
   z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
   z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
@@ -254,10 +241,14 @@ export const RecordScopeTypeV2 = z.enum([
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
-export const ScopeType = z.enum([
+/** Plain scopes are scopes that dont have any options available. */
+const PlainScopeType = z.enum([
   'bypassratelimit',
-  ...RecordScopeTypeV2.options
+  'notification-api',
+  'record.import'
 ])
+
+export const ScopeType = z.union([PlainScopeType, RecordScopeTypeV2])
 export type ScopeType = z.infer<typeof ScopeType>
 
 const scopeByEvent = z
@@ -443,7 +434,7 @@ export const ResolvedRecordScopeV2 = z
   .describe('Resolved scope with location/user IDs instead of filters.')
 
 export const Scope = z.union([
-  z.object({ type: z.literal('bypassratelimit') }),
+  z.object({ type: PlainScopeType }),
   ...RecordScopeV2.options
 ])
 export type Scope = z.infer<typeof Scope>
@@ -635,16 +626,54 @@ export function hasAnyScope(token: string, scopes: ScopeType[]) {
 }
 
 /**
- * Checks if the provided token has the given scope.
+ * Checks whether a scope exists either inside a JWT token or
+ * within a provided list of scopes.
  *
- * @param {string} token - The authentication JWT token.
- * @param {ScopeType} acceptedScope - The scope type to check for.
- * @returns {boolean} True if the token contains the specified scope.
+ * Overloads:
+ * - `hasScope(token, scope)` → extracts scopes from a token
+ * - `hasScope(scopes, scope)` → checks directly from a scope array
  */
-export function hasScope(token: string, scope: ScopeType) {
-  return hasAnyScope(token, [scope])
-}
 
+/**
+ * Checks if the provided token contains the given scope.
+ *
+ * @param token - The authentication JWT token.
+ * @param scope - The scope type to check for.
+ * @returns True if the token contains the specified scope.
+ */
+export function hasScope(token: string, scope: ScopeType): boolean
+
+/**
+ * Checks if the provided list of scopes contains the given scope.
+ *
+ * @param scopes - Array of scopes to check.
+ * @param scope - The scope type to check for.
+ * @returns True if the scope list contains the specified scope.
+ */
+export function hasScope(scopes: string[], scope: ScopeType): boolean
+
+/**
+ * Implementation handling both overloads.
+ *
+ * @param tokenOrScopes - JWT token string or list of scopes.
+ * @param scope - The scope type to check for.
+ * @returns True if the scope is present.
+ */
+export function hasScope(
+  tokenOrScopes: string | string[],
+  scope: ScopeType
+): boolean {
+  if (Array.isArray(tokenOrScopes)) {
+    return (
+      getAcceptedScopesByType({
+        acceptedScopes: [scope],
+        scopes: tokenOrScopes
+      }).length > 0
+    )
+  }
+
+  return hasAnyScope(tokenOrScopes, [scope])
+}
 /**
  * Checks if the given event type is allowed by the scope. If no specific event types are defined, it returns true.
  *
