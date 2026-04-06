@@ -10,16 +10,17 @@ SELECT
   lu.status AS status,
   LOWER(lu."emailForNotification") AS email,
   lu.mobile AS mobile,
-(
-    SELECT
+regexp_replace(
+    (SELECT
       ext
     FROM
       legacy_practitioners lp,
       LATERAL json_array_elements(lp.extension) AS ext
     WHERE
       lp.id = lu."practitionerId"
-      AND ext ->> 'url' = 'http://opencrvs.org/specs/extension/employee-signature') -> 'valueAttachment' ->> 'url' AS signature_path,
-  lu."avatar.data" AS profile_image_path,
+      AND ext ->> 'url' = 'http://opencrvs.org/specs/extension/employee-signature') -> 'valueAttachment' ->> 'url',
+    '^/${MINIO_BUCKET}/', '') AS signature_path,
+  regexp_replace(lu."avatar.data", '^/${MINIO_BUCKET}/', '') AS profile_image_path,
   lu."primaryOfficeId"::uuid AS office_id
 FROM
   legacy_users lu

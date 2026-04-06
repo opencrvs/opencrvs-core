@@ -411,7 +411,7 @@ export const ReviewShowsFilesFromDraft: Story = {
               presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
             })
           }),
-          http.get('http://localhost:3535/ocrvs/:id', () => {
+          http.get('/:id', () => {
             return new HttpResponse(TestImage.Fish, {
               headers: {
                 'Content-Type': 'image/svg+xml',

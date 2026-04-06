@@ -14,6 +14,7 @@ import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { UUID } from '../uuid'
 import { TokenUserType } from '../authentication'
+import { DocumentPath } from '../documents'
 
 /**
  * ActionUpdate is a record of a specific action that updated data fields.
@@ -60,10 +61,9 @@ export const ActionBase = z.object({
     .string()
     .optional()
     .describe('Role of the user who created the action.'),
-  createdBySignature: z
-    .string()
-    .nullish()
-    .describe('Reference to the signature of the user who created the action.'),
+  createdBySignature: DocumentPath.nullish().describe(
+    'Reference to the signature of the user who created the action.'
+  ),
   // @TODO: createdAtLocation should be non-nullable in the future once all actions have this field populated.
   createdAtLocation: UUID.nullish().describe(
     'Reference to the location of the user who created the action.'
