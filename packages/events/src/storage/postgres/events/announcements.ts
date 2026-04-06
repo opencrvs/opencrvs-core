@@ -48,7 +48,6 @@ export async function getNextProcessableAnnouncement() {
     .where((eb) =>
       eb.or([
         eb('status', '=', 'PENDING'),
-        eb('status', '=', 'IN_PROGRESS'),
         eb.and([
           eb('status', '=', 'FAILED'),
           eb('retryCount', '<', ANNOUNCEMENT_RETRY_LIMIT)
@@ -58,15 +57,6 @@ export async function getNextProcessableAnnouncement() {
     .orderBy('createdAt', 'asc')
     .limit(1)
     .executeTakeFirst()
-}
-
-export async function markAnnouncementInProgress(id: UUID) {
-  const db = getClient()
-  return db
-    .updateTable('announcements')
-    .set({ status: 'IN_PROGRESS' })
-    .where('id', '=', id)
-    .execute()
 }
 
 export async function updateAnnouncementProgress(id: UUID, progress: number) {
