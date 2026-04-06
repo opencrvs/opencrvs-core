@@ -3,12 +3,13 @@
 
 import type { default as AnnouncementsTable } from './Announcements'
 import type { default as EventActionDraftsTable } from './EventActionDrafts'
-import type { default as LocationsTable } from './Locations'
-import type { default as UserCredentialsTable } from './UserCredentials'
-import type { default as SystemClientsTable } from './SystemClients'
 import type { default as AdministrativeAreasTable } from './AdministrativeAreas'
 import type { default as EventActionsTable } from './EventActions'
 import type { default as AuditLogTable } from './AuditLog'
+import type { default as LocationsTable } from './Locations'
+import type { default as UserCredentialsTable } from './UserCredentials'
+import type { default as SystemClientsTable } from './SystemClients'
+import type { default as MigrationProgressTable } from './MigrationProgress'
 import type { default as UsersTable } from './Users'
 import type { default as EventsTable } from './Events'
 
@@ -17,17 +18,19 @@ export default interface AppSchema {
 
   eventActionDrafts: EventActionDraftsTable
 
+  administrativeAreas: AdministrativeAreasTable
+
+  eventActions: EventActionsTable
+
+  auditLog: AuditLogTable
+
   locations: LocationsTable
 
   userCredentials: UserCredentialsTable
 
   systemClients: SystemClientsTable
 
-  administrativeAreas: AdministrativeAreasTable
-
-  eventActions: EventActionsTable
-
-  auditLog: AuditLogTable
+  migrationProgress: MigrationProgressTable
 
   users: UsersTable
 

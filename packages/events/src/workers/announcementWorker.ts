@@ -19,6 +19,7 @@ import { getClient } from '@events/storage/postgres/events'
 import {
   getNextProcessableAnnouncement,
   markAnnouncementFailed,
+  markAnnouncementInProgress,
   markAnnouncementSent,
   updateAnnouncementProgress
 } from '@events/storage/postgres/events/announcements'
@@ -47,6 +48,8 @@ export async function processNextAnnouncement() {
     await markAnnouncementSent(announcement.id)
     return
   }
+
+  await markAnnouncementInProgress(announcement.id)
 
   const admin = await getClient()
     .selectFrom('users')

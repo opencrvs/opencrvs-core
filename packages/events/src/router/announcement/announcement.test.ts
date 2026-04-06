@@ -201,7 +201,7 @@ describe('announcement.broadcast', () => {
   test('rejects with TOO_MANY_REQUESTS if an announcement was already sent today', async () => {
     const { user, eventsDb, locations } = await setupTestCase()
 
-    await eventsDb
+    const adminResult = await eventsDb
       .insertInto('users')
       .values([
         {
@@ -218,15 +218,14 @@ describe('announcement.broadcast', () => {
           officeId: locations[0].id
         }
       ])
-      .execute()
+      .returning('id')
+      .executeTakeFirstOrThrow()
+
+    await insertAnnouncement(eventsDb, adminResult.id as UUID, {
+      status: 'PENDING'
+    })
 
     const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
-
-    await client.announcement.broadcast({
-      subject: 'First',
-      body: 'First body',
-      locale: 'en'
-    })
 
     await expect(
       client.announcement.broadcast({
@@ -318,7 +317,6 @@ describe('announcement.broadcast', () => {
       .selectAll()
       .executeTakeFirstOrThrow()
 
-    expect(announcement.status).toBe('PENDING')
     expect(announcement.subject).toBe('Hello')
     expect(announcement.body).toBe('World')
     expect(announcement.locale).toBe('fr')
@@ -350,6 +348,16 @@ describe('getNextProcessableAnnouncement', () => {
     const result = await getNextProcessableAnnouncement()
     expect(result).not.toBeUndefined()
     expect(result?.status).toBe('FAILED')
+  })
+
+  test('returns IN_PROGRESS announcements', async () => {
+    const { eventsDb, locations } = await setupTestCase()
+    const { id: userId } = await insertUser(eventsDb, locations[0].id)
+    await insertAnnouncement(eventsDb, userId, { status: 'IN_PROGRESS' })
+
+    const result = await getNextProcessableAnnouncement()
+    expect(result).not.toBeUndefined()
+    expect(result?.status).toBe('IN_PROGRESS')
   })
 
   test('ignores FAILED announcements at or above the retry limit', async () => {
@@ -461,7 +469,7 @@ describe('processNextAnnouncement', () => {
       .selectAll()
       .executeTakeFirstOrThrow()
 
-    expect(afterFirstChunk.status).toBe('PENDING')
+    expect(afterFirstChunk.status).toBe('IN_PROGRESS')
     expect(afterFirstChunk.progress).toBe(BCC_CHUNK_SIZE)
     expect(dispatchedBccSizes).toEqual([BCC_CHUNK_SIZE])
 

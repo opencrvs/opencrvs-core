@@ -119,7 +119,7 @@ CREATE TABLE app.announcements (
     retry_count integer DEFAULT 0 NOT NULL,
     error jsonb,
     sent_at timestamp with time zone,
-    CONSTRAINT announcements_status_check CHECK ((status = ANY (ARRAY['PENDING'::text, 'SENT'::text, 'FAILED'::text])))
+    CONSTRAINT announcements_status_check CHECK ((status = ANY (ARRAY['PENDING'::text, 'IN_PROGRESS'::text, 'SENT'::text, 'FAILED'::text])))
 );
 
 
@@ -320,6 +320,19 @@ CREATE TABLE app.locations (
 
 
 ALTER TABLE app.locations OWNER TO events_migrator;
+
+--
+-- Name: migration_progress; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.migration_progress (
+    id text NOT NULL,
+    next_batch_offset integer DEFAULT 0 NOT NULL,
+    completed boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE app.migration_progress OWNER TO events_migrator;
 
 --
 -- Name: pgmigrations; Type: TABLE; Schema: app; Owner: events_migrator
@@ -547,6 +560,14 @@ ALTER TABLE ONLY app.locations
 
 
 --
+-- Name: migration_progress migration_progress_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.migration_progress
+    ADD CONSTRAINT migration_progress_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pgmigrations pgmigrations_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -622,7 +643,7 @@ ALTER TABLE ONLY app.users
 -- Name: announcements_status_idx; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
-CREATE INDEX announcements_status_idx ON app.announcements USING btree (status) WHERE (status = 'PENDING'::text);
+CREATE INDEX announcements_status_idx ON app.announcements USING btree (status) WHERE ((status = 'PENDING'::text) OR (status = 'IN_PROGRESS'::text));
 
 
 --
