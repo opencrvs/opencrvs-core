@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import * as z from 'zod/v4'
 
 /**
@@ -26,7 +26,7 @@ export const AddressType = {
 } as const
 
 export const FileFieldValue = z.object({
-  path: FullDocumentPath,
+  path: DocumentPath,
   originalFilename: z.string(),
   type: z.string()
 })
@@ -111,7 +111,7 @@ export const AddressFieldUpdateValue = z
 export type AddressFieldUpdateValue = z.infer<typeof AddressFieldUpdateValue>
 
 export const FileFieldValueWithOption = z.object({
-  path: FullDocumentPath,
+  path: DocumentPath,
   originalFilename: z.string(),
   type: z.string(),
   option: z.string()

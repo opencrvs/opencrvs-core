@@ -21,7 +21,7 @@ exports[`Action updates > partial declaration update accounts for conditional fi
   "applicant.email": "test@opencrvs.org",
   "applicant.image": {
     "originalFilename": "abcd.png",
-    "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+    "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     "type": "image/png",
   },
   "applicant.name": {
@@ -32,7 +32,27 @@ exports[`Action updates > partial declaration update accounts for conditional fi
 }
 `;
 
-exports[`Adding actions > Event document contains all created actions 1`] = `
+exports[`Adding actions > Event document contains all created actions 1`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 2`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 3`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 4`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 5`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 6`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 7`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 8`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 9`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 10`] = `"47f6b2e2-e69e-4401-92d8-35617de8137b.png"`;
+
+exports[`Adding actions > Event document contains all created actions 11`] = `
 {
   "actions": [
     {
@@ -40,7 +60,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
@@ -54,7 +74,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
@@ -67,7 +87,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
         "review.comment": "review.comment-TEXTAREA-0",
         "review.signature": {
           "originalFilename": "abcd.png",
-          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "type": "image/png",
         },
       },
@@ -75,7 +95,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {
         "applicant.address": {
@@ -97,7 +117,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
         "applicant.email": "test@opencrvs.org",
         "applicant.image": {
           "originalFilename": "abcd.png",
-          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "type": "image/png",
         },
         "applicant.name": {
@@ -116,7 +136,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
@@ -130,7 +150,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
@@ -144,7 +164,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
@@ -158,7 +178,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {
         "applicant.address": {
@@ -180,7 +200,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
         "applicant.email": "test@opencrvs.org",
         "applicant.image": {
           "originalFilename": "abcd.png",
-          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "type": "image/png",
         },
         "applicant.name": {
@@ -199,7 +219,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
@@ -214,7 +234,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
@@ -227,7 +247,7 @@ exports[`Adding actions > Event document contains all created actions 1`] = `
       "createdAtLocation": "[sanitized]",
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
-      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdBySignature": "47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "createdByUserType": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
