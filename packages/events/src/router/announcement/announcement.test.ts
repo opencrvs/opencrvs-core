@@ -77,6 +77,8 @@ async function insertAdminWithEmail(
   return { id: result.id as UUID, email }
 }
 
+const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/triggers/user/all-user-notification`
+
 describe('announcement.broadcast', () => {
   describe('authorization', () => {
     test('rejects with FORBIDDEN if caller lacks CONFIG_UPDATE_ALL scope', async () => {
@@ -208,6 +210,7 @@ describe('announcement.broadcast', () => {
           legacyId: user.id,
           role: user.role,
           status: 'active',
+          email: 'admin@test.com',
           mobile: '+1234567890',
           officeId: locations[0].id
         },
@@ -219,6 +222,16 @@ describe('announcement.broadcast', () => {
         }
       ])
       .execute()
+
+    // The broadcast handler fires processNextAnnouncement() eagerly.
+    // Provide an MSW handler so the worker can complete without hitting a
+    // real (unavailable) country-config server and marking the row FAILED,
+    // which would reset the daily count and prevent TOO_MANY_REQUESTS.
+    mswServer.use(
+      http.post(ALL_USER_NOTIFICATION_URL, () =>
+        HttpResponse.json({ ok: true })
+      )
+    )
 
     const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
 
@@ -275,7 +288,7 @@ describe('announcement.broadcast', () => {
     ).resolves.toEqual({ success: true })
   })
 
-  test('creates a PENDING announcement row with correct data and returns { success: true }', async () => {
+  test('creates an announcement row with correct data and returns { success: true }', async () => {
     const { user, eventsDb, locations } = await setupTestCase()
 
     await eventsDb
@@ -285,6 +298,7 @@ describe('announcement.broadcast', () => {
           legacyId: user.id,
           role: user.role,
           status: 'active',
+          email: 'admin@test.com',
           mobile: '+1234567890',
           officeId: locations[0].id
         },
@@ -303,6 +317,15 @@ describe('announcement.broadcast', () => {
       ])
       .execute()
 
+    // The broadcast handler fires processNextAnnouncement() as fire-and-forget.
+    // Provide a handler so the worker does not fail against an unavailable
+    // country-config server and corrupt the row before we read it.
+    mswServer.use(
+      http.post(ALL_USER_NOTIFICATION_URL, () =>
+        HttpResponse.json({ ok: true })
+      )
+    )
+
     const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
 
     const result = await client.announcement.broadcast({
@@ -318,7 +341,10 @@ describe('announcement.broadcast', () => {
       .selectAll()
       .executeTakeFirstOrThrow()
 
-    expect(announcement.status).toBe('PENDING')
+    // Status starts as PENDING; the fire-and-forget worker may advance it to
+    // SENT before this read completes. Either value is correct here — this
+    // test is verifying the row data, not the worker lifecycle.
+    expect(['PENDING', 'SENT']).toContain(announcement.status)
     expect(announcement.subject).toBe('Hello')
     expect(announcement.body).toBe('World')
     expect(announcement.locale).toBe('fr')
@@ -403,8 +429,6 @@ describe('countTodayAnnouncements', () => {
 })
 
 describe('processNextAnnouncement', () => {
-  const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/triggers/user/all-user-notification`
-
   test('sends all recipients in a single call when under the chunk size', async () => {
     const { eventsDb, locations } = await setupTestCase()
     const { id: userId } = await insertAdminWithEmail(eventsDb, locations[0].id)
