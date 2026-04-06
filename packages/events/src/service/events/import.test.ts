@@ -14,8 +14,7 @@ import {
   ActionType,
   createPrng,
   encodeScope,
-  generateEventDocument,
-  SCOPES
+  generateEventDocument
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createSystemTestClient, setupTestCase } from '@events/tests/utils'

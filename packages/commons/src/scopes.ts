@@ -36,13 +36,6 @@ export const SCOPES = {
   RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
     'record.registration-print&issue-certified-copies',
 
-  // correct
-  RECORD_REGISTRATION_REQUEST_CORRECTION:
-    'record.registration-request-correction',
-  RECORD_REGISTRATION_CORRECT: 'record.registration-correct',
-  RECORD_CONFIRM_REGISTRATION: 'record.confirm-registration',
-  RECORD_REJECT_REGISTRATION: 'record.reject-registration',
-
   // profile
   PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
 

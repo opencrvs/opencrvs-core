@@ -33,7 +33,6 @@ import {
   getUUID,
   JurisdictionFilter,
   Location,
-  SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   TokenWithBearer,
@@ -224,10 +223,7 @@ function createTokenExchangeTestToken(
 ): TokenWithBearer {
   const token = jwt.sign(
     {
-      scope: [
-        SCOPES.RECORD_CONFIRM_REGISTRATION,
-        SCOPES.RECORD_REJECT_REGISTRATION
-      ],
+      scope: [],
       sub: userId,
       userType: TokenUserType.enum.user,
       eventId,

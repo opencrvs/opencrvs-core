@@ -470,8 +470,6 @@ it('transform v1 scope to v2', () => {
 it('migrate v1 scopes to v2', () => {
   // Mix of deprecated, upgraded and unchanged scopes
   const v1Scopes = [
-    SCOPES.RECORD_CONFIRM_REGISTRATION,
-    SCOPES.RECORD_REJECT_REGISTRATION,
     SCOPES.PERFORMANCE_READ,
     SCOPES.PERFORMANCE_READ_DASHBOARDS,
     SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
@@ -500,7 +498,7 @@ it('migrate v1 scopes to v2', () => {
     'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
   ]
 
-  expect(v1Scopes).toHaveLength(28)
+  expect(v1Scopes).toHaveLength(27)
 
   const v2Scopes = migrateV1ScopesToV2(v1Scopes)
   expect(v2Scopes).toHaveLength(26)
