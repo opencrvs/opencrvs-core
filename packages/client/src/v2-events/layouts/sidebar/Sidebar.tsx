@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
+import { onlineManager } from '@tanstack/react-query'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
@@ -50,6 +51,14 @@ import { OrganisationNavigationGroup } from './OrganisationNavigationGroup'
 import { PerformanceNavigationGroup } from './PerformanceNavigationGroup'
 
 const SCREEN_LOCK = 'screenLock'
+
+function subscribeOnlineStatus(cb: () => void) {
+  return onlineManager.subscribe(cb)
+}
+
+function getOnlineSnapshot() {
+  return onlineManager.isOnline()
+}
 
 function Workqueues({
   workqueues,
@@ -110,6 +119,11 @@ export const SidebarComponent = ({
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
+  const isOnline = React.useSyncExternalStore(
+    subscribeOnlineStatus,
+    getOnlineSnapshot,
+    () => true
+  )
 
   let name = ''
   if (userDetails?.name) {
@@ -141,6 +155,7 @@ export const SidebarComponent = ({
       applicationName={offlineCountryConfig.config.APPLICATION_NAME}
       applicationVersion={runningVer}
       avatar={() => avatar}
+      isOnline={isOnline}
       name={name}
       navigationWidth={navigationWidth}
       role={role}

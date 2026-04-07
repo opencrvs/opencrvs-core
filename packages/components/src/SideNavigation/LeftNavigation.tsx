@@ -11,6 +11,7 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
+import { ConnectionStatus } from './ConnectionStatus'
 
 export interface ILeftNavigationProps {
   applicationName: string
@@ -22,6 +23,7 @@ export interface ILeftNavigationProps {
   warning?: JSX.Element | null
   className?: string
   applicationVersion: string
+  isOnline?: boolean
 }
 
 const LeftNavigationContainer = styled.div<{
@@ -76,11 +78,18 @@ const ApplicationName = styled.div`
   text-overflow: ellipsis;
 `
 
-const Version = styled.div`
+const VersionCard = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
-  ${({ theme }) => theme.fonts.reg14};
   height: auto;
   padding: 16px;
+  background-color: ${({ theme }) => theme.colors.grey50};
+  margin: 16px;
+  border-radius: 8px;
+`
+
+const VersionText = styled.span`
+  ${({ theme }) => theme.fonts.bold10};
+  text-transform: uppercase;
 `
 
 const Container = styled.div`
@@ -112,10 +121,11 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       </Container>
       <MenuItem>{props.children && props.children}</MenuItem>
       <Container>
-        <Version>
+        <VersionCard>
+          <ConnectionStatus isOnline={props.isOnline} />
           {props.warning}
-          <span>OpenCRVS v{props.applicationVersion}</span>
-        </Version>
+          <VersionText>OpenCRVS v{props.applicationVersion}</VersionText>
+        </VersionCard>
       </Container>
     </LeftNavigationContainer>
   )
