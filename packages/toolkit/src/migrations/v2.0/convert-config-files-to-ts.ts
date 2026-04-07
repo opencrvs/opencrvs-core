@@ -151,12 +151,14 @@ const CONFIG_GROUPS: ConfigGroup[] = [
     defineFn: 'defineLoginConfig',
     importFrom: '@opencrvs/toolkit/application-config',
     validKeys: LOGIN_VALID_KEYS,
-    requiredPlaceholders: {
-      LOGIN_BACKGROUND: "{ backgroundColor: '#F4F4F7' }"
-    },
-    // These three keys are always sourced from applicationConfig rather than
+    requiredPlaceholders: {},
+    // These keys are always sourced from applicationConfig rather than
     // copied from the old JS file or filled with a placeholder value.
+    // LOGIN_BACKGROUND lives in applicationConfig and is not part of the
+    // ApplicationConfig schema, so Phase 3 will inline its value and remove
+    // it from applicationConfig automatically.
     applicationConfigKeys: [
+      'LOGIN_BACKGROUND',
       'USER_NOTIFICATION_DELIVERY_METHOD',
       'INFORMANT_NOTIFICATION_DELIVERY_METHOD',
       'PHONE_NUMBER_PATTERN'
