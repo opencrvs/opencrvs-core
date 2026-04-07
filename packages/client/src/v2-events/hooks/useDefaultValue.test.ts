@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  AdministrativeArea,
   AddressType,
   field,
   FieldType,
   InteractiveFieldType,
-  Location,
   now,
   SystemVariables,
   user,
@@ -25,35 +25,41 @@ const PROVINCE_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' as UUID
 const DISTRICT_ID = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' as UUID
 const OFFICE_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc' as UUID
 
-const mockLocations: Location[] = [
-  {
-    id: OFFICE_ID,
-    parentId: DISTRICT_ID,
-    name: 'Test Office',
-    validUntil: null,
-    locationType: 'CRVS_OFFICE'
-  },
-  {
-    id: DISTRICT_ID,
-    parentId: PROVINCE_ID,
-    name: 'Test District',
-    validUntil: null,
-    locationType: 'ADMIN_STRUCTURE'
-  },
-  {
-    id: PROVINCE_ID,
-    parentId: null,
-    name: 'Test Province',
-    validUntil: null,
-    locationType: 'ADMIN_STRUCTURE'
-  }
-]
+const mockAdministrativeAreas: Map<UUID, AdministrativeArea> = new Map([
+  [
+    OFFICE_ID,
+    {
+      id: OFFICE_ID,
+      parentId: DISTRICT_ID,
+      name: 'Test Office',
+      validUntil: null
+    }
+  ],
+  [
+    DISTRICT_ID,
+    {
+      id: DISTRICT_ID,
+      parentId: PROVINCE_ID,
+      name: 'Test District',
+      validUntil: null
+    }
+  ],
+  [
+    PROVINCE_ID,
+    {
+      id: PROVINCE_ID,
+      parentId: null,
+      name: 'Test Province',
+      validUntil: null
+    }
+  ]
+])
 
 // Mirrors window.config.ADMIN_STRUCTURE in setupTests.ts: ['province', 'district']
 const mockAdminLevelIds = ['province', 'district']
 
 const mockContext: SystemVariables & {
-  locations: Location[]
+  administrativeAreas: Map<UUID, AdministrativeArea>
   adminLevelIds: string[]
 } = {
   user: {
@@ -73,7 +79,7 @@ const mockContext: SystemVariables & {
       originPathname: '/'
     }
   },
-  locations: mockLocations,
+  administrativeAreas: mockAdministrativeAreas,
   adminLevelIds: mockAdminLevelIds
 }
 
