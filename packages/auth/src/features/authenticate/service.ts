@@ -79,21 +79,16 @@ export async function authenticate(
 ): Promise<IAuthentication> {
   const url = resolve(env.USER_MANAGEMENT_URL, '/verifyPassword')
 
-  console.log('CIHAN authenticate() 1', url, username, password)
-
   const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({ username, password }),
     headers: { 'Content-Type': 'application/json' }
   })
 
-  console.log('CIHAN authenticate() 2', JSON.stringify(res, null, 2))
-
   if (res.status !== 200) {
+    console.log('CIHAN AUTH FAIL HERE authenticate()')
     throw Error(res.statusText)
   }
-
-  console.log('CIHAN authenticate() 3')
 
   const body = await res.json()
 
