@@ -45,7 +45,6 @@ import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
-
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
@@ -60,11 +59,9 @@ import usernameReminderHandler, {
 import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
-
 import resetPasswordInviteHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
-
 import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
