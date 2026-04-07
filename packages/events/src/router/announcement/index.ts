@@ -35,7 +35,7 @@ export const announcementRouter = router({
     )
     .output(z.object({ success: z.boolean() }))
     .mutation(async ({ input, ctx }) => {
-      if (!hasScope(ctx.token, SCOPES.CONFIG_UPDATE_ALL)) {
+      if (!hasScope(ctx.token, 'config.update-all')) {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
 
