@@ -32,23 +32,19 @@ export default async function authenticateSuperUserHandler(
   let result: IAuthentication
   const { username, password } = payload
 
-  console.log('CIHAN 1')
+  console.log('CIHAN 1', username, username.trim(), password)
 
   try {
+    console.log('CIHAN TRY 1')
     result = await authenticate(username.trim(), password)
   } catch (err) {
     throw unauthorized()
   }
 
-  console.log('CIHAN 2')
-
   if (result.status === 'deactivated') {
-    console.log('CIHAN ERR 1')
     logger.info('Login attempt with a deactivated super user account detected')
     throw unauthorized()
   }
-
-  console.log('CIHAN 3')
 
   const SUPER_ADMIN_SCOPES = [
     encodeScope({ type: 'bypassratelimit' }),
@@ -63,8 +59,6 @@ export default async function authenticateSuperUserHandler(
     WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER
   )
-
-  console.log('CIHAN 4')
 
   return h.response({
     token
