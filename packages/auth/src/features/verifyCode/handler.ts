@@ -60,7 +60,6 @@ export default async function authenticateHandler(
   recordUserAuditEvent(response.token, {
     operation: 'user.logged_in',
     requestData: { subjectId: userId },
-    responseSummary: {}
   })
 
   return response

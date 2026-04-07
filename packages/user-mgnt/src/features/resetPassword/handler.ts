@@ -53,7 +53,6 @@ export default async function resetPasswordInviteHandler(
   recordUserAuditEvent(request.headers.authorization, {
     operation: 'user.password_reset_by_admin',
     requestData: { subjectId: userId },
-    responseSummary: {}
   })
 
   // DEFAULT_USER_PASSWORD allows QA/dev environments to set a predictable password
