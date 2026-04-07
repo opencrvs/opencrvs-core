@@ -15,6 +15,7 @@ import { raise } from './utils'
 import {
   decodeScope,
   EventConfig,
+  hasScope,
   joinUrl,
   parseLiteralScope
 } from '@opencrvs/commons'
@@ -104,6 +105,7 @@ async function getUsers(token: string) {
       Authorization: `Bearer ${token}`
     }
   })
+
   if (!res.ok) {
     raise(`Expected to get the users from ${url}`)
   }
@@ -133,14 +135,18 @@ async function getUsers(token: string) {
     })
   ])
 
-  if (!rolesResponse.ok) raise(`Error fetching roles: ${rolesResponse.status}`)
-  if (!eventsResponse.ok)
+  if (!rolesResponse.ok) {
+    raise(`Error fetching roles: ${rolesResponse.status}`)
+  }
+
+  if (!eventsResponse.ok) {
     raise(`Error fetching events: ${eventsResponse.status}`)
+  }
 
   const eventsConfig = (await eventsResponse.json()) as EventConfig[]
   const eventIds = eventsConfig.map((event) => event.id)
-
-  const parsedRoles = RoleSchema(eventIds).safeParse(await rolesResponse.json())
+  const rolesRes = await rolesResponse.json()
+  const parsedRoles = RoleSchema(eventIds).safeParse(rolesRes)
 
   if (!parsedRoles.success) {
     raise(
@@ -151,16 +157,17 @@ async function getUsers(token: string) {
   }
 
   const allRoles = parsedRoles.data
-
   let isConfigUpdateAllScopeAvailable = false
-  const configScope = 'config.update:all' as const
 
   for (const userRole of userRoles) {
     const currRole = allRoles.find((role) => role.id === userRole)
-    if (!currRole)
+    if (!currRole) {
       raise(`Role with id ${userRole} is not found in roles.ts file`)
-    if (currRole.scopes.includes(configScope))
+    }
+
+    if (hasScope(currRole.scopes, 'config.update-all')) {
       isConfigUpdateAllScopeAvailable = true
+    }
   }
 
   const seen = new Set<string>()
@@ -179,7 +186,9 @@ async function getUsers(token: string) {
   }
 
   if (!isConfigUpdateAllScopeAvailable) {
-    raise(`At least one user with ${configScope} scope must be created`)
+    raise(
+      `At least one user with 'type=config.update-all' scope must be created`
+    )
   }
   return parsedUsers.data
 }

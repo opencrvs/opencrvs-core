@@ -258,7 +258,7 @@ export const getRoutes = () => {
             SCOPES.ORGANISATION_READ_LOCATIONS,
             SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
             SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-            SCOPES.USER_DATA_SEEDING
+            'type=user.data-seeding'
           ]
         },
         validate: {
@@ -290,7 +290,7 @@ export const getRoutes = () => {
           scope: [
             SCOPES.USER_CREATE,
             SCOPES.USER_CREATE_MY_JURISDICTION,
-            SCOPES.USER_DATA_SEEDING
+            'type=user.data-seeding'
           ]
         }
       }
@@ -306,7 +306,7 @@ export const getRoutes = () => {
           scope: [
             SCOPES.USER_UPDATE,
             SCOPES.USER_UPDATE_MY_JURISDICTION,
-            SCOPES.USER_DATA_SEEDING
+            'type=user.data-seeding'
           ]
         }
       }

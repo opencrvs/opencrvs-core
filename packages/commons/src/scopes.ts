@@ -24,6 +24,7 @@ export const SCOPES = {
   RECORD_IMPORT: 'record.import',
 
   // NOT MIGRATED
+  DEMO: 'demo',
 
   // systems / integrations
   INTEGRATION_CREATE: 'integration.create',
@@ -74,6 +75,7 @@ export const SCOPES = {
  * @deprecated - will be removed in v2.1.
  */
 const LiteralScopes = z.union([
+  z.literal(SCOPES.DEMO),
   z.literal(SCOPES.INTEGRATION_CREATE),
   z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
   z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
@@ -159,8 +161,13 @@ const PlainScopeType = z.enum([
   'record.import',
   'config.update-all',
 
+  // Scope which is applied to all test users
+  'demo',
+
   // User scopes
+  // TODO CIHAN: these might require jurisdiction filters??
   'user.create',
+  'user.update',
 
   // Scopes used exlusively by countryconfig integration token
   'record.confirm-registration',
