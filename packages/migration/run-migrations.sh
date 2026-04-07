@@ -90,6 +90,7 @@ run_pg_migrations() {
   echo "Running migrations for schema '$schema' in $MIGRATIONS_PATH"
   DATABASE_URL="$database_url" \
     yarn --cwd "$SCRIPT_PATH" tsx ./node_modules/.bin/node-pg-migrate up \
+    --no-single-transaction \
     --schema="$schema" \
     --migrations-dir="$MIGRATIONS_PATH" \
     --migrations-table="$migrations_table"
