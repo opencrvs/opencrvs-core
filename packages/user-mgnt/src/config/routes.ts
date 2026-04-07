@@ -60,12 +60,7 @@ import usernameReminderHandler, {
 import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
-import {
-  createSearchHandler,
-  removeSearchHandler,
-  createSearchrequestSchema,
-  removeSearchrequestSchema
-} from '@user-mgnt/features/userSearchRecord/handler'
+
 import resetPasswordInviteHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
@@ -74,7 +69,7 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { SCOPES } from '@opencrvs/commons'
 import mongoose from 'mongoose'
 
 export const getRoutes = () => {
@@ -364,30 +359,6 @@ export const getRoutes = () => {
         },
         validate: {
           payload: userAuditSchema
-        },
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/searches',
-      handler: createSearchHandler,
-      options: {
-        auth: { scope: [] },
-        validate: {
-          payload: createSearchrequestSchema
-        },
-        tags: ['api']
-      }
-    },
-    {
-      method: 'DELETE',
-      path: '/searches',
-      handler: removeSearchHandler,
-      options: {
-        auth: { scope: [] },
-        validate: {
-          payload: removeSearchrequestSchema
         },
         tags: ['api']
       }
