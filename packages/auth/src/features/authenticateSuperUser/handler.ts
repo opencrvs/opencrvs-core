@@ -32,10 +32,7 @@ export default async function authenticateSuperUserHandler(
   let result: IAuthentication
   const { username, password } = payload
 
-  console.log('CIHAN 1', username, username.trim(), password)
-
   try {
-    console.log('CIHAN TRY 1')
     result = await authenticate(username.trim(), password)
   } catch (err) {
     throw unauthorized()

@@ -38,10 +38,14 @@ export default async function verifyPassHandler(
 
   const user: IUserModel | null = await User.findOne({ username })
 
+  console.log('CIHAN verifyPassHandler() 1', username, user)
+
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
+
+  console.log('CIHAN verifyPassHandler() 2', username, user)
   /*
    * In OCRVS-4979 we needed to change the hashing algorithm to conform latest security standards.
    * We still need to support users logging in with the old password hash to allow them to change their passwords to the new hash.
@@ -49,12 +53,16 @@ export default async function verifyPassHandler(
    * TODO: In OpenCRVS 1.4, remove this check and force any users without new password hash to reset their password via sys admin.
    */
   if (!user.passwordHash) {
+    console.log('CIHAN verifyPassHandler() 3', username, user)
     if (generateOldHash(password, user.salt) !== user.oldPasswordHash) {
       throw unauthorized()
     }
   } else if (generateHash(password, user.salt) !== user.passwordHash) {
+    console.log('CIHAN verifyPassHandler() 4', username, user)
     throw unauthorized()
   }
+
+  console.log('CIHAN verifyPassHandler() 5', username, user)
 
   const response: IVerifyResponse = {
     name: user.name,
