@@ -10,7 +10,7 @@
  */
 
 import { http, HttpResponse } from 'msw'
-import { encodeScope, SCOPES, TokenUserType } from '@opencrvs/commons'
+import { encodeScope, TokenUserType } from '@opencrvs/commons'
 import { server } from '@events/server'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'

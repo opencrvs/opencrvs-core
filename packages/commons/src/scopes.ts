@@ -152,9 +152,6 @@ const PlainScopeType = z.enum([
   'config.update-all',
   'attachment.upload',
 
-  // Scope which is applied to all test users
-  'demo',
-
   // User scopes
   // TODO CIHAN: these might require jurisdiction filters??
   'user.create',
@@ -162,10 +159,16 @@ const PlainScopeType = z.enum([
 
   // Scopes used exlusively by countryconfig integration token
   'record.confirm-registration',
-  'record.reject-registration'
+  'record.reject-registration',
+
+  // Scope which is applied to all test users
+  'demo'
 ])
 
-export const ScopeType = z.union([PlainScopeType, RecordScopeTypeV2])
+export const ScopeType = z.enum([
+  ...PlainScopeType.options,
+  ...RecordScopeTypeV2.options
+])
 export type ScopeType = z.infer<typeof ScopeType>
 
 const scopeByEvent = z
@@ -559,7 +562,6 @@ export function hasAnyScope(token: string, scopes: ScopeType[]) {
  * @returns True if the token contains the specified scope.
  */
 export function hasScope(token: string, scope: ScopeType): boolean
-
 /**
  * Checks if the provided list of scopes contains the given scope.
  *
@@ -568,7 +570,6 @@ export function hasScope(token: string, scope: ScopeType): boolean
  * @returns True if the scope list contains the specified scope.
  */
 export function hasScope(scopes: string[], scope: ScopeType): boolean
-
 /**
  * Implementation handling both overloads.
  *
