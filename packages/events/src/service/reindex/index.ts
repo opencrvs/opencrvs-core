@@ -65,7 +65,7 @@ async function reindexBatchToCountryConfig(
 async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   let retries = 0
   const maxRetries = 5
-  while (true) {
+  while (retries <= maxRetries) {
     try {
       return await fn()
     } catch (error) {
