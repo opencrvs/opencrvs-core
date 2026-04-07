@@ -65,10 +65,10 @@ import {
   FileFieldValue,
   HttpFieldValue
 } from './CompositeFieldValue'
-import { FieldValue } from './FieldValue'
+import { FieldValue, PlainDate } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import * as z from 'zod/v4'
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
 
 /**
@@ -159,8 +159,8 @@ export function generateRegistrationNumber(rng: () => number): string {
   return registrationNumber
 }
 
-export function generateRandomSignature(rng: () => number): string {
-  return `/random-bucket/${generateUuid(rng)}.png`
+export function generateRandomSignature(rng: () => number): DocumentPath {
+  return `${generateUuid(rng)}.png` as DocumentPath
 }
 
 /**
@@ -258,15 +258,15 @@ function mapFieldTypeToMockValue(
       return undefined
     case FieldType.DATE_RANGE:
       return {
-        start: '2021-01-01',
-        end: '2021-01-31'
+        start: PlainDate.parse('2021-01-01'),
+        end: PlainDate.parse('2021-01-31')
       }
     case FieldType.CHECKBOX:
       return true
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as FullDocumentPath,
+        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
@@ -353,7 +353,8 @@ export function generateActionDeclarationInput(
         ...declaration,
         ...overrides
       },
-      {} // Intentionally empty. Allow generating fields with custom conditionals.
+      {}, // Intentionally empty. Allow generating fields with custom conditionals.
+      true
     )
   }
 
@@ -462,7 +463,7 @@ export function eventPayloadGenerator(
             },
             'applicant.dob': '2020-01-02',
             'applicant.image': {
-              path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+              path: 'e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png' as DocumentPath,
               originalFilename: 'Screenshot.png',
               type: 'image/png'
             }

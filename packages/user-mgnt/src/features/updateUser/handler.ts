@@ -17,13 +17,13 @@ import {
   findScope
 } from '@opencrvs/commons'
 import { getScopes, SCOPES } from '@opencrvs/commons/authentication'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 import {
   generateUsername,
   uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
-import { getUserId } from '@user-mgnt/utils/userUtils'
+
 import * as _ from 'lodash'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 import { unauthorized } from '@hapi/boom'
@@ -117,26 +117,10 @@ export default async function updateUser(
   }
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
 
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
-
-  try {
-    const systemAdminUser: IUserModel | null = await User.findById(
-      getUserId({ Authorization: request.headers.authorization })
-    )
-    await postUserActionToMetrics(
-      'EDIT_USER',
-      request.headers.authorization,
-      remoteAddress,
-      userAgent,
-      systemAdminUser?.practitionerId,
-      existingUser.practitionerId
-    )
-  } catch (err) {
-    logger.error(err.message)
-  }
+  recordUserAuditEvent(request.headers.authorization, {
+    operation: 'user.edit_user',
+    requestData: { subjectId: user.id },
+  })
 
   return h.response(resUser).code(201)
 }

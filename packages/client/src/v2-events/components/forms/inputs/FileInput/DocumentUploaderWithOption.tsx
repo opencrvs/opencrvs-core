@@ -15,7 +15,7 @@ import { useField } from 'formik'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
-  FullDocumentPath,
+  DocumentPath,
   FileUploadWithOptions,
   MimeType,
   SelectOption
@@ -172,7 +172,7 @@ function DocumentUploaderWithOption({
     maxFileSize
   })
 
-  const onDeleteFile = (path: FullDocumentPath) => {
+  const onDeleteFile = (path: DocumentPath) => {
     setFiles((prevFiles) => {
       const updatedFiles = prevFiles.filter((file) => file.path !== path)
       onChange(updatedFiles)
@@ -347,7 +347,7 @@ function toCertificateVariables(value: FileFieldWithOptionValue | undefined) {
     return parsed.data.reduce(
       (acc, file) => ({
         ...acc,
-        [file.option]: new URL(file.path, window.config.MINIO_BASE_URL).href
+        [file.option]: file.path
       }),
       {}
     )

@@ -19,3 +19,4 @@ grafana
 packages/*
 !packages/user-mgnt
 !packages/commons
+!packages/events

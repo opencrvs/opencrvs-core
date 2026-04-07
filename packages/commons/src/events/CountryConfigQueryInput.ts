@@ -47,6 +47,7 @@ export const SerializedQueryExpression = z
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
     createdAtLocation: z.optional(SerializableWithin),
     updatedAtLocation: z.optional(SerializableWithin),
+    updatedByUserRole: z.optional(SerializableExact),
     assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(SerializableExact),
     createdByUserType: ExactUserType,

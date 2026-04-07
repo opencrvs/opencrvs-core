@@ -13,7 +13,8 @@ import {
   EventStatus,
   QueryInputType,
   AdvancedSearchField,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  PlainDate
 } from '@opencrvs/commons/client'
 import {
   getMetadataFieldConfigs,
@@ -104,7 +105,10 @@ describe('buildDataCondition', () => {
 
   it('should generate range match condition for DATE_RANGE fields when range is selected', () => {
     const state = {
-      'applicant.dob': { start: '1996-01-01', end: '1996-12-31' }
+      'applicant.dob': {
+        start: PlainDate.parse('1996-01-01'),
+        end: PlainDate.parse('1996-12-31')
+      }
     }
     const result = buildSearchQuery(state, fields, searchConfigs)
     expect(

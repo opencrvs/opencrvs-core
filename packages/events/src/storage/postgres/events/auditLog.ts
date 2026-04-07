@@ -27,7 +27,8 @@ export async function writeAuditLog(params: AuditLogParams) {
       clientType: params.clientType,
       operation: params.operation,
       requestData: params.requestData,
-      responseSummary: params.responseSummary
+      responseSummary:
+        'responseSummary' in params ? params.responseSummary : null
     })
     .execute()
 }
@@ -38,25 +39,25 @@ interface UserAuditLogQuery {
   count?: number
   timeStart?: string
   timeEnd?: string
+  excludeOperations: string[]
 }
 
 /**
- * Reads user audit log entries for a given subject user.
- * Filters to rows where requestData.subjectId matches and operation starts with 'user.audit.'.
+ * Reads all audit log entries performed by a given user.
  */
 export async function queryUserAuditLog({
   subjectId,
   skip = 0,
   count = 10,
   timeStart,
-  timeEnd
+  timeEnd,
+  excludeOperations
 }: UserAuditLogQuery) {
   const db = getClient()
 
   let query = db
     .selectFrom('auditLog')
     .selectAll()
-    .where('operation', 'like', 'user.%')
     .where('clientId', '=', subjectId)
 
   if (timeStart) {
@@ -65,6 +66,10 @@ export async function queryUserAuditLog({
 
   if (timeEnd) {
     query = query.where('createdAt', '<=', timeEnd)
+  }
+
+  if (excludeOperations.length > 0) {
+    query = query.where('operation', 'not in', excludeOperations)
   }
 
   const results = await query
@@ -76,8 +81,11 @@ export async function queryUserAuditLog({
   let countQuery = db
     .selectFrom('auditLog')
     .select(({ fn }) => [fn.count<string>('id').as('count')])
-    .where('operation', 'like', 'user.%')
     .where('clientId', '=', subjectId)
+
+  if (excludeOperations.length > 0) {
+    countQuery = countQuery.where('operation', 'not in', excludeOperations)
+  }
 
   if (timeStart) {
     countQuery = countQuery.where('createdAt', '>=', timeStart)

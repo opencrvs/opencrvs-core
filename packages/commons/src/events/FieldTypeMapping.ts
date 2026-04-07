@@ -62,7 +62,7 @@ import {
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
-  DateValue,
+  PlainDate,
   EmailValue,
   FieldValue,
   FieldUpdateValueSchema,
@@ -76,9 +76,10 @@ import {
   ButtonFieldValue,
   VerificationStatusValue,
   AgeValue,
-  FieldUpdateValue
+  FieldUpdateValue,
+  DateValue
 } from './FieldValue'
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import {
   AddressFieldValue,
   FileFieldValue,
@@ -135,7 +136,7 @@ export function mapFieldTypeToZod(field: FieldConfig, actionType?: ActionType) {
 
   switch (field.type) {
     case FieldType.DATE:
-      schema = DateValue
+      schema = PlainDate
       break
     case FieldType.AGE:
       schema = AgeValue
@@ -365,7 +366,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '' as FullDocumentPath,
+        path: '' as DocumentPath,
         originalFilename: '',
         type: ''
       } satisfies FileFieldValue

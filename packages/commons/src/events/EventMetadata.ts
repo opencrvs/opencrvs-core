@@ -14,6 +14,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
 import { Flag } from './Flag'
+import { DocumentPath } from '../documents'
 
 /**
  * Event statuses recognized by the system
@@ -110,10 +111,9 @@ export const EventMetadata = z.object({
   createdAtLocation: UUID.nullish().describe(
     'Location of the user who created the event.'
   ),
-  createdBySignature: z
-    .string()
-    .nullish()
-    .describe('Signature of the user who created the event.'),
+  createdBySignature: DocumentPath.nullish().describe(
+    'Signature of the user who created the event.'
+  ),
   updatedAtLocation: UUID.nullish().describe(
     'Location of the user who last changed the status.'
   ),

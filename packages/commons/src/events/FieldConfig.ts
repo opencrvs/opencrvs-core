@@ -15,16 +15,16 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
-  DateValue,
+  PlainDate,
   NumberFieldValue,
   NonEmptyTextValue,
   TextValue,
   DateRangeFieldValue,
-  SignatureFieldValue,
   SelectDateRangeValue,
   TimeValue,
   ButtonFieldValue,
-  VerificationStatusValue
+  VerificationStatusValue,
+  FieldValue
 } from './FieldValue'
 import {
   CustomFieldValue,
@@ -231,7 +231,7 @@ const SignatureField = BaseField.extend({
   signaturePromptLabel: TranslationConfig.describe(
     'Title of the signature modal'
   ),
-  defaultValue: SignatureFieldValue.optional(),
+  defaultValue: FieldValue.optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -264,7 +264,7 @@ export type EmailField = z.infer<typeof EmailField>
 
 const DateField = BaseField.extend({
   type: z.literal(FieldType.DATE),
-  defaultValue: SerializedNowDateTime.or(DateValue)
+  defaultValue: SerializedNowDateTime.or(PlainDate)
     .optional()
     .describe('Default date value(yyyy-MM-dd)'),
   configuration: z

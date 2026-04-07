@@ -71,7 +71,6 @@ services:
       - WEBHOOKS_URL=http://webhooks:2525/
       - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
-      - MINIO_BUCKET=ocrvs
       - DOCUMENTS_URL=http://documents:9050
   events:
     image: ghcr.io/opencrvs/ocrvs-events:${VERSION}
@@ -173,7 +172,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
-      - METRICS_URL=http://metrics:1050
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   user-mgnt:
     image: ghcr.io/opencrvs/ocrvs-user-mgnt:${VERSION}
@@ -191,6 +189,7 @@ services:
       - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
+      - EVENTS_URL=http://events:5555/
   webhooks:
     image: ghcr.io/opencrvs/ocrvs-webhooks:${VERSION}
     #platform: linux/amd64
