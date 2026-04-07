@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
-import { hasScope, logger, SCOPES } from '@opencrvs/commons'
+import { hasScope, logger } from '@opencrvs/commons'
 import { router, userOnlyProcedure } from '@events/router/trpc'
 import { getClient } from '@events/storage/postgres/events'
 import {
