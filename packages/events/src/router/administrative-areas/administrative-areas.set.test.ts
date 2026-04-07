@@ -28,7 +28,7 @@ test('prevents access when required scope is missing', async () => {
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
-test('Allows setting administrative areas with USER_DATA_SEEDING scope', async () => {
+test('Allows setting administrative areas with data seeding scope', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [scope])
 

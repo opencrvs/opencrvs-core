@@ -66,7 +66,7 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 
-import { SCOPES } from '@opencrvs/commons'
+import { encodeScope, SCOPES } from '@opencrvs/commons'
 import mongoose from 'mongoose'
 
 export const getRoutes = () => {
@@ -351,7 +351,7 @@ export const getRoutes = () => {
           scope: [
             SCOPES.USER_UPDATE,
             SCOPES.USER_UPDATE_MY_JURISDICTION,
-            SCOPES.USER_DATA_SEEDING
+            encodeScope({ type: 'user.data-seeding' })
           ]
         },
         validate: {

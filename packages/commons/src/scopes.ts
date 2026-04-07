@@ -23,6 +23,7 @@ export const SCOPES = {
   RECORD_REINDEX: 'record.reindex',
   RECORD_IMPORT: 'record.import',
   ATTACHMENT_UPLOAD: 'attachment.upload',
+  USER_DATA_SEEDING: 'user.data-seeding',
 
   // NOT MIGRATED
   DEMO: 'demo',
@@ -56,10 +57,7 @@ export const SCOPES = {
   USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
 
   // config
-  CONFIG_UPDATE_ALL: 'config.update:all',
-
-  // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding'
+  CONFIG_UPDATE_ALL: 'config.update:all'
 } as const
 
 /**
