@@ -62,6 +62,25 @@ async function reindexBatchToCountryConfig(
   }
 }
 
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  let retries = 0
+  const maxRetries = 5
+  while (true) {
+    try {
+      return await fn()
+    } catch (error) {
+      logger.warn(
+        `Request failed, retry in 5 seconds. Retry ${retries + 1}/${maxRetries}: ${error}`
+      )
+      retries++
+      if (retries >= maxRetries) {
+        throw error
+      }
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+    }
+  }
+}
+
 async function reindexSearch(
   timestamp: number,
   token: TokenWithBearer,
@@ -88,8 +107,10 @@ async function reindexSearch(
     logger.info(`Batch ${batchId}: ${batch.length} events to index`)
 
     await Promise.all([
-      indexEventsInBulk(batch, configurations, indexNameOverrides),
-      reindexBatchToCountryConfig(token, batch)
+      withRetry(() =>
+        indexEventsInBulk(batch, configurations, indexNameOverrides)
+      ),
+      withRetry(() => reindexBatchToCountryConfig(token, batch))
     ])
 
     await onBatchProcessed?.(batch.length)
