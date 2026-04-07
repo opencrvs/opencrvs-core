@@ -1008,10 +1008,8 @@ export const GeneratedInputField = <T extends FieldConfig>(
     return (
       <InputField {...inputFieldProps}>
         <UserRole.Input
-          {...field.config}
-          id={field.config.id}
+          {...inputProps}
           value={field.value}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       </InputField>
     )
