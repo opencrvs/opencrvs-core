@@ -20,7 +20,6 @@ import { getScopes } from './authentication'
 export const SCOPES = {
   // MIGRATED
   BYPASSRATELIMIT: 'bypassratelimit',
-  CONFIG: 'config',
   RECORD_REINDEX: 'record.reindex',
   RECORD_IMPORT: 'record.import',
 
@@ -158,6 +157,7 @@ const PlainScopeType = z.enum([
   'user.data-seeding',
   'integration.create',
   'record.import',
+  'config.update-all',
 
   // User scopes
   'user.create',
