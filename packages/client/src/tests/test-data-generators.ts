@@ -495,9 +495,9 @@ export function testDataGenerator(rngSeed?: number) {
        * except for workque scope that has an extra workqueue: all-events
        */
       localRegistrar: [
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'profile.electronic-signature' }),
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
         SCOPES.USER_READ_ONLY_MY_AUDIT,
@@ -533,8 +533,8 @@ export function testDataGenerator(rngSeed?: number) {
         })
       ],
       registrationAgent: [
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
         SCOPES.USER_READ_ONLY_MY_AUDIT,
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
@@ -574,9 +574,9 @@ export function testDataGenerator(rngSeed?: number) {
         SCOPES.USER_READ_MY_JURISDICTION,
         SCOPES.USER_UPDATE_MY_JURISDICTION,
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'performance.vital-statistics-export' }),
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
         'user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]',
         'user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]'
@@ -609,9 +609,9 @@ export function testDataGenerator(rngSeed?: number) {
        * record.create has placeOfEvent: 'administrativeArea' so province is locked but districts are selectable.
        */
       provincialRegistrar: [
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'profile.electronic-signature' }),
         SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
         SCOPES.USER_READ_ONLY_MY_AUDIT,
@@ -645,9 +645,9 @@ export function testDataGenerator(rngSeed?: number) {
         SCOPES.USER_CREATE,
         SCOPES.USER_UPDATE,
         SCOPES.USER_READ,
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'performance.vital-statistics-export' }),
         encodeScope({ type: 'record.reindex' }),
         'user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]',
         'user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]'

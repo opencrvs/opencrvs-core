@@ -12,18 +12,18 @@ import {
   TAB_GROUPS,
   WORKQUEUE_TABS
 } from '@client/components/interface/WorkQueueTabs'
-import { SCOPES } from '@opencrvs/commons/client'
+import { ScopeType } from '@opencrvs/commons/client'
 import { usePermissions } from './useAuthorization'
 
 interface Tab {
   name: string
-  scopes?: string[]
+  scopes?: ScopeType[]
   denyScopes?: string[]
 }
 
 interface NavigationConfig {
   name: string
-  scopes?: string[]
+  scopes?: ScopeType[]
   tabs: Tab[]
 }
 
@@ -31,66 +31,53 @@ interface NavigationConfig {
 const routeAccess: NavigationConfig[] = [
   {
     name: TAB_GROUPS.organisations,
-    scopes: [
-      SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-      SCOPES.CONFIG_UPDATE_ALL
-    ],
+    scopes: ['organisation.read-locations', 'config.update-all'],
     tabs: [
       {
         name: WORKQUEUE_TABS.organisation,
-        scopes: [
-          SCOPES.ORGANISATION_READ_LOCATIONS,
-          SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-          SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-        ]
+        scopes: ['organisation.read-locations']
       },
       {
         name: WORKQUEUE_TABS.team,
-        scopes: [
-          SCOPES.ORGANISATION_READ_LOCATIONS,
-          SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-          SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-        ]
+        scopes: ['organisation.read-locations']
       },
       {
         name: WORKQUEUE_TABS.config,
-        scopes: [SCOPES.CONFIG_UPDATE_ALL]
+        scopes: ['config.update-all']
       },
       {
         name: WORKQUEUE_TABS.systems,
-        scopes: [SCOPES.INTEGRATION_CREATE]
+        scopes: ['integration.create']
       },
       {
         name: WORKQUEUE_TABS.communications,
-        scopes: [SCOPES.CONFIG_UPDATE_ALL]
+        scopes: ['config.update-all']
       },
       {
         name: WORKQUEUE_TABS.emailAllUsers,
-        scopes: [SCOPES.CONFIG_UPDATE_ALL]
+        scopes: ['config.update-all']
       }
     ]
   },
   {
     name: TAB_GROUPS.performance,
     scopes: [
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS
+      'performance.read',
+      'performance.read-dashboards',
+      'performance.vital-statistics-export'
     ],
     tabs: [
       {
         name: WORKQUEUE_TABS.dashboard,
-        scopes: [SCOPES.PERFORMANCE_READ_DASHBOARDS]
+        scopes: ['performance.read-dashboards']
       },
       {
         name: WORKQUEUE_TABS.performance,
-        scopes: [SCOPES.PERFORMANCE_READ]
+        scopes: ['performance.read']
       },
       {
         name: WORKQUEUE_TABS.vsexports,
-        scopes: [SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]
+        scopes: ['performance.vital-statistics-export']
       }
     ]
   }

@@ -26,7 +26,7 @@ import { parse } from 'qs'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
 import { vi } from 'vitest'
-import { SCOPES, UUID } from '@opencrvs/commons/client'
+import { encodeScope, SCOPES, UUID } from '@opencrvs/commons/client'
 import { createMemoryRouter } from 'react-router-dom'
 import * as actions from '@client/profile/profileActions'
 
@@ -35,9 +35,9 @@ const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   SCOPES.USER_READ,
   SCOPES.USER_UPDATE,
   SCOPES.ORGANISATION_READ_LOCATIONS,
-  SCOPES.PERFORMANCE_READ,
-  SCOPES.PERFORMANCE_READ_DASHBOARDS,
-  SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+  encodeScope({ type: 'performance.read' }),
+  encodeScope({ type: 'performance.read-dashboards' }),
+  encodeScope({ type: 'performance.vital-statistics-export' })
 ]
 
 describe.skip('Team search test', () => {

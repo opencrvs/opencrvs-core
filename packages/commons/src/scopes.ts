@@ -15,38 +15,31 @@ import { UUID } from './uuid'
 import { parseConfigurableScope } from './scopes.deprecated.do-not-use'
 import { getScopes } from './authentication'
 
-// TODO CIHAN: rename this to ensure its not being used anywhere except migrations
 /** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
-export const SCOPES = {
-  // MIGRATED
+export const MIGRATED_LEGACY_SCOPES = {
   BYPASSRATELIMIT: 'bypassratelimit',
   RECORD_REINDEX: 'record.reindex',
   RECORD_IMPORT: 'record.import',
   ATTACHMENT_UPLOAD: 'attachment.upload',
   USER_DATA_SEEDING: 'user.data-seeding',
+  INTEGRATION_CREATE: 'integration.create',
+  PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
+  PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature'
+}
 
-  // NOT MIGRATED
+/** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
+export const SCOPES = {
   DEMO: 'demo',
 
-  // systems / integrations
-  INTEGRATION_CREATE: 'integration.create',
-
-  // profile
-  PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
-
-  // performance
   PERFORMANCE_READ: 'performance.read',
   PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
-  PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
 
-  // organisation
   ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
   ORGANISATION_READ_LOCATIONS_MY_JURISDICTION:
     'organisation.read-locations:my-jurisdiction',
 
-  // user
   USER_READ: 'user.read:all',
   USER_READ_MY_OFFICE: 'user.read:my-office',
   USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
@@ -56,7 +49,6 @@ export const SCOPES = {
   USER_UPDATE: 'user.update:all',
   USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
 
-  // config
   CONFIG_UPDATE_ALL: 'config.update:all'
 } as const
 
@@ -64,12 +56,15 @@ export const SCOPES = {
  * @deprecated - will be removed in v2.1.
  */
 const LiteralScopes = z.union([
+  z.literal(MIGRATED_LEGACY_SCOPES.USER_DATA_SEEDING),
+  z.literal(MIGRATED_LEGACY_SCOPES.RECORD_REINDEX),
+  z.literal(MIGRATED_LEGACY_SCOPES.ATTACHMENT_UPLOAD),
+  z.literal(MIGRATED_LEGACY_SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
+  z.literal(MIGRATED_LEGACY_SCOPES.INTEGRATION_CREATE),
+  z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS),
   z.literal(SCOPES.DEMO),
-  z.literal(SCOPES.INTEGRATION_CREATE),
-  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
   z.literal(SCOPES.PERFORMANCE_READ),
   z.literal(SCOPES.PERFORMANCE_READ_DASHBOARDS),
-  z.literal(SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS),
   z.literal(SCOPES.ORGANISATION_READ_LOCATIONS),
   z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
   z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),
@@ -81,10 +76,7 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.USER_CREATE_MY_JURISDICTION),
   z.literal(SCOPES.USER_UPDATE),
   z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION),
-  z.literal(SCOPES.CONFIG_UPDATE_ALL),
-  z.literal(SCOPES.USER_DATA_SEEDING),
-  z.literal(SCOPES.RECORD_REINDEX),
-  z.literal(SCOPES.ATTACHMENT_UPLOAD)
+  z.literal(SCOPES.CONFIG_UPDATE_ALL)
 ])
 
 /**
@@ -140,7 +132,7 @@ export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
 /** Plain scopes are scopes that dont have any options available. */
 const PlainScopeType = z.enum([
-  // System scopes
+  // Misc. system scopes
   'bypassratelimit',
   'record.reindex',
   'notification-api',
@@ -150,10 +142,19 @@ const PlainScopeType = z.enum([
   'config.update-all',
   'attachment.upload',
 
-  // User scopes
+  // User management scopes
   // TODO CIHAN: these might require jurisdiction filters??
   'user.create',
   'user.update',
+  'profile.electronic-signature',
+
+  // Location scopes
+  'organisation.read-locations',
+
+  // Performance dashboard
+  'performance.read',
+  'performance.read-dashboards',
+  'performance.vital-statistics-export',
 
   // Scopes used exlusively by countryconfig integration token
   'record.confirm-registration',

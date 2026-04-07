@@ -65,36 +65,6 @@ function inScope(token: string, scopes: string[]) {
 }
 
 /**
- *
- * @deprecated only v2 scopes should be used going forward. This parameter will be removed once all scopes have been migrated to v2. For new features, please use @see canAccessEventWithScopes or similar.
- *
- * Middleware which checks that one of the required scopes (either basic scopes or configurable scopes) are present in the token.
- *
- * @param scopes deprecated literal scopes that are required to access the resource
- * @returns TRPC compatible middleware function
- */
-export function requiresAnyOfScopes(scopes: string[]) {
-  const fn: MiddlewareFunction<
-    TrpcContext,
-    OpenApiMeta,
-    TrpcContext,
-    TrpcContext,
-    unknown
-  > = async (opts) => {
-    const { token } = opts.ctx
-
-    // If the user has any of the allowed plain scopes, allow access
-    if (inScope(token, scopes)) {
-      return opts.next()
-    }
-
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  return fn
-}
-
-/**
  * Middleware to check if the user has any of the specified allowed scopes.
  *
  * Checks the given list of scope types against the scopes in the user's JWT token.

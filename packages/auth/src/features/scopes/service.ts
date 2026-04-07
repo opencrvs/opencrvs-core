@@ -62,8 +62,8 @@ export const DEFAULT_ROLES_DEFINITION = [
           event: ['birth', 'death', 'tennis-club-membership']
         }
       }),
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
       SCOPES.ORGANISATION_READ_LOCATIONS,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
     ]
@@ -94,10 +94,10 @@ export const DEFAULT_ROLES_DEFINITION = [
           event: ['birth', 'death', 'tennis-club-membership']
         }
       }),
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'profile.electronic-signature' }),
       SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
     ]
   },
@@ -113,9 +113,9 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.USER_CREATE_MY_JURISDICTION,
       SCOPES.USER_UPDATE_MY_JURISDICTION,
       SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'performance.vital-statistics-export' })
     ]
   },
   {
@@ -130,9 +130,9 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.USER_READ,
       SCOPES.USER_UPDATE,
       SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'performance.vital-statistics-export' })
     ]
   },
   {
@@ -143,9 +143,9 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.performanceManager'
     },
     scopes: [
-      SCOPES.PERFORMANCE_READ,
-      SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'performance.vital-statistics-export' })
     ]
   }
 ] satisfies Array<{

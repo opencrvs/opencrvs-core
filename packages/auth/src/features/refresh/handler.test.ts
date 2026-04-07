@@ -10,7 +10,7 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import { SCOPES } from '@opencrvs/commons'
+import { encodeScope, SCOPES } from '@opencrvs/commons'
 import * as fetchAny from 'jest-fetch-mock'
 import { AuthenticateResponse } from '@auth/features/authenticate/handler'
 
@@ -107,9 +107,9 @@ describe('authenticate handler receives a request', () => {
         SCOPES.USER_READ,
         SCOPES.USER_UPDATE,
         SCOPES.ORGANISATION_READ_LOCATIONS,
-        SCOPES.PERFORMANCE_READ,
-        SCOPES.PERFORMANCE_READ_DASHBOARDS,
-        SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+        encodeScope({ type: 'performance.read' }),
+        encodeScope({ type: 'performance.read-dashboards' }),
+        encodeScope({ type: 'performance.vital-statistics-export' })
       ])
       expect(body.sub).toBe('1')
     })

@@ -19,7 +19,8 @@ import {
   ScopesWithDeclaredOptions,
   ScopesWithFullOptions,
   ScopesWithPlaceEventOptions,
-  migrateV1ScopesToV2
+  migrateV1ScopesToV2,
+  MIGRATED_LEGACY_SCOPES
 } from './scopes'
 import {
   findScope,
@@ -381,7 +382,7 @@ it('transform v1 scope to v2', () => {
     localRegistrar: [
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
+      MIGRATED_LEGACY_SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
       'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
       'search[event=birth,access=all]',
@@ -435,7 +436,7 @@ it('transform v1 scope to v2', () => {
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
+      MIGRATED_LEGACY_SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
       'user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]',
       'user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]'
@@ -448,8 +449,8 @@ it('transform v1 scope to v2', () => {
       SCOPES.USER_READ,
       SCOPES.PERFORMANCE_READ,
       SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
-      SCOPES.RECORD_REINDEX,
+      MIGRATED_LEGACY_SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
+      MIGRATED_LEGACY_SCOPES.RECORD_REINDEX,
       'user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]',
       'user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]'
     ]
@@ -472,12 +473,10 @@ it('migrate v1 scopes to v2', () => {
   const v1Scopes = [
     SCOPES.PERFORMANCE_READ,
     SCOPES.PERFORMANCE_READ_DASHBOARDS,
-    SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
     SCOPES.USER_READ_MY_OFFICE,
     SCOPES.USER_READ_MY_JURISDICTION,
     SCOPES.USER_UPDATE_MY_JURISDICTION,
     SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-    SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
     SCOPES.USER_READ_ONLY_MY_AUDIT,
     SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
     'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
@@ -498,20 +497,18 @@ it('migrate v1 scopes to v2', () => {
     'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
   ]
 
-  expect(v1Scopes).toHaveLength(26)
+  expect(v1Scopes).toHaveLength(24)
 
   const v2Scopes = migrateV1ScopesToV2(v1Scopes)
-  expect(v2Scopes).toHaveLength(26)
+  expect(v2Scopes).toHaveLength(24)
 
   expect(v2Scopes).toEqual([
     'performance.read',
     'performance.read-dashboards',
-    'profile.electronic-signature',
     'user.read:my-office',
     'user.read:my-jurisdiction',
     'user.update:my-jurisdiction',
     'organisation.read-locations:my-jurisdiction',
-    'performance.vital-statistics-export',
     'user.read:only-my-audit',
     'organisation.read-locations:my-office',
     'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',

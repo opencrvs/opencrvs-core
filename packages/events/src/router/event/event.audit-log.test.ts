@@ -10,7 +10,7 @@
  */
 
 import { http, HttpResponse } from 'msw'
-import { encodeScope, SCOPES, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
+import { encodeScope, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
@@ -204,7 +204,7 @@ describe('audit log', () => {
     test('writes an audit log entry when a system client creates an integration', async () => {
       const systemId = '00000000-0000-0000-0000-000000000099'
       const client = createSystemTestClient(systemId, [
-        SCOPES.INTEGRATION_CREATE
+        encodeScope({ type: 'integration.create' })
       ])
 
       const result = await client.integrations.create({
@@ -233,7 +233,7 @@ describe('audit log', () => {
     test('does not include credentials in audit log response summary', async () => {
       const systemId = '00000000-0000-0000-0000-000000000099'
       const client = createSystemTestClient(systemId, [
-        SCOPES.INTEGRATION_CREATE
+        encodeScope({ type: 'integration.create' })
       ])
 
       await client.integrations.create({
