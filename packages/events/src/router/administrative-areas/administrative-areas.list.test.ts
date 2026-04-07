@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { AdministrativeArea, createPrng, generateUuid } from '@opencrvs/commons'
+import {
+  AdministrativeArea,
+  createPrng,
+  generateUuid,
+  encodeScope
+} from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 const scope = encodeScope({ type: 'user.data-seeding' })
