@@ -16,11 +16,12 @@ import {
   InteractiveFieldType,
   SerializedUserField,
   isNonInteractiveFieldType,
-  Location,
   FieldType,
   FieldValue,
   EventState,
-  buildFormState
+  buildFormState,
+  UUID,
+  AdministrativeArea
 } from '@opencrvs/commons/client'
 import {
   getAdminLevelHierarchy,
@@ -28,10 +29,10 @@ import {
 } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useSystemVariables } from './useSystemVariables'
-import { useLocations } from './useLocations'
+import { useAdministrativeAreas } from './useAdministrativeAreas'
 
 interface Context extends SystemVariables {
-  locations: Location[]
+  administrativeAreas: Map<UUID, AdministrativeArea>
   adminLevelIds: string[]
 }
 
@@ -56,7 +57,7 @@ function resolveSerializedUserField(
     const locationId = context.user[value.$userField]
     const hierarchy = getAdminLevelHierarchy(
       locationId,
-      context.locations,
+      context.administrativeAreas,
       context.adminLevelIds
     )
 
@@ -167,8 +168,8 @@ export function mapFieldToDefaultValue(
 export function useDefaultValue() {
   const systemVariables = useSystemVariables()
   const { config } = useSelector(getOfflineData)
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
   const adminLevelIds = useMemo(
     () => config.ADMIN_STRUCTURE.map((level) => level.id),
     [config.ADMIN_STRUCTURE]
@@ -188,7 +189,7 @@ export function useDefaultValue() {
     }
     return mapFieldToDefaultValue(field, {
       ...systemVariables,
-      locations,
+      administrativeAreas,
       adminLevelIds
     })
   }

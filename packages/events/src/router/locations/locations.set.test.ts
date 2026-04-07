@@ -8,13 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  createPrng,
-  generateUuid,
-  Location,
-  LocationType,
-  SCOPES
-} from '@opencrvs/commons'
+import { createPrng, generateUuid, Location, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -55,10 +49,11 @@ test('Creates single location', async () => {
   const locationPayload: Location[] = [
     {
       id: generateUuid(),
-      parentId: null,
+      administrativeAreaId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: LocationType.enum.ADMIN_STRUCTURE
+      locationType: 'CRVS_OFFICE',
+      externalId: 'abc123xyz456'
     }
   ]
 
@@ -70,25 +65,64 @@ test('Creates single location', async () => {
   expect(locations).toMatchObject(initialLocations.concat(locationPayload))
 })
 
-test('Creates multiple locations', async () => {
+test('Creates multiple locations under administrative area', async () => {
   const { user, generator, rng } = await setupTestCase()
 
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const initialLocations = await dataSeedingClient.locations.list()
 
-  const parentId = generateUuid(rng)
+  const administrativeAreaId = generateUuid(rng)
 
+  const administrativeAreaPayload = generator.administrativeAreas.set(
+    [{ id: administrativeAreaId }],
+    rng
+  )
   const locationPayload = generator.locations.set(
-    [{ id: parentId }, { parentId: parentId }, { parentId: parentId }, {}],
+    [{ administrativeAreaId }, { administrativeAreaId }, {}],
     rng
   )
 
+  await dataSeedingClient.administrativeAreas.set(administrativeAreaPayload)
   await dataSeedingClient.locations.set(locationPayload)
 
   const locations = await dataSeedingClient.locations.list()
 
   expect(locations).toEqual(initialLocations.concat(locationPayload))
+})
+
+test('updates externalId on existing location when re-seeded with a value', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+
+  const locationId = generateUuid()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Location without external id',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: null
+    }
+  ])
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Location without external id',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: 'pcode123'
+    }
+  ])
+
+  const locations = await dataSeedingClient.locations.list()
+  const updated = locations.find((l) => l.id === locationId)
+
+  expect(updated?.externalId).toBe('pcode123')
 })
 
 test('seeding locations is additive, not destructive', async () => {

@@ -30,7 +30,7 @@ export async function initConditionals() {
   }
 }
 
-export interface BuiltInConditionals {
+interface BuiltInConditionals {
   informantType: Conditional
   iDType: Conditional
   isOfficePreSelected: Conditional

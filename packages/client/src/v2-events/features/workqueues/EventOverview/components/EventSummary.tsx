@@ -17,9 +17,7 @@ import {
   areConditionsMet,
   getMixedPath,
   Flag,
-  ActionFlag,
-  InherentFlags,
-  TranslationConfig,
+  EventIndex,
   EventDocument
 } from '@opencrvs/commons/client'
 import { FieldValue, FieldConfig, FieldType } from '@opencrvs/commons/client'
@@ -27,9 +25,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
 import { convertDateFieldsToUnixTimestamps } from '@client/v2-events/utils'
-/**
- * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
- */
+import { useFlagLabelsString } from '@client/v2-events/messages/flags'
 
 const messages = {
   assignedTo: {
@@ -119,49 +115,22 @@ const messages = {
 
 export const summaryMessages = messages
 
-const flagMessages = {
-  [InherentFlags.CORRECTION_REQUESTED]: {
-    id: 'flags.builtin.correction-requested.label',
-    defaultMessage: 'Correction requested',
-    description: 'Flag label for correction requested'
-  },
-  [InherentFlags.POTENTIAL_DUPLICATE]: {
-    id: 'flags.builtin.potential-duplicate.label',
-    defaultMessage: 'Potential duplicate',
-    description: 'Flag label for potential duplicate'
-  },
-  [InherentFlags.REJECTED]: {
-    id: 'flags.builtin.rejected.label',
-    defaultMessage: 'Rejected',
-    description: 'Flag label for rejected'
-  },
-  [InherentFlags.INCOMPLETE]: {
-    id: 'flags.builtin.incomplete.label',
-    defaultMessage: 'Incomplete',
-    description: 'Flag label for incomplete'
-  },
-  [InherentFlags.PENDING_CERTIFICATION]: {
-    id: 'flags.builtin.pending-certification.label',
-    defaultMessage: 'Pending certification',
-    description: 'Flag label for pending certification'
-  }
-} satisfies Record<InherentFlags, TranslationConfig>
-
 export function EventSummary({
   event,
-  eventIndex,
   eventConfiguration,
-  flags,
-  hideSecuredFields = false
+  eventIndex,
+  hideSecuredFields = false,
+  eventDocument
 }: {
-  event?: EventDocument
-  eventIndex: Record<string, FieldValue>
+  event: Record<string, FieldValue>
   eventConfiguration: EventConfig
-  flags: Flag[]
+  eventIndex: EventIndex
   hideSecuredFields?: boolean
+  eventDocument?: EventDocument
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const validationContext = useValidatorContext(event)
+  const validationContext = useValidatorContext(eventDocument)
+  const flagLabels = useFlagLabelsString(eventConfiguration, eventIndex.flags)
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
   const securedFields = declarationFields
@@ -171,14 +140,19 @@ export function EventSummary({
   const configuredFields = summary.fields.map((field) => {
     if (
       field.conditionals &&
-      !areConditionsMet(field.conditionals, eventIndex, validationContext)
+      !areConditionsMet(
+        field.conditionals,
+        event,
+        validationContext,
+        eventIndex
+      )
     ) {
       return null
     }
 
     if ('fieldId' in field) {
       const config = declarationFields.find((f) => f.id === field.fieldId)
-      const value = getMixedPath(eventIndex, field.fieldId, '')
+      const value = getMixedPath(event, field.fieldId, '')
 
       if (!config) {
         return null
@@ -217,18 +191,10 @@ export function EventSummary({
          * i.e. if the message is something like `{event.updatedAt, date, ::dd MM YYYY}`, then the value of `event.updatedAt`
          * needs to be a unix timestamp for it to be formatted correctly by `intl.formatMessage`.
          */
-        convertDateFieldsToUnixTimestamps(eventIndex)
+        convertDateFieldsToUnixTimestamps(event)
       )
     }
   })
-
-  const flattenedFlags = flags
-    .filter((flag) => !ActionFlag.safeParse(flag).success)
-    .filter((flag) => flag !== InherentFlags.INCOMPLETE)
-    .map((flag) => {
-      return intl.formatMessage(flagMessages[flag as InherentFlags])
-    })
-    .join(', ')
 
   return (
     <>
@@ -240,20 +206,20 @@ export function EventSummary({
           placeholder={intl.formatMessage(
             messages.assignedTo.emptyValueMessage
           )}
-          value={intl.formatMessage(messages.assignedTo.value, eventIndex)}
+          value={intl.formatMessage(messages.assignedTo.value, event)}
         />
         <Summary.Row
           key="status"
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
-          value={intl.formatMessage(messages.status.value, eventIndex)}
+          value={intl.formatMessage(messages.status.value, event)}
         />
         <Summary.Row
           key="flags"
           data-testid="flags"
           label={intl.formatMessage(messages.flags.label)}
           placeholder={intl.formatMessage(messages.flags.placeholder)}
-          value={flattenedFlags}
+          value={flagLabels}
         />
         <Summary.Row
           key="event"
@@ -268,7 +234,7 @@ export function EventSummary({
           placeholder={intl.formatMessage(
             messages.trackingId.emptyValueMessage
           )}
-          value={intl.formatMessage(messages.trackingId.value, eventIndex)}
+          value={intl.formatMessage(messages.trackingId.value, event)}
         />
         <Summary.Row
           key="registrationNumber"
@@ -277,10 +243,7 @@ export function EventSummary({
           placeholder={intl.formatMessage(
             messages.registrationNumber.emptyValueMessage
           )}
-          value={intl.formatMessage(
-            messages.registrationNumber.value,
-            eventIndex
-          )}
+          value={intl.formatMessage(messages.registrationNumber.value, event)}
         />
         {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)

@@ -9,8 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EVENT_STATUS } from '@client/workqueue'
 import { SUBMISSION_STATUS } from '.'
+
+const EVENT_STATUS = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  DECLARED: 'DECLARED',
+  VALIDATED: 'VALIDATED',
+  REGISTERED: 'REGISTERED',
+  REJECTED: 'REJECTED',
+  WAITING_VALIDATION: 'WAITING_VALIDATION',
+  CORRECTION_REQUESTED: 'CORRECTION_REQUESTED'
+}
 
 export const isPendingCorrection = (status: SUBMISSION_STATUS | undefined) =>
   status === EVENT_STATUS.CORRECTION_REQUESTED
@@ -34,7 +43,7 @@ export const isPrintable = (status: SUBMISSION_STATUS | undefined) =>
 export const isIssuable = (status: SUBMISSION_STATUS | undefined) =>
   status === SUBMISSION_STATUS.CERTIFIED
 
-export const isRecordOrDeclaration = (status: SUBMISSION_STATUS | undefined) =>
+const isRecordOrDeclaration = (status: SUBMISSION_STATUS | undefined) =>
   status
     ? [
         SUBMISSION_STATUS.REGISTERED,
@@ -65,5 +74,5 @@ export const isArchivable = (status: SUBMISSION_STATUS | undefined) =>
 export const canBeReinstated = (status: SUBMISSION_STATUS | undefined) =>
   status === SUBMISSION_STATUS.ARCHIVED
 
-export const isViewable = (status: SUBMISSION_STATUS | undefined) =>
+const isViewable = (status: SUBMISSION_STATUS | undefined) =>
   status !== SUBMISSION_STATUS.DRAFT

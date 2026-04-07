@@ -14,9 +14,11 @@ import { http, HttpResponse, HttpResponseInit } from 'msw'
 import {
   ActionStatus,
   ActionType,
+  createPrng,
   EventDocument,
   EventIndex,
   generateEventDocument,
+  generateUuid,
   getUUID,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
@@ -36,6 +38,8 @@ import {
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 import { runReindex } from '@events/service/reindex'
+import { getLocations } from '@events/storage/postgres/administrative-hierarchy/locations'
+import { getTemporaryIndexName } from '@events/storage/__mocks__/elasticsearch'
 
 // Mock reindex endpoint so there are no side effects
 vi.mock('@events/service/reindex', async (importOriginal) => {
@@ -43,7 +47,7 @@ vi.mock('@events/service/reindex', async (importOriginal) => {
     await importOriginal<typeof import('@events/service/reindex')>()
   return {
     ...actual,
-    reindex: vi.fn()
+    reindex: vi.fn().mockResolvedValue(undefined)
   }
 })
 
@@ -82,22 +86,63 @@ const reindexToken = createTestToken({
 })
 
 let event: EventDocument
-
+let rngNumber = 949
 beforeEach(async () => {
   mswServer.use(singleEventConfigHandler, silentPostHandler)
   spy.mockReset()
-  const { user, eventsDb } = await setupTestCase()
+  const { user, eventsDb, seed } = await setupTestCase()
+
+  const rng = createPrng(rngNumber)
+
+  const adminLevel1Id = generateUuid(rng)
+  const adminLevel2Id = generateUuid(rng)
+  const crvsOfficeId = generateUuid(rng)
+
+  await seed.administrativeAreas([
+    {
+      name: 'Adming level 1',
+      parentId: null,
+      externalId: 'AS0978ASD2A',
+      id: adminLevel1Id,
+      validUntil: null
+    },
+    {
+      name: 'Admin level 2',
+      parentId: adminLevel1Id,
+      externalId: 'AS0978ASD2B',
+      id: adminLevel2Id,
+      validUntil: null
+    }
+  ])
+  await seed.locations([
+    {
+      name: 'Location within Admin level 2',
+      administrativeAreaId: adminLevel2Id,
+      externalId: 'AS0978ASD2C',
+      locationType: 'CRVS_OFFICE',
+      id: crvsOfficeId,
+      validUntil: null
+    }
+  ])
+
+  rngNumber++
 
   event = generateEventDocument({
     configuration: tennisClubMembershipEvent,
+    rng,
     actions: [
       { type: ActionType.CREATE, user },
       { type: ActionType.DECLARE, user }
     ]
   })
 
+  const locations = await getLocations()
+
+  const crvsOffice = locations.find((x) => x.id === crvsOfficeId)
+
   const draftDocument = generateEventDocument({
     configuration: tennisClubMembershipEvent,
+    rng,
     actions: [{ type: ActionType.CREATE, user }]
   })
 
@@ -122,6 +167,7 @@ beforeEach(async () => {
       actionType: ActionType.CREATE,
       createdBy: user.id,
       createdAt: event.createdAt,
+      createdAtLocation: crvsOffice?.id,
       status: ActionStatus.Accepted,
       createdByRole: user.role,
       createdByUserType: 'user',
@@ -138,6 +184,7 @@ beforeEach(async () => {
       actionType: ActionType.DECLARE,
       createdBy: user.id,
       createdAt: event.createdAt,
+      createdAtLocation: crvsOffice?.id,
       status: ActionStatus.Accepted,
       createdByRole: user.role,
       createdByUserType: 'user',
@@ -165,6 +212,7 @@ beforeEach(async () => {
       eventId: drafteventInDb!.id,
       actionType: ActionType.CREATE,
       createdBy: user.id,
+      createdAtLocation: crvsOffice?.id,
       createdAt: event.createdAt,
       status: ActionStatus.Accepted,
       createdByRole: user.role,
@@ -248,13 +296,34 @@ test('reindex given original concrete index is replaced by a timestamped index',
 
   const liveIndexName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
 
+  const indicesPointingToAlias = Object.keys(
+    await esClient.indices.getAlias({
+      name: getEventAliasName()
+    })
+  )
+
+  expect(indicesPointingToAlias).toContain(liveIndexName)
+
+  getTemporaryIndexName.mockImplementation(
+    (eventType, time) => `${eventType}__new__${time}`
+  )
+
   await runReindex(reindexToken)
+
+  const indicesPointingToAliasAfter = Object.keys(
+    await esClient.indices.getAlias({
+      name: getEventAliasName()
+    })
+  )
+
+  // Expect original liveIndexName to not be pointing to the alias anymore
+  expect(indicesPointingToAliasAfter).not.toContain(liveIndexName)
 
   const allConcreteIndexes = (
     (await esClient.cat.indices({ format: 'json' })) as { index: string }[]
   ).map((i) => i.index)
-  const liveIndexExistsAfterReindex = allConcreteIndexes.includes(liveIndexName)
 
+  const liveIndexExistsAfterReindex = allConcreteIndexes.includes(liveIndexName)
   expect(liveIndexExistsAfterReindex).toBe(false)
 
   // The alias must still resolve to exactly one index
@@ -263,8 +332,9 @@ test('reindex given original concrete index is replaced by a timestamped index',
   })
 
   const indexesBehindAlias = Object.keys(aliasInfo)
-  expect(indexesBehindAlias).toHaveLength(1)
-  expect(indexesBehindAlias[0]).toMatch(new RegExp(`^${liveIndexName}_\\d+$`))
+  expect(indexesBehindAlias.every((index) => index.includes('__new__'))).toBe(
+    true
+  )
 })
 
 test('reindex given first-reindex and concrete index conflicts with alias name - write alias created after removing original concrete index to avoid conflicts', async () => {
@@ -356,26 +426,6 @@ test('reindex on country config failure, temp index is cleaned up and no orphane
       index !== liveIndexAfter
   )
   expect(tempIndexes).toHaveLength(0)
-})
-
-test('reindex events go to the correct (timestamped) index via write alias', async () => {
-  const esClient = getOrCreateClient()
-
-  // Perform a reindex so the live index becomes a timestamped index
-  await runReindex(reindexToken)
-
-  // Determine the current live (timestamped) physical index
-  const globalAlias = getEventAliasName()
-  const aliasInfo = await esClient.indices.getAlias({ name: globalAlias })
-  const liveIndex = Object.keys(aliasInfo)[0]
-
-  const writeAliasName = getEventIndexName(TENNIS_CLUB_MEMBERSHIP)
-  const writeAliasInfo = await esClient.indices.getAlias({
-    name: writeAliasName
-  })
-  const indexBehindWriteAlias = Object.keys(writeAliasInfo)[0]
-
-  expect(indexBehindWriteAlias).toEqual(liveIndex)
 })
 
 test('runReindex records completed status in reindexing_status index', async () => {

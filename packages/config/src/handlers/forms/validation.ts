@@ -345,118 +345,83 @@ const form = z.object({
   sections: z
     .array(
       section
-        .refine(
-          (sec) =>
-            findDuplicates(
-              sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
-            ).length === 0,
-          (sec) => ({
-            message: `Field names in a section should all be unique. Duplicate field(s): ${findDuplicates(
-              sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
-            ).join(', ')} found`
-          })
-        )
-        .refine(
-          (sec) => {
-            const fieldsInSection = sec.groups.flatMap((group) =>
-              group.fields.map(({ name }) => name)
-            )
-            return (
-              (REQUIRED_FIELDS_IN_SECTION[sec.id]?.filter(
-                (reqField) => !fieldsInSection.includes(reqField)
-              ).length ?? 0) === 0
-            )
-          },
-          (sec) => {
-            const fieldsInSection = sec.groups.flatMap((group) =>
-              group.fields.map(({ name }) => name)
-            )
-            const notIncludedRequiredFields = (
-              REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []
-            ).filter((reqField) => !fieldsInSection.includes(reqField))
-            return {
-              message: `Missing required fields "${notIncludedRequiredFields.join(
-                ', '
-              )}" found`
-            }
+        .superRefine((sec, ctx) => {
+          const duplicates = findDuplicates(
+            sec.groups.flatMap(({ fields }) => fields.map(({ name }) => name))
+          )
+          if (duplicates.length > 0) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `Field names in a section should all be unique. Duplicate field(s): ${duplicates.join(', ')} found`
+            })
           }
-        )
-        .refine(
-          (sec) => {
-            const fieldsInSection = sec.groups.flatMap((group) => group.fields)
-            const buttonFields = fieldsInSection.filter(isButtonField)
-            return buttonFields.every((button) =>
-              fieldsInSection.some(
-                (field) => button.options.trigger === field.name
-              )
+        })
+        .superRefine((sec, ctx) => {
+          const fieldsInSection = sec.groups.flatMap((group) =>
+            group.fields.map(({ name }) => name)
+          )
+
+          const notIncludedRequiredFields = (
+            REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []
+          ).filter((reqField) => !fieldsInSection.includes(reqField))
+
+          if (notIncludedRequiredFields.length > 0) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `Missing required fields "${notIncludedRequiredFields.join(', ')}" found`
+            })
+          }
+        })
+        .superRefine((sec, ctx) => {
+          const fieldsInSection = sec.groups.flatMap((group) => group.fields)
+          const buttonFields = fieldsInSection.filter(isButtonField)
+
+          const buttonFieldsMissingTrigger = buttonFields
+            .filter(
+              (button) =>
+                !fieldsInSection.some(
+                  (field) => button.options.trigger === field.name
+                )
             )
-          },
-          (sec) => {
-            const fieldsInSection = sec.groups.flatMap((group) => group.fields)
-            const buttonFields = fieldsInSection.filter(isButtonField)
-            const buttonFieldsMissingTrigger = buttonFields
+            .map(({ name }) => name)
+
+          if (buttonFieldsMissingTrigger.length > 0) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `Missing trigger for button fields ${buttonFieldsMissingTrigger.join(',')}`
+            })
+          }
+        })
+        .superRefine((sec, ctx) => {
+          if (!REQUIRED_FIELDS_IN_SECTION[sec.id]) return
+
+          const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
+            group.fields
+              .filter(({ custom }) => !Boolean(custom))
+              .filter(({ type }) => !DECORATIVE_TYPES.includes(type))
               .filter(
-                (button) =>
-                  !fieldsInSection.some(
-                    (field) => button.options.trigger === field.name
-                  )
+                ({ name }) =>
+                  !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
               )
               .map(({ name }) => name)
-            return {
-              message: `Missing trigger for button fields ${buttonFieldsMissingTrigger.join(
-                ','
-              )}`
-            }
-          }
-        )
-        .refine(
-          (sec) => {
-            if (!REQUIRED_FIELDS_IN_SECTION[sec.id]) {
-              return true
-            }
-            const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
-              group.fields
-                .filter(({ custom }) => !Boolean(custom))
-                .filter(({ type }) => !DECORATIVE_TYPES.includes(type))
-                .filter(
-                  ({ name }) =>
-                    !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
-                )
-                .map(({ name }) => name)
-            )
-            return (
-              nonCustomfieldsInSection.filter(
-                (nonCustomField) =>
-                  !(OPTIONAL_FIELDS_IN_SECTION[sec.id] ?? []).includes(
-                    nonCustomField
-                  )
-              ).length === 0
-            )
-          },
-          (sec) => {
-            const nonCustomfieldsInSection = sec.groups.flatMap((group) =>
-              group.fields
-                .filter(({ custom }) => !Boolean(custom))
-                .filter(({ type }) => !DECORATIVE_TYPES.includes(type))
-                .filter(
-                  ({ name }) =>
-                    !(REQUIRED_FIELDS_IN_SECTION[sec.id] ?? []).includes(name)
-                )
-                .map(({ name }) => name)
-            )
-            const unrecognizedFields = nonCustomfieldsInSection.filter(
-              (nonCustomField) =>
-                !(OPTIONAL_FIELDS_IN_SECTION[sec.id] ?? []).includes(
-                  nonCustomField
-                )
-            )
-            return {
+          )
+
+          const unrecognizedFields = nonCustomfieldsInSection.filter(
+            (nonCustomField) =>
+              !(OPTIONAL_FIELDS_IN_SECTION[sec.id] ?? []).includes(
+                nonCustomField
+              )
+          )
+
+          if (unrecognizedFields.length > 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
               message: `Use "custom" property to make a field custom. Unrecognized non custom fields "${unrecognizedFields.join(
                 ', '
               )}" found`
-            }
+            })
           }
-        )
+        })
     )
     .refine(
       (sections) => {
@@ -542,46 +507,27 @@ const form = z.object({
         )} sections are required`
       }
     )
-    .refine(
-      (sections) =>
-        findDuplicates(
-          sections
-            .flatMap((sec) => [
-              ...(sec.mapping?.template ?? []).map(({ fieldName }) => {
-                // Log the following to observe all available handlebars
-                // console.log('section handlebar: ', fieldName)
-                return fieldName
-              }),
-              ...sec.groups
-                .flatMap((group) => group.fields)
-                .map(({ mapping }) => {
-                  // Log the following to observe all available handlebars
-                  // console.log('field handlebar: ', mapping?.template?.fieldName)
-                  return mapping?.template?.fieldName
-                })
-            ])
-            .filter((maybeName): maybeName is string => Boolean(maybeName))
-        ).length === 0,
-      (sections) => {
-        const duplicateCertificateHandlebars = findDuplicates(
-          sections
-            .flatMap((sec) => [
-              ...(sec.mapping?.template ?? []).map(
-                ({ fieldName }) => fieldName
-              ),
-              ...sec.groups
-                .flatMap((group) => group.fields)
-                .map(({ mapping }) => mapping?.template?.fieldName)
-            ])
-            .filter((maybeName): maybeName is string => Boolean(maybeName))
-        )
-        return {
+    .superRefine((sections, ctx) => {
+      const allHandlebars = sections
+        .flatMap((sec) => [
+          ...(sec.mapping?.template ?? []).map(({ fieldName }) => fieldName),
+          ...sec.groups.flatMap((group) =>
+            group.fields.map(({ mapping }) => mapping?.template?.fieldName)
+          )
+        ])
+        .filter((maybeName): maybeName is string => Boolean(maybeName))
+
+      const duplicateCertificateHandlebars = findDuplicates(allHandlebars)
+
+      if (duplicateCertificateHandlebars.length > 0) {
+        ctx.addIssue({
+          code: 'custom',
           message: `All the certificate handlebars should be unique for an event. Duplicate handlebars for "${duplicateCertificateHandlebars.join(
             ', '
           )}"`
-        }
+        })
       }
-    )
+    })
 })
 
 export const registrationForms = z.object({

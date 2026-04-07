@@ -8,17 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  IOfflineDataState,
-  IOfflineData,
-  CRVSOffice,
-  AdminStructure,
-  Facility
-} from '@client/offline/reducer'
+import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { createSelector } from '@reduxjs/toolkit'
 import { merge } from 'lodash'
-import { IndexMap } from '@opencrvs/commons/client'
 
 const getOfflineState = (store: IStoreState): IOfflineDataState => store.offline
 
@@ -29,13 +22,7 @@ function getKey<K extends keyof IOfflineDataState>(store: IStoreState, key: K) {
 export function isOfflineDataLoaded(
   state: Partial<IOfflineData>
 ): state is IOfflineData {
-  const hasAllRequiredData =
-    state.facilities &&
-    state.locations &&
-    state.config &&
-    state.forms &&
-    state.templates &&
-    state.languages
+  const hasAllRequiredData = state.config && state.templates && state.languages
 
   const isOfflineDataLoaded = Boolean(hasAllRequiredData)
   if (isOfflineDataLoaded) merge(window.config, state.config)
@@ -62,27 +49,18 @@ export const getCertificateTemplates = createSelector(
   getOfflineData,
   (data) => data.templates.certificates
 )
-export const getLocations = createSelector(
-  getOfflineData,
-  (data): IndexMap<AdminStructure | Facility | CRVSOffice> => ({
-    ...data.locations,
-    ...data.facilities,
-    ...data.offices
-  })
-)
 export const getCountryLogoFile = createSelector(
   getOfflineData,
   (data) => data.config.COUNTRY_LOGO.file
 )
 
-export const getAdminStructureLocations = createSelector(
+const getAdminStructureLocations = createSelector(
   getOfflineData,
   (data) => data.locations
 )
 
-export const selectCountryBackground = (store: IStoreState) => {
-  const countryBackground = getKey(store, 'offlineData').config
-    ?.LOGIN_BACKGROUND
+export const selectCountryBackground = () => {
+  const countryBackground = window.config.REGISTER_BACKGROUND
   if (countryBackground?.backgroundImage) {
     return {
       backgroundImage: countryBackground.backgroundImage,
@@ -92,20 +70,6 @@ export const selectCountryBackground = (store: IStoreState) => {
   return {
     backgroundColor: countryBackground?.backgroundColor ?? '36304E'
   }
-}
-
-export const selectCountryLogo = (store: IStoreState) => {
-  return (
-    getKey(store, 'offlineData').config?.COUNTRY_LOGO?.file ||
-    getKey(store, 'offlineData').anonymousConfig?.COUNTRY_LOGO?.file
-  )
-}
-
-export function selectApplicationName(store: IStoreState) {
-  return (
-    getKey(store, 'offlineData').config?.APPLICATION_NAME ||
-    getKey(store, 'offlineData').anonymousConfig?.APPLICATION_NAME
-  )
 }
 
 export const getOfflineLoadingError = (

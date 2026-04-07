@@ -9,12 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import { UUID } from '../uuid'
 import { cloneDeep, difference } from 'lodash'
-import { Action } from './ActionDocument'
+import { Action, ActionDocument, ActionStatus } from './ActionDocument'
+import { EventDocument } from './EventDocument'
 import { ActionType } from './ActionType'
 import {
   findLastAssignmentAction,
+  getCompleteActionAnnotation,
   getDeclaration,
   getDeclarationFields,
   getMixedPath,
@@ -28,8 +32,6 @@ import {
   tennisClubMembershipEvent
 } from '../client'
 import { generateActionDocument } from './test.utils'
-
-/* eslint-disable max-lines */
 
 const commonAction = {
   status: 'Requested' as const,
@@ -51,7 +53,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T00:00:00Z'
       }
     ],
@@ -62,13 +64,13 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T00:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T01:00:00Z',
         assignedTo: 'user-id-2'
       }
@@ -76,7 +78,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
     expected: {
       ...commonAction,
       type: ActionType.ASSIGN,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T01:00:00Z',
       assignedTo: 'user-id-2'
     }
@@ -86,27 +88,27 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T00:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T01:00:00Z',
         assignedTo: 'user-id-2'
       },
       {
         ...commonAction,
         type: ActionType.UNASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T02:00:00Z'
       }
     ],
     expected: {
       ...commonAction,
       type: ActionType.UNASSIGN,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T02:00:00Z'
     }
   },
@@ -115,26 +117,26 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T00:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T01:00:00Z',
         assignedTo: 'user-id-2'
       },
       {
         ...commonAction,
         type: ActionType.UNASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T02:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: TokenUserType.enum.user,
         createdAt: '2023-01-01T03:00:00Z',
         assignedTo: 'user-id-4'
       }
@@ -142,7 +144,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
     expected: {
       ...commonAction,
       type: ActionType.ASSIGN,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T03:00:00Z',
       assignedTo: 'user-id-4'
     }
@@ -293,8 +295,7 @@ describe('deepMerge', () => {
             createdBy: '68497c34f1e1900a891aa81b',
             createdByRole: 'REGISTRATION_AGENT',
             createdAtLocation: 'b04a70a5-a158-44a9-a882-1e5714a7c0f5',
-            createdBySignature:
-              '/random-bucket/45450674-6523-441d-90d3-5ad66c7e57d1.png',
+            createdBySignature: '45450674-6523-441d-90d3-5ad66c7e57d1.png',
             type: ActionType.DECLARE,
             createdAt: '2025-06-11T12:53:08.085Z',
             id: '01a8e3d9-6fce-4b4e-8aba-58f2f67976a0',
@@ -313,8 +314,7 @@ describe('deepMerge', () => {
             createdBy: '68497c34f1e1900a891aa81b',
             createdByRole: 'FIELD_AGENT',
             createdAtLocation: 'b04a70a5-a158-44a9-a882-1e5714a7c0f5',
-            createdBySignature:
-              '/random-bucket/45450674-6523-441d-90d3-5ad66c7e57d1.png',
+            createdBySignature: '45450674-6523-441d-90d3-5ad66c7e57d1.png',
             type: ActionType.DECLARE,
             createdAt: '2025-06-11T12:53:08.085Z',
             id: '01a8e3d9-6fce-4b4e-8aba-58f2f67976a0',
@@ -333,8 +333,7 @@ describe('deepMerge', () => {
             createdAtLocation: 'b04a70a5-a158-44a9-a882-1e5714a7c0f5',
             createdBy: '68497c34f1e1900a891aa81b',
             createdByRole: 'FIELD_AGENT',
-            createdBySignature:
-              '/random-bucket/45450674-6523-441d-90d3-5ad66c7e57d1.png',
+            createdBySignature: '45450674-6523-441d-90d3-5ad66c7e57d1.png',
             declaration: {
               'applicant.name': { firstname: 'Changed', surname: 'Name' }
             },
@@ -365,7 +364,7 @@ describe('getPendingAction', () => {
     const created = {
       ...commonAction,
       type: ActionType.CREATE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T00:00:00Z',
       status: 'Accepted' as const
     }
@@ -374,7 +373,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-2' as UUID,
       type: ActionType.DECLARE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-02-01T00:00:00Z',
       status: 'Requested' as const
     }
@@ -383,7 +382,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-3' as UUID,
       type: ActionType.REQUEST_CORRECTION,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T00:00:00Z',
       status: 'Requested' as const
     }
@@ -399,7 +398,7 @@ describe('getPendingAction', () => {
     const created = {
       ...commonAction,
       type: ActionType.CREATE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T00:00:00Z',
       status: 'Accepted' as const
     }
@@ -408,7 +407,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-2' as UUID,
       type: ActionType.DECLARE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-02-01T00:00:00Z',
       status: 'Accepted' as const
     }
@@ -417,7 +416,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-3' as UUID,
       type: ActionType.REQUEST_CORRECTION,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T00:00:00Z',
       status: 'Requested' as const
     }
@@ -431,7 +430,7 @@ describe('getPendingAction', () => {
     const creates = {
       ...commonAction,
       type: ActionType.CREATE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T00:00:00Z',
       status: 'Accepted' as const
     }
@@ -440,7 +439,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-2' as UUID,
       type: ActionType.DECLARE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-02-01T00:00:00Z',
       status: 'Requested' as const
     }
@@ -449,7 +448,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-4' as UUID,
       type: ActionType.DECLARE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-02-01T00:00:00Z',
       status: 'Accepted' as const,
       originalActionId: 'action-id-2' as UUID
@@ -459,7 +458,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-3' as UUID,
       type: ActionType.REQUEST_CORRECTION,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T00:00:00Z',
       status: 'Requested' as const
     }
@@ -473,7 +472,7 @@ describe('getPendingAction', () => {
     const creates = {
       ...commonAction,
       type: ActionType.CREATE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T00:00:00Z',
       status: 'Accepted' as const
     }
@@ -482,7 +481,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-2' as UUID,
       type: ActionType.DECLARE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-02-01T00:00:00Z',
       status: 'Requested' as const
     }
@@ -491,7 +490,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-3' as UUID,
       type: ActionType.DECLARE,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-02-01T00:00:00Z',
       status: 'Accepted' as const,
       originalActionId: 'action-id-2' as UUID
@@ -501,7 +500,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-4' as UUID,
       type: ActionType.REQUEST_CORRECTION,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T00:00:00Z',
       status: 'Requested' as const
     }
@@ -510,7 +509,7 @@ describe('getPendingAction', () => {
       ...commonAction,
       id: 'action-id-5' as UUID,
       type: ActionType.REGISTER,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdAt: '2023-01-01T00:00:00Z',
       status: 'Requested' as const
     }
@@ -630,5 +629,141 @@ describe('omitHiddenPaginatedFields', () => {
 
     expect(missingKeys).not.toContain('recommender.name')
     expect(missingKeys).not.toContain('recommender.id')
+  })
+})
+
+describe('getCompleteActionAnnotation', () => {
+  const baseEvent: EventDocument = {
+    id: 'event-id-1' as UUID,
+    type: 'TENNIS_CLUB_MEMBERSHIP',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-01T00:00:00Z',
+    trackingId: 'tracking-id-1',
+    actions: []
+  }
+
+  it('merges annotation with action.annotation when no originalActionId', () => {
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: { annotation: { fieldB: 'from-action' } }
+    })
+
+    const result = getCompleteActionAnnotation(
+      { fieldA: 'base' },
+      baseEvent,
+      action
+    )
+
+    expect(result).toEqual({ fieldA: 'base', fieldB: 'from-action' })
+  })
+
+  it('ignores missing original action and merges annotation with action.annotation', () => {
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        originalActionId: 'non-existent-id' as UUID,
+        annotation: { fieldB: 'from-action' }
+      }
+    })
+
+    const result = getCompleteActionAnnotation(
+      { fieldA: 'base' },
+      baseEvent,
+      action
+    )
+
+    expect(result).toEqual({ fieldA: 'base', fieldB: 'from-action' })
+  })
+
+  it('ignores original action annotation when original status is not Requested', () => {
+    const originalAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        annotation: { fieldC: 'from-original' }
+      }
+    }) satisfies ActionDocument
+
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        originalActionId: originalAction.id,
+        annotation: { fieldB: 'from-action' }
+      }
+    })
+
+    const event: EventDocument = { ...baseEvent, actions: [originalAction] }
+
+    const result = getCompleteActionAnnotation(
+      { fieldA: 'base' },
+      event,
+      action
+    )
+
+    expect(result).toEqual({ fieldA: 'base', fieldB: 'from-action' })
+  })
+
+  it('merges original action annotation when original status is Requested', () => {
+    const originalAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Requested,
+        annotation: { fieldC: 'from-original' }
+      }
+    }) satisfies ActionDocument
+
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        originalActionId: originalAction.id,
+        annotation: { fieldB: 'from-action' }
+      }
+    })
+
+    const event: EventDocument = { ...baseEvent, actions: [originalAction] }
+
+    const result = getCompleteActionAnnotation(
+      { fieldA: 'base' },
+      event,
+      action
+    )
+
+    expect(result).toEqual({
+      fieldA: 'base',
+      fieldB: 'from-action',
+      fieldC: 'from-original'
+    })
+  })
+
+  it('action.annotation overrides original action annotation', () => {
+    const originalAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Requested,
+        annotation: { field: 'from-original', fieldO: 'only-in-original' }
+      }
+    }) satisfies ActionDocument
+
+    const action = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        originalActionId: originalAction.id,
+        annotation: { field: 'from-action' }
+      }
+    })
+
+    const event: EventDocument = { ...baseEvent, actions: [originalAction] }
+
+    const result = getCompleteActionAnnotation({}, event, action)
+
+    expect(result).toEqual({ field: 'from-action', fieldO: 'only-in-original' })
   })
 })

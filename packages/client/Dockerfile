@@ -15,6 +15,9 @@ RUN yarn install --frozen-lockfile  && yarn build
 # Variables should be substituted in docker-compose/kubernetes manifest
 ENV CONTENT_SECURITY_POLICY_WILDCARD="{{CONTENT_SECURITY_POLICY_WILDCARD}}"
 ENV COUNTRY_CONFIG_URL_INTERNAL="{{COUNTRY_CONFIG_URL_INTERNAL}}"
+ENV LOGIN_URL="{{LOGIN_URL}}"
+ENV AUTH_URL_INTERNAL="{{AUTH_URL_INTERNAL}}"
+ENV CONFIG_API_URL_INTERNAL="{{CONFIG_API_URL_INTERNAL}}"
 ENV GATEWAY_URL_INTERNAL="{{GATEWAY_URL_INTERNAL}}"
 WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client

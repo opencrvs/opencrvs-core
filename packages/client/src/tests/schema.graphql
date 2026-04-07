@@ -198,15 +198,9 @@ type ApplicationConfiguration {
   CURRENCY: Currency
   DEATH: Death
   MARRIAGE: Marriage
-  MARRIAGE_REGISTRATION: Boolean
-  FIELD_AGENT_AUDIT_LOCATIONS: String
-  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
-  NID_NUMBER_PATTERN: String
   USER_NOTIFICATION_DELIVERY_METHOD: String
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
-  DATE_OF_BIRTH_UNKNOWN: Boolean
-  LOGIN_BACKGROUND: LoginBackground
 }
 
 input ApplicationConfigurationInput {
@@ -216,14 +210,9 @@ input ApplicationConfigurationInput {
   CURRENCY: CurrencyInput
   DEATH: DeathInput
   MARRIAGE: MarriageInput
-  FIELD_AGENT_AUDIT_LOCATIONS: String
-  EXTERNAL_VALIDATION_WORKQUEUE: Boolean
   PHONE_NUMBER_PATTERN: String
-  NID_NUMBER_PATTERN: String
   USER_NOTIFICATION_DELIVERY_METHOD: String
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: String
-  DATE_OF_BIRTH_UNKNOWN: Boolean
-  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 type AssignmentData {
@@ -943,7 +932,7 @@ input MedicalPractitionerInput {
 }
 
 union MixedTotalMetricsResult =
-    TotalMetricsByRegistrar
+  | TotalMetricsByRegistrar
   | TotalMetricsByLocation
   | TotalMetricsByTime
 
@@ -1233,7 +1222,6 @@ type Query {
     event: String
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
-  fetchRecordDetailsForVerification(id: String!): RecordDetails
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User
@@ -1358,8 +1346,6 @@ input QuestionnaireQuestionInput {
   fieldId: String
   value: String
 }
-
-union RecordDetails = BirthRegistration | DeathRegistration
 
 enum RegAction {
   VERIFIED
@@ -1724,7 +1710,8 @@ enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
-  WEBHOOK
+  IMPORT_EXPORT
+  CUSTOM
 }
 
 enum TelecomSystem {
@@ -1813,7 +1800,7 @@ type UserAuditLogItemWithComposition implements AuditLogItemBase {
 }
 
 union UserAuditLogResultItem =
-    UserAuditLogItemWithComposition
+  | UserAuditLogItemWithComposition
   | UserAuditLogItem
 
 type UserAuditLogResultSet {

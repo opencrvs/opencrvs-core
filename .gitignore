@@ -11,6 +11,7 @@ coverage
 build
 
 # misc
+.claude-working/
 .DS_Store
 .env*
 *.log
@@ -35,3 +36,6 @@ grafana
 deploy_key
 .lh
 .vscode
+
+# local markdown files
+*.local.md

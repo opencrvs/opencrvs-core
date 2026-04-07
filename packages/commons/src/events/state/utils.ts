@@ -22,7 +22,10 @@ import { pick } from 'lodash'
  * @returns existing actions for the given action type grouped by action status
  */
 function getActionRequests(actionType: ActionType, actions: Action[]) {
-  const filtered = actions.filter((action) => action.type === actionType)
+  const filtered = actions
+    .filter((action) => action.type === actionType)
+    // Reverse the array to get the latest action first, as there might be multiple actions of the same type.
+    .reverse()
 
   const accept = filtered.find(
     (action) => action.status === ActionStatus.Accepted
@@ -88,12 +91,12 @@ const updateActions = ActionTypes.extract([
   ActionType.CREATE,
   ActionType.NOTIFY,
   ActionType.DECLARE,
-  ActionType.VALIDATE,
   ActionType.REGISTER,
   ActionType.REJECT,
   ActionType.ARCHIVE,
   ActionType.PRINT_CERTIFICATE,
-  ActionType.REQUEST_CORRECTION
+  ActionType.REQUEST_CORRECTION,
+  ActionType.CUSTOM
 ])
 
 /**

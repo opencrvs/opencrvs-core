@@ -21,19 +21,19 @@ import {
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
   SystemVariables,
-  Scope,
-  ActionScopes,
   WorkqueueConfigWithoutQuery,
   joinValues,
   UUID,
-  SystemRole,
-  Location,
   UserOrSystem,
   InteractiveFieldType,
   FieldConfig,
   TextField,
+  AdministrativeArea,
+  ActionType,
   flattenEntries,
-  EventMetadataDateFieldId
+  EventMetadataDateFieldId,
+  getAcceptedScopesByType,
+  decodeScope
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -50,26 +50,18 @@ export function getUsersFullName(name: UserOrSystem['name'], language: string) {
 type AllKeys<T> = T extends T ? keyof T : never
 
 /**
- * @returns unique ids of users are referenced in the ActionDocument array.
  * Used for fetching user data in bulk.
+ * @returns unique ids of users which are referenced in the ActionDocument array.
  */
-export const getUserIdsFromActions = (
-  actions: ActionDocument[],
-  ignoreRoles?: SystemRole[]
-) => {
+export const getUserIdsFromActions = (actions: ActionDocument[]) => {
   const userIdFields = [
     'createdBy',
     'assignedTo'
   ] satisfies AllKeys<ActionDocument>[]
 
-  const userIds = actions
-    .filter(
-      ({ createdByRole }) =>
-        !ignoreRoles?.some((role) => role === createdByRole)
-    )
-    .flatMap((action) =>
-      userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
-    )
+  const userIds = actions.flatMap((action) =>
+    userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
+  )
 
   return uniq(userIds)
 }
@@ -214,27 +206,6 @@ export function replacePlaceholders({
   )
 }
 
-export const AssignmentStatus = {
-  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
-  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
-  UNASSIGNED: 'UNASSIGNED'
-} as const
-
-type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
-
-export function getAssignmentStatus(
-  eventState: EventIndex,
-  userId: string
-): AssignmentStatus {
-  if (!eventState.assignedTo) {
-    return AssignmentStatus.UNASSIGNED
-  }
-
-  return eventState.assignedTo == userId
-    ? AssignmentStatus.ASSIGNED_TO_SELF
-    : AssignmentStatus.ASSIGNED_TO_OTHERS
-}
-
 export function filterEmptyValues(
   obj: Record<string, unknown>
 ): Record<string, unknown> {
@@ -259,12 +230,19 @@ export enum CoreWorkqueues {
   DRAFT = 'draft'
 }
 
-export function hasOutboxWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => ActionScopes.safeParse(scope).success)
+export function hasOutboxWorkqueue(scopes: string[]) {
+  const hasRecordScope = scopes.some((scope) => !!decodeScope(scope))
+
+  return hasRecordScope
 }
 
-export function hasDraftWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => scope.startsWith('record.declare'))
+export function hasDraftWorkqueue(scopes: string[]) {
+  return (
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.create'],
+      scopes
+    }).length > 0
+  )
 }
 
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
@@ -273,7 +251,6 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
     defaultMessage: 'Outbox',
     description: 'Title of outbox workqueue'
   },
-  actions: [],
   slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
 }
@@ -281,10 +258,10 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
 export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
   name: {
     id: 'workqueues.draft.title',
-    defaultMessage: 'My drafts',
+    defaultMessage: 'Drafts',
     description: 'Title of draft workqueue'
   },
-  actions: [],
+  action: { type: ActionType.DECLARE },
   slug: CoreWorkqueues.DRAFT,
   icon: 'FileDotted'
 }
@@ -308,20 +285,20 @@ export function mergeWithoutNullsOrUndefined<T>(
 }
 
 type OutputMode = 'withIds' | 'withNames'
-/*
-Function to traverse the administrative level hierarchy from an arbitrary / leaf point
-*/
-export function getAdminLevelHierarchy(
-  locationId: string | undefined,
-  locations: Location[],
-  adminStructure: string[],
-  outputMode: OutputMode = 'withIds'
+
+// Given an administrative area id, return the full hierarchy from root to leaf.
+export function getAdministrativeAreaHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>
 ) {
   // Collect location objects from leaf to root
-  const collectedLocations: Location[] = []
+  const collectedLocations: AdministrativeArea[] = []
 
-  let current = locationId
-    ? locations.find((l) => l.id === locationId.toString())
+  const parsedAdministrativeAreaId =
+    administrativeAreaId && UUID.safeParse(administrativeAreaId).data
+
+  let current = parsedAdministrativeAreaId
+    ? administrativeAreas.get(parsedAdministrativeAreaId)
     : null
 
   while (current) {
@@ -330,11 +307,26 @@ export function getAdminLevelHierarchy(
       break
     }
     const parentId = current.parentId
-    current = locations.find((l) => l.id === parentId)
+    current = administrativeAreas.get(parentId)
   }
 
+  return collectedLocations
+}
+
+/*
+  Function to traverse the administrative level hierarchy from an arbitrary / leaf point
+*/
+export function getAdminLevelHierarchy(
+  administrativeAreaId: string | undefined | null,
+  administrativeAreas: Map<UUID, AdministrativeArea>,
+  adminStructure: string[],
+  outputMode: OutputMode = 'withIds'
+) {
   // Reverse so root is first, leaf is last
-  collectedLocations.reverse()
+  const collectedLocations = getAdministrativeAreaHierarchy(
+    administrativeAreaId,
+    administrativeAreas
+  ).reverse()
 
   // Map collected locations to the provided admin structure
   const hierarchy: Partial<Record<string, string>> = {}

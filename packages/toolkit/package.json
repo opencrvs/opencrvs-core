@@ -6,6 +6,7 @@
   "exports": {
     "./lib": "./dist/lib.js",
     "./api": "./dist/api/index.js",
+    "./application-config": "./dist/application-config/index.js",
     "./events": "./dist/events/index.js",
     "./scopes": "./dist/scopes/index.js",
     "./events/deduplication": "./dist/events/deduplication.js",
@@ -17,14 +18,19 @@
     "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit && ./build.sh"
   },
   "dependencies": {
-    "uuid": "^9.0.0",
-    "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1",
-    "object-hash": "^3.0.0",
-    "superjson": "1.9.0-0",
     "@trpc/client": "11.4.3",
     "@trpc/server": "11.4.3",
-    "zod-openapi": "^4.2.4"
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "date-fns": "^2.28.0",
+    "jwt-decode": "^3.0.0",
+    "lodash": "^4.17.10",
+    "object-hash": "^3.0.0",
+    "qs": "6.14.0",
+    "superjson": "1.9.0-0",
+    "uuid": "^9.0.0",
+    "zod": "^4.1.12",
+    "zod-openapi": "^5.4.3"
   },
   "devDependencies": {
     "@types/uuid": "^9.0.3",

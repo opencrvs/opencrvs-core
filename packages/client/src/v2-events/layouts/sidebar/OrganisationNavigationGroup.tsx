@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useIntl } from 'react-intl'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
@@ -112,17 +112,18 @@ export function OrganisationNavigationGroup({
                 )}
                 onClick={() => setIsConfigExpanded(!isConfigExpanded)}
               />
-              {(isConfigExpanded ||
-                currentWorkqueueSlug === WORKQUEUE_TABS.systems) && (
-                <NavigationSubItem
-                  id={`navigation_${WORKQUEUE_TABS.systems}`}
-                  isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.systems}
-                  label={intl.formatMessage(
-                    navigationMessages[WORKQUEUE_TABS.systems]
-                  )}
-                  onClick={() => navigate(routes.SYSTEM_LIST)}
-                />
-              )}
+              {hasAccess(WORKQUEUE_TABS.systems) &&
+                (isConfigExpanded ||
+                  currentWorkqueueSlug === WORKQUEUE_TABS.systems) && (
+                  <NavigationSubItem
+                    id={`navigation_${WORKQUEUE_TABS.systems}`}
+                    isSelected={currentWorkqueueSlug === WORKQUEUE_TABS.systems}
+                    label={intl.formatMessage(
+                      navigationMessages[WORKQUEUE_TABS.systems]
+                    )}
+                    onClick={() => navigate(routes.SYSTEM_LIST)}
+                  />
+                )}
             </>
           )}
           {hasAccess(WORKQUEUE_TABS.config) && (

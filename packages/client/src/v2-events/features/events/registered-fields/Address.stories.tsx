@@ -156,7 +156,10 @@ export const AddressFieldWithUserPrimaryOfficeAddress: FormStory = {
         defaultValue: {
           country: 'BGD',
           addressType: AddressType.DOMESTIC,
-          administrativeArea: leafAdminStructureLocationId
+          administrativeArea: {
+            $userField: 'primaryOfficeId',
+            $location: 'district'
+          }
         },
         configuration: {
           streetAddressForm: [

@@ -314,7 +314,7 @@ const messagesToDefine = {
   },
   correctionForApprovalDialogTitle: {
     id: 'correction.correctionForApprovalDialog.title',
-    defaultMessage: 'Send record correction for approval ?',
+    defaultMessage: 'Request record correction?',
     description:
       'The title for the dialog when record correction sent by registration agent for approval'
   },
@@ -332,7 +332,7 @@ const messagesToDefine = {
   },
   correctionForApprovalDialogDescription: {
     defaultMessage:
-      'The Registrar will be notified of this correction request and a record of this request will be recorded',
+      'This will initiate a formal correction request for the selected record. Supporting documentation may be required.',
     description:
       'The description for the dialog when record correction sent by registration agent for approval',
     id: 'correction.correctionForApprovalDialog.description'
@@ -343,10 +343,9 @@ const messagesToDefine = {
     description:
       'The title for the dialog when record correction sent by a registrar'
   },
-
   correctRecordDialogDescription: {
     defaultMessage:
-      'The informant will be notified of this correction and a record of this decision will be recorded',
+      'Approving this correction will permanently update the official record.',
     description:
       'The description for the dialog when record correction sent by a registrar',
     id: 'correction.correctRecordDialog.description'
@@ -385,7 +384,7 @@ const messagesToDefine = {
   },
   correctionApprovalDialogTitle: {
     id: 'correction.correctionForApprovalDialog.title',
-    defaultMessage: 'Send record correction for approval?',
+    defaultMessage: 'Request record correction?',
     description:
       'The title for the dialog when record correction sent by registration agent for approval'
   },

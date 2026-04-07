@@ -40,47 +40,6 @@ CREATE TYPE app.action_status AS ENUM (
 ALTER TYPE app.action_status OWNER TO events_migrator;
 
 --
--- Name: action_type; Type: TYPE; Schema: app; Owner: events_migrator
---
-
-CREATE TYPE app.action_type AS ENUM (
-    'CREATE',
-    'NOTIFY',
-    'DECLARE',
-    'VALIDATE',
-    'REGISTER',
-    'DUPLICATE_DETECTED',
-    'REJECT',
-    'MARK_AS_DUPLICATE',
-    'ARCHIVE',
-    'PRINT_CERTIFICATE',
-    'REQUEST_CORRECTION',
-    'CORRECT',
-    'REJECT_CORRECTION',
-    'APPROVE_CORRECTION',
-    'READ',
-    'ASSIGN',
-    'UNASSIGN',
-    'MARK_AS_NOT_DUPLICATE'
-);
-
-
-ALTER TYPE app.action_type OWNER TO events_migrator;
-
---
--- Name: location_type; Type: TYPE; Schema: app; Owner: events_migrator
---
-
-CREATE TYPE app.location_type AS ENUM (
-    'HEALTH_FACILITY',
-    'CRVS_OFFICE',
-    'ADMIN_STRUCTURE'
-);
-
-
-ALTER TYPE app.location_type OWNER TO events_migrator;
-
---
 -- Name: user_type; Type: TYPE; Schema: app; Owner: events_migrator
 --
 
@@ -97,6 +56,91 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: administrative_areas; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.administrative_areas (
+    id uuid NOT NULL,
+    name text NOT NULL,
+    parent_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    valid_until timestamp with time zone,
+    external_id text
+);
+
+
+ALTER TABLE app.administrative_areas OWNER TO events_migrator;
+
+--
+-- Name: audit_log; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.audit_log (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    client_id text NOT NULL,
+    client_type app.user_type NOT NULL,
+    operation text NOT NULL,
+    request_data jsonb,
+    response_summary jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    transaction_id text DEFAULT (gen_random_uuid())::text NOT NULL
+);
+
+
+ALTER TABLE app.audit_log OWNER TO events_migrator;
+
+--
+-- Name: TABLE audit_log; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON TABLE app.audit_log IS 'Stores an audit trail of operations performed by users and system integrations, including request data and a curated response summary.';
+
+
+--
+-- Name: COLUMN audit_log.client_id; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.client_id IS 'ID of the integration client or user making the request.';
+
+
+--
+-- Name: COLUMN audit_log.client_type; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.client_type IS 'Whether the client is a human user or a system integration.';
+
+
+--
+-- Name: COLUMN audit_log.operation; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.operation IS 'The operation that was performed.';
+
+
+--
+-- Name: COLUMN audit_log.request_data; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.request_data IS 'JSON blob of the request payload.';
+
+
+--
+-- Name: COLUMN audit_log.response_summary; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.response_summary IS 'Per-endpoint curated summary of the response (e.g. search terms used and count + IDs of results returned). Not the raw response payload.';
+
+
+--
+-- Name: COLUMN audit_log.transaction_id; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.audit_log.transaction_id IS 'Client-supplied idempotency key. Existing rows are backfilled with random UUIDs.';
+
+
+--
 -- Name: event_action_drafts; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -104,11 +148,11 @@ CREATE TABLE app.event_action_drafts (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     transaction_id text NOT NULL,
     event_id uuid NOT NULL,
-    action_type app.action_type NOT NULL,
+    action_type text NOT NULL,
     declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
     annotation jsonb,
     created_by text NOT NULL,
-    created_by_role text NOT NULL,
+    created_by_role text,
     created_by_user_type app.user_type NOT NULL,
     created_by_signature text,
     created_at_location uuid NOT NULL,
@@ -130,13 +174,13 @@ COMMENT ON TABLE app.event_action_drafts IS 'Stores user-specific drafts of even
 --
 
 CREATE TABLE app.event_actions (
-    action_type app.action_type NOT NULL,
+    action_type text NOT NULL,
     annotation jsonb,
     assigned_to text,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     created_at_location uuid,
     created_by text NOT NULL,
-    created_by_role text NOT NULL,
+    created_by_role text,
     created_by_signature text,
     created_by_user_type app.user_type NOT NULL,
     declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
@@ -148,7 +192,8 @@ CREATE TABLE app.event_actions (
     status app.action_status NOT NULL,
     transaction_id text NOT NULL,
     content jsonb,
-    CONSTRAINT event_actions_check CHECK ((((action_type = 'ASSIGN'::app.action_type) AND (assigned_to IS NOT NULL)) OR ((action_type = 'UNASSIGN'::app.action_type) AND (assigned_to IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Accepted'::app.action_status) AND (registration_number IS NOT NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Requested'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Rejected'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REJECT'::app.action_type) AND ((content -> 'reason'::text) IS NOT NULL) AND ((content ->> 'reason'::text) <> ''::text)) OR ((action_type = 'REJECT_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR ((action_type = 'APPROVE_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR (action_type <> ALL (ARRAY['ASSIGN'::app.action_type, 'UNASSIGN'::app.action_type, 'REGISTER'::app.action_type, 'REJECT'::app.action_type, 'REJECT_CORRECTION'::app.action_type, 'APPROVE_CORRECTION'::app.action_type]))))
+    custom_action_type text,
+    CONSTRAINT event_actions_check CHECK ((((action_type = 'ASSIGN'::text) AND (assigned_to IS NOT NULL)) OR ((action_type = 'UNASSIGN'::text) AND (assigned_to IS NULL)) OR ((action_type = 'REGISTER'::text) AND (status = 'Accepted'::app.action_status) AND (registration_number IS NOT NULL)) OR ((action_type = 'REGISTER'::text) AND (status = 'Requested'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REGISTER'::text) AND (status = 'Rejected'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REJECT'::text) AND ((content -> 'reason'::text) IS NOT NULL) AND ((content ->> 'reason'::text) <> ''::text)) OR ((action_type = 'REJECT_CORRECTION'::text) AND (request_id IS NOT NULL)) OR ((action_type = 'APPROVE_CORRECTION'::text) AND (request_id IS NOT NULL)) OR ((action_type = 'CUSTOM'::text) AND (custom_action_type IS NOT NULL)) OR (action_type <> ALL (ARRAY['ASSIGN'::text, 'UNASSIGN'::text, 'REGISTER'::text, 'REJECT'::text, 'REJECT_CORRECTION'::text, 'APPROVE_CORRECTION'::text]))))
 );
 
 
@@ -198,12 +243,13 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 CREATE TABLE app.locations (
     id uuid NOT NULL,
     name text NOT NULL,
-    parent_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
-    location_type app.location_type,
-    valid_until timestamp with time zone
+    location_type text,
+    valid_until timestamp with time zone,
+    administrative_area_id uuid,
+    external_id text
 );
 
 
@@ -245,10 +291,105 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
 
 --
+-- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.system_clients (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    legacy_id text,
+    name text NOT NULL,
+    scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
+    created_by text,
+    secret_hash text,
+    salt text,
+    sha_secret text,
+    status text DEFAULT 'active'::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT system_clients_status_check CHECK ((status = ANY (ARRAY['active'::text, 'disabled'::text])))
+);
+
+
+ALTER TABLE app.system_clients OWNER TO events_migrator;
+
+--
+-- Name: user_credentials; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.user_credentials (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    username text NOT NULL,
+    password_hash text NOT NULL,
+    salt text NOT NULL,
+    security_questions jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE app.user_credentials OWNER TO events_migrator;
+
+--
+-- Name: users; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.users (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    legacy_id text,
+    firstname text,
+    surname text,
+    full_honorific_name text,
+    role text NOT NULL,
+    status text NOT NULL,
+    email text,
+    mobile text,
+    signature_path text,
+    profile_image_path text,
+    office_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT email_or_mobile_not_null CHECK (((email IS NOT NULL) OR (mobile IS NOT NULL)))
+);
+
+
+ALTER TABLE app.users OWNER TO events_migrator;
+
+--
+-- Name: COLUMN users.legacy_id; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.users.legacy_id IS 'References the user id from the legacy database.';
+
+
+--
 -- Name: pgmigrations id; Type: DEFAULT; Schema: app; Owner: events_migrator
 --
 
 ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmigrations_id_seq'::regclass);
+
+
+--
+-- Name: administrative_areas administrative_areas_external_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.administrative_areas
+    ADD CONSTRAINT administrative_areas_external_id_key UNIQUE (external_id);
+
+
+--
+-- Name: administrative_areas administrative_areas_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.administrative_areas
+    ADD CONSTRAINT administrative_areas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.audit_log
+    ADD CONSTRAINT audit_log_pkey PRIMARY KEY (id);
 
 
 --
@@ -316,6 +457,14 @@ ALTER TABLE ONLY app.events
 
 
 --
+-- Name: locations locations_external_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.locations
+    ADD CONSTRAINT locations_external_id_key UNIQUE (external_id);
+
+
+--
 -- Name: locations locations_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -329,6 +478,134 @@ ALTER TABLE ONLY app.locations
 
 ALTER TABLE ONLY app.pgmigrations
     ADD CONSTRAINT pgmigrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: system_clients system_clients_legacy_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_clients
+    ADD CONSTRAINT system_clients_legacy_id_key UNIQUE (legacy_id);
+
+
+--
+-- Name: system_clients system_clients_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_clients
+    ADD CONSTRAINT system_clients_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_credentials user_credentials_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.user_credentials
+    ADD CONSTRAINT user_credentials_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_credentials user_credentials_username_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.user_credentials
+    ADD CONSTRAINT user_credentials_username_key UNIQUE (username);
+
+
+--
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- Name: users users_legacy_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_legacy_id_key UNIQUE (legacy_id);
+
+
+--
+-- Name: users users_mobile_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_mobile_key UNIQUE (mobile);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_action_created_by ON app.event_actions USING btree (created_by);
+
+
+--
+-- Name: idx_audit_log_client_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_audit_log_client_id ON app.audit_log USING btree (client_id);
+
+
+--
+-- Name: idx_audit_log_created_at; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_audit_log_created_at ON app.audit_log USING btree (created_at);
+
+
+--
+-- Name: idx_audit_log_operation; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
+
+
+--
+-- Name: idx_audit_log_transaction_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
+
+
+--
+-- Name: idx_event_tracking_id; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_event_tracking_id ON app.events USING btree (tracking_id);
+
+
+--
+-- Name: idx_locations_valid_until; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_locations_valid_until ON app.locations USING btree (valid_until);
+
+
+--
+-- Name: system_clients_legacy_id_idx; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE UNIQUE INDEX system_clients_legacy_id_idx ON app.system_clients USING btree (legacy_id) WHERE (legacy_id IS NOT NULL);
+
+
+--
+-- Name: administrative_areas administrative_areas_parent_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.administrative_areas
+    ADD CONSTRAINT administrative_areas_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES app.administrative_areas(id);
 
 
 --
@@ -372,11 +649,27 @@ ALTER TABLE ONLY app.event_actions
 
 
 --
--- Name: locations locations_parent_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+-- Name: locations locations_administrative_area_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
 ALTER TABLE ONLY app.locations
-    ADD CONSTRAINT locations_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES app.locations(id);
+    ADD CONSTRAINT locations_administrative_area_id_fkey FOREIGN KEY (administrative_area_id) REFERENCES app.administrative_areas(id);
+
+
+--
+-- Name: user_credentials user_credentials_user_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.user_credentials
+    ADD CONSTRAINT user_credentials_user_id_fkey FOREIGN KEY (user_id) REFERENCES app.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users users_office_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.users
+    ADD CONSTRAINT users_office_id_fkey FOREIGN KEY (office_id) REFERENCES app.locations(id);
 
 
 --
@@ -384,6 +677,20 @@ ALTER TABLE ONLY app.locations
 --
 
 GRANT USAGE ON SCHEMA app TO events_app;
+
+
+--
+-- Name: TABLE administrative_areas; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.administrative_areas TO events_app;
+
+
+--
+-- Name: TABLE audit_log; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT ON TABLE app.audit_log TO events_app;
 
 
 --
@@ -412,6 +719,27 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.events TO events_app;
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
+
+
+--
+-- Name: TABLE system_clients; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_clients TO events_app;
+
+
+--
+-- Name: TABLE user_credentials; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.user_credentials TO events_app;
+
+
+--
+-- Name: TABLE users; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 
 
 --

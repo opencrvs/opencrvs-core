@@ -15,7 +15,7 @@ services:
       - './data/mongo:/data/db'
 
   postgres:
-    image: postgres:17.6
+    image: docker.io/chumaky/postgres_mongo_fdw:17.6_fdw5.5.2
     container_name: postgres
     restart: always
     environment:
@@ -76,12 +76,3 @@ services:
       - './data/backups/influxdb:/data/backups/influxdb'
       - './infrastructure/influxdb.conf:/etc/influxdb/influxdb.conf'
       # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
-  hearth:
-    environment:
-      - logger__level=warn
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-      - './infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js'
-      - './infrastructure/hearth-queryparam-extensions.json:/src/hearth/config/queryparam-extensions.json'
-    ports:
-      - '3447:3447'

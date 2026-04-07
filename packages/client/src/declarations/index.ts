@@ -9,79 +9,42 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  Action as DeclarationAction,
-  SubmissionAction,
-  DownloadAction,
-  IForm,
-  IFormData,
-  IFormFieldValue,
-  IContactPoint,
-  FieldValueMap,
-  IAttachmentValue
-} from '@client/forms'
-import { SCOPES } from '@opencrvs/commons/client'
-import {
-  AssignmentData,
-  Attachment,
-  EventType,
-  History,
-  Query,
-  RegStatus
-} from '@client/utils/gateway'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import {
-  UserDetailsAvailable,
-  USER_DETAILS_AVAILABLE
-} from '@client/profile/profileActions'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { storage } from '@client/storage'
-import { IStoreState } from '@client/store'
-import {
-  gqlToDraftTransformer,
-  draftToGqlTransformer
-} from '@client/transformer'
-import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import type {
-  GQLEventSearchResultSet,
-  GQLEventSearchSet,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLRegistrationSearchSet,
-  GQLHumanName,
-  GQLMarriageEventSearchSet
-} from '@client/utils/gateway-deprecated-do-not-use'
-import {
   ApolloClient,
   ApolloError,
-  ApolloQueryResult,
   InternalRefetchQueriesInclude
 } from '@apollo/client'
-import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
-import { v4 as uuid } from 'uuid'
-import { getOfflineData } from '@client/offline/selectors'
+import {
+  Action as DeclarationAction,
+  IForm,
+  IFormData,
+  IFormFieldValue
+} from '@client/forms'
+
+import {
+  ShowDownloadDeclarationFailedToast,
+  ShowUnassignedDeclarations
+} from '@client/notification/actions'
 import { IOfflineData } from '@client/offline/reducer'
 import {
-  showDownloadDeclarationFailedToast,
-  ShowDownloadDeclarationFailedToast,
-  ShowUnassignedDeclarations,
-  showUnassignedDeclarations
-} from '@client/notification/actions'
-import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
+  UserDetailsAvailable
+} from '@client/profile/profileActions'
+import { storage } from '@client/storage'
 import {
-  UpdateRegistrarWorkqueueAction,
-  updateRegistrarWorkqueue,
-  IQueryData,
-  IWorkqueue
-} from '@client/workqueue'
-import { isBase64FileString } from '@client/utils/commonUtils'
-import { EMPTY_STRING, SIGNATURE_KEYS } from '@client/utils/constants'
-import { ViewRecordQueries } from '@client/views/ViewRecord/query'
+  AssignmentData,
+  EventType,
+  RegStatus
+} from '@client/utils/gateway'
+import type {
+  GQLEventSearchResultSet
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
-import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
-import { getReviewForm } from '@client/forms/register/review-selectors'
-import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
-import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
-import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
+import {
+  IQueryData,
+  IWorkqueue,
+  UpdateRegistrarWorkqueueAction
+} from '@client/workqueue'
+import { LoopReducer } from 'redux-loop'
+import { v4 as uuid } from 'uuid'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -143,7 +106,7 @@ export enum SUBMISSION_STATUS {
   REJECT_CORRECTION = 'REJECT_CORRECTION'
 }
 
-export enum DOWNLOAD_STATUS {
+enum DOWNLOAD_STATUS {
   READY_TO_DOWNLOAD = 'READY_TO_DOWNLOAD',
   DOWNLOADING = 'DOWNLOADING',
   DOWNLOADED = 'DOWNLOADED',
@@ -174,30 +137,16 @@ const processingStates = [
   SUBMISSION_STATUS.REJECT_CORRECTION
 ]
 
-const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
-interface IActionList {
-  [key: string]: string
-}
-
-const ACTION_LIST: IActionList = {
-  [DownloadAction.LOAD_REVIEW_DECLARATION]:
-    DownloadAction.LOAD_REVIEW_DECLARATION,
-  [DownloadAction.LOAD_CERTIFICATE_DECLARATION]:
-    DownloadAction.LOAD_REVIEW_DECLARATION,
-  [DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION]:
-    DownloadAction.LOAD_REVIEW_DECLARATION
-}
-
 export interface IPayload {
   [key: string]: IFormFieldValue
 }
 
-export interface IVisitedGroupId {
+interface IVisitedGroupId {
   sectionId: string
   groupId: string
 }
 
-export interface ITaskHistory {
+interface ITaskHistory {
   operationType?: string
   operatedOn?: string
 }
@@ -300,7 +249,7 @@ type PaymentType = 'MANUAL'
 
 type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 
-export type Payment = {
+type Payment = {
   paymentId?: string
   type: PaymentType
   amount: number
@@ -461,7 +410,7 @@ interface IUnassignDeclarationFailed {
   }
 }
 
-export type Action =
+type Action =
   | IArchiveDeclarationAction
   | IStoreDeclarationAction
   | IModifyDeclarationAction
@@ -498,25 +447,13 @@ export interface IUserData {
 export interface IDeclarationsState {
   userID: string
   declarations: IDeclaration[]
-  initialDeclarationsLoaded: boolean
   isWritingDraft: boolean
 }
 
 const initialState: IDeclarationsState = {
   userID: '',
   declarations: [],
-  initialDeclarationsLoaded: false,
   isWritingDraft: false
-}
-
-/* Need to add mappings for events here */
-const QueryMapper = {
-  [EventType.Birth]: getBirthQueryMappings,
-  [EventType.Death]: getDeathQueryMappings,
-  [EventType.Marriage]: getMarriageQueryMappings
-}
-const getQueryMapping = (event: EventType, action: DeclarationAction) => {
-  return QueryMapper[event] && QueryMapper[event](action)
 }
 
 export function createDeclaration(event: EventType, initialData?: IFormData) {
@@ -528,7 +465,7 @@ export function createDeclaration(event: EventType, initialData?: IFormData) {
   }
 }
 
-export function makeDeclarationReadyToDownload(
+function makeDeclarationReadyToDownload(
   event: EventType,
   compositionId: string,
   action: DeclarationAction
@@ -539,25 +476,6 @@ export function makeDeclarationReadyToDownload(
     event,
     action,
     downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
-  }
-}
-
-export function createReviewDeclaration(
-  declarationId: string,
-  formData: IFormData,
-  event: EventType,
-  status?: RegStatus,
-  duplicates?: IDuplicates[]
-): IDeclaration {
-  return {
-    id: declarationId,
-    data: formData,
-    duplicates,
-    originalData: formData,
-    localData: formData,
-    review: true,
-    event,
-    registrationStatus: status
   }
 }
 
@@ -578,36 +496,9 @@ export function storeDeclaration(
   return { type: STORE_DECLARATION, payload: { declaration } }
 }
 
-export function modifyDeclaration(
-  declaration: IPrintableDeclaration | Partial<IDeclaration>
-): IModifyDeclarationAction {
-  return { type: MODIFY_DECLARATION, payload: { declaration } }
-}
-
-export function clearCorrectionAndPrintChanges(
-  declarationId: string
-): IClearCorrectionAndPrintChanges {
-  return {
-    type: CLEAR_CORRECTION_AND_PRINT_CHANGES,
-    payload: { declarationId }
-  }
-}
-
 export function setInitialDeclarations() {
   return { type: SET_INITIAL_DECLARATION }
 }
-
-export const getStorageDeclarationsSuccess = (
-  response: string
-): IGetStorageDeclarationsSuccessAction => ({
-  type: GET_DECLARATIONS_SUCCESS,
-  payload: response
-})
-
-const getStorageDeclarationsFailed =
-  (): IGetStorageDeclarationsFailedAction => ({
-    type: GET_DECLARATIONS_FAILED
-  })
 
 export function archiveDeclaration(
   declarationId: string,
@@ -621,35 +512,6 @@ export function archiveDeclaration(
   }
 }
 
-export const RemoveUnassignedDeclarationsActionCreator = (payload: {
-  currentlyDownloadedDeclarations: IDeclaration[]
-  unassignedDeclarations: IDeclaration[]
-}): IRemoveUnassignedDeclarationAction => ({
-  type: REMOVE_UNASSIGNED_DECLARATIONS,
-  payload: payload
-})
-
-export function deleteDeclaration(
-  declarationId: string,
-  client: ApolloClient<{}>
-): IDeleteDeclarationAction {
-  return { type: DELETE_DECLARATION, payload: { declarationId, client } }
-}
-
-function deleteDeclarationSuccess(
-  declarationId: string,
-  client: ApolloClient<{}>
-): IDeleteDeclarationSuccessAction {
-  return {
-    type: DELETE_DECLARATION_SUCCESS,
-    payload: { declarationId, client }
-  }
-}
-
-function deleteDeclarationFailed(): IDeleteDeclarationFailedAction {
-  return { type: DELETE_DECLARATION_FAILED }
-}
-
 export function writeDeclaration(
   declaration: IDeclaration | IPrintableDeclaration,
   callback?: () => void
@@ -658,26 +520,16 @@ export function writeDeclaration(
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
 
-function writeDeclarationSuccess(
-  declaration: IDeclaration
-): IWriteDeclarationSuccessAction {
-  return { type: WRITE_DECLARATION_SUCCESS, payload: { declaration } }
-}
-
-function writeDeclarationFailed(): IWriteDeclarationFailedAction {
-  return { type: WRITE_DECLARATION_FAILED }
-}
-
 export async function getCurrentUserID(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
 
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as UserDetails).userMgntUserID || ''
+  return (JSON.parse(userDetails) as UserDetails).id || ''
 }
 
-export async function getUserData(userId: string) {
+async function getUserData(userId: string) {
   const userData = await storage.getItem('USER_DATA')
   const allUserData: IUserData[] = !userData
     ? []
@@ -685,295 +537,6 @@ export async function getUserData(userId: string) {
   const currentUserData = allUserData.find((uData) => uData.userID === userId)
 
   return { allUserData, currentUserData }
-}
-
-export function mergeDeclaredDeclarations(
-  declarations: IDeclaration[],
-  declaredDeclarations: GQLEventSearchSet[]
-) {
-  const localDeclarations = declarations.map((declaration) => declaration.id)
-
-  const declarationsNotStoredLocally = declaredDeclarations.filter(
-    (declaredDeclaration) => !localDeclarations.includes(declaredDeclaration.id)
-  )
-  const transformedDeclaredDeclarations = declarationsNotStoredLocally.map(
-    (app) => {
-      return transformSearchQueryDataToDraft(app)
-    }
-  )
-  declarations.push(...transformedDeclaredDeclarations)
-}
-
-export async function getDeclarationsOfCurrentUser(): Promise<string> {
-  // returns a 'stringified' IUserData
-  const storageTable = await storage.getItem('USER_DATA')
-  if (!storageTable) {
-    return JSON.stringify({ declarations: [] })
-  }
-
-  const currentUserID = await getCurrentUserID()
-
-  const allUserData = JSON.parse(storageTable) as IUserData[]
-
-  if (!allUserData.length) {
-    // No user-data at all
-    const payloadWithoutDeclarations: IUserData = {
-      userID: currentUserID,
-      declarations: []
-    }
-
-    return JSON.stringify(payloadWithoutDeclarations)
-  }
-
-  const currentUserData = allUserData.find(
-    (uData) => uData.userID === currentUserID
-  )
-  const currentUserDeclarations: IDeclaration[] =
-    (currentUserData && currentUserData.declarations) || []
-
-  const payload: IUserData = {
-    userID: currentUserID,
-    declarations: currentUserDeclarations
-  }
-  return JSON.stringify(payload)
-}
-
-export async function updateWorkqueueData(
-  state: IStoreState,
-  declaration: IDeclaration,
-  workQueueId: keyof IQueryData,
-  userWorkqueue?: IWorkqueue
-) {
-  if (!userWorkqueue || !userWorkqueue.data) {
-    return
-  }
-
-  const workqueueApp = userWorkqueue.data[workQueueId]?.results?.find(
-    (app) => app && app.id === declaration.id
-  )
-  if (!workqueueApp) {
-    return
-  }
-  const sectionIds =
-    declaration.event === 'birth'
-      ? ['child']
-      : declaration.event === 'death'
-        ? ['deceased']
-        : ['groom', 'bride']
-
-  let transformedName: (GQLHumanName | null)[] | undefined
-  let transformedNameForGroom: (GQLHumanName | null)[] | undefined
-  let transformedNameForBride: (GQLHumanName | null)[] | undefined
-  let transformedDeathDate: IFormFieldValue = EMPTY_STRING
-  let transformedBirthDate: IFormFieldValue = EMPTY_STRING
-  let transformedMarriageDate: IFormFieldValue = EMPTY_STRING
-  let transformedInformantContactNumber = EMPTY_STRING
-
-  if (declaration.event === 'marriage') {
-    const groomSectionId = sectionIds[0]
-    const brideSectionId = sectionIds[1]
-
-    const groomSectionDefinition = getRegisterForm(state)[
-      declaration.event
-    ].sections.find((section) => section.id === groomSectionId)
-    const brideSectionDefinition = getRegisterForm(state)[
-      declaration.event
-    ].sections.find((section) => section.id === brideSectionId)
-
-    const transformedDeclarationForGroom = draftToGqlTransformer(
-      // transforming required section only
-      { sections: groomSectionDefinition ? [groomSectionDefinition] : [] },
-      declaration.data,
-      declaration.id,
-      getUserDetails(state),
-      getOfflineData(state),
-      declaration.originalData
-    )
-
-    const transformedDeclarationForBride = draftToGqlTransformer(
-      // transforming required section only
-      { sections: brideSectionDefinition ? [brideSectionDefinition] : [] },
-      declaration.data,
-      declaration.id,
-      getUserDetails(state),
-      getOfflineData(state),
-      declaration.originalData
-    )
-
-    transformedNameForGroom =
-      (transformedDeclarationForGroom &&
-        transformedDeclarationForGroom[groomSectionId] &&
-        transformedDeclarationForGroom[groomSectionId].name) ||
-      []
-    transformedNameForBride =
-      (transformedDeclarationForBride &&
-        transformedDeclarationForBride[brideSectionId] &&
-        transformedDeclarationForBride[brideSectionId].name) ||
-      []
-    transformedMarriageDate =
-      (declaration.data &&
-        declaration.data.marriageEvent &&
-        declaration.data.marriageEvent.marriageDate) ||
-      []
-  } else {
-    const sectionId = sectionIds[0]
-    const sectionDefinition = getRegisterForm(state)[
-      declaration.event
-    ].sections.find((section) => section.id === sectionId)
-
-    const transformedDeclaration = draftToGqlTransformer(
-      // transforming required section only
-      { sections: sectionDefinition ? [sectionDefinition] : [] },
-      declaration.data,
-      declaration.id,
-      getUserDetails(state),
-      getOfflineData(state),
-      declaration.originalData
-    )
-    transformedName =
-      (transformedDeclaration &&
-        transformedDeclaration[sectionId] &&
-        transformedDeclaration[sectionId].name) ||
-      []
-    transformedDeathDate =
-      (declaration.data &&
-        declaration.data.deathEvent &&
-        declaration.data.deathEvent.deathDate) ||
-      []
-    transformedBirthDate =
-      (declaration.data &&
-        declaration.data.child &&
-        declaration.data.child.childBirthDate) ||
-      []
-  }
-  transformedInformantContactNumber =
-    (declaration.data &&
-      declaration.data.registration &&
-      declaration.data.registration.contactPoint &&
-      (declaration.data.registration.contactPoint as IContactPoint).nestedFields
-        .registrationPhone) ||
-    ''
-
-  if (declaration.event === 'birth') {
-    ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
-    ;(workqueueApp as GQLBirthEventSearchSet).dateOfBirth = transformedBirthDate
-    ;(
-      (workqueueApp as GQLDeathEventSearchSet)
-        .registration as GQLRegistrationSearchSet
-    ).contactNumber = transformedInformantContactNumber
-  } else if (declaration.event === 'death') {
-    ;(workqueueApp as GQLDeathEventSearchSet).deceasedName = transformedName
-    ;(workqueueApp as GQLDeathEventSearchSet).dateOfDeath = transformedDeathDate
-    ;(
-      (workqueueApp as GQLDeathEventSearchSet)
-        .registration as GQLRegistrationSearchSet
-    ).contactNumber = transformedInformantContactNumber
-  } else if (declaration.event === 'marriage') {
-    ;(workqueueApp as GQLMarriageEventSearchSet).brideName =
-      transformedNameForBride
-    ;(workqueueApp as GQLMarriageEventSearchSet).groomName =
-      transformedNameForGroom
-    ;(workqueueApp as GQLMarriageEventSearchSet).dateOfMarriage =
-      transformedMarriageDate
-    ;(
-      (workqueueApp as GQLMarriageEventSearchSet)
-        .registration as GQLRegistrationSearchSet
-    ).contactNumber = transformedInformantContactNumber
-  }
-}
-
-export async function writeDeclarationByUser(
-  getState: () => IStoreState,
-  userId: string,
-  declaration: IDeclaration
-) {
-  const uID = userId || (await getCurrentUserID())
-  const userData = await getUserData(uID)
-  const { allUserData } = userData
-  let { currentUserData } = userData
-
-  if (currentUserData) {
-    currentUserData.declarations = [
-      ...currentUserData.declarations.filter(
-        (savedDeclaration) => savedDeclaration.id !== declaration.id
-      ),
-      declaration
-    ]
-  } else {
-    currentUserData = {
-      userID: uID,
-      declarations: [declaration]
-    }
-    allUserData.push(currentUserData)
-  }
-  if (
-    declaration.registrationStatus &&
-    declaration.registrationStatus === 'IN_PROGRESS'
-  ) {
-    updateWorkqueueData(
-      getState(),
-      declaration,
-      'inProgressTab',
-      currentUserData.workqueue
-    )
-    updateWorkqueueData(
-      getState(),
-      declaration,
-      'notificationTab',
-      currentUserData.workqueue
-    )
-  }
-
-  if (
-    declaration.registrationStatus &&
-    declaration.registrationStatus === 'DECLARED'
-  ) {
-    updateWorkqueueData(
-      getState(),
-      declaration,
-      'reviewTab',
-      currentUserData.workqueue
-    )
-  }
-
-  if (
-    declaration.registrationStatus &&
-    declaration.registrationStatus === 'VALIDATED'
-  ) {
-    updateWorkqueueData(
-      getState(),
-      declaration,
-      'reviewTab',
-      currentUserData.workqueue
-    )
-  }
-
-  if (
-    declaration.registrationStatus &&
-    declaration.registrationStatus === 'REJECTED'
-  ) {
-    updateWorkqueueData(
-      getState(),
-      declaration,
-      'rejectTab',
-      currentUserData.workqueue
-    )
-  }
-
-  if (
-    declaration.registrationStatus &&
-    declaration.registrationStatus === 'REGISTERED'
-  ) {
-    updateWorkqueueData(
-      getState(),
-      declaration,
-      'printTab',
-      currentUserData.workqueue
-    )
-  }
-
-  await storage.setItem('USER_DATA', JSON.stringify(allUserData))
-  return declaration
 }
 
 export async function writeDeclarationByUserWithoutStateUpdate(
@@ -1004,998 +567,14 @@ export async function writeDeclarationByUserWithoutStateUpdate(
   return declaration
 }
 
-export async function deleteDeclarationByUser(
-  userId: string,
-  declarationId: string,
-  state: IDeclarationsState
-): Promise<string> {
-  const uID = userId || (await getCurrentUserID())
-  const { allUserData, currentUserData } = await getUserData(uID)
-
-  allUserData.map((userData) => {
-    if (userData.userID === state.userID) {
-      userData.declarations = state.declarations
-    }
-    return userData
-  })
-
-  const deletedDeclarationId = currentUserData
-    ? currentUserData.declarations.findIndex((app) => app.id === declarationId)
-    : -1
-
-  if (deletedDeclarationId >= 0) {
-    currentUserData &&
-      currentUserData.declarations.splice(deletedDeclarationId, 1)
-    await storage.setItem('USER_DATA', JSON.stringify(allUserData))
-  }
-  return declarationId
-}
-
-export function downloadDeclaration(
-  event: EventType,
-  compositionId: string,
-  action: DeclarationAction,
-  client: ApolloClient<{}>
-): IDownloadDeclaration {
-  const declaration = makeDeclarationReadyToDownload(
-    event,
-    compositionId,
-    action
-  )
-  return {
-    type: ENQUEUE_DOWNLOAD_DECLARATION,
-    payload: {
-      declaration,
-      client
-    }
-  }
-}
-
-function createRequestForDeclaration(
-  declaration: IDeclaration,
-  client: ApolloClient<{}>
-) {
-  const declarationAction = ACTION_LIST[declaration.action as string] || null
-  const result = getQueryMapping(
-    declaration.event,
-    declarationAction as DeclarationAction
-  )
-  const { query } = result || {
-    query: null
-  }
-
-  return {
-    request: client.query,
-    requestArgs: {
-      query,
-      variables: { id: declaration.id }
-    }
-  }
-}
-
-function requestWithStateWrapper(
-  mainRequest: Promise<ApolloQueryResult<Query>>,
-  getState: () => IStoreState,
-  client: ApolloClient<{}>
-) {
-  const store = getState()
-  return new Promise(async (resolve, reject) => {
-    try {
-      const data = await mainRequest
-      const scopes = getScope(getState())
-      if (scopes?.includes(SCOPES.RECORD_REVIEW_DUPLICATES)) {
-        await fetchAllDuplicateDeclarations(data.data)
-      }
-      const duplicateDeclarations = await fetchAllDuplicateDeclarations(
-        data.data
-      )
-
-      const allduplicateDeclarationsAttachments = (duplicateDeclarations ?? [])
-        .map(
-          (declaration) =>
-            declaration.data.fetchRegistrationForViewing?.registration
-        )
-        .flatMap((registration) => registration?.attachments)
-        .map((attachment) => attachment?.data)
-        .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-
-      const allfetchableURLs = [
-        ...new Set([
-          ...getAttachmentUrls(data.data),
-          ...getSignatureUrls(data.data),
-          ...getProfileIconUrls(data.data),
-          ...allduplicateDeclarationsAttachments
-        ])
-      ]
-
-      await Promise.all(
-        allfetchableURLs.map((url) => fetch(url).then((res) => res.blob()))
-      )
-
-      resolve({ data, store, client })
-    } catch (error) {
-      reject(error)
-    }
-  })
-}
-
-function getProfileIconUrls(queryResultData: Query) {
-  const history =
-    queryResultData.fetchBirthRegistration?.history ||
-    queryResultData.fetchDeathRegistration?.history ||
-    queryResultData.fetchMarriageRegistration?.history
-
-  const userAvatars = (history ?? [])
-    .filter((h): h is History => Boolean(h))
-    .map((h) => h.user?.avatar?.data)
-    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-
-  return [...new Set(userAvatars).values()]
-}
-
-function getAttachmentUrls(queryResultData: Query) {
-  const registration =
-    queryResultData.fetchBirthRegistration?.registration ||
-    queryResultData.fetchDeathRegistration?.registration ||
-    queryResultData.fetchMarriageRegistration?.registration
-
-  return (registration?.attachments ?? [])
-    .filter((a): a is Attachment => Boolean(a))
-    .map((a) => a.data)
-    .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-}
-
-function getSignatureUrls(queryResultData: Query) {
-  const data =
-    queryResultData.fetchBirthRegistration ||
-    queryResultData.fetchDeathRegistration ||
-    queryResultData.fetchMarriageRegistration
-
-  if (!data) return []
-  const { registration, history } = data
-
-  const registrarSignatures =
-    history
-      ?.map((entry) => entry?.signature?.data)
-      .filter((entry): entry is string => Boolean(entry)) || []
-
-  return [
-    ...registrarSignatures,
-    ...SIGNATURE_KEYS.map((propertyKey) => registration?.[propertyKey]).filter(
-      (maybeUrl): maybeUrl is string => Boolean(maybeUrl)
-    )
-  ]
-}
-
-async function fetchAllDuplicateDeclarations(queryResultData: Query) {
-  const registration =
-    queryResultData.fetchBirthRegistration?.registration ||
-    queryResultData.fetchDeathRegistration?.registration
-
-  const duplicateCompositionIds = registration?.duplicates?.map(
-    (duplicate) => duplicate?.compositionId
-  )
-
-  if (!duplicateCompositionIds || !duplicateCompositionIds?.length) {
-    return
-  }
-
-  const fetchAllDuplicates = duplicateCompositionIds.map((id) =>
-    ViewRecordQueries.fetchDuplicateDeclarations(id as string)
-  )
-
-  return Promise.all(fetchAllDuplicates)
-}
-
-function getDataKey(declaration: IDeclaration) {
-  const result = getQueryMapping(
-    declaration.event,
-    declaration.action as DeclarationAction
-  )
-
-  const { dataKey } = result || { dataKey: null }
-  return dataKey
-}
-
-function downloadDeclarationSuccess({
-  data,
-  store,
-  client
-}: {
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  data: any
-  store: IStoreState
-  client: ApolloClient<{}>
-}): IDownloadDeclarationSuccess {
-  const form = getReviewForm(store)
-
-  return {
-    type: DOWNLOAD_DECLARATION_SUCCESS,
-    payload: {
-      queryData: data,
-      form,
-      client,
-      offlineData: getOfflineData(store),
-      userDetails: getUserDetails(store) as UserDetails
-    }
-  }
-}
-
-function downloadDeclarationFail(
-  error: ApolloError,
-  declaration: IDeclaration,
-  client: ApolloClient<{}>
-): IDownloadDeclarationFail {
-  return {
-    type: DOWNLOAD_DECLARATION_FAIL,
-    payload: {
-      error,
-      declaration,
-      client
-    }
-  }
-}
-
-function executeUnassignDeclaration(
-  id: string,
-  client: ApolloClient<{}>,
-  refetchQueries?: InternalRefetchQueriesInclude
-): IUnassignDeclaration {
-  return {
-    type: UNASSIGN_DECLARATION,
-    payload: {
-      id,
-      client,
-      refetchQueries
-    }
-  }
-}
-
-export function unassignDeclaration(
-  id: string,
-  client: ApolloClient<{}>,
-  refetchQueries?: InternalRefetchQueriesInclude
-): IEnqueueUnassignDeclaration {
-  return {
-    type: ENQUEUE_UNASSIGN_DECLARATION,
-    payload: {
-      id,
-      client,
-      refetchQueries
-    }
-  }
-}
-
-function unassignDeclarationSuccess([id, client, refetchQueries]: [
-  string,
-  ApolloClient<{}>,
-  InternalRefetchQueriesInclude
-]): IUnassignDeclarationSuccess {
-  return {
-    type: UNASSIGN_DECLARATION_SUCCESS,
-    payload: {
-      id,
-      client,
-      refetchQueries
-    }
-  }
-}
-
-function unassignDeclarationFailed(
-  error: ApolloError,
-  declarationId: string,
-  client: ApolloClient<{}>,
-  refetchQueries?: InternalRefetchQueriesInclude
-): IUnassignDeclarationFailed {
-  return {
-    type: UNASSIGN_DECLARATION_FAILED,
-    payload: {
-      error,
-      declarationId,
-      client,
-      refetchQueries
-    }
-  }
-}
 export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   state: IDeclarationsState = initialState,
   action: Action
-): IDeclarationsState | Loop<IDeclarationsState, Action> => {
-  switch (action.type) {
-    case STORE_DECLARATION:
-      return {
-        ...state,
-        declarations: state.declarations.concat(action.payload.declaration)
-      }
-    case DELETE_DECLARATION: {
-      const { declarationId, client: clientFromDeleteDeclaration } =
-        action.payload
-      return loop(
-        {
-          ...state,
-          declarations: state.declarations.map((declaration) =>
-            declaration.id === declarationId
-              ? { ...declaration, writingDraft: true }
-              : declaration
-          )
-        },
-        Cmd.run(deleteDeclarationByUser, {
-          successActionCreator: (id: string) =>
-            deleteDeclarationSuccess(id, clientFromDeleteDeclaration),
-          failActionCreator: deleteDeclarationFailed,
-          args: [state.userID, action.payload.declarationId, state]
-        })
-      )
-    }
-    case DELETE_DECLARATION_SUCCESS:
-      const declarationToDelete = state.declarations.find(
-        (declaration) => declaration.id === action.payload.declarationId
-      )
-      const declarationMinioUrls =
-        getMinioUrlsFromDeclaration(declarationToDelete)
-
-      postMinioUrlsToServiceWorker(declarationMinioUrls)
-
-      const declarationsWithoutDeleted = state.declarations.filter(
-        ({ id }) => id !== action.payload.declarationId
-      )
-
-      clearUnusedViewRecordCacheEntries(
-        action.payload.client.cache,
-        declarationsWithoutDeleted
-      )
-
-      return {
-        ...state,
-        declarations: declarationsWithoutDeleted
-      }
-    case MODIFY_DECLARATION:
-      const newDeclarations = [...state.declarations]
-      const currentDeclarationIndex = newDeclarations.findIndex(
-        (declaration) => declaration.id === action.payload.declaration.id
-      )
-      const modifiedDeclaration = { ...action.payload.declaration }
-
-      if (modifiedDeclaration.data?.informant?.relationship) {
-        modifiedDeclaration.data.informant.relationship = (
-          modifiedDeclaration.data.registration.informantType as FieldValueMap
-        )?.value
-      }
-
-      newDeclarations[currentDeclarationIndex] = {
-        ...newDeclarations[currentDeclarationIndex],
-        ...modifiedDeclaration
-      }
-
-      return {
-        ...state,
-        declarations: newDeclarations
-      }
-    case CLEAR_CORRECTION_AND_PRINT_CHANGES: {
-      const declarationIndex = state.declarations.findIndex(
-        (declaration) => declaration.id === action.payload.declarationId
-      )
-
-      const correction = state.declarations[declarationIndex]
-
-      const orignalAppliation: IDeclaration = {
-        ...correction,
-        data: {
-          ...correction?.originalData
-        }
-      }
-
-      return loop(
-        {
-          ...state,
-          declarations: state.declarations.map((declaration, index) => {
-            if (index === declarationIndex) {
-              return orignalAppliation
-            }
-            return declaration
-          })
-        },
-        Cmd.action(modifyDeclaration(orignalAppliation))
-      )
-    }
-
-    case WRITE_DECLARATION: {
-      const {
-        declaration: { id }
-      } = action.payload
-      return loop(
-        {
-          ...state,
-          declarations: state.declarations.map((stateDeclaration) =>
-            id === stateDeclaration.id
-              ? { ...stateDeclaration, writingDraft: true }
-              : stateDeclaration
-          )
-        },
-        Cmd.run(writeDeclarationByUser, {
-          successActionCreator: (declaration: IDeclaration) => {
-            if (action.payload.callback) {
-              action.payload.callback()
-            }
-            return writeDeclarationSuccess(declaration)
-          },
-          failActionCreator: writeDeclarationFailed,
-          args: [Cmd.getState, state.userID, action.payload.declaration]
-        })
-      )
-    }
-    case WRITE_DECLARATION_SUCCESS: {
-      const { declaration } = action.payload
-      return {
-        ...state,
-        declarations: state.declarations.map((stateDeclaration) =>
-          declaration.id === stateDeclaration.id
-            ? { ...declaration, writingDraft: false }
-            : stateDeclaration
-        )
-      }
-    }
-    case USER_DETAILS_AVAILABLE:
-      return loop(
-        {
-          ...state
-        },
-        Cmd.run<
-          IGetStorageDeclarationsFailedAction,
-          IGetStorageDeclarationsSuccessAction
-        >(getDeclarationsOfCurrentUser, {
-          successActionCreator: getStorageDeclarationsSuccess,
-          failActionCreator: getStorageDeclarationsFailed,
-          args: []
-        })
-      )
-    case GET_DECLARATIONS_SUCCESS:
-      if (action.payload) {
-        const userData = JSON.parse(action.payload) as IUserData
-        return {
-          ...state,
-          userID: userData.userID,
-          declarations: userData.declarations,
-          initialDeclarationsLoaded: true,
-          isWritingDraft: false
-        }
-      }
-      return {
-        ...state,
-        initialDeclarationsLoaded: true
-      }
-    case ENQUEUE_DOWNLOAD_DECLARATION:
-      const { declarations } = state
-      const { declaration, client } = action.payload
-      const downloadIsRunning = declarations.some(
-        (declaration) =>
-          declaration.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
-      )
-
-      const declarationIndex = declarations.findIndex(
-        (app) => declaration.id === app.id
-      )
-      let newDeclarationsAfterStartingDownload = Array.from(declarations)
-
-      // Download is running, so enqueue
-      if (downloadIsRunning) {
-        // Declaration is not in list
-        if (declarationIndex === -1) {
-          newDeclarationsAfterStartingDownload = declarations.concat([
-            declaration
-          ])
-        } else {
-          // Declaration is failed before, just make it ready to download
-          newDeclarationsAfterStartingDownload[declarationIndex] = declaration
-        }
-
-        // Download is running just return the state
-        return {
-          ...state,
-          declarations: newDeclarationsAfterStartingDownload
-        }
-      }
-      // Download is not running
-      else {
-        // Declaration is not in list, so push it
-        if (declarationIndex === -1) {
-          newDeclarationsAfterStartingDownload = declarations.concat([
-            {
-              ...declaration,
-              downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
-            }
-          ])
-        }
-        // Declaration is in list make it downloading
-        else {
-          newDeclarationsAfterStartingDownload[declarationIndex] = {
-            ...declaration,
-            downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
-          }
-        }
-      }
-
-      const newState = {
-        ...state,
-        declarations: newDeclarationsAfterStartingDownload
-      }
-
-      const { request, requestArgs } = createRequestForDeclaration(
-        declaration,
-        client
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      ) as any
-
-      return loop(
-        newState,
-        Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(
-          requestWithStateWrapper,
-          {
-            args: [
-              request({ ...requestArgs, fetchPolicy: 'no-cache' }),
-              Cmd.getState,
-              client
-            ],
-            successActionCreator: downloadDeclarationSuccess,
-            failActionCreator: (err) =>
-              downloadDeclarationFail(
-                err,
-                {
-                  ...declaration,
-                  downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
-                },
-                client
-              )
-          }
-        )
-      )
-    case DOWNLOAD_DECLARATION_SUCCESS:
-      const {
-        queryData,
-        form,
-        client: clientFromSuccess,
-        offlineData,
-        userDetails
-      } = action.payload
-
-      const downloadingDeclarationIndex = state.declarations.findIndex(
-        (declaration) =>
-          declaration.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
-      )
-      const newDeclarationsAfterDownload = Array.from(state.declarations)
-      const downloadingDeclaration =
-        newDeclarationsAfterDownload[downloadingDeclarationIndex]
-
-      const dataKey = getDataKey(downloadingDeclaration)
-      const eventData = queryData.data[dataKey as string]
-      const transData: IFormData = gqlToDraftTransformer(
-        form[downloadingDeclaration.event],
-        eventData,
-        offlineData,
-        userDetails
-      )
-      const downloadedAppStatus =
-        eventData &&
-        eventData.registration &&
-        eventData.registration.status &&
-        eventData.registration.status[0].type
-      const updateWorkqueue = () =>
-        updateRegistrarWorkqueue(userDetails?.practitionerId, 10)
-
-      newDeclarationsAfterDownload[downloadingDeclarationIndex] =
-        createReviewDeclaration(
-          downloadingDeclaration.id,
-          transData,
-          downloadingDeclaration.event,
-          downloadedAppStatus,
-          eventData?.registration?.duplicates?.filter(
-            (duplicate: IDuplicates) => !!duplicate
-          )
-        )
-      newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
-        DOWNLOAD_STATUS.DOWNLOADED
-
-      newDeclarationsAfterDownload[
-        downloadingDeclarationIndex
-      ].assignmentStatus = eventData?.registration?.assignment ?? null
-
-      const newStateAfterDownload = {
-        ...state,
-        declarations: newDeclarationsAfterDownload
-      }
-
-      // Check if there is more to download
-      const downloadQueueInprogress = state.declarations.filter(
-        (declaration) =>
-          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
-      )
-
-      // If not then, write to IndexedDB and return state
-      if (!downloadQueueInprogress.length) {
-        return loop(
-          newStateAfterDownload,
-          Cmd.list<IDownloadDeclarationFail | UpdateRegistrarWorkqueueAction>(
-            [
-              Cmd.run(writeDeclarationByUser, {
-                args: [
-                  Cmd.getState,
-                  state.userID,
-                  newDeclarationsAfterDownload[downloadingDeclarationIndex]
-                ],
-                failActionCreator: (err) =>
-                  downloadDeclarationFail(
-                    err,
-                    newDeclarationsAfterDownload[downloadingDeclarationIndex],
-                    clientFromSuccess
-                  )
-              }),
-              Cmd.action(updateWorkqueue())
-            ],
-            { sequence: true }
-          )
-        )
-      }
-
-      const declarationToDownload = downloadQueueInprogress[0]
-      declarationToDownload.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
-      const { request: nextRequest, requestArgs: nextRequestArgs } =
-        createRequestForDeclaration(
-          declarationToDownload,
-          clientFromSuccess
-          /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        ) as any
-
-      // Return state, write to indexedDB and download the next ready to download declaration, all in sequence
-      return loop(
-        newStateAfterDownload,
-        Cmd.list<IDownloadDeclarationFail | UpdateRegistrarWorkqueueAction>(
-          [
-            Cmd.run(writeDeclarationByUser, {
-              args: [
-                Cmd.getState,
-                state.userID,
-                newDeclarationsAfterDownload[downloadingDeclarationIndex]
-              ],
-              failActionCreator: downloadDeclarationFail
-            }),
-            Cmd.action(updateWorkqueue()),
-            Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(
-              requestWithStateWrapper,
-              {
-                args: [
-                  nextRequest({ ...nextRequestArgs, fetchPolicy: 'no-cache' }),
-                  Cmd.getState,
-                  clientFromSuccess
-                ],
-                successActionCreator: downloadDeclarationSuccess,
-                failActionCreator: (err) =>
-                  downloadDeclarationFail(
-                    err,
-                    newDeclarationsAfterDownload[downloadingDeclarationIndex],
-                    clientFromSuccess
-                  )
-              }
-            )
-          ],
-          { sequence: true }
-        )
-      )
-
-    case DOWNLOAD_DECLARATION_FAIL:
-      const {
-        declaration: erroredDeclaration,
-        error,
-        client: clientFromFail
-      } = action.payload
-      erroredDeclaration.downloadRetryAttempt =
-        (erroredDeclaration.downloadRetryAttempt || 0) + 1
-
-      const { request: retryRequest, requestArgs: retryRequestArgs } =
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        createRequestForDeclaration(erroredDeclaration, clientFromFail) as any
-
-      const declarationsAfterError = Array.from(state.declarations)
-      const erroredDeclarationIndex = declarationsAfterError.findIndex(
-        (declaration) =>
-          declaration.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
-      )
-
-      declarationsAfterError[erroredDeclarationIndex] = erroredDeclaration
-
-      // Retry download until limit reached
-      if (
-        erroredDeclaration.downloadRetryAttempt < DOWNLOAD_MAX_RETRY_ATTEMPT
-      ) {
-        return loop(
-          {
-            ...state,
-            declarations: declarationsAfterError
-          },
-          Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(
-            requestWithStateWrapper,
-            {
-              args: [
-                retryRequest({ ...retryRequestArgs, fetchPolicy: 'no-cache' }),
-                Cmd.getState,
-                clientFromFail
-              ],
-              successActionCreator: downloadDeclarationSuccess,
-              failActionCreator: (err) =>
-                downloadDeclarationFail(err, erroredDeclaration, clientFromFail)
-            }
-          )
-        )
-      }
-
-      let status
-      if (error.networkError) {
-        status = DOWNLOAD_STATUS.FAILED_NETWORK
-      } else {
-        status = DOWNLOAD_STATUS.FAILED
-      }
-
-      erroredDeclaration.downloadStatus = status
-
-      declarationsAfterError[erroredDeclarationIndex] = erroredDeclaration
-
-      const downloadQueueFollowing = state.declarations.filter(
-        (declaration) =>
-          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
-      )
-
-      // If nothing more to download, return the state and write the declarations
-      if (!downloadQueueFollowing.length) {
-        return loop(
-          {
-            ...state,
-            declarations: declarationsAfterError
-          },
-          Cmd.list([
-            Cmd.action(showDownloadDeclarationFailedToast()),
-            Cmd.run(writeDeclarationByUser, {
-              args: [Cmd.getState, state.userID, erroredDeclaration]
-            })
-          ])
-        )
-      }
-
-      // If there are more to download in queue, start the next request
-      const nextDeclaration = downloadQueueFollowing[0]
-      const {
-        request: nextDeclarationRequest,
-        requestArgs: nextDeclarationRequestArgs
-        /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      } = createRequestForDeclaration(nextDeclaration, clientFromFail) as any
-      return loop(
-        {
-          ...state,
-          declarations: declarationsAfterError
-        },
-        Cmd.list(
-          [
-            Cmd.run(writeDeclarationByUser, {
-              args: [Cmd.getState, state.userID, erroredDeclaration]
-            }),
-            Cmd.run(requestWithStateWrapper, {
-              args: [
-                nextDeclarationRequest({
-                  ...nextDeclarationRequestArgs,
-                  fetchPolicy: 'no-cache'
-                }),
-                Cmd.getState,
-                clientFromFail
-              ],
-              successActionCreator: downloadDeclarationSuccess,
-              failActionCreator: (err) =>
-                downloadDeclarationFail(err, nextDeclaration, clientFromFail)
-            })
-          ],
-          { sequence: true }
-        )
-      )
-
-    case ARCHIVE_DECLARATION:
-      if (action.payload) {
-        const declaration = state.declarations.find(
-          ({ id }) => id === action.payload.declarationId
-        )
-
-        if (!declaration) {
-          return state
-        }
-        const modifiedDeclaration: IDeclaration = {
-          ...declaration,
-          submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-          action: SubmissionAction.ARCHIVE_DECLARATION,
-          payload: {
-            id: declaration.id,
-            reason: action.payload.reason || '',
-            comment: action.payload.comment || '',
-            duplicateTrackingId: action.payload.duplicateTrackingId || ''
-          }
-        }
-        return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
-      }
-      return state
-    case ENQUEUE_UNASSIGN_DECLARATION:
-      const queueIndex = state.declarations.findIndex(
-        ({ id }) => id === action.payload.id
-      )
-      const isQueueBusy = state.declarations.some((declaration) =>
-        [
-          DOWNLOAD_STATUS.READY_TO_UNASSIGN,
-          DOWNLOAD_STATUS.UNASSIGNING
-        ].includes(declaration.downloadStatus as DOWNLOAD_STATUS)
-      )
-      const updatedDeclarationsQueue = state.declarations
-      if (queueIndex === -1) {
-        // Not found locally, unassigning others declaration
-        updatedDeclarationsQueue.push({
-          id: action.payload.id,
-          downloadStatus: DOWNLOAD_STATUS.READY_TO_UNASSIGN
-        } as IDeclaration)
-      } else {
-        updatedDeclarationsQueue[queueIndex].downloadStatus =
-          DOWNLOAD_STATUS.READY_TO_UNASSIGN
-      }
-
-      return loop(
-        {
-          ...state,
-          declarations: updatedDeclarationsQueue
-        },
-        isQueueBusy
-          ? Cmd.none
-          : Cmd.action(
-              executeUnassignDeclaration(
-                action.payload.id,
-                action.payload.client,
-                action.payload.refetchQueries
-              )
-            )
-      )
-    case UNASSIGN_DECLARATION:
-      const unassignIndex = state.declarations.findIndex(
-        ({ id }) => id === action.payload.id
-      )
-      const updatedDeclarationsUnassign = state.declarations
-      updatedDeclarationsUnassign[unassignIndex].downloadStatus =
-        DOWNLOAD_STATUS.UNASSIGNING
-      return loop(
-        {
-          ...state,
-          declarations: updatedDeclarationsUnassign
-        },
-        Cmd.run(
-          async () => {
-            await action.payload.client.mutate({
-              mutation: MARK_EVENT_UNASSIGNED,
-              variables: { id: action.payload.id },
-              refetchQueries: action.payload.refetchQueries
-            })
-            return [
-              action.payload.id,
-              action.payload.client,
-              action.payload.refetchQueries
-            ]
-          },
-          {
-            successActionCreator: unassignDeclarationSuccess,
-            failActionCreator: (err: ApolloError) =>
-              unassignDeclarationFailed(
-                err,
-                action.payload.id,
-                action.payload.client,
-                action.payload.refetchQueries
-              )
-          }
-        )
-      )
-    case UNASSIGN_DECLARATION_SUCCESS:
-      const declarationNextToUnassign = state.declarations.find(
-        (declaration) =>
-          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_UNASSIGN
-      )
-      return loop(
-        state,
-        Cmd.list<
-          | IDeleteDeclarationAction
-          | UpdateRegistrarWorkqueueAction
-          | IUnassignDeclaration
-        >(
-          [
-            Cmd.action(
-              deleteDeclaration(action.payload.id, action.payload.client)
-            ),
-            Cmd.action(updateRegistrarWorkqueue()),
-            declarationNextToUnassign
-              ? Cmd.action(
-                  executeUnassignDeclaration(
-                    declarationNextToUnassign.id,
-                    action.payload.client,
-                    action.payload.refetchQueries
-                  )
-                )
-              : Cmd.none
-          ],
-          { sequence: true }
-        )
-      )
-    case UNASSIGN_DECLARATION_FAILED: {
-      const error = action.payload.error
-      /*
-       * The next declaration that's ready to be unassigned.
-       * We don't want to hold up the unassign queue because
-       * of one failed unassign action
-       */
-      const nextInUnassignQueue = state.declarations.find(
-        (declaration) =>
-          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_UNASSIGN
-      )
-      if (error.graphQLErrors[0]?.extensions.code === 'UNASSIGNED') {
-        return loop(
-          state,
-          Cmd.list<
-            | IDeleteDeclarationAction
-            | UpdateRegistrarWorkqueueAction
-            | IUnassignDeclaration
-          >(
-            [
-              Cmd.action(
-                deleteDeclaration(
-                  action.payload.declarationId,
-                  action.payload.client
-                )
-              ),
-              Cmd.action(updateRegistrarWorkqueue()),
-              nextInUnassignQueue
-                ? Cmd.action(
-                    executeUnassignDeclaration(
-                      nextInUnassignQueue.id,
-                      action.payload.client,
-                      action.payload.refetchQueries
-                    )
-                  )
-                : Cmd.none
-            ],
-            { sequence: true }
-          )
-        )
-      }
-      if (nextInUnassignQueue) {
-        return loop(
-          state,
-          Cmd.action(
-            executeUnassignDeclaration(
-              nextInUnassignQueue.id,
-              action.payload.client,
-              action.payload.refetchQueries
-            )
-          )
-        )
-      }
-      return state
-    }
-
-    case REMOVE_UNASSIGNED_DECLARATIONS:
-      const unassignedDeclarationTrackingIds =
-        action.payload.unassignedDeclarations.map(
-          (dec) => dec.data.registration.trackingId
-        ) as string[]
-
-      return loop(
-        {
-          ...state,
-          declarations: action.payload.currentlyDownloadedDeclarations
-        },
-        Cmd.action(showUnassignedDeclarations(unassignedDeclarationTrackingIds))
-      )
-    default:
-      return state
-  }
+) => {
+  return state
 }
 
-export function filterProcessingDeclarations(
+function filterProcessingDeclarations(
   data: GQLEventSearchResultSet,
   processingDeclarationIds: string[]
 ): GQLEventSearchResultSet {
@@ -2019,58 +598,7 @@ export function filterProcessingDeclarations(
   }
 }
 
-function getMinioUrlsFromDeclaration(declaration: IDeclaration | undefined) {
-  if (!declaration) {
-    return []
-  }
-  const minioUrls: string[] = SIGNATURE_KEYS.map(
-    (propertyKey) => declaration.originalData?.registration?.[propertyKey]
-  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
-
-  const documentsData = declaration.originalData?.documents as Record<
-    string,
-    IAttachmentValue[]
-  >
-
-  const userAvatars: string[] = Object.values(
-    declaration.originalData?.history || []
-  )
-    .map((history) => {
-      if (
-        typeof history === 'object' &&
-        history !== null &&
-        'user' in history
-      ) {
-        const user = history.user as { avatar?: { data?: string } }
-        return user?.avatar?.data
-      }
-      return null
-    })
-    .filter((avatarData): avatarData is string => Boolean(avatarData))
-
-  minioUrls.push(...userAvatars)
-
-  if (!documentsData) {
-    return minioUrls
-  }
-  const docSections = Object.values(documentsData)
-
-  for (const docSection of docSections) {
-    for (const doc of docSection) {
-      if (doc.data && !isBase64FileString(doc.data)) {
-        minioUrls.push(doc.data)
-      }
-    }
-  }
-  return minioUrls
-}
-
-function postMinioUrlsToServiceWorker(minioUrls: string[]) {
-  navigator?.serviceWorker?.controller?.postMessage({
-    minioUrls: minioUrls
-  })
-}
-export function getProcessingDeclarationIds(declarations: IDeclaration[]) {
+function getProcessingDeclarationIds(declarations: IDeclaration[]) {
   return declarations
     .filter(
       (declaration) =>

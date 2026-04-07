@@ -141,7 +141,9 @@ export const DraftDefaultSortByUpdatedAt: Story = {
         event: [
           tRPCMsw.event.draft.list.query(() => allDrafts),
           tRPCMsw.event.get.query((input) => {
-            const found = allPairs.find((p) => p.event.id === input)?.event
+            const found = allPairs.find(
+              (p) => p.event.id === input.eventId
+            )?.event
             if (!found) {
               throw new Error(`Event not found with id: ${input}`)
             }

@@ -10,16 +10,21 @@
  */
 
 import { SystemVariables } from '@opencrvs/commons/client'
-import { useUserDetails } from './useUserDetails'
+import { getUsersFullName } from '../utils'
+import { useCurrentUser } from './useCurrentUser'
 
 /**
  * Exposes template variables such as `$user` for components to replace field values or other templates
  */
 export function useSystemVariables() {
-  const user = useUserDetails()
+  const { currentUser: user } = useCurrentUser()
 
   const variables = {
-    user,
+    user: {
+      ...user,
+      name: getUsersFullName(user.name, 'en'),
+      administrativeAreaId: user.administrativeAreaId ?? undefined
+    },
     $window: {
       location: {
         href: window.location.href,

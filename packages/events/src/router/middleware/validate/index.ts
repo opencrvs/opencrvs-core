@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import {
   MiddlewareFunction,
+  MiddlewareResult,
   TRPCError
 } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
@@ -45,13 +45,16 @@ import {
   runStructuralValidations,
   ValidatorContext,
   flattenFormState,
+  getCustomActionFields,
+  EventInput,
+  UUID,
   getDeclarationFieldById
 } from '@opencrvs/commons/events'
 
 import { getEventConfigurationById } from '@events/service/config/config'
 import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import { getEventById } from '@events/service/events/events'
-import { isLeafLocation } from '@events/storage/postgres/events/locations'
+import { locationExists } from '@events/storage/postgres/administrative-hierarchy/locations'
 import { TrpcContext } from '@events/context'
 import {
   getValidatorContext,
@@ -175,9 +178,14 @@ function validateDeclarationUpdateAction({
     context
   )
 
-  // 4. When completeDeclaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // 4. When the submitted declaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // Only check keys from declarationUpdate (the client's input), not fields inherited from the previous state
+  // that may have become hidden due to changes in the current update.
+  const declarationUpdateOnlyComplete = Object.fromEntries(
+    Object.entries(completeDeclaration).filter(([key]) => key in declarationUpdate)
+  )
   const invalidKeys = getInvalidUpdateKeys({
-    update: completeDeclaration,
+    update: declarationUpdateOnlyComplete,
     cleaned: cleanedDeclaration
   })
 
@@ -251,6 +259,24 @@ function validateActionAnnotation({
   ]
 
   return errors
+}
+
+function validateCustomAction({
+  eventConfig,
+  annotation = {},
+  context,
+  customActionType
+}: {
+  eventConfig: EventConfig
+  annotation?: ActionUpdate
+  context: ValidatorContext
+  customActionType: string
+}) {
+  const customActionFields = getCustomActionFields(
+    eventConfig,
+    customActionType
+  )
+  return getFieldErrors(customActionFields, annotation, context, {})
 }
 
 function validateNotifyAction({
@@ -391,7 +417,7 @@ export const validateAction: MiddlewareFunction<
 
   const declaration = getCurrentEventState(event, eventConfig).declaration
 
-  if (actionType === ActionType.NOTIFY) {
+  if (actionType === ActionType.NOTIFY || actionType === ActionType.EDIT) {
     const errors = validateNotifyAction({
       eventConfig,
       annotation: input.annotation,
@@ -417,6 +443,18 @@ export const validateAction: MiddlewareFunction<
     actionType === ActionType.REJECT_CORRECTION
   ) {
     throwIfRequestActionNotFound(event, input)
+  }
+
+  if (actionType === ActionType.CUSTOM) {
+    const errors = validateCustomAction({
+      eventConfig,
+      annotation: input.annotation,
+      context,
+      customActionType: input.customActionType
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
   }
 
   const declarationUpdateAction = DeclarationUpdateActions.safeParse(actionType)
@@ -455,13 +493,18 @@ export const validateAction: MiddlewareFunction<
 
 // When performing actions via REST API, we need to ensure that a valid 'createdAtLocation' is provided in the payload.
 // For normal users, the createdAtLocation is resolved on the backend from the user's primaryOfficeId.
-export const requireLocationForSystemUserAction: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext,
-  ActionInputWithType
-> = async ({ input, next, ctx }) => {
+// eslint-disable-next-line no-restricted-syntax
+const requireCreatedAtLocationForSystemUser = async <
+  T extends { createdAtLocation?: UUID | null | undefined }
+>({
+  input,
+  next,
+  ctx
+}: {
+  input: T
+  next: () => Promise<MiddlewareResult<TrpcContext>>
+  ctx: TrpcContext
+}) => {
   const { user } = ctx
 
   if (user.type !== 'system') {
@@ -478,18 +521,34 @@ export const requireLocationForSystemUserAction: MiddlewareFunction<
   if (!input.createdAtLocation) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'createdAtLocation is required and must be a valid office id'
+      message: 'createdAtLocation is required and must be a valid location id'
     })
   }
 
-  // Ensure given location is a leaf location, i.e. an office location
-  const isLeaf = await isLeafLocation(input.createdAtLocation)
-  if (!isLeaf) {
+  const isLocationId = await locationExists(input.createdAtLocation)
+
+  if (!isLocationId) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'createdAtLocation must be an office location'
+      message: 'createdAtLocation must be a valid location id'
     })
   }
 
   return next()
 }
+
+export const requireLocationForSystemUserEventCreate: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  EventInput
+> = requireCreatedAtLocationForSystemUser
+
+export const requireLocationForSystemUserAction: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  ActionInputWithType
+> = requireCreatedAtLocationForSystemUser

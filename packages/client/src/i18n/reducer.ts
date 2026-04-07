@@ -16,10 +16,7 @@ import {
 } from '@client/i18n/utils'
 import * as offlineActions from '@client/offline/actions'
 import { ILocation } from '@client/offline/reducer'
-import {
-  IRoleLoadedAction,
-  IRoleMessagesLoadedAction
-} from '@client/user/userReducer'
+import { IRoleMessagesLoadedAction } from '@client/user/userReducer'
 import { Cmd, Loop, LoopReducer, loop } from 'redux-loop'
 
 export interface IntlMessages {
@@ -96,7 +93,7 @@ const getNextMessages = (
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
-  action: actions.Action | offlineActions.Action | IRoleLoadedAction
+  action: actions.Action | offlineActions.Action
 ):
   | IntlState
   | Loop<
@@ -139,12 +136,12 @@ export const intlReducer: LoopReducer<IntlState, any> = (
       )
 
       const languagesWithLocations = formatLocationLanguageState(
-        Object.values(action.payload.locations),
+        Object.values(action.payload.locations ?? []),
         loadedLanguagesState
       )
 
       const languagesWithFacilities = formatLocationLanguageState(
-        Object.values(action.payload.facilities),
+        Object.values(action.payload.facilities ?? []),
         languagesWithLocations
       )
 

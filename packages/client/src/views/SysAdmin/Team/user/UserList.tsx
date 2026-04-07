@@ -8,74 +8,60 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Query } from '@client/components/Query'
+import { AvatarSmall } from '@client/components/Avatar'
+import { LoadingIndicator } from '@client/components/LoadingIndicator'
+import { LocationPicker } from '@client/components/LocationPicker'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import {
   buttonMessages,
   constantsMessages,
   errorMessages
 } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
-import { formatUrl } from '@client/navigation'
-import { ILocation, IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
-import { IStoreState } from '@client/store'
-import styled, { withTheme } from 'styled-components'
-import { SEARCH_USERS } from '@client/user/queries'
-import { LANG_EN } from '@client/utils/constants'
-import { createNamesMap, getLocalisedName } from '@client/utils/data-formatting'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { getAddressName, UserStatus } from '@client/views/SysAdmin/Team/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Pill } from '@opencrvs/components/lib/Pill'
-import { Stack } from '@opencrvs/components/lib/Stack'
+import { messages } from '@client/i18n/messages/views/sysAdmin'
+import * as routes from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { SearchRed, NoWifi } from '@opencrvs/components/lib/icons'
-import { AvatarSmall } from '@client/components/Avatar'
-import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Toast } from '@opencrvs/components/lib/Toast'
+import { IStoreState } from '@client/store'
+import { UserDetails } from '@client/utils/userUtils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { formatUserRole } from '@client/v2-events/hooks/useRoles'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { ROUTES } from '@client/v2-events/routes'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+import { getAddressNameV2, UserStatus } from '@client/views/SysAdmin/Team/utils'
+import { Location, User, UUID } from '@opencrvs/commons/client'
+import { Link } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   BodyContent,
   Content,
   ContentSize
 } from '@opencrvs/components/lib/Content'
-import { ITheme } from '@opencrvs/components/lib/theme'
-import { parse } from 'query-string'
-import {
-  injectIntl,
-  useIntl,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
-import { connect } from 'react-redux'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { userMutations } from '@client/user/mutations'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { NoWifi } from '@opencrvs/components/lib/icons'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
-import React, { useCallback, useState } from 'react'
-import {
-  withOnlineStatus,
-  LoadingIndicator
-} from '@client/views/OfficeHome/LoadingIndicator'
-import { LocationPicker } from '@client/components/LocationPicker'
-import { SearchUsersQuery } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
-import { Link } from '@opencrvs/components'
-import { getLocalizedLocationName } from '@client/utils/locationUtils'
-import { usePermissions } from '@client/hooks/useAuthorization'
-import * as routes from '@client/navigation/routes'
-import { UserSection } from '@client/forms'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+import { parse } from 'qs'
 import { stringify } from 'querystring'
+import React, { useCallback, useMemo, useState } from 'react'
+import { useIntl } from 'react-intl'
+import { connect, useSelector } from 'react-redux'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import styled, { withTheme } from 'styled-components'
+import { useOnlineStatus } from '../../../../utils'
+import { useAdministrativeAreas } from '../../../../v2-events/hooks/useAdministrativeAreas'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
-
-type User = NonNullable<
-  NonNullable<NonNullable<SearchUsersQuery['searchUsers']>['results']>[number]
->
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -156,27 +142,14 @@ const LinkButtonModified = styled(LinkButton)`
   height: 24px;
 `
 
-interface ISearchParams {
-  locationId?: string
+interface SearchParams {
+  locationId?: UUID
 }
 
-type IOnlineStatusProps = {
-  isOnline: boolean
-}
-
-type BaseProps = {
+type UserListProps = {
+  hideNavigation?: boolean
   theme: ITheme
-  offlineOffices: ILocation[]
   userDetails: UserDetails | null
-  offlineCountryConfig: IOfflineData
-}
-
-type IProps = BaseProps &
-  IntlShapeProps &
-  IOnlineStatusProps & { hideNavigation?: boolean }
-
-interface IStatusProps {
-  status: string
 }
 
 interface ToggleModal {
@@ -184,7 +157,7 @@ interface ToggleModal {
   selectedUser: User | null
 }
 
-export const Status = (statusProps: IStatusProps) => {
+export const Status = (statusProps: { status: string }) => {
   const status = statusProps.status
   const intl = useIntl()
   switch (status) {
@@ -209,9 +182,17 @@ export const Status = (statusProps: IStatusProps) => {
   }
 }
 
-function UserListComponent(props: IProps) {
+function UserListComponent({ userDetails, hideNavigation }: UserListProps) {
   const location = useLocation()
   const navigate = useNavigate()
+
+  const intl = useIntl()
+  const isOnline = useOnlineStatus()
+
+  const { getLocations } = useLocations()
+  const { getAdministrativeAreas } = useAdministrativeAreas()
+  const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
+  const locations = getLocations.useSuspenseQuery()
 
   const [showResendInviteSuccess, setShowResendInviteSuccess] = useState(false)
   const [showUsernameReminderSuccess, setShowUsernameReminderSuccess] =
@@ -225,10 +206,9 @@ function UserListComponent(props: IProps) {
   const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
     usePermissions()
 
-  const { intl, userDetails, offlineOffices, isOnline, offlineCountryConfig } =
-    props
-
-  const { locationId } = parse(location.search) as unknown as ISearchParams
+  const { locationId } = parse(location.search, {
+    ignoreQueryPrefix: true
+  }) as unknown as SearchParams
   const [toggleUsernameReminder, setToggleUsernameReminder] =
     useState<ToggleModal>({
       modalVisible: false,
@@ -245,19 +225,34 @@ function UserListComponent(props: IProps) {
 
   const [currentPageNumber, setCurrentPageNumber] =
     useState<number>(DEFAULT_PAGE_NUMBER)
-  const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
-  const searchedLocation: ILocation | undefined = offlineOffices.find(
-    ({ id }) => locationId === id
-  )
+
+  const parsedId = UUID.safeParse(locationId)
+
+  const searchedLocation: Location | undefined = parsedId.success
+    ? locations.get(parsedId.data)
+    : undefined
+
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
-  const isMultipleOfficeUnderJurisdiction =
-    offlineOffices.filter(canAccessOffice).length > 1
+  const canAccessMultipleLocations = useMemo(
+    () => Array.from(locations.values()).filter(canAccessOffice).length > 1,
+    [locations, canAccessOffice]
+  )
 
-  const getParentLocation = ({ partOf }: ILocation) => {
-    const parentLocationId = partOf.split('/')[1]
-    return offlineCountryConfig.locations[parentLocationId]
-  }
+  const { searchUsers } = useUsers()
+  const {
+    data: searchResults,
+    isLoading,
+    error
+  } = searchUsers.useQuery(
+    {
+      primaryOfficeId: locationId,
+      count: DEFAULT_FIELD_AGENT_LIST_SIZE,
+      skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE,
+      sortOrder: 'asc'
+    },
+    { enabled: !!locationId }
+  )
 
   const toggleUserActivationModal = useCallback(
     function toggleUserActivationModal(user?: User) {
@@ -313,62 +308,45 @@ function UserListComponent(props: IProps) {
     [toggleResetPassword]
   )
 
-  const resendInvite = useCallback(
-    async function resendInvite(userId: string) {
-      try {
-        const res = await userMutations.resendInvite(userId, [
-          {
-            query: SEARCH_USERS,
-            variables: { primaryOfficeId: locationId, count: recordCount }
-          }
-        ])
-        if (res && res.data && res.data.resendInvite) {
-          setShowResendInviteSuccess(true)
-        }
-      } catch (err) {
-        setShowResendInviteError(true)
-      }
-    },
-    [locationId, recordCount]
-  )
+  const resendInvite = useCallback(async function resendInvite(userId: string) {
+    try {
+      // const res = await userMutations.resendInvite(userId, [])
+      // if (res && res.data && res.data.resendInvite) {
+      //   setShowResendInviteSuccess(true)
+      // }
+      throw new Error('@todo Resend invite mutation is not implemented')
+    } catch (err) {
+      setShowResendInviteError(true)
+    }
+  }, [])
 
-  const usernameReminder = useCallback(
-    async function usernameReminder(userId: string) {
-      try {
-        const res = await userMutations.usernameReminderSend(userId, [
-          {
-            query: SEARCH_USERS,
-            variables: { primaryOfficeId: locationId, count: recordCount }
-          }
-        ])
-        if (res && res.data && res.data.usernameReminder) {
-          setShowUsernameReminderSuccess(true)
-        }
-      } catch (err) {
-        setShowUsernameReminderError(true)
-      }
-    },
-    [locationId, recordCount]
-  )
+  const usernameReminder = useCallback(async function usernameReminder(
+    userId: string
+  ) {
+    try {
+      throw new Error('@todo Username reminder mutation is not implemented')
+      // const res = await userMutations.usernameReminderSend(userId, [])
+      // if (res && res.data && res.data.usernameReminder) {
+      //   setShowUsernameReminderSuccess(true)
+      // }
+    } catch (err) {
+      setShowUsernameReminderError(true)
+    }
+  }, [])
 
-  const resetPassword = useCallback(
-    async function resetPassword(userId: string) {
-      try {
-        const res = await userMutations.sendResetPasswordInvite(userId, [
-          {
-            query: SEARCH_USERS,
-            variables: { primaryOfficeId: locationId, count: recordCount }
-          }
-        ])
-        if (res && res.data && res.data.resetPasswordInvite) {
-          setShowResetPasswordSuccess(true)
-        }
-      } catch (err) {
-        setResetPasswordError(true)
-      }
-    },
-    [recordCount, locationId]
-  )
+  const resetPassword = useCallback(async function resetPassword(
+    userId: string
+  ) {
+    try {
+      throw new Error('@todo Reset password mutation is not implemented')
+      // const res = await userMutations.sendResetPasswordInvite(userId, [])
+      // if (res && res.data && res.data.resetPasswordInvite) {
+      //   setShowResetPasswordSuccess(true)
+      // }
+    } catch (err) {
+      setResetPasswordError(true)
+    }
+  }, [])
 
   const getMenuItems = useCallback(
     function getMenuItems(user: User) {
@@ -377,9 +355,8 @@ function UserListComponent(props: IProps) {
           label: intl.formatMessage(messages.editUserDetailsTitle),
           handler: () => {
             navigate(
-              formatUrl(routes.REVIEW_USER_DETAILS, {
-                userId: user.id,
-                sectionId: UserSection.Preview
+              ROUTES.V2.SETTINGS.USER.REVIEW.buildPath({
+                userId: user.id
               })
             )
           }
@@ -439,28 +416,24 @@ function UserListComponent(props: IProps) {
   )
 
   const getUserName = (user: User) => {
-    const userName =
-      (user &&
-        user.name &&
-        ((createNamesMap(user.name)[intl.locale] as string) ||
-          (createNamesMap(user.name)[LANG_EN] as string))) ||
+    return (
+      getUsersFullName(user.name, intl.locale) ||
+      getUsersFullName(user.name, 'en') ||
       ''
-    return userName
+    )
   }
 
   const StatusMenu = useCallback(
     function StatusMenu({
       user,
       index,
-      status,
-      underInvestigation
+      status
     }: {
       userDetails: UserDetails | null
       locationId: string
       user: User
       index: number
       status?: string
-      underInvestigation?: boolean
     }) {
       return (
         <Stack
@@ -469,7 +442,6 @@ function UserListComponent(props: IProps) {
           gap={8}
           justifyContent="flex-start"
         >
-          {underInvestigation && <SearchRed />}
           <Status status={status || 'pending'} />
           {canEditUser(user) && (
             <ToggleMenu
@@ -488,66 +460,62 @@ function UserListComponent(props: IProps) {
 
   const generateUserContents = useCallback(
     function generateUserContents(
-      data: SearchUsersQuery,
+      users: User[],
       locationId: string,
       userDetails: UserDetails | null
     ) {
-      if (!data || !data.searchUsers || !data.searchUsers.results) {
-        return []
-      }
+      return users.map((user, index) => {
+        const name =
+          getUsersFullName(user.name, intl.locale) ||
+          getUsersFullName(user.name, 'en')
+        const role = formatUserRole(user.role, intl)
+        const avatar = user.avatar
 
-      return data.searchUsers.results.map((user, index) => {
-        if (user !== null) {
-          const name = getLocalisedName(intl, user.name[0])
-          const role = intl.formatMessage(user.role.label)
-          const avatar = user.avatar
-
-          return {
-            image: (
-              <Link
-                onClick={() =>
-                  navigate(
-                    formatUrl(routes.USER_PROFILE, {
-                      userId: String(user.id)
-                    })
-                  )
-                }
-                disabled={!canReadUser(user)}
-              >
-                <AvatarSmall name={name} avatar={avatar || undefined} />
-              </Link>
-            ),
-            label: (
-              <Link
-                id="profile-link"
-                onClick={() =>
-                  navigate(
-                    formatUrl(routes.USER_PROFILE, {
-                      userId: String(user.id)
-                    })
-                  )
-                }
-                disabled={!canReadUser(user)}
-              >
-                {name}
-              </Link>
-            ),
-            value: <Value>{role}</Value>,
-            actions: (
-              <StatusMenu
-                userDetails={userDetails}
-                locationId={locationId}
-                user={user}
-                index={index}
-                status={user.status || undefined}
-                underInvestigation={user.underInvestigation || false}
-              />
-            )
-          }
+        const userForPermissions = {
+          id: user.id,
+          primaryOfficeId: user.primaryOfficeId
         }
+
         return {
-          label: '',
-          value: <></>
+          image: (
+            <Link
+              onClick={() =>
+                navigate(
+                  ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
+                    userId: String(user.id)
+                  })
+                )
+              }
+              disabled={!canReadUser(userForPermissions)}
+            >
+              <AvatarSmall name={name} avatar={avatar || undefined} />
+            </Link>
+          ),
+          label: (
+            <Link
+              id="profile-link"
+              onClick={() =>
+                navigate(
+                  ROUTES.V2.SETTINGS.USER.VIEW.buildPath({
+                    userId: String(user.id)
+                  })
+                )
+              }
+              disabled={!canReadUser(userForPermissions)}
+            >
+              {name}
+            </Link>
+          ),
+          value: <Value>{role}</Value>,
+          actions: (
+            <StatusMenu
+              userDetails={userDetails}
+              locationId={locationId}
+              user={user}
+              index={index}
+              status={user.status || undefined}
+            />
+          )
         }
       })
     },
@@ -558,9 +526,12 @@ function UserListComponent(props: IProps) {
     function onClickAddUser() {
       if (searchedLocation) {
         navigate(
-          formatUrl(routes.CREATE_USER_ON_LOCATION, {
-            locationId: searchedLocation.id
-          })
+          ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+            {},
+            {
+              officeId: searchedLocation.id
+            }
+          )
         )
       }
     },
@@ -581,9 +552,9 @@ function UserListComponent(props: IProps) {
     }
   }
 
-  const LocationButton = (locationId: string) => {
+  const LocationButton = (locationId: UUID) => {
     const buttons: React.ReactElement[] = []
-    if (isMultipleOfficeUnderJurisdiction) {
+    if (canAccessMultipleLocations) {
       buttons.push(
         <LocationPicker
           key={`location-picker-${locationId}`}
@@ -598,9 +569,7 @@ function UserListComponent(props: IProps) {
 
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
-          locationFilter={(location) =>
-            location.type === 'CRVS_OFFICE' && canAccessOffice(location)
-          }
+          locationFilter={(location) => canAccessOffice(location)}
         />
       )
     }
@@ -622,17 +591,16 @@ function UserListComponent(props: IProps) {
 
   const RenderUserList = useCallback(
     function RenderUserList({
-      data,
+      users,
       locationId,
       userDetails
     }: {
-      data: SearchUsersQuery
-      locationId: string
+      users: User[]
+      locationId: UUID
       userDetails: UserDetails | null
     }) {
-      const totalData =
-        (data && data.searchUsers && data.searchUsers.totalItems) || 0
-      const userContent = generateUserContents(data, locationId, userDetails)
+      const totalData = users.length
+      const userContent = generateUserContents(users, locationId, userDetails)
 
       return (
         <UserTable id="user_list">
@@ -666,15 +634,6 @@ function UserListComponent(props: IProps) {
               show={toggleActivation.modalVisible}
               userId={toggleActivation.selectedUser.id}
               onClose={() => toggleUserActivationModal()}
-              onConfirmRefetchQueries={[
-                {
-                  query: SEARCH_USERS,
-                  variables: {
-                    primaryOfficeId: locationId,
-                    count: recordCount
-                  }
-                }
-              ]}
             />
           ) : null}
 
@@ -768,7 +727,6 @@ function UserListComponent(props: IProps) {
       currentPageNumber,
       generateUserContents,
       intl,
-      recordCount,
       toggleActivation.modalVisible,
       toggleActivation.selectedUser,
       toggleUserActivationModal,
@@ -795,76 +753,60 @@ function UserListComponent(props: IProps) {
   return (
     <SysAdminContentWrapper
       changeTeamLocation={
-        isMultipleOfficeUnderJurisdiction ? onChangeLocation : undefined
+        canAccessMultipleLocations ? onChangeLocation : undefined
       }
       isCertificatesConfigPage={true}
       hideBackground={true}
-      isHidden={props.hideNavigation}
+      isHidden={hideNavigation}
     >
       {isOnline ? (
-        <Query<SearchUsersQuery>
-          query={SEARCH_USERS}
-          variables={{
-            primaryOfficeId: locationId,
-            count: DEFAULT_FIELD_AGENT_LIST_SIZE,
-            skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE
-          }}
-          fetchPolicy={'cache-and-network'}
+        <Content
+          title={
+            !isLoading && !error
+              ? searchedLocation?.name || ''
+              : intl.formatMessage(headerMessages.teamTitle)
+          }
+          size={ContentSize.NORMAL}
+          topActionButtons={LocationButton(locationId)}
         >
-          {({ data, loading, error }) => {
-            return (
-              <Content
-                title={
-                  !loading && !error
-                    ? searchedLocation
-                      ? getLocalizedLocationName(intl, searchedLocation)
-                      : ''
-                    : intl.formatMessage(headerMessages.teamTitle)
-                }
-                size={ContentSize.NORMAL}
-                topActionButtons={LocationButton(locationId)}
-              >
-                {error ? (
-                  <ErrorText id="user_loading_error">
-                    <>{intl.formatMessage(errorMessages.userQueryError)}</>
-                    <LinkButtonModified
-                      onClick={() => window.location.reload()}
-                    >
-                      {intl.formatMessage(constantsMessages.refresh)}
-                    </LinkButtonModified>
-                  </ErrorText>
-                ) : loading ? (
-                  <Loading>
-                    <LoadingIndicator loading={true} />
-                  </Loading>
-                ) : data ? (
-                  <>
-                    <Header id="header">
-                      {(searchedLocation &&
-                        getLocalizedLocationName(intl, searchedLocation)) ||
-                        ''}
-                    </Header>
-                    <LocationInfo>
-                      {searchedLocation && (
-                        <LocationInfoValue>
-                          {getAddressName(
-                            offlineCountryConfig,
-                            getParentLocation(searchedLocation)
-                          )}
-                        </LocationInfoValue>
-                      )}
-                    </LocationInfo>
-                    <RenderUserList
-                      data={data}
-                      locationId={locationId}
-                      userDetails={userDetails}
-                    />
-                  </>
-                ) : null}
-              </Content>
-            )
-          }}
-        </Query>
+          {error ? (
+            <ErrorText id="user_loading_error">
+              <>{intl.formatMessage(errorMessages.userQueryError)}</>
+              <LinkButtonModified onClick={() => window.location.reload()}>
+                {intl.formatMessage(constantsMessages.refresh)}
+              </LinkButtonModified>
+            </ErrorText>
+          ) : isLoading ? (
+            <Loading>
+              <LoadingIndicator loading={true} />
+            </Loading>
+          ) : searchResults ? (
+            <>
+              <Header id="header">{searchedLocation?.name || ''}</Header>
+              <LocationInfo>
+                {searchedLocation && (
+                  <LocationInfoValue>
+                    {getAddressNameV2(
+                      administrativeAreas,
+                      searchedLocation.administrativeAreaId
+                        ? administrativeAreas.get(
+                            searchedLocation.administrativeAreaId
+                          )
+                        : undefined
+                    )}
+                  </LocationInfoValue>
+                )}
+              </LocationInfo>
+              <RenderUserList
+                users={searchResults.filter(
+                  (u): u is User => u.type === 'user'
+                )}
+                locationId={locationId}
+                userDetails={userDetails}
+              />
+            </>
+          ) : null}
+        </Content>
       ) : (
         <Content
           title={intl.formatMessage(headerMessages.teamTitle)}
@@ -950,7 +892,5 @@ function UserListComponent(props: IProps) {
 }
 
 export const UserList = connect((state: IStoreState) => ({
-  offlineOffices: Object.values(getOfflineData(state).offices),
-  userDetails: getUserDetails(state),
-  offlineCountryConfig: getOfflineData(state)
-}))(withTheme(injectIntl(withOnlineStatus(UserListComponent))))
+  userDetails: getUserDetails(state)
+}))(withTheme(UserListComponent))

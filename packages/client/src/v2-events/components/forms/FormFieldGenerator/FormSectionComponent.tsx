@@ -47,6 +47,7 @@ type AllProps = {
   fullForm: EventState
   className?: string
   readonlyMode?: boolean
+  attachmentPath: string
   /**
    * Update the form values in the non-formik state.
    */
@@ -194,6 +195,7 @@ export function FormSectionComponent({
   setValues,
   setTouched,
   resetForm,
+  attachmentPath,
   isCorrection = false,
   validatorContext
 }: AllProps) {
@@ -204,7 +206,7 @@ export function FormSectionComponent({
   const getDefaultValue = useDefaultValue()
   const { cacheHiddenFieldValue, popHiddenFieldValue } = useEventFormData()
 
-  const fullFormFields = eventConfig ? findAllFields(eventConfig) : pageFields
+  const fullFormFields = eventConfig ? findAllFields(eventConfig).concat(pageFields) : pageFields
   const listenerFieldsByParentId = getParentsOfListenerFields(fullFormFields)
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
@@ -222,11 +224,16 @@ export function FormSectionComponent({
     )
 
     const firstNonFalsyValue = compact(
-      referencesToOtherFields.map((reference) =>
-        get(
-          fieldValues,
-          flattenFieldReference(reference).map(makeFormFieldIdFormikCompatible)
-        )
+      referencesToOtherFields.map((reference) => {
+          const referenceFieldConfigs = fullFormFields.filter((field) => field.id === flattenFieldReference(reference).join('.')).filter((field) => isFieldVisible(field, { ...fullForm, ...fieldValues }, validatorContext))
+          if (referenceFieldConfigs.length === 0) {
+            return
+          }
+          return get(
+            fieldValues,
+            flattenFieldReference(reference).map(makeFormFieldIdFormikCompatible)
+          )
+        }
       )
     )[0]
 
@@ -415,6 +422,7 @@ export function FormSectionComponent({
           >
             <GeneratedInputField
               allKnownFields={fullFormFields}
+              attachmentPath={attachmentPath}
               disabled={isDisabled}
               eventConfig={eventConfig}
               fieldDefinition={{ ...field, id: formikFieldId }}

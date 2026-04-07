@@ -14,15 +14,12 @@ import { array } from 'zod'
 import {
   EventConfig,
   getOrThrow,
-  Location,
-  LocationType,
   logger,
+  Role,
   TokenWithBearer,
   WorkqueueConfig
 } from '@opencrvs/commons'
-import { Bundle, SavedLocation } from '@opencrvs/commons/types'
 import { env } from '@events/environment'
-
 /**
  * During 1.9.0 we support only docker swarm configuration.
  * In docker swarm deployment process updates all the containers.
@@ -33,7 +30,7 @@ let inMemoryEventConfigurations: EventConfig[] | null = null
 let inMemoryWorkqueueConfigurations: WorkqueueConfig[] | null = null
 
 export async function getEventConfigurations(token: TokenWithBearer) {
-  const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
+  const res = await fetch(new URL('/config/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
       Authorization: token
@@ -96,12 +93,15 @@ export async function getEventConfigurationById({
 }
 
 async function getWorkqueueConfigurations(token: TokenWithBearer) {
-  const res = await fetch(new URL('/workqueue', env.COUNTRY_CONFIG_URL), {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+  const res = await fetch(
+    new URL('/config/workqueues', env.COUNTRY_CONFIG_URL),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
     }
-  })
+  )
 
   if (!res.ok) {
     throw new Error('Failed to fetch workqueue config')
@@ -133,55 +133,19 @@ export async function getInMemoryWorkqueueConfigurations(
   return inMemoryWorkqueueConfigurations
 }
 
-function parsePartOf(partOf: string | undefined): string | null {
-  if (!partOf) {
-    return null
-  }
-  return partOf === 'Location/0' ? null : partOf.split('/')[1]
-}
 
-export async function getLocations() {
-  const requests = [
-    // Even though these are defined in the same order in the commons, we want to be explicit here.
-    // Admin structures must be seeded first in order for the parent-child relationships to be valid.
-    LocationType.enum.ADMIN_STRUCTURE,
-    LocationType.enum.CRVS_OFFICE,
-    LocationType.enum.HEALTH_FACILITY
-  ].map(async (type) => {
-    const url = new URL('/locations', env.CONFIG_URL)
-    url.searchParams.set('type', type)
-    url.searchParams.set('_count', '0')
-
-    return fetch(url, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+export async function getRoles(token: TokenWithBearer) {
+  const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
   })
 
-  const responses = await Promise.all(requests)
-
-  for (const res of responses) {
-    if (!res.ok) {
-      throw new Error('Failed to fetch locations')
-    }
+  if (!res.ok) {
+    throw new Error('Failed to fetch roles config')
   }
 
-  const results = await Promise.all(
-    responses.map(async (res) => res.json() as Promise<Bundle<SavedLocation>>)
-  )
-  const locations = results
-    .flatMap((result) => result.entry.map(({ resource }) => resource))
-    .map((entry) => {
-      return {
-        id: entry.id,
-        name: entry.name,
-        parentId: parsePartOf(entry.partOf?.reference),
-        validUntil:
-          entry.status === 'inactive' ? new Date().toISOString() : null,
-        locationType: entry.type?.coding ? entry.type.coding[0]?.code : null
-      }
-    })
-
-  return array(Location).parse(locations)
+  return array(Role).parse(await res.json())
 }
+

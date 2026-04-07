@@ -60,6 +60,7 @@ export interface FormFieldGeneratorPropsWithoutRef {
    * form validations/conditionals
    */
   formContext?: EventState
+  attachmentPath?: string
   /** Which fields are generated */
   fields: FieldConfig[]
   eventConfig?: EventConfig
@@ -88,6 +89,7 @@ export const FormFieldGenerator = forwardRef<
       formValues,
       className,
       eventConfig,
+      attachmentPath = '',
       readonlyMode,
       id,
       onValidSubmit,
@@ -204,12 +206,14 @@ export const FormFieldGenerator = forwardRef<
             )
           )
         }
+        validateOnChange={false}
         validateOnMount={true}
         onSubmit={noop}
       >
         {(formikProps) => {
           return (
             <FormSectionComponent
+              attachmentPath={attachmentPath}
               className={className}
               eventConfig={eventConfig}
               fields={fields}

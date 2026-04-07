@@ -34,13 +34,15 @@ module.exports = [
       'eslint*',
       '**/*.js',
       '**/__mocks__/**/*',
-      'public/pdfjs/**'
+      'public/pdfjs/**',
+      'dev-dist/**/*',
+      'node_modules/**/*',
+      'storybook-static/**/*'
     ]
   },
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
     'plugin:import/recommended',
-    'plugin:prettier/recommended',
     'plugin:jsx-a11y/recommended'
   ),
   {
@@ -51,10 +53,9 @@ module.exports = [
   },
   {
     languageOptions: {
-      sourceType: 'commonjs',
       parser: tsParser,
       parserOptions: {
-        project: [path.resolve(__dirname, './tsconfig.json')]
+        project: [path.resolve(__dirname, './tsconfig.eslint.json')]
       }
     },
     settings: {
@@ -67,7 +68,7 @@ module.exports = [
     settings: {
       'import/resolver': {
         typescript: {
-          project: path.resolve(__dirname, './tsconfig.json')
+          project: path.resolve(__dirname, './tsconfig.eslint.json')
         }
       }
     }
@@ -79,7 +80,7 @@ module.exports = [
     settings: {
       'import/resolver': {
         typescript: {
-          project: path.resolve(__dirname, './tsconfig.json')
+          project: path.resolve(__dirname, './tsconfig.eslint.json')
         }
       }
     }

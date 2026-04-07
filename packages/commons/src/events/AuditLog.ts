@@ -1,0 +1,272 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+import * as z from 'zod/v4'
+import { TokenUserType } from '../authentication'
+
+/**
+ * Shared response summary shape for operations that return an event document.
+ */
+type EventResponseSummary = {
+  eventId: string
+  eventType: string
+  trackingId: string
+}
+
+export type EventCreateAuditLog = {
+  operation: 'event.create'
+  requestData: {
+    transactionId: string
+    type: string
+    createdAtLocation: string | null
+  }
+  responseSummary: EventResponseSummary
+}
+
+export type EventGetAuditLog = {
+  operation: 'event.get'
+  requestData: {
+    eventId: string
+  }
+  responseSummary: EventResponseSummary
+}
+
+export type EventSearchAuditLog = {
+  operation: 'event.search'
+  requestData: {
+    query: Record<string, unknown> | null
+    limit: number | null
+    offset: number | null
+  }
+  responseSummary: {
+    total: number
+    eventIds: string[]
+  }
+}
+
+type ActionAuditLogRequestData = {
+  eventId: string
+  actionType: string
+  transactionId: string
+}
+
+export type EventActionAuditLog = {
+  operation:
+    | 'event.actions.notify.request'
+    | 'event.actions.declare.request'
+    | 'event.actions.register.request'
+    | 'event.actions.reject.request'
+    | 'event.actions.validate.request'
+    | 'event.actions.edit.request'
+    | 'event.actions.assign.request'
+    | 'event.actions.unassign.request'
+    | 'event.actions.read.request'
+    | 'event.actions.archive.request'
+    | 'event.actions.reinstate.request'
+    | 'event.actions.print_certificate.request'
+    | 'event.actions.correction.request.request'
+    | 'event.actions.correction.approve.request'
+    | 'event.actions.correction.reject.request'
+    | 'event.actions.mark_as_duplicate.request'
+    | 'event.actions.mark_as_not_duplicate.request'
+  requestData: ActionAuditLogRequestData
+  responseSummary: EventResponseSummary
+}
+
+export type IntegrationCreateAuditLog = {
+  operation: 'integrations.create'
+  requestData: {
+    name: string
+    scopes: string[]
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
+export type IntegrationRefreshTokenAuditLog = {
+  operation: 'integrations.refreshToken'
+  requestData: {
+    clientId: string
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
+export type IntegrationDeactivateAuditLog = {
+  operation: 'integrations.deactivate'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    id: string
+    status: string
+  }
+}
+
+export type IntegrationActivateAuditLog = {
+  operation: 'integrations.activate'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    id: string
+    status: string
+  }
+}
+
+export type IntegrationDeleteAuditLog = {
+  operation: 'integrations.delete'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    id: string
+    name: string
+  }
+}
+
+export type IntegrationRefreshSecretAuditLog = {
+  operation: 'integrations.refreshSecret'
+  requestData: {
+    id: string
+  }
+  responseSummary: {
+    clientId: string
+  }
+}
+
+export type AttachmentUploadAuditLog = {
+  operation: 'attachments.upload'
+  requestData: {
+    transactionId: string
+    path: string | null
+  }
+  responseSummary: {
+    fileUrl: string
+  }
+}
+
+export const UserAuditRecordInput = z.discriminatedUnion('operation', [
+  z.object({
+    operation: z.literal('user.create_user'),
+    requestData: z.object({
+      subjectId: z.string(),
+      role: z.string(),
+      primaryOfficeId: z.string()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.deactivate'),
+    requestData: z.object({
+      subjectId: z.string(),
+      reason: z.string(),
+      comment: z.string().optional()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.reactivate'),
+    requestData: z.object({
+      subjectId: z.string(),
+      reason: z.string(),
+      comment: z.string().optional()
+    }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.edit_user'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.email_address_changed'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({ email: z.string() })
+  }),
+  z.object({
+    operation: z.literal('user.logged_in'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.logged_out'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.password_changed'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.password_reset'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.password_reset_by_admin'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.phone_number_changed'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({ phoneNumber: z.string() })
+  }),
+  z.object({
+    operation: z.literal('user.username_reminder'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  }),
+  z.object({
+    operation: z.literal('user.username_reminder_by_admin'),
+    requestData: z.object({ subjectId: z.string() }),
+    responseSummary: z.object({})
+  })
+])
+
+export type UserAuditLog = z.infer<typeof UserAuditRecordInput>
+
+/**
+ * Union of all audit log entry variants.
+ * Each variant narrows the `operation`, `requestData`, and `responseSummary` fields together.
+ * Event action operations are grouped into a single `EventActionAuditLog` type since they
+ * share identical requestData and responseSummary shapes.
+ */
+export type AuditLogOperation =
+  | EventCreateAuditLog
+  | EventGetAuditLog
+  | EventSearchAuditLog
+  | EventActionAuditLog
+  | IntegrationCreateAuditLog
+  | IntegrationDeactivateAuditLog
+  | IntegrationActivateAuditLog
+  | IntegrationDeleteAuditLog
+  | IntegrationRefreshSecretAuditLog
+  | AttachmentUploadAuditLog
+  | UserAuditLog
+  | IntegrationCreateAuditLog
+  | IntegrationRefreshTokenAuditLog
+  | IntegrationDeactivateAuditLog
+  | IntegrationActivateAuditLog
+  | IntegrationDeleteAuditLog
+
+/**
+ * Parameters for writing an audit log entry.
+ * All fields must be supplied explicitly by the caller — do not pass JWT or context objects.
+ */
+export type AuditLogParams = AuditLogOperation & {
+  clientId: string
+  clientType: TokenUserType
+}

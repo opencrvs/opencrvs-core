@@ -16,6 +16,8 @@ import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { redis } from '@auth/database'
 import * as t from 'io-ts'
+import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import superjson from 'superjson'
 import {
   NotificationEvent,
   generateVerificationCode,
@@ -23,11 +25,13 @@ import {
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
 import { logger, UUID, IUserName } from '@opencrvs/commons'
+import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
+import { AppRouter } from '@opencrvs/events/src/router'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
@@ -38,6 +42,15 @@ const sign = promisify<
   jwt.SignOptions,
   string
 >(jwt.sign)
+
+const eventsClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson
+    })
+  ]
+})
 
 export interface IAuthentication {
   name: IUserName[]
@@ -51,7 +64,7 @@ export interface IAuthentication {
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: Scope[]
+  scope: string[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -92,19 +105,10 @@ export async function authenticateSystem(
   client_id: string,
   client_secret: string
 ): Promise<ISystemAuthentication> {
-  const url = resolve(env.USER_MANAGEMENT_URL, '/verifySystem')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ client_id, client_secret }),
-    headers: { 'Content-Type': 'application/json' }
+  const body = await eventsClient.integrations.authenticate.mutate({
+    client_id,
+    client_secret
   })
-
-  if (res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  const body = await res.json()
   return {
     systemId: body.id,
     scope: body.scope,
@@ -147,6 +151,7 @@ type LegacyRecordValidationInput = {
 export async function createTokenForActionConfirmation(
   input: ActionConfirmationInput | LegacyRecordValidationInput,
   userId: UUID,
+  userType: TokenUserType,
   userRejectScope: string | undefined = undefined
 ) {
   return sign(
@@ -159,7 +164,7 @@ export async function createTokenForActionConfirmation(
       eventId: 'eventId' in input ? input.eventId : undefined,
       actionId: 'actionId' in input ? input.actionId : undefined,
       recordId: 'recordId' in input ? input.recordId : undefined,
-      userType: TokenUserType.enum.user
+      userType
     },
     cert,
     {
@@ -170,7 +175,6 @@ export async function createTokenForActionConfirmation(
         'opencrvs:gateway-user',
         'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
-        'opencrvs:hearth-user',
         'opencrvs:notification-user',
         'opencrvs:workflow-user',
         'opencrvs:search-user',
@@ -247,7 +251,8 @@ const tokenPayload = t.type({
   // role: t.string,
   iat: t.number,
   exp: t.number,
-  aud: t.array(t.string)
+  aud: t.array(t.string),
+  userType: t.string
 })
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>
@@ -269,4 +274,25 @@ export function verifyToken(token: string) {
 
 export function getPublicKey() {
   return publicCert
+}
+
+export async function recordUserAuditEvent(
+  token: string,
+  input: UserAuditLog
+): Promise<void> {
+  try {
+    const client = createTRPCClient<AppRouter>({
+      links: [
+        httpBatchLink({
+          url: env.EVENTS_URL,
+          transformer: superjson,
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]
+    })
+    await client.user.audit.record.mutate(input)
+  } catch (err) {
+    logger.error('Failed to record user audit event', err)
+    throw err
+  }
 }

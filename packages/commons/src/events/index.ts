@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+export * from './AuditLog'
 export * from './Constants'
 export * from './ActionConfig'
 export * from './offline'
@@ -52,7 +53,9 @@ export * from '../conditionals/conditionals'
 export * from '../conditionals/validate'
 // This is a workaround for the fact that field is not exported from events
 export * from './field'
+export * from './Flag'
 export * from './event'
 export * from './locations'
 
 export { UUID } from '../uuid'
+export { DocumentPath } from '../documents'

@@ -45,26 +45,7 @@ import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
-import {
-  registerSystem,
-  reqRegisterSystemSchema,
-  deactivateSystem,
-  reactivateSystem,
-  clientIdSchema,
-  verifySystemHandler,
-  verifySystemReqSchema,
-  verifySystemResSchema,
-  getSystemRequestSchema,
-  getSystemResponseSchema,
-  getSystemHandler,
-  updatePermissions,
-  reqUpdateSystemSchema,
-  refreshSystemSecretHandler,
-  systemSecretRequestSchema,
-  resSystemSchema,
-  SystemSchema,
-  deleteSystem
-} from '@user-mgnt/features/system/handler'
+
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
@@ -94,7 +75,7 @@ import resetPasswordInviteHandler, {
 import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
-import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
+
 import { SCOPES } from '@opencrvs/commons/authentication'
 import mongoose from 'mongoose'
 
@@ -476,118 +457,6 @@ export const getRoutes = () => {
           'Reset password via sms for given userid and make the corresponding user pending'
       }
     },
-    {
-      method: 'POST',
-      path: '/registerSystem',
-      handler: registerSystem,
-      options: {
-        tags: ['api'],
-        description: 'Creates a new system client',
-        auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
-        },
-        validate: {
-          payload: reqRegisterSystemSchema
-        },
-        response: {
-          schema: resSystemSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/updatePermissions',
-      handler: updatePermissions,
-      options: {
-        tags: ['api'],
-        description: 'Update system permissions',
-        auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
-        },
-        validate: {
-          payload: reqUpdateSystemSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/deactivateSystem',
-      handler: deactivateSystem,
-      options: {
-        tags: ['api'],
-        description: 'Deactivates a new system client',
-        auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
-        },
-        validate: {
-          payload: clientIdSchema
-        },
-        response: {
-          schema: SystemSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/reactivateSystem',
-      handler: reactivateSystem,
-      options: {
-        tags: ['api'],
-        description: 'Reactivates a new system client',
-        auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
-        },
-        validate: {
-          payload: clientIdSchema
-        },
-        response: {
-          schema: SystemSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/verifySystem',
-      handler: verifySystemHandler,
-      options: {
-        auth: false,
-        tags: ['api'],
-        description: 'Verify system',
-        notes: 'Verify system exist and access details are correct',
-        validate: {
-          payload: verifySystemReqSchema
-        },
-        response: {
-          schema: verifySystemResSchema
-        }
-      }
-    },
-
-    {
-      method: 'POST',
-      path: '/getSystem',
-      handler: getSystemHandler,
-      options: {
-        tags: ['api'],
-        description: 'Verify system',
-        notes: 'Verify system exist and access details are correct',
-        validate: {
-          payload: getSystemRequestSchema
-        },
-        response: {
-          schema: getSystemResponseSchema
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/getAllSystems',
-      handler: getAllSystemsHandler,
-      options: {
-        tags: ['api'],
-        description: 'Returns all systems'
-      }
-    },
 
     {
       method: 'POST',
@@ -608,44 +477,6 @@ export const getRoutes = () => {
           payload: Joi.object({
             locationId: Joi.string()
           })
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/refreshSystemSecret',
-      handler: refreshSystemSecretHandler,
-      options: {
-        tags: ['api'],
-        description: 'Refresh client secret ',
-        notes: 'Refresh client secret',
-        auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
-        },
-        validate: {
-          payload: systemSecretRequestSchema
-        },
-        response: {
-          schema: resSystemSchema
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/deleteSystem',
-      handler: deleteSystem,
-      options: {
-        tags: ['api'],
-        description: 'Delete system ',
-        notes: 'This is responsible for system deletion',
-        auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
-        },
-        validate: {
-          payload: clientIdSchema
-        },
-        response: {
-          schema: SystemSchema
         }
       }
     }

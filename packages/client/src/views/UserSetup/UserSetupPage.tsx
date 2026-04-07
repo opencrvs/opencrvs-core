@@ -105,7 +105,7 @@ export function UserSetupPage({ setupData, goToStep }: IOwnProps) {
             onClick={() =>
               goToStep(ProtectedAccoutStep.PASSWORD, {
                 ...setupData,
-                userId: (userDetails && userDetails.userMgntUserID) || ''
+                userId: (userDetails && userDetails.id) || ''
               })
             }
           >

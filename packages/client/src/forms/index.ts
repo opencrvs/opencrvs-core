@@ -26,9 +26,7 @@ import * as validators from '@opencrvs/client/src/utils/validate'
 import { IFont } from '@opencrvs/components/lib/fonts'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import * as mutations from './register/mappings/mutation'
-import * as graphQLQueries from './register/legacy'
 import * as queries from './register/mappings/query'
-import * as responseTransformers from './register/legacy/response-transformers'
 import { UserDetails } from '@client/utils/userUtils'
 import { Conditional } from './conditionals'
 import * as labels from '@client/forms/certificate/fieldDefinitions/label'
@@ -59,11 +57,11 @@ export const SUBSECTION_HEADER = 'SUBSECTION_HEADER'
 export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
 export const BULLET_LIST = 'BULLET_LIST'
 export const PARAGRAPH = 'PARAGRAPH'
-export const DOCUMENTS = 'DOCUMENTS'
+const DOCUMENTS = 'DOCUMENTS'
 export const SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 export const SELECT_WITH_DYNAMIC_OPTIONS = 'SELECT_WITH_DYNAMIC_OPTIONS'
 export const FIELD_WITH_DYNAMIC_DEFINITIONS = 'FIELD_WITH_DYNAMIC_DEFINITIONS'
-export const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
+const IMAGE_UPLOADER_WITH_OPTIONS = 'IMAGE_UPLOADER_WITH_OPTIONS'
 export const DOCUMENT_UPLOADER_WITH_OPTION = 'DOCUMENT_UPLOADER_WITH_OPTION'
 export const SIMPLE_DOCUMENT_UPLOADER = 'SIMPLE_DOCUMENT_UPLOADER'
 export const WARNING = 'WARNING'
@@ -111,7 +109,7 @@ export enum AddressCases {
 export type Action = SubmissionAction | DownloadAction
 export interface ISelectOption {
   value: SelectComponentOption['value']
-  label: MessageDescriptor
+  label: MessageDescriptor | string
   isDefault?: boolean
 }
 export interface IRadioOption {
@@ -125,7 +123,7 @@ export interface ICheckboxOption {
   label: MessageDescriptor
 }
 
-export interface IDynamicOptions {
+interface IDynamicOptions {
   dependency?: string
   jurisdictionType?: string
   resource?: string
@@ -137,7 +135,7 @@ interface IDispatchOptions {
   payloadKey: string
 }
 
-export interface IDynamicItems {
+interface IDynamicItems {
   dependency: string
   valueMapper: IDynamicValueMapper
   items: { [key: string]: MessageDescriptor[] }
@@ -148,27 +146,27 @@ export interface IDynamicFormFieldValidators {
   dependencies: string[]
 }
 
-export type IDynamicFormFieldLabelMapper = (
+type IDynamicFormFieldLabelMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
-export type IDynamicFormFieldHelperTextMapper = (
+type IDynamicFormFieldHelperTextMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
-export type IDynamicFormFieldToolTipMapper = (
+type IDynamicFormFieldToolTipMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
-export type IDynamicFormFieldUnitMapper = (
+type IDynamicFormFieldUnitMapper = (
   key: string
 ) => MessageDescriptor | undefined
 
 export type IDynamicValueMapper = (key: string) => string
 
-export type IDynamicFieldTypeMapper = (key: string) => string
+type IDynamicFieldTypeMapper = (key: string) => string
 
-export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
+const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   switch (key) {
     case NATIONAL_ID:
       return BIG_NUMBER
@@ -181,7 +179,7 @@ export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   }
 }
 
-export interface ISerializedDynamicFormFieldDefinitions {
+interface ISerializedDynamicFormFieldDefinitions {
   label?: {
     dependency: string
     labelMapper: Operation<typeof labels>
@@ -211,7 +209,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
   }>
 }
 
-export interface IDynamicFormFieldDefinitions {
+interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
   helperText?: IDynamicFieldHelperText
   tooltip?: IDynamicFieldTooltip
@@ -220,33 +218,33 @@ export interface IDynamicFormFieldDefinitions {
   validator?: IDynamicFormFieldValidators[]
 }
 
-export interface IDynamicFieldLabel {
+interface IDynamicFieldLabel {
   dependency: string
   labelMapper: IDynamicFormFieldLabelMapper
 }
 
-export interface IDynamicFieldHelperText {
+interface IDynamicFieldHelperText {
   dependency: string
   helperTextMapper: IDynamicFormFieldHelperTextMapper
 }
 
-export interface IDynamicFieldTooltip {
+interface IDynamicFieldTooltip {
   dependency: string
   tooltipMapper: IDynamicFormFieldToolTipMapper
 }
 
-export interface IDynamicFieldUnit {
+interface IDynamicFieldUnit {
   dependency: string
   unitMapper: IDynamicFormFieldUnitMapper
 }
 
-export interface IDynamicFieldType {
+interface IDynamicFieldType {
   kind: 'dynamic'
   dependency: string
   typeMapper: IDynamicFieldTypeMapper
 }
 
-export interface IStaticFieldType {
+interface IStaticFieldType {
   kind: 'static'
   staticType: string
 }
@@ -273,7 +271,7 @@ export type IFormFieldValue =
   | IDateRangePickerValue
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
-export interface FieldValueMap {
+interface FieldValueMap {
   [key: string]: IFormFieldValue
 }
 
@@ -289,7 +287,7 @@ export interface IFileValue {
   fileSize: number
 }
 
-export interface IContactPointPhone {
+interface IContactPointPhone {
   registrationPhone: string
 }
 
@@ -404,10 +402,6 @@ type SerializedSelectFormFieldWithOptions = Omit<
   optionCondition?: string
 }
 
-type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
-  queryMap: ISerializedQueryMap
-}
-
 type SerializedRadioGroupWithNestedFields = Omit<
   IRadioGroupWithNestedFieldsFormField,
   'nestedFields'
@@ -415,13 +409,13 @@ type SerializedRadioGroupWithNestedFields = Omit<
   nestedFields: { [key: string]: SerializedFormField[] }
 }
 
-export type IMapping = {
+type IMapping = {
   mutation?: IMutationDescriptor
   query?: IQueryDescriptor
   template?: ITemplateDescriptor
 }
 
-export type SerializedFormField = UnionOmit<
+type SerializedFormField = UnionOmit<
   | Exclude<
       IFormField,
       | IFormFieldWithDynamicDefinitions
@@ -431,7 +425,6 @@ export type SerializedFormField = UnionOmit<
     >
   | SerializedSelectFormFieldWithOptions
   | SerializedFormFieldWithDynamicDefinitions
-  | ILoaderButtonWithSerializedQueryMap
   | SerializedRadioGroupWithNestedFields,
   'validator' | 'mapping'
 > & {
@@ -447,7 +440,7 @@ export interface IAttachment {
   description?: string
 }
 
-export enum REVIEW_OVERRIDE_POSITION {
+enum REVIEW_OVERRIDE_POSITION {
   BEFORE = 'before',
   AFTER = 'after'
 }
@@ -525,11 +518,11 @@ export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
   dynamicDefinitions: IDynamicFormFieldDefinitions
 }
 
-export type INestedInputFields = {
+type INestedInputFields = {
   [key: string]: IFormField[]
 }
 
-export enum FLEX_DIRECTION {
+enum FLEX_DIRECTION {
   ROW = 'row',
   ROW_REVERSE = 'row-reverse',
   COLUMN = 'column',
@@ -583,11 +576,11 @@ interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
   step?: number
 }
-export interface ICheckboxGroupFormField extends IFormFieldBase {
+interface ICheckboxGroupFormField extends IFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: ICheckboxOption[]
 }
-export interface ICheckboxFormField extends IFormFieldBase {
+interface ICheckboxFormField extends IFormFieldBase {
   type: typeof CHECKBOX
   checkedValue?: 'true' | 'false' | boolean
   uncheckedValue?: 'true' | 'false' | boolean
@@ -682,12 +675,6 @@ export interface IQuery {
   responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
 }
 
-export interface ISerializedQueryMap {
-  [key: string]: Omit<IQuery, 'responseTransformer' | 'query'> & {
-    responseTransformer: Operation<typeof responseTransformers>
-    query: Operation<typeof graphQLQueries>
-  }
-}
 export interface IQueryMap {
   [key: string]: IQuery
 }
@@ -830,7 +817,7 @@ export type IFormField =
   | IIDVerificationBannerFormField
   | ILoaderFormField
 
-export interface IPreviewGroup {
+interface IPreviewGroup {
   id: string
   label: MessageDescriptor
   fieldToRedirect?: string
@@ -845,6 +832,7 @@ export interface IDynamicFormField
   type: any
 }
 
+/** @knipignore */
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
 
 type Params<Fn> = Fn extends (...args: infer A) => void ? A : never
@@ -865,7 +853,7 @@ type ValidationDefaultOperationKeys = Exclude<
   ValidationFactoryOperationKeys
 >
 
-export type ValidationFactoryOperation<
+type ValidationFactoryOperation<
   T extends ValidationFactoryOperationKeys = ValidationFactoryOperationKeys
 > = {
   operation: T
@@ -878,7 +866,7 @@ type ValidationDefaultOperation<
   operation: T
 }
 
-export type IValidatorDescriptor =
+type IValidatorDescriptor =
   | ValidationFactoryOperation
   | ValidationDefaultOperation
 
@@ -894,7 +882,7 @@ type QueryDefaultOperationKeys = Exclude<
   QueryFactoryOperationKeys
 >
 
-export type QueryFactoryOperation<
+type QueryFactoryOperation<
   T extends QueryFactoryOperationKeys = QueryFactoryOperationKeys
 > = {
   operation: T
@@ -910,14 +898,11 @@ type QueryDefaultOperation<
   operation: T
 }
 
-export type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
+type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
 
 type ISimpleTemplateDescriptor = { fieldName: string }
-export type IQueryTemplateDescriptor = ISimpleTemplateDescriptor &
-  IQueryDescriptor
-export type ITemplateDescriptor =
-  | IQueryTemplateDescriptor
-  | ISimpleTemplateDescriptor
+type IQueryTemplateDescriptor = ISimpleTemplateDescriptor & IQueryDescriptor
+type ITemplateDescriptor = IQueryTemplateDescriptor | ISimpleTemplateDescriptor
 // Mutations
 
 type MutationFactoryOperationKeys = FilterType<
@@ -930,7 +915,7 @@ type MutationDefaultOperationKeys = Exclude<
   MutationFactoryOperationKeys
 >
 
-export type MutationFactoryOperation<
+type MutationFactoryOperation<
   T extends MutationFactoryOperationKeys = MutationFactoryOperationKeys
 > = {
   operation: T
@@ -946,27 +931,25 @@ type MutationDefaultOperation<
   operation: T
 }
 
-export type IMutationDescriptor =
-  | MutationFactoryOperation
-  | MutationDefaultOperation
+type IMutationDescriptor = MutationFactoryOperation | MutationDefaultOperation
 
 // Initial type as it's always used as an object.
 // @todo should be stricter than this
 export type TransformedData = { [key: string]: any }
 
-export type IFormSectionMapping = {
+type IFormSectionMapping = {
   mutation?: IFormSectionMutationMapFunction
   query?: IFormSectionQueryMapFunction
   template?: [string, IFormSectionQueryMapFunction][]
 }
 
-export type IFormSectionMutationMapFunction = (
+type IFormSectionMutationMapFunction = (
   transFormedData: TransformedData,
   draftData: IFormData,
   sectionId: string
 ) => void
 
-export type IFormSectionQueryMapFunction = (
+type IFormSectionQueryMapFunction = (
   transFormedData: IFormData,
   queryData: any,
   sectionId: string,
@@ -976,13 +959,9 @@ export type IFormSectionQueryMapFunction = (
   userDetails?: UserDetails // user for template user mappings
 ) => void
 
-export enum UserSection {
-  User = 'user',
-  Preview = 'preview'
-}
-
-export enum CertificateSection {
-  Collector = 'collector'
+enum CertificateSection {
+  Collector = 'collector',
+  User = 'user'
 }
 
 export enum CorrectionSection {
@@ -993,11 +972,11 @@ export enum CorrectionSection {
   Summary = 'summary'
 }
 
-export enum PaymentSection {
+enum PaymentSection {
   Payment = 'payment'
 }
 
-export enum ReviewSection {
+enum ReviewSection {
   Review = 'review'
 }
 
@@ -1008,7 +987,6 @@ enum RegistrationSection {
 export type Section =
   | ReviewSection
   | PaymentSection
-  | UserSection
   | CertificateSection
   | CorrectionSection
   | RegistrationSection
@@ -1099,7 +1077,7 @@ interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   options: SelectComponentOption[]
 }
 
-export type Ii18nNestedInputFields = {
+type Ii18nNestedInputFields = {
   [key: string]: Ii18nFormField[]
 }
 
@@ -1380,52 +1358,3 @@ export interface IFormData {
 type PaymentType = 'MANUAL'
 
 type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
-
-type Payment = {
-  paymentId?: string
-  type: PaymentType
-  amount: string
-  outcome: PaymentOutcomeType
-  date: number
-}
-
-export interface ICertificate {
-  collector?: IFormSectionData
-  hasShowedVerifiedDocument?: boolean
-  payments?: Payment[]
-  certificateTemplateId?: string
-}
-
-export function modifyFormField(
-  form: IForm,
-  sectionId: string,
-  groupId: string,
-  fieldName: string,
-  modifyFn: (field: IFormField) => IFormField
-) {
-  return {
-    ...form,
-    sections: form.sections.map((section) => {
-      if (section.id === sectionId) {
-        return {
-          ...section,
-          groups: section.groups.map((group) => {
-            if (group.id === groupId) {
-              return {
-                ...group,
-                fields: group.fields.map((field) => {
-                  if (field.name === fieldName) {
-                    return modifyFn(field)
-                  }
-                  return field
-                })
-              }
-            }
-            return group
-          })
-        }
-      }
-      return section
-    })
-  }
-}

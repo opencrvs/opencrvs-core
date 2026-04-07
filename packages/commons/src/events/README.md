@@ -30,6 +30,25 @@ Outside of the declaration, actions may include form(s) for gathering additional
 
 When an event is submitted for the first time, **in full**, as defined in the event configuration, it receives the status `DECLARED`. [Statuses and flags](./EventMetadata.ts) restrict which actions can take place next.
 
+#### Quick actions
+
+Some actions have their own complete flow on the UI, this includes:
+
+- Declaration
+- Certificate printing
+- Correction
+
+It's good to note that the declaration flow will also validate, or validate and register if the user has the scope for it.
+
+However, certain actions are executed via a simple modal on the event overview. These are called **quick actions**. These include:
+
+- Validation (of a declared event)
+- Registration (of a declared event)
+- Rejection
+- Archival
+
+Quick actions can be added with the [useQuickActionModal.tsx](../../../client/src/v2-events/features/events/actions/quick-actions/useQuickActionModal.tsx)
+
 ### Forms, Pages, Fields
 
 How to configure a form

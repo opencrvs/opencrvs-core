@@ -22,3 +22,8 @@ require('dotenv').config({
 import { createServer } from '@workflow/server'
 
 createServer().then((server) => server.start())
+.catch((error) => {
+  // eslint-disable-next-line no-console
+  console.error('Error starting workflow server', error)
+  process.exit(1)
+})

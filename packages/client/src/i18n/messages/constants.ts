@@ -1163,7 +1163,7 @@ const dynamicMessagesToDefine: Record<
   }
 }
 
-export const dynamicConstantsMessages: Record<
+const dynamicConstantsMessages: Record<
   string | number | symbol,
   MessageDescriptor
 > = defineMessages(dynamicMessagesToDefine)

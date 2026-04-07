@@ -26,7 +26,6 @@ import {
   tennisClubMembershipEvent,
   getCurrentEventState,
   UUID,
-  SystemRole,
   TestUserRole,
   generateActionDocument,
   ActionDocument,
@@ -77,6 +76,96 @@ const defaultEvent = {
   )
 }
 
+const actionDefaults = {
+  createdAt: generateRandomDatetime(
+    createPrng(73),
+    new Date('2024-03-01'),
+    new Date('2024-04-01')
+  ),
+  createdBy: refData.user.id.localRegistrar,
+  createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
+  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId,
+  transactionId: getUUID()
+} satisfies Partial<ActionDocument>
+
+const duplicateEvent = {
+  ...tennisClubMembershipEventDocument,
+  actions: [
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        assignedTo: refData.user.id.localRegistrar
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: actionDefaults
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DUPLICATE_DETECTED,
+      defaults: {
+        ...actionDefaults,
+        content: {
+          duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
+        }
+      }
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.ASSIGN,
+      defaults: {
+        ...actionDefaults,
+        assignedTo: refData.user.id.localRegistrar
+      }
+    })
+  ]
+}
+
+export const WithDuplicateDetectedActionModal: Story = {
+  parameters: {
+    offline: {
+      events: [duplicateEvent]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.AUDIT.buildPath({
+        eventId: duplicateEvent.id
+      })
+    },
+    msw: {
+      handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(
+      await canvas.findByRole('button', {
+        name: 'Flagged as potential duplicate'
+      })
+    )
+  }
+}
+
 export const Overview: Story = {
   parameters: {
     offline: {
@@ -84,7 +173,7 @@ export const Overview: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: defaultEvent.id
       })
     },
@@ -121,26 +210,40 @@ export const Overview: Story = {
   }
 }
 
-export const WithAcceptedRegisterEvent: Story = {
+export const OverviewMobile: Story = {
   parameters: {
+    viewport: { defaultViewport: 'mobile' },
+    offline: {
+      events: [defaultEvent]
+    },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: defaultEvent.id
       })
     },
     msw: {
       handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [
+                getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
+              ],
+              total: 1
+            }
+          })
+        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
               generateEventDraftDocument({
-                eventId: tennisClubMembershipEventDocument.id,
+                eventId: defaultEvent.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
                   'applicant.name': {
-                    firstname: 'Riku',
-                    surname: 'This value is from a draft'
+                    firstname: 'Amelie',
+                    surname: 'Poulain'
                   }
                 }
               })
@@ -148,6 +251,20 @@ export const WithAcceptedRegisterEvent: Story = {
           })
         ]
       }
+    }
+  }
+}
+
+export const WithAcceptedRegisterEvent: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {}
     }
   }
 }
@@ -177,7 +294,7 @@ export const WithRejectedAction: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -213,7 +330,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           assignedTo: '010101',
           declaration: {}
         },
@@ -230,7 +347,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           assignedTo: '010101',
           declaration: {}
         },
@@ -247,7 +364,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           declaration: {}
         },
         {
@@ -263,7 +380,7 @@ export const WithSystemUserActions: Story = {
           createdBy: '010101',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.HEALTH,
+          createdByRole: undefined,
           assignedTo: null,
           declaration: {}
         },
@@ -303,7 +420,7 @@ export const WithSystemUserActions: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -399,7 +516,6 @@ export const WithVariousUserRoles: Story = {
           createdBy: 'system-123',
           createdAtLocation: undefined,
           createdByUserType: 'system' as const,
-          createdByRole: SystemRole.enum.IMPORT_EXPORT,
           declaration: {}
         },
         {
@@ -598,7 +714,7 @@ export const WithVariousUserRoles: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -625,59 +741,6 @@ export const WithVariousUserRoles: Story = {
   }
 }
 
-const actionDefaults = {
-  createdAt: generateRandomDatetime(
-    createPrng(73),
-    new Date('2024-03-01'),
-    new Date('2024-04-01')
-  ),
-  createdBy: refData.user.id.localRegistrar,
-  createdByRole: TestUserRole.Enum.LOCAL_REGISTRAR,
-  createdAtLocation: refData.user.localRegistrar().v2.primaryOfficeId,
-  transactionId: getUUID()
-} satisfies Partial<ActionDocument>
-
-const duplicateEvent = {
-  ...tennisClubMembershipEventDocument,
-  actions: [
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.CREATE,
-      defaults: actionDefaults
-    }),
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.ASSIGN,
-      defaults: {
-        ...actionDefaults,
-        assignedTo: refData.user.id.localRegistrar
-      }
-    }),
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.DECLARE,
-      defaults: actionDefaults
-    }),
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.DUPLICATE_DETECTED,
-      defaults: {
-        ...actionDefaults,
-        content: {
-          duplicates: [{ id: getUUID(), trackingId: '0R1G1NAL' }]
-        }
-      }
-    }),
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.ASSIGN,
-      defaults: {
-        ...actionDefaults,
-        assignedTo: refData.user.id.localRegistrar
-      }
-    })
-  ]
-}
 export const WithDuplicateDetectedAction: Story = {
   parameters: {
     offline: {
@@ -685,7 +748,7 @@ export const WithDuplicateDetectedAction: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: duplicateEvent.id
       })
     },
@@ -703,47 +766,10 @@ export const WithDuplicateDetectedAction: Story = {
         ]
       }
     }
-  }
-}
-
-export const WithDuplicateDetectedActionModal: Story = {
-  parameters: {
-    offline: {
-      events: [duplicateEvent]
-    },
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-        eventId: duplicateEvent.id
-      })
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.search.query(() => {
-            return {
-              results: [
-                getCurrentEventState(duplicateEvent, tennisClubMembershipEvent)
-              ],
-              total: 1
-            }
-          })
-        ]
-      }
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(
-      await canvas.findByRole('button', {
-        name: 'Flagged as potential duplicate'
-      })
-    )
   }
 }
 
 const rng = createPrng(33123)
-const validateActionUuid = generateUuid(rng)
 
 const annotationUpdateOnValidateEvent = {
   id: getUUID(),
@@ -769,31 +795,6 @@ const annotationUpdateOnValidateEvent = {
       }
     }),
     generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      declarationOverrides: {},
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
-        id: validateActionUuid,
-        status: ActionStatus.Requested,
-        annotation: {
-          'review.signature': generateRandomSignature(rng)
-        }
-      }
-    }),
-    generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      declarationOverrides: {},
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString(),
-        status: ActionStatus.Accepted,
-        originalActionId: validateActionUuid
-      }
-    }),
-    generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action: ActionType.ASSIGN,
       defaults: {
@@ -815,7 +816,7 @@ export const WithAnnotationChangeOnValidate: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: annotationUpdateOnValidateEvent.id
       })
     },
@@ -859,15 +860,6 @@ const annotationChangeDuringRegisterEvent = {
           'review.signature': generateRandomSignature(rng)
         }
       }
-    }),
-    generateActionDocument({
-      action: ActionType.VALIDATE,
-      configuration: tennisClubMembershipEvent,
-      defaults: {
-        ...actionDefaults,
-        createdAt: addDays(new Date(actionDefaults.createdAt), 2).toISOString()
-      },
-      declarationOverrides: {}
     }),
     generateActionDocument({
       action: ActionType.REGISTER,
@@ -915,7 +907,7 @@ export const WithAnnotationChangeOnRegister: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.EVENT.buildPath({
         eventId: annotationChangeDuringRegisterEvent.id
       })
     },

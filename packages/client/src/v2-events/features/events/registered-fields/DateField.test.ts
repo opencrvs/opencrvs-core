@@ -13,7 +13,7 @@ import { createIntl } from 'react-intl'
 import { DateField } from './DateField'
 
 const intl = createIntl({ locale: 'en' })
-const context = { intl, locations: [] }
+const context = { intl, locations: new Map(), administrativeAreas: new Map() }
 
 describe.each([
   { name: 'stringify', fn: DateField.stringify },

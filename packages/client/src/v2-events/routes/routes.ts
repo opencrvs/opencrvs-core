@@ -28,18 +28,27 @@ export const ROUTES = {
         'events',
         {},
         {
-          VIEW: route('view/:eventId', {
-            params: { eventId: uuid().defined() },
-            searchParams: {
-              workqueue: string()
+          EVENT: route(
+            ':eventId',
+            {
+              params: { eventId: uuid().defined() },
+              searchParams: {
+                workqueue: string()
+              }
+            },
+            {
+              RECORD: route('record', {
+                searchParams: {
+                  workqueue: string()
+                }
+              }),
+              AUDIT: route('audit', {
+                searchParams: {
+                  workqueue: string()
+                }
+              })
             }
-          }),
-          OVERVIEW: route('overview/:eventId', {
-            params: { eventId: uuid().defined() },
-            searchParams: {
-              workqueue: string()
-            }
-          }),
+          ),
           CREATE: route('create', {
             searchParams: {
               workqueue: string()
@@ -54,15 +63,11 @@ export const ROUTES = {
             'declare/:eventId',
             {
               params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
+              searchParams: { workqueue: string() }
             },
             {
               REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
+                searchParams: { workqueue: string() }
               }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
@@ -74,50 +79,19 @@ export const ROUTES = {
               })
             }
           ),
-          VALIDATE: route(
-            'validate/:eventId',
+          EDIT: route(
+            'edit/:eventId',
             {
               params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
+              searchParams: { workqueue: string() }
             },
             {
               REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
+                searchParams: { workqueue: string() }
               }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
-                searchParams: {
-                  from: string(),
-                  workqueue: string()
-                },
-                hash: hashValues()
-              })
-            }
-          ),
-          REGISTER: route(
-            'register/:eventId',
-            {
-              params: { eventId: uuid().defined() },
-              searchParams: {
-                workqueue: string()
-              }
-            },
-            {
-              REVIEW: route('review', {
-                searchParams: {
-                  workqueue: string()
-                }
-              }),
-              PAGES: route('pages/:pageId', {
-                params: { pageId: string() },
-                searchParams: {
-                  from: string(),
-                  workqueue: string()
-                },
+                searchParams: { from: string(), workqueue: string() },
                 hash: hashValues()
               })
             }
@@ -175,7 +149,39 @@ export const ROUTES = {
           offset: zod(z.number().min(0)).default(0)
         }
       }),
-      SETTINGS: route('settings', {})
+      SETTINGS: route(
+        'settings',
+        {},
+        {
+          USER: route(
+            'users',
+            {},
+            {
+              CREATE: route('create', {
+                searchParams: {
+                  officeId: string().defined()
+                }
+              }),
+              VIEW: route(':userId/view', {
+                params: {
+                  userId: string().defined()
+                }
+              }),
+              REVIEW: route(':userId/review', {
+                params: {
+                  userId: string().defined()
+                }
+              }),
+              EDIT: route(':userId/edit/:pageId', {
+                params: {
+                  userId: string().defined(),
+                  pageId: string()
+                }
+              })
+            }
+          )
+        }
+      )
     }
   )
 }

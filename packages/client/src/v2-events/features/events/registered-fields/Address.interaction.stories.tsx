@@ -36,6 +36,7 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { getOfflineData } from '@client/offline/selectors'
 import { withValidatorContext } from '../../../../../.storybook/decorators'
+import { useAdministrativeAreas } from '../../../hooks/useAdministrativeAreas'
 import { Address } from './Address'
 
 const meta: Meta<FormFieldGeneratorPropsWithoutRef> = {
@@ -638,7 +639,10 @@ export const ToCertificateVariables: Story = {
     const [resolvedAddress, setResolvedAddress] =
       React.useState<ResolvedAddress>()
     const { getLocations } = useLocations()
-    const [locations] = getLocations.useSuspenseQuery()
+    const { getAdministrativeAreas } = useAdministrativeAreas()
+
+    const locations = getLocations.useSuspenseQuery()
+    const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
     const { config: appConfig } = useSelector(getOfflineData)
 
     const adminLevels = appConfig.ADMIN_STRUCTURE
@@ -655,6 +659,7 @@ export const ToCertificateVariables: Story = {
                 defaultMessage: 'Address',
                 description: 'The title for the address input'
               },
+
               configuration: {
                 streetAddressForm: streetAddressConfigs
               }
@@ -671,6 +676,7 @@ export const ToCertificateVariables: Story = {
               const resolved = Address.toCertificateVariables(address.data, {
                 intl,
                 locations,
+                administrativeAreas,
                 adminLevels
               })
               setResolvedAddress((prev) => ({

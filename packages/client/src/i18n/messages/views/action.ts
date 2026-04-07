@@ -21,6 +21,11 @@ const messagesToDefine = {
     description: 'Label for assignee',
     id: 'action.assignee'
   },
+  noActionsAvailable: {
+    defaultMessage: 'No actions available',
+    description: 'No actions available message',
+    id: 'action.noActionsAvailable'
+  },
   view: {
     defaultMessage: 'View {recordOrDeclaration}',
     description: 'Label for view button in dropdown menu',

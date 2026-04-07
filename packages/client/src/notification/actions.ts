@@ -88,7 +88,7 @@ type ShowSubmitFormErrorToast = {
     data: string
   }
 }
-export type ShowCreateUserErrorToast = {
+type ShowCreateUserErrorToast = {
   type: typeof SHOW_CREATE_USER_ERROR_TOAST
   payload: {
     data: string
@@ -96,7 +96,7 @@ export type ShowCreateUserErrorToast = {
   }
 }
 
-export type ShowCreateUserDuplicateEmailErrorToast = {
+type ShowCreateUserDuplicateEmailErrorToast = {
   type: typeof SHOW_CREATE_USER_DUPLICATE_EMAIL_ERROR_TOAST
   payload: {
     data: string
@@ -222,7 +222,7 @@ export const showSubmitFormErrorToast = (
   payload: { data }
 })
 
-export const showCreateUserErrorToast = (
+const showCreateUserErrorToast = (
   data: string,
   mobile: string
 ): ShowCreateUserErrorToast => ({
@@ -230,7 +230,7 @@ export const showCreateUserErrorToast = (
   payload: { data, mobile }
 })
 
-export const showCreateUserDuplicateEmailErrorToast = (
+const showCreateUserDuplicateEmailErrorToast = (
   data: string,
   email: string
 ): ShowCreateUserDuplicateEmailErrorToast => ({
@@ -238,7 +238,7 @@ export const showCreateUserDuplicateEmailErrorToast = (
   payload: { data, email }
 })
 
-export const showDownloadDeclarationFailedToast =
+const showDownloadDeclarationFailedToast =
   (): ShowDownloadDeclarationFailedToast => ({
     type: SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
   })
@@ -281,7 +281,7 @@ type ShowDuplicateRecordsToast = {
   payload: { trackingId: string; compositionId: string }
 }
 
-export const showDuplicateRecordsToast = ({
+const showDuplicateRecordsToast = ({
   trackingId,
   compositionId
 }: AdditionalIdWithCompositionId): ShowDuplicateRecordsToast => ({
@@ -312,14 +312,12 @@ export const hidePINUpdateSuccessToast = (): HidePINUpdateSuccessAction => ({
   type: HIDE_PIN_UPDATE_SUCCESS
 })
 
-export const showUnassigned = (
-  data: ShowUnassignedPayload
-): ShowUnassigned => ({
+const showUnassigned = (data: ShowUnassignedPayload): ShowUnassigned => ({
   type: SHOW_UNASSIGNED,
   payload: data
 })
 
-export const showUnassignedDeclarations = (
+const showUnassignedDeclarations = (
   unassignedDeclarationTrackingIds: string[]
 ): ShowUnassignedDeclarations => ({
   type: SHOW_UNASSIGNED_DECLARATIONS,

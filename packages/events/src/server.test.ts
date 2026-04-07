@@ -95,7 +95,9 @@ test('Server starts up and returns an event based on context dependency values',
   const mockUserResponse = {
     primaryOfficeId: locations[0].id,
     role: TestUserRole.enum.LOCAL_REGISTRAR,
-    signature: '/ocrvs/my-signature.png'
+    signature: {
+      data: 'my-signature.png'
+    }
   }
 
   mswServer.use(
@@ -125,7 +127,7 @@ test('Server starts up and returns an event based on context dependency values',
 
   expect(createAction.type).toEqual(ActionType.CREATE)
   expect(createAction.createdBy).toEqual(userId)
-  expect(createAction.createdBySignature).toEqual(mockUserResponse.signature)
+  expect(createAction.createdBySignature).toEqual('my-signature.png')
   expect(createAction.createdAtLocation).toEqual(
     mockUserResponse.primaryOfficeId
   )
@@ -150,14 +152,14 @@ test('Server will accept requests after error', async () => {
 
   await expect(
     createEvent(BearerTokenByUserType.localRegistrar)
-  ).rejects.toMatchObject(new TRPCError({ code: 'INTERNAL_SERVER_ERROR' }))
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 
   mswServer.use(
     http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
       return HttpResponse.json({
         primaryOfficeId: locations[0].id,
         role: TestUserRole.enum.LOCAL_REGISTRAR,
-        signature: '/ocrvs/my-signature.png'
+        signature: 'my-signature.png'
       })
     })
   )
@@ -179,16 +181,16 @@ test('Throws when dependency payload returns malformed data', async () => {
 
   await expect(
     createEvent(BearerTokenByUserType.localRegistrar)
-  ).rejects.toMatchObject(new TRPCError({ code: 'INTERNAL_SERVER_ERROR' }))
+  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
 })
 
 test('Throws with malformed token', async () => {
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 
-  await expect(createEvent('bad-token')).rejects.toMatchObject(
-    new TRPCError({ code: 'UNAUTHORIZED' })
-  )
+  await expect(createEvent('bad-token')).rejects.toMatchObject({
+    data: { code: 'UNAUTHORIZED' }
+  })
 })
 
 test('UNAUTHORIZED error is thrown when authorization header is missing', async () => {

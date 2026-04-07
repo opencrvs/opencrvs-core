@@ -155,7 +155,7 @@ function getSelectedOption<T>(
   return selectedOption ?? null
 }
 
-export interface SelectProps<T>
+interface SelectProps<T>
   extends Omit<StyledSelectProps, 'value' | 'onChange' | 'options'> {
   searchableLength?: number
   onChange: (option: Option<T>) => void

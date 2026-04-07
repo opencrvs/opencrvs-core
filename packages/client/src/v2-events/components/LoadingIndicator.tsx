@@ -118,7 +118,7 @@ function LoadingIndicatorComp({
   )
 }
 
-export function withOnlineStatus<ComponentProps>(
+function withOnlineStatus<ComponentProps>(
   Component: React.ComponentType<ComponentProps>
 ) {
   return (props: Omit<ComponentProps, 'isOnline'>) => {

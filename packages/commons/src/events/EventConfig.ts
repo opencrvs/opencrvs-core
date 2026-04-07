@@ -8,19 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { ActionConfig } from './ActionConfig'
 import { SummaryConfig } from './SummaryConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
-import { findAllFields, getDeclarationFields } from './utils'
-import { DeclarationFormConfig } from './FormConfig'
-import { extendZodWithOpenApi } from 'zod-openapi'
-import { FieldType } from './FieldType'
+import { AdvancedSearchConfig } from './AdvancedSearchConfig'
+import { DeclarationFormConfig, DeclarationFormConfigInput } from './FormConfig'
 import { FieldReference } from './FieldConfig'
-import { isFieldReference } from '../conditionals/conditionals'
 import { EventMetadataDateFieldIdInput } from './EventMetadata'
-extendZodWithOpenApi(z)
+import { FlagConfig } from './Flag'
+import {
+  validateActionOrder,
+  validateActionFlags,
+  validatePlaceOfEvent,
+  validateDateOfEvent,
+  validateAdvancedSearchConfig
+} from './eventConfigValidation'
 
 export const EventFieldReference = z
   .object({ $$event: EventMetadataDateFieldIdInput })
@@ -28,122 +31,109 @@ export const EventFieldReference = z
     'Reference to a field defined in the event metadata, using the field id.'
   )
 
+export type EventConfig = {
+  id: string
+  dateOfEvent?: FieldReference | z.infer<typeof EventFieldReference>
+  placeOfEvent?: FieldReference
+  title: TranslationConfig
+  fallbackTitle?: TranslationConfig
+  summary: SummaryConfig
+  label: TranslationConfig
+  actions: ActionConfig[]
+  actionOrder?: string[]
+  declaration: DeclarationFormConfig
+  advancedSearch: AdvancedSearchConfig[]
+  flags: FlagConfig[]
+}
+
+export type EventConfigInput = Omit<
+  EventConfig,
+  | 'advancedSearch'
+  | 'flags'
+  | 'declaration'
+  | 'actions'
+  | 'dateOfEvent'
+  | 'placeOfEvent'
+> & {
+  dateOfEvent?:
+    | z.input<typeof FieldReference>
+    | z.infer<typeof EventFieldReference>
+  placeOfEvent?: z.input<typeof FieldReference>
+  advancedSearch?: AdvancedSearchConfig[]
+  flags?: FlagConfig[]
+  declaration: DeclarationFormConfigInput
+  actions: z.input<typeof ActionConfig>[]
+}
+
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
  *
  * `Event.parse(config)` will throw an error if the configuration is invalid.
  */
-export const EventConfig = z
-  .object({
-    id: z
-      .string()
-      .describe(
-        'Machine-readable identifier of the event (e.g. "birth", "death").'
-      ),
-    dateOfEvent: FieldReference.or(EventFieldReference)
-      .optional()
-      .describe(
-        'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
-      ),
-    title: TranslationConfig.describe(
-      'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
+const _EventConfigBase: z.ZodType<EventConfig, EventConfigInput> = z.object({
+  id: z
+    .string()
+    .describe(
+      'Machine-readable identifier of the event (e.g. "birth", "death").'
     ),
-    fallbackTitle: TranslationConfig.optional().describe(
-      'Fallback title shown when the main title resolves to an empty value.'
+  dateOfEvent: FieldReference.or(EventFieldReference)
+    .optional()
+    .describe(
+      'Reference to the field capturing the date of the event (e.g. date of birth). Defaults to the event creation date if unspecified.'
     ),
-    summary: SummaryConfig.describe(
-      'Summary information displayed in the event overview.'
+  placeOfEvent: FieldReference.optional().describe(
+    'Reference to the field capturing the place of the event (e.g. place of birth). Defaults to the meta.createdAtLocation if unspecified.'
+  ),
+  title: TranslationConfig.describe(
+    'Title template for the singular event, supporting variables (e.g. "{applicant.name.firstname} {applicant.name.surname}").'
+  ),
+  fallbackTitle: TranslationConfig.optional().describe(
+    'Fallback title shown when the main title resolves to an empty value.'
+  ),
+  summary: SummaryConfig.describe(
+    'Summary information displayed in the event overview.'
+  ),
+  label: TranslationConfig.describe('Human-readable label for the event type.'),
+  actions: z
+    .array(ActionConfig)
+    .describe(
+      'Configuration of system-defined actions associated with the event.'
     ),
-    label: TranslationConfig.describe(
-      'Human-readable label for the event type.'
+  actionOrder: z
+    .array(z.string())
+    .optional()
+    .describe(
+      'Order of actions in the action menu. Use either the action type for core actions or the customActionType for custom actions.'
     ),
-    actions: z
-      .array(ActionConfig)
-      .describe(
-        'Configuration of system-defined actions associated with the event.'
-      ),
-    declaration: DeclarationFormConfig.describe(
-      'Configuration of the form used to gather event data.'
+  declaration: DeclarationFormConfig.describe(
+    'Configuration of the form used to gather event data.'
+  ),
+  advancedSearch: z
+    .array(AdvancedSearchConfig)
+    .optional()
+    .default([])
+    .describe(
+      'Configuration of fields available in the advanced search feature.'
     ),
-    advancedSearch: z
-      .array(AdvancedSearchConfig)
-      .optional()
-      .default([])
-      .describe(
-        'Configuration of fields available in the advanced search feature.'
-      )
-  })
-  .superRefine((event, ctx) => {
-    const allFields = findAllFields(event)
-    const fieldIds = allFields.map((field) => field.id)
-
-    const advancedSearchFields = event.advancedSearch.flatMap((section) =>
-      section.fields.flatMap((field) => field.fieldId)
+  flags: z
+    .array(FlagConfig)
+    .optional()
+    .default([])
+    .describe(
+      'Configuration of flags associated with the actions of this event type.'
     )
+})
 
-    const advancedSearchFieldsSet = new Set(advancedSearchFields)
-
-    if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Advanced search field ids must be unique',
-        path: ['advancedSearch']
-      })
-    }
-
-    const invalidFields = event.advancedSearch.flatMap((section) =>
-      // Check if the fieldId is not in the fieldIds array
-      // and also not in the metadataFields array
-      section.fields.filter(
-        (field) =>
-          !(
-            fieldIds.includes(field.fieldId) ||
-            (EventFieldId.options as string[]).includes(field.fieldId) ||
-            (field.config.searchFields &&
-              field.config.searchFields.length > 0 &&
-              field.config.searchFields.every((sf) => fieldIds.includes(sf)))
-          )
-      )
-    )
-
-    if (invalidFields.length > 0) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Advanced search id must match a field id of form fields or pre-defined metadata fields.
-    Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
-      .map((f) => f.fieldId)
-      .join(', ')}`,
-        path: ['advancedSearch']
-      })
-    }
-
-    if (
-      event.dateOfEvent !== undefined &&
-      isFieldReference(event.dateOfEvent)
-    ) {
-      const dateOfEvent = event.dateOfEvent
-      const eventDateFieldId = getDeclarationFields(event).find(
-        ({ id }) => id === dateOfEvent.$$field
-      )
-      if (!eventDateFieldId) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Date of event field id must match a field id in fields array.
-          Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.$$field}`,
-          path: ['dateOfEvent']
-        })
-      } else if (eventDateFieldId.type !== FieldType.DATE) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Field specified for date of event is of type: ${eventDateFieldId.type}, but it needs to be of type: ${FieldType.DATE}`,
-          path: ['dateOfEvent.fieldType']
-        })
-      }
-    }
-  })
-  .openapi({
-    ref: 'EventConfig'
-  })
-  .describe('Configuration defining an event type.')
-
-export type EventConfig = z.infer<typeof EventConfig>
+export const EventConfig: z.ZodType<EventConfig, EventConfigInput> =
+  _EventConfigBase
+    .superRefine((event, ctx) => {
+      validateAdvancedSearchConfig(event, ctx)
+      validateDateOfEvent(event, ctx)
+      validatePlaceOfEvent(event, ctx)
+      validateActionFlags(event, ctx)
+      validateActionOrder(event, ctx)
+    })
+    .meta({
+      id: 'EventConfig'
+    })
+    .describe('Configuration defining an event type.')

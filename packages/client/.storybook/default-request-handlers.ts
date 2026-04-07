@@ -27,10 +27,13 @@ import {
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
   libraryMembershipEvent,
-  LocationType,
   TestUserRole
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import {
+  V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS,
+  V2_DEFAULT_MOCK_LOCATIONS
+} from '@client/tests/v2-events/administrative-hierarchy-mock'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -54,165 +57,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
-
-export const V2_DEFAULT_MOCK_LOCATIONS = [
-  {
-    id: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    name: 'Central',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    validUntil: null
-  },
-  {
-    id: 'c599b691-fd2d-45e1-abf4-d185de727fb5' as UUID,
-    name: 'Sulaka',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    validUntil: null
-  },
-  {
-    id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
-    name: 'Pualula',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    validUntil: null
-  },
-  {
-    id: '6d1a59df-988c-4021-a846-ccbc021931a7' as UUID,
-    name: 'Chuminga',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: null,
-    validUntil: null
-  },
-  {
-    id: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    name: 'Ibombo',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
-    // @TODO:  Find a way to give out context aware mock values in the future.
-    id: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
-    name: 'Isango',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    id: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
-    name: 'Isamba',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    id: '89a33893-b17d-481d-a26d-6461e7ac1651' as UUID,
-    name: 'Itambo',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250' as UUID,
-    name: 'Ezhi',
-    locationType: LocationType.enum.ADMIN_STRUCTURE,
-    parentId: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
-    validUntil: null
-  },
-  {
-    id: '423d000f-101b-47c0-8b86-21a908067cee' as UUID,
-    name: 'Chamakubi Health Post',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '4d3279be-d026-420c-88f7-f0a4ae986973' as UUID,
-    name: 'Ibombo Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '190902f4-1d77-476a-8947-41145af1db7d' as UUID,
-    name: 'Chikobo Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71' as UUID,
-    name: 'Chilochabalenje Health Post',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: 'dbfc178f-7295-4b90-b28d-111c95b03127' as UUID,
-    name: 'Chipeso Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '09862bfe-c7ac-46cd-987b-668681533c80' as UUID,
-    name: 'Chisamba Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '834ce389-e95b-4fb0-96a0-33e9ab323059' as UUID,
-    name: 'Chitanda Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '0431c433-6062-4a4c-aee9-25271aec61ee' as UUID,
-    name: 'Golden Valley Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2' as UUID,
-    name: 'Ipongo Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '4cf1f53b-b730-41d2-8649-dff7eeed970d' as UUID,
-    name: 'Itumbwe Health Post',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0' as UUID,
-    name: 'Kabangalala Rural Health Centre',
-    locationType: LocationType.enum.HEALTH_FACILITY,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID,
-    name: 'Ibombo District Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
-    validUntil: null
-  },
-  {
-    id: '62a0ccb4-4f30-4f30-8882-f256007dff9f' as UUID,
-    name: 'Isamba District Office',
-    locationType: LocationType.enum.CRVS_OFFICE,
-    parentId: '967032fd-3f81-478a-826c-30cb8fe121bd' as UUID,
-    validUntil: null
-  }
-]
 
 export const handlers = {
   ping: [
@@ -250,6 +94,9 @@ export const handlers = {
   eventLocations: [
     tRPCMsw.locations.list.query(() => {
       return V2_DEFAULT_MOCK_LOCATIONS
+    }),
+    tRPCMsw.administrativeAreas.list.query(() => {
+      return V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS
     })
   ],
   getUserRoles: [
@@ -537,6 +384,41 @@ export const handlers = {
     http.delete('/api/files/:filePath*', async (request) => {
       return HttpResponse.text('OK')
     }),
+    http.get('/files/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+
+      const response = await cache.match(request.request)
+
+      if (response) {
+        return response
+      }
+
+      const url = new URL(request.request.url)
+
+      const basename = url.pathname.split('/').pop()
+
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = TestImage.Tree
+          break
+        case 'fish.svg':
+          file = TestImage.Fish
+          break
+        case 'mountain.svg':
+          file = TestImage.Mountain
+          break
+        default:
+          file = TestImage.Box
+      }
+
+      return new HttpResponse(file, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'no-cache'
+        }
+      })
+    }),
     http.get('http://localhost:3535/ocrvs/:id', async (request) => {
       const cache = await caches.open(FAKE_CACHE_NAME)
 
@@ -577,6 +459,39 @@ export const handlers = {
 
       const response = await cache.match(request.request)
 
+      if (response) {
+        return response
+      }
+
+      const url = new URL(request.request.url)
+
+      const basename = url.pathname.split('/').pop()
+
+      let file: string
+      switch (basename) {
+        case 'tree.svg':
+          file = TestImage.Tree
+          break
+        case 'fish.svg':
+          file = TestImage.Fish
+          break
+        case 'mountain.svg':
+          file = TestImage.Mountain
+          break
+        default:
+          file = TestImage.Box
+      }
+
+      return new HttpResponse(file, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'no-cache'
+        }
+      })
+    }),
+    http.get('/:id', async (request) => {
+      const cache = await caches.open(FAKE_CACHE_NAME)
+      const response = await cache.match(request.request)
       if (response) {
         return response
       }
@@ -1212,155 +1127,93 @@ export const handlers = {
     })
   ],
   user: [
-    graphql.query('getUserAuditLog', (input) => {
-      const start = input.variables.skip || 0
-      const end = start + (input.variables.count || 10)
-      const total = 11
-      return HttpResponse.json({
-        data: {
-          getUserAuditLog: {
-            total,
-            results: [
-              {
-                time: '2025-10-03T10:46:49.362Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_OUT',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              },
-              {
-                time: '2025-10-03T10:44:55.012Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_IN',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              },
-              {
-                time: '2025-10-03T10:44:49.362Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_OUT',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              },
-              {
-                time: '2025-10-03T10:43:16.704Z',
-                userAgent:
-                  'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'ASSIGNED',
-                isV2: null,
-                data: {
-                  compositionId: '0458a3ba-3f30-4345-be16-9ec81aa39b89',
-                  trackingId: 'BSK4XRC',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: '68df9529f8f3a73007a44264',
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'ASSIGNED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:24:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:23:45.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:23:25.604Z',
-                userAgent: '',
-                practitionerId: input.variables.userId,
-                ipAddress: '',
-                action: 'VIEWED',
-                isV2: true,
-                data: {
-                  compositionId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
-                  trackingId: 'MOX89J',
-                  __typename: 'AdditionalIdWithCompositionId'
-                },
-                __typename: 'UserAuditLogItemWithComposition'
-              },
-              {
-                time: '2025-10-03T09:22:10.128Z',
-                userAgent: 'undefined',
-                practitionerId: input.variables.userId,
-                ipAddress: '127.0.0.1',
-                action: 'LOGGED_IN',
-                isV2: null,
-                __typename: 'UserAuditLogItem'
-              }
-            ].slice(start, Math.min(end, total)),
-            __typename: 'UserAuditLogResultSet'
-          }
+    tRPCMsw.user.audit.list.query((input) => {
+      const skip = input.skip ?? 0
+      const count = input.count ?? 10
+      const allResults = [
+        {
+          id: '1',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'user.logged_out',
+          requestData: { subjectId: input.userId },
+          responseSummary: {},
+          createdAt: '2025-10-03T10:46:49.362Z'
+        },
+        {
+          id: '2',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'user.logged_in',
+          requestData: { subjectId: input.userId },
+          responseSummary: {},
+          createdAt: '2025-10-03T10:44:55.012Z'
+        },
+        {
+          id: '3',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'event.actions.assign.request',
+          requestData: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            actionType: 'ASSIGN',
+            transactionId: 'BSK4XRC'
+          },
+          responseSummary: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            eventType: 'birth',
+            trackingId: 'BSK4XRC'
+          },
+          createdAt: '2025-10-03T10:43:16.704Z'
+        },
+        {
+          id: '4',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'event.actions.declare.request',
+          requestData: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            actionType: 'DECLARE',
+            transactionId: 'MOX89J'
+          },
+          responseSummary: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            eventType: 'birth',
+            trackingId: 'MOX89J'
+          },
+          createdAt: '2025-10-03T09:24:25.604Z'
+        },
+        {
+          id: '5',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'event.actions.register.request',
+          requestData: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            actionType: 'REGISTER',
+            transactionId: 'MOX89J'
+          },
+          responseSummary: {
+            eventId: 'ea2d18f5-d6e7-4d18-a323-a2407b61b7fe',
+            eventType: 'birth',
+            trackingId: 'MOX89J'
+          },
+          createdAt: '2025-10-03T09:23:45.604Z'
+        },
+        {
+          id: '6',
+          clientId: input.userId,
+          clientType: 'user',
+          operation: 'user.logged_in',
+          requestData: { subjectId: input.userId },
+          responseSummary: {},
+          createdAt: '2025-10-03T09:22:10.128Z'
         }
-      })
+      ]
+      return {
+        results: allResults.slice(skip, skip + count),
+        total: allResults.length
+      }
     }),
     graphql.query('fetchUser', (input) => {
       const userId = input.variables.userId
@@ -1372,9 +1225,13 @@ export const handlers = {
       } else if (userId == generator.user.id.registrationAgent) {
         response = generator.user.registrationAgent().v1
       } else if (userId == generator.user.id.localSystemAdmin) {
-        response = generator.user.localSystemAdmin()
+        response = generator.user.localSystemAdmin().v1
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v1
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v1
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v1
       } else {
         response = generator.user.localRegistrar().v1
       }
@@ -1395,9 +1252,13 @@ export const handlers = {
       } else if (userId == generator.user.id.registrationAgent) {
         response = generator.user.registrationAgent().v1
       } else if (userId == generator.user.id.localSystemAdmin) {
-        response = generator.user.localSystemAdmin()
+        response = generator.user.localSystemAdmin().v1
       } else if (userId == generator.user.id.nationalSystemAdmin) {
         response = generator.user.nationalSystemAdmin().v1
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v1
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v1
       } else {
         response = generator.user.localRegistrar().v1
       }
@@ -1413,17 +1274,34 @@ export const handlers = {
 
       return [generator.user.localRegistrar().v2]
     }),
-    tRPCMsw.user.get.query((id) => {
+    tRPCMsw.user.get.query((userId) => {
       const generator = testDataGenerator()
+      let response
 
-      return generator.user.localRegistrar().v2
+      if (userId == generator.user.id.fieldAgent) {
+        response = generator.user.fieldAgent().v2
+      } else if (userId == generator.user.id.registrationAgent) {
+        response = generator.user.registrationAgent().v2
+      } else if (userId == generator.user.id.nationalSystemAdmin) {
+        response = generator.user.nationalSystemAdmin().v2
+      } else if (userId == generator.user.id.provincialRegistrar) {
+        response = generator.user.provincialRegistrar().v2
+      } else if (userId == generator.user.id.communityLeader) {
+        response = generator.user.communityLeader().v2
+      } else if (userId == generator.user.id.localSystemAdmin) {
+        response = generator.user.localSystemAdmin().v2
+      } else {
+        response = generator.user.localRegistrar().v2
+      }
+
+      return response
     })
   ],
   event: [
     tRPCMsw.event.get.query(() => {
       return tennisClubMembershipEventDocument
     }),
-    tRPCMsw.event.search.query((input) => {
+    tRPCMsw.event.search.query(() => {
       return { results: [], total: 0 }
     })
   ],
@@ -1449,7 +1327,7 @@ export const handlers = {
           {
             fullUrl:
               // @NOTE: Addresss component uses both V1 and V2. It should use only V2 api in the long run. Meanwhile, ensure ids match.
-              'http://localhost:2021/location/62a0ccb4-880d-4f30-8882-f256007dfff9/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
+              '/api/config/location/62a0ccb4-880d-4f30-8882-f256007dfff9/_history/8ae119de-682a-40fa-be03-9de10fc07d53',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2158,7 +2036,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://localhost:2021/location/465c448a-2c85-45f5-80f0-967e91f51de9/_history/b7990a30-5093-409e-9a61-8cba9906687f',
+              '/api/config/location/465c448a-2c85-45f5-80f0-967e91f51de9/_history/b7990a30-5093-409e-9a61-8cba9906687f',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2203,7 +2081,7 @@ export const handlers = {
           },
           {
             fullUrl:
-              'http://localhost:2021/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf',
+              '/api/config/location/a45b982a-5c7b-4bd9-8fd8-a42d0994054c/_history/790ef7f2-e2ee-4c48-9e0a-c2f7c3d416bf',
             resource: {
               resourceType: 'Location',
               identifier: [
@@ -2285,7 +2163,7 @@ export const handlers = {
     })
   ],
   modules: [
-    http.get('http://localhost:3040/conditionals.js', () => {
+    http.get('/api/countryconfig/conditionals.js', () => {
       const fileContent = `
       const conditionals = {
         isDefaultCountry: {
@@ -2304,16 +2182,8 @@ export const handlers = {
         }
       })
     }),
-    http.get('http://localhost:3040/handlebars.js', () => {
+    http.get('/api/countryconfig/handlebars.js', () => {
       return HttpResponse.text('', { status: 404 })
-    }),
-    http.get('http://localhost:3040/validators.js', () => {
-      return HttpResponse.text('export function noop() {}', {
-        status: 200,
-        headers: {
-          'content-type': 'application/javascript'
-        }
-      })
     })
   ],
   config: [
@@ -2351,10 +2221,8 @@ export const handlers = {
       })
     }),
 
-    http.get('http://localhost:2021/config', () => {
+    http.get('/api/config/config', () => {
       return HttpResponse.json({
-        systems: [],
-
         config: mockOfflineData.config,
         certificates: [
           {
@@ -2440,7 +2308,7 @@ export const handlers = {
     })
   ],
   localisations: [
-    http.get('http://localhost:3040/content/client', () => {
+    http.get('/api/countryconfig/content/client', () => {
       return HttpResponse.json({
         languages: [
           {
@@ -2458,7 +2326,7 @@ export const handlers = {
     })
   ],
   forms: [
-    http.get('http://localhost:2021/forms', () => {
+    http.get('/api/config/forms', () => {
       return HttpResponse.json(forms.forms)
     })
   ],
@@ -2484,7 +2352,7 @@ export const handlers = {
     })
   ],
   workqueues: [
-    tRPCMsw.workqueue.count.query((input) => {
+    tRPCMsw.workqueue.count.query((input: { slug: string }[]) => {
       if (input.length === 0) {
         /** Ensure we catch situations where no input is provided before merging anything. */
         throw new Error('No input provided.')
@@ -2499,6 +2367,16 @@ export const handlers = {
     })
   ],
   searchUsers: [
+    tRPCMsw.user.search.query(() => {
+      const generator = testDataGenerator()
+
+      return [
+        generator.user.localSystemAdmin().v2,
+        generator.user.localRegistrar().v2,
+        generator.user.registrationAgent().v2,
+        generator.user.fieldAgent().v2
+      ]
+    }),
     graphql.query('searchUsers', () => {
       const generator = testDataGenerator()
 
@@ -2508,7 +2386,7 @@ export const handlers = {
             totalItems: 4,
             results: [
               {
-                id: generator.user.localSystemAdmin().id as UUID,
+                id: generator.user.localSystemAdmin().v2.id as UUID,
                 name: [
                   {
                     use: 'en',
@@ -2677,7 +2555,7 @@ export const handlers = {
         }
       })
     }),
-    http.post('http://localhost:7070/sendVerifyCode', () => {
+    http.post('/api/gateway/sendVerifyCode', () => {
       const generator = testDataGenerator()
       return HttpResponse.json({
         userId: generator.user.registrationAgent().v2.id,

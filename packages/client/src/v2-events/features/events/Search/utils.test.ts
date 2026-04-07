@@ -83,7 +83,6 @@ describe('buildDataCondition', () => {
         EventStatus.enum.CREATED,
         EventStatus.enum.NOTIFIED,
         EventStatus.enum.DECLARED,
-        EventStatus.enum.VALIDATED,
         EventStatus.enum.REGISTERED,
         EventStatus.enum.ARCHIVED
       ]

@@ -24,7 +24,6 @@ export default async function anonymousTokenHandler(
     '__ANONYMOUS_USER__',
     ['verify'],
     [
-      'opencrvs:hearth-user',
       'opencrvs:user-mgnt-user',
       'opencrvs:workflow-user',
       'opencrvs:countryconfig-user'

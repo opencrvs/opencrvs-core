@@ -50,7 +50,12 @@ import {
   EventConfig,
   isAgeFieldType,
   isFieldGroupFieldType,
-  FieldType
+  FieldType,
+  FieldUpdateValue,
+  isCustomFieldType,
+  isImageViewFieldType,
+  isHeadingFieldType,
+  isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -65,20 +70,25 @@ import {
   Select,
   SelectCountry,
   Paragraph,
+  Heading,
   Number,
   NumberWithUnit,
   Text,
   TimeField,
   getRegisteredFieldByFieldConfig,
   VerificationStatus,
-  AgeField
+  AgeField,
+  ImageView,
+  UserRole
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { SignatureField } from '@client/v2-events/components/forms/inputs/SignatureField/SignatureField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { isEqualFieldValue } from '../actions/correct/utils'
 import { Data } from '../registered-fields/Data'
+import { Custom } from '../registered-fields/Custom'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -101,7 +111,7 @@ export function ValueOutput({
   eventConfig
 }: {
   config: FieldConfig
-  value: FieldValue
+  value: FieldValue | FieldUpdateValue
   searchMode?: {} | boolean
   eventConfig?: EventConfig
 }) {
@@ -157,8 +167,16 @@ export function ValueOutput({
     return PageHeader.Output
   }
 
+  if (isImageViewFieldType(field)) {
+    return ImageView.Output
+  }
+
   if (isParagraphFieldType(field)) {
     return Paragraph.Output
+  }
+
+  if (isHeadingFieldType(field)) {
+    return Heading.Output
   }
 
   if (isNumberFieldType(field)) {
@@ -169,7 +187,11 @@ export function ValueOutput({
     return <NumberWithUnit.Output {...field} />
   }
 
-  if (isFileFieldType(field) || isSignatureFieldType(field)) {
+  if (isSignatureFieldType(field)) {
+    return <SignatureField.Output value={field.value} />
+  }
+
+  if (isFileFieldType(field)) {
     return <File.Output {...field} />
   }
 
@@ -219,16 +241,16 @@ export function ValueOutput({
     return <AdministrativeArea.Output value={field.value} />
   }
 
-  if (isOfficeFieldType(field) || isLocationFieldType(field)) {
+  if (
+    isOfficeFieldType(field) ||
+    isLocationFieldType(field) ||
+    isFacilityFieldType(field)
+  ) {
     return <LocationSearch.Output value={field.value} />
   }
 
   if (isDividerFieldType(field)) {
     return Divider.Output
-  }
-
-  if (isFacilityFieldType(field)) {
-    return <LocationSearch.Output value={field.value} />
   }
 
   if (isVerificationStatusType(field)) {
@@ -250,6 +272,14 @@ export function ValueOutput({
         value={field.value}
       />
     )
+  }
+
+  if (isUserRoleFieldType(field)) {
+    return <UserRole.Output value={field.value} />
+  }
+
+  if (isCustomFieldType(field)) {
+    return <Custom.Output {...field.config} value={field.value} />
   }
 }
 
@@ -314,7 +344,7 @@ export function Output({
   displayEmptyAsDash = false
 }: {
   field: FieldConfig
-  value?: FieldValue
+  value?: FieldValue | FieldUpdateValue
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged?: boolean
   previousForm?: EventState

@@ -26,7 +26,9 @@ import {
   ActionUpdate,
   TestUserRole,
   AddressType,
-  deepMerge
+  deepMerge,
+  encodeScope,
+  getDeclarationFields
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -37,6 +39,8 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
+import { createIndex } from '@events/service/indexing/indexing'
+import { getEventIndexName } from '@events/storage/elasticsearch'
 import { mswServer } from '../../tests/msw'
 import { env } from '../../environment'
 
@@ -87,22 +91,12 @@ describe('Adding actions', () => {
 
     await client.event.actions.assignment.assign(assignmentInput)
 
-    const generatedValidation = generator.event.actions.validate(
-      originalEvent.id
-    )
-    await client.event.actions.validate.request(generatedValidation)
-
-    await client.event.actions.assignment.assign({
-      ...assignmentInput,
-      transactionId: getUUID()
-    })
-
     const generatedRegistration = generator.event.actions.register(
       originalEvent.id
     )
     await client.event.actions.register.request(generatedRegistration)
 
-    const updatedEvent = await client.event.get(originalEvent.id)
+    const updatedEvent = await client.event.get({ eventId: originalEvent.id })
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -113,16 +107,6 @@ describe('Adding actions', () => {
       }),
       expect.objectContaining({
         type: ActionType.DECLARE,
-        status: ActionStatus.Accepted
-      }),
-      expect.objectContaining({ type: ActionType.UNASSIGN }),
-      expect.objectContaining({ type: ActionType.ASSIGN }),
-      expect.objectContaining({
-        type: ActionType.VALIDATE,
-        status: ActionStatus.Requested
-      }),
-      expect.objectContaining({
-        type: ActionType.VALIDATE,
         status: ActionStatus.Accepted
       }),
       expect.objectContaining({ type: ActionType.UNASSIGN }),
@@ -142,8 +126,7 @@ describe('Adding actions', () => {
     updatedEvent.actions.forEach((action) => {
       expect(action.createdAtLocation).toBe(user.primaryOfficeId)
       expect(action.createdByRole).toBe(user.role)
-      expect(action.createdBySignature).toBe(user.signature)
-
+      expect(action.createdBySignature).toMatchSnapshot()
       const actionsWithoutAnnotatation = [
         ActionType.CREATE,
         ActionType.READ,
@@ -179,7 +162,7 @@ describe('Action drafts', () => {
         'applicant.image': {
           type: 'image/png',
           originalFilename: 'abcd.png',
-          path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
         }
       },
       transactionId: getUUID(),
@@ -191,7 +174,7 @@ describe('Action drafts', () => {
 
     const draftEvents = await client.event.draft.list()
 
-    const event = await client.event.get(originalEvent.id)
+    const event = await client.event.get({ eventId: originalEvent.id })
     // this triggers READ action
     expect(event.actions.at(-1)?.type).toBe(ActionType.READ)
 
@@ -213,7 +196,7 @@ describe('Action drafts', () => {
         'applicant.image': {
           type: 'image/png',
           originalFilename: 'abcd.png',
-          path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+          path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
         }
       },
       transactionId: getUUID(),
@@ -278,6 +261,13 @@ const multiFileConfig = {
   advancedSearch: []
 } satisfies EventConfig
 
+beforeEach(async () => {
+  return createIndex(
+    getEventIndexName(multiFileConfig.id),
+    getDeclarationFields(tennisClubMembershipEvent)
+  )
+})
+
 describe('Action updates', () => {
   const deleteFileMock = vi.fn()
   const fileExistsMock = vi.fn()
@@ -287,7 +277,7 @@ describe('Action updates', () => {
     fileExistsMock.mockClear()
 
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([multiFileConfig, tennisClubMembershipEvent])
       }),
       http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, (req) => {
@@ -313,19 +303,19 @@ describe('Action updates', () => {
     'documents.singleFile': {
       type: 'image/svg+xml',
       originalFilename: 'tree.svg',
-      path: '/ocrvs/tree.svg'
+      path: 'tree.svg'
     },
     'documents.multiFile': [
       {
         type: 'image/svg+xml',
         originalFilename: 'multi-file-1.svg',
-        path: '/ocrvs/fish.svg',
+        path: 'fish.svg',
         option: 'multifile1'
       },
       {
         type: 'image/svg+xml',
         originalFilename: 'multi-file-2.svg',
-        path: '/ocrvs/mountain.svg',
+        path: 'mountain.svg',
         option: 'multifile2'
       }
     ]
@@ -351,8 +341,8 @@ describe('Action updates', () => {
       })
     )
 
-    await client.event.actions.validate.request({
-      type: ActionType.VALIDATE,
+    await client.event.actions.register.request({
+      type: ActionType.REGISTER,
       declaration: {
         'applicant.dobUnknown': true,
         'applicant.age': 25
@@ -361,7 +351,7 @@ describe('Action updates', () => {
       transactionId: getUUID()
     })
 
-    const event = await client.event.get(originalEvent.id)
+    const event = await client.event.get({ eventId: originalEvent.id })
     const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
     expect(eventState.declaration).toMatchSnapshot()
   })
@@ -407,24 +397,8 @@ describe('Action updates', () => {
     const declaredEvent = await createEvent(client, generator, [
       ActionType.DECLARE
     ])
-    const validatePayload = generator.event.actions.validate(declaredEvent.id)
-    const validateDeclarationWithHiddenField = getDeclarationWithHiddenField(
-      validatePayload.declaration
-    )
 
-    await expect(
-      client.event.actions.validate.request({
-        ...validatePayload,
-        declaration: validateDeclarationWithHiddenField
-      })
-    ).rejects.toMatchObject(expectedError)
-
-    const validatedEvent = await createEvent(client, generator, [
-      ActionType.DECLARE,
-      ActionType.VALIDATE
-    ])
-
-    const registerPayload = generator.event.actions.register(validatedEvent.id)
+    const registerPayload = generator.event.actions.register(declaredEvent.id)
     const registerDeclarationWithHiddenField = getDeclarationWithHiddenField(
       registerPayload.declaration
     )
@@ -442,7 +416,12 @@ describe('Action updates', () => {
 
     const client = createTestClient(user, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${multiFileConfig.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [multiFileConfig.id]
+        }
+      })
     ])
 
     const originalEvent = await client.event.create({
@@ -476,9 +455,9 @@ describe('Action updates', () => {
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
 
-    await client.event.actions.validate.request({
+    await client.event.actions.register.request({
       eventId: originalEvent.id,
-      type: ActionType.VALIDATE,
+      type: ActionType.REGISTER,
       declaration: {
         'documents.multiFile': null,
         'documents.singleFile': null
@@ -488,7 +467,7 @@ describe('Action updates', () => {
       keepAssignment: true
     })
 
-    const { results: resultsAfterValidate } = await client.event.search({
+    const { results: resultsAfterRegister } = await client.event.search({
       query: {
         type: 'and',
         clauses: [
@@ -499,13 +478,13 @@ describe('Action updates', () => {
       }
     })
 
-    const [eventAfterValidate] = resultsAfterValidate
+    const [eventAfterRegister] = resultsAfterRegister
 
     expect(
-      eventAfterValidate.declaration['documents.singleFile']
+      eventAfterRegister.declaration['documents.singleFile']
     ).not.toBeDefined()
     expect(
-      eventAfterValidate.declaration['documents.multiFile']
+      eventAfterRegister.declaration['documents.multiFile']
     ).not.toBeDefined()
   })
 
@@ -513,7 +492,12 @@ describe('Action updates', () => {
     const { user } = await setupTestCase()
     const client = createTestClient(user, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${multiFileConfig.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [multiFileConfig.id]
+        }
+      })
     ])
     const originalEvent = await client.event.create({
       transactionId: generateTransactionId(),
@@ -544,11 +528,11 @@ describe('Action updates', () => {
     expect(eventAfterDeclare.declaration['documents.singleFile']).toBeDefined()
     expect(eventAfterDeclare.declaration['documents.multiFile']).toHaveLength(2)
 
-    expect(fileExistsMock.mock.calls[0]).toEqual(['ocrvs/tree.svg'])
+    expect(fileExistsMock.mock.calls[0]).toEqual(['tree.svg'])
 
-    await client.event.actions.validate.request({
+    await client.event.actions.register.request({
       eventId: originalEvent.id,
-      type: ActionType.VALIDATE,
+      type: ActionType.REGISTER,
       declaration: {
         'documents.multiFile': [],
         'documents.singleFile': null
@@ -560,7 +544,7 @@ describe('Action updates', () => {
     // No files should be deleted, only references removed
     expect(deleteFileMock.mock.calls).toHaveLength(0)
 
-    const { results: resultsAfterValidate } = await client.event.search({
+    const { results: resultsAfterRegister } = await client.event.search({
       query: {
         type: 'and',
         clauses: [
@@ -571,11 +555,11 @@ describe('Action updates', () => {
       }
     })
 
-    const [eventAfterValidate] = resultsAfterValidate
+    const [eventAfterRegister] = resultsAfterRegister
     expect(
-      eventAfterValidate.declaration['documents.singleFile']
+      eventAfterRegister.declaration['documents.singleFile']
     ).not.toBeDefined()
-    expect(eventAfterValidate.declaration['documents.multiFile']).toHaveLength(
+    expect(eventAfterRegister.declaration['documents.multiFile']).toHaveLength(
       0
     )
   })
@@ -589,10 +573,6 @@ test('PRINT_CERTIFICATE action can include a valid content.templateId property i
 
   await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id, { keepAssignment: true })
-  )
-
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(originalEvent.id, { keepAssignment: true })
   )
 
   await client.event.actions.register.request(
@@ -615,7 +595,7 @@ test('PRINT_CERTIFICATE action can include a valid content.templateId property i
   )
   expect(result).toBeDefined()
 
-  const updatedEvent = await client.event.get(originalEvent.id)
+  const updatedEvent = await client.event.get({ eventId: originalEvent.id })
   const printAction = updatedEvent.actions.find(
     (action) => action.type === ActionType.PRINT_CERTIFICATE
   ) as PrintCertificateAction
@@ -630,10 +610,6 @@ test('REGISTER action throws when content property is in payload', async () => {
 
   await client.event.actions.declare.request(
     generator.event.actions.declare(originalEvent.id, { keepAssignment: true })
-  )
-
-  await client.event.actions.validate.request(
-    generator.event.actions.validate(originalEvent.id, { keepAssignment: true })
   )
 
   const baseRegisterAction = generator.event.actions.register(originalEvent.id)
@@ -672,6 +648,15 @@ test('Can not add action with same [transactionId, type, status]', async () => {
 
   await client.event.actions.reject.request(
     generator.event.actions.reject(originalEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.edit.request(
+    generator.event.actions.edit(originalEvent.id)
   )
 
   const eventBeforeDuplicateAttempt =
@@ -732,7 +717,7 @@ describe('Conditionals based on user role', () => {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: locations[0].id,
+        administrativeArea: locations[0].administrativeAreaId,
         streetLevelDetails: {
           town: 'Example Village',
           state: 'State',
@@ -744,6 +729,7 @@ describe('Conditionals based on user role', () => {
     const users = TestUserRole.options.map((role) => {
       return seed.user({
         primaryOfficeId: locations[0].id,
+        administrativeAreaId: locations[0].administrativeAreaId,
         name: [
           {
             use: 'en',
@@ -755,13 +741,13 @@ describe('Conditionals based on user role', () => {
       })
     })
 
-    expect(users).toHaveLength(7)
+    expect(users).toHaveLength(9)
     for (const u of users) {
       const userClient = createTestClient(u)
 
       const event = await userClient.event.create(generator.event.create())
 
-      if (u.role === TestUserRole.Enum.FIELD_AGENT) {
+      if (u.role === TestUserRole.enum.FIELD_AGENT) {
         await expect(
           userClient.event.actions.declare.request(
             generator.event.actions.declare(event.id, {
@@ -791,21 +777,22 @@ describe('Conditionals based on user role', () => {
     const { generator, seed, locations } = await setupTestCase()
     const fieldAgent = seed.user({
       primaryOfficeId: locations[0].id,
+      administrativeAreaId: locations[0].administrativeAreaId,
       name: [
         {
           use: 'en',
-          family: TestUserRole.Enum.FIELD_AGENT,
+          family: TestUserRole.enum.FIELD_AGENT,
           given: ['John']
         }
       ],
-      role: TestUserRole.Enum.FIELD_AGENT
+      role: TestUserRole.enum.FIELD_AGENT
     })
 
     const declarationPayload = deepMerge(baseDeclarationWithoutAddress, {
       'applicant.address': {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        administrativeArea: locations[0].id,
+        administrativeArea: locations[0].administrativeAreaId,
         streetLevelDetails: {
           town: 'Example Village',
           state: 'State',
@@ -831,16 +818,21 @@ describe('Conditionals based on user role', () => {
       name: [
         {
           use: 'en',
-          family: TestUserRole.Enum.REGISTRATION_AGENT,
+          family: TestUserRole.enum.REGISTRATION_AGENT,
           given: ['Jane']
         }
       ],
-      role: TestUserRole.Enum.FIELD_AGENT
+      role: TestUserRole.enum.FIELD_AGENT
     })
 
     const registrationAgentClient = createTestClient(registrationAgent, [
       ...TEST_USER_DEFAULT_SCOPES,
-      `search[event=${tennisClubMembershipEvent.id},access=all]`
+      encodeScope({
+        type: 'record.search',
+        options: {
+          event: [tennisClubMembershipEvent.id]
+        }
+      })
     ])
 
     await registrationAgentClient.event.actions.assignment.assign({
@@ -851,8 +843,8 @@ describe('Conditionals based on user role', () => {
     })
 
     await expect(
-      registrationAgentClient.event.actions.validate.request({
-        type: ActionType.VALIDATE,
+      registrationAgentClient.event.actions.register.request({
+        type: ActionType.REGISTER,
         declaration: {},
         eventId: event.id,
         transactionId: getUUID()

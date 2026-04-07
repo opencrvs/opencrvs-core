@@ -98,6 +98,7 @@ export function Onboarding() {
       title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
+        attachmentPath={`events/${event.id}/`}
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         declaration={eventIndex.declaration}
         eventConfig={configuration}

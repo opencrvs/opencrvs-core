@@ -9,16 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { ActionType } from '@opencrvs/commons/client'
-import { AssignmentStatus } from '@client/v2-events/utils'
+import {
+  TestUserRole,
+  ActionType,
+  AssignmentStatus
+} from '@opencrvs/commons/client'
+
 import { ActionMenu } from '../../ActionMenu'
 import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
-  AssertType,
-  Scenario,
-  UserRoles
+  Scenario
 } from '../ActionMenu.common'
 
 export default {
@@ -38,8 +40,7 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
       ActionType.UNASSIGN
     ],
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   },
 
@@ -55,15 +56,14 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_OTHERS
     ],
     expected: {
-      ...getHiddenActions(),
-      [ActionType.READ]: AssertType.ENABLED
+      ...getHiddenActions()
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
   archivedScenariosForRegistrationAgent,
-  UserRoles.REGISTRATION_AGENT
+  TestUserRole.enum.REGISTRATION_AGENT
 )
 
 export const Unassigned = stories['Unassigned']

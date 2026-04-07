@@ -20,7 +20,6 @@ import {
   bengaliOnlyNameFormat,
   englishOnlyNameFormat,
   range,
-  validIDNumber,
   maxLength,
   isValidBirthDate,
   checkBirthDate,
@@ -172,43 +171,6 @@ describe('validate', () => {
       const goodValue = '5'
       const response = undefined
       expect(range(0, 6)(goodValue)).toEqual(response)
-    })
-  })
-
-  describe('validIDNumber. Used for ID number field that has a specific validation', () => {
-    it('Should error when supplied a bad value containing characters as National ID.', () => {
-      const badValue = '2019BrTVz8945'
-      const typeOfID = 'NATIONAL_ID'
-      const response = {
-        message: {
-          defaultMessage:
-            'The National ID can only be numeric and must be 10 digits long',
-          description:
-            'The error message that appears when an invalid value is used as nid',
-          id: 'validations.validNationalId'
-        }
-      }
-      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
-    })
-    it('Should error when supplied a bad value containing more digits than desired as National ID.', () => {
-      const badValue = '20197839489452'
-      const typeOfID = 'NATIONAL_ID'
-      const response = {
-        message: {
-          defaultMessage:
-            'The National ID can only be numeric and must be 10 digits long',
-          description:
-            'The error message that appears when an invalid value is used as nid',
-          id: 'validations.validNationalId'
-        }
-      }
-      expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
-    })
-    it('Should pass when supplied a good value as National ID.', () => {
-      const goodValue = '123456789'
-      const typeOfID = 'NATIONAL_ID'
-      const response = undefined
-      expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
     })
   })
 

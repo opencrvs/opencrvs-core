@@ -18,7 +18,7 @@ export const env = cleanEnv(process.env, {
   AUTH_HOST: str({ default: '0.0.0.0' }),
   AUTH_PORT: port({ default: 4040 }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
-  METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   DOMAIN: str({ devDefault: '*' }),
   COUNTRY_CONFIG_URL_EXTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for external requests (CORS whitelist)
   COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for internal service-to-service communication

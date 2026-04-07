@@ -13,7 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 
-import { within, userEvent, expect, waitFor } from '@storybook/test'
+import { within, userEvent, expect, waitFor, fireEvent } from '@storybook/test'
 import { Outlet } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
 import {
@@ -72,7 +72,7 @@ export const NoTemplateAvailable: Story = {
               )
             }
           ),
-          http.get('http://localhost:2021/config', () => {
+          http.get('/api/config/config', () => {
             return HttpResponse.json({
               systems: [],
               config: mockOfflineData.config,
@@ -122,14 +122,15 @@ export const NoTemplateAvailable: Story = {
     await step(
       'Click Certification Type and find no options message',
       async () => {
-        await userEvent.click(
-          await canvas.findByTestId('select__certificateTemplateId')
+        const selectControl = await canvas.findByTestId(
+          'select__certificateTemplateId'
         )
+        await fireEvent.mouseDown(selectControl)
         await expect(
           await canvas.findByText(
             'No template available for this event, contact Admin'
           )
-        ).toBeVisible()
+        ).toBeInTheDocument()
       }
     )
   }
@@ -295,7 +296,6 @@ export const RedirectAfterPrint: Story = {
               configuration: tennisClubMembershipEvent,
               actions: [
                 { type: ActionType.DECLARE },
-                { type: ActionType.VALIDATE },
                 { type: ActionType.REGISTER },
                 { type: ActionType.PRINT_CERTIFICATE }
               ]
@@ -354,9 +354,9 @@ export const RedirectAfterPrint: Story = {
         await canvas.findByRole('button', { name: 'Yes, print certificate' })
       )
 
-      await canvas.findByText('Print and issue certificate?')
+      await canvas.findByText('Print certified copy?')
       await canvas.findByText(
-        'A Pdf of the certificate will open in a new tab for printing and issuing.'
+        'This will generate a certified copy of the record for printing.'
       )
 
       await canvas.findByRole('button', { name: 'Cancel' })

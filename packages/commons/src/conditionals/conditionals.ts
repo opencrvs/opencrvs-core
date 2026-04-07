@@ -11,13 +11,15 @@
 import * as objectHash from 'object-hash'
 import { EventDocument } from '../events/EventDocument'
 import { EventState } from '../events/ActionDocument'
-import { ITokenPayload as TokenPayload, Scope } from '../authentication'
+import { ITokenPayload as TokenPayload } from '../authentication'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 import { omitKeyDeep } from '../utils'
 import { UUID } from '../uuid'
 import { todayDateTimeValueSerializer } from '../events/serializers/date/serializer'
+import { EventStatus } from '../events/EventMetadata'
 import { FieldReference } from '../events/FieldConfig'
+import { userReferenceFunctions } from '../users/userReferences'
 
 /* eslint-disable max-lines */
 
@@ -70,10 +72,16 @@ export type FormConditionalParameters = CommonConditionalParameters & {
   $leafAdminStructureLocationIds?: Array<{ id: UUID }>
 }
 
+export type EventStateConditionalParameters = CommonConditionalParameters & {
+  $flags: string[]
+  $status: EventStatus
+}
+
 export type ConditionalParameters =
   | UserConditionalParameters
   | EventConditionalParameters
   | FormConditionalParameters
+  | EventStateConditionalParameters
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
@@ -187,7 +195,8 @@ export const now = Object.assign(todayDateTimeValueSerializer, {})
  * Generate conditional rules for user.
  */
 export const user = Object.assign(userSerializer, {
-  hasScope: (scope: Scope) =>
+  ...userReferenceFunctions,
+  hasScope: (scope: string) =>
     defineConditional({
       type: 'object',
       properties: {
@@ -236,9 +245,7 @@ export const user = Object.assign(userSerializer, {
       required: ['$online']
     }),
   locationLevel: (adminLevelId: string) => ({
-    $user: {
-      $location: adminLevelId
-    }
+    $user: { $location: adminLevelId }
   })
 })
 
@@ -393,6 +400,37 @@ function defineComparison(
       )
     },
     required: [field.$$field]
+  })
+}
+
+/** Check if an event flag is present */
+export function flag(flagvalue: string) {
+  return defineConditional({
+    type: 'object',
+    properties: {
+      $flags: {
+        type: 'array',
+        contains: {
+          type: 'string',
+          const: flagvalue
+        }
+      }
+    },
+    required: ['$flags']
+  })
+}
+
+/** Check if an event flag is present */
+export function status(statusValue: EventStatus) {
+  return defineConditional({
+    type: 'object',
+    properties: {
+      $status: {
+        type: 'string',
+        const: statusValue
+      }
+    },
+    required: ['$status']
   })
 }
 

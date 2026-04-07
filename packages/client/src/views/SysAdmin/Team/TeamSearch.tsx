@@ -12,7 +12,7 @@ import { messages } from '@client/i18n/messages/views/performance'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { getOfflineData } from '@client/offline/selectors'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { Header } from '@client/views/SysAdmin/Performance/utils'
+
 import {
   ISearchLocation,
   LocationSearch
@@ -25,10 +25,11 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'query-string'
+import { stringify } from 'qs'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useOnlineStatus } from '@client/utils'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import { UUID } from '@opencrvs/commons/client'
 
 const ConnectivityContainer = styled.div`
   justify-content: center;
@@ -45,6 +46,10 @@ const NoConnectivity = styled(NoWifi)`
 const Text = styled.div`
   ${({ theme }) => theme.fonts.reg16};
   text-align: center;
+`
+const Header = styled.h1`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.h2};
 `
 
 export function TeamSearch() {
@@ -83,7 +88,9 @@ export function TeamSearch() {
             selectedLocation={selectedLocation}
             buttonLabel={intl.formatMessage(buttonMessages.search)}
             locationList={Object.values(offlineCountryConfiguration.offices)
-              .filter(canAccessOffice)
+              .filter((location) =>
+                canAccessOffice({ id: location.id as UUID })
+              )
               .map((location) => {
                 return {
                   id: location.id,

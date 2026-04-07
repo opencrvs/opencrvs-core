@@ -28,7 +28,7 @@ describe('requiresScopes()', () => {
         token: createTestToken({
           userId: 'test-user-id',
           scopes: ['record.declare[event=birth|death|tennis-club-membership]'],
-          role: TestUserRole.Enum.REGISTRATION_AGENT
+          role: TestUserRole.enum.REGISTRATION_AGENT
         })
       },
       next: vi.fn()
@@ -53,7 +53,7 @@ describe('requiresScopes()', () => {
         token: createTestToken({
           userId: 'test-user-id',
           scopes: [SCOPES.RECORD_CONFIRM_REGISTRATION],
-          role: TestUserRole.Enum.REGISTRATION_AGENT
+          role: TestUserRole.enum.REGISTRATION_AGENT
         })
       },
       next: vi.fn()
