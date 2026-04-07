@@ -54,9 +54,6 @@ export default async function verifyPassHandler(
       throw unauthorized()
     }
   } else if (generateHash(password, user.salt) !== user.passwordHash) {
-    console.log('CIHAN FAIL HERE')
-    console.log(generateHash(password, user.salt))
-    console.log(user.passwordHash)
     throw unauthorized()
   }
 

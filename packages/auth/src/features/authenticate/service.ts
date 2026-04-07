@@ -86,7 +86,6 @@ export async function authenticate(
   })
 
   if (res.status !== 200) {
-    console.log('CIHAN AUTH FAIL HERE authenticate()')
     throw Error(res.statusText)
   }
 

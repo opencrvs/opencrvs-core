@@ -28,12 +28,12 @@ import { stringify } from 'querystring'
 import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
+// TODO CIHAN: here
+
 export const useHomePage = () => {
   const { pathname } = useLocation()
   const { routes } = useNavigation()
   const userDetails = useSelector(getUserDetails)
-
-  console.log('CIHAN TEST1')
 
   const firstDashboard = window.config.DASHBOARDS?.at(0)?.id
 

@@ -44,12 +44,13 @@ export default async function authenticateSuperUserHandler(
   }
 
   const SUPER_ADMIN_SCOPES = [
-    SCOPES.BYPASSRATELIMIT,
     SCOPES.USER_CREATE,
     SCOPES.USER_DATA_SEEDING,
     SCOPES.INTEGRATION_CREATE,
     encodeScope({ type: 'bypassratelimit' }),
-    encodeScope({ type: 'user.data-seeding' })
+    encodeScope({ type: 'user.data-seeding' }),
+    encodeScope({ type: 'integration.create' }),
+    encodeScope({ type: 'user.create' })
   ]
 
   const token = await createToken(
