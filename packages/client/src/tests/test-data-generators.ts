@@ -640,7 +640,7 @@ export function testDataGenerator(rngSeed?: number) {
         encodeScope({ type: 'record.review-duplicates' })
       ],
       nationalSystemAdmin: [
-        SCOPES.CONFIG_UPDATE_ALL,
+        encodeScope({ type: 'config.update-all' }),
         SCOPES.ORGANISATION_READ_LOCATIONS,
         SCOPES.USER_CREATE,
         SCOPES.USER_UPDATE,
