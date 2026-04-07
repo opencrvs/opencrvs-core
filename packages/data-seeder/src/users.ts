@@ -17,11 +17,11 @@ import {
   EventConfig,
   hasScope,
   joinUrl,
-  parseLiteralScope
+  parseLiteralScope,
+  parseConfigurableScope
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
 import { createClient } from '@opencrvs/toolkit/api'
-import { parseConfigurableScope } from '@opencrvs/toolkit/scopes'
 
 const RoleSchema = (eventIds: string[]) =>
   z.array(
