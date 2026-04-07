@@ -110,6 +110,8 @@ async function triggerSystemReady(token: string) {
   }
 }
 
+// misc change
+
 async function deactivateSuperuser(token: string) {
   const { sub } = getTokenPayload(token)
   const res = await fetch(`${env.GATEWAY_HOST}/graphql`, {
