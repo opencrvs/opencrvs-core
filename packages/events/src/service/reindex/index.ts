@@ -79,6 +79,7 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
       await new Promise((resolve) => setTimeout(resolve, 5000))
     }
   }
+  throw new Error(`Max retries exceeded. This should never happen`)
 }
 
 async function reindexSearch(
