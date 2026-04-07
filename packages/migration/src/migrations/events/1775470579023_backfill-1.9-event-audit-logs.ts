@@ -72,7 +72,6 @@ function buildBatchInsertQuery(count: number): string {
     INSERT INTO app.audit_log
       (client_id, client_type, operation, request_data, response_summary, created_at, transaction_id)
     VALUES ${valueSets.join(', ')}
-    ON CONFLICT (transaction_id) DO NOTHING
   `
 }
 
@@ -146,11 +145,14 @@ async function run(pg: Pool): Promise<void> {
         e.tracking_id
       FROM app.event_actions ea
       JOIN app.events e ON e.id = ea.event_id
+      WHERE ea.status = 'Accepted'
       ORDER BY ea.id
       LIMIT $1 OFFSET $2
       `,
       [BATCH_SIZE, offset]
     )
+
+    console.log(JSON.stringify(page.rows, null, 2))
 
     if (page.rows.length === 0) break
 
