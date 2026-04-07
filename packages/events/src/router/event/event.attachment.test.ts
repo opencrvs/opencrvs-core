@@ -107,7 +107,7 @@ describe('POST /attachments', () => {
 
     const token = createTestToken({
       userId: user.id,
-      scopes: [SCOPES.ATTACHMENT_UPLOAD],
+      scopes: [encodeScope({ type: 'attachment.upload' })],
       userType: TokenUserType.enum.user,
       role: user.role
     })
@@ -140,7 +140,7 @@ describe('POST /attachments', () => {
 
     const token = createTestToken({
       userId: user.id,
-      scopes: [SCOPES.ATTACHMENT_UPLOAD],
+      scopes: [encodeScope({ type: 'attachment.upload' })],
       userType: TokenUserType.enum.user,
       role: user.role
     })

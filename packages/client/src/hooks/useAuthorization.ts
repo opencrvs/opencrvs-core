@@ -16,6 +16,9 @@ import {
   SCOPES,
   User,
   Location
+  // TODO CIHAN:
+  // hasScope,
+  // hasAnyScope
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'

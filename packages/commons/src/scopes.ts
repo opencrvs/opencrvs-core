@@ -22,19 +22,13 @@ export const SCOPES = {
   BYPASSRATELIMIT: 'bypassratelimit',
   RECORD_REINDEX: 'record.reindex',
   RECORD_IMPORT: 'record.import',
+  ATTACHMENT_UPLOAD: 'attachment.upload',
 
   // NOT MIGRATED
   DEMO: 'demo',
 
   // systems / integrations
   INTEGRATION_CREATE: 'integration.create',
-
-  /**
-   * This scope is used to **print and **issue certified copies of a record
-   * after it has been registered. Previously Registrars had this permission.
-   */
-  RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
-    'record.registration-print&issue-certified-copies',
 
   // profile
   PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
@@ -65,10 +59,7 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding',
-
-  // attachment
-  ATTACHMENT_UPLOAD: 'attachment.upload'
+  USER_DATA_SEEDING: 'user.data-seeding'
 } as const
 
 /**
@@ -78,7 +69,6 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.DEMO),
   z.literal(SCOPES.INTEGRATION_CREATE),
   z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
-  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   z.literal(SCOPES.PERFORMANCE_READ),
   z.literal(SCOPES.PERFORMANCE_READ_DASHBOARDS),
   z.literal(SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS),
@@ -95,8 +85,8 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION),
   z.literal(SCOPES.CONFIG_UPDATE_ALL),
   z.literal(SCOPES.USER_DATA_SEEDING),
-  z.literal(SCOPES.ATTACHMENT_UPLOAD),
-  z.literal(SCOPES.RECORD_REINDEX)
+  z.literal(SCOPES.RECORD_REINDEX),
+  z.literal(SCOPES.ATTACHMENT_UPLOAD)
 ])
 
 /**
@@ -160,6 +150,7 @@ const PlainScopeType = z.enum([
   'integration.create',
   'record.import',
   'config.update-all',
+  'attachment.upload',
 
   // Scope which is applied to all test users
   'demo',

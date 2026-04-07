@@ -33,6 +33,8 @@ export const useHomePage = () => {
   const { routes } = useNavigation()
   const userDetails = useSelector(getUserDetails)
 
+  console.log('CIHAN TEST1')
+
   const firstDashboard = window.config.DASHBOARDS?.at(0)?.id
 
   const tabs = routes.flatMap((navigationGroup) => navigationGroup.tabs)

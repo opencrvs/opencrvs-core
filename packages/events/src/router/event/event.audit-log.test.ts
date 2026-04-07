@@ -265,7 +265,7 @@ describe('audit log', () => {
       )
 
       const client = createSystemTestClient(systemId, [
-        SCOPES.ATTACHMENT_UPLOAD
+        encodeScope({ type: 'attachment.upload' })
       ])
 
       const formData = new FormData()
