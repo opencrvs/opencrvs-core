@@ -67,7 +67,6 @@ services:
       - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - NOTIFICATION_URL=http://notification:2020/
-      - WORKFLOW_URL=http://workflow:5050/
       - WEBHOOKS_URL=http://webhooks:2525/
       - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
@@ -89,27 +88,6 @@ services:
       - AUTH_URL=http://auth:4040
       - CONFIG_URL=http://config:2021
   # User facing services
-  workflow:
-    image: ghcr.io/opencrvs/ocrvs-workflow:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/workflow/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-    environment:
-      - NODE_ENV=development
-      - SEARCH_URL=http://search:9090/
-      - METRICS_URL=http://metrics:1050
-      - DOCUMENTS_URL=http://documents:9050
-      - NOTIFICATION_SERVICE_URL=http://notification:2020/
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - WEBHOOKS_URL=http://webhooks:2525/
-      - APPLICATION_CONFIG_URL=http://config:2021/
-      - AUTH_URL=http://auth:4040
-      - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
   search:
     image: ghcr.io/opencrvs/ocrvs-search:${VERSION}
     #platform: linux/amd64
