@@ -24,7 +24,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID, IUserName } from '@opencrvs/commons'
+import { logger, UUID, IUserName, hasScope } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
 import { encodeScope, TokenUserType } from '@opencrvs/commons/authentication'
@@ -223,7 +223,7 @@ export async function generateAndSendVerificationCode(
   email?: string,
   role?: string | number
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1 || env.QA_ENV
+  const isDemoUser = hasScope(scope, 'demo') || env.QA_ENV
   logger.info(
     `Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')} Role: ${role}`
   )

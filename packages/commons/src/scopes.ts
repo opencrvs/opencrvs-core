@@ -188,7 +188,7 @@ const scopeOptionsDeclared = scopeOptionsPlaceEvent
   })
   .describe('Options applicable to actions that may take place after DECLARE')
 
-const ScopeOptionsFull = scopeOptionsDeclared
+const FullRecordScopeOptions = scopeOptionsDeclared
   .extend({
     registeredIn: JurisdictionFilter.optional(),
     registeredBy: UserFilter.optional()
@@ -197,7 +197,7 @@ const ScopeOptionsFull = scopeOptionsDeclared
     'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
   )
 
-const CustomActionScopeOptions = ScopeOptionsFull.extend({
+const CustomActionScopeOptions = FullRecordScopeOptions.extend({
   customActionTypes: z
     .preprocess(
       (val) => (val === undefined ? undefined : [val].flat()),
@@ -206,8 +206,20 @@ const CustomActionScopeOptions = ScopeOptionsFull.extend({
     .describe('Allowed custom action types')
 })
 
-export type ScopeOptionsFull = z.infer<typeof ScopeOptionsFull>
-export const ScopeOptionKey = ScopeOptionsFull.keyof()
+type FullRecordScopeOptions = z.infer<typeof FullRecordScopeOptions>
+
+const OrganisationScopeOptions = z.object({
+  accessLevel: JurisdictionFilter.optional()
+})
+
+const AllScopeOptions = z.object({
+  ...FullRecordScopeOptions.shape,
+  ...OrganisationScopeOptions.shape
+})
+
+type AllScopeOptions = z.infer<typeof AllScopeOptions>
+
+export const ScopeOptionKey = AllScopeOptions.keyof()
 export type ScopeOptionKey = z.infer<typeof ScopeOptionKey>
 
 const ResolvedScopeOptionsPlaceEvent = z
@@ -255,7 +267,7 @@ export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.unassign-others'
 ])
 
-const ScopeOptionsPrintCertifiedCopies = ScopeOptionsFull.extend({
+const ScopeOptionsPrintCertifiedCopies = FullRecordScopeOptions.extend({
   templates: z
     // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
     .preprocess(
@@ -279,7 +291,7 @@ export const RecordScopeV2 = z
     }),
     z.object({
       type: ScopesWithFullOptions,
-      options: ScopeOptionsFull.optional()
+      options: FullRecordScopeOptions.optional()
     }),
     z.object({
       type: z.literal('record.custom-action'),
@@ -351,7 +363,7 @@ export const ResolvedRecordScopeV2 = z
 const SystemScope = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('organisation.read-locations'),
-    options: z.object({ accessLevel: JurisdictionFilter.optional() }).optional()
+    options: OrganisationScopeOptions.optional()
   })
   // z.object({
   //   type: z.literal('user.read'),
@@ -404,8 +416,9 @@ export const decodeScope = (query: string) => {
 }
 
 /** If a certain scope option is not set, we use the default value. */
-const DEFAULT_SCOPE_OPTIONS: ScopeOptionsFull = {
-  placeOfEvent: JurisdictionFilter.enum.all
+const DEFAULT_SCOPE_OPTIONS: AllScopeOptions = {
+  placeOfEvent: JurisdictionFilter.enum.all,
+  accessLevel: JurisdictionFilter.enum.all
 }
 
 /**
@@ -418,8 +431,8 @@ const DEFAULT_SCOPE_OPTIONS: ScopeOptionsFull = {
 export function getScopeOptionValue<T extends ScopeOptionKey>(
   scope: RecordScopeV2,
   option: T
-): ScopeOptionsFull[T] | undefined {
-  const options = scope.options as Partial<ScopeOptionsFull> | undefined
+): AllScopeOptions[T] | undefined {
+  const options = scope.options as Partial<AllScopeOptions> | undefined
   const value = options?.[option]
 
   const defaultValue =

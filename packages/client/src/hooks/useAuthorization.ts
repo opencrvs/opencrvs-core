@@ -18,7 +18,8 @@ import {
   hasAnyScope as hasAnyScopeFromCommons,
   ScopeType,
   getAcceptedScopesByType,
-  getScopeOptionValue
+  getScopeOptionValue,
+  JurisdictionFilter
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
@@ -132,32 +133,26 @@ export function usePermissions() {
     })
 
     const accessLevels = acceptedScopes.map((s) =>
-      // @ts-expect-error foo
       getScopeOptionValue(s, 'accessLevel')
     )
 
-    // TODO CIHAN: FIX AND REMOVE
-    // eslint-disable-next-line no-console
-    console.log(accessLevels)
-
-    // TODO CIHAN: remember this!!
-    if (hasScope('organisation.read-locations')) {
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
 
-    // TODO CIHAN:
-    // if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE)) {
-    //   return office.id === userPrimaryOfficeId
-    // }
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return office.id === userPrimaryOfficeId
+    }
 
-    // if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
-    //   return isLocationUnderJurisdiction({
-    //     locationId: userPrimaryOfficeId,
-    //     otherLocationId: office.id,
-    //     locations,
-    //     administrativeAreas
-    //   })
-    // }
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOfficeId,
+        otherLocationId: office.id,
+        locations,
+        administrativeAreas
+      })
+    }
+
     return false
   }
 
