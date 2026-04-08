@@ -2452,6 +2452,7 @@ components:
                                 - config.update-all
                                 - attachment.upload
                                 - profile.electronic-signature
+                                - user.read-only-my-audit
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
@@ -6902,6 +6903,7 @@ components:
                                 - config.update-all
                                 - attachment.upload
                                 - profile.electronic-signature
+                                - user.read-only-my-audit
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
@@ -7298,6 +7300,7 @@ components:
                                 - config.update-all
                                 - attachment.upload
                                 - profile.electronic-signature
+                                - user.read-only-my-audit
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
@@ -7532,6 +7535,7 @@ components:
                                 - config.update-all
                                 - attachment.upload
                                 - profile.electronic-signature
+                                - user.read-only-my-audit
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
@@ -7765,6 +7769,7 @@ components:
                                 - config.update-all
                                 - attachment.upload
                                 - profile.electronic-signature
+                                - user.read-only-my-audit
                                 - performance.read
                                 - performance.read-dashboards
                                 - performance.vital-statistics-export
