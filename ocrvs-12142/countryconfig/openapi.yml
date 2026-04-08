@@ -3177,6 +3177,25 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
                                 - notification-api
@@ -3193,25 +3212,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - demo
-                                - record.search
-                                - record.create
-                                - record.read
-                                - record.declare
-                                - record.notify
-                                - record.edit
-                                - record.reject
-                                - record.archive
-                                - record.review-duplicates
-                                - record.register
-                                - record.print-certified-copies
-                                - record.request-correction
-                                - record.correct
-                                - record.unassign-others
-                                - record.custom-action
-                                - organisation.read-locations
-                                - user.read
-                                - user.create
-                                - user.update
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -3222,6 +3223,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
@@ -7628,6 +7630,25 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
                                 - notification-api
@@ -7644,25 +7665,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - demo
-                                - record.search
-                                - record.create
-                                - record.read
-                                - record.declare
-                                - record.notify
-                                - record.edit
-                                - record.reject
-                                - record.archive
-                                - record.review-duplicates
-                                - record.register
-                                - record.print-certified-copies
-                                - record.request-correction
-                                - record.correct
-                                - record.unassign-others
-                                - record.custom-action
-                                - organisation.read-locations
-                                - user.read
-                                - user.create
-                                - user.update
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -7673,6 +7676,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
@@ -8025,6 +8029,25 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
                                 - notification-api
@@ -8041,25 +8064,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - demo
-                                - record.search
-                                - record.create
-                                - record.read
-                                - record.declare
-                                - record.notify
-                                - record.edit
-                                - record.reject
-                                - record.archive
-                                - record.review-duplicates
-                                - record.register
-                                - record.print-certified-copies
-                                - record.request-correction
-                                - record.correct
-                                - record.unassign-others
-                                - record.custom-action
-                                - organisation.read-locations
-                                - user.read
-                                - user.create
-                                - user.update
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -8070,6 +8075,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
@@ -8260,6 +8266,25 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
                                 - notification-api
@@ -8276,25 +8301,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - demo
-                                - record.search
-                                - record.create
-                                - record.read
-                                - record.declare
-                                - record.notify
-                                - record.edit
-                                - record.reject
-                                - record.archive
-                                - record.review-duplicates
-                                - record.register
-                                - record.print-certified-copies
-                                - record.request-correction
-                                - record.correct
-                                - record.unassign-others
-                                - record.custom-action
-                                - organisation.read-locations
-                                - user.read
-                                - user.create
-                                - user.update
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -8305,6 +8312,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
@@ -8494,6 +8502,25 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
+                                - record.search
+                                - record.create
+                                - record.read
+                                - record.declare
+                                - record.notify
+                                - record.edit
+                                - record.reject
+                                - record.archive
+                                - record.review-duplicates
+                                - record.register
+                                - record.print-certified-copies
+                                - record.request-correction
+                                - record.correct
+                                - record.unassign-others
+                                - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
                                 - notification-api
@@ -8510,25 +8537,7 @@ components:
                                 - record.confirm-registration
                                 - record.reject-registration
                                 - demo
-                                - record.search
-                                - record.create
-                                - record.read
-                                - record.declare
-                                - record.notify
-                                - record.edit
-                                - record.reject
-                                - record.archive
-                                - record.review-duplicates
-                                - record.register
-                                - record.print-certified-copies
-                                - record.request-correction
-                                - record.correct
-                                - record.unassign-others
-                                - record.custom-action
-                                - organisation.read-locations
-                                - user.read
-                                - user.create
-                                - user.update
+                                - workqueue
                             $option:
                               type: string
                               enum:
@@ -8539,6 +8548,7 @@ components:
                                 - registeredIn
                                 - registeredBy
                                 - accessLevel
+                                - ids
                           required:
                             - $scope
                             - $option
