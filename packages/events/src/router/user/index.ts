@@ -12,7 +12,6 @@
 /* eslint-disable max-lines */
 import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
-import { UserAuditRecordInput } from '@opencrvs/commons/events'
 import {
   AuditLogEntrySchema,
   UserAuditRecordInput
@@ -38,6 +37,7 @@ import {
   getUserByUsername,
   getUserCredentialsByUserId,
   updatePasswordHash,
+  deleteSuperUser,
   SecurityQuestion
 } from '@events/storage/postgres/events/users'
 import { getUserActions } from '@events/service/events/user/actions'
@@ -604,6 +604,20 @@ export const userRouter = router({
     .input(z.any())
     .mutation(async ({ input, ctx }) => {
       return activateUser(input, ctx.token)
+    }),
+  deactivateSuperUser: userAndSystemProcedure
+    .use(
+      requiresAnyOfScopes([
+        SCOPES.BYPASSRATELIMIT,
+        SCOPES.USER_CREATE,
+        SCOPES.USER_DATA_SEEDING,
+        SCOPES.INTEGRATION_CREATE
+      ])
+    )
+    .input(z.object({ username: z.string() }))
+    .output(z.void())
+    .mutation(async ({ input }) => {
+      await deleteSuperUser(input.username)
     }),
   audit: auditRouter
 })
