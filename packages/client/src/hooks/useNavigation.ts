@@ -18,7 +18,6 @@ import { usePermissions } from './useAuthorization'
 interface Tab {
   name: string
   scopes?: ScopeType[]
-  denyScopes?: string[]
 }
 
 interface NavigationConfig {
@@ -86,12 +85,8 @@ const routeAccess: NavigationConfig[] = [
 export function useNavigation() {
   const { hasAnyScope } = usePermissions()
 
-  const hasAccess = (scopes?: string[], denyScopes?: string[]): boolean => {
-    const hasRequiredScope =
-      !scopes || scopes.length === 0 || hasAnyScope(scopes)
-    const hasDeniedScope = denyScopes && hasAnyScope(denyScopes)
-
-    return hasRequiredScope && !hasDeniedScope
+  const hasAccess = (scopes?: ScopeType[]) => {
+    return !scopes || scopes.length === 0 || hasAnyScope(scopes)
   }
 
   const routes = routeAccess.reduce((acc, group) => {
@@ -101,7 +96,7 @@ export function useNavigation() {
     const groupAccess = {
       name: group.name,
       tabs: group.tabs
-        .filter((tab) => hasAccess(tab.scopes, tab.denyScopes))
+        .filter((tab) => hasAccess(tab.scopes))
         .map((filteredTab) => ({
           name: filteredTab.name
         }))

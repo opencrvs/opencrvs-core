@@ -83,7 +83,7 @@ const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/triggers/user/all-u
 
 describe('announcement.broadcast', () => {
   describe('authorization', () => {
-    test('rejects with FORBIDDEN if caller lacks CONFIG_UPDATE_ALL scope', async () => {
+    test('rejects with FORBIDDEN if caller lacks config.update-all scope', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [])
 

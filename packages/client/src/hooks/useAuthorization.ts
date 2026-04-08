@@ -13,12 +13,11 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
   findScope,
   getAcceptedScopesByType,
-  SCOPES,
   User,
-  Location
-  // TODO CIHAN:
-  // hasScope,
-  // hasAnyScope
+  Location,
+  hasScope as hasScopeFromCommons,
+  hasAnyScope as hasAnyScopeFromCommons,
+  ScopeType
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
@@ -26,7 +25,7 @@ import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
 export function usePermissions() {
-  const userScopes = useSelector(getScope)
+  const userScopes = useSelector(getScope) || []
 
   const currentUser = useSelector(getUserDetails)
   const userPrimaryOfficeId = currentUser?.primaryOfficeId
@@ -41,14 +40,11 @@ export function usePermissions() {
   const roleScopes = (role: string) =>
     roles.find(({ id }) => id === role)?.scopes ?? []
 
-  const hasScopes = (neededScopes: string[]) =>
-    neededScopes.every((scope) => userScopes?.includes(scope))
+  const hasAnyScope = (neededScopes: ScopeType[]) =>
+    hasAnyScopeFromCommons(userScopes, neededScopes)
 
-  const hasAnyScope = (neededScopes: string[]) =>
-    neededScopes.length === 0 ||
-    neededScopes.some((scope) => userScopes?.includes(scope))
-
-  const hasScope = (neededScope: string) => hasAnyScope([neededScope])
+  const hasScope = (neededScope: ScopeType) =>
+    hasScopeFromCommons(userScopes, neededScope)
 
   const canSearchRecords =
     getAcceptedScopesByType({
@@ -60,23 +56,27 @@ export function usePermissions() {
     if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.USER_READ)) {
+
+    // TODO CIHAN: remember this!!
+    if (hasScope('user.read')) {
       return true
     }
-    if (hasScope(SCOPES.USER_READ_MY_OFFICE)) {
-      return user.primaryOfficeId === userPrimaryOfficeId
-    }
-    if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
-      return isLocationUnderJurisdiction({
-        locationId: userPrimaryOfficeId,
-        otherLocationId: user.primaryOfficeId,
-        locations,
-        administrativeAreas
-      })
-    }
-    if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
-      return user.id === currentUser?.id
-    }
+
+    // TODO CIHAN:
+    // if (hasScope(SCOPES.USER_READ_MY_OFFICE)) {
+    //   return user.primaryOfficeId === userPrimaryOfficeId
+    // }
+    // if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
+    //   return isLocationUnderJurisdiction({
+    //     locationId: userPrimaryOfficeId,
+    //     otherLocationId: user.primaryOfficeId,
+    //     locations,
+    //     administrativeAreas
+    //   })
+    // }
+    // if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
+    //   return user.id === currentUser?.id
+    // }
 
     return false
   }
@@ -91,49 +91,58 @@ export function usePermissions() {
     if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.USER_UPDATE)) {
+
+    // TODO CIHAN: remember this!!
+    if (hasScope('user.update')) {
       return true
     }
-    if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION)) {
-      if (roleScopes(user.role).includes(SCOPES.USER_UPDATE)) {
-        return false
-      }
-      return isLocationUnderJurisdiction({
-        locationId: userPrimaryOfficeId,
-        otherLocationId: user.primaryOfficeId,
-        locations,
-        administrativeAreas
-      })
-    }
+
+    // TODO CIHAN:
+    // if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION)) {
+    //   if (roleScopes(user.role).includes(SCOPES.USER_UPDATE)) {
+    //     return false
+    //   }
+    //   return isLocationUnderJurisdiction({
+    //     locationId: userPrimaryOfficeId,
+    //     otherLocationId: user.primaryOfficeId,
+    //     locations,
+    //     administrativeAreas
+    //   })
+    // }
 
     return false
   }
 
   const creatableRoleIds = findScope(userScopes ?? [], 'user.create')?.options
     ?.role
+
   const canCreateUser = Array.isArray(creatableRoleIds)
     ? creatableRoleIds.length > 0
-    : hasAnyScope([SCOPES.USER_CREATE, SCOPES.USER_CREATE_MY_JURISDICTION])
+    : hasScope('user.create')
 
   const canAccessOffice = (office: Pick<Location, 'id'>) => {
     if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS)) {
+
+    // TODO CIHAN: remember this!!
+    if (hasScope('organisation.read-locations')) {
       return true
     }
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE)) {
-      return office.id === userPrimaryOfficeId
-    }
 
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
-      return isLocationUnderJurisdiction({
-        locationId: userPrimaryOfficeId,
-        otherLocationId: office.id,
-        locations,
-        administrativeAreas
-      })
-    }
+    // TODO CIHAN:
+    // if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE)) {
+    //   return office.id === userPrimaryOfficeId
+    // }
+
+    // if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
+    //   return isLocationUnderJurisdiction({
+    //     locationId: userPrimaryOfficeId,
+    //     otherLocationId: office.id,
+    //     locations,
+    //     administrativeAreas
+    //   })
+    // }
     return false
   }
 
@@ -141,22 +150,25 @@ export function usePermissions() {
     if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.USER_CREATE)) {
+
+    // TODO CIHAN: remember this!!
+    if (hasScope('user.create')) {
       return true
     }
-    if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
-      return isLocationUnderJurisdiction({
-        locationId: userPrimaryOfficeId,
-        otherLocationId: office.id,
-        locations,
-        administrativeAreas
-      })
-    }
+
+    // TODO CIHAN:
+    // if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
+    //   return isLocationUnderJurisdiction({
+    //     locationId: userPrimaryOfficeId,
+    //     otherLocationId: office.id,
+    //     locations,
+    //     administrativeAreas
+    //   })
+    // }
     return false
   }
 
   return {
-    hasScopes,
     hasScope,
     hasAnyScope,
     canSearchRecords,

@@ -53,6 +53,8 @@ export function OrganisationNavigationGroup({
 
   const { hasAccess } = useHasAccessToNavigationItem()
 
+  console.log(hasAccess(TAB_GROUPS.organisations))
+
   return (
     <>
       {hasAccess(TAB_GROUPS.organisations) && (

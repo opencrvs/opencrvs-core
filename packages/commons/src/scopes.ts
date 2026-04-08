@@ -24,15 +24,15 @@ export const MIGRATED_LEGACY_SCOPES = {
   USER_DATA_SEEDING: 'user.data-seeding',
   INTEGRATION_CREATE: 'integration.create',
   PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
-  PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature'
+  PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
+  PERFORMANCE_READ: 'performance.read',
+  PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
+  CONFIG_UPDATE_ALL: 'config.update:all'
 }
 
 /** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
 export const SCOPES = {
   DEMO: 'demo',
-
-  PERFORMANCE_READ: 'performance.read',
-  PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
 
   ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
@@ -47,9 +47,7 @@ export const SCOPES = {
   USER_CREATE: 'user.create:all',
   USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
   USER_UPDATE: 'user.update:all',
-  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
-
-  CONFIG_UPDATE_ALL: 'config.update:all'
+  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction'
 } as const
 
 /**
@@ -62,9 +60,9 @@ const LiteralScopes = z.union([
   z.literal(MIGRATED_LEGACY_SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
   z.literal(MIGRATED_LEGACY_SCOPES.INTEGRATION_CREATE),
   z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS),
+  z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ),
+  z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS),
   z.literal(SCOPES.DEMO),
-  z.literal(SCOPES.PERFORMANCE_READ),
-  z.literal(SCOPES.PERFORMANCE_READ_DASHBOARDS),
   z.literal(SCOPES.ORGANISATION_READ_LOCATIONS),
   z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
   z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),
@@ -76,7 +74,7 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.USER_CREATE_MY_JURISDICTION),
   z.literal(SCOPES.USER_UPDATE),
   z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION),
-  z.literal(SCOPES.CONFIG_UPDATE_ALL)
+  z.literal(MIGRATED_LEGACY_SCOPES.CONFIG_UPDATE_ALL)
 ])
 
 /**
@@ -144,6 +142,7 @@ const PlainScopeType = z.enum([
 
   // User management scopes
   // TODO CIHAN: these might require jurisdiction filters??
+  'user.read',
   'user.create',
   'user.update',
   'profile.electronic-signature',
@@ -529,16 +528,47 @@ export function getAcceptedScopesByType({
 }
 
 /**
+ * Checks if the provided scopes or token contain any of the accepted scopes.
+ *
+ * Overloads:
+ * - `hasAnyScope(token, scopes)` → extracts scopes from a token
+ * - `hasAnyScope(scopes, scopes)` → checks directly from a scope array
+ */
+
+/**
  * Checks if the provided token contains any of the accepted scopes.
  *
  * @param {string} token - The authentication JWT token.
  * @param {ScopeType[]} scopes - An array of scope types to check for.
  * @returns {boolean} True if the token contains at least one of the accepted scopes, false otherwise.
  */
-export function hasAnyScope(token: string, scopes: ScopeType[]) {
+export function hasAnyScope(token: string, scopes: ScopeType[]): boolean
+/**
+ * Checks if the provided array of scopes contains any of the accepted scopes.
+ *
+ * @param {string[]} userScopes - Array of scopes to check.
+ * @param {ScopeType[]} scopes - An array of scope types to check for.
+ * @returns {boolean} True if the scope list contains at least one of the accepted scopes.
+ */
+export function hasAnyScope(userScopes: string[], scopes: ScopeType[]): boolean
+/**
+ * Implementation handling both overloads.
+ *
+ * @param tokenOrScopes - JWT token string or list of scopes.
+ * @param scopes - The scope types to check for.
+ * @returns True if any of the scopes is present.
+ */
+export function hasAnyScope(
+  tokenOrScopes: string | string[],
+  scopes: ScopeType[]
+): boolean {
+  const userScopes = Array.isArray(tokenOrScopes)
+    ? tokenOrScopes
+    : getScopes(tokenOrScopes)
+
   const foundScopes = getAcceptedScopesByType({
     acceptedScopes: scopes,
-    scopes: getScopes(token)
+    scopes: userScopes
   })
 
   return foundScopes.length > 0

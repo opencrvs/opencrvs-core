@@ -26,15 +26,15 @@ import { parse } from 'qs'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
 import { vi } from 'vitest'
-import { encodeScope, SCOPES, UUID } from '@opencrvs/commons/client'
+import { encodeScope, UUID } from '@opencrvs/commons/client'
 import { createMemoryRouter } from 'react-router-dom'
 import * as actions from '@client/profile/profileActions'
 
 const SYSTEM_ADMIN_DEFAULT_SCOPES = [
-  SCOPES.USER_CREATE,
-  SCOPES.USER_READ,
-  SCOPES.USER_UPDATE,
-  SCOPES.ORGANISATION_READ_LOCATIONS,
+  encodeScope({ type: 'user.create' }),
+  encodeScope({ type: 'user.read' }),
+  encodeScope({ type: 'user.update' }),
+  encodeScope({ type: 'organisation.read-locations' }),
   encodeScope({ type: 'performance.read' }),
   encodeScope({ type: 'performance.read-dashboards' }),
   encodeScope({ type: 'performance.vital-statistics-export' })
@@ -153,7 +153,7 @@ describe.skip('Team search test', () => {
     beforeAll(async () => {})
 
     beforeEach(async () => {
-      setScopes([SCOPES.USER_READ], store)
+      setScopes([encodeScope({ type: 'user.read' })], store)
 
       testComponent = (
         await createTestComponent(<TeamSearch />, {

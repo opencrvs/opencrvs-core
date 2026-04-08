@@ -17,8 +17,6 @@ import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
 import * as routes from '@client/navigation/routes'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
-import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userEditor/UserEditor'
-import { SCOPES } from '@opencrvs/commons/client'
 import { getTheme } from '@opencrvs/components'
 import * as React from 'react'
 import { Provider } from 'react-redux'
@@ -34,7 +32,6 @@ import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 import { I18nContainer } from './i18n/components/I18nContainer'
 import { useApolloClient } from './utils/apolloClient'
 import { ApolloProvider } from './utils/ApolloProvider'
-
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
 import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
@@ -99,13 +96,7 @@ export const routesConfig = [
         path: routes.TEAM_SEARCH,
         element: (
           <TRPCProvider>
-            <ProtectedRoute
-              scopes={[
-                SCOPES.USER_READ,
-                SCOPES.USER_READ_MY_OFFICE,
-                SCOPES.USER_READ_MY_JURISDICTION
-              ]}
-            >
+            <ProtectedRoute scopes={['user.read']}>
               <TeamSearch />
             </ProtectedRoute>
           </TRPCProvider>
