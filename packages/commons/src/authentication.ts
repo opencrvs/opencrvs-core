@@ -11,7 +11,7 @@
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
-import { RecordScopeV2, decodeScope } from './scopes'
+import { RecordScopeV2, ScopeType, decodeScope } from './scopes'
 import { UUID } from './uuid'
 export * from './scopes'
 
@@ -22,10 +22,10 @@ export * from './scopes'
  * @param acceptedScopes - An array of acceptable scope types to filter by.
  * @returns An array of parsed RecordScopeV2 objects that are found in the token and match the accepted scope types.
  */
-export function getAcceptedScopesFromToken<T extends RecordScopeV2['type']>(
+export function getAcceptedScopesFromToken<T extends ScopeType>(
   token: string,
   acceptedScopes: T[]
-): Array<Extract<RecordScopeV2, { type: T }>> {
+): Array<Extract<Scope, { type: T }>> {
   const tokenScopes = getScopes(token)
 
   return tokenScopes
