@@ -51,6 +51,7 @@ type DeclarationProps =
   | {
       declaration: EventState
     }
+
 /**
  *
  * Reusable component for rendering a form with pagination. Used by different action forms
@@ -86,10 +87,16 @@ export function Pages({
     document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
   }, [pageId])
 
-  function switchToNextPage() {
-    const nextPageIdx = pageIdx + 1
+  function switchToNextPage(formValues: EventState = formData) {
+    const currentVisiblePages = formPages.filter((p) =>
+      isPageVisible(p, formValues, validatorContext)
+    )
+    const currentPageIdx = currentVisiblePages.findIndex((p) => p.id === pageId)
+    const nextPageIdx = currentPageIdx + 1
     const nextPage =
-      nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
+      nextPageIdx < currentVisiblePages.length
+        ? currentVisiblePages[nextPageIdx]
+        : undefined
 
     // If there is a next page on the form available, navigate to it.
     // Otherwise, submit the form.

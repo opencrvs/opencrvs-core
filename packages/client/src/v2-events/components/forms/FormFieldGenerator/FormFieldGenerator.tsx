@@ -69,7 +69,7 @@ export interface FormFieldGeneratorPropsWithoutRef {
   onFormChange?: (values: EventState) => void
   onTouchedChange?: (touched: IndexMap<FormState<boolean>>) => void
   /** Called when the form is submitted and all fields are valid */
-  onValidSubmit?: () => void
+  onValidSubmit?: (formValues: EventState) => void
   isCorrection?: boolean
   validatorContext: ValidatorContext
 }
@@ -139,17 +139,18 @@ export const FormFieldGenerator = forwardRef<
           makeFormFieldIdsFormikCompatible(allTouched)
         )
         onTouchedChange?.({ ...formTouched, ...allTouched })
-        onFormChange?.({
+        const updatedFormValues = {
           ...formValues,
           ...(formikRef.current?.values &&
             makeFormikFieldIdsOpenCRVSCompatible(formikRef.current.values)),
           ...extraValues
-        })
+        }
+        onFormChange?.(updatedFormValues)
         const currentErrors = flattenFormState(formikRef.current?.errors)
           .map(([, errs]) => errs)
           .filter((err) => err !== undefined)
         if (currentErrors.length === 0) {
-          onValidSubmit?.()
+          onValidSubmit?.(updatedFormValues)
         }
         return currentErrors
       }
