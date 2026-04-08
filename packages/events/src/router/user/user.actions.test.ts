@@ -101,6 +101,8 @@ test('Finds user in nested location using administrative area id with my jurisdi
   // @TODO: Probably wont work
   const { user: userOnParentLocation, seed } = await setupTestCase()
   const parentLocationClient = createTestClient(userOnParentLocation, [
+    // TODO CIHAN: this needs jurisdiction option
+    encodeScope({ type: 'user.read' }),
     SCOPES.USER_READ_MY_JURISDICTION
   ])
 
@@ -166,6 +168,8 @@ test('Finds user in nested location using administrative area id with my jurisdi
 test('Find user with appropriate scopes', async () => {
   const { user: userOnParentLocation, seed } = await setupTestCase()
   const clientWithJurisdictionScope = createTestClient(userOnParentLocation, [
+    // TODO CIHAN: this needs jurisdiction option
+    encodeScope({ type: 'user.read' }),
     SCOPES.USER_READ_MY_JURISDICTION
   ])
 
@@ -189,6 +193,8 @@ test('Find user with appropriate scopes', async () => {
   })
 
   const clientWithOfficeScope = createTestClient(userInTheSameOffice, [
+    // TODO CIHAN: this needs jurisdiction option
+    encodeScope({ type: 'user.read' }),
     SCOPES.USER_READ_MY_OFFICE
   ])
 
@@ -199,6 +205,8 @@ test('Find user with appropriate scopes', async () => {
   })
 
   const userToSearchClient = createTestClient(userToSearch, [
+    // TODO CIHAN: this needs jurisdiction option
+    encodeScope({ type: 'user.read' }),
     SCOPES.USER_READ_ONLY_MY_AUDIT
   ])
 

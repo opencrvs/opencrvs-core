@@ -27,7 +27,7 @@ import { formatUrl } from '@client/navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { useHasAccessToNavigationItem } from '@client/components/interface/useHasAccessToNavigationItem'
 
-const conmmunicationTab: string[] = [
+const communicationTab = [
   WORKQUEUE_TABS.informantNotification,
   WORKQUEUE_TABS.emailAllUsers
 ]
@@ -52,8 +52,6 @@ export function OrganisationNavigationGroup({
   const intl = useIntl()
 
   const { hasAccess } = useHasAccessToNavigationItem()
-
-  console.log(hasAccess(TAB_GROUPS.organisations))
 
   return (
     <>
@@ -133,7 +131,7 @@ export function OrganisationNavigationGroup({
               <NavigationItem
                 expandableIcon={() =>
                   isCommunicationExpanded ||
-                  conmmunicationTab.some(
+                  communicationTab.some(
                     (tab) => tab === currentWorkqueueSlug
                   ) ? (
                     <Expandable selected={true} />
@@ -143,7 +141,7 @@ export function OrganisationNavigationGroup({
                 }
                 icon={() => <Icon name="ChatCircle" size="small" />}
                 id={`navigation_${WORKQUEUE_TABS.communications}_main`}
-                isSelected={conmmunicationTab.some(
+                isSelected={communicationTab.some(
                   (tab) => tab === currentWorkqueueSlug
                 )}
                 label={intl.formatMessage(
@@ -154,7 +152,7 @@ export function OrganisationNavigationGroup({
                 }
               />
               {(isCommunicationExpanded ||
-                conmmunicationTab.some(
+                communicationTab.some(
                   (tab) => tab === currentWorkqueueSlug
                 )) && (
                 <NavigationSubItem

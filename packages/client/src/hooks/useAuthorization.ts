@@ -136,6 +136,8 @@ export function usePermissions() {
       getScopeOptionValue(s, 'accessLevel')
     )
 
+    // TODO CIHAN: FIX AND REMOVE
+    // eslint-disable-next-line no-console
     console.log(accessLevels)
 
     // TODO CIHAN: remember this!!
