@@ -8687,6 +8687,37 @@ components:
                 loading:
                   description: Whether the button is in a loading state and shows a spinner
                   type: boolean
+                buttonSize:
+                  description: Size of the button.
+                  type: string
+                  enum:
+                    - small
+                    - medium
+                    - large
+                buttonType:
+                  description: Type of the button.
+                  type: string
+                  enum:
+                    - primary
+                    - secondary
+                    - tertiary
+                    - positive
+                    - negative
+                    - secondaryNegative
+                    - icon
+                    - iconPrimary
+                textColor:
+                  description: Color of the text.
+                  type: string
+                  enum:
+                    - primary
+                    - copy
+                textVariant:
+                  description: Variant of the text.
+                  type: string
+                  enum:
+                    - bold14
+                    - reg14
                 text:
                   description: Text to display on the button
                   $ref: "#/components/schemas/TranslationConfig"
