@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { randomUUID } from 'crypto'
 import fetch from 'node-fetch'
 import { z } from 'zod'
 import {
@@ -28,7 +29,11 @@ import {
   getSystemByLegacyId,
   getSystemClientById
 } from '@events/storage/postgres/events/system-clients'
-import { getUserById } from '@events/storage/postgres/events/users'
+import {
+  getUserById,
+  createUserWithCredentials
+} from '@events/storage/postgres/events/users'
+import { generateSaltedHash } from '@events/service/auth/hash'
 
 type UserAPIResult = {
   id: string
@@ -93,10 +98,10 @@ export async function getUser(
     username: user.username,
     status: user.status as User['status'],
     signature: user.signaturePath
-      ? (user.signaturePath as FullDocumentPath)
+      ? (user.signaturePath as DocumentPath)
       : undefined,
     avatar: user.profileImagePath
-      ? (user.profileImagePath as FullDocumentPath)
+      ? (user.profileImagePath as DocumentPath)
       : undefined,
     primaryOfficeId: user.officeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
@@ -207,30 +212,39 @@ export async function updateUser(
   return getUser(input.id)
 }
 
-export async function createUser(input: CreateUserPayload, token: string) {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'createUser').href, {
-    method: 'POST',
-    body: JSON.stringify({
-      ...input,
-      signature: input.signature && {
-        type: input.signature.type,
-        data: input.signature.path
-      }
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
-    }
-  })
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to create user. Error: ${res.status} status received`
-    )
+export async function createUser(input: CreateUserPayload, _token: string) {
+  if (!input.username) {
+    throw new Error('username is required')
   }
 
-  const response = (await res.json()) as UserAPIResult
-  return getUser(response.id)
+  const englishName = input.name.find((n) => n.use === 'en') ?? input.name[0]
+
+  // Hash the provided password, or generate a random placeholder for pending
+  // users who will set their own password via the activation flow.
+  const { hash, salt } = await generateSaltedHash(
+    input.password ?? randomUUID()
+  )
+
+  const postgresId = await createUserWithCredentials(
+    {
+      firstname: englishName?.given[0] ?? null,
+      surname: englishName?.family ?? null,
+      fullHonorificName: input.fullHonorificName ?? null,
+      role: input.role,
+      status: input.status ?? 'pending',
+      email: input.email ?? null,
+      mobile: input.mobile ?? null,
+      officeId: input.primaryOfficeId as UUID
+    },
+    {
+      username: input.username,
+      passwordHash: hash,
+      salt,
+      securityQuestions: []
+    }
+  )
+
+  return getUser(postgresId)
 }
 
 export async function activateUser(
