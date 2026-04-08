@@ -63,6 +63,7 @@ function resolveJurisdictionScopeOptionReference(
   const acceptedScopes = getAcceptedScopesFromToken(token, [$scope])
 
   const acceptedScopesMatchingEventType = acceptedScopes.filter((scope) => {
+    // Only filter with event type if the scope has options and event type is defined
     if (
       !('options' in scope) ||
       !scope.options ||
