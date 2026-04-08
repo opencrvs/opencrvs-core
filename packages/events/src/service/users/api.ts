@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { z } from 'zod'
 import {
   DocumentPath,
@@ -19,9 +18,10 @@ import {
   User,
   UserInput,
   UserOrSystem,
+  findScope,
+  getScopes,
   hasScope,
   isUUID,
-  joinUrl,
   logger,
   personNameFromV1ToV2,
   triggerUserEventNotification
@@ -35,34 +35,12 @@ import {
   getUserById,
   createUserWithCredentials,
   searchUsersWithInput,
-  activateUserWithCredentials
+  activateUserWithCredentials,
+  updateUserById,
+  updateUsernameById
 } from '@events/storage/postgres/events/users'
 import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
 import { generateUsername } from './users'
-
-type UserAPIResult = {
-  id: string
-  avatar?: {
-    data: DocumentPath
-    type: string
-  }
-  signature?: {
-    data: DocumentPath
-    type: string
-  }
-  device?: string
-  name: IUserName[]
-  username: string
-  email: string
-  mobile: string
-  role: string
-  fullHonorificName?: string
-  practitionerId: string
-  primaryOfficeId: UUID
-  scope: string[]
-  status: string
-  creationDate: number
-}
 
 export type SearchUsersPayload = {
   username?: string
@@ -74,11 +52,6 @@ export type SearchUsersPayload = {
   count: number
   skip: number
   sortOrder: 'asc' | 'desc'
-}
-
-export type SearchUsersResult = {
-  totalItems: number
-  results: UserAPIResult[]
 }
 
 export async function getUser(
@@ -184,25 +157,61 @@ export async function updateUser(
   input: CreateUserPayload & { id: string },
   token: string
 ): Promise<User> {
-  const res = await fetch(joinUrl(env.USER_MANAGEMENT_URL, 'updateUser').href, {
-    method: 'POST',
-    body: JSON.stringify({
-      ...input,
-      signature: input.signature && {
-        type: input.signature.type,
-        data: input.signature.path
-      }
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token
+  const existingUser = await getUserById(input.id)
+
+  if (!existingUser) {
+    throw new Error(`No user found by given id: ${input.id}`)
+  }
+
+  const scopes = getScopes(token)
+  const editableRoleIds = findScope(scopes, 'user.edit')?.options?.role
+  if (Array.isArray(editableRoleIds) && !editableRoleIds.includes(input.role)) {
+    throw new Error('Unauthorized to edit user with this role')
+  }
+
+  let officeId = existingUser.officeId
+  if (input.primaryOfficeId !== existingUser.officeId) {
+    if (hasScope(token, SCOPES.CONFIG_UPDATE_ALL)) {
+      officeId = input.primaryOfficeId as UUID
+    } else {
+      throw new Error('Location can not be changed by this user')
     }
+  }
+
+  const englishName = input.name.find((n) => n.use === 'en') ?? input.name[0]
+  const oldUsername = existingUser.username
+  const newUsername = await generateUsername(input.name, existingUser.username)
+
+  await updateUserById(input.id, {
+    firstname: englishName?.given[0] ?? null,
+    surname: englishName?.family ?? null,
+    fullHonorificName: input.fullHonorificName ?? null,
+    email: input.email ?? null,
+    mobile: input.mobile ?? null,
+    device: input.device ?? null,
+    role: input.role,
+    officeId,
+    signaturePath: input.signature
+      ? input.signature.path
+      : existingUser.signaturePath
   })
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to update user. Error: ${res.status} status received`
-    )
+  if (newUsername !== oldUsername) {
+    await updateUsernameById(input.id, newUsername)
+    triggerUserEventNotification({
+      event: 'user-updated',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(input.name),
+          email: input.email ?? undefined,
+          mobile: input.mobile ?? undefined
+        },
+        oldUsername,
+        newUsername
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
   }
 
   return getUser(input.id)
@@ -317,75 +326,4 @@ export async function activateUser(input: {
   )
 
   await activateUserWithCredentials(input.userId, hash, salt, securityQuestions)
-}
-
-export async function changeUserPhone(
-  payload: { userId: string; phoneNumber: string },
-  token: string
-): Promise<void> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserPhone').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change phone number. Error: ${res.status} status received`
-    )
-  }
-}
-
-export async function changeUserEmail(
-  payload: { userId: string; email: string },
-  token: string
-): Promise<void> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserEmail').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change email. Error: ${res.status} status received`
-    )
-  }
-}
-
-export async function changeUserAvatar(
-  payload: { userId: string; avatar: { type: string; data: string } },
-  token: string
-) {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'changeUserAvatar').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change avatar. Error: ${res.status} status received`
-    )
-  }
-
-  return res
 }

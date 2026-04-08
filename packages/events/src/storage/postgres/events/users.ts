@@ -267,6 +267,39 @@ export async function checkUsername(username: string) {
   return !!user
 }
 
+export async function updateUserById(
+  userId: string,
+  fields: Partial<{
+    firstname: string | null
+    surname: string | null
+    fullHonorificName: string | null
+    email: string | null
+    mobile: string | null
+    device: string | null
+    role: string
+    status: string
+    officeId: UUID
+    signaturePath: string | null
+    profileImagePath: string | null
+  }>
+) {
+  const db = getClient()
+  return db
+    .updateTable('users')
+    .set(fields)
+    .where('id', '=', userId as UUID)
+    .execute()
+}
+
+export async function updateUsernameById(userId: string, username: string) {
+  const db = getClient()
+  return db
+    .updateTable('userCredentials')
+    .set({ username })
+    .where('userId', '=', userId as UUID)
+    .execute()
+}
+
 export async function activateUserWithCredentials(
   userId: string,
   passwordHash: string,

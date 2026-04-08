@@ -17,6 +17,7 @@ import {
   UserAuditRecordInput
 } from '@opencrvs/commons/events'
 import {
+  isBase64FileString,
   logger,
   personNameFromV1ToV2,
   User,
@@ -37,6 +38,7 @@ import {
   getUserByUsername,
   getUserCredentialsByUserId,
   updatePasswordHash,
+  updateUserById,
   deleteSuperUser,
   SecurityQuestion
 } from '@events/storage/postgres/events/users'
@@ -47,14 +49,12 @@ import {
 } from '@events/storage/postgres/events/auditLog'
 import {
   activateUser,
-  changeUserAvatar,
-  changeUserEmail,
-  changeUserPhone,
   createUser,
   getUser,
   searchUsers,
   updateUser
 } from '@events/service/users/api'
+import { uploadBase64File } from '@events/service/files'
 import { getUsersById, isUser } from '@events/service/users/users'
 import {
   checkVerificationCode,
@@ -383,7 +383,14 @@ export const userRouter = router({
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
         }
       }
-      return updateUser(input, ctx.token)
+      const user = await updateUser(input, ctx.token)
+      await writeAuditLog({
+        operation: 'user.edit_user',
+        requestData: { subjectId: input.id },
+        clientId: ctx.user.id,
+        clientType: ctx.user.type
+      })
+      return user
     }),
   list: userOnlyProcedure
     .input(z.array(z.string()))
@@ -513,6 +520,13 @@ export const userRouter = router({
         })
       }
 
+      if (user.status !== 'active') {
+        logger.error(
+          `User is not in active state for given userid: ${input.userId}`
+        )
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
       if (!user.email) {
         logger.error(
           `Failed to change phone number for user ${input.userId}: User has no email address to send verification code to`
@@ -543,10 +557,14 @@ export const userRouter = router({
         })
       }
 
-      await changeUserPhone(
-        { userId: input.userId, phoneNumber: input.phoneNumber },
-        ctx.token
-      )
+      await updateUserById(input.userId, { mobile: input.phoneNumber })
+      await writeAuditLog({
+        operation: 'user.phone_number_changed',
+        requestData: { subjectId: input.userId },
+        responseSummary: { phoneNumber: input.phoneNumber },
+        clientId: ctx.user.id,
+        clientType: ctx.user.type
+      })
     }),
   changeEmail: userOnlyProcedure
     .input(
@@ -573,6 +591,14 @@ export const userRouter = router({
         })
       }
 
+      const subject = await getUser(input.userId)
+      if (subject.status !== 'active') {
+        logger.error(
+          `User is not in active state for given userid: ${input.userId}`
+        )
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
       const userWithDuplicateEmail = await searchUsers({
         email: input.email,
         count: 1,
@@ -591,10 +617,14 @@ export const userRouter = router({
         })
       }
 
-      await changeUserEmail(
-        { userId: input.userId, email: input.email },
-        ctx.token
-      )
+      await updateUserById(input.userId, { email: input.email })
+      await writeAuditLog({
+        operation: 'user.email_address_changed',
+        requestData: { subjectId: input.userId },
+        responseSummary: { email: input.email },
+        clientId: ctx.user.id,
+        clientType: ctx.user.type
+      })
     }),
   changeAvatar: userOnlyProcedure
     .input(
@@ -613,7 +643,17 @@ export const userRouter = router({
           message: "Not allowed to change another user's avatar"
         })
       }
-      await changeUserAvatar(input, ctx.token)
+      const subject = await getUser(input.userId)
+      if (subject.status !== 'active') {
+        logger.error(
+          `User is not in active state for given userid: ${input.userId}`
+        )
+        throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+      const profileImagePath = isBase64FileString(input.avatar.data)
+        ? await uploadBase64File(input.avatar.data, ctx.token)
+        : input.avatar.data
+      await updateUserById(input.userId, { profileImagePath })
     }),
   activate: userOnlyProcedure
     .input(
