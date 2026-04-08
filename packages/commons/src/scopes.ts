@@ -40,8 +40,7 @@ export const MIGRATED_LEGACY_SCOPES = {
   USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
   USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit',
   USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
-  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
-  DEMO: 'demo'
+  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction'
 }
 
 /**

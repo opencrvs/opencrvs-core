@@ -8,10 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
 import { ITokenPayload } from '@user-mgnt/utils/token'
 import decode from 'jwt-decode'
-import { hasScope } from '@opencrvs/commons'
 
 export const statuses = {
   PENDING: 'pending',
@@ -22,18 +20,6 @@ export const statuses = {
 
 interface IAuthHeader {
   Authorization: string
-}
-
-export function hasDemoScope(request: Hapi.Request): boolean {
-  if (
-    !request.auth ||
-    !request.auth.credentials ||
-    !request.auth.credentials.scope
-  ) {
-    return false
-  }
-
-  return hasScope(request.auth.credentials.scope, 'demo')
 }
 
 const getTokenPayload = (token: string): ITokenPayload => {

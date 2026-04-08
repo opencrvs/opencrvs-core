@@ -33,7 +33,8 @@ import {
   AdvancedSearchConfigWithFieldsResolved,
   METADATA_FIELD_PREFIX,
   ValidatorContext,
-  getAcceptedScopesByType
+  getAcceptedScopesByType,
+  RecordScopeV2
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
@@ -767,7 +768,7 @@ export function checkScopeForEventSearch(eventId: string) {
   const searchScopes = getAcceptedScopesByType({
     acceptedScopes: ['record.search'],
     scopes: scopes ?? []
-  })
+  }) as RecordScopeV2[]
 
   const isEventSearchAllowed = searchScopes.some(
     (scope) =>

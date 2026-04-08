@@ -12,7 +12,6 @@ import configHandler, {
   getLoginConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
 import getForms from '@config/handlers/forms/formsHandler'
-import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
 import { ServerRoute } from '@hapi/hapi'
 
 export default function getRoutes(): ServerRoute[] {
@@ -61,15 +60,5 @@ export default function getRoutes(): ServerRoute[] {
         description: 'Retrieve forms'
       }
     },
-    {
-      method: 'GET',
-      path: '/dashboardQueries',
-      handler: getDashboardQueries,
-      options: {
-        tags: ['api'],
-        auth: false,
-        description: 'Fetch dashboard queries from country config'
-      }
-    }
   ]
 }

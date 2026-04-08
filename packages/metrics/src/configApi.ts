@@ -10,7 +10,6 @@
  */
 import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
-import { Document } from 'mongoose'
 
 export interface ICountryLogo {
   fileName: string
@@ -49,25 +48,6 @@ export async function getApplicationConfig(
     .catch((error) => {
       return Promise.reject(
         new Error(`Application config request failed: ${error.message}`)
-      )
-    })
-}
-
-export async function getDashboardQueries(): Promise<
-  Array<{ collection: string; aggregate: Document[] }>
-> {
-  return fetch(`${CONFIG_API_URL}/dashboardQueries`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Dashboard queries request failed: ${error.message}`)
       )
     })
 }

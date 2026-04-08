@@ -10,7 +10,6 @@
  */
 
 import { AuthServer, createServer } from '@auth/server'
-import { encodeScope } from '@opencrvs/commons'
 import * as codeService from '@auth/features/verifyCode/service'
 import * as retrievalService from '@auth/features/retrievalSteps/verifyUser/service'
 import * as fetchAny from 'jest-fetch-mock'
@@ -37,7 +36,7 @@ describe('verifyNumber handler receives a request', () => {
         id: '1',
         username: 'fake_user_name',
         status: 'active',
-        scope: [encodeScope({ type: 'demo' })],
+        scope: [],
         mobile: '+8801711111111',
         securityQuestionKey: 'dummyKey'
       })
