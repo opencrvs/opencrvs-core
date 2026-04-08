@@ -773,22 +773,42 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
+const ButtonSize = z.enum(['small', 'medium', 'large'])
+const ButtonType = z.enum([
+  'primary',
+  'secondary',
+  'tertiary',
+  'positive',
+  'negative',
+  'secondaryNegative',
+  'icon',
+  'iconPrimary'
+])
+const TextColor = z.enum(['primary', 'copy'])
+const TextVariant = z.enum(['bold14', 'reg14'])
+
+const ButtonConfiguration = z.object({
+  icon: z
+    .string()
+    .optional()
+    .describe('Icon for the button. You can find icons from OpenCRVS UI-Kit.'),
+  loading: z
+    .boolean()
+    .optional()
+    .describe('Whether the button is in a loading state and shows a spinner'),
+  buttonSize: ButtonSize.optional().describe('Size of the button.'),
+  buttonType: ButtonType.optional().describe('Type of the button.'),
+  textColor: TextColor.optional().describe('Color of the text.'),
+  textVariant: TextVariant.optional().describe('Variant of the text.'),
+  text: TranslationConfig.describe('Text to display on the button')
+})
+
+export type ButtonConfiguration = z.infer<typeof ButtonConfiguration>
+
 const ButtonField = BaseField.extend({
   type: z.literal(FieldType.BUTTON),
   defaultValue: ButtonFieldValue.optional(),
-  configuration: z.object({
-    icon: z
-      .string()
-      .optional()
-      .describe(
-        'Icon for the button. You can find icons from OpenCRVS UI-Kit.'
-      ),
-    loading: z
-      .boolean()
-      .optional()
-      .describe('Whether the button is in a loading state and shows a spinner'),
-    text: TranslationConfig.describe('Text to display on the button')
-  })
+  configuration: ButtonConfiguration
 }).describe('Generic button without any built-in functionality')
 
 export type ButtonField = z.infer<typeof ButtonField>
