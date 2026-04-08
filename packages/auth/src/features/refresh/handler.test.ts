@@ -10,7 +10,7 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import { encodeScope, SCOPES } from '@opencrvs/commons'
+import { encodeScope } from '@opencrvs/commons'
 import * as fetchAny from 'jest-fetch-mock'
 import { AuthenticateResponse } from '@auth/features/authenticate/handler'
 
