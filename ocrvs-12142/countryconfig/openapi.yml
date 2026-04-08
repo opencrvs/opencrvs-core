@@ -3177,6 +3177,24 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - bypassratelimit
+                                - record.reindex
+                                - notification-api
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - user.read
+                                - user.create
+                                - user.update
+                                - profile.electronic-signature
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - demo
                                 - record.search
                                 - record.create
                                 - record.read
@@ -3192,6 +3210,7 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - organisation.read-locations
                             $option:
                               type: string
                               enum:
@@ -3201,6 +3220,7 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
                           required:
                             - $scope
                             - $option
@@ -7607,6 +7627,24 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - bypassratelimit
+                                - record.reindex
+                                - notification-api
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - user.read
+                                - user.create
+                                - user.update
+                                - profile.electronic-signature
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - demo
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7622,6 +7660,7 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - organisation.read-locations
                             $option:
                               type: string
                               enum:
@@ -7631,6 +7670,7 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
                           required:
                             - $scope
                             - $option
@@ -7983,6 +8023,24 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - bypassratelimit
+                                - record.reindex
+                                - notification-api
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - user.read
+                                - user.create
+                                - user.update
+                                - profile.electronic-signature
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - demo
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7998,6 +8056,7 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - organisation.read-locations
                             $option:
                               type: string
                               enum:
@@ -8007,6 +8066,7 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
                           required:
                             - $scope
                             - $option
@@ -8197,6 +8257,24 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - bypassratelimit
+                                - record.reindex
+                                - notification-api
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - user.read
+                                - user.create
+                                - user.update
+                                - profile.electronic-signature
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - demo
                                 - record.search
                                 - record.create
                                 - record.read
@@ -8212,6 +8290,7 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - organisation.read-locations
                             $option:
                               type: string
                               enum:
@@ -8221,6 +8300,7 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
                           required:
                             - $scope
                             - $option
@@ -8410,6 +8490,24 @@ components:
                             $scope:
                               type: string
                               enum:
+                                - bypassratelimit
+                                - record.reindex
+                                - notification-api
+                                - user.data-seeding
+                                - integration.create
+                                - record.import
+                                - config.update-all
+                                - attachment.upload
+                                - user.read
+                                - user.create
+                                - user.update
+                                - profile.electronic-signature
+                                - performance.read
+                                - performance.read-dashboards
+                                - performance.vital-statistics-export
+                                - record.confirm-registration
+                                - record.reject-registration
+                                - demo
                                 - record.search
                                 - record.create
                                 - record.read
@@ -8425,6 +8523,7 @@ components:
                                 - record.correct
                                 - record.unassign-others
                                 - record.custom-action
+                                - organisation.read-locations
                             $option:
                               type: string
                               enum:
@@ -8434,6 +8533,7 @@ components:
                                 - declaredBy
                                 - registeredIn
                                 - registeredBy
+                                - accessLevel
                           required:
                             - $scope
                             - $option
