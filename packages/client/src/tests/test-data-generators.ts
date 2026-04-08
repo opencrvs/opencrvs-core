@@ -501,7 +501,22 @@ export function testDataGenerator(rngSeed?: number) {
           type: 'organisation.read-locations',
           options: { accessLevel: 'location' }
         }),
-        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
+        encodeScope({
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-completion',
+              'requires-updates',
+              'in-review-all',
+              'in-external-validation',
+              'ready-to-print',
+              'ready-to-issue'
+            ]
+          }
+        }),
         encodeScope({ type: 'user.read-only-my-audit' }),
         encodeScope({ type: 'record.search' }),
         encodeScope({ type: 'record.create' }),
@@ -542,7 +557,23 @@ export function testDataGenerator(rngSeed?: number) {
           options: { accessLevel: 'location' }
         }),
         encodeScope({ type: 'user.read-only-my-audit' }),
-        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
+        encodeScope({
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-completion',
+              'requires-updates',
+              'in-review',
+              'sent-for-approval',
+              'in-external-validation',
+              'ready-to-print',
+              'ready-to-issue'
+            ]
+          }
+        }),
         encodeScope({
           type: 'record.search'
         }),
@@ -566,7 +597,18 @@ export function testDataGenerator(rngSeed?: number) {
         encodeScope({ type: 'record.request-correction' })
       ],
       fieldAgent: [
-        'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
+        encodeScope({
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-updates',
+              'sent-for-review'
+            ]
+          }
+        }),
         encodeScope({ type: 'record.search' }),
         encodeScope({ type: 'record.create' }),
         encodeScope({ type: 'record.read' }),
@@ -598,7 +640,18 @@ export function testDataGenerator(rngSeed?: number) {
        * record.create has placeOfEvent: 'location' so the field is fully locked.
        */
       communityLeader: [
-        'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]',
+        encodeScope({
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-updates',
+              'sent-for-review'
+            ]
+          }
+        }),
         encodeScope({ type: 'record.search' }),
         encodeScope({
           type: 'record.create',
@@ -628,7 +681,22 @@ export function testDataGenerator(rngSeed?: number) {
           type: 'organisation.read-locations',
           options: { accessLevel: 'location' }
         }),
-        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
+        encodeScope({
+          type: 'workqueue',
+          options: {
+            ids: [
+              'all-events',
+              'assigned-to-you',
+              'recent',
+              'requires-completion',
+              'requires-updates',
+              'in-review-all',
+              'in-external-validation',
+              'ready-to-print',
+              'ready-to-issue'
+            ]
+          }
+        }),
         encodeScope({ type: 'user.read-only-my-audit' }),
         encodeScope({ type: 'record.search' }),
         encodeScope({

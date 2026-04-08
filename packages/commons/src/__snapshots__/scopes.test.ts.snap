@@ -5,7 +5,7 @@ exports[`transform v1 scope to v2 1`] = `
   "fieldAgent": [
     {
       "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]",
-      "v2": "workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]",
+      "v2": "type=workqueue&ids=all-events,assigned-to-you,recent,requires-updates,sent-for-review",
     },
     {
       "v1": "search[event=birth,access=all]",
@@ -55,7 +55,7 @@ exports[`transform v1 scope to v2 1`] = `
     },
     {
       "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]",
-      "v2": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]",
+      "v2": "type=workqueue&ids=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review-all,in-external-validation,ready-to-print,ready-to-issue",
     },
     {
       "v1": "search[event=birth,access=all]",
@@ -225,7 +225,7 @@ exports[`transform v1 scope to v2 1`] = `
     },
     {
       "v1": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]",
-      "v2": "workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]",
+      "v2": "type=workqueue&ids=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review,sent-for-approval,in-external-validation,ready-to-print,ready-to-issue",
     },
     {
       "v1": "search[event=birth,access=all]",

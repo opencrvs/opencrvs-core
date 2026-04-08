@@ -15,7 +15,11 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes'
+import {
+  getAcceptedScopesByType,
+  RecordScopeTypeV2,
+  RecordScopeV2
+} from '../scopes'
 import {
   EventIndexWithAdministrativeHierarchy,
   userCanAccessEventWithScopes
@@ -132,14 +136,18 @@ export function isActionInScope({
     scopes
   })
 
-  const canAccess = userCanAccessEventWithScopes(event, matchingScopes, {
-    id: currentUser.id,
-    primaryOfficeId: currentUser.primaryOfficeId,
-    administrativeAreaId: currentUser.administrativeAreaId ?? null,
-    role: currentUser.role,
-    signature: currentUser.signature,
-    type: currentUser.type
-  })
+  const canAccess = userCanAccessEventWithScopes(
+    event,
+    matchingScopes as RecordScopeV2[],
+    {
+      id: currentUser.id,
+      primaryOfficeId: currentUser.primaryOfficeId,
+      administrativeAreaId: currentUser.administrativeAreaId ?? null,
+      role: currentUser.role,
+      signature: currentUser.signature,
+      type: currentUser.type
+    }
+  )
 
   return canAccess
 }

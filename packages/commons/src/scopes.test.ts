@@ -509,7 +509,7 @@ it('migrate v1 scopes to v2', () => {
     'organisation.read-locations:my-jurisdiction',
     'user.read:only-my-audit',
     'organisation.read-locations:my-office',
-    'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
+    'type=workqueue&ids=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review-all,in-external-validation,ready-to-print,ready-to-issue',
     'type=record.search&event=birth&placeOfEvent=all',
     'type=record.search&event=death&placeOfEvent=all',
     'type=record.search&event=tennis-club-membership&placeOfEvent=all',

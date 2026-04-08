@@ -19,7 +19,6 @@ import {
   ActionInputWithType,
   ActionType,
   DeleteActionInput,
-  findScope,
   getAssignedUserFromActions,
   getScopes,
   TokenUserType,
@@ -39,7 +38,8 @@ import {
   hasAnyScope,
   hasScope,
   getScopeOptionValue,
-  JurisdictionFilter
+  JurisdictionFilter,
+  getAcceptedScopesByType
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -153,17 +153,24 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   WorkqueueCountInput
 > = async ({ next, ctx, input }) => {
   const scopes = getScopes(ctx.token)
-  const workqueueScope = findScope(scopes, 'workqueue')
 
-  if (!workqueueScope) {
+  const workqueueScopes = getAcceptedScopesByType({
+    acceptedScopes: ['workqueue'],
+    scopes: scopes ?? []
+  })
+
+  if (!workqueueScopes || !workqueueScopes.length) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  const availableWorkqueues = workqueueScope.options.id
+  const availableWorkqueues = workqueueScopes.flatMap((s) =>
+    getScopeOptionValue(s, 'ids')
+  )
 
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
+
   return next()
 }
 

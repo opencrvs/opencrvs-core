@@ -128,15 +128,6 @@ const PlainScopeType = z.enum([
   'demo'
 ])
 
-const SystemScopeType = z.enum([
-  'organisation.read-locations',
-  'user.read',
-  'user.create',
-  'user.update'
-])
-
-export type SystemScopeType = z.infer<typeof SystemScopeType>
-
 const scopeByEvent = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
   .preprocess(
@@ -183,9 +174,19 @@ const AccessLevelOptions = z.object({
   accessLevel: JurisdictionFilter.optional()
 })
 
+const WorkqueueOptions = z.object({
+  ids: z
+    .preprocess(
+      (val) => (val === undefined ? undefined : [val].flat()),
+      z.array(z.string())
+    )
+    .describe('Must contain a list of workqueue ids.')
+})
+
 const AllScopeOptions = z.object({
   ...AllRecordScopeOptions.shape,
-  ...AccessLevelOptions.shape
+  ...AccessLevelOptions.shape,
+  ...WorkqueueOptions.shape
 })
 
 type AllScopeOptions = z.infer<typeof AllScopeOptions>
@@ -334,27 +335,41 @@ export const ResolvedRecordScopeV2 = z
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
 export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
-const SystemScope = z.discriminatedUnion('type', [
+export const Scope = z.discriminatedUnion('type', [
+  z.object({ type: PlainScopeType }),
+  ...RecordScopeV2.options,
   z.object({
-    type: SystemScopeType,
+    type: z.enum([
+      'organisation.read-locations',
+      'user.read',
+      'user.create',
+      'user.update'
+    ]),
     options: AccessLevelOptions.optional()
+  }),
+  z.object({
+    type: z.literal('workqueue'),
+    options: WorkqueueOptions
   })
 ])
 
-export const Scope = z.union([
-  z.object({ type: PlainScopeType }),
-  ...RecordScopeV2.options,
-  ...SystemScope.options
+const SystemScopeType = z.enum([
+  'organisation.read-locations',
+  'user.read',
+  'user.create',
+  'user.update'
 ])
+
+export type SystemScopeType = z.infer<typeof SystemScopeType>
 
 export type Scope = z.infer<typeof Scope>
 
 export const ScopeType = z.enum([
-  ...PlainScopeType.options,
+  ...SystemScopeType.options,
   ...RecordScopeTypeV2.options,
-  ...SystemScopeType.options
+  ...PlainScopeType.options,
+  'workqueue'
 ])
-
 export type ScopeType = z.infer<typeof ScopeType>
 
 const flattenScope = (scope: Scope) => ({
@@ -390,7 +405,7 @@ export const decodeScope = (query: string) => {
 }
 
 /** If a certain scope option is not set, we use the default value. */
-const DEFAULT_SCOPE_OPTIONS: AllScopeOptions = {
+const DEFAULT_SCOPE_OPTIONS: Partial<AllScopeOptions> = {
   placeOfEvent: JurisdictionFilter.enum.all,
   accessLevel: JurisdictionFilter.enum.all
 }
@@ -474,6 +489,15 @@ export const v1ScopeToV2Scope = (v1Scope: string) => {
       throw new Error(`Unsupported V1 scope type: ${configurableV1Scope.type}`)
     }
 
+    if (configurableV1Scope.type === 'workqueue') {
+      return encodeScope({
+        type: 'workqueue',
+        options: {
+          ids: configurableV1Scope.options.id || []
+        }
+      })
+    }
+
     if (configurableV1Scope.type === 'search') {
       return encodeScope({
         type: type as RecordScopeTypeV2,
@@ -515,7 +539,7 @@ export function getAcceptedScopesByType({
 }: {
   acceptedScopes: ScopeType[]
   scopes: string[]
-}): RecordScopeV2[] {
+}): Scope[] {
   return scopes
     .map((scope) => {
       const parsedScope = decodeScope(scope)
@@ -526,7 +550,7 @@ export function getAcceptedScopesByType({
         ? parsedScope
         : null
     })
-    .filter((scope): scope is RecordScopeV2 => scope !== null)
+    .filter((scope): scope is Scope => scope !== null)
 }
 
 /**

@@ -117,7 +117,12 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
+  encodeScope({
+    type: 'workqueue',
+    options: {
+      ids: ['assigned-to-you', 'recent', 'requires-updates', 'sent-for-review']
+    }
+  }),
   encodeScope({
     type: 'record.read',
     options: {
