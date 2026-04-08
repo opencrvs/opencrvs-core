@@ -3180,7 +3180,7 @@ components:
                                 - organisation.read-locations
                                 - user.read
                                 - user.create
-                                - user.update
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
@@ -7633,7 +7633,7 @@ components:
                                 - organisation.read-locations
                                 - user.read
                                 - user.create
-                                - user.update
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
@@ -8032,7 +8032,7 @@ components:
                                 - organisation.read-locations
                                 - user.read
                                 - user.create
-                                - user.update
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
@@ -8269,7 +8269,7 @@ components:
                                 - organisation.read-locations
                                 - user.read
                                 - user.create
-                                - user.update
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
@@ -8505,7 +8505,7 @@ components:
                                 - organisation.read-locations
                                 - user.read
                                 - user.create
-                                - user.update
+                                - user.edit
                                 - record.search
                                 - record.create
                                 - record.read
