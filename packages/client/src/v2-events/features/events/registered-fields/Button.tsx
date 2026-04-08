@@ -44,10 +44,10 @@ function ButtonInput({
     icon,
     loading = false,
     text,
-    buttonSize,
-    buttonType,
-    textColor,
-    textVariant
+    buttonSize = 'medium',
+    buttonType = 'secondary',
+    textColor = 'copy',
+    textVariant = 'bold14'
   } = configuration
 
   const handleClick = () => onChange(value + 1)

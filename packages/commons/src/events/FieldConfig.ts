@@ -796,18 +796,10 @@ const ButtonConfiguration = z.object({
     .boolean()
     .optional()
     .describe('Whether the button is in a loading state and shows a spinner'),
-  buttonSize: ButtonSize.optional()
-    .default('medium')
-    .describe('Size of the button.'),
-  buttonType: ButtonType.optional()
-    .default('secondary')
-    .describe('Type of the button.'),
-  textColor: TextColor.optional()
-    .default('copy')
-    .describe('Color of the text.'),
-  textVariant: TextVariant.optional()
-    .default('bold14')
-    .describe('Variant of the text.'),
+  buttonSize: ButtonSize.optional().describe('Size of the button.'),
+  buttonType: ButtonType.optional().describe('Type of the button.'),
+  textColor: TextColor.optional().describe('Color of the text.'),
+  textVariant: TextVariant.optional().describe('Variant of the text.'),
   text: TranslationConfig.describe('Text to display on the button')
 })
 
