@@ -11,7 +11,7 @@
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import * as z from 'zod/v4'
-import { RecordScopeV2, ScopeType, decodeScope, Scope } from './scopes'
+import { ScopeType, decodeScope, Scope } from './scopes'
 import { UUID } from './uuid'
 export * from './scopes'
 
@@ -38,9 +38,7 @@ export function getAcceptedScopesFromToken<T extends ScopeType>(
         ? parsedScope
         : null
     })
-    .filter(
-      (scope): scope is Extract<RecordScopeV2, { type: T }> => scope !== null
-    )
+    .filter((scope): scope is Extract<Scope, { type: T }> => scope !== null)
 }
 
 /*
