@@ -27,18 +27,17 @@ export const MIGRATED_LEGACY_SCOPES = {
   PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
   PERFORMANCE_READ: 'performance.read',
   PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
-  CONFIG_UPDATE_ALL: 'config.update:all'
+  CONFIG_UPDATE_ALL: 'config.update:all',
+  ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
+  ORGANISATION_READ_LOCATIONS_MY_OFFICE:
+    'organisation.read-locations:my-office',
+  ORGANISATION_READ_LOCATIONS_MY_JURISDICTION:
+    'organisation.read-locations:my-jurisdiction'
 }
 
 /** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
 export const SCOPES = {
   DEMO: 'demo',
-
-  ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
-  ORGANISATION_READ_LOCATIONS_MY_OFFICE:
-    'organisation.read-locations:my-office',
-  ORGANISATION_READ_LOCATIONS_MY_JURISDICTION:
-    'organisation.read-locations:my-jurisdiction',
 
   USER_READ: 'user.read:all',
   USER_READ_MY_OFFICE: 'user.read:my-office',
@@ -63,9 +62,9 @@ const LiteralScopes = z.union([
   z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ),
   z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS),
   z.literal(SCOPES.DEMO),
-  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS),
-  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
-  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),
+  z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS),
+  z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
+  z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),
   z.literal(SCOPES.USER_READ),
   z.literal(SCOPES.USER_READ_MY_OFFICE),
   z.literal(SCOPES.USER_READ_MY_JURISDICTION),
@@ -141,15 +140,10 @@ const PlainScopeType = z.enum([
   'attachment.upload',
 
   // User management scopes
-  // TODO CIHAN: these might require jurisdiction filters??
   'user.read',
   'user.create',
   'user.update',
   'profile.electronic-signature',
-
-  // Location scopes
-  'organisation.read-locations',
-
   // Performance dashboard
   'performance.read',
   'performance.read-dashboards',
@@ -163,10 +157,14 @@ const PlainScopeType = z.enum([
   'demo'
 ])
 
+export const SystemScopeType = z.enum(['organisation.read-locations'])
+
 export const ScopeType = z.enum([
   ...PlainScopeType.options,
-  ...RecordScopeTypeV2.options
+  ...RecordScopeTypeV2.options,
+  ...SystemScopeType.options
 ])
+
 export type ScopeType = z.infer<typeof ScopeType>
 
 const scopeByEvent = z
@@ -351,9 +349,23 @@ export const ResolvedRecordScopeV2 = z
   ])
   .describe('Resolved scope with location/user IDs instead of filters.')
 
+const SystemScope = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('organisation.read-locations'),
+    options: z.object({ accessLevel: JurisdictionFilter.optional() }).optional()
+  })
+  // z.object({
+  //   type: z.literal('user.read'),
+  //   options: z
+  //     .object({ accessLevel: JurisdictionFilter.or(UserFilter).optional() })
+  //     .optional()
+  // })
+])
+
 export const Scope = z.union([
   z.object({ type: PlainScopeType }),
-  ...RecordScopeV2.options
+  ...RecordScopeV2.options,
+  ...SystemScope.options
 ])
 export type Scope = z.infer<typeof Scope>
 
@@ -621,6 +633,7 @@ export function hasScope(
 
   return hasAnyScope(tokenOrScopes, [scope])
 }
+
 /**
  * Checks if the given event type is allowed by the scope. If no specific event types are defined, it returns true.
  *

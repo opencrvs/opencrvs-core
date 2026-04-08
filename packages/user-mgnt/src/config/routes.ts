@@ -255,10 +255,20 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            SCOPES.ORGANISATION_READ_LOCATIONS,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-            'type=user.data-seeding'
+            encodeScope({ type: 'organisation.read-locations' }),
+            encodeScope({
+              type: 'organisation.read-locations',
+              options: { accessLevel: 'location' }
+            }),
+            encodeScope({
+              type: 'organisation.read-locations',
+              options: { accessLevel: 'administrativeArea' }
+            }),
+            encodeScope({
+              type: 'organisation.read-locations',
+              options: { accessLevel: 'all' }
+            }),
+            encodeScope({ type: 'user.data-seeding' })
           ]
         },
         validate: {

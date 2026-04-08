@@ -106,7 +106,7 @@ describe('authenticate handler receives a request', () => {
         SCOPES.USER_CREATE,
         SCOPES.USER_READ,
         SCOPES.USER_UPDATE,
-        SCOPES.ORGANISATION_READ_LOCATIONS,
+        encodeScope({ type: 'organisation.read-locations' }),
         encodeScope({ type: 'performance.read' }),
         encodeScope({ type: 'performance.read-dashboards' }),
         encodeScope({ type: 'performance.vital-statistics-export' })

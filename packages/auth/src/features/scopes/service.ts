@@ -64,8 +64,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       }),
       encodeScope({ type: 'performance.read' }),
       encodeScope({ type: 'performance.read-dashboards' }),
-      SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+      encodeScope({ type: 'organisation.read-locations' })
     ]
   },
   {
@@ -97,8 +96,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       encodeScope({ type: 'performance.read' }),
       encodeScope({ type: 'performance.read-dashboards' }),
       encodeScope({ type: 'profile.electronic-signature' }),
-      SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+      encodeScope({ type: 'organisation.read-locations' })
     ]
   },
   {
@@ -112,7 +110,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.USER_READ_MY_OFFICE,
       SCOPES.USER_CREATE_MY_JURISDICTION,
       SCOPES.USER_UPDATE_MY_JURISDICTION,
-      SCOPES.ORGANISATION_READ_LOCATIONS,
+      encodeScope({ type: 'organisation.read-locations' }),
       encodeScope({ type: 'performance.read' }),
       encodeScope({ type: 'performance.read-dashboards' }),
       encodeScope({ type: 'performance.vital-statistics-export' })
@@ -129,7 +127,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       SCOPES.USER_CREATE,
       SCOPES.USER_READ,
       SCOPES.USER_UPDATE,
-      SCOPES.ORGANISATION_READ_LOCATIONS,
+      encodeScope({ type: 'organisation.read-locations' }),
       encodeScope({ type: 'performance.read' }),
       encodeScope({ type: 'performance.read-dashboards' }),
       encodeScope({ type: 'performance.vital-statistics-export' })

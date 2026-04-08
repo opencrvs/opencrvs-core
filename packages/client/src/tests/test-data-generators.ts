@@ -498,7 +498,10 @@ export function testDataGenerator(rngSeed?: number) {
         encodeScope({ type: 'performance.read' }),
         encodeScope({ type: 'performance.read-dashboards' }),
         encodeScope({ type: 'profile.electronic-signature' }),
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+        encodeScope({
+          type: 'organisation.read-locations',
+          options: { accessLevel: 'location' }
+        }),
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
         SCOPES.USER_READ_ONLY_MY_AUDIT,
         encodeScope({ type: 'record.search' }),
@@ -535,7 +538,10 @@ export function testDataGenerator(rngSeed?: number) {
       registrationAgent: [
         encodeScope({ type: 'performance.read' }),
         encodeScope({ type: 'performance.read-dashboards' }),
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+        encodeScope({
+          type: 'organisation.read-locations',
+          options: { accessLevel: 'location' }
+        }),
         SCOPES.USER_READ_ONLY_MY_AUDIT,
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
         encodeScope({
@@ -573,11 +579,13 @@ export function testDataGenerator(rngSeed?: number) {
         SCOPES.USER_READ_MY_OFFICE,
         SCOPES.USER_READ_MY_JURISDICTION,
         SCOPES.USER_UPDATE_MY_JURISDICTION,
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
+        encodeScope({
+          type: 'organisation.read-locations',
+          options: { accessLevel: 'administrativeArea' }
+        }),
         encodeScope({ type: 'performance.read' }),
         encodeScope({ type: 'performance.read-dashboards' }),
         encodeScope({ type: 'performance.vital-statistics-export' }),
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
         'user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]',
         'user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]'
       ],
@@ -612,7 +620,10 @@ export function testDataGenerator(rngSeed?: number) {
         encodeScope({ type: 'performance.read' }),
         encodeScope({ type: 'performance.read-dashboards' }),
         encodeScope({ type: 'profile.electronic-signature' }),
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+        encodeScope({
+          type: 'organisation.read-locations',
+          options: { accessLevel: 'location' }
+        }),
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
         SCOPES.USER_READ_ONLY_MY_AUDIT,
         encodeScope({ type: 'record.search' }),

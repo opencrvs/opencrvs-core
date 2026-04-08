@@ -12,12 +12,13 @@ import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
   findScope,
-  getAcceptedScopesByType,
   User,
   Location,
   hasScope as hasScopeFromCommons,
   hasAnyScope as hasAnyScopeFromCommons,
-  ScopeType
+  ScopeType,
+  getAcceptedScopesByType,
+  getScopeOptionValue
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
@@ -124,6 +125,18 @@ export function usePermissions() {
     if (!userPrimaryOfficeId) {
       return false
     }
+
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['organisation.read-locations'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      // @ts-expect-error foo
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    console.log(accessLevels)
 
     // TODO CIHAN: remember this!!
     if (hasScope('organisation.read-locations')) {
