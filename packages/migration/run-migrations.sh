@@ -49,14 +49,16 @@ run_pg_migrations() {
 
   mkdir -p "$BACKUP_PATH"
 
-  FILES_TO_MIGRATE=$(ls -p "$MIGRATIONS_PATH" | grep -v /)
+  # Only SQL files need envsubst — JS migration files use process.env directly
+  # and running envsubst on them would corrupt JS template literals (${...} syntax)
+  SQL_FILES_TO_MIGRATE=$(ls -p "$MIGRATIONS_PATH" | grep -v / | grep '\.sql$' || true)
 
   # --- define cleanup function ---
   # As this function is being called via 'trap', the variables
   # used inside need to be global
   restore_backups() {
     echo "Restoring original migration files in $MIGRATIONS_PATH"
-    for migration_file in $FILES_TO_MIGRATE; do
+    for migration_file in $SQL_FILES_TO_MIGRATE; do
       if [ -f "$BACKUP_PATH/$migration_file" ]; then
         mv "$BACKUP_PATH/$migration_file" "$MIGRATIONS_PATH/$migration_file"
       fi
@@ -68,13 +70,13 @@ run_pg_migrations() {
   trap restore_backups EXIT
 
   # --- Backup originals ---
-  for migration_file in $FILES_TO_MIGRATE; do
+  for migration_file in $SQL_FILES_TO_MIGRATE; do
     echo "Creating backup for $MIGRATIONS_PATH/$migration_file"
     cp "$MIGRATIONS_PATH/$migration_file" "$BACKUP_PATH/$migration_file"
   done
 
   # --- envsubst ---
-  for migration_file in $FILES_TO_MIGRATE; do
+  for migration_file in $SQL_FILES_TO_MIGRATE; do
     echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
     envsubst <"$MIGRATIONS_PATH/$migration_file" >"$MIGRATIONS_PATH/$migration_file.tmp"
     mv "$MIGRATIONS_PATH/$migration_file.tmp" "$MIGRATIONS_PATH/$migration_file"
