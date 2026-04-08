@@ -11,6 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import { ITokenPayload } from '@user-mgnt/utils/token'
 import decode from 'jwt-decode'
+import { hasScope } from '@opencrvs/commons'
 
 export const statuses = {
   PENDING: 'pending',
@@ -19,11 +20,11 @@ export const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
-export interface IAuthHeader {
+interface IAuthHeader {
   Authorization: string
 }
 
-export const hasScope = (request: Hapi.Request, scope: string): boolean => {
+export function hasDemoScope(request: Hapi.Request): boolean {
   if (
     !request.auth ||
     !request.auth.credentials ||
@@ -31,14 +32,11 @@ export const hasScope = (request: Hapi.Request, scope: string): boolean => {
   ) {
     return false
   }
-  return request.auth.credentials.scope.includes(scope)
+
+  return hasScope(request.auth.credentials.scope, 'demo')
 }
 
-export function hasDemoScope(request: Hapi.Request): boolean {
-  return hasScope(request, 'demo')
-}
-
-export const getTokenPayload = (token: string): ITokenPayload => {
+const getTokenPayload = (token: string): ITokenPayload => {
   let decoded: ITokenPayload
   try {
     decoded = decode(token)

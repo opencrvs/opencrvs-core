@@ -35,13 +35,12 @@ export const MIGRATED_LEGACY_SCOPES = {
     'organisation.read-locations:my-jurisdiction',
   USER_CREATE: 'user.create:all',
   USER_READ: 'user.read:all',
-  USER_UPDATE: 'user.update:all'
+  USER_UPDATE: 'user.update:all',
+  DEMO: 'demo'
 }
 
 /** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
 export const SCOPES = {
-  DEMO: 'demo',
-
   USER_READ_MY_OFFICE: 'user.read:my-office',
   USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
   USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit', //v1.8
@@ -61,7 +60,7 @@ const LiteralScopes = z.union([
   z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS),
   z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ),
   z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS),
-  z.literal(SCOPES.DEMO),
+  z.literal(MIGRATED_LEGACY_SCOPES.DEMO),
   z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS),
   z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
   z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),

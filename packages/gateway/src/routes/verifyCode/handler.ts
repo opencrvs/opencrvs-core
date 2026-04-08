@@ -26,7 +26,8 @@ import {
   logger,
   personNameFromV1ToV2,
   TriggerEvent,
-  triggerUserEventNotification
+  triggerUserEventNotification,
+  hasScope
 } from '@opencrvs/commons'
 import * as t from 'io-ts'
 import * as F from 'fp-ts'
@@ -157,7 +158,7 @@ export async function generateAndSendVerificationCode(
   mobile?: string,
   email?: string
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1
+  const isDemoUser = hasScope(scope, 'demo')
   logger.info(
     `isDemoUser,
       ${JSON.stringify({

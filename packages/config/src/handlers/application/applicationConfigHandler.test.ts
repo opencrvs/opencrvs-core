@@ -18,7 +18,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 
 const token = jwt.sign(
-  { scope: ['config.update:all'] },
+  { scope: ['type=config.update-all'] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
