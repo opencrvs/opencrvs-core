@@ -235,7 +235,8 @@ export const getRoutes = () => {
         description: 'Retrieves a user mobile number',
         auth: {
           scope: [
-            SCOPES.USER_READ,
+            encodeScope({ type: 'user.read' }),
+            // TODO CIHAN
             SCOPES.USER_READ_MY_JURISDICTION,
             SCOPES.USER_READ_MY_OFFICE
           ]
@@ -380,7 +381,10 @@ export const getRoutes = () => {
       handler: resendInviteHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
+          scope: [
+            encodeScope({ type: 'user.update' }),
+            SCOPES.USER_UPDATE_MY_JURISDICTION
+          ]
         },
         validate: {
           payload: resendInviteRequestSchema
@@ -395,7 +399,10 @@ export const getRoutes = () => {
       handler: usernameReminderHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
+          scope: [
+            encodeScope({ type: 'user.update' }),
+            SCOPES.USER_UPDATE_MY_JURISDICTION
+          ]
         },
         validate: {
           payload: usernameReminderRequestSchema
@@ -410,7 +417,10 @@ export const getRoutes = () => {
       handler: resetPasswordInviteHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
+          scope: [
+            encodeScope({ type: 'user.update' }),
+            SCOPES.USER_UPDATE_MY_JURISDICTION
+          ]
         },
         validate: {
           payload: resetPasswordRequestSchema

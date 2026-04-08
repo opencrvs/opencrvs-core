@@ -16,7 +16,8 @@ import {
   generateUuid,
   TestUserRole,
   ActionType,
-  createPrng
+  createPrng,
+  encodeScope
 } from '@opencrvs/commons'
 import {
   createEvent,
@@ -82,7 +83,9 @@ test('Throws error when accessing other user with scope for own audit', async ()
 
 test('Find user by id outside of jurisdiction with global scope', async () => {
   const { users } = await setupTestCase()
-  const client = createTestClient(users[0], [SCOPES.USER_READ])
+  const client = createTestClient(users[0], [
+    encodeScope({ type: 'user.read' })
+  ])
 
   await expect(
     client.user.actions({
@@ -250,7 +253,9 @@ test('Find user with appropriate scopes', async () => {
 
 test('Returns user actions', async () => {
   const { users, generator } = await setupTestCase()
-  const clientThatSearchesUser = createTestClient(users[0], [SCOPES.USER_READ])
+  const clientThatSearchesUser = createTestClient(users[0], [
+    encodeScope({ type: 'user.read' })
+  ])
   const userThatDoesThings = users[1]
   const clientThatDoesThings = createTestClient(userThatDoesThings)
 
