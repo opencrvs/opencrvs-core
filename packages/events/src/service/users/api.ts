@@ -8,21 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { randomUUID } from 'crypto'
 import fetch from 'node-fetch'
 import { z } from 'zod'
 import {
   DocumentPath,
   IUserName,
+  SCOPES,
   TokenUserType,
   UUID,
   User,
   UserInput,
   UserOrSystem,
+  hasScope,
   isUUID,
   joinUrl,
-  logger
+  logger,
+  personNameFromV1ToV2,
+  triggerUserEventNotification
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
@@ -31,9 +33,12 @@ import {
 } from '@events/storage/postgres/events/system-clients'
 import {
   getUserById,
-  createUserWithCredentials
+  createUserWithCredentials,
+  searchUsersWithInput,
+  activateUserWithCredentials
 } from '@events/storage/postgres/events/users'
-import { generateSaltedHash } from '@events/service/auth/hash'
+import { generateSaltedHash, generateHash } from '@events/service/auth/hash'
+import { generateUsername } from './users'
 
 type UserAPIResult = {
   id: string
@@ -59,7 +64,7 @@ type UserAPIResult = {
   creationDate: number
 }
 
-type SearchUsersPayload = {
+export type SearchUsersPayload = {
   username?: string
   mobile?: string
   email?: string
@@ -94,6 +99,7 @@ export async function getUser(
     role: user.role,
     email: user.email ?? undefined,
     mobile: user.mobile ?? undefined,
+    device: user.device ?? undefined,
     username: user.username,
     status: user.status as User['status'],
     signature: user.signaturePath
@@ -142,37 +148,28 @@ export async function findUserOrSystem(
 }
 
 export async function searchUsers(
-  payload: SearchUsersPayload,
-  token: string
+  payload: SearchUsersPayload
 ): Promise<User[]> {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'searchUsers').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error(
-      `Unable to search users. Error: ${res.status} status received`
-    )
-  }
-
-  const { results } = (await res.json()) as SearchUsersResult
+  const results = await searchUsersWithInput(payload)
 
   return results.map((user) => ({
     type: TokenUserType.enum.user,
     id: user.id,
-    name: user.name,
+    name: [
+      {
+        use: 'en',
+        given: [user.firstname ?? ''],
+        family: user.surname ?? ''
+      }
+    ],
     role: user.role,
-    signature: user.signature?.data ? user.signature.data : undefined,
-    avatar: user.avatar?.data ? user.avatar.data : undefined,
-    primaryOfficeId: user.primaryOfficeId,
+    signature: user.signaturePath
+      ? (user.signaturePath as DocumentPath)
+      : undefined,
+    avatar: user.profileImagePath
+      ? (user.profileImagePath as DocumentPath)
+      : undefined,
+    primaryOfficeId: user.officeId,
     status: user.status as User['status'],
     device: user.device ? user.device : undefined,
     fullHonorificName: user.fullHonorificName
@@ -211,62 +208,115 @@ export async function updateUser(
   return getUser(input.id)
 }
 
-export async function createUser(input: CreateUserPayload, _token: string) {
-  if (!input.username) {
-    throw new Error('username is required')
+function hasDemoScope(request: string): boolean {
+  return hasScope(request, SCOPES.DEMO)
+}
+
+function generateRandomPassword(demoUser?: boolean) {
+  if (!!demoUser) {
+    return 'test'
   }
 
+  const length = 6
+  const charset =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+  let randomPassword = ''
+  for (let i = 0; i < length; i += 1) {
+    randomPassword += charset.charAt(Math.floor(Math.random() * charset.length))
+  }
+
+  return randomPassword
+}
+
+export async function sendCredentialsNotification(
+  userFullName: IUserName[],
+  username: string,
+  password: string,
+  token: string,
+  msisdn?: string,
+  email?: string
+) {
+  try {
+    await triggerUserEventNotification({
+      event: 'user-created',
+      payload: {
+        recipient: {
+          name: personNameFromV1ToV2(userFullName),
+          email,
+          mobile: msisdn
+        },
+        username,
+        temporaryPassword: password
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: token }
+    })
+  } catch (err) {
+    logger.error(`Unable to send notification for error : ${err}`)
+  }
+}
+
+export async function createUser(input: CreateUserPayload, _token: string) {
   const englishName = input.name.find((n) => n.use === 'en') ?? input.name[0]
 
   // Hash the provided password, or generate a random placeholder for pending
   // users who will set their own password via the activation flow.
-  const { hash, salt } = await generateSaltedHash(
-    input.password ?? randomUUID()
-  )
+  const password =
+    input.password ?? generateRandomPassword(hasDemoScope(_token))
+  const { hash, salt } = await generateSaltedHash(password)
+
+  const userPayload = {
+    firstname: englishName?.given[0] ?? null,
+    surname: englishName?.family ?? null,
+    email: input.email ?? null,
+    fullHonorificName: input.fullHonorificName ?? null,
+    role: input.role,
+    device: input.device ?? null,
+    officeId: input.primaryOfficeId as UUID,
+    mobile: input.mobile ?? null,
+    status: input.status ?? 'pending'
+  }
+
+  const userCredentialPayload = {
+    username: input.username ?? (await generateUsername(input.name)),
+    passwordHash: hash,
+    salt,
+    securityQuestions: []
+  }
 
   const postgresId = await createUserWithCredentials(
-    {
-      firstname: englishName?.given[0] ?? null,
-      surname: englishName?.family ?? null,
-      fullHonorificName: input.fullHonorificName ?? null,
-      role: input.role,
-      status: input.status ?? 'pending',
-      email: input.email ?? null,
-      mobile: input.mobile ?? null,
-      officeId: input.primaryOfficeId as UUID
-    },
-    {
-      username: input.username,
-      passwordHash: hash,
-      salt,
-      securityQuestions: []
-    }
+    userPayload,
+    userCredentialPayload
+  )
+
+  sendCredentialsNotification(
+    input.name,
+    userCredentialPayload.username,
+    password,
+    _token,
+    userPayload.mobile ?? undefined,
+    userPayload.email
   )
 
   return getUser(postgresId)
 }
 
-export async function activateUser(
-  input: { userId: string; password: string; securityQNAs: unknown[] },
-  token: string
-) {
-  const res = await fetch(
-    joinUrl(env.USER_MANAGEMENT_URL, 'activateUser').href,
-    {
-      method: 'POST',
-      body: JSON.stringify(input),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token
-      }
-    }
+export async function activateUser(input: {
+  userId: string
+  password: string
+  securityQNAs: { questionKey: string; answer: string }[]
+}): Promise<void> {
+  const { hash, salt } = await generateSaltedHash(input.password)
+
+  const securityQuestions = await Promise.all(
+    input.securityQNAs.map(async (qna) => ({
+      questionKey: qna.questionKey,
+      answerHash: await generateHash(qna.answer.toLowerCase(), salt)
+    }))
   )
 
-  if (!res.ok) {
-    throw new Error(
-      `Unable to change password. Error: ${res.status} status received`
-    )
-  }
+  await activateUserWithCredentials(input.userId, hash, salt, securityQuestions)
 }
 
 export async function changeUserPhone(

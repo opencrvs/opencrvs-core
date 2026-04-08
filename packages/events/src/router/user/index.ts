@@ -306,10 +306,12 @@ export const userRouter = router({
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
-        const existingWithMobile = await searchUsers(
-          { mobile: input.mobile, count: 1, skip: 0, sortOrder: 'asc' },
-          ctx.token
-        )
+        const existingWithMobile = await searchUsers({
+          mobile: input.mobile,
+          count: 1,
+          skip: 0,
+          sortOrder: 'asc'
+        })
         if (existingWithMobile.length > 0) {
           logger.error(
             `Phone number ${input.mobile} is already in use by another user`
@@ -318,16 +320,31 @@ export const userRouter = router({
         }
       }
       if (input.email) {
-        const existingWithEmail = await searchUsers(
-          { email: input.email, count: 1, skip: 0, sortOrder: 'asc' },
-          ctx.token
-        )
+        const existingWithEmail = await searchUsers({
+          email: input.email,
+          count: 1,
+          skip: 0,
+          sortOrder: 'asc'
+        })
         if (existingWithEmail.length > 0) {
           logger.error(`Email ${input.email} is already in use by another user`)
           throw new TRPCError({ code: 'CONFLICT', message: 'DUPLICATE_EMAIL' })
         }
       }
-      return createUser(input, ctx.token)
+      const user = await createUser(input, ctx.token)
+      await writeAuditLog({
+        ...input,
+        clientId: user.id,
+        clientType: user.type,
+        operation: 'user.create_user',
+        requestData: {
+          subjectId: user.id,
+          role: user.role,
+          primaryOfficeId: user.primaryOfficeId
+        }
+      })
+
+      return user
     }),
   update: userAndSystemProcedure
     .use(allowedWithAnyOfScopes(['user.edit']))
@@ -335,10 +352,12 @@ export const userRouter = router({
     .output(User)
     .mutation(async ({ input, ctx }) => {
       if (input.mobile) {
-        const existingWithMobile = await searchUsers(
-          { mobile: input.mobile, count: 1, skip: 0, sortOrder: 'asc' },
-          ctx.token
-        )
+        const existingWithMobile = await searchUsers({
+          mobile: input.mobile,
+          count: 1,
+          skip: 0,
+          sortOrder: 'asc'
+        })
         if (
           existingWithMobile.length > 0 &&
           existingWithMobile[0].id !== input.id
@@ -350,10 +369,12 @@ export const userRouter = router({
         }
       }
       if (input.email) {
-        const existingWithEmail = await searchUsers(
-          { email: input.email, count: 1, skip: 0, sortOrder: 'asc' },
-          ctx.token
-        )
+        const existingWithEmail = await searchUsers({
+          email: input.email,
+          count: 1,
+          skip: 0,
+          sortOrder: 'asc'
+        })
         if (
           existingWithEmail.length > 0 &&
           existingWithEmail[0].id !== input.id
@@ -371,7 +392,7 @@ export const userRouter = router({
   search: userAndSystemProcedure
     .input(UserSearch)
     .output(z.array(UserOrSystem))
-    .query(async ({ input, ctx }) => searchUsers(input, ctx.token)),
+    .query(async ({ input, ctx }) => searchUsers(input)),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadOtherUser)
@@ -502,15 +523,12 @@ export const userRouter = router({
         })
       }
 
-      const userWithDuplicateNumber = await searchUsers(
-        {
-          email: user.email,
-          count: 1,
-          skip: 0,
-          sortOrder: 'asc'
-        },
-        ctx.token
-      )
+      const userWithDuplicateNumber = await searchUsers({
+        email: user.email,
+        count: 1,
+        skip: 0,
+        sortOrder: 'asc'
+      })
 
       if (
         userWithDuplicateNumber.length > 0 &&
@@ -555,15 +573,12 @@ export const userRouter = router({
         })
       }
 
-      const userWithDuplicateEmail = await searchUsers(
-        {
-          email: input.email,
-          count: 1,
-          skip: 0,
-          sortOrder: 'asc'
-        },
-        ctx.token
-      )
+      const userWithDuplicateEmail = await searchUsers({
+        email: input.email,
+        count: 1,
+        skip: 0,
+        sortOrder: 'asc'
+      })
 
       if (
         userWithDuplicateEmail.length > 0 &&
@@ -601,9 +616,20 @@ export const userRouter = router({
       await changeUserAvatar(input, ctx.token)
     }),
   activate: userOnlyProcedure
-    .input(z.any())
-    .mutation(async ({ input, ctx }) => {
-      return activateUser(input, ctx.token)
+    .input(
+      z.object({
+        userId: z.string(),
+        password: z.string(),
+        securityQNAs: z.array(
+          z.object({
+            questionKey: z.string(),
+            answer: z.string()
+          })
+        )
+      })
+    )
+    .mutation(async ({ input }) => {
+      return activateUser(input)
     }),
   deactivateSuperUser: userAndSystemProcedure
     .use(

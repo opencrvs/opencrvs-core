@@ -9,7 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TokenUserType, User, UserOrSystem } from '@opencrvs/commons'
+import {
+  logger,
+  TokenUserType,
+  User,
+  UserInput,
+  UserOrSystem
+} from '@opencrvs/commons'
+import { checkUsername } from '@events/storage/postgres/events/users'
 import { findUserOrSystem } from './api'
 /**
  * Retrieves multiple users/systems by their IDs.
@@ -29,4 +36,48 @@ export const getUsersById = async (ids: string[]): Promise<UserOrSystem[]> => {
 
 export function isUser(userOrSystem: UserOrSystem): userOrSystem is User {
   return userOrSystem.type === TokenUserType.enum.user
+}
+
+export async function generateUsername(
+  names: UserInput['name'],
+  existingUserName?: string
+) {
+  const { given = [], family = '' } =
+    names.find((name) => name.use === 'en') || {}
+  const initials = given.reduce(
+    (accumulated, current) => accumulated + current.trim().charAt(0),
+    ''
+  )
+
+  let proposedUsername = `${initials}${initials === '' ? '' : '.'}${family
+    .trim()
+    .replace(/ /g, '-')}`.toLowerCase()
+
+  if (proposedUsername.length < 3) {
+    proposedUsername =
+      proposedUsername + '0'.repeat(3 - proposedUsername.length)
+  }
+
+  if (existingUserName && existingUserName === proposedUsername) {
+    return proposedUsername
+  }
+
+  try {
+    let usernameTaken = await checkUsername(proposedUsername)
+    let i = 1
+    const copyProposedName = proposedUsername
+    while (usernameTaken) {
+      if (existingUserName && existingUserName === proposedUsername) {
+        return proposedUsername
+      }
+      proposedUsername = copyProposedName + i
+      i += 1
+      usernameTaken = await checkUsername(proposedUsername)
+    }
+  } catch (err) {
+    logger.error(`Failed username generation: ${err}`)
+    throw new Error('Failed username generation')
+  }
+
+  return proposedUsername
 }
