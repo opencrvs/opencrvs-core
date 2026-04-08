@@ -269,7 +269,7 @@ function debouncePromise<Args extends any[], R>(
 function AutocompleteInput(props: AutocompleteProps) {
   const { id, onChange, value, configuration, error, touched } = props
 
-  const defaultOptions = configuration?.defaultOptions
+  const defaultOptions = configuration.defaultOptions
 
   const fetchOptions = useCallback(
     async (inputValue: string): Promise<AutocompleteValue[]> => {
