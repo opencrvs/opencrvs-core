@@ -156,10 +156,10 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
 
   const workqueueScopes = getAcceptedScopesByType({
     acceptedScopes: ['workqueue'],
-    scopes: scopes ?? []
+    scopes
   })
 
-  if (!workqueueScopes || !workqueueScopes.length) {
+  if (!workqueueScopes.length) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 

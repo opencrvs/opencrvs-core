@@ -335,32 +335,22 @@ export const ResolvedRecordScopeV2 = z
 export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
 export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
 
-export const Scope = z.discriminatedUnion('type', [
-  z.object({ type: PlainScopeType }),
-  ...RecordScopeV2.options,
-  z.object({
-    type: z.enum([
-      'organisation.read-locations',
-      'user.read',
-      'user.create',
-      'user.update'
-    ]),
-    options: AccessLevelOptions.optional()
-  }),
-  z.object({
-    type: z.literal('workqueue'),
-    options: WorkqueueOptions
-  })
-])
-
 const SystemScopeType = z.enum([
   'organisation.read-locations',
   'user.read',
   'user.create',
-  'user.update'
+  'user.edit'
 ])
 
 export type SystemScopeType = z.infer<typeof SystemScopeType>
+
+/** The primary scope schema which gathers all scope types together. All scopes are discriminated by type and options are determined according to the type. */
+export const Scope = z.discriminatedUnion('type', [
+  z.object({ type: PlainScopeType }),
+  ...RecordScopeV2.options,
+  z.object({ type: SystemScopeType, options: AccessLevelOptions.optional() }),
+  z.object({ type: z.literal('workqueue'), options: WorkqueueOptions })
+])
 
 export type Scope = z.infer<typeof Scope>
 

@@ -11,8 +11,6 @@
 
 import * as z from 'zod/v4'
 
-// TODO CIHAN: this whole file!!!
-
 /**
  * @deprecated - will be removed in v2.1.
  * Configurable scopes are for example:
