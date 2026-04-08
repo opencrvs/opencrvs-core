@@ -13,7 +13,10 @@ import { env } from '@user-mgnt/environment'
 import User from '@user-mgnt/model/user'
 import { resolveLocationChildren } from '@user-mgnt/utils/location'
 
-export async function countUsersByLocation(locationId: UUID | undefined) {
+export async function countUsersByLocation(
+  locationId: UUID | undefined,
+  token: string
+) {
   // For the whole country
   const roles = await fetchJSON<Roles>(
     joinUrl(env.COUNTRY_CONFIG_URL, '/config/roles')
@@ -33,7 +36,7 @@ export async function countUsersByLocation(locationId: UUID | undefined) {
     return resArray[0] ?? { registrars: 0 }
   }
 
-  const locationChildren = await resolveLocationChildren(locationId)
+  const locationChildren = await resolveLocationChildren(locationId, token)
 
   const resArray = await User.aggregate([
     {

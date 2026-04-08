@@ -72,7 +72,7 @@ export const NoTemplateAvailable: Story = {
               )
             }
           ),
-          http.get('/api/config/config', () => {
+          http.get('/api/config', () => {
             return HttpResponse.json({
               systems: [],
               config: mockOfflineData.config,

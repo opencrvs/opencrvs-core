@@ -18,5 +18,5 @@ type Payload = {
 
 export async function countUsersByLocationHandler(request: Hapi.Request) {
   const { locationId } = request.payload as Payload
-  return countUsersByLocation(locationId)
+  return countUsersByLocation(locationId, request.headers.authorization)
 }

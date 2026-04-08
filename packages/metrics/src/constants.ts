@@ -23,7 +23,6 @@ const env = cleanEnv(process.env, {
   MONGO_URL: str({ devDefault: 'mongodb://localhost/metrics' }),
   SEARCH_URL: url({ devDefault: 'http://localhost:9090/' }),
   EXPECTED_BIRTH_REGISTRATION_IN_DAYS: num({ default: 45 }),
-  CONFIG_API_URL: url({ devDefault: 'http://localhost:2021' }),
   DEFAULT_TIMEOUT: num({ default: 600000 }),
   DASHBOARD_MONGO_URL: str({ devDefault: 'mongodb://localhost/performance' })
 })
@@ -41,7 +40,6 @@ export const {
   MONGO_URL,
   SEARCH_URL,
   EXPECTED_BIRTH_REGISTRATION_IN_DAYS,
-  CONFIG_API_URL,
   DEFAULT_TIMEOUT,
   DASHBOARD_MONGO_URL
 } = env

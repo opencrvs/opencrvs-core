@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { env } from '@config/environment'
+import { PRODUCTION, QA_ENV } from '@gateway/constants'
 import { subMinutes } from 'date-fns'
 
 const registrations = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
@@ -774,7 +774,7 @@ const populationEstimatesPerDay = () => ({
   ]
 })
 
-const REFRESH_AFTER_IN_MINUTE = env.isProd && !env.QA_ENV ? 1440 : 5
+const REFRESH_AFTER_IN_MINUTE = PRODUCTION && !QA_ENV ? 1440 : 5
 
 export function defaultQueries() {
   const lastUpdatedAt = subMinutes(

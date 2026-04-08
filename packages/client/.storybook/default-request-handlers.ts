@@ -2210,7 +2210,7 @@ export const handlers = {
       })
     }),
 
-    http.get('/api/config/config', () => {
+    http.get('/api/config', () => {
       return HttpResponse.json({
         config: mockOfflineData.config,
         certificates: [
@@ -2315,7 +2315,7 @@ export const handlers = {
     })
   ],
   forms: [
-    http.get('/api/config/forms', () => {
+    http.get('/api/forms', () => {
       return HttpResponse.json(forms.forms)
     })
   ],

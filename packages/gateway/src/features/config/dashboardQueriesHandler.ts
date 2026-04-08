@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { env } from '@config/environment'
+import { COUNTRY_CONFIG_URL } from '@gateway/constants'
+import fetch from '@gateway/fetch'
 import { defaultQueries } from './defaultQueries'
-import fetch from 'node-fetch'
 
-export default async function getDashboardQueries(
+export async function dashboardQueriesHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const url = new URL('dashboards/queries.json', env.COUNTRY_CONFIG_URL)
+  const url = new URL('dashboards/queries.json', COUNTRY_CONFIG_URL).toString()
   const response = await fetch(url)
 
   if (response.status === 404) {
