@@ -3185,9 +3185,6 @@ components:
                                 - record.import
                                 - config.update-all
                                 - attachment.upload
-                                - user.read
-                                - user.create
-                                - user.update
                                 - profile.electronic-signature
                                 - performance.read
                                 - performance.read-dashboards
@@ -3211,6 +3208,9 @@ components:
                                 - record.unassign-others
                                 - record.custom-action
                                 - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
                             $option:
                               type: string
                               enum:
@@ -7635,9 +7635,6 @@ components:
                                 - record.import
                                 - config.update-all
                                 - attachment.upload
-                                - user.read
-                                - user.create
-                                - user.update
                                 - profile.electronic-signature
                                 - performance.read
                                 - performance.read-dashboards
@@ -7661,6 +7658,9 @@ components:
                                 - record.unassign-others
                                 - record.custom-action
                                 - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
                             $option:
                               type: string
                               enum:
@@ -8031,9 +8031,6 @@ components:
                                 - record.import
                                 - config.update-all
                                 - attachment.upload
-                                - user.read
-                                - user.create
-                                - user.update
                                 - profile.electronic-signature
                                 - performance.read
                                 - performance.read-dashboards
@@ -8057,6 +8054,9 @@ components:
                                 - record.unassign-others
                                 - record.custom-action
                                 - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
                             $option:
                               type: string
                               enum:
@@ -8265,9 +8265,6 @@ components:
                                 - record.import
                                 - config.update-all
                                 - attachment.upload
-                                - user.read
-                                - user.create
-                                - user.update
                                 - profile.electronic-signature
                                 - performance.read
                                 - performance.read-dashboards
@@ -8291,6 +8288,9 @@ components:
                                 - record.unassign-others
                                 - record.custom-action
                                 - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
                             $option:
                               type: string
                               enum:
@@ -8498,9 +8498,6 @@ components:
                                 - record.import
                                 - config.update-all
                                 - attachment.upload
-                                - user.read
-                                - user.create
-                                - user.update
                                 - profile.electronic-signature
                                 - performance.read
                                 - performance.read-dashboards
@@ -8524,6 +8521,9 @@ components:
                                 - record.unassign-others
                                 - record.custom-action
                                 - organisation.read-locations
+                                - user.read
+                                - user.create
+                                - user.update
                             $option:
                               type: string
                               enum:
