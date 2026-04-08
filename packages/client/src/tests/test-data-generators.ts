@@ -622,7 +622,7 @@ export function testDataGenerator(rngSeed?: number) {
           options: { accessLevel: 'administrativeArea' }
         }),
         encodeScope({
-          type: 'user.update',
+          type: 'user.edit',
           options: { accessLevel: 'administrativeArea' }
         }),
         encodeScope({
@@ -726,7 +726,7 @@ export function testDataGenerator(rngSeed?: number) {
         encodeScope({ type: 'config.update-all' }),
         encodeScope({ type: 'organisation.read-locations' }),
         encodeScope({ type: 'user.create' }),
-        encodeScope({ type: 'user.update' }),
+        encodeScope({ type: 'user.edit' }),
         encodeScope({ type: 'user.read' }),
         encodeScope({ type: 'performance.read' }),
         encodeScope({ type: 'performance.read-dashboards' }),

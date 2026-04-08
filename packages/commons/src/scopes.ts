@@ -190,7 +190,6 @@ const AllScopeOptions = z.object({
 })
 
 type AllScopeOptions = z.infer<typeof AllScopeOptions>
-
 export const ScopeOptionKey = AllScopeOptions.keyof()
 export type ScopeOptionKey = z.infer<typeof ScopeOptionKey>
 

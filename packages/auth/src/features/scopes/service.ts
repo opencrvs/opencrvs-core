@@ -112,7 +112,7 @@ export const DEFAULT_ROLES_DEFINITION = [
         options: { accessLevel: 'administrativeArea' }
       }),
       encodeScope({
-        type: 'user.update',
+        type: 'user.edit',
         options: { accessLevel: 'administrativeArea' }
       }),
       encodeScope({ type: 'organisation.read-locations' }),
@@ -131,7 +131,7 @@ export const DEFAULT_ROLES_DEFINITION = [
     scopes: [
       encodeScope({ type: 'user.create' }),
       encodeScope({ type: 'user.read' }),
-      encodeScope({ type: 'user.update' }),
+      encodeScope({ type: 'user.edit' }),
       encodeScope({ type: 'organisation.read-locations' }),
       encodeScope({ type: 'performance.read' }),
       encodeScope({ type: 'performance.read-dashboards' }),

@@ -33,7 +33,7 @@ import * as actions from '@client/profile/profileActions'
 const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   encodeScope({ type: 'user.create' }),
   encodeScope({ type: 'user.read' }),
-  encodeScope({ type: 'user.update' }),
+  encodeScope({ type: 'user.edit' }),
   encodeScope({ type: 'organisation.read-locations' }),
   encodeScope({ type: 'performance.read' }),
   encodeScope({ type: 'performance.read-dashboards' }),

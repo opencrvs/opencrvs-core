@@ -148,7 +148,7 @@ export const userRouter = router({
       return createUser(input, ctx.token)
     }),
   update: userAndSystemProcedure
-    .use(allowedWithAnyOfScopes(['user.update']))
+    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UserInput.and(z.object({ id: z.string() })))
     .output(User)
     .mutation(async ({ input, ctx }) => {

@@ -105,7 +105,7 @@ export function usePermissions() {
     }
 
     const acceptedScopes = getAcceptedScopesByType({
-      acceptedScopes: ['user.update'],
+      acceptedScopes: ['user.edit'],
       scopes: userScopes
     })
 
@@ -122,7 +122,7 @@ export function usePermissions() {
     }
 
     if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
-      if (hasScopeFromCommons(roleScopes(user.role), 'user.update')) {
+      if (hasScopeFromCommons(roleScopes(user.role), 'user.edit')) {
         return false
       }
 

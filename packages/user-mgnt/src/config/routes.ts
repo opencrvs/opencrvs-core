@@ -312,7 +312,7 @@ export const getRoutes = () => {
         description: 'Updates an existing user',
         auth: {
           scope: [
-            ...getAllowedScopes('user.update'),
+            ...getAllowedScopes('user.edit'),
             encodeScope({ type: 'user.data-seeding' })
           ]
         }
@@ -356,7 +356,7 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            ...getAllowedScopes('user.update'),
+            ...getAllowedScopes('user.edit'),
             encodeScope({ type: 'user.data-seeding' })
           ]
         },
@@ -372,7 +372,7 @@ export const getRoutes = () => {
       handler: resendInviteHandler,
       options: {
         auth: {
-          scope: getAllowedScopes('user.update')
+          scope: getAllowedScopes('user.edit')
         },
         validate: {
           payload: resendInviteRequestSchema
@@ -387,7 +387,7 @@ export const getRoutes = () => {
       handler: usernameReminderHandler,
       options: {
         auth: {
-          scope: getAllowedScopes('user.update')
+          scope: getAllowedScopes('user.edit')
         },
         validate: {
           payload: usernameReminderRequestSchema
@@ -402,7 +402,7 @@ export const getRoutes = () => {
       handler: resetPasswordInviteHandler,
       options: {
         auth: {
-          scope: getAllowedScopes('user.update')
+          scope: getAllowedScopes('user.edit')
         },
         validate: {
           payload: resetPasswordRequestSchema
