@@ -122,10 +122,9 @@ export function usePermissions() {
     }
 
     if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
-      // TODO CIHAN:
-      // if (roleScopes(user.role).includes(SCOPES.USER_UPDATE)) {
-      //   return false
-      // }
+      if (hasScopeFromCommons(roleScopes(user.role), 'user.update')) {
+        return false
+      }
 
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
