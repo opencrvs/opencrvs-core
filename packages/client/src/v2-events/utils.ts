@@ -34,7 +34,8 @@ import {
   flattenEntries,
   EventMetadataDateFieldId,
   getAcceptedScopesByType,
-  decodeScope
+  decodeScope,
+  RecordScopeTypeV2
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(name: UserOrSystem['name'], language: string) {
@@ -276,7 +277,13 @@ export enum CoreWorkqueues {
 }
 
 export function hasOutboxWorkqueue(scopes: string[]) {
-  const hasRecordScope = scopes.some((scope) => !!decodeScope(scope))
+  const hasRecordScope = scopes.some((s) => {
+    const scope = decodeScope(s)
+    return (
+      scope &&
+      RecordScopeTypeV2.options.includes(scope.type as RecordScopeTypeV2)
+    )
+  })
 
   return hasRecordScope
 }
