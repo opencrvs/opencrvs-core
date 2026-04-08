@@ -57,12 +57,7 @@ const RoleSchema = (eventIds: string[]) =>
 
             const options = parsedV2Scopes.options
 
-            if (
-              options &&
-              'event' in options &&
-              options?.event &&
-              Array.isArray(options.event)
-            ) {
+            if (options && 'event' in options && Array.isArray(options.event)) {
               const invalidEventIds = options.event.filter(
                 (id) => !eventIds.includes(id)
               )
