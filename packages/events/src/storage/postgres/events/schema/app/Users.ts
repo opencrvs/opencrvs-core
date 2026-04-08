@@ -25,6 +25,8 @@ export default interface UsersTable {
 
   mobile: ColumnType<string | null, string | null, string | null>
 
+  device: ColumnType<string | null, string | null, string | null>
+
   signaturePath: ColumnType<string | null, string | null, string | null>
 
   profileImagePath: ColumnType<string | null, string | null, string | null>

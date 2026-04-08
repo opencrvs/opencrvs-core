@@ -8,9 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Kysely } from 'kysely'
+import { Kysely, sql } from 'kysely'
 import { UUID } from '@opencrvs/commons/events'
 import { getClient } from '@events/storage/postgres/events'
+import { SearchUsersPayload } from '@events/service/users/api'
 import { NewUsers } from './schema/app/Users'
 import Schema from './schema/Database'
 import { NewUserCredentials } from './schema/app/UserCredentials'
@@ -63,6 +64,7 @@ export async function getUserById(userId: string) {
       'users.fullHonorificName',
       'users.mobile',
       'users.email',
+      'users.device',
       'users.role',
       'users.status',
       'users.officeId',
@@ -155,7 +157,9 @@ export async function deleteSuperUser(username: string): Promise<void> {
       .where('userCredentials.username', '=', username)
       .executeTakeFirst()
 
-    if (!user) { return }
+    if (!user) {
+      return
+    }
 
     // user_credentials are deleted via ON DELETE CASCADE
     await trx.deleteFrom('users').where('id', '=', user.id).execute()
@@ -185,5 +189,124 @@ export async function createUserWithCredentials(
     const userId = await createUserInTrx(user, trx)
     await createUserCredentialInTrx({ ...cred, userId }, trx)
     return userId
+  })
+}
+
+export async function searchUsersWithInput(input: SearchUsersPayload) {
+  const db = getClient()
+
+  let query = db
+    .selectFrom('users')
+    .innerJoin('userCredentials', 'userCredentials.userId', 'users.id')
+    .leftJoin('locations', 'locations.id', 'users.officeId')
+    .select([
+      'users.id',
+      'users.firstname',
+      'users.surname',
+      'users.email',
+      'users.mobile',
+      'users.device',
+      'users.status',
+      'users.officeId',
+      'userCredentials.username',
+      'users.signaturePath',
+      'users.role',
+      'users.officeId',
+      'users.status',
+      'users.profileImagePath',
+      'users.fullHonorificName'
+    ])
+
+  // 🔍 Dynamic filters
+  if (input.username) {
+    query = query.where(
+      'userCredentials.username',
+      'ilike',
+      `%${input.username}%`
+    )
+  }
+
+  if (input.mobile) {
+    query = query.where('users.mobile', 'ilike', `%${input.mobile}%`)
+  }
+
+  if (input.email) {
+    query = query.where('users.email', 'ilike', `%${input.email}%`)
+  }
+
+  if (input.status) {
+    query = query.where('users.status', '=', input.status)
+  }
+
+  if (input.primaryOfficeId) {
+    query = query.where('users.officeId', '=', input.primaryOfficeId as UUID)
+  }
+
+  if (input.locationId) {
+    query = query.where('locations.id', '=', input.locationId as UUID)
+  }
+
+  const result = await query
+    .orderBy('users.createdAt', input.sortOrder)
+    .limit(input.count)
+    .offset(input.skip)
+    .execute()
+
+  return result
+}
+
+export async function checkUsername(username: string) {
+  const db = getClient()
+
+  const query = db
+    .selectFrom('userCredentials')
+    .select('username')
+    .where('username', '=', username)
+
+  const user = await query.executeTakeFirst()
+  return !!user
+}
+
+export async function activateUserWithCredentials(
+  userId: string,
+  passwordHash: string,
+  salt: string,
+  securityQuestions: Array<{ questionKey: string; answerHash: string }>
+): Promise<void> {
+  const db = getClient()
+  await db.transaction().execute(async (trx) => {
+    const user = await trx
+      .selectFrom('users')
+      .select(['users.id', 'users.status'])
+      .where('users.id', '=', userId as UUID)
+      .executeTakeFirst()
+
+    if (!user) {
+      throw new Error(`User not found: ${userId}`)
+    }
+
+    if (user.status !== 'pending') {
+      throw new Error(`User is not in pending state: ${userId}`)
+    }
+
+    await trx
+      .updateTable('userCredentials')
+      .set({
+        passwordHash,
+        salt,
+        securityQuestions:
+          sql`cast (${JSON.stringify(securityQuestions)} as jsonb)` as unknown as Record<
+            string,
+            any
+          >
+      })
+      .where('userId', '=', userId as UUID)
+      .execute()
+
+    await trx
+      .updateTable('users')
+      .set({ status: 'active' })
+      .where('id', '=', userId as UUID)
+      .execute()
   })
 }
