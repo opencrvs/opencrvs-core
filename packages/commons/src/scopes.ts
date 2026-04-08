@@ -429,10 +429,13 @@ const DEFAULT_SCOPE_OPTIONS: AllScopeOptions = {
  * @returns The value of the scope option. Will return the default value if the option is not set.
  */
 export function getScopeOptionValue<T extends ScopeOptionKey>(
-  scope: RecordScopeV2,
+  scope: Scope,
   option: T
 ): AllScopeOptions[T] | undefined {
-  const options = scope.options as Partial<AllScopeOptions> | undefined
+  const options =
+    'options' in scope
+      ? (scope.options as Partial<AllScopeOptions> | undefined)
+      : undefined
   const value = options?.[option]
 
   const defaultValue =

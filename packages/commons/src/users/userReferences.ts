@@ -62,11 +62,17 @@ function resolveJurisdictionScopeOptionReference(
   const { $scope, $option } = scopeOptionReference
   const acceptedScopes = getAcceptedScopesFromToken(token, [$scope])
 
-  const acceptedScopesMatchingEventType = acceptedScopes.filter(
-    (scope) =>
-      scope.options?.event?.includes(eventType) ||
-      scope.options?.event === undefined
-  )
+  const acceptedScopesMatchingEventType = acceptedScopes.filter((scope) => {
+    if (
+      !('options' in scope) ||
+      !scope.options ||
+      !('event' in scope.options)
+    ) {
+      return true
+    }
+
+    return scope.options.event?.includes(eventType)
+  })
 
   const acceptedJurisdictionFilters = acceptedScopesMatchingEventType
     .map((scope) => getScopeOptionValue(scope, $option))
