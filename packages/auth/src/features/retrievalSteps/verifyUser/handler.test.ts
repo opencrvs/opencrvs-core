@@ -12,6 +12,7 @@ import * as fetchAny from 'jest-fetch-mock'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
 import * as codeService from '@auth/features/verifyCode/service'
 import { AuthServer, createServer } from '@auth/server'
+import { encodeScope } from '@opencrvs/commons'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
@@ -52,7 +53,7 @@ describe('verifyUser handler receives a request', () => {
           id: '1',
           username: 'fake_user_name',
           status: 'active',
-          scope: ['demo'],
+          scope: [encodeScope({ type: 'demo' })],
           mobile: '+8801711111111',
           securityQuestionKey: 'dummyKey'
         })

@@ -576,9 +576,14 @@ export function testDataGenerator(rngSeed?: number) {
         encodeScope({ type: 'record.edit' })
       ],
       localSystemAdmin: [
-        SCOPES.USER_READ_MY_OFFICE,
-        SCOPES.USER_READ_MY_JURISDICTION,
-        SCOPES.USER_UPDATE_MY_JURISDICTION,
+        encodeScope({
+          type: 'user.read',
+          options: { accessLevel: 'administrativeArea' }
+        }),
+        encodeScope({
+          type: 'user.update',
+          options: { accessLevel: 'administrativeArea' }
+        }),
         encodeScope({
           type: 'organisation.read-locations',
           options: { accessLevel: 'administrativeArea' }

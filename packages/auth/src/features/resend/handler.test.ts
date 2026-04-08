@@ -13,6 +13,7 @@ import {
   createServerWithEnvironment
 } from '@auth/tests/util'
 import { AuthServer, createServer } from '@auth/server'
+import { encodeScope } from '@opencrvs/commons'
 
 jest.mock('@auth/features/verifyCode/service', () => {
   const actual = jest.requireActual('@auth/features/verifyCode/service')
@@ -88,7 +89,7 @@ describe('resend handler receives a request', () => {
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'getStoredUserInformation').mockReturnValue({
         userId: '2',
-        scope: ['demo'],
+        scope: [encodeScope({ type: 'demo' })],
         mobile: '+8801712323234'
       })
       const spy = jest.spyOn(codeService, 'generateVerificationCode')

@@ -21,7 +21,6 @@ const ScopeOptionReference = z.object({
   $scope: ScopeType,
   $option: ScopeOptionKey
 })
-
 type ScopeOptionReference = z.infer<typeof ScopeOptionReference>
 
 export const JurisdictionReference = z.object({

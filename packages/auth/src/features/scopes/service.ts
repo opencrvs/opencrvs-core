@@ -15,8 +15,7 @@ import {
   joinUrl,
   logger,
   Roles,
-  encodeScope,
-  SCOPES
+  encodeScope
 } from '@opencrvs/commons'
 
 export const DEFAULT_ROLES_DEFINITION = [
@@ -107,9 +106,15 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localSystemAdmin'
     },
     scopes: [
-      SCOPES.USER_READ_MY_OFFICE,
-      SCOPES.USER_CREATE_MY_JURISDICTION,
-      SCOPES.USER_UPDATE_MY_JURISDICTION,
+      encodeScope({ type: 'user.read', options: { accessLevel: 'location' } }),
+      encodeScope({
+        type: 'user.create',
+        options: { accessLevel: 'administrativeArea' }
+      }),
+      encodeScope({
+        type: 'user.update',
+        options: { accessLevel: 'administrativeArea' }
+      }),
       encodeScope({ type: 'organisation.read-locations' }),
       encodeScope({ type: 'performance.read' }),
       encodeScope({ type: 'performance.read-dashboards' }),

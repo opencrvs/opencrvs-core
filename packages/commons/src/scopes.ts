@@ -137,12 +137,8 @@ const PlainScopeType = z.enum([
   'record.import',
   'config.update-all',
   'attachment.upload',
-
-  // User management scopes
-  'user.read',
-  'user.create',
-  'user.update',
   'profile.electronic-signature',
+
   // Performance dashboard
   'performance.read',
   'performance.read-dashboards',
@@ -156,15 +152,12 @@ const PlainScopeType = z.enum([
   'demo'
 ])
 
-export const SystemScopeType = z.enum(['organisation.read-locations'])
-
-export const ScopeType = z.enum([
-  ...PlainScopeType.options,
-  ...RecordScopeTypeV2.options,
-  ...SystemScopeType.options
+const SystemScopeType = z.enum([
+  'organisation.read-locations',
+  'user.read',
+  'user.create',
+  'user.update'
 ])
-
-export type ScopeType = z.infer<typeof ScopeType>
 
 const scopeByEvent = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
@@ -188,7 +181,7 @@ const scopeOptionsDeclared = scopeOptionsPlaceEvent
   })
   .describe('Options applicable to actions that may take place after DECLARE')
 
-const FullRecordScopeOptions = scopeOptionsDeclared
+const AllRecordScopeOptions = scopeOptionsDeclared
   .extend({
     registeredIn: JurisdictionFilter.optional(),
     registeredBy: UserFilter.optional()
@@ -197,7 +190,7 @@ const FullRecordScopeOptions = scopeOptionsDeclared
     'Options applicable to actions that may take place after REGISTER, with full filtering capabilities.'
   )
 
-const CustomActionScopeOptions = FullRecordScopeOptions.extend({
+const CustomActionScopeOptions = AllRecordScopeOptions.extend({
   customActionTypes: z
     .preprocess(
       (val) => (val === undefined ? undefined : [val].flat()),
@@ -206,15 +199,15 @@ const CustomActionScopeOptions = FullRecordScopeOptions.extend({
     .describe('Allowed custom action types')
 })
 
-type FullRecordScopeOptions = z.infer<typeof FullRecordScopeOptions>
+type AllRecordScopeOptions = z.infer<typeof AllRecordScopeOptions>
 
-const OrganisationScopeOptions = z.object({
+const AccessLevelOptions = z.object({
   accessLevel: JurisdictionFilter.optional()
 })
 
 const AllScopeOptions = z.object({
-  ...FullRecordScopeOptions.shape,
-  ...OrganisationScopeOptions.shape
+  ...AllRecordScopeOptions.shape,
+  ...AccessLevelOptions.shape
 })
 
 type AllScopeOptions = z.infer<typeof AllScopeOptions>
@@ -267,7 +260,7 @@ export const ScopesWithFullOptions = RecordScopeTypeV2.extract([
   'record.unassign-others'
 ])
 
-const ScopeOptionsPrintCertifiedCopies = FullRecordScopeOptions.extend({
+const ScopeOptionsPrintCertifiedCopies = AllRecordScopeOptions.extend({
   templates: z
     // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
     .preprocess(
@@ -291,7 +284,7 @@ export const RecordScopeV2 = z
     }),
     z.object({
       type: ScopesWithFullOptions,
-      options: FullRecordScopeOptions.optional()
+      options: AllRecordScopeOptions.optional()
     }),
     z.object({
       type: z.literal('record.custom-action'),
@@ -360,17 +353,14 @@ export const ResolvedRecordScopeV2 = z
   ])
   .describe('Resolved scope with location/user IDs instead of filters.')
 
+export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
+export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
+
 const SystemScope = z.discriminatedUnion('type', [
   z.object({
-    type: z.literal('organisation.read-locations'),
-    options: OrganisationScopeOptions.optional()
+    type: SystemScopeType,
+    options: AccessLevelOptions.optional()
   })
-  // z.object({
-  //   type: z.literal('user.read'),
-  //   options: z
-  //     .object({ accessLevel: JurisdictionFilter.or(UserFilter).optional() })
-  //     .optional()
-  // })
 ])
 
 export const Scope = z.union([
@@ -380,8 +370,13 @@ export const Scope = z.union([
 ])
 export type Scope = z.infer<typeof Scope>
 
-export type RecordScopeV2 = z.infer<typeof RecordScopeV2>
-export type ResolvedRecordScopeV2 = z.infer<typeof ResolvedRecordScopeV2>
+export const ScopeType = z.enum([
+  ...PlainScopeType.options,
+  ...RecordScopeTypeV2.options,
+  ...SystemScopeType.options
+])
+
+export type ScopeType = z.infer<typeof ScopeType>
 
 const flattenScope = (scope: Scope) => ({
   type: scope.type,
@@ -436,6 +431,7 @@ export function getScopeOptionValue<T extends ScopeOptionKey>(
     'options' in scope
       ? (scope.options as Partial<AllScopeOptions> | undefined)
       : undefined
+
   const value = options?.[option]
 
   const defaultValue =
