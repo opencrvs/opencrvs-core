@@ -12,10 +12,8 @@ import { env } from './environment'
 import fetch from 'node-fetch'
 import { seedLocations } from './locations'
 import { seedUsers } from './users'
-import { parseGQLResponse, raise } from './utils'
-import { print } from 'graphql'
-import gql from 'graphql-tag'
-import decode from 'jwt-decode'
+import { raise } from './utils'
+import { createClient } from '@opencrvs/toolkit/api'
 
 async function getToken(): Promise<string> {
   const authUrl = new URL('authenticate-super-user', env.AUTH_HOST).toString()
@@ -38,37 +36,6 @@ async function getToken(): Promise<string> {
   }
   const body = await res.json()
   return body.token
-}
-
-const deactivateUserMutation = print(gql`
-  mutation deactivateUser(
-    $userId: String!
-    $action: String!
-    $reason: String!
-    $comment: String
-  ) {
-    auditUser(
-      userId: $userId
-      action: $action
-      reason: $reason
-      comment: $comment
-    )
-  }
-`)
-
-interface TokenPayload {
-  sub: string
-  exp: string
-  algorithm: string
-  scope: string[]
-}
-
-function getTokenPayload(token: string): TokenPayload {
-  try {
-    return decode<TokenPayload>(token)
-  } catch (err) {
-    raise(`getTokenPayload: Error occurred during token decode : ${err}`)
-  }
 }
 
 async function triggerSystemReady(token: string) {
@@ -111,24 +78,9 @@ async function triggerSystemReady(token: string) {
 }
 
 async function deactivateSuperuser(token: string) {
-  const { sub } = getTokenPayload(token)
-  const res = await fetch(`${env.GATEWAY_HOST}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      query: deactivateUserMutation,
-      variables: {
-        userId: sub,
-        action: 'DEACTIVATE',
-        reason: 'Remove super user'
-      }
-    })
-  })
-
-  parseGQLResponse(await res.json())
+  const url = new URL('events', env.GATEWAY_HOST).toString()
+  const client = createClient(url, `Bearer ${token}`)
+  await client.user.deactivateSuperUser.mutate({ username: 'o.admin' })
 }
 
 async function main() {
