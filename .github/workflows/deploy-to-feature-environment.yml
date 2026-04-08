@@ -154,6 +154,7 @@ jobs:
           else
             branch="develop"
           fi
+
           echo "chart branch name=${branch}"
           echo "branch=$branch" >> $GITHUB_OUTPUT
       - name: Get PR Author
