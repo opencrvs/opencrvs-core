@@ -65,9 +65,24 @@ import resetPasswordInviteHandler, {
 import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
-
-import { encodeScope, SCOPES } from '@opencrvs/commons'
+import { encodeScope, SystemScopeType } from '@opencrvs/commons'
 import mongoose from 'mongoose'
+
+// Helper function to generate all possible scopes for a given system scope type
+function getAllowedScopes(systemScopeType: SystemScopeType) {
+  return [
+    encodeScope({ type: systemScopeType }),
+    encodeScope({ type: systemScopeType, options: { accessLevel: 'all' } }),
+    encodeScope({
+      type: systemScopeType,
+      options: { accessLevel: 'location' }
+    }),
+    encodeScope({
+      type: systemScopeType,
+      options: { accessLevel: 'administrativeArea' }
+    })
+  ]
+}
 
 export const getRoutes = () => {
   return [
@@ -234,12 +249,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Retrieves a user mobile number',
         auth: {
-          scope: [
-            encodeScope({ type: 'user.read' }),
-            // TODO CIHAN
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE
-          ]
+          scope: getAllowedScopes('user.read')
         },
         validate: {
           payload: userIdSchema
@@ -256,19 +266,7 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            encodeScope({ type: 'organisation.read-locations' }),
-            encodeScope({
-              type: 'organisation.read-locations',
-              options: { accessLevel: 'location' }
-            }),
-            encodeScope({
-              type: 'organisation.read-locations',
-              options: { accessLevel: 'administrativeArea' }
-            }),
-            encodeScope({
-              type: 'organisation.read-locations',
-              options: { accessLevel: 'all' }
-            }),
+            ...getAllowedScopes('organisation.read-locations'),
             encodeScope({ type: 'user.data-seeding' })
           ]
         },
@@ -299,11 +297,7 @@ export const getRoutes = () => {
         description: 'Creates a new user',
         auth: {
           scope: [
-            encodeScope({ type: 'user.create' }),
-            'type=user.create',
-            // TODO CIHAN
-            SCOPES.USER_CREATE_MY_JURISDICTION,
-            // encodeScope({ type: 'user.create' }),
+            ...getAllowedScopes('user.create'),
             encodeScope({ type: 'user.data-seeding' })
           ]
         }
@@ -318,9 +312,7 @@ export const getRoutes = () => {
         description: 'Updates an existing user',
         auth: {
           scope: [
-            encodeScope({ type: 'user.update' }),
-            // TODO CIHAN
-            SCOPES.USER_UPDATE_MY_JURISDICTION,
+            ...getAllowedScopes('user.update'),
             encodeScope({ type: 'user.data-seeding' })
           ]
         }
@@ -364,8 +356,7 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            encodeScope({ type: 'user.update' }),
-            SCOPES.USER_UPDATE_MY_JURISDICTION,
+            ...getAllowedScopes('user.update'),
             encodeScope({ type: 'user.data-seeding' })
           ]
         },
@@ -381,10 +372,7 @@ export const getRoutes = () => {
       handler: resendInviteHandler,
       options: {
         auth: {
-          scope: [
-            encodeScope({ type: 'user.update' }),
-            SCOPES.USER_UPDATE_MY_JURISDICTION
-          ]
+          scope: getAllowedScopes('user.update')
         },
         validate: {
           payload: resendInviteRequestSchema
@@ -399,10 +387,7 @@ export const getRoutes = () => {
       handler: usernameReminderHandler,
       options: {
         auth: {
-          scope: [
-            encodeScope({ type: 'user.update' }),
-            SCOPES.USER_UPDATE_MY_JURISDICTION
-          ]
+          scope: getAllowedScopes('user.update')
         },
         validate: {
           payload: usernameReminderRequestSchema
@@ -417,10 +402,7 @@ export const getRoutes = () => {
       handler: resetPasswordInviteHandler,
       options: {
         auth: {
-          scope: [
-            encodeScope({ type: 'user.update' }),
-            SCOPES.USER_UPDATE_MY_JURISDICTION
-          ]
+          scope: getAllowedScopes('user.update')
         },
         validate: {
           payload: resetPasswordRequestSchema

@@ -36,43 +36,22 @@ export const MIGRATED_LEGACY_SCOPES = {
   USER_CREATE: 'user.create:all',
   USER_READ: 'user.read:all',
   USER_UPDATE: 'user.update:all',
+  USER_READ_MY_OFFICE: 'user.read:my-office',
+  USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
+  USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit',
+  USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
+  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
   DEMO: 'demo'
 }
 
 /** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
-export const SCOPES = {
-  USER_READ_MY_OFFICE: 'user.read:my-office',
-  USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
-  USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit', //v1.8
-  USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
-  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction'
-} as const
+export const SCOPES = {} as const
 
 /**
  * @deprecated - will be removed in v2.1.
  */
 const LiteralScopes = z.union([
-  z.literal(MIGRATED_LEGACY_SCOPES.USER_DATA_SEEDING),
-  z.literal(MIGRATED_LEGACY_SCOPES.RECORD_REINDEX),
-  z.literal(MIGRATED_LEGACY_SCOPES.ATTACHMENT_UPLOAD),
-  z.literal(MIGRATED_LEGACY_SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
-  z.literal(MIGRATED_LEGACY_SCOPES.INTEGRATION_CREATE),
-  z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS),
-  z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ),
-  z.literal(MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS),
-  z.literal(MIGRATED_LEGACY_SCOPES.DEMO),
-  z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS),
-  z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
-  z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),
-  z.literal(MIGRATED_LEGACY_SCOPES.USER_READ),
-  z.literal(SCOPES.USER_READ_MY_OFFICE),
-  z.literal(SCOPES.USER_READ_MY_JURISDICTION),
-  z.literal(SCOPES.USER_READ_ONLY_MY_AUDIT),
-  z.literal(MIGRATED_LEGACY_SCOPES.USER_CREATE),
-  z.literal(SCOPES.USER_CREATE_MY_JURISDICTION),
-  z.literal(MIGRATED_LEGACY_SCOPES.USER_UPDATE),
-  z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION),
-  z.literal(MIGRATED_LEGACY_SCOPES.CONFIG_UPDATE_ALL)
+  ...Object.values(MIGRATED_LEGACY_SCOPES).map((scope) => z.literal(scope))
 ])
 
 /**
@@ -126,6 +105,8 @@ export const RecordScopeTypeV2 = z.enum([
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
+// TODO CIHAN: rename these to whatever is used in do-not-use-file
+
 /** Plain scopes are scopes that dont have any options available. */
 const PlainScopeType = z.enum([
   // Misc. system scopes
@@ -138,6 +119,7 @@ const PlainScopeType = z.enum([
   'config.update-all',
   'attachment.upload',
   'profile.electronic-signature',
+  'user.read-only-my-audit',
 
   // Performance dashboard
   'performance.read',
@@ -158,6 +140,8 @@ const SystemScopeType = z.enum([
   'user.create',
   'user.update'
 ])
+
+export type SystemScopeType = z.infer<typeof SystemScopeType>
 
 const scopeByEvent = z
   // Ensure input is always an array for consistent parsing, even if a single string is provided by qs.
@@ -368,6 +352,7 @@ export const Scope = z.union([
   ...RecordScopeV2.options,
   ...SystemScope.options
 ])
+
 export type Scope = z.infer<typeof Scope>
 
 export const ScopeType = z.enum([

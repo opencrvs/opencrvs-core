@@ -27,8 +27,6 @@ import {
   UUID,
   EventDocument,
   getTokenPayload,
-  hasScopeOld,
-  SCOPES,
   getCurrentEventState,
   EventInput,
   RecordScopeTypeV2,
@@ -39,7 +37,9 @@ import {
   getAcceptedScopesFromToken,
   ScopeType,
   hasAnyScope,
-  hasScope
+  hasScope,
+  getScopeOptionValue,
+  JurisdictionFilter
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -56,11 +56,6 @@ import { isLocationUnderAdministrativeArea } from '../../../storage/postgres/adm
 export function setBearerForToken(token: string) {
   const bearer = 'Bearer'
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
-}
-
-function inScope(token: string, scopes: string[]) {
-  const tokenScopes = getScopes(token)
-  return scopes.some((scope) => tokenScopes.includes(scope))
 }
 
 /**
@@ -381,16 +376,22 @@ export const userCanReadOtherUser: MiddlewareFunction<
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  // TODO CIHAN: check audit?
-  if (hasScope(token, 'user.read')) {
+  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
+
+  const accessLevels = acceptedScopes.map((s) =>
+    getScopeOptionValue(s, 'accessLevel')
+  )
+
+  if (accessLevels.includes(JurisdictionFilter.enum.all)) {
     return next()
   }
 
+  const hasLocationAccess =
+    accessLevels.includes(JurisdictionFilter.enum.location) ||
+    accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
+
   if (
-    inScope(token, [
-      SCOPES.USER_READ_MY_OFFICE,
-      SCOPES.USER_READ_MY_JURISDICTION
-    ]) &&
+    hasLocationAccess &&
     userReading.primaryOfficeId === otherUser.primaryOfficeId
   ) {
     return next()
@@ -406,14 +407,14 @@ export const userCanReadOtherUser: MiddlewareFunction<
     : true
 
   if (
-    hasScopeOld(token, SCOPES.USER_READ_MY_JURISDICTION) &&
+    accessLevels.includes(JurisdictionFilter.enum.administrativeArea) &&
     isUnderJurisdiction
   ) {
     return next()
   }
 
   if (
-    hasScopeOld(token, SCOPES.USER_READ_ONLY_MY_AUDIT) &&
+    hasScope(token, 'user.read-only-my-audit') &&
     userReading.id === otherUser.id
   ) {
     return next()

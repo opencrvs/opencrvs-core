@@ -10,7 +10,6 @@
  */
 
 import {
-  SCOPES,
   decodeScope,
   encodeScope,
   v1ScopeToV2Scope,
@@ -388,7 +387,7 @@ it('transform v1 scope to v2', () => {
       'search[event=death,access=all]',
       'search[event=tennis-club-membership,access=all]',
       'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
-      SCOPES.USER_READ_ONLY_MY_AUDIT,
+      MIGRATED_LEGACY_SCOPES.USER_READ_ONLY_MY_AUDIT,
       'record.create[event=birth|death|tennis-club-membership]',
       'record.read[event=birth|death|tennis-club-membership]',
       'record.declare[event=birth|death|tennis-club-membership]',
@@ -404,7 +403,7 @@ it('transform v1 scope to v2', () => {
       MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ,
       MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS,
       MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      SCOPES.USER_READ_ONLY_MY_AUDIT,
+      MIGRATED_LEGACY_SCOPES.USER_READ_ONLY_MY_AUDIT,
       'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
       'search[event=birth,access=all]',
       'search[event=death,access=all]',
@@ -429,9 +428,9 @@ it('transform v1 scope to v2', () => {
       'record.notify[event=birth|death|tennis-club-membership]'
     ],
     localSystemAdmin: [
-      SCOPES.USER_READ_MY_OFFICE,
-      SCOPES.USER_READ_MY_JURISDICTION,
-      SCOPES.USER_UPDATE_MY_JURISDICTION,
+      MIGRATED_LEGACY_SCOPES.USER_READ_MY_OFFICE,
+      MIGRATED_LEGACY_SCOPES.USER_READ_MY_JURISDICTION,
+      MIGRATED_LEGACY_SCOPES.USER_UPDATE_MY_JURISDICTION,
       MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
       MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ,
       MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS,
@@ -472,11 +471,11 @@ it('migrate v1 scopes to v2', () => {
   const v1Scopes = [
     MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ,
     MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS,
-    SCOPES.USER_READ_MY_OFFICE,
-    SCOPES.USER_READ_MY_JURISDICTION,
-    SCOPES.USER_UPDATE_MY_JURISDICTION,
+    MIGRATED_LEGACY_SCOPES.USER_READ_MY_OFFICE,
+    MIGRATED_LEGACY_SCOPES.USER_READ_MY_JURISDICTION,
+    MIGRATED_LEGACY_SCOPES.USER_UPDATE_MY_JURISDICTION,
     MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-    SCOPES.USER_READ_ONLY_MY_AUDIT,
+    MIGRATED_LEGACY_SCOPES.USER_READ_ONLY_MY_AUDIT,
     MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
     'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
     'search[event=birth,access=all]',

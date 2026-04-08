@@ -39,7 +39,12 @@ test('Throws error if user does not have required scope', async () => {
 
 test('Throws error when accessing user outside jurisdiction with my jurisdiction scope', async () => {
   const { users } = await setupTestCase()
-  const client = createTestClient(users[0], [SCOPES.USER_READ_MY_JURISDICTION])
+  const client = createTestClient(users[0], [
+    encodeScope({
+      type: 'user.read',
+      options: { accessLevel: 'administrativeArea' }
+    })
+  ])
 
   await expect(
     client.user.actions({
@@ -50,7 +55,9 @@ test('Throws error when accessing user outside jurisdiction with my jurisdiction
 
 test('Throws error when accessing user in different office with my office scope', async () => {
   const { users } = await setupTestCase()
-  const client = createTestClient(users[0], [SCOPES.USER_READ_MY_OFFICE])
+  const client = createTestClient(users[0], [
+    encodeScope({ type: 'user.read', options: { accessLevel: 'location' } })
+  ])
 
   await expect(
     client.user.actions({
@@ -72,7 +79,12 @@ test('Throws error when accessing oneself user without my audit scope', async ()
 
 test('Throws error when accessing other user with scope for own audit', async () => {
   const { users } = await setupTestCase()
-  const client = createTestClient(users[0], [SCOPES.USER_READ_ONLY_MY_AUDIT])
+  const client = createTestClient(users[0], [
+    encodeScope({
+      type: 'user.read',
+      options: { accessLevel: 'administrativeArea' }
+    })
+  ])
 
   await expect(
     client.user.actions({
@@ -101,9 +113,10 @@ test('Finds user in nested location using administrative area id with my jurisdi
   // @TODO: Probably wont work
   const { user: userOnParentLocation, seed } = await setupTestCase()
   const parentLocationClient = createTestClient(userOnParentLocation, [
-    // TODO CIHAN: this needs jurisdiction option
-    encodeScope({ type: 'user.read' }),
-    SCOPES.USER_READ_MY_JURISDICTION
+    encodeScope({
+      type: 'user.read',
+      options: { accessLevel: 'administrativeArea' }
+    })
   ])
 
   const rng = createPrng(44444)
@@ -168,9 +181,10 @@ test('Finds user in nested location using administrative area id with my jurisdi
 test('Find user with appropriate scopes', async () => {
   const { user: userOnParentLocation, seed } = await setupTestCase()
   const clientWithJurisdictionScope = createTestClient(userOnParentLocation, [
-    // TODO CIHAN: this needs jurisdiction option
-    encodeScope({ type: 'user.read' }),
-    SCOPES.USER_READ_MY_JURISDICTION
+    encodeScope({
+      type: 'user.read',
+      options: { accessLevel: 'administrativeArea' }
+    })
   ])
 
   const userToSearchLocationId = generateUuid()
@@ -193,9 +207,7 @@ test('Find user with appropriate scopes', async () => {
   })
 
   const clientWithOfficeScope = createTestClient(userInTheSameOffice, [
-    // TODO CIHAN: this needs jurisdiction option
-    encodeScope({ type: 'user.read' }),
-    SCOPES.USER_READ_MY_OFFICE
+    encodeScope({ type: 'user.read', options: { accessLevel: 'location' } })
   ])
 
   const userToSearch = seed.user({
@@ -205,9 +217,8 @@ test('Find user with appropriate scopes', async () => {
   })
 
   const userToSearchClient = createTestClient(userToSearch, [
-    // TODO CIHAN: this needs jurisdiction option
     encodeScope({ type: 'user.read' }),
-    SCOPES.USER_READ_ONLY_MY_AUDIT
+    encodeScope({ type: 'user.read-only-my-audit' })
   ])
 
   mswServer.use(

@@ -14,7 +14,6 @@ import {
   eventPayloadGenerator,
   generateUuid,
   JurisdictionFilter,
-  SCOPES,
   TestUserRole,
   TokenUserType,
   User,
@@ -503,7 +502,7 @@ export function testDataGenerator(rngSeed?: number) {
           options: { accessLevel: 'location' }
         }),
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
-        SCOPES.USER_READ_ONLY_MY_AUDIT,
+        encodeScope({ type: 'user.read-only-my-audit' }),
         encodeScope({ type: 'record.search' }),
         encodeScope({ type: 'record.create' }),
         encodeScope({
@@ -542,7 +541,7 @@ export function testDataGenerator(rngSeed?: number) {
           type: 'organisation.read-locations',
           options: { accessLevel: 'location' }
         }),
-        SCOPES.USER_READ_ONLY_MY_AUDIT,
+        encodeScope({ type: 'user.read-only-my-audit' }),
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
         encodeScope({
           type: 'record.search'
@@ -630,7 +629,7 @@ export function testDataGenerator(rngSeed?: number) {
           options: { accessLevel: 'location' }
         }),
         'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
-        SCOPES.USER_READ_ONLY_MY_AUDIT,
+        encodeScope({ type: 'user.read-only-my-audit' }),
         encodeScope({ type: 'record.search' }),
         encodeScope({
           type: 'record.create',

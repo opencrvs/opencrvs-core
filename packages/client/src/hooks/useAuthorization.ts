@@ -59,26 +59,35 @@ export function usePermissions() {
       return false
     }
 
-    // TODO CIHAN: remember this!!
-    if (hasScope('user.read')) {
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['user.read'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
 
-    // TODO CIHAN:
-    // if (hasScope(SCOPES.USER_READ_MY_OFFICE)) {
-    //   return user.primaryOfficeId === userPrimaryOfficeId
-    // }
-    // if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
-    //   return isLocationUnderJurisdiction({
-    //     locationId: userPrimaryOfficeId,
-    //     otherLocationId: user.primaryOfficeId,
-    //     locations,
-    //     administrativeAreas
-    //   })
-    // }
-    // if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
-    //   return user.id === currentUser?.id
-    // }
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return user.primaryOfficeId === userPrimaryOfficeId
+    }
+
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOfficeId,
+        otherLocationId: user.primaryOfficeId,
+        locations,
+        administrativeAreas
+      })
+    }
+
+    if (hasScope('user.read-only-my-audit')) {
+      return user.id === currentUser?.id
+    }
 
     return false
   }
@@ -90,27 +99,41 @@ export function usePermissions() {
     if (Array.isArray(editableRoleIds)) {
       return editableRoleIds.includes(user.role)
     }
+
     if (!userPrimaryOfficeId) {
       return false
     }
 
-    // TODO CIHAN: remember this!!
-    if (hasScope('user.update')) {
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['user.update'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
 
-    // TODO CIHAN:
-    // if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION)) {
-    //   if (roleScopes(user.role).includes(SCOPES.USER_UPDATE)) {
-    //     return false
-    //   }
-    //   return isLocationUnderJurisdiction({
-    //     locationId: userPrimaryOfficeId,
-    //     otherLocationId: user.primaryOfficeId,
-    //     locations,
-    //     administrativeAreas
-    //   })
-    // }
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return user.primaryOfficeId === userPrimaryOfficeId
+    }
+
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+      // TODO CIHAN:
+      // if (roleScopes(user.role).includes(SCOPES.USER_UPDATE)) {
+      //   return false
+      // }
+
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOfficeId,
+        otherLocationId: user.primaryOfficeId,
+        locations,
+        administrativeAreas
+      })
+    }
 
     return false
   }
@@ -161,20 +184,32 @@ export function usePermissions() {
       return false
     }
 
-    // TODO CIHAN: remember this!!
-    if (hasScope('user.create')) {
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['user.create'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
 
-    // TODO CIHAN:
-    // if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
-    //   return isLocationUnderJurisdiction({
-    //     locationId: userPrimaryOfficeId,
-    //     otherLocationId: office.id,
-    //     locations,
-    //     administrativeAreas
-    //   })
-    // }
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return office.id === userPrimaryOfficeId
+    }
+
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOfficeId,
+        otherLocationId: office.id,
+        locations,
+        administrativeAreas
+      })
+    }
+
     return false
   }
 
