@@ -29,7 +29,6 @@ import {
   getTokenPayload,
   hasScopeOld,
   SCOPES,
-  hasAnyOfScopes,
   getCurrentEventState,
   EventInput,
   RecordScopeTypeV2,
@@ -360,15 +359,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
 
   // Throw early to avoid mistakes in the logic below.
   // There are test cases for each but better safe than sorry.
-  const scopeFound = hasAnyOfScopes(
-    [
-      SCOPES.USER_READ,
-      SCOPES.USER_READ_MY_OFFICE,
-      SCOPES.USER_READ_MY_JURISDICTION,
-      SCOPES.USER_READ_ONLY_MY_AUDIT
-    ],
-    getScopes(token)
-  )
+  const scopeFound = hasScope(token, 'user.read')
 
   if (!scopeFound) {
     throw new TRPCError({ code: 'NOT_FOUND' })
@@ -390,7 +381,8 @@ export const userCanReadOtherUser: MiddlewareFunction<
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  if (hasScopeOld(token, SCOPES.USER_READ)) {
+  // TODO CIHAN: check audit?
+  if (hasScope(token, 'user.read')) {
     return next()
   }
 

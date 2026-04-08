@@ -298,9 +298,12 @@ export const getRoutes = () => {
         description: 'Creates a new user',
         auth: {
           scope: [
-            SCOPES.USER_CREATE,
+            encodeScope({ type: 'user.create' }),
+            'type=user.create',
+            // TODO CIHAN
             SCOPES.USER_CREATE_MY_JURISDICTION,
-            'type=user.data-seeding'
+            // encodeScope({ type: 'user.create' }),
+            encodeScope({ type: 'user.data-seeding' })
           ]
         }
       }
@@ -314,9 +317,10 @@ export const getRoutes = () => {
         description: 'Updates an existing user',
         auth: {
           scope: [
-            SCOPES.USER_UPDATE,
+            encodeScope({ type: 'user.update' }),
+            // TODO CIHAN
             SCOPES.USER_UPDATE_MY_JURISDICTION,
-            'type=user.data-seeding'
+            encodeScope({ type: 'user.data-seeding' })
           ]
         }
       }
@@ -359,7 +363,7 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            SCOPES.USER_UPDATE,
+            encodeScope({ type: 'user.update' }),
             SCOPES.USER_UPDATE_MY_JURISDICTION,
             encodeScope({ type: 'user.data-seeding' })
           ]

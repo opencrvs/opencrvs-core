@@ -124,9 +124,9 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.nationalSystemAdmin'
     },
     scopes: [
-      SCOPES.USER_CREATE,
-      SCOPES.USER_READ,
-      SCOPES.USER_UPDATE,
+      encodeScope({ type: 'user.create' }),
+      encodeScope({ type: 'user.read' }),
+      encodeScope({ type: 'user.update' }),
       encodeScope({ type: 'organisation.read-locations' }),
       encodeScope({ type: 'performance.read' }),
       encodeScope({ type: 'performance.read-dashboards' }),

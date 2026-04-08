@@ -52,8 +52,7 @@ describe('getScopeOptionValue()', () => {
 
 describe('findScope()', () => {
   const userScopes = [
-    SCOPES.USER_CREATE,
-    SCOPES.USER_READ,
+    'foobar',
     'user.create[role=first-role|second-role]',
     'record.notify[event=birth]'
   ]
@@ -82,7 +81,7 @@ describe('findScope()', () => {
 
 describe('parseConfigurableScope()', () => {
   it('should not be able to parse a literal scope', () => {
-    expect(parseConfigurableScope(SCOPES.USER_CREATE)).toEqual(undefined)
+    expect(parseConfigurableScope('user.create')).toEqual(undefined)
   })
 
   it('should successfully parse a configurable scope', () => {
@@ -444,8 +443,8 @@ it('transform v1 scope to v2', () => {
     nationalSystemAdmin: [
       MIGRATED_LEGACY_SCOPES.CONFIG_UPDATE_ALL,
       MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.USER_CREATE,
-      SCOPES.USER_UPDATE,
+      MIGRATED_LEGACY_SCOPES.USER_CREATE,
+      MIGRATED_LEGACY_SCOPES.USER_UPDATE,
       SCOPES.USER_READ,
       MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ,
       MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS,

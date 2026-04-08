@@ -32,20 +32,20 @@ export const MIGRATED_LEGACY_SCOPES = {
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
   ORGANISATION_READ_LOCATIONS_MY_JURISDICTION:
-    'organisation.read-locations:my-jurisdiction'
+    'organisation.read-locations:my-jurisdiction',
+  USER_CREATE: 'user.create:all',
+  USER_READ: 'user.read:all',
+  USER_UPDATE: 'user.update:all'
 }
 
 /** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
 export const SCOPES = {
   DEMO: 'demo',
 
-  USER_READ: 'user.read:all',
   USER_READ_MY_OFFICE: 'user.read:my-office',
   USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
   USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit', //v1.8
-  USER_CREATE: 'user.create:all',
   USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
-  USER_UPDATE: 'user.update:all',
   USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction'
 } as const
 
@@ -65,13 +65,13 @@ const LiteralScopes = z.union([
   z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS),
   z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
   z.literal(MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),
-  z.literal(SCOPES.USER_READ),
+  z.literal(MIGRATED_LEGACY_SCOPES.USER_READ),
   z.literal(SCOPES.USER_READ_MY_OFFICE),
   z.literal(SCOPES.USER_READ_MY_JURISDICTION),
   z.literal(SCOPES.USER_READ_ONLY_MY_AUDIT),
-  z.literal(SCOPES.USER_CREATE),
+  z.literal(MIGRATED_LEGACY_SCOPES.USER_CREATE),
   z.literal(SCOPES.USER_CREATE_MY_JURISDICTION),
-  z.literal(SCOPES.USER_UPDATE),
+  z.literal(MIGRATED_LEGACY_SCOPES.USER_UPDATE),
   z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION),
   z.literal(MIGRATED_LEGACY_SCOPES.CONFIG_UPDATE_ALL)
 ])
