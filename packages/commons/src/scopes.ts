@@ -44,20 +44,14 @@ export const MIGRATED_LEGACY_SCOPES = {
   DEMO: 'demo'
 }
 
-/** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
-export const SCOPES = {} as const
-
-/**
- * @deprecated - will be removed in v2.1.
- */
-const LiteralScopes = z.union([
-  ...Object.values(MIGRATED_LEGACY_SCOPES).map((scope) => z.literal(scope))
-])
-
 /**
  * @deprecated - will be removed in v2.1.
  */
 export function parseLiteralScope(scope: string) {
+  const LiteralScopes = z.union([
+    ...Object.values(MIGRATED_LEGACY_SCOPES).map((scope) => z.literal(scope))
+  ])
+
   const maybeLiteralScope = LiteralScopes.safeParse(scope)
 
   if (maybeLiteralScope.success) {

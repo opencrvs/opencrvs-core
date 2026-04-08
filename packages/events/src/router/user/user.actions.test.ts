@@ -12,7 +12,6 @@
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
 import {
-  SCOPES,
   generateUuid,
   TestUserRole,
   ActionType,

@@ -76,11 +76,6 @@ export function getScopes(token: string): string[] {
   return tokenPayload.scope || []
 }
 
-/** @deprecated todo cihan remove */
-export function hasScopeOld(token: string, scope: string) {
-  return getScopes(token).includes(scope)
-}
-
 export const getTokenPayload = (token: string): ITokenPayload => {
   let decoded: ITokenPayload
   try {

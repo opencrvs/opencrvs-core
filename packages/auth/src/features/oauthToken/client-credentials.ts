@@ -45,7 +45,6 @@ export async function clientCredentialsHandler(
     return oauthResponse.invalidClient(h)
   }
 
-  // TODO CIHAN: do we need this?
   /**
    * Intermediary step to convert any legacy scopes to the new format.
    * For example, 'record.create' becomes 'type=record.create' to align with the new scope format.
