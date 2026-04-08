@@ -313,11 +313,7 @@ export const userCanCreateEvent: MiddlewareFunction<
 > = async ({ next, ctx, getRawInput }) => {
   const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
-  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
-    'record.create'
-  ])
-
-  if (acceptedScopes.length === 0) {
+  if (!hasScope(ctx.token, 'record.create')) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
@@ -339,7 +335,7 @@ export const userCanCreateEvent: MiddlewareFunction<
     })
   }
 
-  const canCreateEvent = canUserCreateEvent(acceptedScopes, input.type)
+  const canCreateEvent = canUserCreateEvent(getScopes(ctx.token), input.type)
 
   if (!canCreateEvent) {
     throw new TRPCError({
