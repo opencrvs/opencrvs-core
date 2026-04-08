@@ -105,6 +105,7 @@ function warnOnConfigurationIssues(
   workqueue: WorkqueueConfigInputWithV19Compat
 ) {
   if (workqueue.actions) {
+    // eslint-disable-next-line no-console
     console.warn(
       `
        ************** WARNING **************

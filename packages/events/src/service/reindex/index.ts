@@ -58,7 +58,6 @@ async function reindexBatchToCountryConfig(
   )
   if (!response.ok) {
     if (tryNum < 5) {
-      console.warn('Country config request failed. Trying again in 3 seconds')
       await new Promise((resolve) => setTimeout(resolve, 3000))
       return reindexBatchToCountryConfig(token, batch, tryNum + 1)
     }
