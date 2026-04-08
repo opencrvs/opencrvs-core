@@ -39,8 +39,7 @@ import {
 
 async function reindexBatchToCountryConfig(
   token: TokenWithBearer,
-  batch: EventDocument[],
-  tryNum: number = 0
+  batch: EventDocument[]
 ): Promise<void> {
   const start = new Date()
 
@@ -57,10 +56,6 @@ async function reindexBatchToCountryConfig(
     `Batch ${batchId}: Reindex batch to country config took ${new Date().valueOf() - start.valueOf()} ms`
   )
   if (!response.ok) {
-    if (tryNum < 5) {
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-      return reindexBatchToCountryConfig(token, batch, tryNum + 1)
-    }
     throw new Error(
       `Failed to reindex country config batch: ${response.status} ${response.statusText}`
     )
