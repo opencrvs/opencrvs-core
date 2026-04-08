@@ -38,7 +38,11 @@ export const env = cleanEnv(process.env, {
     desc: 'Disables the Redis-based rate limiting globally'
   }),
   SENTRY_DSN: str({ default: undefined }),
-  QA_ENV: bool({ default: false }),
+  TWO_FA_ENABLED: bool({
+    devDefault: false,
+    default: true,
+    desc: 'Enable two-factor authentication. When disabled, verification codes are set to 000000.'
+  }),
   CHECK_INVALID_TOKEN: bool({
     devDefault: false,
     desc: 'Check if the token has been invalidated in the auth service before it has expired'

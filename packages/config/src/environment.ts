@@ -16,7 +16,6 @@ export const env = cleanEnv(process.env, {
   LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
   CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
   PORT: port({ default: 2021 }),
-  QA_ENV: bool({ default: false }),
   CHECK_INVALID_TOKEN: bool({
     devDefault: false,
     desc: `Check if the token has been invalided in the auth service before it has expired`
