@@ -8,21 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { inspect } from 'util'
 
 export function raise(...params: Parameters<typeof console.error>): never {
   // eslint-disable-next-line no-console
   console.error(...params)
   process.exit(1)
-}
-
-export function parseGQLResponse<T>(
-  response: { data: T } | { errors: Array<{ message: string }> }
-) {
-  if ('errors' in response) {
-    raise(inspect(response.errors))
-  }
-  return response.data
 }
 
 export async function delay(timeInMilliseconds: number) {

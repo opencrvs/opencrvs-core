@@ -42,7 +42,7 @@ export function useCurrentUser() {
     status: user.status,
     primaryOfficeId: user.primaryOfficeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
-    signature: user.signature
+    signature: user.signature ?? undefined
   }
 
   // @todo: administrativeAreaId should be returned from the API
