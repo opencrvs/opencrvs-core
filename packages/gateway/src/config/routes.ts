@@ -13,7 +13,6 @@ import {
   configHandler,
   publicConfigHandler
 } from '@gateway/features/config/configHandler'
-import { dashboardQueriesHandler } from '@gateway/features/config/dashboardQueriesHandler'
 import { formsHandler } from '@gateway/features/config/formsHandler'
 import healthCheckHandler from '@gateway/features/healthCheck/handler'
 import sendVerifyCodeHandler, {
@@ -131,16 +130,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Retrieve forms'
-      }
-    },
-    {
-      method: 'GET',
-      path: '/dashboardQueries',
-      handler: dashboardQueriesHandler,
-      options: {
-        auth: false,
-        tags: ['api'],
-        description: 'Fetch dashboard queries from country config'
       }
     },
     catchAllProxy.auth,
