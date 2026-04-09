@@ -45,6 +45,32 @@ describe('getScopeOptionValue()', () => {
     const result = getScopeOptionValue(scope, 'placeOfEvent')
     expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
   })
+
+  it('should successfully return empty array', () => {
+    const result = getScopeOptionValue(
+      {
+        type: 'workqueue',
+        options: {
+          ids: []
+        }
+      },
+      'ids'
+    )
+
+    expect(result).toEqual([])
+  })
+
+  it('should successfully return undefined if scope option is not set and no default is available', () => {
+    const result = getScopeOptionValue(
+      {
+        type: 'record.search',
+        options: {}
+      },
+      'declaredIn'
+    )
+
+    expect(result).toEqual(undefined)
+  })
 })
 
 describe('2.0 scopes', () => {
