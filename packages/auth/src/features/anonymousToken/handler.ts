@@ -23,11 +23,7 @@ export default async function anonymousTokenHandler(
   const token = await createToken(
     '__ANONYMOUS_USER__',
     ['verify'],
-    [
-      'opencrvs:user-mgnt-user',
-      'opencrvs:workflow-user',
-      'opencrvs:countryconfig-user'
-    ],
+    ['opencrvs:user-mgnt-user', 'opencrvs:countryconfig-user'],
     'opencrvs:auth-service',
     undefined,
     true
