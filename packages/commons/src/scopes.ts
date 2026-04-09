@@ -98,8 +98,6 @@ export const RecordScopeTypeV2 = z.enum([
 
 export type RecordScopeTypeV2 = z.infer<typeof RecordScopeTypeV2>
 
-// TODO CIHAN: rename these to whatever is used in do-not-use-file
-
 /** Plain scopes are scopes that dont have any options available. */
 const PlainScopeType = z.enum([
   // Misc. system scopes
