@@ -28,9 +28,5 @@ export function useAllowedActionConfigurations(
     [actions]
   )
 
-  const hasOnlyAssignmentActions = visibleActions.every(
-    ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN
-  )
-
-  return [modals, hasOnlyAssignmentActions ? [] : visibleActions]
+  return [modals, visibleActions]
 }
