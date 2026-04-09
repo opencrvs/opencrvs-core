@@ -275,9 +275,9 @@ export const RecordScopeV2 = z
   )
 
 export function scopeUsesDeclaredOptions(
-  scope: RecordScopeV2
+  scope: Scope
 ): scope is Extract<
-  RecordScopeV2,
+  Scope,
   { type: z.infer<typeof ScopesWithDeclaredOptions> }
 > {
   // If the scope has less, it is found here. Otherwise in other categories.
@@ -285,23 +285,20 @@ export function scopeUsesDeclaredOptions(
 }
 
 export function scopeUsesFullOptions(
-  scope: RecordScopeV2
-): scope is Extract<
-  RecordScopeV2,
-  { type: z.infer<typeof ScopesWithFullOptions> }
-> {
+  scope: Scope
+): scope is Extract<Scope, { type: z.infer<typeof ScopesWithFullOptions> }> {
   return ScopesWithFullOptions.options.some((opt) => opt === scope.type)
 }
 
 export function scopeUsesPrintCertifiedCopiesOptions(
-  scope: RecordScopeV2
-): scope is Extract<RecordScopeV2, { type: 'record.print-certified-copies' }> {
+  scope: Scope
+): scope is Extract<Scope, { type: 'record.print-certified-copies' }> {
   return scope.type === 'record.print-certified-copies'
 }
 
 export function isCustomActionScope(
-  scope: RecordScopeV2
-): scope is Extract<RecordScopeV2, { type: 'record.custom-action' }> {
+  scope: Scope
+): scope is Extract<Scope, { type: 'record.custom-action' }> {
   return scope.type === 'record.custom-action'
 }
 
@@ -658,16 +655,6 @@ export function canUserCreateEvent(userScopes: string[], eventType: string) {
 
     return scope.options?.event?.includes(eventType)
   })
-}
-
-/**
- * Helper for defining scopes for user roles.
- * @param scopes Array of scopes in object format.
- *
- * @returns Array of scopes in string format, encoded for use in JWT tokens.
- */
-export function defineScopes(scopes: RecordScopeV2[]) {
-  return scopes.map((scope) => RecordScopeV2.parse(scope)).map(encodeScope)
 }
 
 /**

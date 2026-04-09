@@ -118,7 +118,7 @@ export function isActionInScope({
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS
 
   const acceptedScopes = isUnassigningOthers
-    ? (['record.unassign-others'] as RecordScopeTypeV2[])
+    ? ['record.unassign-others' as const]
     : ACTION_SCOPE_MAP[action]
 
   // 'null' means that the action is always allowed

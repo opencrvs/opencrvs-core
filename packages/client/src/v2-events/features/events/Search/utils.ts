@@ -34,7 +34,8 @@ import {
   METADATA_FIELD_PREFIX,
   ValidatorContext,
   getAcceptedScopesByType,
-  RecordScopeV2
+  RecordScopeV2,
+  scopeUsesFullOptions
 } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
@@ -768,14 +769,19 @@ export function checkScopeForEventSearch(eventId: string) {
   const searchScopes = getAcceptedScopesByType({
     acceptedScopes: ['record.search'],
     scopes: scopes ?? []
-  }) as RecordScopeV2[]
+  })
 
-  const isEventSearchAllowed = searchScopes.some(
-    (scope) =>
+  const isEventSearchAllowed = searchScopes.some((scope) => {
+    if (!scopeUsesFullOptions(scope)) {
+      return false
+    }
+
+    // Unless specified, event search is allowed for all events
+    return (
       scope.options?.event?.includes(eventId) ||
-      // Unless specified, event search is allowed for all events
       scope.options?.event === undefined
-  )
+    )
+  })
 
   return isEventSearchAllowed
 }
