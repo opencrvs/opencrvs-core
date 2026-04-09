@@ -18,7 +18,6 @@ export const SCOPES = {
   // TODO v1.8 legacy scopes
   BYPASSRATELIMIT: 'bypassratelimit',
   REGISTER: 'register',
-  DEMO: 'demo',
   CONFIG: 'config',
 
   // systems / integrations
@@ -119,7 +118,6 @@ export const SCOPES = {
 const LegacyScopes = z.union([
   z.literal(SCOPES.BYPASSRATELIMIT),
   z.literal(SCOPES.REGISTER),
-  z.literal(SCOPES.DEMO),
   z.literal(SCOPES.CONFIG)
 ])
 

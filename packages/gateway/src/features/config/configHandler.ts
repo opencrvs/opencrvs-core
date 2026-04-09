@@ -9,48 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@opencrvs/commons'
 import { badData } from '@hapi/boom'
 import * as Joi from 'joi'
 import { pick } from 'lodash'
-import { env } from '@config/environment'
-import fetch from 'node-fetch'
-import { getToken } from '@config/utils/auth'
-import { pipe } from 'fp-ts/lib/function'
-import { verifyToken } from '@config/utils/verifyToken'
+import { logger } from '@opencrvs/commons'
 import { getAcceptedScopesFromToken } from '@opencrvs/commons/authentication'
+import { COUNTRY_CONFIG_URL } from '@gateway/constants'
+import fetch from '@gateway/fetch'
 
-export default async function configHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    const [certificates, config] = await Promise.all([
-      getCertificatesConfig(request, h),
-      getApplicationConfig(request, h)
-    ])
-    return {
-      config,
-      certificates
-    }
-  } catch (ex) {
-    logger.error(ex)
-    if (process.env.NODE_ENV === 'development') {
-      throw ex
-    }
-    return {}
+function getToken(request: Hapi.Request): string {
+  if (request.headers.authorization.indexOf('Bearer') > -1) {
+    return request.headers.authorization.split(' ')[1]
   }
+  return request.headers.authorization
 }
 
-async function getCertificatesConfig(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
+async function getCertificatesConfig(request: Hapi.Request) {
   const authToken = getToken(request)
-  const decodedOrError = pipe(authToken, verifyToken)
-  if (decodedOrError._tag === 'Left') {
-    return []
-  }
 
   const printCertifiedCopiesScope = getAcceptedScopesFromToken(authToken, [
     'record.print-certified-copies'
@@ -59,8 +34,7 @@ async function getCertificatesConfig(
     return []
   }
 
-  const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
-
+  const url = new URL('/certificates', COUNTRY_CONFIG_URL).toString()
   const res = await fetch(url, {
     method: 'GET',
     headers: { Authorization: `Bearer ${authToken}` }
@@ -87,46 +61,6 @@ async function getCertificatesConfig(
   return certificateConfigs.filter((config: { id: string }) =>
     allowedTemplateIds.has(config.id)
   )
-}
-
-async function getConfigFromCountry(authToken?: string) {
-  const url = new URL('config/application', env.COUNTRY_CONFIG_URL).toString()
-
-  const res = await fetch(url)
-  if (!res.ok) {
-    throw new Error(`Expected to get the application config from ${url}`)
-  }
-  return res.json()
-}
-
-async function getApplicationConfig(
-  request?: Hapi.Request,
-  h?: Hapi.ResponseToolkit
-) {
-  const configFromCountryConfig = await getConfigFromCountry()
-  const { error, value: updatedConfigFromCountryConfig } =
-    applicationConfigResponseValidation.validate(configFromCountryConfig, {
-      allowUnknown: true
-    })
-  if (error) {
-    throw badData(error.details[0].message)
-  }
-
-  return updatedConfigFromCountryConfig
-}
-
-export async function getLoginConfigHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const refineConfigResponse = pick(await getApplicationConfig(), [
-    'APPLICATION_NAME',
-    'COUNTRY_LOGO',
-    'PHONE_NUMBER_PATTERN',
-    'USER_NOTIFICATION_DELIVERY_METHOD',
-    'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
-  ])
-  return { config: refineConfigResponse }
 }
 
 const searchCriteria = [
@@ -160,3 +94,55 @@ const applicationConfigResponseValidation = Joi.object({
     .optional()
     .default('TRACKING_ID')
 })
+
+async function getApplicationConfig() {
+  const url = new URL('config/application', COUNTRY_CONFIG_URL).toString()
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error(`Expected to get the application config from ${url}`)
+  }
+
+  const configFromCountryConfig = await res.json()
+  const { error, value: validatedConfig } =
+    applicationConfigResponseValidation.validate(configFromCountryConfig, {
+      allowUnknown: true
+    })
+  if (error) {
+    throw badData(error.details[0].message)
+  }
+
+  return validatedConfig
+}
+
+export async function configHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const [certificates, config] = await Promise.all([
+      getCertificatesConfig(request),
+      getApplicationConfig()
+    ])
+    return { config, certificates }
+  } catch (ex) {
+    logger.error(ex)
+    if (process.env.NODE_ENV === 'development') {
+      throw ex
+    }
+    return {}
+  }
+}
+
+export async function publicConfigHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const config = pick(await getApplicationConfig(), [
+    'APPLICATION_NAME',
+    'COUNTRY_LOGO',
+    'PHONE_NUMBER_PATTERN',
+    'USER_NOTIFICATION_DELIVERY_METHOD',
+    'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
+  ])
+  return { config }
+}
