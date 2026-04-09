@@ -16,7 +16,6 @@ export const METRICS_URL = 'http://localhost:1050/'
 export const DOCUMENTS_URL = 'http://localhost:9050'
 export const AUTH_URL = 'http://localhost:4040/'
 export const NOTIFICATION_SERVICE_URL = 'http://localhost:2020/'
-export const APPLICATION_CONFIG_URL = 'http://localhost:2021/'
 export const COUNTRY_CONFIG_URL = 'http://localhost:3040'
 export const WEBHOOKS_URL = 'http://localhost:2525/'
 export function getDefaultLanguage() {

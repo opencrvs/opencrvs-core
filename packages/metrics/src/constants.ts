@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { cleanEnv, str, num, bool, url } from 'envalid'
+import { cleanEnv, str, num, url } from 'envalid'
 import { join } from 'path'
 
 const env = cleanEnv(process.env, {
@@ -19,11 +19,9 @@ const env = cleanEnv(process.env, {
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   SENTRY_DSN: str({ default: '' }),
-  QA_ENV: bool({ default: false }),
   MONGO_URL: str({ devDefault: 'mongodb://localhost/metrics' }),
   SEARCH_URL: url({ devDefault: 'http://localhost:9090/' }),
   EXPECTED_BIRTH_REGISTRATION_IN_DAYS: num({ default: 45 }),
-  CONFIG_API_URL: url({ devDefault: 'http://localhost:2021' }),
   DEFAULT_TIMEOUT: num({ default: 600000 }),
   DASHBOARD_MONGO_URL: str({ devDefault: 'mongodb://localhost/performance' })
 })
@@ -37,11 +35,9 @@ export const {
   DOCUMENTS_URL,
   SENTRY_DSN,
   isProd: PRODUCTION,
-  QA_ENV,
   MONGO_URL,
   SEARCH_URL,
   EXPECTED_BIRTH_REGISTRATION_IN_DAYS,
-  CONFIG_API_URL,
   DEFAULT_TIMEOUT,
   DASHBOARD_MONGO_URL
 } = env

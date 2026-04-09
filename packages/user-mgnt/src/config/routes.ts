@@ -60,8 +60,6 @@ import usernameReminderHandler, {
 import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
-import * as Joi from 'joi'
-import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
 import {
   createSearchHandler,
   removeSearchHandler,
@@ -455,29 +453,6 @@ export const getRoutes = () => {
         },
         description:
           'Reset password via sms for given userid and make the corresponding user pending'
-      }
-    },
-
-    {
-      method: 'POST',
-      path: '/countUsersByLocation',
-      handler: countUsersByLocationHandler,
-      options: {
-        tags: ['api'],
-        description: 'Gets count of users group by office ids',
-        auth: {
-          scope: [
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE,
-            SCOPES.PERFORMANCE_READ
-          ]
-        },
-        validate: {
-          payload: Joi.object({
-            locationId: Joi.string()
-          })
-        }
       }
     }
   ] satisfies Hapi.ServerRoute[]
