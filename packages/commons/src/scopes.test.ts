@@ -12,15 +12,17 @@
 import {
   decodeScope,
   encodeScope,
-  v1ScopeToV2Scope,
   getScopeOptionValue,
   JurisdictionFilter,
   ScopesWithDeclaredOptions,
   ScopesWithFullOptions,
-  ScopesWithPlaceEventOptions,
-  migrateV1ScopesToV2,
-  MIGRATED_LEGACY_SCOPES
+  ScopesWithPlaceEventOptions
 } from './scopes'
+
+import {
+  migrateLegacyScopesToV2,
+  legacyScopeToV2Scope
+} from './scopes.deprecated.do-not-use'
 
 describe('getScopeOptionValue()', () => {
   it('should return the default value if the scope option is not set', () => {
@@ -249,7 +251,7 @@ describe('2.0 scopes', () => {
     const v1Scope =
       'record.registered.print-certified-copies[event=birth|death,templates=cert-1|cert-2]'
 
-    expect(v1ScopeToV2Scope(v1Scope)).toEqual(
+    expect(legacyScopeToV2Scope(v1Scope)).toEqual(
       'type=record.print-certified-copies&event=birth,death&templates=cert-1,cert-2'
     )
   })
@@ -268,23 +270,23 @@ describe('2.0 scopes', () => {
   })
 })
 
-it('transform v1 scope to v2', () => {
+it('transform legacy scope to v2', () => {
   const scopes = {
     /**
      * scopes are same as countryconfig/src/data-seeding/roles/roles.ts
      * except for workque scope that has an extra workqueue: all-events
      */
     localRegistrar: [
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ,
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      MIGRATED_LEGACY_SCOPES.PROFILE_ELECTRONIC_SIGNATURE,
-      MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      'performance.read',
+      'performance.read-dashboards',
+      'profile.electronic-signature',
+      'organisation.read-locations:my-office',
       'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
       'search[event=birth,access=all]',
       'search[event=death,access=all]',
       'search[event=tennis-club-membership,access=all]',
       'search[event=FOOTBALL_CLUB_MEMBERSHIP,access=all]',
-      MIGRATED_LEGACY_SCOPES.USER_READ_ONLY_MY_AUDIT,
+      'user.read:only-my-audit',
       'record.create[event=birth|death|tennis-club-membership]',
       'record.read[event=birth|death|tennis-club-membership]',
       'record.declare[event=birth|death|tennis-club-membership]',
@@ -297,10 +299,10 @@ it('transform v1 scope to v2', () => {
       'record.declared.review-duplicates[event=birth|death|tennis-club-membership]'
     ],
     registrationAgent: [
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ,
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      MIGRATED_LEGACY_SCOPES.USER_READ_ONLY_MY_AUDIT,
+      'performance.read',
+      'performance.read-dashboards',
+      'organisation.read-locations:my-office',
+      'user.read:only-my-audit',
       'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
       'search[event=birth,access=all]',
       'search[event=death,access=all]',
@@ -325,27 +327,27 @@ it('transform v1 scope to v2', () => {
       'record.notify[event=birth|death|tennis-club-membership]'
     ],
     localSystemAdmin: [
-      MIGRATED_LEGACY_SCOPES.USER_READ_MY_OFFICE,
-      MIGRATED_LEGACY_SCOPES.USER_READ_MY_JURISDICTION,
-      MIGRATED_LEGACY_SCOPES.USER_UPDATE_MY_JURISDICTION,
-      MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ,
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
-      MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      'user.read:my-office',
+      'user.read:my-jurisdiction',
+      'user.update:my-jurisdiction',
+      'organisation.read-locations:my-jurisdiction',
+      'performance.read',
+      'performance.read-dashboards',
+      'performance.vital-statistics-export',
+      'organisation.read-locations:my-office',
       'user.create[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]',
       'user.edit[role=FIELD_AGENT|POLICE_OFFICER|SOCIAL_WORKER|HEALTHCARE_WORKER|LOCAL_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR]'
     ],
     nationalSystemAdmin: [
-      MIGRATED_LEGACY_SCOPES.CONFIG_UPDATE_ALL,
-      MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS,
-      MIGRATED_LEGACY_SCOPES.USER_CREATE,
-      MIGRATED_LEGACY_SCOPES.USER_UPDATE,
-      MIGRATED_LEGACY_SCOPES.USER_READ,
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ,
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS,
-      MIGRATED_LEGACY_SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
-      MIGRATED_LEGACY_SCOPES.RECORD_REINDEX,
+      'config.update-all',
+      'organisation.read-locations',
+      'user.create:all',
+      'user.update:all',
+      'user.read:all',
+      'performance.read',
+      'performance.read-dashboards',
+      'performance.vital-statistics-export',
+      'record.reindex',
       'user.create[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]',
       'user.edit[role=FIELD_AGENT|HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER]'
     ]
@@ -355,7 +357,10 @@ it('transform v1 scope to v2', () => {
     Object.entries(scopes).map(([role, roleScopes]) => {
       return [
         role,
-        roleScopes.map((s) => ({ v2: v1ScopeToV2Scope(s as string), v1: s }))
+        roleScopes.map((s) => ({
+          v2: legacyScopeToV2Scope(s as string),
+          v1: s
+        }))
       ] as const
     })
   )
@@ -363,17 +368,17 @@ it('transform v1 scope to v2', () => {
   expect(scopeMapping).toMatchSnapshot()
 })
 
-it('migrate v1 scopes to v2', () => {
-  // Mix of deprecated, upgraded and unchanged scopes
+it('migrate legacy scopes to v2', () => {
+  // Mix of legacy v1.8 literal scopes and v1.9 config scopes
   const v1Scopes = [
-    MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ,
-    MIGRATED_LEGACY_SCOPES.PERFORMANCE_READ_DASHBOARDS,
-    MIGRATED_LEGACY_SCOPES.USER_READ_MY_OFFICE,
-    MIGRATED_LEGACY_SCOPES.USER_READ_MY_JURISDICTION,
-    MIGRATED_LEGACY_SCOPES.USER_UPDATE_MY_JURISDICTION,
-    MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
-    MIGRATED_LEGACY_SCOPES.USER_READ_ONLY_MY_AUDIT,
-    MIGRATED_LEGACY_SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+    'performance.read',
+    'performance.read-dashboards',
+    'user.read:my-office',
+    'user.read:my-jurisdiction',
+    'user.update:my-jurisdiction',
+    'organisation.read-locations:my-jurisdiction',
+    'user.read:only-my-audit',
+    'organisation.read-locations:my-office',
     'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
     'search[event=birth,access=all]',
     'search[event=death,access=all]',
@@ -394,18 +399,18 @@ it('migrate v1 scopes to v2', () => {
 
   expect(v1Scopes).toHaveLength(24)
 
-  const v2Scopes = migrateV1ScopesToV2(v1Scopes)
+  const v2Scopes = migrateLegacyScopesToV2(v1Scopes)
   expect(v2Scopes).toHaveLength(24)
 
   expect(v2Scopes).toEqual([
-    'performance.read',
-    'performance.read-dashboards',
-    'user.read:my-office',
-    'user.read:my-jurisdiction',
-    'user.update:my-jurisdiction',
-    'organisation.read-locations:my-jurisdiction',
-    'user.read:only-my-audit',
-    'organisation.read-locations:my-office',
+    'type=performance.read',
+    'type=performance.read-dashboards',
+    'type=user.read&accessLevel=location',
+    'type=user.read&accessLevel=administrativeArea',
+    'type=user.edit&accessLevel=administrativeArea',
+    'type=organisation.read-locations&accessLevel=administrativeArea',
+    'type=user.read-only-my-audit',
+    'type=organisation.read-locations&accessLevel=location',
     'type=workqueue&ids=all-events,assigned-to-you,recent,requires-completion,requires-updates,in-review-all,in-external-validation,ready-to-print,ready-to-issue',
     'type=record.search&event=birth&placeOfEvent=all',
     'type=record.search&event=death&placeOfEvent=all',

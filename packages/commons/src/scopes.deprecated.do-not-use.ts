@@ -10,6 +10,7 @@
  */
 
 import * as z from 'zod/v4'
+import { encodeScope, RecordScopeTypeV2, RecordScopeV2, Scope } from './scopes'
 
 /**
  * @deprecated - will be removed in v2.1.
@@ -229,4 +230,220 @@ export function parseConfigurableScope(scope: string) {
 
   const result = ConfigurableRawScopes.safeParse(parsedScope)
   return result.success ? result.data : undefined
+}
+
+/**
+ * @deprecated - These are v1.8 legacy litral scopes which are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes.
+ * */
+const MigratedLegacyScope = z.enum([
+  'bypassratelimit',
+  'record.reindex',
+  'record.import',
+  'attachment.upload',
+  'user.data-seeding',
+  'integration.create',
+  'performance.vital-statistics-export',
+  'profile.electronic-signature',
+  'performance.read',
+  'performance.read-dashboards',
+  'config.update-all',
+  'organisation.read-locations',
+  'organisation.read-locations:my-office',
+  'organisation.read-locations:my-jurisdiction',
+  'user.create:all',
+  'user.read:all',
+  'user.update:all',
+  'user.read:my-office',
+  'user.read:my-jurisdiction',
+  'user.read:only-my-audit',
+  'user.create:my-jurisdiction',
+  'user.update:my-jurisdiction'
+])
+
+const literalScopeToV2ScopeMap: Record<
+  z.infer<typeof MigratedLegacyScope>,
+  Scope
+> = {
+  bypassratelimit: { type: 'bypassratelimit' },
+  'record.reindex': { type: 'record.reindex' },
+  'record.import': { type: 'record.import' },
+  'attachment.upload': { type: 'attachment.upload' },
+  'user.data-seeding': { type: 'user.data-seeding' },
+  'integration.create': { type: 'integration.create' },
+  'performance.vital-statistics-export': {
+    type: 'performance.vital-statistics-export'
+  },
+  'profile.electronic-signature': { type: 'profile.electronic-signature' },
+  'performance.read': { type: 'performance.read' },
+  'performance.read-dashboards': { type: 'performance.read-dashboards' },
+  'config.update-all': { type: 'config.update-all' },
+  'organisation.read-locations': {
+    type: 'organisation.read-locations'
+  },
+  'organisation.read-locations:my-office': {
+    type: 'organisation.read-locations',
+    options: { accessLevel: 'location' }
+  },
+  'organisation.read-locations:my-jurisdiction': {
+    type: 'organisation.read-locations',
+    options: { accessLevel: 'administrativeArea' }
+  },
+  'user.create:all': { type: 'user.create' },
+  'user.create:my-jurisdiction': {
+    type: 'user.create',
+    options: { accessLevel: 'administrativeArea' }
+  },
+  'user.read:all': { type: 'user.read' },
+  'user.read:my-office': {
+    type: 'user.read',
+    options: { accessLevel: 'location' }
+  },
+  'user.read:my-jurisdiction': {
+    type: 'user.read',
+    options: { accessLevel: 'administrativeArea' }
+  },
+  'user.read:only-my-audit': { type: 'user.read-only-my-audit' },
+  'user.update:all': { type: 'user.edit' },
+  'user.update:my-jurisdiction': {
+    type: 'user.edit',
+    options: { accessLevel: 'administrativeArea' }
+  }
+} as const
+
+/**
+ * @deprecated - will be removed in v2.1.
+ */
+export function parseLiteralScope(scope: string) {
+  const maybeLiteralScope = MigratedLegacyScope.safeParse(scope)
+
+  if (maybeLiteralScope.success) {
+    return literalScopeToV2ScopeMap[maybeLiteralScope.data]
+  }
+
+  return
+}
+
+/**
+ * Mapping of V1 scope types to V2 scope types.
+ *
+ * Unifies the naming structure by dropping the status from the string.
+ * This is done in order to more easily represent the scopes in human-readable formant, and to match better with the system actions.
+ */
+const v1ToV2ConfigScopeTypeMap: Record<string, string> = {
+  search: 'record.search',
+  workqueue: 'workqueue',
+  'user.create': 'user.create',
+  'user.edit': 'user.edit',
+  'record.create': 'record.create',
+  'record.read': 'record.read',
+  'record.declare': 'record.declare',
+  'record.notify': 'record.notify',
+  'record.register': 'record.register',
+  'record.unassign-others': 'record.unassign-others',
+  'record.declared.reject': 'record.reject',
+  'record.declared.archive': 'record.archive',
+  'record.declared.review-duplicates': 'record.review-duplicates',
+  'record.registered.print-certified-copies': 'record.print-certified-copies',
+  'record.registered.request-correction': 'record.request-correction',
+  'record.registered.correct': 'record.correct',
+  'record.declared.edit': 'record.edit',
+  'record.declared.validate': 'record.custom-action'
+}
+
+/**
+ * Converts a V1 scope string to a V2 compatible scope string. Used to migrate between 1.9 and 2.0 scopes.
+ * @deprecated - This will be removed after migration to V2 scopes is complete. Do not use for new development.
+ *
+ * NOTE: We are casting intentionally broad with the input and output types to allow for flexibility during migration, without forcing loose types on the rest of the codebase.
+ *
+ * @param v1Scope e.g. 'record.declared.reject[event=birth|death|tennis-club-membership]',
+ * @returns corresponding V2 compatible scope string based on v1 input.
+ */
+export const legacyScopeToV2Scope = (v1Scope: string) => {
+  const configurableV1Scope = parseConfigurableScope(v1Scope)
+  const literalV1Scope = parseLiteralScope(v1Scope)
+
+  if (!configurableV1Scope && !literalV1Scope) {
+    throw new Error(`Invalid V1 scope: ${v1Scope}`)
+  }
+
+  if (literalV1Scope) {
+    return encodeScope(literalV1Scope)
+  }
+
+  if (configurableV1Scope) {
+    const type = v1ToV2ConfigScopeTypeMap[configurableV1Scope.type]
+
+    if (type === undefined) {
+      throw new Error(`Unsupported V1 scope type: ${configurableV1Scope.type}`)
+    }
+
+    if (configurableV1Scope.type === 'workqueue') {
+      return encodeScope({
+        type: 'workqueue',
+        options: {
+          ids: configurableV1Scope.options.id || []
+        }
+      })
+    }
+
+    if (configurableV1Scope.type === 'search') {
+      return encodeScope({
+        type: type as RecordScopeTypeV2,
+        options: {
+          event: configurableV1Scope.options.event || [],
+          placeOfEvent:
+            configurableV1Scope.options.access[0] === 'my-jurisdiction'
+              ? 'administrativeArea'
+              : 'all'
+        }
+      })
+    }
+
+    if (configurableV1Scope.type === 'record.declared.validate') {
+      return encodeScope({
+        type: 'record.custom-action',
+        options: {
+          event: configurableV1Scope.options.event,
+          customActionTypes: ['VALIDATE_DECLARATION']
+        }
+      })
+    }
+    if (!configurableV1Scope.type.startsWith('record.')) {
+      return v1Scope
+    }
+
+    return encodeScope({
+      type: type as RecordScopeTypeV2,
+      options: configurableV1Scope.options as RecordScopeV2['options']
+    })
+  }
+
+  throw new Error(`Unsupported V1 scope type: ${v1Scope}`)
+}
+
+/**
+ * Helper for porting legacy scopes to new query-string "v2" model.
+ *
+ * Legacy scopes may include both:
+ *   - v1.8 plain scopes, e.g. 'record.reindex'
+ *   - v1.9 config scopes, e.g. 'record.read[event=birth|death|tennis-club-membership]'
+ *
+ * Output will be an array of v2 query string scopes.
+ *
+ * @param scopes legacy scopes
+ * @returns array of v2 compatible scopes, filtering out the old ones not used anymore.
+ */
+export function migrateLegacyScopesToV2(scopes: string[]): string[] {
+  return scopes
+    .map((scope) => {
+      try {
+        return legacyScopeToV2Scope(scope)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn(`Could not migrate scope: ${scope}. Error: ${error}`)
+        return null
+      }
+    })
+    .filter((scope): scope is string => !!scope)
 }

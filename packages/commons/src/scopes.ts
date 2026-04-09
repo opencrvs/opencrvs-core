@@ -12,53 +12,7 @@
 import * as z from 'zod/v4'
 import * as qs from 'qs'
 import { UUID } from './uuid'
-import { parseConfigurableScope } from './scopes.deprecated.do-not-use'
 import { getScopes } from './authentication'
-
-/** @deprecated - These scopes are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes. */
-export const MIGRATED_LEGACY_SCOPES = {
-  BYPASSRATELIMIT: 'bypassratelimit',
-  RECORD_REINDEX: 'record.reindex',
-  RECORD_IMPORT: 'record.import',
-  ATTACHMENT_UPLOAD: 'attachment.upload',
-  USER_DATA_SEEDING: 'user.data-seeding',
-  INTEGRATION_CREATE: 'integration.create',
-  PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
-  PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
-  PERFORMANCE_READ: 'performance.read',
-  PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
-  CONFIG_UPDATE_ALL: 'config.update:all',
-  ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
-  ORGANISATION_READ_LOCATIONS_MY_OFFICE:
-    'organisation.read-locations:my-office',
-  ORGANISATION_READ_LOCATIONS_MY_JURISDICTION:
-    'organisation.read-locations:my-jurisdiction',
-  USER_CREATE: 'user.create:all',
-  USER_READ: 'user.read:all',
-  USER_UPDATE: 'user.update:all',
-  USER_READ_MY_OFFICE: 'user.read:my-office',
-  USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
-  USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit',
-  USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
-  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction'
-}
-
-/**
- * @deprecated - will be removed in v2.1.
- */
-export function parseLiteralScope(scope: string) {
-  const LiteralScopes = z.union([
-    ...Object.values(MIGRATED_LEGACY_SCOPES).map((scope) => z.literal(scope))
-  ])
-
-  const maybeLiteralScope = LiteralScopes.safeParse(scope)
-
-  if (maybeLiteralScope.success) {
-    return { type: maybeLiteralScope.data }
-  }
-
-  return
-}
 
 export const JurisdictionFilter = z
   .enum(['administrativeArea', 'location', 'all'])
@@ -417,105 +371,6 @@ export function getScopeOptionValue<T extends ScopeOptionKey>(
   return value ?? defaultValue
 }
 
-/**
- * Mapping of V1 scope types to V2 scope types.
- *
- * Unifies the naming structure by dropping the status from the string.
- * This is done in order to more easily represent the scopes in human-readable formant, and to match better with the system actions.
- */
-const v1ToV2ConfigScopeTypeMap: Record<string, string> = {
-  search: 'record.search',
-  workqueue: 'workqueue',
-  'user.create': 'user.create',
-  'user.edit': 'user.edit',
-  'record.create': 'record.create',
-  'record.read': 'record.read',
-  'record.declare': 'record.declare',
-  'record.notify': 'record.notify',
-  'record.register': 'record.register',
-  'record.unassign-others': 'record.unassign-others',
-  'record.declared.reject': 'record.reject',
-  'record.declared.archive': 'record.archive',
-  'record.declared.review-duplicates': 'record.review-duplicates',
-  'record.registered.print-certified-copies': 'record.print-certified-copies',
-  'record.registered.request-correction': 'record.request-correction',
-  'record.registered.correct': 'record.correct',
-  'record.declared.edit': 'record.edit',
-  'record.declared.validate': 'record.custom-action'
-}
-
-/**
- * Converts a V1 scope string to a V2 compatible scope string. Used to migrate between 1.9 and 2.0 scopes.
- * @deprecated - This will be removed after migration to V2 scopes is complete. Do not use for new development.
- *
- * NOTE: We are casting intentionally broad with the input and output types to allow for flexibility during migration, without forcing loose types on the rest of the codebase.
- *
- * @param v1Scope e.g. 'record.declared.reject[event=birth|death|tennis-club-membership]',
- * @returns corresponding V2 compatible scope string based on v1 input.
- */
-export const v1ScopeToV2Scope = (v1Scope: string) => {
-  const configurableV1Scope = parseConfigurableScope(v1Scope)
-  const literalV1Scope = parseLiteralScope(v1Scope)
-
-  if (!configurableV1Scope && !literalV1Scope) {
-    throw new Error(`Invalid V1 scope: ${v1Scope}`)
-  }
-
-  if (literalV1Scope) {
-    return literalV1Scope.type
-  }
-
-  if (configurableV1Scope) {
-    const type = v1ToV2ConfigScopeTypeMap[configurableV1Scope.type]
-
-    if (type === undefined) {
-      throw new Error(`Unsupported V1 scope type: ${configurableV1Scope.type}`)
-    }
-
-    if (configurableV1Scope.type === 'workqueue') {
-      return encodeScope({
-        type: 'workqueue',
-        options: {
-          ids: configurableV1Scope.options.id || []
-        }
-      })
-    }
-
-    if (configurableV1Scope.type === 'search') {
-      return encodeScope({
-        type: type as RecordScopeTypeV2,
-        options: {
-          event: configurableV1Scope.options.event || [],
-          placeOfEvent:
-            configurableV1Scope.options.access[0] === 'my-jurisdiction'
-              ? 'administrativeArea'
-              : 'all'
-        }
-      })
-    }
-
-    if (configurableV1Scope.type === 'record.declared.validate') {
-      return encodeScope({
-        type: 'record.custom-action',
-        options: {
-          event: configurableV1Scope.options.event,
-          customActionTypes: ['VALIDATE_DECLARATION']
-        }
-      })
-    }
-    if (!configurableV1Scope.type.startsWith('record.')) {
-      return v1Scope
-    }
-
-    return encodeScope({
-      type: type as RecordScopeTypeV2,
-      options: configurableV1Scope.options as RecordScopeV2['options']
-    })
-  }
-
-  throw new Error(`Unsupported V1 scope type: ${v1Scope}`)
-}
-
 export function getAcceptedScopesByType({
   acceptedScopes,
   scopes
@@ -655,23 +510,4 @@ export function canUserCreateEvent(userScopes: string[], eventType: string) {
 
     return scope.options?.event?.includes(eventType)
   })
-}
-
-/**
- * Helper for porting v1 scopes to v2. Intended to be used in the interim during migration, not for new development.
- * @param scopes v1 scopes
- * @returns array of v2 compatible scopes, filtering out the old ones not used anymore.
- */
-export function migrateV1ScopesToV2(scopes: string[]): string[] {
-  return scopes
-    .map((scope) => {
-      try {
-        return v1ScopeToV2Scope(scope)
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Could not migrate scope: ${scope}. Error: ${error}`)
-        return null
-      }
-    })
-    .filter((scope): scope is string => !!scope)
 }

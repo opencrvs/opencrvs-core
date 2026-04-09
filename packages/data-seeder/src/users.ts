@@ -17,7 +17,6 @@ import {
   EventConfig,
   hasScope,
   joinUrl,
-  parseLiteralScope,
   parseConfigurableScope
 } from '@opencrvs/commons'
 import { fromZodError } from 'zod-validation-error'
@@ -34,15 +33,10 @@ const RoleSchema = (eventIds: string[]) =>
       }),
       scopes: z.array(
         z.string().superRefine((scope, ctx) => {
-          const parsedLiteralScope = parseLiteralScope(scope)
           const parsedConfigurableScope = parseConfigurableScope(scope)
           const parsedV2Scopes = decodeScope(scope)
 
-          if (
-            !parsedLiteralScope &&
-            !parsedConfigurableScope &&
-            !parsedV2Scopes
-          ) {
+          if (!parsedConfigurableScope && !parsedV2Scopes) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Invalid scope: "${scope}"`
