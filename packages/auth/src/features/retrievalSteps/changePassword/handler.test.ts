@@ -8,22 +8,26 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as fetchAny from 'jest-fetch-mock'
 import { AuthServer, createServer } from '@auth/server'
 import {
   storeRetrievalStepInformation,
   RetrievalSteps
 } from '@auth/features/retrievalSteps/verifyUser/service'
-
-const fetch = fetchAny as fetchAny.FetchMock
+import * as changePasswordService from '@auth/features/retrievalSteps/changePassword/service'
 
 describe('password change', () => {
   let server: AuthServer
+  let changePasswordSpy: jest.SpyInstance
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
 
   beforeEach(async () => {
     server = await createServer()
-    fetch.resetMocks()
-    fetch.mockResponse('OK')
+    changePasswordSpy = jest
+      .spyOn(changePasswordService, 'changePassword')
+      .mockResolvedValue(undefined)
     storeRetrievalStepInformation('12345', RetrievalSteps.SECURITY_Q_VERIFIED, {
       userFullName: [
         {
@@ -53,7 +57,7 @@ describe('password change', () => {
 
       expect(res.statusCode).toBe(200)
     })
-    it('calls user-management service to change the password', async () => {
+    it('calls events service to change the password', async () => {
       await server.server.inject({
         method: 'POST',
         url: '/changePassword',
@@ -63,7 +67,7 @@ describe('password change', () => {
         }
       })
 
-      expect(fetch.mock.calls).toHaveLength(1)
+      expect(changePasswordSpy).toHaveBeenCalledTimes(1)
     })
   })
   describe('when an invalid nonce is supplied', () => {

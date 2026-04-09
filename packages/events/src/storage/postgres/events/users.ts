@@ -122,7 +122,7 @@ export async function updatePasswordHash(userId: string, passwordHash: string) {
     .execute()
 }
 
-export async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {
+async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {
   const { id } = await trx
     .insertInto('users')
     .values(user)
@@ -133,7 +133,7 @@ export async function createUserInTrx(user: NewUsers, trx: Kysely<Schema>) {
   return id
 }
 
-export async function createUserCredentialInTrx(
+async function createUserCredentialInTrx(
   cred: NewUserCredentials,
   trx: Kysely<Schema>
 ) {
@@ -327,11 +327,7 @@ export async function activateUserWithCredentials(
       .set({
         passwordHash,
         salt,
-        securityQuestions:
-          sql`cast (${JSON.stringify(securityQuestions)} as jsonb)` as unknown as Record<
-            string,
-            any
-          >
+        securityQuestions: sql`cast (${JSON.stringify(securityQuestions)} as jsonb)`
       })
       .where('userId', '=', userId as UUID)
       .execute()
