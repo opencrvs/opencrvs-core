@@ -28,7 +28,6 @@ services:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
       - LOGIN_URL=http://login:3020
       - AUTH_URL_INTERNAL=http://auth:4040
-      - CONFIG_API_URL_INTERNAL=http://config:2021
       - GATEWAY_URL_INTERNAL=http://gateway:7070
   login:
     image: ghcr.io/opencrvs/ocrvs-login:${VERSION}
@@ -43,7 +42,6 @@ services:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
       - CLIENT_APP_URL=http://register:3000
       - AUTH_URL_INTERNAL=http://auth:4040
-      - CONFIG_API_URL_INTERNAL=http://config:2021
       - GATEWAY_URL_INTERNAL=http://gateway:7070
   gateway:
     image: ghcr.io/opencrvs/ocrvs-gateway:${VERSION}
@@ -68,7 +66,6 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - NOTIFICATION_URL=http://notification:2020/
       - WEBHOOKS_URL=http://webhooks:2525/
-      - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
       - DOCUMENTS_URL=http://documents:9050
   events:
@@ -86,7 +83,6 @@ services:
       - DOCUMENTS_URL=http://documents:9050
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - AUTH_URL=http://auth:4040
-      - CONFIG_URL=http://config:2021
   # User facing services
   search:
     image: ghcr.io/opencrvs/ocrvs-search:${VERSION}
@@ -101,7 +97,6 @@ services:
       - NODE_ENV=development
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
-      - APPLICATION_CONFIG_URL=http://config:2021/
   metrics:
     image: ghcr.io/opencrvs/ocrvs-metrics:${VERSION}
     #platform: linux/amd64
@@ -116,7 +111,6 @@ services:
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
-      - CONFIG_API_URL=http://config:2021
       - MONGO_URL=mongodb://mongo1/metrics
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
       - SEARCH_URL=http://search:9090/
@@ -164,7 +158,6 @@ services:
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - HOST=0.0.0.0
       - METRICS_URL=http://metrics:1050
-      - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
       - EVENTS_URL=http://events:5555/
@@ -198,27 +191,6 @@ services:
       - HOST=0.0.0.0
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-  config:
-    image: ghcr.io/opencrvs/ocrvs-config:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/config/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-    environment:
-      - AUTH_URL=http://auth:4040
-      - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - HOST=0.0.0.0
-      - PORT=2021
-      - MONGO_URL=mongodb://mongo1/application-config
-      - SEARCH_URL=http://search:9090/
-      - METRICS_URL=http://metrics:1050
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - GATEWAY_URL=http://gateway:7070/
-      - DOCUMENTS_URL=http://documents:9050
-      - CHECK_INVALID_TOKEN=true
   migration:
     image: ghcr.io/opencrvs/ocrvs-migration:${VERSION}
     #platform: linux/amd64
@@ -230,7 +202,6 @@ services:
       - base
     environment:
       - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
-      - APPLICATION_CONFIG_MONGO_URL=mongodb://mongo1/application-config
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev

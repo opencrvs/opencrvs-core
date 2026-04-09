@@ -88,7 +88,3 @@ services:
   login:
     ports:
       - '3020:3020'
-
-  config:
-    ports:
-      - '2021:2021'

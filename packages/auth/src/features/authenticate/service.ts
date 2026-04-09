@@ -180,7 +180,6 @@ export async function createTokenForActionConfirmation(
         'opencrvs:metrics-user',
         'opencrvs:countryconfig-user',
         'opencrvs:webhooks-user',
-        'opencrvs:config-user',
         'opencrvs:documents-user',
         'opencrvs:notification-api-user'
       ],
@@ -222,12 +221,12 @@ export async function generateAndSendVerificationCode(
   email?: string,
   role?: string | number
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1 || env.QA_ENV
+  const isTwoFADisabled = !env.TWO_FA_ENABLED
   logger.info(
-    `Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')} Role: ${role}`
+    `2FA disabled: ${isTwoFADisabled}. Scopes: ${scope.join(', ')} Role: ${role}`
   )
   let verificationCode
-  if (isDemoUser) {
+  if (isTwoFADisabled) {
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
