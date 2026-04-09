@@ -399,7 +399,7 @@ export const userRouter = router({
   search: userAndSystemProcedure
     .input(UserSearch)
     .output(z.array(UserOrSystem))
-    .query(async ({ input, ctx }) => searchUsers(input)),
+    .query(async ({ input }) => searchUsers(input)),
   actions: userOnlyProcedure
     .input(UserActionsQuery)
     .use(userCanReadOtherUser)
