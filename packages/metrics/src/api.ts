@@ -9,32 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { IAuthHeader , logger } from '@opencrvs/commons'
-import {
-  USER_MANAGEMENT_URL,
-  DOCUMENTS_URL
-} from '@metrics/constants'
+import { logger } from '@opencrvs/commons'
+import { DOCUMENTS_URL } from '@metrics/constants'
 
 export interface ICountByLocation {
   total: number
   locationId: string
-}
-
-export async function countRegistrarsByLocation(
-  authHeader: IAuthHeader,
-  locationId?: string
-): Promise<{ registrars: number }> {
-  const res = await fetch(`${USER_MANAGEMENT_URL}/countUsersByLocation`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    },
-    body: JSON.stringify({
-      locationId
-    })
-  })
-  return res.json()
 }
 
 export async function uploadFileToMinio(fileData: Buffer): Promise<string> {
