@@ -24,7 +24,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger, UUID, IUserName, hasScope } from '@opencrvs/commons'
+import { logger, UUID, IUserName } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
 import { encodeScope, TokenUserType } from '@opencrvs/commons/authentication'

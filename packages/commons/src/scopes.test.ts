@@ -21,10 +21,6 @@ import {
   migrateV1ScopesToV2,
   MIGRATED_LEGACY_SCOPES
 } from './scopes'
-import {
-  findScope,
-  parseConfigurableScope
-} from './scopes.deprecated.do-not-use'
 
 describe('getScopeOptionValue()', () => {
   it('should return the default value if the scope option is not set', () => {
@@ -46,105 +42,6 @@ describe('getScopeOptionValue()', () => {
 
     const result = getScopeOptionValue(scope, 'placeOfEvent')
     expect(result).toEqual(JurisdictionFilter.enum.administrativeArea)
-  })
-})
-
-describe('findScope()', () => {
-  const userScopes = [
-    'foobar',
-    'user.create[role=first-role|second-role]',
-    'record.notify[event=birth]'
-  ]
-
-  it('successfully finds a configurable scope', () => {
-    const result = findScope(userScopes, 'user.create')
-    expect(result).toEqual({
-      type: 'user.create',
-      options: { role: ['first-role', 'second-role'] }
-    })
-  })
-
-  it('successfully finds a configurable scope, even if config value includes special characters', () => {
-    const result = findScope(userScopes, 'user.create')
-    expect(result).toEqual({
-      type: 'user.create',
-      options: { role: ['first-role', 'second-role'] }
-    })
-  })
-
-  it('returns undefined if the scope is not found', () => {
-    const result = findScope(userScopes, 'user.edit')
-    expect(result).toEqual(undefined)
-  })
-})
-
-describe('parseConfigurableScope()', () => {
-  it('should not be able to parse a literal scope', () => {
-    expect(parseConfigurableScope('user.create')).toEqual(undefined)
-  })
-
-  it('should successfully parse a configurable scope', () => {
-    const scope = 'user.create[role=foo|bar]'
-    const result = parseConfigurableScope(scope)
-
-    expect(result).toEqual({
-      type: 'user.create',
-      options: { role: ['foo', 'bar'] }
-    })
-  })
-
-  it('should return undefined for a configurable scope with no options', () => {
-    const scope = 'user.create[role=]'
-    const result = parseConfigurableScope(scope)
-    expect(result).toEqual(undefined)
-  })
-
-  it('should return undefined for a configurable scope with missing options bracket', () => {
-    const scope = 'user.create'
-    const result = parseConfigurableScope(scope)
-    expect(result).toEqual(undefined)
-  })
-
-  it('should return undefined for a configurable scope with empty options bracket', () => {
-    const scope = 'user.create[]'
-    const result = parseConfigurableScope(scope)
-    expect(result).toEqual(undefined)
-  })
-
-  it('should return scope for a valid scope with print-certified-copies', () => {
-    const scope1 =
-      'record.registered.print-certified-copies[event=tennis-club-membership,templates=v2.tennis-club-membership-certificate-alpha]' // valid scope with templateIds option
-    expect(parseConfigurableScope(scope1)).toEqual({
-      type: 'record.registered.print-certified-copies',
-      options: {
-        event: ['tennis-club-membership'],
-        templates: ['v2.tennis-club-membership-certificate-alpha']
-      }
-    })
-
-    const scope2 =
-      'record.registered.print-certified-copies[event=tennis-club-membership]' // valid because templates is optional
-
-    expect(parseConfigurableScope(scope2)).toEqual({
-      type: 'record.registered.print-certified-copies',
-      options: { event: ['tennis-club-membership'] }
-    })
-
-    const scope3 =
-      'record.registered.print-certified-copies[event=tennis-club-membership,templates=]' // invalid because templates is empty
-
-    expect(parseConfigurableScope(scope3)).toEqual(undefined)
-
-    const scope4 =
-      'record.registered.print-certified-copies[event=tennis-club-membership,templates=v2.tennis-club-membership-certificate-alpha|v2.birth]' // valid scope with multiple templateIds option
-
-    expect(parseConfigurableScope(scope4)).toEqual({
-      type: 'record.registered.print-certified-copies',
-      options: {
-        event: ['tennis-club-membership'],
-        templates: ['v2.tennis-club-membership-certificate-alpha', 'v2.birth']
-      }
-    })
   })
 })
 
