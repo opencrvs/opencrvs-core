@@ -263,7 +263,6 @@ jobs:
           Chart Branch: ${{ needs.generate_stack_name_and_branch.outputs.chart_branch }}
           Stack: ${{ steps.generate_stack.outputs.stack }}
           """
-
       - name: Trigger E2E Workflow
         id: dispatch_e2e
         uses: actions/github-script@v7
