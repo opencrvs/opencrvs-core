@@ -28,7 +28,6 @@ export const env = cleanEnv(process.env, {
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
-  CONFIG_URL: url({ devDefault: 'http://localhost:2021' }),
   TWO_FA_ENABLED: bool({
     devDefault: false,
     default: true,

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { CONFIG_API_URL } from '@metrics/constants'
+import { COUNTRY_CONFIG_URL } from '@metrics/constants'
 
 export interface ICountryLogo {
   fileName: string
@@ -31,19 +31,14 @@ export interface IApplicationConfig {
 export async function getApplicationConfig(
   authorization: string
 ): Promise<IApplicationConfig> {
-  const token = authorization.replace('Bearer ', '')
-  return fetch(`${CONFIG_API_URL}/config`, {
+  return fetch(new URL('config/application', COUNTRY_CONFIG_URL).toString(), {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      'Content-Type': 'application/json'
     }
   })
     .then((response) => {
       return response.json()
-    })
-    .then((response) => {
-      return response.config
     })
     .catch((error) => {
       return Promise.reject(

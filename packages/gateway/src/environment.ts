@@ -27,7 +27,6 @@ export const env = cleanEnv(process.env, {
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   WEBHOOKS_URL: url({ devDefault: 'http://localhost:2525/' }),
-  APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
   NOTIFICATION_URL: url({ devDefault: 'http://localhost:2020/' }),
   EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),

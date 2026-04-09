@@ -15,7 +15,6 @@ export const env = cleanEnv(process.env, {
   HOST: str({ devDefault: 'localhost' }),
   PORT: port({ default: 3030 }),
   MONGO_URL: url({ devDefault: 'mongodb://localhost/user-mgnt' }),
-  APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
