@@ -18,6 +18,5 @@ export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({ default: '../../.secrets/public-key.pem' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   MATCH_SCORE_THRESHOLD: num({ default: 1.0 }),
-  OPENCRVS_INDEX_NAME: str({ default: 'ocrvs' }),
-  APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' })
+  OPENCRVS_INDEX_NAME: str({ default: 'ocrvs' })
 })

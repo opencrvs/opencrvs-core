@@ -33,7 +33,7 @@ const server = setupServer(
       })
     )
   }),
-  rest.get('/api/config/publicConfig', (req, res, ctx) => {
+  rest.get('/api/publicConfig', (req, res, ctx) => {
     return res(
       ctx.json({
         config: {

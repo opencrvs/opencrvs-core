@@ -63,7 +63,10 @@ export default async function searchUsers(
     criteria = { ...criteria, primaryOfficeId }
   }
   if (locationId) {
-    const locationChildren = await resolveLocationChildren(locationId)
+    const locationChildren = await resolveLocationChildren(
+      locationId,
+      request.headers.authorization
+    )
     criteria = { ...criteria, primaryOfficeId: { $in: locationChildren } }
   }
   if (status) {

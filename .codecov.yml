@@ -53,10 +53,6 @@ coverage:
         paths:
           - packages/metrics
         threshold: 0.5
-      config:
-        paths:
-          - packages/config
-        threshold: 0.5
       documents:
         paths:
           - packages/documents
