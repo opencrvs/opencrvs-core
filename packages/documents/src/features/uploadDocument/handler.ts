@@ -100,7 +100,7 @@ export async function fileExistsHandler(
     filePath = filePath.slice(MINIO_BUCKET.length + 1)
   }
 
-  let documentPath = DocumentPath.parse(filePath)
+  const documentPath = DocumentPath.parse(filePath)
 
   let stat
 

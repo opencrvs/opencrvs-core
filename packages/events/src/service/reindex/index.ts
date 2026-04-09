@@ -117,7 +117,7 @@ async function reindexSearch(
           indexNameOverrides
         )
       ),
-      withRetry(() => reindexBatchToCountryConfig(token, batch))
+      withRetry(async () => reindexBatchToCountryConfig(token, batch))
     ])
 
     await onBatchProcessed?.(batch.length)

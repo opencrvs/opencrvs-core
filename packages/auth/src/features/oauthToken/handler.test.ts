@@ -28,11 +28,11 @@ describe('authenticate handler receives a request', () => {
     )
   })
 
-  describe('user management service says credentials are not valid', () => {
+  describe('events service says credentials are not valid', () => {
     it('returns a 401 response to client', async () => {
-      jest.spyOn(authService, 'authenticateSystem').mockRejectedValue(
-        new Error('Invalid credentials')
-      )
+      jest
+        .spyOn(authService, 'authenticateSystem')
+        .mockRejectedValue(new Error('Invalid credentials'))
       const res = await server.server.inject({
         method: 'POST',
         url: '/token?client_id=123&client_secret=456&grant_type=client_credentials'
@@ -41,7 +41,7 @@ describe('authenticate handler receives a request', () => {
       expect(res.statusCode).toBe(401)
     })
   })
-  describe('user management service says credentials are valid', () => {
+  describe('events service says credentials are valid', () => {
     it('returns a token to the client', async () => {
       const res = await server.server.inject({
         method: 'POST',

@@ -42,7 +42,7 @@ export function useCurrentUser() {
     status: user.status,
     primaryOfficeId: user.primaryOfficeId,
     administrativeAreaId: user.administrativeAreaId ?? undefined,
-    signature: user.signature
+    signature: user.signature ?? undefined
   }
 
   if (user.primaryOfficeId) {
