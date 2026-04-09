@@ -65,7 +65,7 @@ setQueryDefaults<
 
     return {
       ...user,
-      signature: user.signature,
+      signature: user.signature ?? undefined,
       avatar: user.avatar
     }
   }

@@ -8,12 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as fetchAny from 'jest-fetch-mock'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
 import * as codeService from '@auth/features/verifyCode/service'
+import * as verifyUserService from '@auth/features/retrievalSteps/verifyUser/service'
 import { AuthServer, createServer } from '@auth/server'
-
-const fetch = fetchAny as fetchAny.FetchMock
 
 describe('verifyUser handler receives a request', () => {
   let server: AuthServer
@@ -22,9 +20,9 @@ describe('verifyUser handler receives a request', () => {
     server = await createServer()
   })
 
-  describe('user management service says user is not valid', () => {
+  describe('events service says user is not valid', () => {
     it('returns a 401 response to client when error occurs', async () => {
-      fetch.mockReject(new Error())
+      jest.spyOn(verifyUserService, 'verifyUser').mockRejectedValue(new Error())
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyUser',
@@ -34,7 +32,9 @@ describe('verifyUser handler receives a request', () => {
       expect(res.statusCode).toBe(401)
     })
     it('returns a 401 response to client when the fetch call responses with a bad request response', async () => {
-      fetch.mockResponse('{}', { status: 400 })
+      jest
+        .spyOn(verifyUserService, 'verifyUser')
+        .mockRejectedValue(new Error('Bad request'))
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyUser',
@@ -44,19 +44,19 @@ describe('verifyUser handler receives a request', () => {
       expect(res.statusCode).toBe(401)
     })
   })
-  describe('user management service says user is valid', () => {
+  describe('events service says user is valid', () => {
     it('returns a nonce to the client', async () => {
       jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
-      fetch.mockResponse(
-        JSON.stringify({
-          id: '1',
-          username: 'fake_user_name',
-          status: 'active',
-          scope: [],
-          mobile: '+8801711111111',
-          securityQuestionKey: 'dummyKey'
-        })
-      )
+      jest.spyOn(verifyUserService, 'verifyUser').mockResolvedValue({
+        userId: '1',
+        username: 'fake_user_name',
+        userFullName: [],
+        scope: ['demo'],
+        status: 'active',
+        mobile: '+8801711111111',
+        email: undefined,
+        securityQuestionKey: 'dummyKey'
+      })
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyUser',
@@ -71,20 +71,23 @@ describe('verifyUser handler receives a request', () => {
       /* eslint-disable @typescript-eslint/no-require-imports */
       /* eslint-disable @typescript-eslint/no-var-requires */
       const reloadedCodeService = require('../../verifyCode/service')
+      const reloadedVerifyUserService = require('./service')
 
+      jest.spyOn(reloadedVerifyUserService, 'verifyUser').mockResolvedValue({
+        userId: '1',
+        username: 'fake_user_name',
+        userFullName: [],
+        scope: ['admin'],
+        status: 'active',
+        mobile: '+8801711111111',
+        email: undefined,
+        securityQuestionKey: 'dummyKey'
+      })
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
 
-      fetch.mockResponse(
-        JSON.stringify({
-          id: '1',
-          username: 'fake_user_name',
-          status: 'active',
-          scope: ['admin'],
-          mobile: '+8801711111111',
-          securityQuestionKey: 'dummyKey'
-        })
-      )
-      const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')
+      const spy = jest
+        .spyOn(reloadedCodeService, 'sendVerificationCode')
+        .mockResolvedValue(undefined)
 
       await server.server.inject({
         method: 'POST',

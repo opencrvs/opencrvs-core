@@ -35,7 +35,7 @@ describe('authenticate handler receives a request', () => {
     jest.spyOn(authService, 'recordUserAuditEvent').mockImplementation(() => {})
   })
 
-  describe('user management service says credentials are valid', () => {
+  describe('events service says credentials are valid', () => {
     it('verifies a code and generates a token', async () => {
       /* eslint-disable @typescript-eslint/no-require-imports */
       /* eslint-disable @typescript-eslint/no-var-requires */

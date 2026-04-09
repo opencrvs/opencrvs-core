@@ -8,28 +8,27 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as fetchAny from 'jest-fetch-mock'
 import { AuthServer, createServer } from '@auth/server'
 import {
   RetrievalSteps,
   storeRetrievalStepInformation,
   getRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
-
-const fetch = fetchAny as fetchAny.FetchMock
+import * as securityAnswerService from '@auth/features/retrievalSteps/verifySecurityAnswer/service'
 
 describe('security question answer checking', () => {
   let server: AuthServer
 
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   beforeEach(async () => {
     server = await createServer()
-    fetch.resetMocks()
-    fetch.mockResponse(
-      JSON.stringify({
-        matched: true,
-        questionKey: 'TEST_SECURITY_QUESTION_KEY'
-      })
-    )
+    jest.spyOn(securityAnswerService, 'verifySecurityAnswer').mockResolvedValue({
+      matched: true,
+      questionKey: 'TEST_SECURITY_QUESTION_KEY'
+    })
     await storeRetrievalStepInformation(
       'TEST_NONCE',
       RetrievalSteps.NUMBER_VERIFIED,
@@ -113,12 +112,12 @@ describe('security question answer checking', () => {
   })
   describe('when submitted security answer is incorrect', () => {
     beforeEach(() =>
-      fetch.mockResponse(
-        JSON.stringify({
+      jest
+        .spyOn(securityAnswerService, 'verifySecurityAnswer')
+        .mockResolvedValue({
           matched: false,
           questionKey: 'ANOTHER_KEY'
         })
-      )
     )
     it('responds with matched as false', async () => {
       const res = await server.server.inject({

@@ -164,7 +164,7 @@ export async function updateUser(
   }
 
   const scopes = getScopes(token)
-  const editableRoleIds = findScope(scopes, 'user.edit')?.options?.role
+  const editableRoleIds = findScope(scopes, 'user.edit')?.options.role
   if (Array.isArray(editableRoleIds) && !editableRoleIds.includes(input.role)) {
     throw new Error('Unauthorized to edit user with this role')
   }
@@ -183,12 +183,12 @@ export async function updateUser(
   const newUsername = await generateUsername(input.name, existingUser.username)
 
   await updateUserById(input.id, {
-    firstname: englishName?.given[0] ?? null,
-    surname: englishName?.family ?? null,
-    fullHonorificName: input.fullHonorificName ?? null,
-    email: input.email ?? null,
-    mobile: input.mobile ?? null,
-    device: input.device ?? null,
+    firstname: englishName.given[0],
+    surname: englishName.family,
+    fullHonorificName: input.fullHonorificName,
+    email: input.email,
+    mobile: input.mobile,
+    device: input.device,
     role: input.role,
     officeId,
     signaturePath: input.signature
@@ -198,13 +198,13 @@ export async function updateUser(
 
   if (newUsername !== oldUsername) {
     await updateUsernameById(input.id, newUsername)
-    triggerUserEventNotification({
+    await triggerUserEventNotification({
       event: 'user-updated',
       payload: {
         recipient: {
           name: personNameFromV1ToV2(input.name),
-          email: input.email ?? undefined,
-          mobile: input.mobile ?? undefined
+          email: input.email,
+          mobile: input.mobile
         },
         oldUsername,
         newUsername
@@ -238,7 +238,7 @@ function generateRandomPassword(demoUser?: boolean) {
   return randomPassword
 }
 
-export async function sendCredentialsNotification(
+async function sendCredentialsNotification(
   userFullName: IUserName[],
   username: string,
   password: string,
@@ -276,14 +276,14 @@ export async function createUser(input: CreateUserPayload, _token: string) {
   const { hash, salt } = await generateSaltedHash(password)
 
   const userPayload = {
-    firstname: englishName?.given[0] ?? null,
-    surname: englishName?.family ?? null,
-    email: input.email ?? null,
-    fullHonorificName: input.fullHonorificName ?? null,
+    firstname: englishName.given[0],
+    surname: englishName.family,
+    email: input.email,
+    fullHonorificName: input.fullHonorificName,
     role: input.role,
-    device: input.device ?? null,
+    device: input.device,
     officeId: input.primaryOfficeId as UUID,
-    mobile: input.mobile ?? null,
+    mobile: input.mobile,
     status: input.status ?? 'pending'
   }
 
@@ -299,7 +299,7 @@ export async function createUser(input: CreateUserPayload, _token: string) {
     userCredentialPayload
   )
 
-  sendCredentialsNotification(
+  await sendCredentialsNotification(
     input.name,
     userCredentialPayload.username,
     password,

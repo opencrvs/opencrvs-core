@@ -12,8 +12,6 @@
 import { AuthServer, createServer } from '@auth/server'
 import * as codeService from '@auth/features/verifyCode/service'
 import * as retrievalService from '@auth/features/retrievalSteps/verifyUser/service'
-import * as fetchAny from 'jest-fetch-mock'
-const fetch = fetchAny as fetchAny.FetchMock
 
 jest.mock('@auth/features/verifyCode/service', () => {
   const actual = jest.requireActual('@auth/features/verifyCode/service')
@@ -31,16 +29,16 @@ describe('verifyNumber handler receives a request', () => {
 
   it('Verifies the code for a valid nonce and returns a security question key', async () => {
     jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
-    fetch.mockResponse(
-      JSON.stringify({
-        id: '1',
-        username: 'fake_user_name',
-        status: 'active',
-        scope: [],
-        mobile: '+8801711111111',
-        securityQuestionKey: 'dummyKey'
-      })
-    )
+    jest.spyOn(retrievalService, 'verifyUser').mockResolvedValue({
+      userId: '1',
+      username: 'fake_user_name',
+      status: 'active',
+      scope: ['demo'],
+      mobile: '+8801711111111',
+      email: undefined,
+      securityQuestionKey: 'dummyKey',
+      userFullName: []
+    })
     const stepOneRes: {
       result?: { nonce: string; securityQuestionKey?: string }
     } = await server.server.inject({
