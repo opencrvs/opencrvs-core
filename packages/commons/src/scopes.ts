@@ -543,10 +543,10 @@ export function canUserCreateEvent(
 
 /**
  * Helper for defining scopes for user roles. Should be used in country config.
- * @param scopes Array of scopes in object format.
  *
+ * @param scopes Array of scopes in object format.
  * @returns Array of scopes in string format, encoded for use in JWT tokens.
  */
-export function defineScopes(scopes: RecordScopeV2[]) {
-  return scopes.map((scope) => RecordScopeV2.parse(scope)).map(encodeScope)
+export function defineScopes(scopes: Scope[]) {
+  return scopes.map((scope) => Scope.parse(scope)).map(encodeScope)
 }
