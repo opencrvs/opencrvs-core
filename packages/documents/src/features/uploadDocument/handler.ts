@@ -12,11 +12,10 @@ import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
 import {
-  FullDocumentPath,
+  DocumentPath,
   getUserId,
   joinUrlPaths,
-  logger,
-  toDocumentPath
+  logger
 } from '@opencrvs/commons'
 import { fromBuffer } from 'file-type'
 import { v4 as uuid } from 'uuid'
@@ -57,7 +56,7 @@ const FileSchema = z
 const Payload = z.object({
   file: FileSchema,
   transactionId: z.string(),
-  path: z.string().optional().default('/')
+  path: z.string().optional().default('')
 })
 
 /**
@@ -76,27 +75,35 @@ export async function fileUploadHandler(
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
-  const filePath = joinUrlPaths(path, filename)
+  const filePath = (
+    path ? joinUrlPaths(path, filename) : filename
+  ) as DocumentPath
 
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId,
     ...(filename.endsWith('.pdf') && { 'content-type': 'application/pdf' })
   })
 
-  return ('/' + joinUrlPaths(MINIO_BUCKET, filePath)) as FullDocumentPath
+  return filePath
 }
 
 export async function fileExistsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  // Ensure file is still in the desired format. forwarding url from gateway,
-  // '/files/{filePath*}' --> files//ocrvs/filename.jpg and the double slash is removed.
-  const filePath = FullDocumentPath.parse(request.params.filePath)
+  let filePath = request.params.filePath
+  if (filePath.startsWith('/')) {
+    filePath = filePath.slice(1)
+  }
+
+  if (filePath.startsWith(MINIO_BUCKET)) {
+    filePath = filePath.slice(MINIO_BUCKET.length + 1)
+  }
+
+  const documentPath = DocumentPath.parse(filePath)
 
   let stat
 
-  const documentPath = toDocumentPath(filePath)
   try {
     stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
   } catch (error) {

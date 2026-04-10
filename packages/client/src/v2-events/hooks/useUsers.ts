@@ -12,13 +12,11 @@
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { inferInput, inferOutput } from '@trpc/tanstack-react-query'
 import {
-  FullDocumentUrl,
   System,
   TokenUserType,
   User,
   UserOrSystem
 } from '@opencrvs/commons/client'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import {
   hasConflict,
   queryClient,
@@ -32,14 +30,14 @@ import {
 } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
 
-type UserWithFullUrlFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
-  signature?: FullDocumentUrl
-  avatar?: FullDocumentUrl
+type UserWithResolvedFiles = Omit<UserOrSystem, 'signature' | 'avatar'> & {
+  signature?: string
+  avatar?: string
 }
 
 setQueryDefaults<
   typeof trpcOptionsProxy.user.get,
-  Promise<UserWithFullUrlFiles>
+  Promise<UserWithResolvedFiles>
 >(trpcOptionsProxy.user.get, {
   queryFn: async (...params) => {
     const {
@@ -67,10 +65,8 @@ setQueryDefaults<
 
     return {
       ...user,
-      signature: user.signature
-        ? getUnsignedFileUrl(user.signature)
-        : undefined,
-      avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
+      signature: user.signature,
+      avatar: user.avatar
     }
   }
 })
@@ -108,10 +104,8 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
 
     return users.map((user) => ({
       ...user,
-      signature: user.signature
-        ? getUnsignedFileUrl(user.signature)
-        : undefined,
-      avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
+      signature: user.signature,
+      avatar: user.avatar
     }))
   }
 })

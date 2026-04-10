@@ -23,6 +23,7 @@ import {
   getDefaultActionProcedures
 } from '@events/router/event/actions'
 import { getInMemoryEventConfigurations } from '@events/service/config/config'
+import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
 
 export function customActionProcedures() {
   return {
@@ -73,7 +74,7 @@ export function customActionProcedures() {
           })
         }
 
-        return defaultRequestHandler(
+        const result = await defaultRequestHandler(
           input,
           user,
           token,
@@ -81,6 +82,22 @@ export function customActionProcedures() {
           config,
           CustomActionInput
         )
+
+        await writeAuditLog({
+          clientId: user.id,
+          clientType: user.type,
+          operation: 'event.actions.custom.request',
+          requestData: {
+            eventId: input.eventId,
+            actionType: ActionType.CUSTOM,
+            eventType: result.type,
+            trackingId: result.trackingId,
+            transactionId: input.transactionId,
+            customAction: input.customActionType
+          }
+        })
+
+        return result
       })
   }
 }

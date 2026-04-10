@@ -27,7 +27,8 @@ export async function writeAuditLog(params: AuditLogParams) {
       clientType: params.clientType,
       operation: params.operation,
       requestData: params.requestData,
-      responseSummary: params.responseSummary
+      responseSummary:
+        'responseSummary' in params ? params.responseSummary : null
     })
     .execute()
 }
@@ -38,6 +39,7 @@ interface UserAuditLogQuery {
   count?: number
   timeStart?: string
   timeEnd?: string
+  excludeOperations: string[]
 }
 
 /**
@@ -48,7 +50,8 @@ export async function queryUserAuditLog({
   skip = 0,
   count = 10,
   timeStart,
-  timeEnd
+  timeEnd,
+  excludeOperations
 }: UserAuditLogQuery) {
   const db = getClient()
 
@@ -65,6 +68,10 @@ export async function queryUserAuditLog({
     query = query.where('createdAt', '<=', timeEnd)
   }
 
+  if (excludeOperations.length > 0) {
+    query = query.where('operation', 'not in', excludeOperations)
+  }
+
   const results = await query
     .orderBy('createdAt', 'desc')
     .limit(count)
@@ -75,6 +82,10 @@ export async function queryUserAuditLog({
     .selectFrom('auditLog')
     .select(({ fn }) => [fn.count<string>('id').as('count')])
     .where('clientId', '=', subjectId)
+
+  if (excludeOperations.length > 0) {
+    countQuery = countQuery.where('operation', 'not in', excludeOperations)
+  }
 
   if (timeStart) {
     countQuery = countQuery.where('createdAt', '>=', timeStart)

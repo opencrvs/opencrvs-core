@@ -101,8 +101,7 @@ export async function userAuditHandler(
           subjectId: auditUserPayload.userId,
           reason: auditUserPayload.reason,
           comment: auditUserPayload.comment
-        },
-        responseSummary: {}
+        }
       })
     }
     try {

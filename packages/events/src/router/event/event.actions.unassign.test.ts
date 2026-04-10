@@ -160,7 +160,7 @@ test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
       'applicant.image': {
         type: 'image/png',
         originalFilename: 'abcd.png',
-        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
       }
     },
     transactionId: getUUID(),
@@ -207,7 +207,7 @@ test(`${ActionType.UNASSIGN} is idempotent`, async () => {
       'applicant.image': {
         type: 'image/png',
         originalFilename: 'abcd.png',
-        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
       }
     },
     transactionId: getUUID(),

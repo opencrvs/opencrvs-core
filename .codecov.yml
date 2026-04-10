@@ -41,10 +41,6 @@ coverage:
         paths:
           - packages/commons
         threshold: 0.5
-      workflow:
-        paths:
-          - packages/workflow
-        threshold: 0.5
       search:
         paths:
           - packages/search
@@ -52,10 +48,6 @@ coverage:
       metrics:
         paths:
           - packages/metrics
-        threshold: 0.5
-      config:
-        paths:
-          - packages/config
         threshold: 0.5
       documents:
         paths:
@@ -69,7 +61,6 @@ ignore:
   - 'packages/client/src/src-sw.js'
   - 'packages/client/src/src-sw.ts'
   - 'packages/client/src/tests/graphql-schema-mock.ts'
-  - 'packages/workflow/src/index.ts'
   - 'packages/gateway/src/index.ts'
   - 'packages/gateway/src/routes.ts'
   - 'packages/login/src/extract-translations.ts'

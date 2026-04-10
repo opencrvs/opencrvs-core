@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
@@ -27,9 +27,10 @@ import {
   ResponsiveModal
 } from '@opencrvs/components'
 import styled from 'styled-components'
-import { useLazyQuery } from '@apollo/client'
+import { useMutation } from '@tanstack/react-query'
 import { useDispatch } from 'react-redux'
 import { toggleEmailAllUsersFeedbackToast } from '@client/notification/actions'
+import { trpcClient } from '@client/v2-events/trpc'
 
 const Form = styled.form`
   & > :not(:last-child) {
@@ -87,25 +88,31 @@ const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
     setSubject('')
     setBody('')
   }
+
+  const broadcastMutation = useMutation({
+    mutationFn: () =>
+      trpcClient.announcement.broadcast.mutate({
+        subject,
+        body,
+        locale: intl.locale
+      }),
+    onSuccess: () => {
+      dispatch(
+        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
+      )
+      resetForm()
+    },
+    onError: () => {
+      dispatch(
+        toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
+      )
+    }
+  })
+
   const handleConfirmSubmit = () => {
-    throw new Error('Not implemented yet')
+    hideModal()
+    broadcastMutation.mutate()
   }
-
-  // useEffect(() => {
-  //   if (data) {
-  //     dispatch(
-  //       toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
-  //     )
-  //   }
-  // }, [data, dispatch])
-
-  // useEffect(() => {
-  //   if (error) {
-  //     dispatch(
-  //       toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
-  //     )
-  //   }
-  // }, [error, dispatch])
 
   return (
     <>

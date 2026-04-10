@@ -14,12 +14,10 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:user-mgnt-user',
   'opencrvs:gateway-user',
   'opencrvs:notification-user',
-  'opencrvs:workflow-user',
   'opencrvs:search-user',
   'opencrvs:metrics-user',
   'opencrvs:countryconfig-user',
   'opencrvs:webhooks-user',
-  'opencrvs:config-user',
   'opencrvs:documents-user'
 ]
 export const NOTIFICATION_API_USER_AUDIENCE = 'opencrvs:notification-api-user'
