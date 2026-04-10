@@ -20,7 +20,12 @@ import {
   NOTIFICATION_API_USER_AUDIENCE
 } from '@auth/constants'
 import * as oauthResponse from './responses'
-import { TokenUserType, hasScope, encodeScope } from '@opencrvs/commons'
+import {
+  TokenUserType,
+  hasScope,
+  encodeScope,
+  EncodedScope
+} from '@opencrvs/commons'
 import { getParam } from './utils'
 
 export async function clientCredentialsHandler(
@@ -73,7 +78,7 @@ export async function clientCredentialsHandler(
       return encodeScope({ type: 'record.import' })
     }
 
-    return s
+    return s as EncodedScope
   })
 
   const isNotificationAPIUser = hasScope(v2Scopes, 'notification-api')
