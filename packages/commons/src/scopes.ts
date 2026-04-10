@@ -319,15 +319,20 @@ const unflattenScope = (input: Record<string, unknown>) => {
   return { type, options }
 }
 
-export const encodeScope = (scope: Scope): string => {
+// Define a branded type for encoded scope strings
+export const EncodedScope = z.string().brand('EncodedScope')
+export type EncodedScope = z.infer<typeof EncodedScope>
+
+export const encodeScope = (scope: Scope): EncodedScope => {
   const flattened = flattenScope(scope)
 
+  // Cast to the branded type
   return qs.stringify(flattened, {
     arrayFormat: 'comma',
     allowDots: true,
     addQueryPrefix: false,
     encode: false
-  })
+  }) as EncodedScope
 }
 
 export const decodeScope = (query: string) => {
