@@ -89,7 +89,10 @@ export const rateLimitedRoute =
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
-    if (hasScope(args[0].headers.authorization, 'bypassratelimit')) {
+    if (
+      args[0].headers.authorization &&
+      hasScope(args[0].headers.authorization, 'bypassratelimit')
+    ) {
       return fn(...args)
     }
 

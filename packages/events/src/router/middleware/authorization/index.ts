@@ -357,9 +357,10 @@ export const userCanReadOtherUser: MiddlewareFunction<
 
   // Throw early to avoid mistakes in the logic below.
   // There are test cases for each but better safe than sorry.
-  const scopeFound = hasScope(token, 'user.read')
+  const hasReadScope = hasScope(token, 'user.read')
+  const hasReadMyAuditScope = hasScope(token, 'user.read-only-my-audit')
 
-  if (!scopeFound) {
+  if (!hasReadScope && !hasReadMyAuditScope) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
@@ -379,9 +380,9 @@ export const userCanReadOtherUser: MiddlewareFunction<
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  const acceptedScopes = getAcceptedScopesFromToken(token, ['user.read'])
+  const readScopes = getAcceptedScopesFromToken(token, ['user.read'])
 
-  const accessLevels = acceptedScopes.map((s) =>
+  const accessLevels = readScopes.map((s) =>
     getScopeOptionValue(s, 'accessLevel')
   )
 
@@ -416,10 +417,7 @@ export const userCanReadOtherUser: MiddlewareFunction<
     return next()
   }
 
-  if (
-    hasScope(token, 'user.read-only-my-audit') &&
-    userReading.id === otherUser.id
-  ) {
+  if (hasReadMyAuditScope && userReading.id === otherUser.id) {
     return next()
   }
 

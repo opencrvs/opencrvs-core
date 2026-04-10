@@ -233,7 +233,7 @@ export function parseConfigurableScope(scope: string) {
 }
 
 /**
- * @deprecated - These are v1.8 legacy litral scopes which are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes.
+ * @deprecated - These are v1.8 legacy literal scopes which are no longer supported on v2.0. However, they are automatically migrated to v2.0 scopes.
  * */
 const MigratedLegacyScope = z.enum([
   'bypassratelimit',
