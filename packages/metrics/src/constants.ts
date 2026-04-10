@@ -20,7 +20,6 @@ const env = cleanEnv(process.env, {
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   SENTRY_DSN: str({ default: '' }),
   MONGO_URL: str({ devDefault: 'mongodb://localhost/metrics' }),
-  SEARCH_URL: url({ devDefault: 'http://localhost:9090/' }),
   EXPECTED_BIRTH_REGISTRATION_IN_DAYS: num({ default: 45 }),
   DEFAULT_TIMEOUT: num({ default: 600000 }),
   DASHBOARD_MONGO_URL: str({ devDefault: 'mongodb://localhost/performance' })
@@ -36,7 +35,6 @@ export const {
   SENTRY_DSN,
   isProd: PRODUCTION,
   MONGO_URL,
-  SEARCH_URL,
   EXPECTED_BIRTH_REGISTRATION_IN_DAYS,
   DEFAULT_TIMEOUT,
   DASHBOARD_MONGO_URL

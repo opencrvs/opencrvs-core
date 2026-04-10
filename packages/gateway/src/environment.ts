@@ -22,7 +22,6 @@ export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({
     devDefault: '../../.secrets/public-key.pem'
   }),
-  SEARCH_URL: url({ devDefault: 'http://localhost:9090/' }),
   METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
@@ -50,6 +49,5 @@ export const env = cleanEnv(process.env, {
   COUNTRY: str({ devDefault: 'FAR' }),
   CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
-  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
-  RECORD_SEARCH_QUOTA: num({ default: 2000 })
+  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }) // 10 minutes
 })

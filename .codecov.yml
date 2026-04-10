@@ -41,10 +41,6 @@ coverage:
         paths:
           - packages/commons
         threshold: 0.5
-      search:
-        paths:
-          - packages/search
-        threshold: 0.5
       metrics:
         paths:
           - packages/metrics
