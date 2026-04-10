@@ -21,4 +21,3 @@ export const SENTRY_DSN = process.env.SENTRY_DSN
 export const OPENCRVS_INDEX_NAME = env.OPENCRVS_INDEX_NAME
 export const DEFAULT_TIMEOUT = 600000
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
-export const APPLICATION_CONFIG_URL = env.APPLICATION_CONFIG_URL
