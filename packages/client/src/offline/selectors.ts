@@ -59,9 +59,8 @@ const getAdminStructureLocations = createSelector(
   (data) => data.locations
 )
 
-export const selectCountryBackground = (store: IStoreState) => {
-  const countryBackground = getKey(store, 'offlineData').config
-    ?.LOGIN_BACKGROUND
+export const selectCountryBackground = () => {
+  const countryBackground = window.config.REGISTER_BACKGROUND
   if (countryBackground?.backgroundImage) {
     return {
       backgroundImage: countryBackground.backgroundImage,
@@ -71,20 +70,6 @@ export const selectCountryBackground = (store: IStoreState) => {
   return {
     backgroundColor: countryBackground?.backgroundColor ?? '36304E'
   }
-}
-
-const selectCountryLogo = (store: IStoreState) => {
-  return (
-    getKey(store, 'offlineData').config?.COUNTRY_LOGO?.file ||
-    getKey(store, 'offlineData').anonymousConfig?.COUNTRY_LOGO?.file
-  )
-}
-
-function selectApplicationName(store: IStoreState) {
-  return (
-    getKey(store, 'offlineData').config?.APPLICATION_NAME ||
-    getKey(store, 'offlineData').anonymousConfig?.APPLICATION_NAME
-  )
 }
 
 export const getOfflineLoadingError = (

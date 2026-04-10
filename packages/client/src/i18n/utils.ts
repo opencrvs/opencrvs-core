@@ -11,7 +11,7 @@
 import { storage } from '@client/storage'
 
 export function getAvailableLanguages() {
-  return window.config.LANGUAGES.split(',')
+  return window.config.LANGUAGES
 }
 
 export function getDefaultLanguage() {

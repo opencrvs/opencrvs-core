@@ -17,9 +17,9 @@ import {
 } from '@auth/features/verifyCode/service'
 import {
   getStoredUserInformation,
-  createToken
+  createToken,
+  recordUserAuditEvent
 } from '@auth/features/authenticate/service'
-import { postUserActionToMetrics } from '@auth/metrics'
 import { logger, TokenUserType } from '@opencrvs/commons'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
@@ -50,27 +50,16 @@ export default async function authenticateHandler(
     WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
     role,
-    false,
     TokenUserType.enum.user
   )
 
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-  try {
-    await postUserActionToMetrics(
-      'LOGGED_IN',
-      response.token,
-      remoteAddress,
-      userAgent
-    )
-  } catch (err) {
-    logger.error(err)
-  }
+  recordUserAuditEvent(response.token, {
+    operation: 'user.logged_in',
+    requestData: { subjectId: userId }
+  })
 
   return response
 }

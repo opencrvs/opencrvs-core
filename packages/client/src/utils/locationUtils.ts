@@ -8,15 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  ILocation,
-  LocationType,
-  IOfflineData,
-  Facility,
-  CRVSOffice,
-  AdminStructure
-} from '@client/offline/reducer'
-import { Address } from '@client/utils/gateway'
+import { ILocation, AdminStructure } from '@client/offline/reducer'
 import { ISearchLocation as SearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
@@ -28,8 +20,7 @@ import {
   AdministrativeArea,
   joinValues,
   Location,
-  UUID,
-  LocationType as V2LocationType
+  UUID
 } from '@opencrvs/commons/client'
 import { getAdministrativeAreaHierarchy } from '../v2-events/utils'
 
@@ -44,31 +35,7 @@ export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
-  allowedType: 'HEALTH_FACILITY',
-  match?: {
-    locationLevel: keyof ILocation
-    locationId?: string
-  }
-): { [key: string]: Facility }
-export function filterLocations(
-  locations: { [key: string]: ILocation },
-  allowedType: 'CRVS_OFFICE',
-  match?: {
-    locationLevel: keyof ILocation
-    locationId?: string
-  }
-): { [key: string]: CRVSOffice }
-export function filterLocations(
-  locations: { [key: string]: ILocation },
-  allowedType: 'ADMIN_STRUCTURE',
-  match?: {
-    locationLevel: keyof ILocation
-    locationId?: string
-  }
-): { [key: string]: AdminStructure }
-export function filterLocations(
-  locations: { [key: string]: ILocation },
-  allowedType: LocationType,
+  allowedType: string,
   match?: {
     locationLevel: keyof ILocation // ex: 'partOf' or 'id'
     locationId?: string
@@ -105,25 +72,7 @@ export function generateLocationName(
   return name
 }
 
-function generateFullLocation(
-  districtId: string,
-  stateId: string,
-  countryCode: string,
-  resources: IOfflineData,
-  intl: IntlShape
-) {
-  const district = districtId && resources.locations[districtId]
-  const state = stateId && resources.locations[stateId]
-  const country =
-    countryCode && intl.formatMessage(countryMessages[countryCode])
-  let location = ''
-  if (district) location = district.name + ', '
-  if (state) location = location + state.name + ', '
-  location = location + country
-  return location
-}
-
-export function generateSearchableLocations(
+function generateSearchableLocations(
   locations: ILocation[],
   offlineLocations: { [key: string]: ILocation },
   intl: IntlShape,
@@ -140,7 +89,7 @@ export function generateSearchableLocations(
       if (
         location.partOf &&
         location.partOf !== 'Location/0' &&
-        location.type !== V2LocationType.enum.CRVS_OFFICE
+        location.type !== 'CRVS_OFFICE'
       ) {
         const locRef = location.partOf.split('/')[1]
         let parent
@@ -322,24 +271,32 @@ export function getLocationHierarchy(
   })
 }
 
-export function isOfficeUnderJurisdiction({
-  officeId,
-  otherOfficeId,
+/**
+ * Determines if the given other location is under the jurisdiction (administrative area) of the specified location.
+ *
+ * @param {string} params.locationId - The UUID of the reference location (the one representing the office's jurisdiction).
+ * @param {string} params.otherLocationId - The UUID of the location to check against the jurisdiction.
+ * @param {Map<UUID, Location>} params.locations - A map of all locations, keyed by UUID.
+ * @param {Map<UUID, AdministrativeArea>} params.administrativeAreas - A map of administrative areas, keyed by UUID.
+ * @returns {boolean} True if the other location falls under the parent administrative area of the given location, otherwise false.
+ */
+export function isLocationUnderJurisdiction({
+  locationId,
+  otherLocationId,
   locations,
   administrativeAreas
 }: {
-  officeId: string
-  otherOfficeId: string
+  locationId: string
+  otherLocationId: string
   locations: Map<UUID, Location>
   administrativeAreas: Map<UUID, AdministrativeArea>
 }) {
-  const office = locations.get(UUID.parse(officeId))
-  const otherOffice = locations.get(UUID.parse(otherOfficeId))
+  const location = locations.get(UUID.parse(locationId))
+  const otherLocation = locations.get(UUID.parse(otherLocationId))
+  const officeAdministrativeAreaId = location?.administrativeAreaId
+  const otherLocationAdministrativeAreaId = otherLocation?.administrativeAreaId
 
-  const officeAdministrativeAreaId = office?.administrativeAreaId
-  const otherOfficeAdministrativeAreaId = otherOffice?.administrativeAreaId
-
-  if (!officeAdministrativeAreaId || !otherOfficeAdministrativeAreaId) {
+  if (!officeAdministrativeAreaId || !otherLocationAdministrativeAreaId) {
     return false
   }
 
@@ -351,7 +308,7 @@ export function isOfficeUnderJurisdiction({
   }
 
   const hierarchy = getAdministrativeAreaHierarchy(
-    otherOfficeAdministrativeAreaId,
+    otherLocationAdministrativeAreaId,
     administrativeAreas
   )
 
@@ -363,9 +320,7 @@ function getAssociatedLocationsAndOffices(
   locations: ILocation[]
 ): ILocation[] {
   const office = locations.find(
-    (location) =>
-      location.id === officeId &&
-      location.type === V2LocationType.enum.CRVS_OFFICE
+    (location) => location.id === officeId && location.type === 'CRVS_OFFICE'
   )
 
   if (!office) {
@@ -389,45 +344,4 @@ function getAssociatedLocationsAndOffices(
   })
 
   return [office, ...associatedLocations]
-}
-
-function generateFullAddress(
-  address: Address,
-  offlineData: IOfflineData
-): string[] {
-  const district =
-    address.district && offlineData.locations[address.district].name
-
-  const state = address.state && offlineData.locations[address.state].name
-
-  const eventLocationLevel3 =
-    address?.line?.[10] && offlineData.locations[address.line[10]]?.name
-
-  const eventLocationLevel4 =
-    address?.line?.[11] && offlineData.locations[address.line[11]]?.name
-
-  const eventLocationLevel5 =
-    address?.line?.[12] && offlineData.locations[address.line[12]]?.name
-
-  const eventLocationLevel6 =
-    address?.line?.[13] && offlineData.locations[address.line[13]]?.name
-
-  return [
-    eventLocationLevel6,
-    eventLocationLevel5,
-    eventLocationLevel4,
-    eventLocationLevel3,
-    district,
-    state
-  ].filter((maybeLocation): maybeLocation is string => Boolean(maybeLocation))
-}
-
-function isAdministrativeArea(
-  a: Location | AdministrativeArea
-): a is AdministrativeArea {
-  // Until LocationSearch is refactored, using parser as a type guard is too expensive.
-  return (
-    (a as AdministrativeArea).parentId !== undefined ||
-    (a as Location).locationType !== undefined
-  )
 }

@@ -19,20 +19,14 @@ export const env = cleanEnv(process.env, {
   DOMAIN: str({ devDefault: '*' }),
   LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
   CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
-  FHIR_URL: url({
-    devDefault: 'http://localhost:3447/fhir'
-  }),
   CERT_PUBLIC_KEY_PATH: str({
     devDefault: '../../.secrets/public-key.pem'
   }),
-  SEARCH_URL: url({ devDefault: 'http://localhost:9090/' }),
   METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   WEBHOOKS_URL: url({ devDefault: 'http://localhost:2525/' }),
-  APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
   NOTIFICATION_URL: url({ devDefault: 'http://localhost:2020/' }),
-  WORKFLOW_URL: url({ devDefault: 'http://localhost:5050/' }),
   EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
@@ -42,7 +36,11 @@ export const env = cleanEnv(process.env, {
     desc: 'Disables the Redis-based rate limiting globally'
   }),
   SENTRY_DSN: str({ default: undefined }),
-  QA_ENV: bool({ default: false }),
+  TWO_FA_ENABLED: bool({
+    devDefault: false,
+    default: true,
+    desc: 'Enable two-factor authentication. When disabled, verification codes are set to 000000.'
+  }),
   CHECK_INVALID_TOKEN: bool({
     devDefault: false,
     desc: 'Check if the token has been invalidated in the auth service before it has expired'
@@ -51,7 +49,5 @@ export const env = cleanEnv(process.env, {
   COUNTRY: str({ devDefault: 'FAR' }),
   CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
-  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
-  MINIO_BUCKET: str({ devDefault: 'ocrvs' }),
-  RECORD_SEARCH_QUOTA: num({ default: 2000 })
+  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }) // 10 minutes
 })

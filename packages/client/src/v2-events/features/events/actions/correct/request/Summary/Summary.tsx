@@ -100,7 +100,7 @@ export function Summary() {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
 
-  const { isActionAllowed } = useUserAllowedActions(event.type)
+  const { isActionAllowed } = useUserAllowedActions(eventIndex)
   const userMayCorrect = isActionAllowed(ActionType.APPROVE_CORRECTION)
 
   const submitCorrection = React.useCallback(() => {
@@ -133,12 +133,18 @@ export function Summary() {
 
     const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
 
+    const uncorrectableFieldIds = getDeclarationFields(eventConfiguration)
+      .filter((f) => f.uncorrectable)
+      .map((f) => f.id)
+
     const mutationPayload = {
       eventId,
-      declaration: {
-        ...formWithOnlyChangedValues,
-        ...nullifiedHiddenValues
-      },
+      declaration: Object.fromEntries(
+        Object.entries({
+          ...formWithOnlyChangedValues,
+          ...nullifiedHiddenValues
+        }).filter(([key]) => !uncorrectableFieldIds.includes(key))
+      ),
       transactionId: generateTransactionId(),
       annotation,
       event,

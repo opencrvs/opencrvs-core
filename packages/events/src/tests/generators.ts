@@ -10,22 +10,21 @@
  */
 
 import {
-  getUUID,
-  eventPayloadGenerator,
-  UUID,
-  TestUserRole,
-  EventConfig,
-  Location,
-  LocationType,
-  generateUuid,
-  pickRandom,
+  AdministrativeArea,
   createPrng,
+  EventConfig,
+  eventPayloadGenerator,
   generateTrackingId,
-  AdministrativeArea
+  generateUuid,
+  getUUID,
+  Location,
+  pickRandom,
+  TestUserRole,
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons'
-import { setLocations } from '../service/locations/locations'
 import { setAdministrativeAreas } from '../service/administrative-areas'
-
+import { setLocations } from '../service/locations/locations'
 interface Name {
   use: string
   given: string[]
@@ -38,6 +37,7 @@ export interface CreatedUser {
   role: string
   name: Array<Name>
   fullHonorificName?: string
+  administrativeAreaId?: UUID | null
 }
 
 interface CreateUser {
@@ -60,6 +60,9 @@ export function payloadGenerator(
       role: input.role ?? TestUserRole.enum.REGISTRATION_AGENT,
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId,
+      avatar: 'avatar.jpg',
+      status: 'active',
+      type: TokenUserType.enum.user,
       administrativeAreaId: input.administrativeAreaId,
       fullHonorificName: input.fullHonorificName
     })
@@ -75,10 +78,7 @@ export function payloadGenerator(
           administrativeAreaId: null,
           validUntil: null,
           externalId: generateTrackingId(prng) + generateTrackingId(prng),
-          locationType: pickRandom(prng, [
-            LocationType.enum.CRVS_OFFICE,
-            LocationType.enum.HEALTH_FACILITY
-          ])
+          locationType: pickRandom(prng, ['CRVS_OFFICE', 'HEALTH_FACILITY'])
         })) satisfies Location[]
       }
 
@@ -90,7 +90,7 @@ export function payloadGenerator(
         externalId:
           location.externalId ??
           generateTrackingId(prng) + generateTrackingId(prng),
-        locationType: LocationType.enum.CRVS_OFFICE
+        locationType: 'CRVS_OFFICE'
       })) as Location[]
     }
   }
@@ -146,6 +146,7 @@ export function seeder() {
       primaryOfficeId: user.primaryOfficeId,
       administrativeAreaId: user.administrativeAreaId ?? null,
       name: user.name,
+      status: 'active',
       fullHonorificName: user.fullHonorificName,
       role: user.role as TestUserRole,
       id: user.id ?? getUUID()
@@ -174,7 +175,7 @@ function generateTestLocations(
     (admin) => {
       const crvs = {
         name: `${admin.name} CRVS Office`,
-        locationType: LocationType.enum.CRVS_OFFICE,
+        locationType: 'CRVS_OFFICE',
         administrativeAreaId: admin.id,
         id: generateUuid(rng),
         validUntil: null,
@@ -183,7 +184,7 @@ function generateTestLocations(
 
       const health = {
         name: `${admin.name} Health Facility`,
-        locationType: LocationType.enum.HEALTH_FACILITY,
+        locationType: 'HEALTH_FACILITY',
         administrativeAreaId: admin.id,
         id: generateUuid(rng),
         validUntil: null,
@@ -197,7 +198,7 @@ function generateTestLocations(
   const locationsUnderCountry = [
     {
       name: `Country-level CRVS Office`,
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       administrativeAreaId: null,
       id: generateUuid(rng),
       validUntil: null,
@@ -205,7 +206,7 @@ function generateTestLocations(
     },
     {
       name: `Country-level Health Facility`,
-      locationType: LocationType.enum.HEALTH_FACILITY,
+      locationType: 'HEALTH_FACILITY',
       administrativeAreaId: null,
       id: generateUuid(rng),
       validUntil: null,

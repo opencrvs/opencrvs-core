@@ -23,13 +23,20 @@ import {
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
   ActionUpdate,
-  EventState
+  EventState,
+  EventDocument,
+  encodeScope
 } from '@opencrvs/commons'
 import {
   tennisClubMembershipEvent,
   tennisClubMembershipEventWithDedupCheck
 } from '@opencrvs/commons/fixtures'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  setupTestCase,
+  createSystemTestClient,
+  TEST_USER_DEFAULT_SCOPES
+} from '@events/tests/utils'
 import { CreatedUser, payloadGenerator } from '@events/tests/generators'
 import {
   getEventIndexName,
@@ -38,7 +45,20 @@ import {
 import { encodeEventIndex } from '@events/service/indexing/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
+import { EventNotFoundError } from '@events/service/events/events'
 
+function getRequestedRegisterAction(response: EventDocument) {
+  const savedAction = response.actions.find(
+    ({ type, status }: { type: ActionType; status: ActionStatus }) =>
+      type === ActionType.DECLARE && status === ActionStatus.Requested
+  )
+
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+
+  return savedAction
+}
+
+/* eslint-disable max-lines */
 describe('Declare action', () => {
   let user: CreatedUser
   let generator: ReturnType<typeof payloadGenerator>
@@ -64,21 +84,33 @@ describe('Declare action', () => {
     ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
   })
 
-  test('prevents forbidden access if configurable scope does not have required event type allowed', async () => {
-    const client = createTestClient(user, ['record.declare[event=death]'])
+  test('prevents access if configurable scope does not have required event type allowed', async () => {
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['death']
+        }
+      })
+    ])
 
     await expect(
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
       )
-    ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    ).rejects.toMatchObject(new EventNotFoundError(eventId))
   })
 
   test('allows access if required scope is present', async () => {
     const client = createTestClient(user, [
-      'record.create[event=death|birth|tennis-club-membership]',
-      'record.declare[event=death|birth|tennis-club-membership]'
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['death', 'birth', 'tennis-club-membership']
+        }
+      })
     ])
+
     await expect(
       client.event.actions.declare.request(
         generator.event.actions.declare(eventId, {})
@@ -87,7 +119,11 @@ describe('Declare action', () => {
   })
 
   test('Validation error message contains all the offending fields', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -103,7 +139,11 @@ describe('Declare action', () => {
   })
 
   test('when mandatory field is invalid, conditional hidden fields are still skipped', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -132,7 +172,11 @@ describe('Declare action', () => {
   })
 
   test('Skips required field validation when they are conditionally hidden', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const form = {
       'applicant.dob': '2024-02-01',
@@ -159,19 +203,18 @@ describe('Declare action', () => {
 
     const response = await client.event.actions.declare.request(data)
 
-    const savedAction = response.actions.find(
-      ({ type, status }) =>
-        type === ActionType.DECLARE && status === ActionStatus.Requested
-    )
-
-    expect(savedAction?.status).toEqual(ActionStatus.Requested)
+    const savedAction = getRequestedRegisterAction(response)
     if (savedAction?.status === ActionStatus.Requested) {
       expect(savedAction.declaration).toEqual(form)
     }
   })
 
   test('gives validation error when a conditional page, which is visible, has a required field', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({
+        type: 'record.declare'
+      })
+    ])
 
     const form = {
       // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
@@ -202,7 +245,9 @@ describe('Declare action', () => {
   })
 
   test('successfully validates a fields on a conditional page, which is visible', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const form = {
       // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
@@ -231,19 +276,16 @@ describe('Declare action', () => {
 
     const response = await client.event.actions.declare.request(data)
 
-    const savedAction = response.actions.find(
-      ({ type, status }) =>
-        type === ActionType.DECLARE && status === ActionStatus.Requested
-    )
-
-    expect(savedAction?.status).toEqual(ActionStatus.Requested)
+    const savedAction = getRequestedRegisterAction(response)
     if (savedAction?.status === ActionStatus.Requested) {
       expect(savedAction.declaration).toEqual(form)
     }
   })
 
   test('Prevents adding birth date in future', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const form = {
       'applicant.dob': '2040-02-01',
@@ -274,7 +316,9 @@ describe('Declare action', () => {
   })
 
   test('validation prevents including hidden fields', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -293,7 +337,9 @@ describe('Declare action', () => {
   })
 
   test('validation prevents including miscellaneous fields', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       declaration: {
@@ -312,11 +358,14 @@ describe('Declare action', () => {
   })
 
   test('valid action is appended to event actions', async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.read' }),
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId)
     await client.event.actions.declare.request(data)
-    const updatedEvent = await client.event.get({eventId})
+    const updatedEvent = await client.event.get({ eventId })
 
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -337,7 +386,9 @@ describe('Declare action', () => {
   })
 
   test(`DECLARE is idempotent`, async () => {
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       keepAssignment: true
@@ -360,7 +411,9 @@ describe('Declare action', () => {
         }
       )
     )
-    const client = createTestClient(user)
+    const client = createTestClient(user, [
+      encodeScope({ type: 'record.declare' })
+    ])
 
     const data = generator.event.actions.declare(eventId, {
       keepAssignment: true
@@ -383,7 +436,7 @@ describe('Declare action', () => {
 
 test('deduplication and annotation check is performed after declaration', async () => {
   mswServer.use(
-    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+    http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
       return HttpResponse.json([
         tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE)
       ])
@@ -392,7 +445,11 @@ test('deduplication and annotation check is performed after declaration', async 
   const esClient = getOrCreateClient()
   const prng = createPrng(73)
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.read' }),
+    encodeScope({ type: 'record.declare' })
+  ])
 
   const newEvent = await client.event.create(generator.event.create())
   const existingEventId = getUUID()
@@ -443,4 +500,482 @@ test('deduplication and annotation check is performed after declaration', async 
   ).toEqual([
     { id: existingEventId, trackingId: existingEventIndex.trackingId }
   ])
+})
+
+describe('Declare action - hidden field nullification', () => {
+  let user: CreatedUser
+  let generator: ReturnType<typeof payloadGenerator>
+  let eventId: UUID
+
+  beforeEach(async () => {
+    const testCase = await setupTestCase()
+    user = testCase.user
+    generator = testCase.generator
+
+    const client = createTestClient(testCase.user)
+    const event = await client.event.create(generator.event.create())
+    eventId = event.id
+  })
+
+  describe('Invalid keys scenarios', () => {
+    test('rejects hidden field with non-null value', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // recommender.name is HIDDEN when recommender.none = true
+          // Sending a VALUE for hidden field should fail
+          'recommender.name': {
+            firstname: 'Jane',
+            surname: 'Smith'
+          },
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      await expect(
+        client.event.actions.declare.request(payload)
+      ).rejects.toMatchSnapshot()
+    })
+
+    test('rejects multiple hidden fields with non-null values', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Both fields are HIDDEN when recommender.none = true
+          'recommender.name': {
+            firstname: 'Jane',
+            surname: 'Smith'
+          },
+          'recommender.id': '1234',
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      const error = await client.event.actions.declare
+        .request(payload)
+        .catch((e) => e)
+
+      expect(error).toBeInstanceOf(TRPCError)
+      expect(error.code).toBe('BAD_REQUEST')
+      // Should mention both offending fields
+      expect(error.message).toContain('recommender.name')
+      expect(error.message).toContain('recommender.id')
+    })
+
+    test('rejects non-existent field', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Field does not exist in form config
+          'nonexistent.field': 'some value',
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      await expect(
+        client.event.actions.declare.request(payload)
+      ).rejects.toMatchSnapshot()
+    })
+
+    test('rejects hidden field from conditional page', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          // DOB after 1950 means senior-pass page is HIDDEN
+          'applicant.dob': '2000-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // senior-pass.id is on a hidden page
+          'senior-pass.id': '1234567890',
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      await expect(
+        client.event.actions.declare.request(payload)
+      ).rejects.toMatchSnapshot()
+    })
+  })
+
+  describe('Valid keys scenarios', () => {
+    test('accepts hidden field with null value (intentional clearing)', async () => {
+      const client = createTestClient(user, [
+        ...TEST_USER_DEFAULT_SCOPES,
+        encodeScope({
+          type: 'record.search',
+          options: { event: [TENNIS_CLUB_MEMBERSHIP] }
+        })
+      ])
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Explicitly setting hidden field to null is allowed
+          'recommender.name': null,
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.declare.request(payload)
+
+      const savedAction = getRequestedRegisterAction(response)
+      if (savedAction?.status === ActionStatus.Requested) {
+        // The null value should be included in the declaration
+        expect(savedAction.declaration).toHaveProperty('recommender.name', null)
+      }
+
+      const { results: fetchedEvents } = await client.event.search({
+        query: {
+          type: 'and',
+          clauses: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              data: {
+                'applicant.name': { type: 'fuzzy', term: 'John' },
+                'applicant.dob': { type: 'exact', term: '2024-02-01' }
+              }
+            }
+          ]
+        }
+      })
+
+      expect(fetchedEvents).toHaveLength(1)
+      expect(fetchedEvents[0].declaration).not.toHaveProperty(
+        'recommender.name'
+      )
+      expect(fetchedEvents[0].declaration).not.toHaveProperty('recommender.id')
+      expect(fetchedEvents[0].declaration).toHaveProperty(
+        'recommender.none',
+        true
+      )
+      expect(fetchedEvents[0].declaration).toHaveProperty('applicant.name', {
+        firstname: 'John',
+        surname: 'Doe'
+      })
+    })
+
+    test('accepts multiple hidden fields with null values', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Multiple hidden fields explicitly set to null
+          'recommender.name': null,
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.declare.request(payload)
+
+      const savedAction = getRequestedRegisterAction(response)
+      if (savedAction?.status === ActionStatus.Requested) {
+        expect(savedAction.declaration).toHaveProperty('recommender.name', null)
+      }
+    })
+
+    test('accepts visible field with any value', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          // When recommender.none = false, recommender.name is VISIBLE
+          'recommender.none': false,
+          'recommender.id': '1234',
+          'recommender.name': {
+            firstname: 'Jane',
+            surname: 'Smith'
+          },
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.declare.request(payload)
+      const savedAction = getRequestedRegisterAction(response)
+      if (savedAction?.status === ActionStatus.Requested) {
+        expect(savedAction.declaration).toHaveProperty('recommender.name', {
+          firstname: 'Jane',
+          surname: 'Smith'
+        })
+      }
+    })
+
+    test('accepts field from conditional page when page is visible', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          // DOB before 1950 makes senior-pass page VISIBLE
+          'applicant.dob': '1944-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // senior-pass.id is now on a visible page
+          'senior-pass.id': '1234567890',
+          'senior-pass.recommender': true,
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.declare.request(payload)
+
+      const savedAction = getRequestedRegisterAction(response)
+      if (savedAction?.status === ActionStatus.Requested) {
+        expect(savedAction.declaration).toHaveProperty(
+          'senior-pass.id',
+          '1234567890'
+        )
+      }
+    })
+
+    test('omits hidden field when not provided (default behavior)', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          'applicant.dob': '2024-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // recommender.name is hidden and NOT provided (omitted)
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.declare.request(payload)
+
+      const savedAction = getRequestedRegisterAction(response)
+      if (savedAction?.status === ActionStatus.Requested) {
+        // Hidden field should not be in the declaration at all
+        expect(savedAction.declaration).not.toHaveProperty('recommender.name')
+      }
+    })
+  })
+
+  describe('Edge cases', () => {
+    test('accepts null for hidden field on hidden page', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          // DOB after 1950 means senior-pass page is HIDDEN
+          'applicant.dob': '2000-02-01',
+          'applicant.dobUnknown': false,
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true,
+          // Explicitly clearing field on hidden page
+          'recommender.name': null,
+          'recommender.id': null,
+          'senior-pass.id': null,
+          'senior-pass.recommender': null,
+          'applicant.address': {
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      const response = await client.event.actions.declare.request(payload)
+
+      const savedAction = getRequestedRegisterAction(response)
+      if (savedAction?.status === ActionStatus.Requested) {
+        expect(savedAction.declaration).toHaveProperty('recommender.name', null)
+      }
+    })
+
+    test('mixed valid but hidden and invalid keys returns only invalid keys in error', async () => {
+      const client = createTestClient(user)
+
+      const payload = generator.event.actions.declare(eventId, {
+        declaration: {
+          'applicant.dob': '2024-02-01', // ✅ Valid
+          'applicant.dobUnknown': false, // ✅ Valid
+          'applicant.name': {
+            // ✅ Valid
+            firstname: 'John',
+            surname: 'Doe'
+          },
+          'recommender.none': true, // ✅ Valid
+          'recommender.name': {
+            // ❌ Invalid: hidden field with value
+            firstname: 'Jane',
+            surname: 'Smith'
+          },
+          'nonexistent.field': 'test', // ❌ Invalid: doesn't exist
+          'applicant.address': {
+            // ✅ Valid
+            country: 'FAR',
+            addressType: AddressType.DOMESTIC,
+            administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a',
+            streetLevelDetails: {
+              state: 'state',
+              district2: 'district2'
+            }
+          }
+        }
+      })
+
+      const error = await client.event.actions.declare
+        .request(payload)
+        .catch((e) => e)
+
+      expect(error).toBeInstanceOf(TRPCError)
+      // Should only mention invalid keys
+      expect(error.message).toEqual(
+        'Field with id nonexistent.field not found in event config'
+      )
+    })
+  })
+})
+
+test('System user can not declare an event, even with the right scope', async () => {
+  const { generator, locations } = await setupTestCase()
+  const systemUserClient = createSystemTestClient('test-system', [
+    encodeScope({ type: 'record.create' }),
+    encodeScope({ type: 'record.declare' })
+  ])
+
+  const event = await systemUserClient.event.create({
+    ...generator.event.create(),
+    createdAtLocation: locations[0].id
+  })
+
+  await expect(
+    systemUserClient.event.actions.declare.request(
+      generator.event.actions.declare(event.id)
+    )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })

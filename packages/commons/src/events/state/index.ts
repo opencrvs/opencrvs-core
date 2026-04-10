@@ -20,24 +20,27 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventMetadata, EventStatus, ZodDate } from '../EventMetadata'
+import {
+  EventMetadata,
+  EventStatus,
+  ZodDate,
+  ZodDateTime
+} from '../EventMetadata'
 import { Draft } from '../Draft'
 import {
   aggregateActionDeclarations,
   deepMerge,
   getAcceptedActions,
-  getCompleteActionAnnotation
+  getCompleteActionAnnotation,
+  getMixedPath
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getEventFlags } from './flags'
 import { getUUID, UUID } from '../../uuid'
-import {
-  DocumentPath,
-  FullDocumentPath,
-  FullDocumentUrl
-} from '../../documents'
+import { DocumentPath } from '../../documents'
 import { AddressFieldValue, AddressType } from '../CompositeFieldValue'
+import { isFieldReference } from '../../conditionals/conditionals'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -105,17 +108,15 @@ type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny chan
   ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
   : T extends UUID
     ? T
-    : T extends FullDocumentPath
+    : T extends DocumentPath
       ? T
-      : T extends DocumentPath
-        ? T
-        : T extends FullDocumentUrl
-          ? T
-          : T extends (infer U)[]
-            ? NonNullableDeep<U>[]
-            : T extends object
-              ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-              : NonNullable<T>
+      : T extends string
+        ? NonNullable<T>
+        : T extends (infer U)[]
+          ? NonNullableDeep<U>[]
+          : T extends object
+            ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+            : NonNullable<T>
 
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values
@@ -150,16 +151,30 @@ export function isUndeclaredDraft(status: EventStatus): boolean {
 export const DEFAULT_DATE_OF_EVENT_PROPERTY =
   'createdAt' satisfies keyof EventDocument
 
+function extractDateString(dateTime: string): string {
+  return dateTime.split('T')[0]
+}
+
 export function resolveDateOfEvent(
-  eventMetadata: { createdAt: string },
+  eventIndex: EventIndex,
   declaration: EventState,
   config: EventConfig
 ) {
   if (!config.dateOfEvent) {
-    return eventMetadata[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+    return extractDateString(eventIndex[DEFAULT_DATE_OF_EVENT_PROPERTY])
   }
-  const parsedDate = ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
-  return parsedDate.success ? parsedDate.data : undefined
+
+  // If dateOfEvent is a field reference, we need to extract the date from the declaration using the field id.
+  // Otherwise, we extract it from the event index using the event reference.
+  // i.e. event('legalStatuses.REGISTERED.acceptedAt') will look for the acceptedAt field in the legalStatuses object
+  // in the event metadata in EventIndex, whereas field('child.dob') will look for the dob field in the declaration.
+  const parsedDate = isFieldReference(config.dateOfEvent)
+    ? ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
+    : ZodDateTime.safeParse(
+        getMixedPath(eventIndex, config.dateOfEvent.$$event)
+      )
+
+  return parsedDate.success ? extractDateString(parsedDate.data) : undefined
 }
 
 export const DEFAULT_PLACE_OF_EVENT_PROPERTY =
@@ -265,12 +280,14 @@ export function getCurrentEventState(
   const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
   const declaration = aggregateActionDeclarations(event)
+  const status = getStatusFromActions(sortedActions)
+  const legalStatuses = getLegalStatuses(sortedActions)
 
-  return deepDropNulls({
+  const base = deepDropNulls({
     id: event.id,
     type: event.type,
-    status: getStatusFromActions(sortedActions),
-    legalStatuses: getLegalStatuses(sortedActions),
+    status,
+    legalStatuses,
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdByUserType: creationAction.createdByUserType,
@@ -284,7 +301,6 @@ export function getCurrentEventState(
     declaration,
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
-    dateOfEvent: resolveDateOfEvent(event, declaration, config),
     placeOfEvent: resolvePlaceOfEvent(
       { createdAtLocation: creationAction.createdAtLocation },
       declaration,
@@ -292,6 +308,11 @@ export function getCurrentEventState(
     ),
     potentialDuplicates: extractPotentialDuplicatesFromActions(sortedActions),
     flags: getEventFlags(event, config)
+  })
+
+  return deepDropNulls({
+    ...base,
+    dateOfEvent: resolveDateOfEvent(base, declaration, config)
   })
 }
 

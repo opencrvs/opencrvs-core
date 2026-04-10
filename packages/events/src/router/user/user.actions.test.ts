@@ -12,12 +12,11 @@
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
 import {
-  LocationType,
-  SCOPES,
   generateUuid,
   TestUserRole,
   ActionType,
-  createPrng
+  createPrng,
+  encodeScope
 } from '@opencrvs/commons'
 import {
   createEvent,
@@ -39,7 +38,12 @@ test('Throws error if user does not have required scope', async () => {
 
 test('Throws error when accessing user outside jurisdiction with my jurisdiction scope', async () => {
   const { users } = await setupTestCase()
-  const client = createTestClient(users[0], [SCOPES.USER_READ_MY_JURISDICTION])
+  const client = createTestClient(users[0], [
+    encodeScope({
+      type: 'user.read',
+      options: { accessLevel: 'administrativeArea' }
+    })
+  ])
 
   await expect(
     client.user.actions({
@@ -50,7 +54,9 @@ test('Throws error when accessing user outside jurisdiction with my jurisdiction
 
 test('Throws error when accessing user in different office with my office scope', async () => {
   const { users } = await setupTestCase()
-  const client = createTestClient(users[0], [SCOPES.USER_READ_MY_OFFICE])
+  const client = createTestClient(users[0], [
+    encodeScope({ type: 'user.read', options: { accessLevel: 'location' } })
+  ])
 
   await expect(
     client.user.actions({
@@ -72,7 +78,12 @@ test('Throws error when accessing oneself user without my audit scope', async ()
 
 test('Throws error when accessing other user with scope for own audit', async () => {
   const { users } = await setupTestCase()
-  const client = createTestClient(users[0], [SCOPES.USER_READ_ONLY_MY_AUDIT])
+  const client = createTestClient(users[0], [
+    encodeScope({
+      type: 'user.read',
+      options: { accessLevel: 'administrativeArea' }
+    })
+  ])
 
   await expect(
     client.user.actions({
@@ -83,7 +94,9 @@ test('Throws error when accessing other user with scope for own audit', async ()
 
 test('Find user by id outside of jurisdiction with global scope', async () => {
   const { users } = await setupTestCase()
-  const client = createTestClient(users[0], [SCOPES.USER_READ])
+  const client = createTestClient(users[0], [
+    encodeScope({ type: 'user.read' })
+  ])
 
   await expect(
     client.user.actions({
@@ -99,7 +112,10 @@ test('Finds user in nested location using administrative area id with my jurisdi
   // @TODO: Probably wont work
   const { user: userOnParentLocation, seed } = await setupTestCase()
   const parentLocationClient = createTestClient(userOnParentLocation, [
-    SCOPES.USER_READ_MY_JURISDICTION
+    encodeScope({
+      type: 'user.read',
+      options: { accessLevel: 'administrativeArea' }
+    })
   ])
 
   const rng = createPrng(44444)
@@ -121,7 +137,7 @@ test('Finds user in nested location using administrative area id with my jurisdi
     {
       name: 'Grandchild office',
       administrativeAreaId: childAdministrativeAreaId,
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       id: grandchildLocationId,
       validUntil: null,
       externalId: 'abc123xyz458'
@@ -164,7 +180,10 @@ test('Finds user in nested location using administrative area id with my jurisdi
 test('Find user with appropriate scopes', async () => {
   const { user: userOnParentLocation, seed } = await setupTestCase()
   const clientWithJurisdictionScope = createTestClient(userOnParentLocation, [
-    SCOPES.USER_READ_MY_JURISDICTION
+    encodeScope({
+      type: 'user.read',
+      options: { accessLevel: 'administrativeArea' }
+    })
   ])
 
   const userToSearchLocationId = generateUuid()
@@ -173,7 +192,7 @@ test('Find user with appropriate scopes', async () => {
     {
       name: 'Child office',
       administrativeAreaId: userOnParentLocation.administrativeAreaId,
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       id: userToSearchLocationId,
       validUntil: null,
       externalId: 'abc123xyz459'
@@ -187,7 +206,7 @@ test('Find user with appropriate scopes', async () => {
   })
 
   const clientWithOfficeScope = createTestClient(userInTheSameOffice, [
-    SCOPES.USER_READ_MY_OFFICE
+    encodeScope({ type: 'user.read', options: { accessLevel: 'location' } })
   ])
 
   const userToSearch = seed.user({
@@ -197,7 +216,8 @@ test('Find user with appropriate scopes', async () => {
   })
 
   const userToSearchClient = createTestClient(userToSearch, [
-    SCOPES.USER_READ_ONLY_MY_AUDIT
+    encodeScope({ type: 'user.read' }),
+    encodeScope({ type: 'user.read-only-my-audit' })
   ])
 
   mswServer.use(
@@ -251,7 +271,9 @@ test('Find user with appropriate scopes', async () => {
 
 test('Returns user actions', async () => {
   const { users, generator } = await setupTestCase()
-  const clientThatSearchesUser = createTestClient(users[0], [SCOPES.USER_READ])
+  const clientThatSearchesUser = createTestClient(users[0], [
+    encodeScope({ type: 'user.read' })
+  ])
   const userThatDoesThings = users[1]
   const clientThatDoesThings = createTestClient(userThatDoesThings)
 

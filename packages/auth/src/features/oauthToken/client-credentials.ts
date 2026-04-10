@@ -9,18 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as Hapi from '@hapi/hapi'
+import { JWT_ISSUER, WEB_USER_JWT_AUDIENCES } from '@auth/constants'
 import {
   authenticateSystem,
   createToken
 } from '@auth/features/authenticate/service'
-import {
-  WEB_USER_JWT_AUDIENCES,
-  JWT_ISSUER,
-  NOTIFICATION_API_USER_AUDIENCE
-} from '@auth/constants'
+import * as Hapi from '@hapi/hapi'
+import { TokenUserType, encodeScope } from '@opencrvs/commons'
 import * as oauthResponse from './responses'
-import { SCOPES, TokenUserType } from '@opencrvs/commons/authentication'
 import { getParam } from './utils'
 
 export async function clientCredentialsHandler(
@@ -45,9 +41,6 @@ export async function clientCredentialsHandler(
     return oauthResponse.invalidClient(h)
   }
 
-  const isNotificationAPIUser = result.scope.includes(SCOPES.NOTIFICATION_API)
-  const isImportExportClient = result.scope.includes(SCOPES.RECORD_IMPORT)
-
   /**
    * Intermediary step to convert any legacy scopes to the new format.
    * For example, 'record.create' becomes 'type=record.create' to align with the new scope format.
@@ -56,16 +49,24 @@ export async function clientCredentialsHandler(
    */
   const v2Scopes = result.scope.map((s) => {
     // Intentionally verbose for clarity.
+    if (s === 'record.notify') {
+      return 'type=record.notify'
+    }
+
     if (s === 'record.search') {
-      return 'type=record.search'
+      return encodeScope({ type: 'record.search' })
     }
 
     if (s === 'record.read') {
-      return 'type=record.read'
+      return encodeScope({ type: 'record.read' })
     }
 
     if (s === 'record.create') {
-      return 'type=record.create'
+      return encodeScope({ type: 'record.create' })
+    }
+
+    if (s === 'record.import') {
+      return encodeScope({ type: 'record.import' })
     }
 
     return s
@@ -74,12 +75,9 @@ export async function clientCredentialsHandler(
   const token = await createToken(
     result.systemId,
     v2Scopes,
-    isNotificationAPIUser
-      ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
-      : WEB_USER_JWT_AUDIENCES,
+    WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
     undefined,
-    !isImportExportClient,
     TokenUserType.enum.system
   )
   return oauthResponse.success(h, token)

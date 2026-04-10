@@ -9,12 +9,16 @@
 set -e
 
 sed -e s~{{COUNTRY_CONFIG_URL_INTERNAL}}~$COUNTRY_CONFIG_URL_INTERNAL~g \
+    -e s~{{LOGIN_URL}}~$LOGIN_URL~g \
+    -e s~{{AUTH_URL_INTERNAL}}~$AUTH_URL_INTERNAL~g \
     -e s~{{GATEWAY_URL_INTERNAL}}~$GATEWAY_URL_INTERNAL~g \
     -e s~{{CONTENT_SECURITY_POLICY_WILDCARD}}~$CONTENT_SECURITY_POLICY_WILDCARD~g \
     /etc/nginx/conf.d/default.conf > /tmp/default.conf
 cat /tmp/default.conf > /etc/nginx/conf.d/default.conf
 
 sed -e s~{{COUNTRY_CONFIG_URL_INTERNAL}}~$COUNTRY_CONFIG_URL_INTERNAL~g \
+    -e s~{{LOGIN_URL}}~$LOGIN_URL~g \
+    -e s~{{AUTH_URL_INTERNAL}}~$AUTH_URL_INTERNAL~g \
     -e s~{{GATEWAY_URL_INTERNAL}}~$GATEWAY_URL_INTERNAL~g \
     /usr/share/nginx/html/index.html > /tmp/index.html
 cat /tmp/index.html > /usr/share/nginx/html/index.html

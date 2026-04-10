@@ -10,148 +10,125 @@
  */
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { findScope, Scope, SCOPES } from '@opencrvs/commons/client'
-import { User, Location } from '@client/utils/gateway'
-import { SUBMISSION_STATUS } from '@client/declarations'
 import {
-  canBeCorrected,
-  canBeReinstated,
-  isArchivable,
-  isIssuable,
-  isPendingCorrection,
-  isPrintable,
-  isReviewableDeclaration,
-  isUpdatableDeclaration
-} from '@client/declarations/utils'
-import { isOfficeUnderJurisdiction } from '@client/utils/locationUtils'
+  findScope,
+  User,
+  Location,
+  hasScope as hasScopeFromCommons,
+  hasAnyScope as hasAnyScopeFromCommons,
+  ScopeType,
+  getAcceptedScopesByType,
+  getScopeOptionValue,
+  JurisdictionFilter
+} from '@opencrvs/commons/client'
+import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
-const RECORD_ALLOWED_SCOPES = {
-  UPDATE: [
-    SCOPES.RECORD_REGISTER,
-    SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-    SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-  ],
-  REVIEW: [
-    SCOPES.RECORD_REGISTER,
-    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-    SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-    SCOPES.RECORD_REVIEW_DUPLICATES
-  ],
-  PRINT: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
-  ISSUE: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
-  CORRECT: [
-    SCOPES.RECORD_REGISTRATION_CORRECT,
-    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
-  ],
-  ARCHIVE: [SCOPES.RECORD_DECLARATION_ARCHIVE],
-  REINSTATE: [SCOPES.RECORD_DECLARATION_REINSTATE],
-  REVIEW_CORRECTION: [SCOPES.RECORD_REGISTRATION_CORRECT]
-}
-
-export const RECORD_DECLARE_SCOPES = [
-  SCOPES.RECORD_DECLARE_BIRTH,
-  SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
-  SCOPES.RECORD_DECLARE_DEATH,
-  SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
-  SCOPES.RECORD_DECLARE_MARRIAGE,
-  SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
-]
-
-const RECORD_SEARCH_SCOPES = [
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-  SCOPES.SEARCH_MARRIAGE,
-  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-]
-
 export function usePermissions() {
-  const userScopes = useSelector(getScope)
+  const userScopes = useSelector(getScope) || []
+
   const currentUser = useSelector(getUserDetails)
-  const userPrimaryOffice = currentUser?.primaryOffice
+  const userPrimaryOfficeId = currentUser?.primaryOfficeId
 
   const { getLocations } = useLocations()
+  const locations = getLocations.useSuspenseQuery()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
-  const locations = getLocations.useSuspenseQuery()
 
   const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
 
   const roleScopes = (role: string) =>
     roles.find(({ id }) => id === role)?.scopes ?? []
 
-  const hasScopes = (neededScopes: Scope[]) =>
-    neededScopes.every((scope) => userScopes?.includes(scope))
+  const hasAnyScope = (neededScopes: ScopeType[]) =>
+    hasAnyScopeFromCommons(userScopes, neededScopes)
 
-  const hasAnyScope = (neededScopes: Scope[]) =>
-    neededScopes.length === 0 ||
-    neededScopes.some((scope) => userScopes?.includes(scope))
+  const hasScope = (neededScope: ScopeType) =>
+    hasScopeFromCommons(userScopes, neededScope)
 
-  const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
+  const canSearchRecords =
+    getAcceptedScopesByType({
+      acceptedScopes: ['record.search'],
+      scopes: userScopes ?? []
+    }).length > 0
 
-  const canSearchRecords = hasAnyScope(RECORD_SEARCH_SCOPES)
-
-  const hasBirthSearchJurisdictionScope = hasScope(
-    SCOPES.SEARCH_BIRTH_MY_JURISDICTION
-  )
-
-  const hasDeathSearchJurisdictionScope = hasScope(
-    SCOPES.SEARCH_DEATH_MY_JURISDICTION
-  )
-
-  const canDeclareRecords = hasAnyScope(RECORD_DECLARE_SCOPES)
-
-  const canReadUser = (user: Pick<User, 'id' | 'primaryOffice'>) => {
-    if (!userPrimaryOffice?.id) {
+  const canReadUser = (user: Pick<User, 'id' | 'primaryOfficeId'>) => {
+    if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.USER_READ)) {
+
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['user.read'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
-    if (hasScope(SCOPES.USER_READ_MY_OFFICE)) {
-      return user.primaryOffice.id === userPrimaryOffice?.id
+
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return user.primaryOfficeId === userPrimaryOfficeId
     }
-    if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdiction({
-        officeId: userPrimaryOffice.id,
-        otherOfficeId: user.primaryOffice.id,
+
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOfficeId,
+        otherLocationId: user.primaryOfficeId,
         locations,
         administrativeAreas
       })
     }
-    if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
+
+    if (hasScope('user.read-only-my-audit')) {
       return user.id === currentUser?.id
     }
 
     return false
   }
 
-  const canEditUser = (
-    user: Pick<User, 'primaryOffice'> & { role: { id: string } }
-  ) => {
+  const canEditUser = (user: User) => {
     const editableRoleIds = findScope(userScopes ?? [], 'user.edit')?.options
       ?.role
 
     if (Array.isArray(editableRoleIds)) {
-      return editableRoleIds.includes(user.role.id)
+      return editableRoleIds.includes(user.role)
     }
-    if (!userPrimaryOffice?.id) {
+
+    if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.USER_UPDATE)) {
+
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['user.edit'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
-    if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION)) {
-      if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
+
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return user.primaryOfficeId === userPrimaryOfficeId
+    }
+
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+      if (hasScopeFromCommons(roleScopes(user.role), 'user.edit')) {
         return false
       }
-      return isOfficeUnderJurisdiction({
-        officeId: userPrimaryOffice.id,
-        otherOfficeId: user.primaryOffice.id,
+
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOfficeId,
+        otherLocationId: user.primaryOfficeId,
         locations,
         administrativeAreas
       })
@@ -162,113 +139,87 @@ export function usePermissions() {
 
   const creatableRoleIds = findScope(userScopes ?? [], 'user.create')?.options
     ?.role
+
   const canCreateUser = Array.isArray(creatableRoleIds)
     ? creatableRoleIds.length > 0
-    : hasAnyScope([SCOPES.USER_CREATE, SCOPES.USER_CREATE_MY_JURISDICTION])
+    : hasScope('user.create')
 
   const canAccessOffice = (office: Pick<Location, 'id'>) => {
-    if (!userPrimaryOffice?.id) {
+    if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS)) {
+
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['organisation.read-locations'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE)) {
-      return office.id === userPrimaryOffice.id
+
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return office.id === userPrimaryOfficeId
     }
 
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdiction({
-        officeId: userPrimaryOffice.id,
-        otherOfficeId: office.id,
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOfficeId,
+        otherLocationId: office.id,
         locations,
         administrativeAreas
       })
     }
+
     return false
   }
 
   const canAddOfficeUsers = (office: Pick<Location, 'id'>) => {
-    if (!userPrimaryOffice?.id) {
+    if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.USER_CREATE)) {
+
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['user.create'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
-    if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
-      return isOfficeUnderJurisdiction({
-        officeId: userPrimaryOffice.id,
-        otherOfficeId: office.id,
+
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return office.id === userPrimaryOfficeId
+    }
+
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+      return isLocationUnderJurisdiction({
+        locationId: userPrimaryOfficeId,
+        otherLocationId: office.id,
         locations,
         administrativeAreas
       })
     }
+
     return false
   }
 
-  const canUpdateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.UPDATE)
-
-  const canReviewRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW)
-
-  const canPrintRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.PRINT)
-
-  const canIssueRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.ISSUE)
-
-  const canCorrectRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.CORRECT)
-
-  const canArchiveRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.ARCHIVE)
-
-  const canReinstateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REINSTATE)
-
-  const canReviewCorrection = () =>
-    hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION)
-
-  const canSearchBirthRecords = hasAnyScope([
-    SCOPES.SEARCH_BIRTH,
-    SCOPES.SEARCH_BIRTH_MY_JURISDICTION
-  ])
-
-  const canSearchDeathRecords = hasAnyScope([
-    SCOPES.SEARCH_DEATH,
-    SCOPES.SEARCH_DEATH_MY_JURISDICTION
-  ])
-
-  const isRecordActionable = (status: SUBMISSION_STATUS) =>
-    [
-      canUpdateRecord() && isUpdatableDeclaration(status),
-      canReviewRecord() && isReviewableDeclaration(status),
-      canPrintRecord() && isPrintable(status),
-      canIssueRecord() && isIssuable(status),
-      canCorrectRecord() && canBeCorrected(status),
-      canReviewCorrection() && isPendingCorrection(status),
-      canArchiveRecord() && isArchivable(status),
-      canReinstateRecord() && canBeReinstated(status)
-    ]
-      .map((p) => Boolean(p))
-      .some((p) => p)
-
   return {
-    hasScopes,
     hasScope,
     hasAnyScope,
-    isRecordActionable,
     canSearchRecords,
-    canSearchBirthRecords,
-    canSearchDeathRecords,
-    canDeclareRecords,
-    canPrintRecord,
-    canIssueRecord,
     canReadUser,
     canEditUser,
     canCreateUser,
     canAccessOffice,
-    hasBirthSearchJurisdictionScope,
-    hasDeathSearchJurisdictionScope,
-    canAddOfficeUsers,
-    canUpdateRecord,
-    canReviewRecord,
-    canCorrectRecord,
-    canArchiveRecord,
-    canReinstateRecord
+    canAddOfficeUsers
   }
 }

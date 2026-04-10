@@ -10,8 +10,7 @@
  */
 
 import * as z from 'zod/v4'
-import { SCOPES } from '@opencrvs/commons'
-import { requiresAnyOfScopes } from '@events/router/middleware'
+import { allowedWithAnyOfScopes } from '@events/router/middleware'
 import { router, userAndSystemProcedure } from '@events/router/trpc'
 import { AttachmentInput, uploadFile } from '@events/service/files'
 import { writeAuditLog } from '@events/storage/postgres/events/auditLog'
@@ -34,7 +33,7 @@ export const attachmentsRouter = router({
     // })
     .input(AttachmentInput)
     .output(z.string())
-    .use(requiresAnyOfScopes([SCOPES.ATTACHMENT_UPLOAD]))
+    .use(allowedWithAnyOfScopes(['attachment.upload']))
     .mutation(async ({ input, ctx }) => {
       const fileUrl = await uploadFile(input, ctx.token)
 

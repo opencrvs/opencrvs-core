@@ -12,19 +12,14 @@
 import fetch from 'node-fetch'
 import { array } from 'zod'
 import {
-  AdministrativeArea,
   EventConfig,
   getOrThrow,
-  Location,
-  LocationType,
-  LocationTypeV1,
   logger,
+  Role,
   TokenWithBearer,
   WorkqueueConfig
 } from '@opencrvs/commons'
-import { Bundle, SavedLocation } from '@opencrvs/commons/types'
 import { env } from '@events/environment'
-
 /**
  * During 1.9.0 we support only docker swarm configuration.
  * In docker swarm deployment process updates all the containers.
@@ -35,7 +30,7 @@ let inMemoryEventConfigurations: EventConfig[] | null = null
 let inMemoryWorkqueueConfigurations: WorkqueueConfig[] | null = null
 
 export async function getEventConfigurations(token: TokenWithBearer) {
-  const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
+  const res = await fetch(new URL('/config/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
       Authorization: token
@@ -98,12 +93,15 @@ export async function getEventConfigurationById({
 }
 
 async function getWorkqueueConfigurations(token: TokenWithBearer) {
-  const res = await fetch(new URL('/workqueue', env.COUNTRY_CONFIG_URL), {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+  const res = await fetch(
+    new URL('/config/workqueues', env.COUNTRY_CONFIG_URL),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
     }
-  })
+  )
 
   if (!res.ok) {
     throw new Error('Failed to fetch workqueue config')
@@ -135,73 +133,19 @@ export async function getInMemoryWorkqueueConfigurations(
   return inMemoryWorkqueueConfigurations
 }
 
-function parsePartOf(partOf: string | undefined): string | null {
-  if (!partOf) {
-    return null
-  }
-  return partOf === 'Location/0' ? null : partOf.split('/')[1]
-}
 
-async function fetchLocationV1(type: LocationTypeV1) {
-  const url = new URL('/locations', env.CONFIG_URL)
-  url.searchParams.set('type', type)
-  url.searchParams.set('_count', '0')
-
-  return fetch(url, {
+export async function getRoles(token: TokenWithBearer) {
+  const res = await fetch(new URL('/config/roles', env.COUNTRY_CONFIG_URL), {
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Authorization: token
     }
   })
-}
 
-export async function fetchAdministrativeAreas() {
-  const res = await fetchLocationV1(LocationTypeV1.enum.ADMIN_STRUCTURE)
   if (!res.ok) {
-    throw new Error('Failed to fetch administrative areas')
+    throw new Error('Failed to fetch roles config')
   }
 
-  const result = (await res.json()) as Bundle<SavedLocation>
-  const administrativeAreas = result.entry.map(({ resource }) => ({
-    id: resource.id,
-    name: resource.name,
-    parentId: parsePartOf(resource.partOf?.reference),
-    validUntil: resource.status === 'inactive' ? new Date().toISOString() : null
-  }))
-
-  return array(AdministrativeArea).parse(administrativeAreas)
+  return array(Role).parse(await res.json())
 }
 
-export async function getLocations() {
-  const locationRequests = [
-    LocationType.enum.CRVS_OFFICE,
-    LocationType.enum.HEALTH_FACILITY
-  ].map(fetchLocationV1)
-
-  const locationResponses = await Promise.all(locationRequests)
-  for (const res of locationResponses) {
-    if (!res.ok) {
-      throw new Error('Failed to fetch locations')
-    }
-  }
-
-  const results = await Promise.all(
-    locationResponses.map(
-      async (res) => res.json() as Promise<Bundle<SavedLocation>>
-    )
-  )
-
-  const locations = results
-    .flatMap((result) => result.entry.map(({ resource }) => resource))
-    .map((entry) => {
-      return {
-        id: entry.id,
-        name: entry.name,
-        administrativeAreaId: parsePartOf(entry.partOf?.reference),
-        validUntil:
-          entry.status === 'inactive' ? new Date().toISOString() : null,
-        locationType: entry.type?.coding ? entry.type.coding[0]?.code : null
-      }
-    })
-
-  return array(Location).parse(locations)
-}

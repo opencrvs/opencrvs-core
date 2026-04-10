@@ -13,7 +13,8 @@ import React, { useEffect } from 'react'
 import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
-import { ActionType, SCOPES } from '@opencrvs/commons/client'
+import { onlineManager } from '@tanstack/react-query'
+import { ActionType } from '@opencrvs/commons/client'
 import * as V1_LEGACY_ROUTES from '@client/navigation/routes'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRequestRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -45,6 +46,11 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { SettingsPage } from '@client/v2-events/features/settings/Settings'
 import { TeamPage } from '@client/v2-events/features/team/Team'
 import { OrganisationPage } from '@client/v2-events/features/organisation/Organisation'
+import {
+  CreateNewUser,
+  EditUser,
+  ReviewUser
+} from '@client/views/SysAdmin/Team/user/userEditor/UserEditor'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
@@ -100,6 +106,45 @@ function PrefetchQueries() {
 export const routesConfig = {
   path: ROUTES.V2.path,
   Component: () => {
+    useEffect(() => {
+      let cancelled = false
+
+      onlineManager.setOnline(false)
+
+      async function probeNetwork() {
+        try {
+          const controller = new AbortController()
+          setTimeout(() => controller.abort(), 3000)
+
+          const res = await fetch('/api/ping', {
+            method: 'GET',
+            cache: 'no-store',
+            signal: controller.signal
+          })
+
+          if (!res.ok) {
+            throw new Error('Network probe failed')
+          }
+
+          await res.json()
+
+          if (!cancelled) {
+            onlineManager.setOnline(true)
+          }
+        } catch {
+          if (!cancelled) {
+            onlineManager.setOnline(false)
+          }
+        }
+      }
+
+      void probeNetwork()
+
+      return () => {
+        cancelled = true
+      }
+    }, [])
+
     const currentUser = useSelector(getUserDetails)
 
     if (!currentUser) {
@@ -257,9 +302,29 @@ export const routesConfig = {
       element: <SettingsPage />
     },
     {
+      path: ROUTES.V2.SETTINGS.USER.VIEW.path,
+      element: (
+        <WorkqueueLayout>
+          <UserAudit hideNavigation={true} />
+        </WorkqueueLayout>
+      )
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.CREATE.path,
+      element: <CreateNewUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.EDIT.path,
+      element: <EditUser />
+    },
+    {
+      path: ROUTES.V2.SETTINGS.USER.REVIEW.path,
+      element: <ReviewUser />
+    },
+    {
       path: ROUTES.V2.DASHBOARD.path,
       element: (
-        <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
+        <ProtectedRoute scopes={['performance.read-dashboards']}>
           <PerformanceDashboard />
         </ProtectedRoute>
       )
@@ -271,35 +336,15 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.TEAM_USER_LIST,
       element: (
-        <ProtectedRoute
-          scopes={[
-            SCOPES.ORGANISATION_READ_LOCATIONS,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-          ]}
-        >
+        <ProtectedRoute scopes={['organisation.read-locations']}>
           <TeamPage />
         </ProtectedRoute>
       )
     },
     {
-      path: ROUTES.V2.path + V1_LEGACY_ROUTES.USER_PROFILE,
-      element: (
-        <WorkqueueLayout>
-          <UserAudit hideNavigation={true} />
-        </WorkqueueLayout>
-      )
-    },
-    {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.ORGANISATIONS_INDEX,
       element: (
-        <ProtectedRoute
-          scopes={[
-            SCOPES.ORGANISATION_READ_LOCATIONS,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
-          ]}
-        >
+        <ProtectedRoute scopes={['organisation.read-locations']}>
           <OrganisationPage />
         </ProtectedRoute>
       )
@@ -307,7 +352,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.SYSTEM_LIST,
       element: (
-        <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+        <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
             <SystemList hideNavigation={true} />
           </WorkqueueLayout>
@@ -317,7 +362,7 @@ export const routesConfig = {
     {
       path: ROUTES.V2.path + V1_LEGACY_ROUTES.ALL_USER_EMAIL,
       element: (
-        <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
+        <ProtectedRoute scopes={['config.update-all']}>
           <WorkqueueLayout>
             <AllUserEmail hideNavigation={true} />
           </WorkqueueLayout>

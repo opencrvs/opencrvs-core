@@ -14,6 +14,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { PotentialDuplicate } from './ActionDocument'
 import { UUID } from '../uuid'
 import { Flag } from './Flag'
+import { DocumentPath } from '../documents'
 
 /**
  * Event statuses recognized by the system
@@ -29,6 +30,7 @@ export const EventStatus = z.enum([
 export type EventStatus = z.infer<typeof EventStatus>
 
 export const ZodDate = z.iso.date()
+export const ZodDateTime = z.string().datetime()
 
 export const ActionCreationMetadata = z.object({
   createdAt: z.iso
@@ -72,7 +74,6 @@ export type RegistrationCreationMetadata = z.infer<
   typeof RegistrationCreationMetadata
 >
 
-// @TODO: In the future REVOKE should be added to the list of statuses
 export const LegalStatuses = z.object({
   [EventStatus.enum.DECLARED]: ActionCreationMetadata.nullish(),
   [EventStatus.enum.REGISTERED]: RegistrationCreationMetadata.nullish()
@@ -110,10 +111,9 @@ export const EventMetadata = z.object({
   createdAtLocation: UUID.nullish().describe(
     'Location of the user who created the event.'
   ),
-  createdBySignature: z
-    .string()
-    .nullish()
-    .describe('Signature of the user who created the event.'),
+  createdBySignature: DocumentPath.nullish().describe(
+    'Signature of the user who created the event.'
+  ),
   updatedAtLocation: UUID.nullish().describe(
     'Location of the user who last changed the status.'
   ),
@@ -258,3 +258,27 @@ export const eventMetadataLabelMap: Record<
     description: 'Flags'
   }
 }
+
+export const EventMetadataDateFieldIdInput = z.enum([
+  'createdAt',
+  'updatedAt',
+  'legalStatuses.DECLARED.createdAt',
+  'legalStatuses.DECLARED.acceptedAt',
+  'legalStatuses.REGISTERED.createdAt',
+  'legalStatuses.REGISTERED.acceptedAt'
+])
+
+export type EventMetadataDateFieldIdInput = z.infer<
+  typeof EventMetadataDateFieldIdInput
+>
+
+export const EventMetadataDateFieldId = z.enum([
+  'event.createdAt',
+  'event.updatedAt',
+  'event.legalStatuses.DECLARED.createdAt',
+  'event.legalStatuses.DECLARED.acceptedAt',
+  'event.legalStatuses.REGISTERED.createdAt',
+  'event.legalStatuses.REGISTERED.acceptedAt'
+])
+
+export type EventMetadataDateFieldId = z.infer<typeof EventMetadataDateFieldId>

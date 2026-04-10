@@ -12,10 +12,11 @@ import {
   createPrng,
   generateUuid,
   Location,
-  LocationType,
-  SCOPES
+  encodeScope
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+
+const scope = encodeScope({ type: 'user.data-seeding' })
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -29,7 +30,7 @@ test('prevents forbidden access if missing required scope', async () => {
 
 test('Allows national system admin to set locations', async () => {
   const { user, generator } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   const locationRng = createPrng(846)
   await expect(
@@ -39,7 +40,7 @@ test('Allows national system admin to set locations', async () => {
 
 test('Prevents sending empty payload', async () => {
   const { user } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   await expect(
     dataSeedingClient.locations.set([])
@@ -48,7 +49,7 @@ test('Prevents sending empty payload', async () => {
 
 test('Creates single location', async () => {
   const { user } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   const initialLocations = await dataSeedingClient.locations.list()
 
@@ -58,7 +59,7 @@ test('Creates single location', async () => {
       administrativeAreaId: null,
       name: 'Location foobar',
       validUntil: null,
-      locationType: LocationType.enum.CRVS_OFFICE,
+      locationType: 'CRVS_OFFICE',
       externalId: 'abc123xyz456'
     }
   ]
@@ -74,7 +75,7 @@ test('Creates single location', async () => {
 test('Creates multiple locations under administrative area', async () => {
   const { user, generator, rng } = await setupTestCase()
 
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   const initialLocations = await dataSeedingClient.locations.list()
 
@@ -97,9 +98,43 @@ test('Creates multiple locations under administrative area', async () => {
   expect(locations).toEqual(initialLocations.concat(locationPayload))
 })
 
+test('updates externalId on existing location when re-seeded with a value', async () => {
+  const { user } = await setupTestCase()
+  const dataSeedingClient = createTestClient(user, [scope])
+
+  const locationId = generateUuid()
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Location without external id',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: null
+    }
+  ])
+
+  await dataSeedingClient.locations.set([
+    {
+      id: locationId,
+      administrativeAreaId: null,
+      name: 'Location without external id',
+      validUntil: null,
+      locationType: 'CRVS_OFFICE',
+      externalId: 'pcode123'
+    }
+  ])
+
+  const locations = await dataSeedingClient.locations.list()
+  const updated = locations.find((l) => l.id === locationId)
+
+  expect(updated?.externalId).toBe('pcode123')
+})
+
 test('seeding locations is additive, not destructive', async () => {
   const { user, generator } = await setupTestCase()
-  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  const dataSeedingClient = createTestClient(user, [scope])
 
   const initialLocations = await dataSeedingClient.locations.list()
   const locationRng = createPrng(847)

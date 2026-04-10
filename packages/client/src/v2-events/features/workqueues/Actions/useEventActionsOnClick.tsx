@@ -17,15 +17,13 @@ import {
   getUUID,
   ClientSpecificAction,
   getOrThrow,
-  WorkqueueActionType
+  WorkqueueActionType,
+  AssignmentStatus,
+  getAssignmentStatus
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import {
-  AssignmentStatus,
-  getAssignmentStatus,
-  getUsersFullName
-} from '@client/v2-events/utils'
+import { getUsersFullName } from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useModal } from '@client/hooks/useModal'
@@ -59,9 +57,8 @@ export function useEventActionsOnClick(event: EventIndex) {
     false
   )
   const { onQuickAction, quickActionModal } = useQuickActionModal(
-    event.id,
     eventConfiguration,
-    event.type
+    event
   )
 
   const eventId = event.id

@@ -20,15 +20,6 @@ services:
       - LANGUAGES=en
       - NODE_ENV=development
 
-  workflow:
-    environment:
-      - LANGUAGES=en
-      - NODE_ENV=development
-
-  search:
-    environment:
-      - NODE_ENV=development
-
   metrics:
     environment:
       - NODE_ENV=development
@@ -46,9 +37,5 @@ services:
       - NODE_ENV=development
 
   webhooks:
-    environment:
-      - NODE_ENV=development
-
-  config:
     environment:
       - NODE_ENV=development

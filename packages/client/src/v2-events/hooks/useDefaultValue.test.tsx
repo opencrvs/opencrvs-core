@@ -18,7 +18,6 @@ import { AddressType, FieldConfig, user } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider, queryClient } from '../trpc'
 import { testDataGenerator } from '../../tests/test-data-generators'
 import { createTestStore } from '../../tests/util'
-import { useSystemVariables } from './useSystemVariables'
 import { useDefaultValues } from './useDefaultValues'
 
 const fields: FieldConfig[] = [

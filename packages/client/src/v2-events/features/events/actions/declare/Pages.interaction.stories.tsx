@@ -401,7 +401,7 @@ const overriddenEventConfig = {
     description: 'This is what this event is referred as in the system',
     id: 'event.tennis-club-membership.label'
   },
-  placeOfEvent: { $$field: 'eventLocationId' },
+  placeOfEvent: { $$field: 'eventLocationId', $$subfield: [] },
   declaration: {
     ...tennisClubMembershipEvent.declaration,
     pages: tennisClubMembershipEvent.declaration.pages.map((page, index) => {
@@ -515,6 +515,10 @@ export const CanSubmitValidlyFilledForm: Story = {
       const district = await canvas.findByLabelText(/District/i)
       await userEvent.click(district)
       await selectEvent.select(district, 'Ibombo')
+
+      const village = await canvas.findByLabelText(/Village/i)
+      await userEvent.click(village)
+      await selectEvent.select(village, 'Pemba')
 
       const continueButton = await canvas.findByText('Continue')
       await userEvent.click(continueButton)

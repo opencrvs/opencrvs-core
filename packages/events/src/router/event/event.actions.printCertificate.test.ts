@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import { ActionType, FieldType, never, PageTypes } from '@opencrvs/commons'
+import { ActionType, encodeScope, FieldType, never, PageTypes } from '@opencrvs/commons'
 import {
   PRINT_CERTIFICATE_FORM,
   tennisClubMembershipEvent
@@ -38,7 +38,12 @@ test('prevents forbidden access if missing required scope', async () => {
 test(`allows access if required scope is present`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'record.registered.print-certified-copies[event=birth|death|tennis-club-membership]'
+    encodeScope({
+      type: 'record.print-certified-copies',
+      options: {
+        event: ['birth', 'death', 'tennis-club-membership']
+      }
+    })
   ])
 
   await expect(

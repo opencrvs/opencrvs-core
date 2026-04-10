@@ -16,16 +16,6 @@ import {
   WorkqueueActions
 } from './actions'
 
-export const EVENT_STATUS = {
-  IN_PROGRESS: 'IN_PROGRESS',
-  DECLARED: 'DECLARED',
-  VALIDATED: 'VALIDATED',
-  REGISTERED: 'REGISTERED',
-  REJECTED: 'REJECTED',
-  WAITING_VALIDATION: 'WAITING_VALIDATION',
-  CORRECTION_REQUESTED: 'CORRECTION_REQUESTED'
-}
-
 export interface IWorkqueue {
   loading?: boolean
   error?: boolean
@@ -67,8 +57,6 @@ const workqueueInitialState: WorkqueueState = {
     issueTab: 1
   }
 }
-
-
 
 export function updateRegistrarWorkqueue(
   userId?: string,

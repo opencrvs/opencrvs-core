@@ -55,6 +55,7 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
+import { Location, AdministrativeArea } from './locations'
 import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -64,10 +65,10 @@ import {
   FileFieldValue,
   HttpFieldValue
 } from './CompositeFieldValue'
-import { FieldValue } from './FieldValue'
+import { FieldValue, PlainDate } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import * as z from 'zod/v4'
-import { FullDocumentPath } from '../documents'
+import { DocumentPath } from '../documents'
 import { defineConfig } from './defineConfig'
 
 /**
@@ -87,7 +88,9 @@ export const TestUserRole = z.enum([
   'NATIONAL_REGISTRAR',
   'REGISTRATION_AGENT',
   'NATIONAL_SYSTEM_ADMIN',
-  'SOCIAL_WORKER'
+  'SOCIAL_WORKER',
+  'COMMUNITY_LEADER',
+  'PROVINCIAL_REGISTRAR'
 ])
 
 export type TestUserRole = z.infer<typeof TestUserRole>
@@ -156,8 +159,8 @@ export function generateRegistrationNumber(rng: () => number): string {
   return registrationNumber
 }
 
-export function generateRandomSignature(rng: () => number): string {
-  return `/random-bucket/${generateUuid(rng)}.png`
+export function generateRandomSignature(rng: () => number): DocumentPath {
+  return `${generateUuid(rng)}.png` as DocumentPath
 }
 
 /**
@@ -166,8 +169,22 @@ export function generateRandomSignature(rng: () => number): string {
 function mapFieldTypeToMockValue(
   field: FieldConfig,
   i: number,
-  rng: () => number
+  rng: () => number,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
+  administrativeHierarchy?: {
+    administrativeAreas: AdministrativeArea[]
+    locations: Location[]
+  }
 ): FieldValue {
+  const leafLevelAdministrativeAreas =
+    administrativeHierarchy?.administrativeAreas.filter((aa) =>
+      administrativeHierarchy?.administrativeAreas.every(
+        (other) => other.parentId !== aa.id
+      )
+    )
+
   switch (field.type) {
     case FieldType.DIVIDER:
     case FieldType.TEXT:
@@ -180,19 +197,24 @@ function mapFieldTypeToMockValue(
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
+    case FieldType.HEADING:
     case FieldType.IMAGE_VIEW:
     case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
     case FieldType.PHONE:
     case FieldType.QUERY_PARAM_READER:
     case FieldType.ID:
-    case FieldType.OFFICE:
     case FieldType.LINK_BUTTON:
     case FieldType.LOADER:
     case FieldType.ALPHA_HIDDEN:
       return `${field.id}-${field.type}-${i}`
     case FieldType.VERIFICATION_STATUS:
       return 'verified'
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
+      return administrativeHierarchy?.locations
+        ? pickRandom(rng, administrativeHierarchy.locations)?.id
+        : ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID)
+
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
@@ -210,9 +232,9 @@ function mapFieldTypeToMockValue(
       return {
         country: 'FAR',
         addressType: AddressType.DOMESTIC,
-        // @NOTE: This happens to map to a valid location in events test environment. Updating it will break tests.
-        // @TODO:  Find a way to give out context aware mock values in the future.
-        administrativeArea: '27160bbd-32d1-4625-812f-860226bfb92a' as UUID,
+        administrativeArea: leafLevelAdministrativeAreas
+          ? pickRandom(rng, leafLevelAdministrativeAreas)?.id
+          : ('27160bbd-32d1-4625-812f-860226bfb92a' as UUID),
         streetLevelDetails: {
           town: 'Example Town',
           residentialArea: 'Example Residential Area',
@@ -236,15 +258,15 @@ function mapFieldTypeToMockValue(
       return undefined
     case FieldType.DATE_RANGE:
       return {
-        start: '2021-01-01',
-        end: '2021-01-31'
+        start: PlainDate.parse('2021-01-01'),
+        end: PlainDate.parse('2021-01-31')
       }
     case FieldType.CHECKBOX:
       return true
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as FullDocumentPath,
+        path: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as DocumentPath,
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
@@ -263,17 +285,31 @@ function mapFieldTypeToMockValue(
       return Object.create(null)
     case FieldType.ID_READER:
       return Object.create(null)
+    case FieldType.USER_ROLE:
+      return TestUserRole.enum.FIELD_AGENT
   }
 }
 
 export function fieldConfigsToActionPayload(
   fields: FieldConfig[],
-  rng: () => number
+  rng: () => number,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
+  administrativeHierarchy?: {
+    administrativeAreas: AdministrativeArea[]
+    locations: Location[]
+  }
 ): ActionUpdate {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
-      [field.id]: mapFieldTypeToMockValue(field, i, rng)
+      [field.id]: mapFieldTypeToMockValue(
+        field,
+        i,
+        rng,
+        administrativeHierarchy
+      )
     }),
     {}
   )
@@ -283,7 +319,14 @@ export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number,
-  overrides?: ActionUpdate
+  overrides?: ActionUpdate,
+  /**
+   * Given hierarchy, ensures that related fields (e.g. location and administrative area) have valid values based on the hierarchy.
+   */
+  administrativeHierarchy?: {
+    administrativeAreas: AdministrativeArea[]
+    locations: Location[]
+  }
 ): ActionUpdate {
   const parsed = DeclarationUpdateActions.safeParse(action)
 
@@ -296,7 +339,11 @@ export function generateActionDeclarationInput(
 
     const declarationConfig = getDeclaration(configuration)
 
-    const declaration = fieldConfigsToActionPayload(fields, rng)
+    const declaration = fieldConfigsToActionPayload(
+      fields,
+      rng,
+      administrativeHierarchy
+    )
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
@@ -306,7 +353,8 @@ export function generateActionDeclarationInput(
         ...declaration,
         ...overrides
       },
-      {} // Intentionally empty. Allow generating fields with custom conditionals.
+      {}, // Intentionally empty. Allow generating fields with custom conditionals.
+      true
     )
   }
 
@@ -415,7 +463,7 @@ export function eventPayloadGenerator(
             },
             'applicant.dob': '2020-01-02',
             'applicant.image': {
-              path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+              path: 'e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png' as DocumentPath,
               originalFilename: 'Screenshot.png',
               type: 'image/png'
             }

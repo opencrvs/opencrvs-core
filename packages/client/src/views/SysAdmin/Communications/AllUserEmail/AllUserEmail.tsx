@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
@@ -27,10 +27,10 @@ import {
   ResponsiveModal
 } from '@opencrvs/components'
 import styled from 'styled-components'
-import { useLazyQuery } from '@apollo/client'
-import { EMAIL_ALL_USERS } from '@client/views/SysAdmin/Communications/AllUserEmail/queries'
+import { useMutation } from '@tanstack/react-query'
 import { useDispatch } from 'react-redux'
 import { toggleEmailAllUsersFeedbackToast } from '@client/notification/actions'
+import { trpcClient } from '@client/v2-events/trpc'
 
 const Form = styled.form`
   & > :not(:last-child) {
@@ -81,40 +81,38 @@ const AllUserEmail = ({ hideNavigation }: { hideNavigation?: boolean }) => {
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false)
-  const [sendEmail, { data, error }] = useLazyQuery(EMAIL_ALL_USERS)
+
   const dispatch = useDispatch()
   const hideModal = () => setConfirmationModalOpen(false)
   const resetForm = () => {
     setSubject('')
     setBody('')
   }
-  const handleConfirmSubmit = () => {
-    sendEmail({
-      variables: {
+
+  const broadcastMutation = useMutation({
+    mutationFn: () =>
+      trpcClient.announcement.broadcast.mutate({
         subject,
         body,
         locale: intl.locale
-      }
-    })
-    hideModal()
-    resetForm()
-  }
-
-  useEffect(() => {
-    if (data) {
+      }),
+    onSuccess: () => {
       dispatch(
         toggleEmailAllUsersFeedbackToast({ visible: true, type: 'success' })
       )
-    }
-  }, [data, dispatch])
-
-  useEffect(() => {
-    if (error) {
+      resetForm()
+    },
+    onError: () => {
       dispatch(
         toggleEmailAllUsersFeedbackToast({ visible: true, type: 'error' })
       )
     }
-  }, [error, dispatch])
+  })
+
+  const handleConfirmSubmit = () => {
+    hideModal()
+    broadcastMutation.mutate()
+  }
 
   return (
     <>

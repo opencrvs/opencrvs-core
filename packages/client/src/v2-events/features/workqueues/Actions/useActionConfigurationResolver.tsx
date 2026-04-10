@@ -14,7 +14,8 @@ import {
   ClientSpecificAction,
   EventIndex,
   getActionConfig,
-  WorkqueueActionType
+  WorkqueueActionType,
+  isValidIcon
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useValidatorContext } from '@client/v2-events/hooks/useValidatorContext'
@@ -48,15 +49,15 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const { onClick, modals } = useEventActionsOnClick(event)
   const validatorContext = useValidatorContext()
-  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
-    event.type
-  )
+  const { isActionAllowed: isActionAllowedForUser } =
+    useUserAllowedActions(event)
 
   const events = useEvents()
   const isOnline = useOnlineStatus()
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
+  const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
 
   const resolveAction = useCallback(
     <T extends WorkqueueActionType | ClientSpecificAction>(
@@ -76,7 +77,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
         eventConfiguration,
         isOnline,
         isDownloaded,
-        isAssigning: events.actions.assignment.assign.isAssigning(event.id)
+        isAssigning
       })
 
       const actionConfig = getActionConfig({ eventConfiguration, actionType })
@@ -88,7 +89,9 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
           ? buttonMessages.update
           : actionLabels[actionType],
         type: actionType,
-        icon: actionConfig?.icon || actionIcons[actionType],
+        icon: isValidIcon(actionConfig?.icon)
+          ? actionConfig.icon
+          : actionIcons[actionType],
         onClick: async (workqueue?: string) => onClick(actionType, workqueue),
         disabled: !enabled,
         hidden: !visible
@@ -102,7 +105,7 @@ export function useEventActionConfigurationResolver(event: EventIndex) {
       eventConfiguration,
       isOnline,
       isDownloaded,
-      events,
+      isAssigning,
       onClick
     ]
   )
@@ -119,9 +122,8 @@ export function useResolveActionConditionals(
   isDeclareDraftOpen: boolean
 ) {
   const validatorContext = useValidatorContext()
-  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
-    event.type
-  )
+  const { isActionAllowed: isActionAllowedForUser } =
+    useUserAllowedActions(event)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const events = useEvents()
   const isOnline = useOnlineStatus()
@@ -152,14 +154,14 @@ export function useResolveActionConditionals(
 export function useResolveAssignmentActionConditionals(event: EventIndex) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const validatorContext = useValidatorContext()
-  const { isActionAllowed: isActionAllowedForUser } = useUserAllowedActions(
-    event.type
-  )
+  const { isActionAllowed: isActionAllowedForUser } =
+    useUserAllowedActions(event)
   const events = useEvents()
   const isOnline = useOnlineStatus()
   const { useFindEventFromCache } = events.getEvent
   const cachedEvent = useFindEventFromCache(event.id)
   const isDownloaded = Boolean(cachedEvent.data)
+  const isAssigning = events.actions.assignment.assign.isAssigning(event.id)
 
   const resolveConditionals = useCallback(
     (actionType: typeof ActionType.ASSIGN | typeof ActionType.UNASSIGN) => {
@@ -172,7 +174,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
         eventConfiguration,
         isOnline,
         isDownloaded,
-        isAssigning: events.actions.assignment.assign.isAssigning(event.id)
+        isAssigning
       })
 
       return { enabled, visible }
@@ -184,7 +186,7 @@ export function useResolveAssignmentActionConditionals(event: EventIndex) {
       eventConfiguration,
       isOnline,
       isDownloaded,
-      events
+      isAssigning
     ]
   )
 
@@ -212,7 +214,9 @@ export function useAssignmentActionConfigurationResolver(event: EventIndex) {
       return {
         label: actionLabels[actionType],
         type: actionType,
-        icon: actionConfig?.icon || actionIcons[actionType],
+        icon: isValidIcon(actionConfig?.icon)
+          ? actionConfig.icon
+          : actionIcons[actionType],
         onClick:
           actionType === ActionType.ASSIGN
             ? async () => onAssign()

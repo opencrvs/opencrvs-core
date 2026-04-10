@@ -105,7 +105,7 @@ const LoadingIndicatorComp = ({
   </Wrapper>
 )
 
-export function withOnlineStatus<T>(
+function withOnlineStatus<T>(
   WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
 ) {
   return function WithOnlineStatus(props: T) {
@@ -115,7 +115,7 @@ export function withOnlineStatus<T>(
   }
 }
 
-export type IOnlineStatusProps = {
+type IOnlineStatusProps = {
   isOnline: boolean
 }
 

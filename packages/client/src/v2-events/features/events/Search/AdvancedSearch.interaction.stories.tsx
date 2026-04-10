@@ -107,9 +107,14 @@ export const AdvancedSearchStory: Story = {
         within(accordion).getByRole('button', { name: 'Show' })
       )
 
-      const locationInput = await canvas.findByTestId(
-        'event____legalStatuses____REGISTERED____createdAtLocation'
+      const locationInput = canvasElement.querySelector(
+        '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
       )
+
+      if (!locationInput) {
+        throw new Error('Location input not found')
+      }
+
       await userEvent.type(locationInput, 'Ibombo', { delay: 100 })
       const locationOption = await canvas.findAllByText(
         'Ibombo District Office'
@@ -271,10 +276,10 @@ export const AdvancedSearchTabsBehaviour: Story = {
 
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
-        await canvas.findByTestId(
-          'event____legalStatuses____REGISTERED____createdAtLocation'
+        canvasElement.querySelector(
+          '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation'
         )
-      ).toHaveValue('Ibombo District Office')
+      ).toHaveTextContent('Ibombo District Office')
       await within(accordion).findByText('June 2024 to June 2025')
       await within(accordion).findByText('Any status')
     }
@@ -303,10 +308,6 @@ export const AdvancedSearchTabsBehaviour: Story = {
         await assertRegistration()
       }
     )
-
-    // @TODO: Re-enable once the application supports NAME parameter as a serializedParams parameter.
-    // updating NAME is done only on core. Updating countryconfig happens separately.
-    // This should be solved by: https://github.com/opencrvs/opencrvs-core/issues/9690
 
     await step("Prepopulate Applicant's details", async () => {
       const accordion = await canvas.findByTestId(
@@ -354,21 +355,29 @@ export const AdvancedSearchTabsBehaviour: Story = {
       await userEvent.click(
         within(footballAccordion).getByRole('button', { name: 'Show' })
       )
-      const input = await canvas.findByTestId(
-        'event____legalStatuses____REGISTERED____createdAtLocation'
+
+      const locationInput = canvasElement.querySelector(
+        '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
       )
-      await userEvent.type(input, 'Ibombo', { delay: 100 })
-      const option = await canvas.findAllByText('Ibombo District Office')
-      await userEvent.click(option[0])
+
+      if (!locationInput) {
+        throw new Error('Location input not found')
+      }
+
+      await userEvent.type(locationInput, 'Ibombo', { delay: 100 })
+      const locationOption = await canvas.findAllByText(
+        'Ibombo District Office'
+      )
+      await userEvent.click(locationOption[0])
 
       await userEvent.click(tennisTab)
       await assertRegistration()
       await userEvent.click(footballTab)
       await expect(
-        await canvas.findByTestId(
-          'event____legalStatuses____REGISTERED____createdAtLocation'
+        canvasElement.querySelector(
+          '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation .react-select__single-value'
         )
-      ).toHaveValue('Ibombo District Office')
+      ).toHaveTextContent('Ibombo District Office')
     })
   }
 }
@@ -402,17 +411,23 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     await step(
       'Clear Place and Date of Registration, perform search',
       async () => {
-        const locationInput = await canvas.findByTestId(
-          'event____legalStatuses____REGISTERED____createdAtLocation',
-          {},
-          {
-            timeout: 5000
-          }
+        await new Promise((resolve) => setTimeout(resolve, 5000))
+
+        const locationInput = canvasElement.querySelector(
+          '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation input'
         )
 
-        await expect(locationInput).toHaveValue('Ibombo District Office')
+        if (!locationInput) {
+          throw new Error('Location input not found')
+        }
+
+        await expect(
+          canvasElement.querySelector(
+            '#searchable-select-event____legalStatuses____REGISTERED____createdAtLocation .react-select__single-value'
+          )
+        ).toHaveTextContent('Ibombo District Office')
+
         await userEvent.clear(locationInput)
-        locationInput.blur()
 
         const dateToggle = (await canvas.findAllByRole('checkbox')).find(
           (el) =>
@@ -431,15 +446,11 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
         ).find((btn) => btn.id === 'search')
 
         if (searchBtn) {
-          // @TODO: Check for Enabled when https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
-          // Currently, name fields are interpreted as required fields, so clearing them disables the search button.
           await expect(searchBtn).toBeEnabled()
-          // await userEvent.click(searchBtn)
         }
       }
     )
 
-    // @TODO: Bring back once issues in https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
     await step(
       'Ensure cleared fields do not appear in search criteria',
       async () => {

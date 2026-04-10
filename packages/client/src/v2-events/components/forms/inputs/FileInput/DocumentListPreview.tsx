@@ -16,8 +16,8 @@ import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
 import {
+  DocumentPath,
   FileFieldValueWithOption,
-  FullDocumentPath,
   SelectOption
 } from '@opencrvs/commons/client'
 import { IAttachmentValue } from '@client/forms'
@@ -64,7 +64,7 @@ interface Props {
   label?: string
   onSelect: (document: FileFieldValueWithOption | IAttachmentValue) => void
   dropdownOptions?: SelectOption[]
-  onDelete?: (path: FullDocumentPath) => void
+  onDelete?: (path: DocumentPath) => void
   inReviewSection?: boolean
   disabled?: boolean
 }

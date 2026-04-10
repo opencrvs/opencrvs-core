@@ -21,7 +21,6 @@ import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import {
-  IApplicationConfig,
   IApplicationConfigAnonymous,
   ILocationDataResponse,
   referenceApi,
@@ -32,7 +31,6 @@ import {
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { isOfflineDataLoaded } from './selectors'
 import { merge } from 'lodash'
@@ -40,21 +38,15 @@ import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
 import { initConditionals } from '@client/forms/conditionals'
 import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
-import { initValidators } from '@client/forms/validators'
 import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
 import { getToken } from '@client/utils/authUtils'
+import { ApplicationConfig } from '@opencrvs/commons/client'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
-
-export type LocationType =
-  | 'HEALTH_FACILITY'
-  | 'CRVS_OFFICE'
-  | 'ADMIN_STRUCTURE'
-  | 'PRIVATE_HOME'
 
 export interface ILocation {
   id: string
@@ -76,19 +68,19 @@ type JurisdictionType =
   | 'LOCATION_LEVEL_5'
 
 export interface AdminStructure extends ILocation {
-  type: 'ADMIN_STRUCTURE'
+  type: string
   jurisdictionType: JurisdictionType
-  physicalType: 'Jurisdiction'
+  physicalType: string
 }
 
 export interface Facility extends ILocation {
-  type: 'HEALTH_FACILITY'
-  physicalType: 'Building'
+  type: string
+  physicalType: string
 }
 
 export interface CRVSOffice extends ILocation {
-  type: 'CRVS_OFFICE'
-  physicalType: 'Building'
+  type: string
+  physicalType: string
 }
 
 export interface IForms {
@@ -116,8 +108,7 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-  systems: System[]
-  config: IApplicationConfig
+  config: ApplicationConfig
   anonymousConfig: IApplicationConfigAnonymous
 }
 
@@ -249,11 +240,6 @@ const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
   failActionCreator: actions.conditionalsFailed
 })
 
-const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
-  successActionCreator: actions.validatorsLoaded,
-  failActionCreator: actions.validatorsFailed
-})
-
 const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
   successActionCreator: actions.handlebarsLoaded,
   failActionCreator: actions.handlebarsFailed
@@ -375,32 +361,16 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
-    case actions.UPDATE_OFFLINE_SYSTEMS: {
-      const newOfflineData = {
-        ...state.offlineData,
-        systems: action.payload.systems
-      }
-
-      return loop(
-        {
-          ...state,
-          offlineData: newOfflineData
-        },
-        Cmd.run(saveOfflineData, { args: [newOfflineData] })
-      )
-    }
-
     /*
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, systems } = action.payload
+      const { certificates, config } = action.payload
       merge(window.config, config)
 
       const newOfflineData = {
         ...state.offlineData,
         config,
-        systems,
         templates: {
           ...state.offlineData.templates,
           certificates: (certificates as ICertificateData[]).map((x) => {
@@ -568,19 +538,6 @@ function reducer(
       const offices = filterLocations(
         action.payload,
         'CRVS_OFFICE'
-        /*
-
-        // This is used to filter office locations available offline
-        // It was important in an older design and may become important again
-
-        {
-          locationLevel: 'id',
-          locationId: isNationalSystemAdmin(state.userDetails)
-            ? undefined
-            : state.userDetails &&
-              state.userDetails.primaryOffice &&
-              state.userDetails.primaryOffice.id
-        }*/
       )
       const activeOffices = Object.fromEntries(
         Object.entries(offices).filter(

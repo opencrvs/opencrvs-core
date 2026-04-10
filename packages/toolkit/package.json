@@ -1,11 +1,12 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "1.9.8",
+  "version": "1.9.11",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
     "./lib": "./dist/lib.js",
     "./api": "./dist/api/index.js",
+    "./application-config": "./dist/application-config/index.js",
     "./events": "./dist/events/index.js",
     "./scopes": "./dist/scopes/index.js",
     "./events/deduplication": "./dist/events/deduplication.js",

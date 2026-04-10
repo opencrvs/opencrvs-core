@@ -16,14 +16,14 @@ import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
+import { env } from '@user-mgnt/environment'
+import { getUserId, statuses } from '@user-mgnt/utils/userUtils'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 import {
-  logger,
   triggerUserEventNotification,
   personNameFromV1ToV2
 } from '@opencrvs/commons'
-import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 
 interface IResendPasswordInvitePayload {
   userId: string
@@ -42,12 +42,6 @@ export default async function resetPasswordInviteHandler(
     throw unauthorized()
   }
 
-  const remoteAddress =
-    request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
-
-  const subjectPractitionerId = user.practitionerId
   const systemAdminUser = await User.findById(
     getUserId({ Authorization: request.headers.authorization })
   )
@@ -56,20 +50,14 @@ export default async function resetPasswordInviteHandler(
     return h.response().code(400)
   }
 
-  try {
-    await postUserActionToMetrics(
-      'PASSWORD_RESET_BY_ADMIN',
-      request.headers.authorization,
-      remoteAddress,
-      userAgent,
-      systemAdminUser?.practitionerId,
-      subjectPractitionerId
-    )
-  } catch (err) {
-    logger.error(err)
-  }
+  recordUserAuditEvent(request.headers.authorization, {
+    operation: 'user.password_reset_by_admin',
+    requestData: { subjectId: userId },
+  })
 
-  randomPassword = generateRandomPassword(hasDemoScope(request))
+  // DEFAULT_USER_PASSWORD allows QA/dev environments to set a predictable password
+  // for manually created users when SMS/email delivery is unavailable.
+  randomPassword = env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
   const { hash, salt } = generateSaltedHash(randomPassword)
 
   user.passwordHash = hash

@@ -33,18 +33,14 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
-import {
-  RECORD_DECLARE_SCOPES,
-  usePermissions
-} from '@client/hooks/useAuthorization'
-import ProtectedComponent from '@client/components/ProtectedComponent'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
 import { parse, stringify } from 'qs'
-import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
+import { ROUTES } from '../../v2-events/routes/routes'
 
 type IStateProps = {
   language: string
@@ -124,14 +120,7 @@ const HeaderComponent = (props: IFullProps) => {
     changeTeamLocation
   } = props
 
-  const {
-    canCreateUser,
-    canSearchRecords,
-    canSearchBirthRecords,
-    canSearchDeathRecords
-  } = usePermissions()
-
-  const canDoAdvanceSearch = canSearchBirthRecords || canSearchDeathRecords
+  const { canCreateUser, canSearchRecords } = usePermissions()
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
     const locationId = parse(router.location.search, {
@@ -175,7 +164,12 @@ const HeaderComponent = (props: IFullProps) => {
               handler: () => {
                 if (locationId) {
                   router.navigate(
-                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                    ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+                      {},
+                      {
+                        officeId: locationId
+                      }
+                    )
                   )
                 }
               }
@@ -198,7 +192,12 @@ const HeaderComponent = (props: IFullProps) => {
               handler: () => {
                 if (locationId) {
                   router.navigate(
-                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                    ROUTES.V2.SETTINGS.USER.CREATE.buildPath(
+                      {},
+                      {
+                        officeId: locationId
+                      }
+                    )
                   )
                 }
               }
@@ -300,8 +299,7 @@ const HeaderComponent = (props: IFullProps) => {
           selectedSearchType ?? offlineData.config.SEARCH_DEFAULT_CRITERIA
         }
         searchTypeList={searchTypeList}
-        // @TODO: How to hide the navigation list from field agents? Ask JPF
-        navigationList={canDoAdvanceSearch ? advancedSearchNavigationList : []}
+        navigationList={canSearchRecords ? advancedSearchNavigationList : []}
         searchHandler={(text, type) =>
           props.router.navigate(
             {
@@ -348,17 +346,15 @@ const HeaderComponent = (props: IFullProps) => {
     {
       element: (
         <HeaderCenter>
-          <ProtectedComponent scopes={RECORD_DECLARE_SCOPES}>
-            <Button
-              type="iconPrimary"
-              size="medium"
-              key="newEvent"
-              id="header_new_event"
-              onClick={() => router.navigate(routes.SELECT_VITAL_EVENT)}
-            >
-              <Icon name="Plus" size="medium" />
-            </Button>
-          </ProtectedComponent>
+          <Button
+            type="iconPrimary"
+            size="medium"
+            key="newEvent"
+            id="header_new_event"
+            onClick={() => router.navigate(routes.SELECT_VITAL_EVENT)}
+          >
+            <Icon name="Plus" size="medium" />
+          </Button>
           {canSearchRecords && renderSearchInput(props)}
         </HeaderCenter>
       )

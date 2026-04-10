@@ -13,8 +13,7 @@ import * as Joi from 'joi'
 import {
   CERT_PUBLIC_KEY_PATH,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
-  PRODUCTION,
-  QA_ENV
+  PRODUCTION
 } from '@gateway/constants'
 import { redis } from '@gateway/utils/redis'
 import * as crypto from 'crypto'
@@ -157,21 +156,21 @@ export async function generateAndSendVerificationCode(
   mobile?: string,
   email?: string
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1
+  const isTwoFADisabled = !env.TWO_FA_ENABLED
   logger.info(
-    `isDemoUser,
+    `isTwoFADisabled,
       ${JSON.stringify({
-        isDemoUser: isDemoUser
+        isTwoFADisabled: isTwoFADisabled
       })}`
   )
   let verificationCode
-  if (isDemoUser) {
+  if (isTwoFADisabled) {
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
     verificationCode = await generateAndStoreVerificationCode(nonce)
   }
-  if (!PRODUCTION || QA_ENV) {
+  if (!PRODUCTION) {
     logger.info(
       `Sending a verification to ,
           ${JSON.stringify({
@@ -181,7 +180,7 @@ export async function generateAndSendVerificationCode(
           })}`
     )
   } else {
-    if (isDemoUser) {
+    if (isTwoFADisabled) {
       throw unauthorized()
     } else {
       await sendVerificationCode(

@@ -27,13 +27,12 @@ import {
   generateActionDeclarationInput,
   generateUuid,
   Location,
-  LocationType,
   QueryType,
   TENNIS_CLUB_MEMBERSHIP,
   TestUserRole,
   UUID
 } from '@opencrvs/commons/events'
-import { encodeScope, SCOPES } from '@opencrvs/commons'
+import { encodeScope } from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
@@ -104,7 +103,7 @@ test('records are indexed with full location hierarchy', async () => {
     id: user.primaryOfficeId,
     administrativeAreaId: childAdministrativeArea.id,
     name: 'Child location',
-    locationType: LocationType.enum.CRVS_OFFICE
+    locationType: 'CRVS_OFFICE'
   } satisfies Location
 
   await seed.administrativeAreas([
@@ -1027,7 +1026,7 @@ describe('placeOfEvent location hierarchy handling', () => {
       placeOfEvent: field('locationId')
     }
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([modifiedEventConfig])
       })
     )
@@ -1055,7 +1054,7 @@ describe('placeOfEvent location hierarchy handling', () => {
           event: [TENNIS_CLUB_MEMBERSHIP]
         }
       }),
-      SCOPES.RECORD_REINDEX
+      encodeScope({ type: 'record.reindex' })
     ])
     esClient = getOrCreateClient()
 
@@ -1075,7 +1074,7 @@ describe('placeOfEvent location hierarchy handling', () => {
       id: user.primaryOfficeId,
       administrativeAreaId: parentAdministrativeAreaId,
       name: 'Child location',
-      locationType: LocationType.enum.CRVS_OFFICE
+      locationType: 'CRVS_OFFICE'
     }
 
     await seed.administrativeAreas([
@@ -1305,10 +1304,10 @@ describe('placeOfEvent location hierarchy handling', () => {
 
     // Step 4: Perform reindexing
     const sysClient = createSystemTestClient('test-system', [
-      SCOPES.RECORD_REINDEX
+      encodeScope({ type: 'record.reindex' })
     ])
 
-    await sysClient.event.reindex()
+    await sysClient.event.reindex.trigger()
 
     // Refresh index to make reindexed documents searchable
     await esClient.indices.refresh({
@@ -1423,7 +1422,7 @@ describe('placeOfEvent location hierarchy handling', () => {
   test('records are indexed with createdAtLocation for no placeOfEvent config', async () => {
     // Step 1: Create and declare events with international address
     mswServer.use(
-      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      http.get(`${env.COUNTRY_CONFIG_URL}/config/events`, () => {
         return HttpResponse.json([
           { ...modifiedEventConfig, placeOfEvent: undefined }
         ])

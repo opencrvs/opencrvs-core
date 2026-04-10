@@ -2,8 +2,9 @@
 -- PostgreSQL database dump
 --
 
+
 -- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
--- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-2.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -25,6 +26,34 @@ CREATE SCHEMA app;
 
 
 ALTER SCHEMA app OWNER TO events_migrator;
+
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
 
 --
 -- Name: action_status; Type: TYPE; Schema: app; Owner: events_migrator
@@ -56,6 +85,61 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: administrative_areas; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.administrative_areas (
+    id uuid NOT NULL,
+    name text NOT NULL,
+    parent_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    valid_until timestamp with time zone,
+    external_id text
+);
+
+
+ALTER TABLE app.administrative_areas OWNER TO events_migrator;
+
+--
+-- Name: announcements; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.announcements (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    subject text NOT NULL,
+    body text NOT NULL,
+    locale text DEFAULT 'en'::text NOT NULL,
+    recipients text[] NOT NULL,
+    created_by uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    status text DEFAULT 'PENDING'::text NOT NULL,
+    progress integer DEFAULT 0 NOT NULL,
+    retry_count integer DEFAULT 0 NOT NULL,
+    error jsonb,
+    sent_at timestamp with time zone,
+    CONSTRAINT announcements_status_check CHECK ((status = ANY (ARRAY['PENDING'::text, 'SENT'::text, 'FAILED'::text])))
+);
+
+
+ALTER TABLE app.announcements OWNER TO events_migrator;
+
+--
+-- Name: COLUMN announcements.recipients; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.announcements.recipients IS 'All BCC recipient emails, snapshotted at creation time.';
+
+
+--
+-- Name: COLUMN announcements.progress; Type: COMMENT; Schema: app; Owner: events_migrator
+--
+
+COMMENT ON COLUMN app.announcements.progress IS 'Number of recipients sent so far. Worker resumes from this offset on retry.';
+
+
+--
 -- Name: audit_log; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -66,7 +150,8 @@ CREATE TABLE app.audit_log (
     operation text NOT NULL,
     request_data jsonb,
     response_summary jsonb,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    transaction_id text DEFAULT (gen_random_uuid())::text NOT NULL
 );
 
 
@@ -115,22 +200,11 @@ COMMENT ON COLUMN app.audit_log.response_summary IS 'Per-endpoint curated summar
 
 
 --
--- Name: administrative_areas; Type: TABLE; Schema: app; Owner: events_migrator
+-- Name: COLUMN audit_log.transaction_id; Type: COMMENT; Schema: app; Owner: events_migrator
 --
 
-CREATE TABLE app.administrative_areas (
-    id uuid NOT NULL,
-    name text NOT NULL,
-    parent_id uuid,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp with time zone,
-    valid_until timestamp with time zone,
-    external_id text
-);
+COMMENT ON COLUMN app.audit_log.transaction_id IS 'Client-supplied idempotency key. Existing rows are backfilled with random UUIDs.';
 
-
-ALTER TABLE app.administrative_areas OWNER TO events_migrator;
 
 --
 -- Name: event_action_drafts; Type: TABLE; Schema: app; Owner: events_migrator
@@ -283,6 +357,27 @@ ALTER SEQUENCE app.pgmigrations_id_seq OWNED BY app.pgmigrations.id;
 
 
 --
+-- Name: system_clients; Type: TABLE; Schema: app; Owner: events_migrator
+--
+
+CREATE TABLE app.system_clients (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    legacy_id text,
+    name text NOT NULL,
+    scopes jsonb DEFAULT '[]'::jsonb NOT NULL,
+    created_by text NOT NULL,
+    secret_hash text NOT NULL,
+    salt text NOT NULL,
+    sha_secret text NOT NULL,
+    status text DEFAULT 'active'::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT system_clients_status_check CHECK ((status = ANY (ARRAY['active'::text, 'disabled'::text])))
+);
+
+
+ALTER TABLE app.system_clients OWNER TO events_migrator;
+
+--
 -- Name: user_credentials; Type: TABLE; Schema: app; Owner: events_migrator
 --
 
@@ -340,14 +435,6 @@ ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmig
 
 
 --
--- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.audit_log
-    ADD CONSTRAINT audit_log_pkey PRIMARY KEY (id);
-
-
---
 -- Name: administrative_areas administrative_areas_external_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -361,6 +448,22 @@ ALTER TABLE ONLY app.administrative_areas
 
 ALTER TABLE ONLY app.administrative_areas
     ADD CONSTRAINT administrative_areas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: announcements announcements_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.announcements
+    ADD CONSTRAINT announcements_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.audit_log
+    ADD CONSTRAINT audit_log_pkey PRIMARY KEY (id);
 
 
 --
@@ -452,6 +555,22 @@ ALTER TABLE ONLY app.pgmigrations
 
 
 --
+-- Name: system_clients system_clients_legacy_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_clients
+    ADD CONSTRAINT system_clients_legacy_id_key UNIQUE (legacy_id);
+
+
+--
+-- Name: system_clients system_clients_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.system_clients
+    ADD CONSTRAINT system_clients_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_credentials user_credentials_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
@@ -500,6 +619,20 @@ ALTER TABLE ONLY app.users
 
 
 --
+-- Name: announcements_status_idx; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX announcements_status_idx ON app.announcements USING btree (status) WHERE (status = 'PENDING'::text);
+
+
+--
+-- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE INDEX idx_action_created_by ON app.event_actions USING btree (created_by);
+
+
+--
 -- Name: idx_audit_log_client_id; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
@@ -521,10 +654,10 @@ CREATE INDEX idx_audit_log_operation ON app.audit_log USING btree (operation);
 
 
 --
--- Name: idx_action_created_by; Type: INDEX; Schema: app; Owner: events_migrator
+-- Name: idx_audit_log_transaction_id; Type: INDEX; Schema: app; Owner: events_migrator
 --
 
-CREATE INDEX idx_action_created_by ON app.event_actions USING btree (created_by);
+CREATE UNIQUE INDEX idx_audit_log_transaction_id ON app.audit_log USING btree (transaction_id);
 
 
 --
@@ -542,11 +675,26 @@ CREATE INDEX idx_locations_valid_until ON app.locations USING btree (valid_until
 
 
 --
+-- Name: system_clients_legacy_id_idx; Type: INDEX; Schema: app; Owner: events_migrator
+--
+
+CREATE UNIQUE INDEX system_clients_legacy_id_idx ON app.system_clients USING btree (legacy_id) WHERE (legacy_id IS NOT NULL);
+
+
+--
 -- Name: administrative_areas administrative_areas_parent_id_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
 ALTER TABLE ONLY app.administrative_areas
     ADD CONSTRAINT administrative_areas_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES app.administrative_areas(id);
+
+
+--
+-- Name: announcements announcements_created_by_fkey; Type: FK CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.announcements
+    ADD CONSTRAINT announcements_created_by_fkey FOREIGN KEY (created_by) REFERENCES app.users(id);
 
 
 --
@@ -621,17 +769,24 @@ GRANT USAGE ON SCHEMA app TO events_app;
 
 
 --
--- Name: TABLE audit_log; Type: ACL; Schema: app; Owner: events_migrator
---
-
-GRANT SELECT,INSERT ON TABLE app.audit_log TO events_app;
-
-
---
 -- Name: TABLE administrative_areas; Type: ACL; Schema: app; Owner: events_migrator
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.administrative_areas TO events_app;
+
+
+--
+-- Name: TABLE announcements; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE app.announcements TO events_app;
+
+
+--
+-- Name: TABLE audit_log; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT ON TABLE app.audit_log TO events_app;
 
 
 --
@@ -663,6 +818,13 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 
 
 --
+-- Name: TABLE system_clients; Type: ACL; Schema: app; Owner: events_migrator
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.system_clients TO events_app;
+
+
+--
 -- Name: TABLE user_credentials; Type: ACL; Schema: app; Owner: events_migrator
 --
 
@@ -679,3 +841,5 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.users TO events_app;
 --
 -- PostgreSQL database dump complete
 --
+
+

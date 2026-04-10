@@ -15,7 +15,8 @@ import {
   isArgumentElement,
   isSelectElement,
   isPluralElement,
-  parse
+  parse,
+  isDateElement
 } from '@formatjs/icu-messageformat-parser'
 import { useMemo } from 'react'
 import { EventState } from '@opencrvs/commons/client'
@@ -84,7 +85,7 @@ function convertDotInCurlyBraces(str: string): string {
 }
 
 function getVariablesFromElement(element: MessageFormatElement): string[] {
-  if (isArgumentElement(element)) {
+  if (isArgumentElement(element) || isDateElement(element)) {
     return [element.value]
   }
   if (isSelectElement(element)) {
@@ -180,9 +181,21 @@ export function useIntlFormatMessageWithFlattenedParams() {
     const variablesWithEmptyValues = Object.fromEntries(
       variablesInMessage.map((variable) => [variable, EMPTY_TOKEN])
     )
+    const mergedVariables = { ...variablesWithEmptyValues, ...variables }
+
+    // Date-element variables cannot accept EMPTY_TOKEN — IntlMessageFormat throws RangeError
+    // when it tries to format a non-date string as a date. Return '' if any date field is absent.
+    const dateVariableNames = parse(defaultMessage)
+      .filter(isDateElement)
+      .map((el) => el.value)
+    if (
+      dateVariableNames.some((name) => mergedVariables[name] === EMPTY_TOKEN)
+    ) {
+      return ''
+    }
 
     const formatted = new IntlMessageFormat(defaultMessage, intl.locale).format(
-      { ...variablesWithEmptyValues, ...variables }
+      mergedVariables
     )
     if (!formatted || typeof formatted !== 'string') {
       return ''
@@ -192,9 +205,23 @@ export function useIntlFormatMessageWithFlattenedParams() {
     return formatted.replaceAll(EMPTY_TOKEN, '').trim()
   }
 
+  function safeFormatMessage<T extends {}>(
+    message: MessageDescriptor,
+    params?: T
+  ): string {
+    try {
+      return formatMessage(message, params)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error formatting message:', error)
+      return ''
+    }
+  }
+
   return {
     ...intl,
     formatMessage,
+    safeFormatMessage,
     variablesUsed: (message: MessageDescriptor) =>
       variablesUsed(getDefaultMessage(message))
   }

@@ -51,7 +51,9 @@ import {
   isAgeFieldType,
   FieldUpdateValue,
   isCustomFieldType,
-  isImageViewFieldType
+  isImageViewFieldType,
+  isHeadingFieldType,
+  isUserRoleFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -66,6 +68,7 @@ import {
   Select,
   SelectCountry,
   Paragraph,
+  Heading,
   Number,
   NumberWithUnit,
   Text,
@@ -73,9 +76,11 @@ import {
   getRegisteredFieldByFieldConfig,
   VerificationStatus,
   AgeField,
-  ImageView
+  ImageView,
+  UserRole
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { SignatureField } from '@client/v2-events/components/forms/inputs/SignatureField/SignatureField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
@@ -148,6 +153,10 @@ export function ValueOutput({
     return Paragraph.Output
   }
 
+  if (isHeadingFieldType(field)) {
+    return Heading.Output
+  }
+
   if (isNumberFieldType(field)) {
     return <Number.Output {...field} />
   }
@@ -156,7 +165,11 @@ export function ValueOutput({
     return <NumberWithUnit.Output {...field} />
   }
 
-  if (isFileFieldType(field) || isSignatureFieldType(field)) {
+  if (isSignatureFieldType(field)) {
+    return <SignatureField.Output value={field.value} />
+  }
+
+  if (isFileFieldType(field)) {
     return <File.Output {...field} />
   }
 
@@ -206,16 +219,16 @@ export function ValueOutput({
     return <AdministrativeArea.Output value={field.value} />
   }
 
-  if (isOfficeFieldType(field) || isLocationFieldType(field)) {
+  if (
+    isOfficeFieldType(field) ||
+    isLocationFieldType(field) ||
+    isFacilityFieldType(field)
+  ) {
     return <LocationSearch.Output value={field.value} />
   }
 
   if (isDividerFieldType(field)) {
     return Divider.Output
-  }
-
-  if (isFacilityFieldType(field)) {
-    return <LocationSearch.Output value={field.value} />
   }
 
   if (isVerificationStatusType(field)) {
@@ -237,6 +250,10 @@ export function ValueOutput({
         value={field.value}
       />
     )
+  }
+
+  if (isUserRoleFieldType(field)) {
+    return <UserRole.Output value={field.value} />
   }
 
   if (isCustomFieldType(field)) {

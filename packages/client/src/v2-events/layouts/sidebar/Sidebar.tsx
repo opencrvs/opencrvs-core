@@ -32,16 +32,17 @@ import { useCountryConfigWorkqueueConfigurations } from '@client/v2-events/featu
 import { ROUTES } from '@client/v2-events/routes'
 import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
-import {
-  getIndividualNameObj,
-  removeUserDetails
-} from '@client/utils/userUtils'
+import { removeUserDetails } from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { Avatar } from '@client/components/Avatar'
-import { hasDraftWorkqueue, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
+import {
+  getUsersFullName,
+  hasDraftWorkqueue,
+  WORKQUEUE_DRAFT
+} from '@client/v2-events/utils'
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -63,6 +64,7 @@ function Workqueues({
   const intl = useIntl()
   const navigate = useNavigate()
   const { getCount } = useWorkqueue(currentWorkqueueSlug ?? '')
+
   const counts = getCount.useSuspenseQuery()
 
   return workqueues.map(({ name: label, slug, icon }) => (
@@ -113,15 +115,21 @@ export function SidebarComponent({
 
   let name = ''
   if (userDetails?.name) {
-    const nameObj = getIndividualNameObj(userDetails.name, language)
-    if (nameObj) {
-      const { firstNames, familyName } = nameObj
-      name = joinValues([firstNames, familyName], ' ')
-    }
+    name = getUsersFullName(userDetails.name, language)
   }
 
   const role =
-    (userDetails?.role && intl.formatMessage(userDetails.role.label)) ?? ''
+    (userDetails?.role &&
+      intl.formatMessage(
+        {
+          id: 'event.history.role',
+          defaultMessage: 'Unknown'
+        },
+        {
+          role: userDetails.role
+        }
+      )) ??
+    ''
 
   const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
 
@@ -132,7 +140,7 @@ export function SidebarComponent({
     await removeToken()
     await removeUserDetails()
     window.location.assign(
-      `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
+      `/login?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`
     )
   }
 
@@ -195,7 +203,7 @@ export function SidebarComponent({
       </NavigationGroup>
       <OrganisationNavigationGroup
         currentWorkqueueSlug={workqueueSlug}
-        primaryOfficeId={userDetails?.primaryOffice.id}
+        primaryOfficeId={userDetails?.primaryOfficeId}
       />
       <PerformanceNavigationGroup currentWorkqueueSlug={workqueueSlug} />
       {isMobileView && (
