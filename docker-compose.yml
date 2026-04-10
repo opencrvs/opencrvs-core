@@ -60,7 +60,6 @@ services:
       - NODE_ENV=development
       - EVENTS_URL=http://events:5555/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
@@ -84,19 +83,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - AUTH_URL=http://auth:4040
   # User facing services
-  search:
-    image: ghcr.io/opencrvs/ocrvs-search:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/search/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-    environment:
-      - NODE_ENV=development
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - ES_HOST=elasticsearch:9200
   metrics:
     image: ghcr.io/opencrvs/ocrvs-metrics:${VERSION}
     #platform: linux/amd64
@@ -113,7 +99,6 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - MONGO_URL=mongodb://mongo1/metrics
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
-      - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - DOCUMENTS_URL=http://documents:9050
   # END User facing services
@@ -206,7 +191,6 @@ services:
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
       - EVENTS_MONGO_URL=mongodb://mongo1/events
-      - SEARCH_URL=http://search:9090/
       - ES_HOST=elasticsearch:9200
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
