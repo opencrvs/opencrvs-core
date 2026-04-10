@@ -14,7 +14,6 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:user-mgnt-user',
   'opencrvs:gateway-user',
   'opencrvs:notification-user',
-  'opencrvs:search-user',
   'opencrvs:metrics-user',
   'opencrvs:countryconfig-user',
   'opencrvs:webhooks-user',
