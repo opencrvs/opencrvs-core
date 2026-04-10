@@ -10,13 +10,7 @@
  */
 
 import { env } from '@auth/environment'
-import {
-  fetchJSON,
-  joinUrl,
-  logger,
-  Roles,
-  encodeScope
-} from '@opencrvs/commons'
+import { fetchJSON, joinUrl, logger, Roles } from '@opencrvs/commons'
 
 export async function getUserRoleScopeMapping() {
   const roles = await fetchJSON<Roles>(
