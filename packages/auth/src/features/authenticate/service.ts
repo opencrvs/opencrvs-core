@@ -176,7 +176,6 @@ export async function createTokenForActionConfirmation(
         'opencrvs:user-mgnt-user',
         'opencrvs:auth-user',
         'opencrvs:notification-user',
-        'opencrvs:search-user',
         'opencrvs:metrics-user',
         'opencrvs:countryconfig-user',
         'opencrvs:webhooks-user',
