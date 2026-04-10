@@ -319,10 +319,20 @@ const unflattenScope = (input: Record<string, unknown>) => {
   return { type, options }
 }
 
-// Define a branded type for encoded scope strings
+/**
+ * Branded encoded scope string, in query string format.
+ *
+ */
 export const EncodedScope = z.string().brand('EncodedScope')
 export type EncodedScope = z.infer<typeof EncodedScope>
 
+/**
+ * Encodes a scope object into an EncodedScope branded query string.
+ *
+ *
+ * @param scope - The scope object to encode.
+ * @returns The encoded scope as a branded string (`EncodedScope`).
+ */
 export const encodeScope = (scope: Scope): EncodedScope => {
   const flattened = flattenScope(scope)
 
@@ -334,6 +344,15 @@ export const encodeScope = (scope: Scope): EncodedScope => {
     encode: false
   }) as EncodedScope
 }
+
+/**
+ * Converts a scope object into an encoded query string representation.
+ *
+ * @TODO scope param could be defined as EncodedScope instead of string.
+ *
+ * @param scope - The scope object to encode.
+ * @returns The encoded scope as a branded string (`EncodedScope`).
+ */
 
 export const decodeScope = (query: string) => {
   const scope = qs.parse(query, {
