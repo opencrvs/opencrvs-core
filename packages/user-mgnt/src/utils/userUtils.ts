@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
 import { ITokenPayload } from '@user-mgnt/utils/token'
 import decode from 'jwt-decode'
 
@@ -19,26 +18,11 @@ export const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
-export interface IAuthHeader {
+interface IAuthHeader {
   Authorization: string
 }
 
-export const hasScope = (request: Hapi.Request, scope: string): boolean => {
-  if (
-    !request.auth ||
-    !request.auth.credentials ||
-    !request.auth.credentials.scope
-  ) {
-    return false
-  }
-  return request.auth.credentials.scope.includes(scope)
-}
-
-export function hasDemoScope(request: Hapi.Request): boolean {
-  return hasScope(request, 'demo')
-}
-
-export const getTokenPayload = (token: string): ITokenPayload => {
+const getTokenPayload = (token: string): ITokenPayload => {
   let decoded: ITokenPayload
   try {
     decoded = decode(token)

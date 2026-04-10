@@ -17,7 +17,6 @@ import {
 import { buttonMessages } from '@client/i18n/messages'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { formatUrl, generateGoToHomeTabUrl } from '@client/navigation'
-import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -39,7 +38,6 @@ import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavi
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { NavigationSubItem } from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
-import { omit } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -55,7 +53,6 @@ import {
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'qs'
 import { useHasAccessToNavigationItem } from './useHasAccessToNavigationItem'
-import { SCOPES } from '@opencrvs/commons/client'
 import { usePermissions } from '@client/hooks/useAuthorization'
 
 const SCREEN_LOCK = 'screenLock'
@@ -549,7 +546,7 @@ const NavigationView = (props: IFullProps) => {
           )}
         </NavigationGroup>
       )}
-      {hasScope(SCOPES.PERFORMANCE_READ_DASHBOARDS) && (
+      {hasScope('performance.read-dashboards') && (
         <NavigationGroup>
           {
             <>

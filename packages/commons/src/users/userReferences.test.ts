@@ -54,7 +54,7 @@ function createTestToken(scopes: string[]) {
   return jwt.sign({ scope: scopes }, readFileSync('./test/cert.key'), {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:workflow-user'
+    audience: 'opencrvs:gateway-user'
   })
 }
 

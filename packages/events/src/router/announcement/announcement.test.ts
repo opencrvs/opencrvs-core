@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import { SCOPES, UUID } from '@opencrvs/commons'
+import { encodeScope, UUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import {
@@ -25,6 +25,8 @@ import {
 } from '@events/workers/announcementWorker'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
+
+const scope = encodeScope({ type: 'config.update-all' })
 
 function generateEmails(count: number): string[] {
   return Array.from({ length: count }, (_, i) => `user${i}@test.com`)
@@ -81,7 +83,7 @@ const ALL_USER_NOTIFICATION_URL = `${env.COUNTRY_CONFIG_URL}/triggers/user/all-u
 
 describe('announcement.broadcast', () => {
   describe('authorization', () => {
-    test('rejects with FORBIDDEN if caller lacks CONFIG_UPDATE_ALL scope', async () => {
+    test('rejects with FORBIDDEN if caller lacks config.update-all scope', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [])
 
@@ -97,7 +99,7 @@ describe('announcement.broadcast', () => {
 
   test('rejects with NOT_FOUND if the logged-in admin is not in the database', async () => {
     const { user } = await setupTestCase()
-    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+    const client = createTestClient(user, [scope])
 
     await expect(
       client.announcement.broadcast({
@@ -122,7 +124,7 @@ describe('announcement.broadcast', () => {
       })
       .execute()
 
-    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+    const client = createTestClient(user, [scope])
 
     await expect(
       client.announcement.broadcast({
@@ -160,7 +162,7 @@ describe('announcement.broadcast', () => {
       ])
       .execute()
 
-    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+    const client = createTestClient(user, [scope])
 
     await expect(
       client.announcement.broadcast({ subject: '', body: 'Body', locale: 'en' })
@@ -189,7 +191,7 @@ describe('announcement.broadcast', () => {
       ])
       .execute()
 
-    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+    const client = createTestClient(user, [scope])
 
     await expect(
       client.announcement.broadcast({
@@ -233,7 +235,7 @@ describe('announcement.broadcast', () => {
       )
     )
 
-    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+    const client = createTestClient(user, [scope])
 
     await client.announcement.broadcast({
       subject: 'First',
@@ -277,7 +279,7 @@ describe('announcement.broadcast', () => {
       status: 'FAILED'
     })
 
-    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+    const client = createTestClient(user, [scope])
 
     await expect(
       client.announcement.broadcast({
@@ -326,7 +328,7 @@ describe('announcement.broadcast', () => {
       )
     )
 
-    const client = createTestClient(user, [SCOPES.CONFIG_UPDATE_ALL])
+    const client = createTestClient(user, [scope])
 
     const result = await client.announcement.broadcast({
       subject: 'Hello',

@@ -26,10 +26,10 @@ import {
   FieldType,
   never,
   PageTypes,
-  SCOPES,
   TokenUserType,
   EventConfigToDeclarationFormType,
-  UserInput
+  UserInput,
+  hasScope
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -158,8 +158,9 @@ function getUserEditConfig(selectedRole?: { scopes: string[] }) {
           title: messages.userSignatureAttachmentTitle,
           requireCompletionToContinue: true,
           type: PageTypes.enum.FORM,
-          conditional: selectedRole?.scopes.includes(
-            SCOPES.PROFILE_ELECTRONIC_SIGNATURE
+          conditional: hasScope(
+            selectedRole?.scopes ?? [],
+            'profile.electronic-signature'
           )
             ? defineConditional(alwaysTrue())
             : never(),

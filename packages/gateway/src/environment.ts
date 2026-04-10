@@ -27,7 +27,6 @@ export const env = cleanEnv(process.env, {
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   WEBHOOKS_URL: url({ devDefault: 'http://localhost:2525/' }),
-  APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
   NOTIFICATION_URL: url({ devDefault: 'http://localhost:2020/' }),
   EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
@@ -38,7 +37,11 @@ export const env = cleanEnv(process.env, {
     desc: 'Disables the Redis-based rate limiting globally'
   }),
   SENTRY_DSN: str({ default: undefined }),
-  QA_ENV: bool({ default: false }),
+  TWO_FA_ENABLED: bool({
+    devDefault: false,
+    default: true,
+    desc: 'Enable two-factor authentication. When disabled, verification codes are set to 000000.'
+  }),
   CHECK_INVALID_TOKEN: bool({
     devDefault: false,
     desc: 'Check if the token has been invalidated in the auth service before it has expired'

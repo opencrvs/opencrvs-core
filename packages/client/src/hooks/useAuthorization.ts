@@ -12,27 +12,22 @@ import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
   findScope,
-  getAcceptedScopesByType,
-  SCOPES,
   User,
-  Location
+  Location,
+  hasScope as hasScopeFromCommons,
+  hasAnyScope as hasAnyScopeFromCommons,
+  ScopeType,
+  getAcceptedScopesByType,
+  getScopeOptionValue,
+  JurisdictionFilter
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
-export const RECORD_DECLARE_SCOPES = [
-  SCOPES.RECORD_DECLARE_BIRTH,
-  SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
-  SCOPES.RECORD_DECLARE_DEATH,
-  SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
-  SCOPES.RECORD_DECLARE_MARRIAGE,
-  SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
-]
-
 export function usePermissions() {
-  const userScopes = useSelector(getScope)
+  const userScopes = useSelector(getScope) || []
 
   const currentUser = useSelector(getUserDetails)
   const userPrimaryOfficeId = currentUser?.primaryOfficeId
@@ -47,14 +42,11 @@ export function usePermissions() {
   const roleScopes = (role: string) =>
     roles.find(({ id }) => id === role)?.scopes ?? []
 
-  const hasScopes = (neededScopes: string[]) =>
-    neededScopes.every((scope) => userScopes?.includes(scope))
+  const hasAnyScope = (neededScopes: ScopeType[]) =>
+    hasAnyScopeFromCommons(userScopes, neededScopes)
 
-  const hasAnyScope = (neededScopes: string[]) =>
-    neededScopes.length === 0 ||
-    neededScopes.some((scope) => userScopes?.includes(scope))
-
-  const hasScope = (neededScope: string) => hasAnyScope([neededScope])
+  const hasScope = (neededScope: ScopeType) =>
+    hasScopeFromCommons(userScopes, neededScope)
 
   const canSearchRecords =
     getAcceptedScopesByType({
@@ -66,13 +58,25 @@ export function usePermissions() {
     if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.USER_READ)) {
+
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['user.read'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
-    if (hasScope(SCOPES.USER_READ_MY_OFFICE)) {
+
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
       return user.primaryOfficeId === userPrimaryOfficeId
     }
-    if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
+
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
         otherLocationId: user.primaryOfficeId,
@@ -80,7 +84,8 @@ export function usePermissions() {
         administrativeAreas
       })
     }
-    if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
+
+    if (hasScope('user.read-only-my-audit')) {
       return user.id === currentUser?.id
     }
 
@@ -94,16 +99,33 @@ export function usePermissions() {
     if (Array.isArray(editableRoleIds)) {
       return editableRoleIds.includes(user.role)
     }
+
     if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.USER_UPDATE)) {
+
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['user.edit'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
-    if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION)) {
-      if (roleScopes(user.role).includes(SCOPES.USER_UPDATE)) {
+
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return user.primaryOfficeId === userPrimaryOfficeId
+    }
+
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
+      if (hasScopeFromCommons(roleScopes(user.role), 'user.edit')) {
         return false
       }
+
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
         otherLocationId: user.primaryOfficeId,
@@ -117,22 +139,34 @@ export function usePermissions() {
 
   const creatableRoleIds = findScope(userScopes ?? [], 'user.create')?.options
     ?.role
+
   const canCreateUser = Array.isArray(creatableRoleIds)
     ? creatableRoleIds.length > 0
-    : hasAnyScope([SCOPES.USER_CREATE, SCOPES.USER_CREATE_MY_JURISDICTION])
+    : hasScope('user.create')
 
   const canAccessOffice = (office: Pick<Location, 'id'>) => {
     if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS)) {
+
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['organisation.read-locations'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE)) {
+
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
       return office.id === userPrimaryOfficeId
     }
 
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
         otherLocationId: office.id,
@@ -140,6 +174,7 @@ export function usePermissions() {
         administrativeAreas
       })
     }
+
     return false
   }
 
@@ -147,10 +182,25 @@ export function usePermissions() {
     if (!userPrimaryOfficeId) {
       return false
     }
-    if (hasScope(SCOPES.USER_CREATE)) {
+
+    const acceptedScopes = getAcceptedScopesByType({
+      acceptedScopes: ['user.create'],
+      scopes: userScopes
+    })
+
+    const accessLevels = acceptedScopes.map((s) =>
+      getScopeOptionValue(s, 'accessLevel')
+    )
+
+    if (accessLevels.includes(JurisdictionFilter.enum.all)) {
       return true
     }
-    if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
+
+    if (accessLevels.includes(JurisdictionFilter.enum.location)) {
+      return office.id === userPrimaryOfficeId
+    }
+
+    if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
         otherLocationId: office.id,
@@ -158,11 +208,11 @@ export function usePermissions() {
         administrativeAreas
       })
     }
+
     return false
   }
 
   return {
-    hasScopes,
     hasScope,
     hasAnyScope,
     canSearchRecords,

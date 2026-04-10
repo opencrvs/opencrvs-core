@@ -15,7 +15,11 @@ import {
   ActionType,
   DisplayableAction
 } from './ActionType'
-import { getAcceptedScopesByType, RecordScopeTypeV2 } from '../scopes'
+import {
+  getAcceptedScopesByType,
+  RecordScopeTypeV2,
+  RecordScopeV2
+} from '../scopes'
 import {
   EventIndexWithAdministrativeHierarchy,
   userCanAccessEventWithScopes
@@ -114,7 +118,7 @@ export function isActionInScope({
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS
 
   const acceptedScopes = isUnassigningOthers
-    ? (['record.unassign-others'] as RecordScopeTypeV2[])
+    ? ['record.unassign-others' as const]
     : ACTION_SCOPE_MAP[action]
 
   // 'null' means that the action is always allowed
@@ -132,14 +136,18 @@ export function isActionInScope({
     scopes
   })
 
-  const canAccess = userCanAccessEventWithScopes(event, matchingScopes, {
-    id: currentUser.id,
-    primaryOfficeId: currentUser.primaryOfficeId,
-    administrativeAreaId: currentUser.administrativeAreaId ?? null,
-    role: currentUser.role,
-    signature: currentUser.signature,
-    type: currentUser.type
-  })
+  const canAccess = userCanAccessEventWithScopes(
+    event,
+    matchingScopes as RecordScopeV2[],
+    {
+      id: currentUser.id,
+      primaryOfficeId: currentUser.primaryOfficeId,
+      administrativeAreaId: currentUser.administrativeAreaId ?? null,
+      role: currentUser.role,
+      signature: currentUser.signature,
+      type: currentUser.type
+    }
+  )
 
   return canAccess
 }

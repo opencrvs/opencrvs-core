@@ -14,7 +14,6 @@ HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
 : "${EVENTS_POSTGRES_URL:=postgres://events_migrator:migrator_password@localhost:5432/events}"
 : "${EVENTS_SUPERUSER_POSTGRES_URL:=postgres://postgres:postgres@localhost:5432/events}"
 OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
-APP_CONFIG=./build/dist/src/migrate-mongo-config-application-config.js
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
 PERFORMANCE_CONFIG=./build/dist/src/migrate-mongo-config-performance.js
 
@@ -134,9 +133,6 @@ run_pg_migrations \
 
 #openhim migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG
-
-# Application Config migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $APP_CONFIG
 
 # User mgnt migration
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG
