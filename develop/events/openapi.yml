@@ -2464,7 +2464,6 @@ components:
                                 - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
-                                - notification-api
                                 - user.data-seeding
                                 - integration.create
                                 - record.import
@@ -2477,7 +2476,6 @@ components:
                                 - performance.vital-statistics-export
                                 - record.confirm-registration
                                 - record.reject-registration
-                                - demo
                                 - workqueue
                             $option:
                               type: string
@@ -6917,7 +6915,6 @@ components:
                                 - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
-                                - notification-api
                                 - user.data-seeding
                                 - integration.create
                                 - record.import
@@ -6930,7 +6927,6 @@ components:
                                 - performance.vital-statistics-export
                                 - record.confirm-registration
                                 - record.reject-registration
-                                - demo
                                 - workqueue
                             $option:
                               type: string
@@ -7316,7 +7312,6 @@ components:
                                 - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
-                                - notification-api
                                 - user.data-seeding
                                 - integration.create
                                 - record.import
@@ -7329,7 +7324,6 @@ components:
                                 - performance.vital-statistics-export
                                 - record.confirm-registration
                                 - record.reject-registration
-                                - demo
                                 - workqueue
                             $option:
                               type: string
@@ -7553,7 +7547,6 @@ components:
                                 - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
-                                - notification-api
                                 - user.data-seeding
                                 - integration.create
                                 - record.import
@@ -7566,7 +7559,6 @@ components:
                                 - performance.vital-statistics-export
                                 - record.confirm-registration
                                 - record.reject-registration
-                                - demo
                                 - workqueue
                             $option:
                               type: string
@@ -7789,7 +7781,6 @@ components:
                                 - record.custom-action
                                 - bypassratelimit
                                 - record.reindex
-                                - notification-api
                                 - user.data-seeding
                                 - integration.create
                                 - record.import
@@ -7802,7 +7793,6 @@ components:
                                 - performance.vital-statistics-export
                                 - record.confirm-registration
                                 - record.reject-registration
-                                - demo
                                 - workqueue
                             $option:
                               type: string
