@@ -256,7 +256,9 @@ const tokenPayload = t.type({
   userType: t.string
 })
 
-export type ITokenPayload = t.TypeOf<typeof tokenPayload>
+export type ITokenPayload = t.TypeOf<typeof tokenPayload> & {
+  scope: EncodedScope[]
+}
 
 function safeVerifyJwt(token: string) {
   return tryCatch(
