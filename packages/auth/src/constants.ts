@@ -16,7 +16,6 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:notification-user',
   'opencrvs:metrics-user',
   'opencrvs:countryconfig-user',
-  'opencrvs:webhooks-user',
   'opencrvs:documents-user'
 ]
 

@@ -731,7 +731,6 @@ export interface GQLSystemInput {
 
 export interface GQLUpdatePermissionsInput {
   clientId: string
-  webhook: Array<GQLWebhookInput>
 }
 
 export interface GQLBookMarkedSearches {
@@ -1076,7 +1075,6 @@ export const enum GQLSystemType {
   NATIONAL_ID = 'NATIONAL_ID',
   HEALTH = 'HEALTH',
   RECORD_SEARCH = 'RECORD_SEARCH',
-  WEBHOOK = 'WEBHOOK',
   CUSTOM = 'CUSTOM'
 }
 
@@ -1088,7 +1086,6 @@ export const enum GQLIntegratingSystemType {
 
 export interface GQLSystemSettings {
   dailyQuota?: number
-  webhook?: Array<GQLWebhookPermission>
   openIdProviderClientId?: string
   openIdProviderBaseUrl?: string
   openIdProviderClaims?: string
@@ -1369,12 +1366,6 @@ export interface GQLLoginBackgroundInput {
 
 export interface GQLSystemSettingsInput {
   dailyQuota?: number
-  webhook?: Array<GQLWebhookInput | null>
-}
-
-export interface GQLWebhookInput {
-  event: string
-  permissions: Array<string | null>
 }
 
 export interface GQLAssignmentData {
@@ -1650,11 +1641,6 @@ export interface GQLEventProgressData {
   timeInWaitingForApproval?: number
   timeInWaitingForBRIS?: number
   timeInReadyToPrint?: number
-}
-
-export interface GQLWebhookPermission {
-  event: string
-  permissions: Array<string>
 }
 
 export interface GQLOIDPUserAddress {
@@ -1994,7 +1980,6 @@ export interface GQLResolver {
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   MarriageEventSearchSet?: GQLMarriageEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
-  WebhookPermission?: GQLWebhookPermissionTypeResolver
   OIDPUserAddress?: GQLOIDPUserAddressTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
@@ -6495,7 +6480,6 @@ export interface EventProgressSetToProgressReportResolver<
 
 export interface GQLSystemSettingsTypeResolver<TParent = any> {
   dailyQuota?: SystemSettingsToDailyQuotaResolver<TParent>
-  webhook?: SystemSettingsToWebhookResolver<TParent>
   openIdProviderClientId?: SystemSettingsToOpenIdProviderClientIdResolver<TParent>
   openIdProviderBaseUrl?: SystemSettingsToOpenIdProviderBaseUrlResolver<TParent>
   openIdProviderClaims?: SystemSettingsToOpenIdProviderClaimsResolver<TParent>
@@ -6505,10 +6489,6 @@ export interface SystemSettingsToDailyQuotaResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface SystemSettingsToWebhookResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -8231,25 +8211,6 @@ export interface EventProgressDataToTimeInWaitingForBRISResolver<
 }
 
 export interface EventProgressDataToTimeInReadyToPrintResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLWebhookPermissionTypeResolver<TParent = any> {
-  event?: WebhookPermissionToEventResolver<TParent>
-  permissions?: WebhookPermissionToPermissionsResolver<TParent>
-}
-
-export interface WebhookPermissionToEventResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface WebhookPermissionToPermissionsResolver<
   TParent = any,
   TResult = any
 > {
