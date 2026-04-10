@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { EncodedScope } from './scopes'
 
 export const Role = z.object({
   id: z.string(),
-  scopes: z.array(EncodedScope)
+  scopes: z.array(z.string())
 })
 
 export type Role = z.infer<typeof Role>
@@ -22,5 +21,5 @@ export type Roles = Array<{
   id: string
   /** @deprecated */
   labels: Array<{ language: string; label: string }>
-  scopes: EncodedScope[]
+  scopes: string[]
 }>

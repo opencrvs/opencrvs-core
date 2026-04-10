@@ -63,6 +63,76 @@ describe('isActionInScope()', () => {
     })
   })
 
+  describe('actions with empty scope map (never allowed)', () => {
+    it('should return false for DUPLICATE_DETECTED even with scopes', () => {
+      expect(
+        isActionInScope({
+          scopes: ['record.read[event=birth]'],
+          action: ActionType.DUPLICATE_DETECTED,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(false)
+    })
+
+    it('should return false for CUSTOM even with scopes', () => {
+      expect(
+        isActionInScope({
+          scopes: ['record.read[event=birth]'],
+          action: ActionType.CUSTOM,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(false)
+    })
+  })
+
+  describe('non-encoded scopes', () => {
+    it('should prevent READ when legacy scope includes the event type', () => {
+      expect(
+        isActionInScope({
+          scopes: ['record.read[event=birth]'],
+          action: ActionType.READ,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(false)
+    })
+
+    it('should deny READ when legacy scope does not include the event type', () => {
+      expect(
+        isActionInScope({
+          scopes: ['record.read[event=birth]'],
+          action: ActionType.READ,
+          event: makeEvent('death'),
+          currentUser: testUser
+        })
+      ).toBe(false)
+    })
+
+    it('should deny DECLARE when user has legacy record.declare scope for the event', () => {
+      expect(
+        isActionInScope({
+          scopes: ['record.declare[event=birth|death]'],
+          action: ActionType.DECLARE,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(false)
+    })
+
+    it('should deny DECLARE when user has legacy record.register scope for the event', () => {
+      expect(
+        isActionInScope({
+          scopes: ['record.register[event=birth]'],
+          action: ActionType.DECLARE,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(false)
+    })
+  })
+
   describe('encoded scopes', () => {
     it('should allow READ when V2 scope includes the event type', () => {
       const encodedScope = encodeScope({
@@ -153,6 +223,59 @@ describe('isActionInScope()', () => {
         isActionInScope({
           scopes: [encodedScope],
           action: ActionType.REGISTER,
+          event: makeEvent('tennis-club-membership'),
+          currentUser: testUser
+        })
+      ).toBe(false)
+    })
+  })
+
+  describe('encoded and non-encoded scope interaction (OR logic)', () => {
+    it('should allow when V1 denies but V2 allows', () => {
+      const nonEncodedScope = 'record.read[event=birth]'
+      const encodedScope = encodeScope({
+        type: 'record.read',
+        options: { event: ['death'] }
+      })
+
+      expect(
+        isActionInScope({
+          scopes: [encodedScope, nonEncodedScope],
+          action: ActionType.READ,
+          event: makeEvent('death'),
+          currentUser: testUser
+        })
+      ).toBe(true)
+    })
+
+    it('should deny when V1 allows but V2 denies', () => {
+      const nonEncodedScope = 'record.read[event=birth]'
+      const encodedScope = encodeScope({
+        type: 'record.read',
+        options: { event: ['death'] }
+      })
+
+      expect(
+        isActionInScope({
+          scopes: [nonEncodedScope, encodedScope],
+          action: ActionType.READ,
+          event: makeEvent('birth'),
+          currentUser: testUser
+        })
+      ).toBe(false)
+    })
+
+    it('should deny when both V1 and V2 deny', () => {
+      const nonEncodedScope = 'record.read[event=birth]'
+      const encodedScope = encodeScope({
+        type: 'record.read',
+        options: { event: ['death'] }
+      })
+
+      expect(
+        isActionInScope({
+          scopes: [nonEncodedScope, encodedScope],
+          action: ActionType.READ,
           event: makeEvent('tennis-club-membership'),
           currentUser: testUser
         })

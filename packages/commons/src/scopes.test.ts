@@ -11,7 +11,6 @@
 
 import {
   decodeScope,
-  EncodedScope,
   encodeScope,
   getScopeOptionValue,
   JurisdictionFilter,
@@ -285,8 +284,7 @@ describe('2.0 scopes', () => {
 
   it('Should decode scope with single event & template', () => {
     const scope =
-      'type=record.print-certified-copies&event=tennis-club-membership&templates=v2.tennis-club-membership-certificate-alpha' as EncodedScope
-
+      'type=record.print-certified-copies&event=tennis-club-membership&templates=v2.tennis-club-membership-certificate-alpha'
     const decodedScope = decodeScope(scope)
     expect(decodedScope).toEqual({
       type: 'record.print-certified-copies',

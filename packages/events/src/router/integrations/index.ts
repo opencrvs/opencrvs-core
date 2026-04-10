@@ -12,7 +12,7 @@
 import { randomUUID } from 'crypto'
 import * as z from 'zod/v4'
 import { TRPCError } from '@trpc/server'
-import { EncodedScope, UUID } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons'
 import {
   publicProcedure,
   router,
@@ -66,7 +66,7 @@ const AuthenticateSystemInput = z.object({
 const AuthenticateSystemOutput = z.object({
   id: UUID,
   status: z.string(),
-  scope: z.array(EncodedScope)
+  scope: z.array(z.string())
 })
 
 const IntegrationIdInput = z.object({

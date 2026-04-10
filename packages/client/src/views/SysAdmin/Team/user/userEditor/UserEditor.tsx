@@ -29,8 +29,7 @@ import {
   TokenUserType,
   EventConfigToDeclarationFormType,
   UserInput,
-  hasScope,
-  EncodedScope
+  hasScope
 } from '@opencrvs/commons/client'
 import { AppBar, Frame, Spinner } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -74,7 +73,7 @@ const SpinnerWrapper = styled.div`
   padding: 20px;
 `
 
-function getUserEditConfig(selectedRole?: { scopes: EncodedScope[] }) {
+function getUserEditConfig(selectedRole?: { scopes: string[] }) {
   return {
     id: '__user__',
     summary: {

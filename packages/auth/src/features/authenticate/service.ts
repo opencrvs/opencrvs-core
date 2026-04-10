@@ -27,11 +27,7 @@ import {
 import { logger, UUID, IUserName } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import {
-  EncodedScope,
-  encodeScope,
-  TokenUserType
-} from '@opencrvs/commons/authentication'
+import { encodeScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -68,7 +64,7 @@ export interface IAuthentication {
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: EncodedScope[]
+  scope: string[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -122,7 +118,7 @@ export async function authenticateSystem(
 
 export async function createToken(
   userId: string,
-  scope: EncodedScope[],
+  scope: string[],
   audience: string[],
   issuer: string,
   role?: string | number | undefined,
@@ -255,9 +251,7 @@ const tokenPayload = t.type({
   userType: t.string
 })
 
-export type ITokenPayload = t.TypeOf<typeof tokenPayload> & {
-  scope: EncodedScope[]
-}
+export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
 function safeVerifyJwt(token: string) {
   return tryCatch(

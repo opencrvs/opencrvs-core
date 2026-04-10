@@ -17,6 +17,7 @@ import {
 import * as offlineActions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
+import { UserRole } from '@client/utils/gateway'
 import { trpcClient } from '@client/v2-events/trpc'
 import { User } from '@opencrvs/commons/client'
 
@@ -40,6 +41,7 @@ export enum TOAST_MESSAGES {
 const initialState: IUserFormState = {
   userDetailsStored: false,
   submitting: false,
+  userRoles: [],
   submissionError: false,
   userAuditForm
 }
@@ -129,6 +131,7 @@ export interface IUserFormState {
   userDetailsStored: boolean
   submitting: boolean
   submissionError: boolean
+  userRoles: UserRole[]
   userAuditForm: IUserAuditForm
 }
 
