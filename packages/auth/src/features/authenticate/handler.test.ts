@@ -11,7 +11,146 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
 import { createServer, AuthServer } from '@auth/server'
-import { DEFAULT_ROLES_DEFINITION } from '../scopes/service'
+import { encodeScope } from '@opencrvs/commons'
+
+export const DEFAULT_ROLES_DEFINITION = [
+  {
+    id: 'FIELD_AGENT',
+    label: {
+      defaultMessage: 'Field Agent',
+      description: 'Name for user role Field Agent',
+      id: 'userRole.fieldAgent'
+    },
+    scopes: [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      })
+    ]
+  },
+  {
+    id: 'REGISTRATION_AGENT',
+    label: {
+      defaultMessage: 'Registration Agent',
+      description: 'Name for user role Registration Agent',
+      id: 'userRole.registrationAgent'
+    },
+    scopes: [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'organisation.read-locations' })
+    ]
+  },
+  {
+    id: 'LOCAL_REGISTRAR',
+    label: {
+      defaultMessage: 'Local Registrar',
+      description: 'Name for user role Local Registrar',
+      id: 'userRole.localRegistrar'
+    },
+    scopes: [
+      encodeScope({
+        type: 'record.create',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.declare',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({
+        type: 'record.review-duplicates',
+        options: {
+          event: ['birth', 'death', 'tennis-club-membership']
+        }
+      }),
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'profile.electronic-signature' }),
+      encodeScope({ type: 'organisation.read-locations' })
+    ]
+  },
+  {
+    id: 'LOCAL_SYSTEM_ADMIN',
+    label: {
+      defaultMessage: 'Local System Admin',
+      description: 'Name for user role Local System Admin',
+      id: 'userRole.localSystemAdmin'
+    },
+    scopes: [
+      encodeScope({ type: 'user.read', options: { accessLevel: 'location' } }),
+      encodeScope({
+        type: 'user.create',
+        options: { accessLevel: 'administrativeArea' }
+      }),
+      encodeScope({
+        type: 'user.edit',
+        options: { accessLevel: 'administrativeArea' }
+      }),
+      encodeScope({ type: 'organisation.read-locations' }),
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'performance.vital-statistics-export' })
+    ]
+  },
+  {
+    id: 'NATIONAL_SYSTEM_ADMIN',
+    label: {
+      defaultMessage: 'National System Admin',
+      description: 'Name for user role National System Admin',
+      id: 'userRole.nationalSystemAdmin'
+    },
+    scopes: [
+      encodeScope({ type: 'user.create' }),
+      encodeScope({ type: 'user.read' }),
+      encodeScope({ type: 'user.edit' }),
+      encodeScope({ type: 'organisation.read-locations' }),
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'performance.vital-statistics-export' })
+    ]
+  },
+  {
+    id: 'PERFORMANCE_MANAGER',
+    label: {
+      defaultMessage: 'Performance Manager',
+      description: 'Name for user role Performance Manager',
+      id: 'userRole.performanceManager'
+    },
+    scopes: [
+      encodeScope({ type: 'performance.read' }),
+      encodeScope({ type: 'performance.read-dashboards' }),
+      encodeScope({ type: 'performance.vital-statistics-export' })
+    ]
+  }
+] satisfies Array<{
+  id: string
+  label: { defaultMessage: string; description: string; id: string }
+  scopes: string[]
+}>
 
 const fetch = fetchAny as fetchAny.FetchMock
 describe('authenticate handler receives a request', () => {

@@ -13,8 +13,7 @@ import { createProductionEnvironmentServer } from '@auth/tests/util'
 import { encodeScope } from '@opencrvs/commons'
 import * as fetchAny from 'jest-fetch-mock'
 import { AuthenticateResponse } from '@auth/features/authenticate/handler'
-
-import { DEFAULT_ROLES_DEFINITION } from '../scopes/service'
+import { DEFAULT_ROLES_DEFINITION } from '@auth/features/authenticate/handler.test'
 const fetch = fetchAny as fetchAny.FetchMock
 
 jest.mock('@auth/features/verifyCode/service', () => {

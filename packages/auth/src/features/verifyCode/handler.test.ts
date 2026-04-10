@@ -12,7 +12,7 @@ import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
 import { encodeScope } from '@opencrvs/commons'
 import * as fetchMock from 'jest-fetch-mock'
-import { DEFAULT_ROLES_DEFINITION } from '../scopes/service'
+import { DEFAULT_ROLES_DEFINITION } from '@auth/features/authenticate/handler.test'
 
 jest.mock('@opencrvs/commons', () => {
   const actual = jest.requireActual('@opencrvs/commons')
