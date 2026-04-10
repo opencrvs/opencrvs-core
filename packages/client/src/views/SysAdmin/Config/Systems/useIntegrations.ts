@@ -47,7 +47,10 @@ export interface IntegrationDetails {
 
 type SystemIntegrationType = 'HEALTH' | 'RECORD_SEARCH'
 
-const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, string[]> = {
+const DEFAULT_SCOPES_BY_TYPE: Record<
+  SystemIntegrationType,
+  RecordScopeTypeV2[]
+> = {
   HEALTH: ['record.notify'],
   RECORD_SEARCH: ['record.search']
 }
