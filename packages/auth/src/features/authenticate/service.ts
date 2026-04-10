@@ -122,7 +122,6 @@ export async function createToken(
   audience: string[],
   issuer: string,
   role?: string | number | undefined,
-  temporary = false,
   userType: TokenUserType = TokenUserType.enum.user,
   expiresInSeconds?: number
 ): Promise<string> {
@@ -131,7 +130,7 @@ export async function createToken(
     algorithm: 'RS256',
     expiresIn:
       expiresInSeconds ??
-      (temporary
+      (userType === TokenUserType.enum.system
         ? env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
         : env.CONFIG_TOKEN_EXPIRY_SECONDS),
     audience,

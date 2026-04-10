@@ -256,7 +256,7 @@ export const canAccessEventWithScopes = (scopes: RecordScopeTypeV2[]) => {
       eventIndexWithLocationHierarchy,
       acceptedScopes,
       ctx.user,
-      input?.customActionType
+      input.customActionType
     )
 
     if (!hasAccess) {

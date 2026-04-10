@@ -9,18 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as Hapi from '@hapi/hapi'
+import { JWT_ISSUER, WEB_USER_JWT_AUDIENCES } from '@auth/constants'
 import {
   authenticateSystem,
   createToken
 } from '@auth/features/authenticate/service'
-import {
-  WEB_USER_JWT_AUDIENCES,
-  JWT_ISSUER,
-  NOTIFICATION_API_USER_AUDIENCE
-} from '@auth/constants'
+import * as Hapi from '@hapi/hapi'
+import { TokenUserType, encodeScope } from '@opencrvs/commons'
 import * as oauthResponse from './responses'
-import { TokenUserType, hasScope, encodeScope } from '@opencrvs/commons'
 import { getParam } from './utils'
 
 export async function clientCredentialsHandler(
@@ -53,6 +49,10 @@ export async function clientCredentialsHandler(
    */
   const v2Scopes = result.scope.map((s) => {
     // Intentionally verbose for clarity.
+    if (s === 'record.notify') {
+      return 'type=record.notify'
+    }
+
     if (s === 'record.search') {
       return encodeScope({ type: 'record.search' })
     }
@@ -65,10 +65,6 @@ export async function clientCredentialsHandler(
       return encodeScope({ type: 'record.create' })
     }
 
-    if (s === 'notification-api') {
-      return encodeScope({ type: 'notification-api' })
-    }
-
     if (s === 'record.import') {
       return encodeScope({ type: 'record.import' })
     }
@@ -76,18 +72,12 @@ export async function clientCredentialsHandler(
     return s
   })
 
-  const isNotificationAPIUser = hasScope(v2Scopes, 'notification-api')
-  const isImportExportClient = hasScope(v2Scopes, 'record.import')
-
   const token = await createToken(
     result.systemId,
     v2Scopes,
-    isNotificationAPIUser
-      ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
-      : WEB_USER_JWT_AUDIENCES,
+    WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
     undefined,
-    !isImportExportClient,
     TokenUserType.enum.system
   )
   return oauthResponse.success(h, token)

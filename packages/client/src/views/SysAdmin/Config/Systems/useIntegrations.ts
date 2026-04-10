@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useTRPC, trpcClient } from '@client/v2-events/trpc'
-import { encodeScope } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { UUID } from '@opencrvs/commons/client'
+import { trpcClient, useTRPC } from '@client/v2-events/trpc'
+import { encodeScope, UUID } from '@opencrvs/commons/client'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 /** Data shape returned by integrations.list */
 export interface IntegrationItem {
@@ -50,8 +49,7 @@ function getSystemScopesFromType(
   if (type === 'HEALTH') {
     return [
       encodeScope({ type: 'record.create', options: { event: eventIds } }),
-      encodeScope({ type: 'record.notify', options: { event: eventIds } }),
-      encodeScope({ type: 'notification-api' })
+      encodeScope({ type: 'record.notify', options: { event: eventIds } })
     ]
   }
 

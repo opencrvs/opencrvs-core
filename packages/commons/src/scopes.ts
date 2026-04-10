@@ -57,7 +57,6 @@ const PlainScopeType = z.enum([
   // Misc. system scopes
   'bypassratelimit',
   'record.reindex',
-  'notification-api',
   'user.data-seeding',
   'integration.create',
   'record.import',
@@ -73,10 +72,7 @@ const PlainScopeType = z.enum([
 
   // Scopes used exclusively by countryconfig integration token
   'record.confirm-registration',
-  'record.reject-registration',
-
-  // Scope which is applied to all test users
-  'demo'
+  'record.reject-registration'
 ])
 
 const scopeByEvent = z
