@@ -19,7 +19,6 @@ import {
   ActionInputWithType,
   ActionType,
   DeleteActionInput,
-  findScope,
   getAssignedUserFromActions,
   getScopes,
   TokenUserType,
@@ -27,9 +26,6 @@ import {
   UUID,
   EventDocument,
   getTokenPayload,
-  hasScope,
-  SCOPES,
-  hasAnyOfScopes,
   getCurrentEventState,
   EventInput,
   RecordScopeTypeV2,
@@ -37,7 +33,13 @@ import {
   canUserCreateEvent,
   getEventConfigById,
   userCanAccessEventWithScopes,
-  getAcceptedScopesFromToken
+  getAcceptedScopesFromToken,
+  ScopeType,
+  hasAnyScope,
+  hasScope,
+  getScopeOptionValue,
+  JurisdictionFilter,
+  getAcceptedScopesByType
 } from '@opencrvs/commons'
 import { EventNotFoundError, getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -56,21 +58,18 @@ export function setBearerForToken(token: string) {
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
-function inScope(token: string, scopes: string[]) {
-  const tokenScopes = getScopes(token)
-  return scopes.some((scope) => tokenScopes.includes(scope))
-}
-
 /**
+ * Middleware to check if the user has any of the specified allowed scopes.
  *
- * @deprecated only v2 scopes should be used going forward. This parameter will be removed once all scopes have been migrated to v2. For new features, please use @see canAccessEventWithScopes or similar.
+ * Checks the given list of scope types against the scopes in the user's JWT token.
+ * If at least one of the provided scopes is found, access is granted and
+ * the middleware passes control to the next step. Otherwise, a TRPCError
+ * with code 'FORBIDDEN' is thrown.
  *
- * Middleware which checks that one of the required scopes (either basic scopes or configurable scopes) are present in the token.
- *
- * @param scopes deprecated literal scopes that are required to access the resource
- * @returns TRPC compatible middleware function
+ * @param {ScopeType[]} scopes - Array of allowed scope types.
+ * @returns {MiddlewareFunction} TRPC-compatible middleware function.
  */
-export function requiresAnyOfScopes(scopes: string[]) {
+export function allowedWithAnyOfScopes(scopes: ScopeType[]) {
   const fn: MiddlewareFunction<
     TrpcContext,
     OpenApiMeta,
@@ -81,7 +80,7 @@ export function requiresAnyOfScopes(scopes: string[]) {
     const { token } = opts.ctx
 
     // If the user has any of the allowed plain scopes, allow access
-    if (inScope(token, scopes)) {
+    if (hasAnyScope(token, scopes)) {
       return opts.next()
     }
 
@@ -154,17 +153,24 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   WorkqueueCountInput
 > = async ({ next, ctx, input }) => {
   const scopes = getScopes(ctx.token)
-  const workqueueScope = findScope(scopes, 'workqueue')
 
-  if (!workqueueScope) {
+  const workqueueScopes = getAcceptedScopesByType({
+    acceptedScopes: ['workqueue'],
+    scopes
+  })
+
+  if (!workqueueScopes.length) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  const availableWorkqueues = workqueueScope.options.id
+  const availableWorkqueues = workqueueScopes.flatMap((s) =>
+    getScopeOptionValue(s, 'ids')
+  )
 
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
+
   return next()
 }
 
@@ -181,15 +187,12 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
   TrpcContext,
   AsyncActionConfirmationResponseSchema
 > = async ({ next, ctx, input }) => {
-  const {
-    eventId: grantedEventId,
-    actionId: grantedActionId,
-    scope
-  } = getTokenPayload(ctx.token)
+  const { token } = ctx
+  const { eventId, actionId } = getTokenPayload(token)
 
   const hasConfirmAndRejectScope =
-    scope.includes('record.confirm-registration') &&
-    scope.includes('record.reject-registration')
+    hasScope(token, 'record.confirm-registration') &&
+    hasScope(token, 'record.reject-registration')
 
   if (!hasConfirmAndRejectScope) {
     throw new TRPCError({
@@ -198,7 +201,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
     })
   }
 
-  const isActionConfirmationToken = grantedEventId && grantedActionId
+  const isActionConfirmationToken = eventId && actionId
 
   if (!isActionConfirmationToken) {
     throw new TRPCError({
@@ -207,7 +210,7 @@ export const requireActionConfirmationAuthorization: MiddlewareFunction<
     })
   }
 
-  if (grantedEventId !== input.eventId || grantedActionId !== input.actionId) {
+  if (eventId !== input.eventId || actionId !== input.actionId) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
@@ -310,11 +313,7 @@ export const userCanCreateEvent: MiddlewareFunction<
 > = async ({ next, ctx, getRawInput }) => {
   const eventConfigs = await getInMemoryEventConfigurations(ctx.token)
 
-  const acceptedScopes = getAcceptedScopesFromToken(ctx.token, [
-    'record.create'
-  ])
-
-  if (acceptedScopes.length === 0) {
+  if (!hasScope(ctx.token, 'record.create')) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
@@ -336,7 +335,7 @@ export const userCanCreateEvent: MiddlewareFunction<
     })
   }
 
-  const canCreateEvent = canUserCreateEvent(acceptedScopes, input.type)
+  const canCreateEvent = canUserCreateEvent(getScopes(ctx.token), input.type)
 
   if (!canCreateEvent) {
     throw new TRPCError({
@@ -358,17 +357,10 @@ export const userCanReadOtherUser: MiddlewareFunction<
 
   // Throw early to avoid mistakes in the logic below.
   // There are test cases for each but better safe than sorry.
-  const hasAnyScope = hasAnyOfScopes(
-    [
-      SCOPES.USER_READ,
-      SCOPES.USER_READ_MY_OFFICE,
-      SCOPES.USER_READ_MY_JURISDICTION,
-      SCOPES.USER_READ_ONLY_MY_AUDIT
-    ],
-    getScopes(token)
-  )
+  const hasReadScope = hasScope(token, 'user.read')
+  const hasReadMyAuditScope = hasScope(token, 'user.read-only-my-audit')
 
-  if (!hasAnyScope) {
+  if (!hasReadScope && !hasReadMyAuditScope) {
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
@@ -388,15 +380,22 @@ export const userCanReadOtherUser: MiddlewareFunction<
     throw new TRPCError({ code: 'NOT_FOUND' })
   }
 
-  if (hasScope(token, SCOPES.USER_READ)) {
+  const readScopes = getAcceptedScopesFromToken(token, ['user.read'])
+
+  const accessLevels = readScopes.map((s) =>
+    getScopeOptionValue(s, 'accessLevel')
+  )
+
+  if (accessLevels.includes(JurisdictionFilter.enum.all)) {
     return next()
   }
 
+  const hasLocationAccess =
+    accessLevels.includes(JurisdictionFilter.enum.location) ||
+    accessLevels.includes(JurisdictionFilter.enum.administrativeArea)
+
   if (
-    inScope(token, [
-      SCOPES.USER_READ_MY_OFFICE,
-      SCOPES.USER_READ_MY_JURISDICTION
-    ]) &&
+    hasLocationAccess &&
     userReading.primaryOfficeId === otherUser.primaryOfficeId
   ) {
     return next()
@@ -412,16 +411,13 @@ export const userCanReadOtherUser: MiddlewareFunction<
     : true
 
   if (
-    hasScope(token, SCOPES.USER_READ_MY_JURISDICTION) &&
+    accessLevels.includes(JurisdictionFilter.enum.administrativeArea) &&
     isUnderJurisdiction
   ) {
     return next()
   }
 
-  if (
-    hasScope(token, SCOPES.USER_READ_ONLY_MY_AUDIT) &&
-    userReading.id === otherUser.id
-  ) {
+  if (hasReadMyAuditScope && userReading.id === otherUser.id) {
     return next()
   }
 

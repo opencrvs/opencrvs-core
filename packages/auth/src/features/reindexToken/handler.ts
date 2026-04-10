@@ -10,7 +10,7 @@
  */
 import { createToken } from '@auth/features/authenticate/service'
 import * as Hapi from '@hapi/hapi'
-import { REINDEX_USER_ID, TokenUserType } from '@opencrvs/commons'
+import { encodeScope, REINDEX_USER_ID, TokenUserType } from '@opencrvs/commons'
 import * as Joi from 'joi'
 
 interface IAuthResponse {
@@ -23,7 +23,7 @@ export default async function reindexingTokenHandler(
 ): Promise<IAuthResponse> {
   const token = await createToken(
     REINDEX_USER_ID,
-    ['record.reindex'],
+    [encodeScope({ type: 'record.reindex' })],
     ['opencrvs:gateway-user', 'opencrvs:events-user'],
     'opencrvs:auth-service',
     undefined,

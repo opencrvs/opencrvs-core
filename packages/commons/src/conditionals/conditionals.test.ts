@@ -24,7 +24,6 @@ import {
   status
 } from './conditionals'
 import { formatISO } from 'date-fns'
-import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
 import { ActionStatus, EventState } from '../events/ActionDocument'
 import { field } from '../events/field'
@@ -1028,13 +1027,8 @@ describe('"user" conditionals', () => {
   }
 
   it('validates "user.hasScope" conditional', () => {
-    expect(validate(user.hasScope(SCOPES.BYPASSRATELIMIT), userParams)).toBe(
-      false
-    )
-
-    expect(validate(user.hasScope(SCOPES.RECORD_REGISTER), userParams)).toBe(
-      true
-    )
+    expect(validate(user.hasScope('bypassratelimit'), userParams)).toBe(false)
+    expect(validate(user.hasScope('record.register'), userParams)).toBe(true)
   })
 
   it('validates "user.isOnline" conditional', () => {

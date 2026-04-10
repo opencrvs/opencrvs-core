@@ -16,7 +16,7 @@ import {
 } from '@auth/features/authenticate/service'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 import * as oauthResponse from './responses'
-import { TokenUserType } from '@opencrvs/commons/authentication'
+import { TokenUserType, hasScope, encodeScope } from '@opencrvs/commons'
 import { getParam } from './utils'
 
 export async function clientCredentialsHandler(
@@ -54,15 +54,19 @@ export async function clientCredentialsHandler(
     }
 
     if (s === 'record.search') {
-      return 'type=record.search'
+      return encodeScope({ type: 'record.search' })
     }
 
     if (s === 'record.read') {
-      return 'type=record.read'
+      return encodeScope({ type: 'record.read' })
     }
 
     if (s === 'record.create') {
-      return 'type=record.create'
+      return encodeScope({ type: 'record.create' })
+    }
+
+    if (s === 'record.import') {
+      return encodeScope({ type: 'record.import' })
     }
 
     return s
