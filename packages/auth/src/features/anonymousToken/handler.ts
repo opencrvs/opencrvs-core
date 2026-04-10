@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
 import { createToken } from '@auth/features/authenticate/service'
 import { TokenUserType } from '@opencrvs/commons'
 
@@ -31,7 +30,3 @@ export default async function anonymousTokenHandler(
   )
   return { token }
 }
-
-export const responseSchema = Joi.object({
-  token: Joi.string().optional()
-})
