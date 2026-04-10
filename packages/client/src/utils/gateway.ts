@@ -1927,10 +1927,12 @@ type SystemSettings = {
   openIdProviderBaseUrl?: Maybe<Scalars['String']>
   openIdProviderClaims?: Maybe<Scalars['String']>
   openIdProviderClientId?: Maybe<Scalars['String']>
+  webhook?: Maybe<Array<WebhookPermission>>
 }
 
 type SystemSettingsInput = {
   dailyQuota?: InputMaybe<Scalars['Int']>
+  webhook?: InputMaybe<Array<InputMaybe<WebhookInput>>>
 }
 
 export enum SystemStatus {
@@ -1944,6 +1946,7 @@ export enum SystemType {
   NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
   Reindex = 'REINDEX',
+  Webhook = 'WEBHOOK',
   Custom = 'CUSTOM'
 }
 
@@ -1998,6 +2001,11 @@ type UpdateFieldInput = {
   fieldId: Scalars['String']
   valueBoolean?: InputMaybe<Scalars['Boolean']>
   valueString?: InputMaybe<Scalars['String']>
+}
+
+type UpdatePermissionsInput = {
+  clientId: Scalars['String']
+  webhook: Array<WebhookInput>
 }
 
 type User = unknown
@@ -2079,6 +2087,17 @@ type VerifyPasswordResult = {
   scrope?: Maybe<Array<Maybe<Scalars['String']>>>
   status?: Maybe<Scalars['String']>
   username?: Maybe<Scalars['String']>
+}
+
+type WebhookInput = {
+  event: Scalars['String']
+  permissions: Array<InputMaybe<Scalars['String']>>
+}
+
+export type WebhookPermission = {
+  __typename?: 'WebhookPermission'
+  event: Scalars['String']
+  permissions: Array<Scalars['String']>
 }
 
 type CreateBirthRegistrationCorrectionMutationVariables = Exact<{

@@ -1690,6 +1690,7 @@ type SystemSecret {
 
 type SystemSettings {
   dailyQuota: Int
+  webhook: [WebhookPermission!]
   openIdProviderClientId: String
   openIdProviderBaseUrl: String
   openIdProviderClaims: String
@@ -1697,6 +1698,7 @@ type SystemSettings {
 
 input SystemSettingsInput {
   dailyQuota: Int
+  webhook: [WebhookInput]
 }
 
 enum SystemStatus {
@@ -1752,6 +1754,11 @@ type TotalMetricsResult {
 
 type TotalVSExport {
   results: [VSExport!]
+}
+
+input UpdatePermissionsInput {
+  clientId: String!
+  webhook: [WebhookInput!]!
 }
 
 type User {
@@ -1837,4 +1844,14 @@ type VSExport {
   fileSize: String!
   url: String!
   createdOn: Date!
+}
+
+input WebhookInput {
+  event: String!
+  permissions: [String]!
+}
+
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
 }
