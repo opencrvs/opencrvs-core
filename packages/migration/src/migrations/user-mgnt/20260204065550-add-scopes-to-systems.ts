@@ -18,16 +18,17 @@ import { Db, MongoClient } from 'mongodb'
  *
  * Scope mapping from type:
  * - HEALTH: ['record.notify', 'record.create']
- * - NATIONAL_ID: ['nationalId']
+ * - NATIONAL_ID: [] (deprecated - will be removed)
  * - RECORD_SEARCH: ['record.search']
  * - IMPORT_EXPORT: ['record.import', 'record.export', 'record.search', 'user.data-seeding', 'record.reindex']
  * - REINDEX: ['record.reindex']
- * - WEBHOOK: (deprecated - will be removed)
+ * - WEBHOOK: [] (deprecated - will be removed)
  */
 
 const DEFAULT_SCOPES_BY_TYPE: Record<string, string[]> = {
   HEALTH: ['record.notify', 'record.create'],
-  NATIONAL_ID: ['nationalId'],
+  NATIONAL_ID: [],
+  WEBHOOK: [],
   RECORD_SEARCH: ['record.search'],
   IMPORT_EXPORT: [
     'record.import',
