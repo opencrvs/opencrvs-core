@@ -26,7 +26,6 @@ import {
   getMixedPath,
   getUUID,
   Location,
-  SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   TEST_SYSTEM_IANA_TIMEZONE
 } from '@opencrvs/commons'
@@ -298,7 +297,7 @@ test('Returns events based on the updatedAt column', async () => {
         event: [TENNIS_CLUB_MEMBERSHIP]
       }
     }),
-    SCOPES.RECORD_IMPORT,
+    encodeScope({ type: 'record.import' }),
     ...TEST_USER_DEFAULT_SCOPES
   ])
 
@@ -433,7 +432,7 @@ test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column',
         event: [TENNIS_CLUB_MEMBERSHIP]
       }
     }),
-    SCOPES.RECORD_IMPORT,
+    encodeScope({ type: 'record.import' }),
     ...TEST_USER_DEFAULT_SCOPES
   ])
 

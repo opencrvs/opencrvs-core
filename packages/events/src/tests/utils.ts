@@ -33,7 +33,6 @@ import {
   getUUID,
   JurisdictionFilter,
   Location,
-  SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   TokenUserType,
   TokenWithBearer,
@@ -118,7 +117,12 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
 const { createCallerFactory } = t
 
 export const TEST_USER_DEFAULT_SCOPES = [
-  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]',
+  encodeScope({
+    type: 'workqueue',
+    options: {
+      ids: ['assigned-to-you', 'recent', 'requires-updates', 'sent-for-review']
+    }
+  }),
   encodeScope({
     type: 'record.read',
     options: {
@@ -225,8 +229,8 @@ function createTokenExchangeTestToken(
   const token = jwt.sign(
     {
       scope: [
-        SCOPES.RECORD_CONFIRM_REGISTRATION,
-        SCOPES.RECORD_REJECT_REGISTRATION
+        encodeScope({ type: 'record.confirm-registration' }),
+        encodeScope({ type: 'record.reject-registration' })
       ],
       sub: userId,
       userType: TokenUserType.enum.user,
