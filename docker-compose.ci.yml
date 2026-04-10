@@ -20,11 +20,6 @@ services:
       - LANGUAGES=en
       - NODE_ENV=development
 
-  workflow:
-    environment:
-      - LANGUAGES=en
-      - NODE_ENV=development
-
   search:
     environment:
       - NODE_ENV=development

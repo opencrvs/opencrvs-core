@@ -52,14 +52,6 @@ services:
     ports:
       - '7070:7070'
 
-  workflow:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-    ports:
-      - '5050:5050'
-
   search:
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
