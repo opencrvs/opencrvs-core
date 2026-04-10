@@ -18,7 +18,7 @@ import { allowedWithAnyOfScopes } from '.'
 describe('allowedWithAnyOfScopes()', () => {
   test('should throw TRPCError with code "FORBIDDEN" if none of the required scopes are present on the token', async () => {
     const middleware = allowedWithAnyOfScopes([
-      'notification-api',
+      'record.notify',
       'record.reindex'
     ])
 
@@ -43,7 +43,7 @@ describe('allowedWithAnyOfScopes()', () => {
 
   test('should call next if any of the required scopes are present on the token', async () => {
     const middleware = allowedWithAnyOfScopes([
-      'notification-api',
+      'record.notify',
       'record.reindex'
     ])
 
