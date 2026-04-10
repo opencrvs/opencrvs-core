@@ -132,10 +132,10 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' http://localhost:4040/anonymous-token
+  // curl -H 'Content-Type: application/json' http://localhost:4040/internal/anonymous-token
   server.route({
     method: 'GET',
-    path: '/anonymous-token',
+    path: '/internal/anonymous-token',
     handler: anonymousTokenHandler,
     options: {
       tags: ['api', 'deprecated'],

@@ -9,10 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
+import { createToken } from '@auth/features/authenticate/service'
+import { TokenUserType } from '@opencrvs/commons'
+
+interface IAuthResponse {
+  token: string
+}
 
 export default async function anonymousTokenHandler(
   _request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  return h.response().code(410) // Gone
+  _h: Hapi.ResponseToolkit
+): Promise<IAuthResponse> {
+  const token = await createToken(
+    '__ANONYMOUS_USER__',
+    [],
+    ['opencrvs:user-mgnt-user', 'opencrvs:countryconfig-user'],
+    'opencrvs:auth-service',
+    undefined,
+    TokenUserType.enum.system
+  )
+  return { token }
 }
+
+export const responseSchema = Joi.object({
+  token: Joi.string().optional()
+})
