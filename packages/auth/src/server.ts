@@ -139,9 +139,12 @@ export async function createServer() {
     handler: anonymousTokenHandler,
     options: {
       tags: ['api', 'deprecated'],
-      description: 'Deprecated: Authenticate an anonymous user',
+      description: `
+      Deprecated: Authenticate an anonymous user.
+      This is still used by events service to fetch events configuration from country config on startup
+      when there is no user interaction involved.`,
       notes:
-        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints'
+        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints. Token contains no scopes.'
     }
   })
   // curl -H 'Content-Type: application/json' http://localhost:4040/reindexing-token
