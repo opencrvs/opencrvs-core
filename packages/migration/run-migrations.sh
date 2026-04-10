@@ -57,7 +57,7 @@ run_pg_migrations() {
   restore_backups() {
     echo "Restoring original migration files in $MIGRATIONS_PATH"
     for migration_file in $FILES_TO_MIGRATE; do
-      if [[ "$migration_file" == *.sql ]] && [ -f "$BACKUP_PATH/$migration_file" ]; then
+      if [ -f "$BACKUP_PATH/$migration_file" ]; then
         mv "$BACKUP_PATH/$migration_file" "$MIGRATIONS_PATH/$migration_file"
       fi
     done
@@ -67,29 +67,23 @@ run_pg_migrations() {
   # Always run restore_backups when the function exits
   trap restore_backups EXIT
 
-  # --- Backup originals (SQL only — TS files must not be modified by envsubst) ---
+  # --- Backup originals ---
   for migration_file in $FILES_TO_MIGRATE; do
-    if [[ "$migration_file" == *.sql ]]; then
-      echo "Creating backup for $MIGRATIONS_PATH/$migration_file"
-      cp "$MIGRATIONS_PATH/$migration_file" "$BACKUP_PATH/$migration_file"
-    fi
+    echo "Creating backup for $MIGRATIONS_PATH/$migration_file"
+    cp "$MIGRATIONS_PATH/$migration_file" "$BACKUP_PATH/$migration_file"
   done
 
-  # --- envsubst (SQL only) ---
+  # --- envsubst ---
   for migration_file in $FILES_TO_MIGRATE; do
-    if [[ "$migration_file" == *.sql ]]; then
-      echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
-      envsubst <"$MIGRATIONS_PATH/$migration_file" >"$MIGRATIONS_PATH/$migration_file.tmp"
-      mv "$MIGRATIONS_PATH/$migration_file.tmp" "$MIGRATIONS_PATH/$migration_file"
-    fi
+    echo "Updating environment variables in $MIGRATIONS_PATH/$migration_file"
+    envsubst <"$MIGRATIONS_PATH/$migration_file" >"$MIGRATIONS_PATH/$migration_file.tmp"
+    mv "$MIGRATIONS_PATH/$migration_file.tmp" "$MIGRATIONS_PATH/$migration_file"
   done
 
   # --- Run migrations ---
-  # tsx is used so that node-pg-migrate can load TypeScript migration files
   echo "Running migrations for schema '$schema' in $MIGRATIONS_PATH"
   DATABASE_URL="$database_url" \
-    yarn --cwd "$SCRIPT_PATH" tsx ./node_modules/.bin/node-pg-migrate up \
-    --no-single-transaction \
+    yarn --cwd "$SCRIPT_PATH" node-pg-migrate up \
     --schema="$schema" \
     --migrations-dir="$MIGRATIONS_PATH" \
     --migrations-table="$migrations_table"
