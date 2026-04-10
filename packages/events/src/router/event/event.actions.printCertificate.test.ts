@@ -11,7 +11,13 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import { ActionType, encodeScope, FieldType, never, PageTypes } from '@opencrvs/commons'
+import {
+  ActionType,
+  encodeScope,
+  FieldType,
+  never,
+  PageTypes
+} from '@opencrvs/commons'
 import {
   PRINT_CERTIFICATE_FORM,
   tennisClubMembershipEvent
@@ -166,7 +172,7 @@ test(`PRINT_CERTIFICATE is idempotent`, async () => {
   expect(firstResponse).toEqual(secondResponse)
 })
 
-test.only(`should not have validation errors for required fields on a hidden page`, async () => {
+test(`should not have validation errors for required fields on a hidden page`, async () => {
   const hiddenConditionalPage = {
     id: 'hiddenConditionalPageTest',
     type: PageTypes.enum.FORM,
