@@ -20,9 +20,9 @@ import {
   generateEventDocument,
   generateUuid,
   getUUID,
-  SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
-  TokenUserType
+  TokenUserType,
+  encodeScope
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -80,7 +80,7 @@ const singleEventConfigHandler = http.get(
 
 const reindexToken = createTestToken({
   userId: 'reindex-system',
-  scopes: [SCOPES.RECORD_REINDEX],
+  scopes: [encodeScope({ type: 'record.reindex' })],
   role: 'TEST_SYSTEM_ROLE',
   userType: TokenUserType.enum.system
 })
@@ -231,7 +231,9 @@ test(`prevents forbidden access if missing required scope`, async () => {
 })
 
 test('allows access with reindex scope', async () => {
-  const client = createSystemTestClient('test-system', [SCOPES.RECORD_REINDEX])
+  const client = createSystemTestClient('test-system', [
+    encodeScope({ type: 'record.reindex' })
+  ])
 
   await expect(client.event.reindex.trigger()).resolves.not.toThrow()
 })
@@ -433,7 +435,7 @@ test('runReindex records completed status in reindexing_status index', async () 
   await runReindex(reindexToken)
 
   const client = createSystemTestClient('reindex-system', [
-    SCOPES.RECORD_REINDEX
+    encodeScope({ type: 'record.reindex' })
   ])
   const history = await client.event.reindex.status()
 
@@ -452,7 +454,7 @@ test('runReindex records failed status when country config returns 500', async (
   })
 
   const client = createSystemTestClient('reindex-system', [
-    SCOPES.RECORD_REINDEX
+    encodeScope({ type: 'record.reindex' })
   ])
   const history = await client.event.reindex.status()
 

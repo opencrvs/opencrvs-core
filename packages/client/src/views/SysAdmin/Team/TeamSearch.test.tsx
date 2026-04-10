@@ -16,7 +16,6 @@ import {
   createTestStore,
   flushPromises,
   mockUserResponse,
-  SYSTEM_ADMIN_DEFAULT_SCOPES,
   setScopes,
   userDetails
 } from '@client/tests/util'
@@ -27,9 +26,19 @@ import { parse } from 'qs'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
 import { vi } from 'vitest'
-import { SCOPES, UUID } from '@opencrvs/commons/client'
+import { encodeScope, UUID } from '@opencrvs/commons/client'
 import { createMemoryRouter } from 'react-router-dom'
 import * as actions from '@client/profile/profileActions'
+
+const SYSTEM_ADMIN_DEFAULT_SCOPES = [
+  encodeScope({ type: 'user.create' }),
+  encodeScope({ type: 'user.read' }),
+  encodeScope({ type: 'user.edit' }),
+  encodeScope({ type: 'organisation.read-locations' }),
+  encodeScope({ type: 'performance.read' }),
+  encodeScope({ type: 'performance.read-dashboards' }),
+  encodeScope({ type: 'performance.vital-statistics-export' })
+]
 
 describe.skip('Team search test', () => {
   let store: AppStore
@@ -144,7 +153,7 @@ describe.skip('Team search test', () => {
     beforeAll(async () => {})
 
     beforeEach(async () => {
-      setScopes([SCOPES.USER_READ], store)
+      setScopes([encodeScope({ type: 'user.read' })], store)
 
       testComponent = (
         await createTestComponent(<TeamSearch />, {

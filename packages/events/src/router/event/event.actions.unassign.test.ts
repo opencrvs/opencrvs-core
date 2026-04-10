@@ -14,8 +14,7 @@ import {
   ActionStatus,
   ActionType,
   encodeScope,
-  getUUID,
-  SCOPES
+  getUUID
 } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
@@ -111,7 +110,7 @@ describe('Without scope: record.unassign-others', () => {
   })
 })
 
-test(`Can unassign record that is assigned to someone else, if user has ${SCOPES.RECORD_UNASSIGN_OTHERS} scope`, async () => {
+test(`Can unassign record that is assigned to someone else, if user has unassign scope`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     encodeScope({

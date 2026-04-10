@@ -27,7 +27,7 @@ import {
 import { logger, UUID, IUserName } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import { TokenUserType } from '@opencrvs/commons/authentication'
+import { encodeScope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -122,7 +122,6 @@ export async function createToken(
   audience: string[],
   issuer: string,
   role?: string | number | undefined,
-  temporary = false,
   userType: TokenUserType = TokenUserType.enum.user,
   expiresInSeconds?: number
 ): Promise<string> {
@@ -131,7 +130,7 @@ export async function createToken(
     algorithm: 'RS256',
     expiresIn:
       expiresInSeconds ??
-      (temporary
+      (userType === TokenUserType.enum.system
         ? env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
         : env.CONFIG_TOKEN_EXPIRY_SECONDS),
     audience,
@@ -157,8 +156,8 @@ export async function createTokenForActionConfirmation(
   return sign(
     {
       scope: [
-        'record.confirm-registration',
-        'record.reject-registration',
+        encodeScope({ type: 'record.confirm-registration' }),
+        encodeScope({ type: 'record.reject-registration' }),
         userRejectScope
       ].filter(Boolean),
       eventId: 'eventId' in input ? input.eventId : undefined,

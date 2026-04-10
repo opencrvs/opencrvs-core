@@ -17,7 +17,8 @@ import {
   triggerUserEventNotification,
   personNameFromV1ToV2,
   IUserName,
-  TriggerEvent
+  TriggerEvent,
+  TokenUserType
 } from '@opencrvs/commons'
 
 interface ICodeDetails {
@@ -93,7 +94,7 @@ export async function sendVerificationCode(
         ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
         JWT_ISSUER,
         undefined,
-        true
+        TokenUserType.enum.system
       )}`
     }
   })

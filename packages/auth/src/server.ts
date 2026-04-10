@@ -62,9 +62,7 @@ import sendUserNameHandler, {
 import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
-import anonymousTokenHandler, {
-  responseSchema as anonymousResponseSchema
-} from './features/anonymousToken/handler'
+import anonymousTokenHandler from './features/anonymousToken/handler'
 import reindexingTokenHandler, {
   responseSchema as reindexResponseSchema
 } from './features/reindexToken/handler'
@@ -134,19 +132,19 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' http://localhost:4040/anonymous-token
+  // curl -H 'Content-Type: application/json' http://localhost:4040/internal/anonymous-token
   server.route({
     method: 'GET',
-    path: '/anonymous-token',
+    path: '/internal/anonymous-token',
     handler: anonymousTokenHandler,
     options: {
-      tags: ['api'],
-      description: 'Authenticate an anonymous user',
+      tags: ['api', 'deprecated'],
+      description: `
+      Deprecated: Authenticate an anonymous user.
+      This is still used by events service to fetch events configuration from country config on startup
+      when there is no user interaction involved.`,
       notes:
-        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints',
-      response: {
-        schema: anonymousResponseSchema
-      }
+        'Returns a token to be used for endpoints that allow unauthorized access such as certificate verification endpoints. Token contains no scopes.'
     }
   })
   // curl -H 'Content-Type: application/json' http://localhost:4040/reindexing-token
