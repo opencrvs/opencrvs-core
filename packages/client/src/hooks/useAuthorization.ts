@@ -22,7 +22,6 @@ import {
   JurisdictionFilter
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
-import { IStoreState } from '@client/store'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useAdministrativeAreas } from '../v2-events/hooks/useAdministrativeAreas'
 
@@ -36,11 +35,6 @@ export function usePermissions() {
   const locations = getLocations.useSuspenseQuery()
   const { getAdministrativeAreas } = useAdministrativeAreas()
   const administrativeAreas = getAdministrativeAreas.useSuspenseQuery()
-
-  const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
-
-  const roleScopes = (role: string) =>
-    roles.find(({ id }) => id === role)?.scopes ?? []
 
   const hasAnyScope = (neededScopes: ScopeType[]) =>
     hasAnyScopeFromCommons(userScopes, neededScopes)
@@ -122,10 +116,6 @@ export function usePermissions() {
     }
 
     if (accessLevels.includes(JurisdictionFilter.enum.administrativeArea)) {
-      if (hasScopeFromCommons(roleScopes(user.role), 'user.edit')) {
-        return false
-      }
-
       return isLocationUnderJurisdiction({
         locationId: userPrimaryOfficeId,
         otherLocationId: user.primaryOfficeId,
