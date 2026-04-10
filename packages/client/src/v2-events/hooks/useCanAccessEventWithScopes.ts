@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux'
 import {
   getAcceptedScopesByType,
   RecordScopeTypeV2,
+  RecordScopeV2,
   userCanAccessEventWithScopes
 } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
@@ -58,7 +59,7 @@ export function useCanAccessEventWithScopes(
     canAccessEventWithScopes: (customActionType?: string) =>
       userCanAccessEventWithScopes(
         eventWithHierarchy,
-        matchingScopes,
+        matchingScopes as RecordScopeV2[],
         {
           id: currentUser.id,
           primaryOfficeId: currentUser.primaryOfficeId,

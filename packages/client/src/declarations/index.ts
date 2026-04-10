@@ -25,18 +25,10 @@ import {
   ShowUnassignedDeclarations
 } from '@client/notification/actions'
 import { IOfflineData } from '@client/offline/reducer'
-import {
-  UserDetailsAvailable
-} from '@client/profile/profileActions'
+import { UserDetailsAvailable } from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import {
-  AssignmentData,
-  EventType,
-  RegStatus
-} from '@client/utils/gateway'
-import type {
-  GQLEventSearchResultSet
-} from '@client/utils/gateway-deprecated-do-not-use'
+import { AssignmentData, EventType, RegStatus } from '@client/utils/gateway'
+import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
 import {
   IQueryData,
@@ -465,20 +457,6 @@ export function createDeclaration(event: EventType, initialData?: IFormData) {
   }
 }
 
-function makeDeclarationReadyToDownload(
-  event: EventType,
-  compositionId: string,
-  action: DeclarationAction
-): IDeclaration {
-  return {
-    id: compositionId,
-    data: {},
-    event,
-    action,
-    downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
-  }
-}
-
 export function dynamicDispatch(
   action: string,
   payload: { [key: string]: string }
@@ -498,18 +476,6 @@ export function storeDeclaration(
 
 export function setInitialDeclarations() {
   return { type: SET_INITIAL_DECLARATION }
-}
-
-export function archiveDeclaration(
-  declarationId: string,
-  reason?: string,
-  comment?: string,
-  duplicateTrackingId?: string
-): IArchiveDeclarationAction {
-  return {
-    type: ARCHIVE_DECLARATION,
-    payload: { declarationId, reason, comment, duplicateTrackingId }
-  }
 }
 
 export function writeDeclaration(

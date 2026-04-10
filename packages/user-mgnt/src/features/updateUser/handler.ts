@@ -14,9 +14,10 @@ import {
   isBase64FileString,
   triggerUserEventNotification,
   personNameFromV1ToV2,
-  findScope
+  findScope,
+  getScopes,
+  hasScope
 } from '@opencrvs/commons'
-import { getScopes, SCOPES } from '@opencrvs/commons/authentication'
 import { recordUserAuditEvent } from '@user-mgnt/utils/userAudit'
 import {
   generateUsername,
@@ -57,7 +58,7 @@ export default async function updateUser(
   existingUser.role = user.role
 
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
-    if (request.auth.credentials?.scope?.includes(SCOPES.CONFIG_UPDATE_ALL)) {
+    if (hasScope(request.auth.credentials?.scope ?? [], 'config.update-all')) {
       existingUser.primaryOfficeId = user.primaryOfficeId
     } else {
       throw new Error('Location can not be changed by this user')
@@ -119,7 +120,7 @@ export default async function updateUser(
 
   recordUserAuditEvent(request.headers.authorization, {
     operation: 'user.edit_user',
-    requestData: { subjectId: user.id },
+    requestData: { subjectId: user.id }
   })
 
   return h.response(resUser).code(201)

@@ -19,7 +19,6 @@ import {
   FieldType,
   JurisdictionFilter,
   RecordScopeV2,
-  SCOPES,
   TENNIS_CLUB_MEMBERSHIP,
   UserFilter,
   createPrng,
@@ -882,7 +881,9 @@ test('For users in locations directly under country "administrativeArea" and "al
       return HttpResponse.json({})
     })
   )
-  const reindexClient = createTestClient(users[0], [SCOPES.RECORD_REINDEX])
+  const reindexClient = createTestClient(users[0], [
+    encodeScope({ type: 'record.reindex' })
+  ])
 
   await expect(reindexClient.event.reindex.trigger()).resolves.not.toThrow()
 
