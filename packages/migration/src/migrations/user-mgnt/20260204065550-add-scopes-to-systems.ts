@@ -26,18 +26,18 @@ import { Db, MongoClient } from 'mongodb'
  */
 
 const DEFAULT_SCOPES_BY_TYPE: Record<string, string[]> = {
-  HEALTH: ['record.notify', 'record.create'],
+  HEALTH: ['type=record.notify', 'type=record.create'],
   NATIONAL_ID: [],
   WEBHOOK: [],
-  RECORD_SEARCH: ['record.search'],
+  RECORD_SEARCH: ['type=record.search'],
   IMPORT_EXPORT: [
-    'record.import',
-    'record.export',
-    'record.search',
-    'user.data-seeding',
-    'record.reindex'
+    'type=record.import',
+    'type=record.export',
+    'type=record.search',
+    'type=user.data-seeding',
+    'type=record.reindex'
   ],
-  REINDEX: ['record.reindex']
+  REINDEX: ['type=record.reindex']
 }
 
 export const up = async (db: Db, client: MongoClient) => {
