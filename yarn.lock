@@ -10559,7 +10559,7 @@
   resolved "https://registry.yarnpkg.com/@types/uuid-validate/-/uuid-validate-0.0.3.tgz#33f95a33ea776606862cc6eea3a8d49ccb90cba6"
   integrity sha512-htkuv1+RZjjHkSrXets3a6kqDeqgYutBtdER3U6I1mWV58AIsDFWoUuN0cB6DMOWiqTHK0XqH3pXeqIVfJIrog==
 
-"@types/uuid@^3.4.3", "@types/uuid@^3.4.4":
+"@types/uuid@^3.4.3":
   version "3.4.13"
   resolved "https://registry.npmjs.org/@types/uuid/-/uuid-3.4.13.tgz"
   integrity sha512-pAeZeUbLE4Z9Vi9wsWV2bYPTweEHeJJy0G4pEjOA/FSvy1Ad5U5Km8iDV6TKre1mjBiVNfAdVHKruP8bAh4Q5A==
@@ -14523,7 +14523,7 @@ dataloader@^2.2.2:
   resolved "https://registry.npmjs.org/dataloader/-/dataloader-2.2.2.tgz"
   integrity sha512-8YnDaaf7N3k/q5HnTJVuzSyLETjoZjVmHc4AeKAzOvKHEFQKcn64OKBfzHYtE9zGjctNM7V9I0MfnUVLpi7M5g==
 
-date-fns@^2.28.0, date-fns@^2.29.3, date-fns@^2.30.0:
+date-fns@^2.28.0, date-fns@^2.30.0:
   version "2.30.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.30.0.tgz#f367e644839ff57894ec6ac480de40cae4b0f4d0"
   integrity sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==
