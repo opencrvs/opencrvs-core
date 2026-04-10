@@ -27,7 +27,11 @@ import {
 import { logger, UUID, IUserName } from '@opencrvs/commons'
 import { UserAuditLog } from '@opencrvs/commons/events'
 import * as F from 'fp-ts'
-import { encodeScope, TokenUserType } from '@opencrvs/commons/authentication'
+import {
+  EncodedScope,
+  encodeScope,
+  TokenUserType
+} from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -64,7 +68,7 @@ export interface IAuthentication {
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: string[]
+  scope: EncodedScope[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -118,7 +122,7 @@ export async function authenticateSystem(
 
 export async function createToken(
   userId: string,
-  scope: string[],
+  scope: EncodedScope[],
   audience: string[],
   issuer: string,
   role?: string | number | undefined,
