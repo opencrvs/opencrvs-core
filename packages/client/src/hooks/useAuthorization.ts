@@ -19,7 +19,8 @@ import {
   ScopeType,
   getAcceptedScopesByType,
   getScopeOptionValue,
-  JurisdictionFilter
+  JurisdictionFilter,
+  EncodedScope
 } from '@opencrvs/commons/client'
 import { isLocationUnderJurisdiction } from '@client/utils/locationUtils'
 import { IStoreState } from '@client/store'
@@ -40,7 +41,7 @@ export function usePermissions() {
   const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
 
   const roleScopes = (role: string) =>
-    roles.find(({ id }) => id === role)?.scopes ?? []
+    (roles.find(({ id }) => id === role)?.scopes as EncodedScope[]) ?? []
 
   const hasAnyScope = (neededScopes: ScopeType[]) =>
     hasAnyScopeFromCommons(userScopes, neededScopes)

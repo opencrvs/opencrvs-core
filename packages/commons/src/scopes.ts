@@ -336,7 +336,6 @@ export type EncodedScope = z.infer<typeof EncodedScope>
 export const encodeScope = (scope: Scope): EncodedScope => {
   const flattened = flattenScope(scope)
 
-  // Cast to the branded type
   return qs.stringify(flattened, {
     arrayFormat: 'comma',
     allowDots: true,
@@ -354,7 +353,7 @@ export const encodeScope = (scope: Scope): EncodedScope => {
  * @returns The encoded scope as a branded string (`EncodedScope`).
  */
 
-export const decodeScope = (query: string) => {
+export const decodeScope = (query: EncodedScope) => {
   const scope = qs.parse(query, {
     ignoreQueryPrefix: true,
     comma: true,
@@ -400,7 +399,7 @@ export function getAcceptedScopesByType({
   scopes
 }: {
   acceptedScopes: ScopeType[]
-  scopes: string[]
+  scopes: EncodedScope[]
 }): Scope[] {
   return scopes
     .map((scope) => {
@@ -434,11 +433,14 @@ export function hasAnyScope(token: string, scopes: ScopeType[]): boolean
 /**
  * Checks if the provided array of scopes contains any of the accepted scopes.
  *
- * @param {string[]} userScopes - Array of scopes to check.
+ * @param {EncodedScope[]} userScopes - Array of scopes to check.
  * @param {ScopeType[]} scopes - An array of scope types to check for.
  * @returns {boolean} True if the scope list contains at least one of the accepted scopes.
  */
-export function hasAnyScope(userScopes: string[], scopes: ScopeType[]): boolean
+export function hasAnyScope(
+  userScopes: EncodedScope[],
+  scopes: ScopeType[]
+): boolean
 /**
  * Implementation handling both overloads.
  *
@@ -447,7 +449,7 @@ export function hasAnyScope(userScopes: string[], scopes: ScopeType[]): boolean
  * @returns True if any of the scopes is present.
  */
 export function hasAnyScope(
-  tokenOrScopes: string | string[],
+  tokenOrScopes: string | EncodedScope[],
   scopes: ScopeType[]
 ): boolean {
   const userScopes = Array.isArray(tokenOrScopes)
@@ -486,7 +488,7 @@ export function hasScope(token: string, scope: ScopeType): boolean
  * @param scope - The scope type to check for.
  * @returns True if the scope list contains the specified scope.
  */
-export function hasScope(scopes: string[], scope: ScopeType): boolean
+export function hasScope(scopes: EncodedScope[], scope: ScopeType): boolean
 /**
  * Implementation handling both overloads.
  *
@@ -495,7 +497,7 @@ export function hasScope(scopes: string[], scope: ScopeType): boolean
  * @returns True if the scope is present.
  */
 export function hasScope(
-  tokenOrScopes: string | string[],
+  tokenOrScopes: string | EncodedScope[],
   scope: ScopeType
 ): boolean {
   if (Array.isArray(tokenOrScopes)) {
@@ -517,7 +519,10 @@ export function hasScope(
  * @param {string} eventType - The event type to check for permission.
  * @returns {boolean} Returns true if the event type is allowed by the scope.
  */
-export function canUserCreateEvent(userScopes: string[], eventType: string) {
+export function canUserCreateEvent(
+  userScopes: EncodedScope[],
+  eventType: string
+) {
   const scopes = getAcceptedScopesByType({
     acceptedScopes: ['record.create'],
     scopes: userScopes
@@ -534,4 +539,14 @@ export function canUserCreateEvent(userScopes: string[], eventType: string) {
 
     return scope.options?.event?.includes(eventType)
   })
+}
+
+/**
+ * Helper for defining scopes for user roles. Should be used in country config.
+ * @param scopes Array of scopes in object format.
+ *
+ * @returns Array of scopes in string format, encoded for use in JWT tokens.
+ */
+export function defineScopes(scopes: RecordScopeV2[]) {
+  return scopes.map((scope) => RecordScopeV2.parse(scope)).map(encodeScope)
 }
