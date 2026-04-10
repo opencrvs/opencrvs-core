@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as Hapi from '@hapi/hapi'
+import { JWT_ISSUER, WEB_USER_JWT_AUDIENCES } from '@auth/constants'
 import {
   authenticateSystem,
   createToken
 } from '@auth/features/authenticate/service'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import * as Hapi from '@hapi/hapi'
+import { TokenUserType, encodeScope } from '@opencrvs/commons'
 import * as oauthResponse from './responses'
-import { TokenUserType, hasScope, encodeScope } from '@opencrvs/commons'
 import { getParam } from './utils'
 
 export async function clientCredentialsHandler(
