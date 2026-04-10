@@ -256,6 +256,22 @@ export async function refetchAllSearchQueries() {
   )
 }
 
+/**
+ * Refetch search queries for a specific workqueue identified by its slug.
+ * Queries are tagged with { workqueueSlug } in meta by useWorkqueue → getResult.
+ */
+export async function refetchWorkqueueSearchQueries(slug: string) {
+  const queries = queryClient.getQueryCache().findAll({
+    queryKey: trpcOptionsProxy.event.search.queryKey(),
+    predicate: (query) => query.meta?.workqueueSlug === slug
+  })
+  await Promise.all(
+    queries.map(async (query) =>
+      queryClient.refetchQueries({ queryKey: query.queryKey, exact: true })
+    )
+  )
+}
+
 async function deleteEventData(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))

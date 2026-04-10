@@ -39,6 +39,7 @@ import {
 } from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
+import { refetchWorkqueueSearchQueries } from '@client/v2-events/features/events/useEvents/api'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { Avatar } from '@client/components/Avatar'
@@ -73,6 +74,21 @@ function Workqueues({
   const navigate = useNavigate()
   const { getCount } = useWorkqueue(currentWorkqueueSlug ?? '')
   const counts = getCount.useSuspenseQuery()
+
+  const prevCountsRef = React.useRef<Record<string, number> | null>(null)
+
+  React.useEffect(() => {
+    const prev = prevCountsRef.current
+    prevCountsRef.current = counts
+    if (prev === null) {
+      return
+    }
+
+    const changedSlugs = Object.keys(counts).filter(
+      (slug) => prev[slug] !== counts[slug]
+    )
+    changedSlugs.forEach((slug) => void refetchWorkqueueSearchQueries(slug))
+  }, [counts])
 
   return workqueues.map(({ name: label, slug, icon }) => (
     <NavigationItem
