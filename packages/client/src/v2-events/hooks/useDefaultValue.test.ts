@@ -67,6 +67,7 @@ const mockContext: SystemVariables & {
     firstname: 'John',
     middlename: 'Michael',
     surname: 'Doe',
+    administrativeAreaId: DISTRICT_ID,
     primaryOfficeId: OFFICE_ID,
     name: 'John Michael Doe',
     role: 'REGISTRAR'
