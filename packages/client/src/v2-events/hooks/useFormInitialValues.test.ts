@@ -28,13 +28,15 @@ import { computeInitialValues } from './useFormInitialValues'
 const emptyValidator = {} as ValidatorContext
 
 /** Stub that returns the raw string defaultValue, or undefined. */
-function stubGetDefaultValue(f: FieldConfig): FieldValue | undefined {
-  if (isNonInteractiveFieldType(f)) {
+function stubGetDefaultValue(config: FieldConfig): FieldValue | undefined {
+  if (isNonInteractiveFieldType(config)) {
     return undefined
   }
-  const interactive = f as InteractiveFieldType
-  return typeof interactive.defaultValue === 'string'
-    ? interactive.defaultValue
+  if (config.type === FieldType.FIELD_GROUP) {
+    return undefined
+  }
+  return typeof config.defaultValue === 'string'
+    ? config.defaultValue
     : undefined
 }
 
