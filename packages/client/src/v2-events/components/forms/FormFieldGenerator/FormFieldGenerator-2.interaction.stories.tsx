@@ -23,7 +23,6 @@ import {
   FieldConfig,
   EventState,
   generateTranslationConfig,
-  UUID,
   DocumentPath,
   PlainDate
 } from '@opencrvs/commons/client'
@@ -220,11 +219,6 @@ const fields = [
           required: false
         }
       ]
-    },
-    defaultValue: {
-      country: 'FAR',
-      administrativeArea: '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID,
-      addressType: 'DOMESTIC'
     }
   },
 
@@ -434,7 +428,7 @@ const declaration = {
   'applicant.country': 'BGD',
   'applicant.region': 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
   'applicant.address': {
-    country: 'FAR',
+    country: 'BGD',
     addressType: 'DOMESTIC',
     administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9'
   },
