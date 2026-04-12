@@ -9,7 +9,7 @@
     "test": "NODE_ENV=development tsx --test"
   },
   "dependencies": {
-    "@opencrvs/mosip": "2.0.0-rc.1",
+    "@opencrvs/mosip": "2.0.0-rc.2",
     "@fastify/cors": "^10.1.0",
     "@fastify/formbody": "^8.0.1",
     "@fastify/jwt": "^9.0.4",
