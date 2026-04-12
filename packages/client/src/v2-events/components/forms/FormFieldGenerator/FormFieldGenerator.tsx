@@ -22,12 +22,11 @@ import {
   flattenFormState,
   FormState,
   IndexMap,
-  isFieldVisible,
   mapFormState,
   ValidatorContext
 } from '@opencrvs/commons/client'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
-import { useDefaultValue } from '@client/v2-events/hooks/useDefaultValue'
+import { useFormInitialValues } from '@client/v2-events/hooks/useFormInitialValues'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -158,20 +157,13 @@ export const FormFieldGenerator = forwardRef<
       }
     }))
     const intl = useIntl()
-    const getDefaultValues = useDefaultValue()
-    const defaultPageValues = getDefaultValues(
-      fields.filter((field) =>
-        isFieldVisible(field, fullForm, validatorContext)
-      )
-    )
-
-    const formikCompatibleInitialValues = makeFormFieldIdsFormikCompatible({
-      ...defaultPageValues,
-      ...pick(
-        formValues,
-        fields.map((field) => field.id)
-      )
+    const { getInitialValues } = useFormInitialValues()
+    const initialValues = getInitialValues(fields, formValues ?? {}, {
+      validator: validatorContext,
+      form: formContext ?? {}
     })
+    const formikCompatibleInitialValues =
+      makeFormFieldIdsFormikCompatible(initialValues)
     const formikCompatibleInitialTouched = makeFormFieldIdsFormikCompatible(
       pick(
         formTouched,

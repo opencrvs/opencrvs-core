@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { get } from 'lodash'
+import { compact, get } from 'lodash'
 import {
   FieldReference,
   FieldValue,
@@ -48,6 +48,18 @@ export function makeFormikFieldIdsOpenCRVSCompatible<T>(
       value
     ])
   )
+}
+
+/**
+ * Resolves a field's synced value by looking up its `value` references in order,
+ * returning the first non-falsy match.
+ */
+export function resolveSyncedFieldValue(
+  field: { value?: FieldReference | FieldReference[] },
+  getValue: (ref: FieldReference) => FieldValue | undefined
+): FieldValue | undefined {
+  const refs = ([] as FieldReference[]).concat(field.value ?? [])
+  return compact(refs.map(getValue))[0]
 }
 
 export function parseFieldReferenceToValue(
