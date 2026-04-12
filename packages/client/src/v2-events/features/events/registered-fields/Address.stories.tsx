@@ -67,7 +67,7 @@ export default meta
 type FormStory = StoryObj<typeof FormFieldGenerator>
 
 const leafAdminStructureLocationId =
-  '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID
+  '1d4e5f6a-7b8c-4912-8efa-345678901234' as UUID
 
 export const DefaultAddressField: FormStory = {
   name: 'Empty address input'

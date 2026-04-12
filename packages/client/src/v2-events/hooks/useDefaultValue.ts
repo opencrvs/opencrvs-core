@@ -51,10 +51,10 @@ function resolveSerializedUserField(
     return value
   }
   if (value.$location) {
-    if (value.$userField !== 'primaryOfficeId') {
+    if (value.$userField !== 'primaryOfficeId' && value.$userField !== 'administrativeAreaId') {
       return ''
     }
-    const locationId = context.user[value.$userField]
+    const locationId = context.user.administrativeAreaId
     const hierarchy = getAdminLevelHierarchy(
       locationId,
       context.administrativeAreas,
