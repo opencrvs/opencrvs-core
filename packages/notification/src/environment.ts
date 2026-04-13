@@ -16,6 +16,5 @@ export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ default: undefined }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
-  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   MONGO_URL: str({ devDefault: 'mongodb://localhost/notification' })
 })

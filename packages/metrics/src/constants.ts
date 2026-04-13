@@ -16,7 +16,6 @@ const env = cleanEnv(process.env, {
   METRICS_PORT: num({ default: 1050 }),
   CERT_PUBLIC_KEY_PATH: str({ default: '../../.secrets/public-key.pem' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
-  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   SENTRY_DSN: str({ default: '' }),
   MONGO_URL: str({ devDefault: 'mongodb://localhost/metrics' }),
@@ -30,7 +29,6 @@ export const {
   METRICS_PORT: PORT,
   CERT_PUBLIC_KEY_PATH,
   COUNTRY_CONFIG_URL,
-  USER_MANAGEMENT_URL,
   DOCUMENTS_URL,
   SENTRY_DSN,
   isProd: PRODUCTION,
@@ -39,7 +37,6 @@ export const {
   DEFAULT_TIMEOUT,
   DASHBOARD_MONGO_URL
 } = env
-
 
 export const BIRTH_REPORT_PATH = PRODUCTION
   ? '/usr/src/app/packages/metrics/src/scripts/Birth_Report.csv'

@@ -26,7 +26,6 @@ export const env = cleanEnv(process.env, {
   ES_REINDEXING_STATUS_INDEX: str({ default: 'reindexing_status' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
-  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
   TWO_FA_ENABLED: bool({
     devDefault: false,

@@ -14,7 +14,6 @@ export const env = cleanEnv(process.env, {
   MONGO_URL: str({ devDefault: 'mongodb://localhost/webhooks' }),
   HOST: str({ devDefault: '0.0.0.0' }),
   PORT: port({ default: 2525 }),
-  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ default: undefined }),
   NODE_ENV: str({ devDefault: 'development' }),
