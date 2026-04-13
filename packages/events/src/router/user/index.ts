@@ -55,7 +55,7 @@ import {
   updateUser
 } from '@events/service/users/api'
 import { uploadBase64File } from '@events/service/files'
-import { getUsersById, isUser } from '@events/service/users/users'
+import { getUsersById, isUser } from '@events/service/users/api'
 import {
   checkVerificationCode,
   generateAndSendVerificationCode,
@@ -673,11 +673,11 @@ export const userRouter = router({
     }),
   deactivateSuperUser: userAndSystemProcedure
     .use(
-      requiresAnyOfScopes([
-        SCOPES.BYPASSRATELIMIT,
-        SCOPES.USER_CREATE,
-        SCOPES.USER_DATA_SEEDING,
-        SCOPES.INTEGRATION_CREATE
+      allowedWithAnyOfScopes([
+        'bypassratelimit',
+        'user.create',
+        'user.data-seeding',
+        'integration.create'
       ])
     )
     .input(z.object({ username: z.string() }))
