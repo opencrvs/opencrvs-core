@@ -54,6 +54,17 @@ const ReadersContainer = styled.div`
   }
 `
 
+const SubComponentStack = styled(Stack)`
+  & > section {
+    width: 100%;
+  }
+
+  & > section > div + div {
+    margin-top: -8px;
+    margin-bottom: -8px;
+  }
+`
+
 const messages = {
   dividerLabel: {
     id: 'views.idReader.label.or',
@@ -91,36 +102,26 @@ function IdReaderInput({
 
   return (
     <MainContainer>
-      <Stack alignItems="center" direction="column" gap={0}>
-        <ReadersContainer>
-          <FormFieldGenerator
-            fields={methods}
-            id={id}
-            validatorContext={validatorContext}
-            onChange={(values) => {
-              /**
-               * Extracts the actual value from nested field definitions (passed as `methods`)
-               * to prevent redundant nesting in the resulting form data.
-               *
-               * This ensures that the parent form receives only the relevant value,
-               * without needing awareness of the nested field structure.
-               *
-               * Currently, this logic applies only to QR Reader fields —
-               * hence, we specifically search for and extract values from QR Reader field types.
-               */
-              onChange(getQrFieldValue(methods, values))
-            }}
-          />
-        </ReadersContainer>
-        <Divider>
-          <Text align="center" color="grey500" element="p" variant="reg18">
-            {intl.formatMessage(messages.dividerLabel)}
-          </Text>
-        </Divider>
-        <Text align="center" element="span" variant="reg16">
-          {intl.formatMessage(messages.manualInputInstructionLabel)}
-        </Text>
-      </Stack>
+      <SubComponentStack direction="column" gap={0}>
+        <FormFieldGenerator
+          fields={methods}
+          id={id}
+          validatorContext={validatorContext}
+          onChange={(values) => {
+            /**
+             * Extracts the actual value from nested field definitions (passed as `methods`)
+             * to prevent redundant nesting in the resulting form data.
+             *
+             * This ensures that the parent form receives only the relevant value,
+             * without needing awareness of the nested field structure.
+             *
+             * Currently, this logic applies only to QR Reader fields —
+             * hence, we specifically search for and extract values from QR Reader field types.
+             */
+            onChange(getQrFieldValue(methods, values))
+          }}
+        />
+      </SubComponentStack>
     </MainContainer>
   )
 }

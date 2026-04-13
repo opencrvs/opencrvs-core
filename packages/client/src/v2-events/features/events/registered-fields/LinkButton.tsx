@@ -55,7 +55,7 @@ function LinkButtonInput({
       href={url}
       id={id}
       size="large"
-      type="secondary"
+      type="primary"
     >
       {configuration.icon && (
         <Icon

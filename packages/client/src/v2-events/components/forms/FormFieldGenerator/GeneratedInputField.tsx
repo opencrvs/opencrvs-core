@@ -853,11 +853,13 @@ export const GeneratedInputField = React.memo(
 
     if (isIdReaderFieldType(field)) {
       return (
-        <IdReader.Input
-          id={field.config.id}
-          methods={field.config.methods}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
-        />
+        <InputField variant="highlighted" {...inputFieldProps}>
+          <IdReader.Input
+            id={field.config.id}
+            methods={field.config.methods}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
 

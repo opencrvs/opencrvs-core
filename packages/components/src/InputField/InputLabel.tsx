@@ -19,6 +19,7 @@ export type IInputLabel = {
   required?: boolean
   hideAsterisk?: boolean
   tooltip?: string
+  variant?: 'default' | 'highlighted'
 } & React.LabelHTMLAttributes<HTMLLabelElement>
 
 const StyledInputLabel = styled.label<IInputLabel>`
@@ -40,14 +41,7 @@ const Required = styled.span<
 `
 
 export const InputLabel = (props: IInputLabel) => {
-  const {
-    inputDescriptor,
-    required,
-    hideAsterisk,
-    children,
-    tooltip,
-    disabled
-  } = props
+  const { required, hideAsterisk, children, tooltip, disabled } = props
   return (
     <StyledInputLabel data-tip={tooltip} {...props}>
       {tooltip && <ReactTooltip />}
@@ -55,7 +49,6 @@ export const InputLabel = (props: IInputLabel) => {
       {required && !hideAsterisk && (
         <Required disabled={disabled}>&nbsp;*</Required>
       )}
-      {inputDescriptor && <InputDescriptor>{inputDescriptor}</InputDescriptor>}
     </StyledInputLabel>
   )
 }
