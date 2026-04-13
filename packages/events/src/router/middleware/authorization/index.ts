@@ -316,6 +316,13 @@ export const userCanReadEvent: MiddlewareFunction<
   TrpcContext & { event: EventDocument },
   UUID
 > = async ({ next, ctx, input }) => {
+  const { eventId: grantedEventId } = getTokenPayload(ctx.token)
+  if (grantedEventId && grantedEventId !== input) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Token does not grant access to this event'
+    })
+  }
   const event = await getEventById(input)
 
   const createAction = event.actions.find(
