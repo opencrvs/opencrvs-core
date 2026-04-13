@@ -17,16 +17,17 @@ import {
   ActionStatus,
   ActionType,
   BearerTokenByUserType,
+  encodeScope,
   getTokenPayload,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
-  TestUserRole
+  TestUserRole,
+  TokenUserType
 } from '@opencrvs/commons'
 import { AppRouter } from './router'
 import { server } from './server'
 import { mswServer } from './tests/msw'
-import { env } from './environment'
-import { setupTestCase } from './tests/utils'
+import { createTestToken, setupTestCase } from './tests/utils'
 
 /**
  * This test suite verifies that the server starts up correctly and handles basic dependencies.
@@ -92,6 +93,8 @@ test('Server starts up and returns an event based on context dependency values',
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 
+  const userId = getTokenPayload(BearerTokenByUserType.localRegistrar).sub
+
   const mockUserResponse = {
     primaryOfficeId: locations[0].id,
     role: TestUserRole.enum.LOCAL_REGISTRAR,
@@ -100,9 +103,48 @@ test('Server starts up and returns an event based on context dependency values',
     }
   }
 
+  const eventId = getUUID()
+  const mockEvent = {
+    id: eventId,
+    type: TENNIS_CLUB_MEMBERSHIP,
+    trackingId: 'TRK-MOCK-001',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    actions: [
+      {
+        id: getUUID(),
+        type: ActionType.CREATE,
+        transactionId: getUUID(),
+        createdBy: userId,
+        createdByUserType: TokenUserType.enum.user,
+        createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
+        createdBySignature: 'my-signature.png',
+        createdAtLocation: mockUserResponse.primaryOfficeId,
+        status: ActionStatus.Accepted,
+        declaration: {},
+        annotation: null,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: getUUID(),
+        type: ActionType.ASSIGN,
+        transactionId: getUUID(),
+        createdBy: userId,
+        createdByUserType: TokenUserType.enum.user,
+        createdByRole: TestUserRole.enum.LOCAL_REGISTRAR,
+        createdAtLocation: mockUserResponse.primaryOfficeId,
+        status: ActionStatus.Accepted,
+        declaration: {},
+        annotation: null,
+        createdAt: new Date().toISOString(),
+        assignedTo: userId
+      }
+    ]
+  }
+
   mswServer.use(
-    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () =>
-      HttpResponse.json(mockUserResponse)
+    http.post(`${url}/event.create`, () =>
+      HttpResponse.json([{ result: { data: superjson.serialize(mockEvent) } }])
     )
   )
 
@@ -120,8 +162,6 @@ test('Server starts up and returns an event based on context dependency values',
     }
   )
 
-  const userId = getTokenPayload(BearerTokenByUserType.localRegistrar).sub
-
   expect(response.actions.length).toEqual(2)
   const [createAction] = response.actions
 
@@ -135,37 +175,34 @@ test('Server starts up and returns an event based on context dependency values',
 })
 
 test('Server will accept requests after error', async () => {
-  const { locations } = await setupTestCase()
-
+  const { user, generator } = await setupTestCase()
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 
-  mswServer.use(
-    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-      return HttpResponse.json(
-        { message: 'Invalid credentials' },
-        // @ts-expect-error - MSW does not have a type for this?
-        { status: 401 }
-      )
-    })
-  )
+  const tokenWithoutCreateScope = createTestToken({
+    userId: user.id,
+    scopes: [],
+    userType: TokenUserType.enum.user,
+    role: user.role
+  })
 
   await expect(
-    createEvent(BearerTokenByUserType.localRegistrar)
-  ).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } })
-
-  mswServer.use(
-    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-      return HttpResponse.json({
-        primaryOfficeId: locations[0].id,
-        role: TestUserRole.enum.LOCAL_REGISTRAR,
-        signature: 'my-signature.png'
-      })
+    customClient.event.create.mutate(generator.event.create(), {
+      context: { headers: { authorization: tokenWithoutCreateScope } }
     })
-  )
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+
+  const tokenWithCreateScope = createTestToken({
+    userId: user.id,
+    scopes: [encodeScope({ type: 'record.create' })],
+    userType: TokenUserType.enum.user,
+    role: user.role
+  })
 
   await expect(
-    createEvent(BearerTokenByUserType.fieldAgent)
+    customClient.event.create.mutate(generator.event.create(), {
+      context: { headers: { authorization: tokenWithCreateScope } }
+    })
   ).resolves.toBeDefined()
 })
 
@@ -174,9 +211,23 @@ test('Throws when dependency payload returns malformed data', async () => {
   expect(url).toBeDefined()
 
   mswServer.use(
-    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
-      return HttpResponse.json({ allNeededPropertiesMissing: true })
-    })
+    http.post(`${url}/event.create`, () =>
+      HttpResponse.json([
+        {
+          error: {
+            json: {
+              message: 'Authentication failed',
+              code: -32001,
+              data: {
+                code: 'UNAUTHORIZED',
+                httpStatus: 401,
+                path: 'event.create'
+              }
+            }
+          }
+        }
+      ])
+    )
   )
 
   await expect(

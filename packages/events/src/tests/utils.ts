@@ -75,7 +75,8 @@ export const UNSTABLE_EVENT_FIELDS = [
   'dateOfEvent',
   'placeOfEvent',
   'registrationNumber',
-  'originalActionId'
+  'originalActionId',
+  'createdBySignature'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -344,18 +345,20 @@ export const setupTestCase = async (
 
   const locations = await getLocations()
 
-  const defaultUser = seed.user(
-    generator.user.create({
-      primaryOfficeId: locations[0].id,
-      administrativeAreaId: locations[0].administrativeAreaId
-    })
-  )
-  const secondaryUser = seed.user(
-    generator.user.create({
-      primaryOfficeId: locations[1].id,
-      administrativeAreaId: locations[1].administrativeAreaId
-    })
-  )
+  const [defaultUser, secondaryUser] = await Promise.all([
+    seed.user(
+      generator.user.create({
+        primaryOfficeId: locations[0].id,
+        administrativeAreaId: locations[0].administrativeAreaId
+      })
+    ),
+    seed.user(
+      generator.user.create({
+        primaryOfficeId: locations[1].id,
+        administrativeAreaId: locations[1].administrativeAreaId
+      })
+    )
+  ])
 
   const users = [defaultUser, secondaryUser]
 
@@ -531,7 +534,7 @@ export async function seedEvent(
       .insertInto('events')
       .values({
         eventType: eventConfig.id,
-        transactionId: `tx-${Date.now()}`,
+        transactionId: getUUID(),
         trackingId: getUUID()
       })
       .returning(['id'])
