@@ -11,7 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
-import { verifyToken } from '@auth/features/authenticate/service'
+import { verifyToken, ITokenPayload } from '@auth/features/authenticate/service'
 import { refreshToken } from '@auth/features/refresh/service'
 
 interface IRefreshPayload {
@@ -29,7 +29,7 @@ export default async function refreshHandler(request: Hapi.Request) {
 
   const decoded = decodedOrError.right
 
-  const newToken = await refreshToken(decoded)
+  const newToken = await refreshToken(decoded as ITokenPayload)
   return { token: newToken }
 }
 

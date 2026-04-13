@@ -50,7 +50,7 @@ export async function clientCredentialsHandler(
   const v2Scopes = result.scope.map((s) => {
     // Intentionally verbose for clarity.
     if (s === 'record.notify') {
-      return 'type=record.notify'
+      return encodeScope({ type: 'record.notify' })
     }
 
     if (s === 'record.search') {
