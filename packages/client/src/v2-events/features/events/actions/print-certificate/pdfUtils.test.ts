@@ -367,6 +367,112 @@ describe('SVG compiler', () => {
       )
     })
   })
+  describe('fullAddress', () => {
+    // fullAddress is a computed convenience field on ADDRESS certificate variables.
+    // It joins admin levels most-specific-first, then country — empty values are filtered.
+    //
+    // Note on 'FAR' (Farajaland): FAR is only added to the countries list when
+    // window.config.COUNTRY === 'FAR', which is set at runtime in dev and prod but
+    // not in the test environment. So in tests, SelectCountry.stringify('FAR') returns ''
+    // and gets filtered out. In dev/prod, it resolves to "Farajaland" and is included.
+    function expectFullAddress(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      addressValue: Record<string, any>,
+      output: string
+    ) {
+      const generator = testDataGenerator(2323)
+      const registrar = generator.user.localRegistrar()
+      const { declaration: _decl, ...metadata } = tennisClubMembershipEventIndex
+
+      const result = compileSvg({
+        templateString:
+          '<svg><text>{{$lookup $declaration "applicant.address.fullAddress"}}</text></svg>',
+        $metadata: {
+          ...metadata,
+          createdBy: registrar.v2.id,
+          modifiedAt: new Date().toISOString(),
+          copiesPrintedForTemplate: 2
+        },
+        $actions: tennisClubMembershipEventDocument.actions as ActionDocument[],
+        $declaration: { 'applicant.address': addressValue },
+        review: false,
+        locations: V2_DEFAULT_MOCK_LOCATIONS_MAP,
+        administrativeAreas: V2_DEFAULT_MOCK_ADMINISTRATIVE_AREAS_MAP,
+        users: [registrar.v2],
+        language: { lang: 'en', messages: {} },
+        config: tennisClubMembershipEvent,
+        adminLevels: [
+          {
+            id: 'province',
+            label: {
+              id: 'field.address.province.label',
+              defaultMessage: 'Province',
+              description: 'Label for province in address'
+            }
+          },
+          {
+            id: 'district',
+            label: {
+              id: 'field.address.district.label',
+              defaultMessage: 'District',
+              description: 'Label for district in address'
+            }
+          }
+        ]
+      })
+
+      expect(result).toBe(output)
+    }
+
+    it('domestic: district + province (most-specific-first, country filtered when unresolved)', () => {
+      // Ibombo (district) under Central (province) — FAR not in countries list in test env → filtered
+      // In dev/prod: "Ibombo, Central, Farajaland"
+      expectFullAddress(
+        {
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: '62a0ccb4-880d-4f30-8882-f256007dfff9' as UUID,
+          country: 'FAR'
+        },
+        '<svg><text>Ibombo, Central</text></svg>'
+      )
+    })
+
+    it('domestic: province only when no district present', () => {
+      // Central has no parent → only province level resolved; FAR filtered in test env
+      // In dev/prod: "Central, Farajaland"
+      expectFullAddress(
+        {
+          addressType: AddressType.DOMESTIC,
+          administrativeArea: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+          country: 'FAR'
+        },
+        '<svg><text>Central</text></svg>'
+      )
+    })
+
+    it('international: state + country', () => {
+      // USA resolves to full English name via intl
+      expectFullAddress(
+        {
+          addressType: AddressType.INTERNATIONAL,
+          country: 'USA',
+          streetLevelDetails: { state: 'California' }
+        },
+        '<svg><text>California, United States of America</text></svg>'
+      )
+    })
+
+    it('international: country only when state is absent', () => {
+      expectFullAddress(
+        {
+          addressType: AddressType.INTERNATIONAL,
+          country: 'USA',
+          streetLevelDetails: {}
+        },
+        '<svg><text>United States of America</text></svg>'
+      )
+    })
+  })
   describe('$lookup', () => {
     it('stringifies complex form field values using the stringifier of said form input', () => {
       expectRenderOutput(

@@ -479,7 +479,13 @@ function toCertificateVariables(
 
   const administrativeAreaId = getAdministrativeAreaIdFromAddress(value)
   if (value.addressType === AddressType.INTERNATIONAL) {
-    return { ...stringifiedResult, streetLevelDetails }
+    const fullAddress = [
+      value.streetLevelDetails?.state,
+      stringifiedResult.country
+    ]
+      .filter(Boolean)
+      .join(', ')
+    return { ...stringifiedResult, streetLevelDetails, fullAddress }
   }
   const appConfigAdminLevels = adminLevels?.map((level) => level.id)
 
@@ -490,10 +496,19 @@ function toCertificateVariables(
     'withNames'
   )
 
+  const orderedAdminValues = [...(appConfigAdminLevels ?? [])]
+    .reverse()
+    .map((level) => (adminLevelHierarchy as Record<string, string>)[level])
+
+  const fullAddress = [...orderedAdminValues, stringifiedResult.country]
+    .filter(Boolean)
+    .join(', ')
+
   return {
     ...stringifiedResult,
     ...adminLevelHierarchy,
-    streetLevelDetails
+    streetLevelDetails,
+    fullAddress
   }
 }
 
