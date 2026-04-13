@@ -19,7 +19,8 @@ import {
   baseMeta,
   getHiddenActions,
   createStoriesFromScenarios,
-  Scenario
+  Scenario,
+  AssertType
 } from '../ActionMenu.common'
 
 export default {
@@ -39,7 +40,8 @@ const archivedScenariosForFieldAgent: Scenario[] = [
       ActionType.UNASSIGN
     ],
     expected: {
-      ...getHiddenActions()
+      ...getHiddenActions(),
+      ['Assign']: AssertType.ENABLED
     }
   },
   {
@@ -69,7 +71,8 @@ const archivedScenariosForFieldAgent: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_SELF
     ],
     expected: {
-      ...getHiddenActions()
+      ...getHiddenActions(),
+      ['Unassign']: AssertType.ENABLED
     }
   }
 ]
