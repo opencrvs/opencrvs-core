@@ -43,6 +43,11 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
 HTTP input now accepts `field('..')` references in the HTTP body definition.
 
+#### Certificate template helpers
+
+- Added `$join` Handlebars helper for certificate SVG templates. Joins values with a separator while filtering out empty or undefined values — useful for address hierarchies where some levels may be absent (e.g. `{{$join ", " district province country}}`).
+- ADDRESS field certificate variables now include a `fullAddress` convenience field: all configured admin levels joined most-specific-first with country (e.g. `"Ibombo, Central, Farajaland"`). Use as `{{$lookup $declaration "field.address.fullAddress"}}`.
+
 #### Jurisdiction
 
 - Elasticsearch now stores location IDs as a full administrative hierarchy, with the leaf representing the actual event location. This enables searching events by any jurisdiction level (district, province, office, health facility etc.).
