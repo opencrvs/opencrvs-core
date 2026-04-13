@@ -123,43 +123,43 @@ const messagesToDefine = {
 
   childDetails: {
     id: 'integrations.childDetails',
-    defaultMessage: `Child's details`,
+    defaultMessage: "Child's details",
     description: 'Label for child details'
   },
 
   motherDetails: {
     id: 'integrations.motherDetails',
-    defaultMessage: `Mother's details`,
+    defaultMessage: "Mother's details",
     description: 'Label for mothers details'
   },
 
   fatherDetails: {
     id: 'integrations.fatherDetails',
-    defaultMessage: `Father's details`,
+    defaultMessage: "Father's details",
     description: 'Label for fathers details'
   },
 
   informantDetails: {
     id: 'integrations.informantDetails',
-    defaultMessage: `Informant's details`,
+    defaultMessage: "Informant's details",
     description: 'Label for informant details'
   },
 
   documentDetails: {
     id: 'integrations.documentDetails',
-    defaultMessage: `Document details`,
+    defaultMessage: 'Document details',
     description: 'Label for document details'
   },
 
   deathEventDetails: {
     id: 'integrations.deathEventDetails',
-    defaultMessage: `Event details`,
+    defaultMessage: 'Event details',
     description: 'Label for death event details'
   },
 
   deceasedDetails: {
     id: 'integrations.deceasedDetails',
-    defaultMessage: `Deceased's details`,
+    defaultMessage: "Deceased's details",
     description: 'Label for Deceased details'
   },
 
@@ -337,8 +337,7 @@ const messagesToDefine = {
   createdOn: {
     id: 'integrations.createdOn',
     defaultMessage: 'Created {date}',
-    description:
-      'Label showing when an integration was created (no user info)'
+    description: 'Label showing when an integration was created (no user info)'
   },
   clientDetails: {
     id: 'integrations.clientDetails',

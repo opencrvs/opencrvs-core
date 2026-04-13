@@ -432,8 +432,10 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.estimatedNumberOfRegistartion'
   },
   estimatedTargetDaysRegistrationTitle: {
-    defaultMessage: `Estimated vs total registered in {registrationTargetDays} days`,
-    description: `A label for estimated vs total registered in {registrationTargetDays} days`,
+    defaultMessage:
+      'Estimated vs total registered in {registrationTargetDays} days',
+    description:
+      'A label for estimated vs total registered in {registrationTargetDays} days',
     id: 'constants.estimatedTargetDaysRegistrationTitle'
   },
   event: {
@@ -713,8 +715,8 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.registeredBy'
   },
   registeredInTargetd: {
-    defaultMessage: `Registered in {registrationTargetDays} days`,
-    description: `A label for Registered in {registrationTargetDays} days`,
+    defaultMessage: 'Registered in {registrationTargetDays} days',
+    description: 'A label for Registered in {registrationTargetDays} days',
     id: 'constants.registeredInTargetd'
   },
   registeredStatus: {
@@ -723,8 +725,9 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.registered.status'
   },
   registeredWithinTargetd: {
-    defaultMessage: `Registered within\n{registrationTargetDays} days of event`,
-    description: `A label for Registered {registrationTargetDays} within  days of event`,
+    defaultMessage: 'Registered within\n{registrationTargetDays} days of event',
+    description:
+      'A label for Registered {registrationTargetDays} within  days of event',
     id: 'constants.registeredWithinTargetd'
   },
   rejected: {
@@ -906,8 +909,9 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.totalRegistered'
   },
   totalRegisteredInTargetDays: {
-    defaultMessage: `Total registered in {registrationTargetDays} days`,
-    description: `A label for total registered in {registrationTargetDays} days`,
+    defaultMessage: 'Total registered in {registrationTargetDays} days',
+    description:
+      'A label for total registered in {registrationTargetDays} days',
     id: 'constants.totalRegisteredInTargetDays'
   },
   trackingId: {
@@ -971,17 +975,18 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.within1YearTo5Years'
   },
   withinTargetDays: {
-    defaultMessage: `Within {registrationTargetDays} days`,
-    description: `Label for registrations within {registrationTargetDays} days`,
+    defaultMessage: 'Within {registrationTargetDays} days',
+    description: 'Label for registrations within {registrationTargetDays} days',
     id: 'constants.withinTargetDays'
   },
   withinTargetDaysTo1Year: {
-    defaultMessage: `{registrationTargetDays} days - 1 year`,
-    description: `Label for registrations within {registrationTargetDays} days to 1 year`,
+    defaultMessage: '{registrationTargetDays} days - 1 year',
+    description:
+      'Label for registrations within {registrationTargetDays} days to 1 year',
     id: 'constants.withinTargetDaysTo1Year'
   },
   humanName: {
-    defaultMessage: `{firstName} {middleName} {lastName}`,
+    defaultMessage: '{firstName} {middleName} {lastName}',
     description: 'A localized order of the full name',
     id: 'constants.humanName'
   }

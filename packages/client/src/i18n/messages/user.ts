@@ -349,7 +349,8 @@ const messagesToDefine: IUserMessages = {
     id: 'settings.changePassword'
   },
   changePasswordMessage: {
-    defaultMessage: `Create a unique password - one that you don't use for other websites or applications. A secure and easy to remember passphrase could include three random words, while avoiding the use of personal info.`,
+    defaultMessage:
+      "Create a unique password - one that you don't use for other websites or applications. A secure and easy to remember passphrase could include three random words, while avoiding the use of personal info.",
     description: 'Password change message',
     id: 'misc.newPass.instruction'
   },
