@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/// <reference types="node" />
 
 /**
  * Extracts all MessageDescriptor objects from the client and login packages
@@ -47,10 +48,7 @@ function findSourceFiles(dir: string): string[] {
   return results
 }
 
-function extractMessageDescriptors(
-  _filePath: string,
-  sourceCode: string
-): MessageDescriptor[] {
+function extractMessageDescriptors(sourceCode: string): MessageDescriptor[] {
   const sourceFile = ts.createSourceFile(
     'temp.ts',
     sourceCode,
@@ -69,8 +67,11 @@ function extractMessageDescriptors(
       (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'id'
     )
     const defaultMessageProp = node.properties.find(
-      (p) =>
-        ts.isPropertyAssignment(p) && p.name.getText() === 'defaultMessage'
+      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'defaultMessage'
+    )
+
+    const descriptionProp = node.properties.find(
+      (p) => ts.isPropertyAssignment(p) && p.name.getText() === 'description'
     )
 
     if (!(idProp && defaultMessageProp)) {
@@ -78,12 +79,30 @@ function extractMessageDescriptors(
       return
     }
 
-    const objectText = node.getText(sourceFile)
     try {
-      // eslint-disable-next-line no-new-func
-      matches.push(new Function(`return (${objectText});`)())
+      const idNode = (idProp as ts.PropertyAssignment).initializer
+      const msgNode = (defaultMessageProp as ts.PropertyAssignment).initializer
+      const descriptionNode = (descriptionProp as ts.PropertyAssignment)
+        ?.initializer
+
+      const description =
+        descriptionNode && ts.isStringLiteral(descriptionNode)
+          ? descriptionNode.text
+          : undefined
+
+      if (ts.isStringLiteral(idNode) && ts.isStringLiteral(msgNode)) {
+        matches.push({
+          id: idNode.text,
+          defaultMessage: msgNode.text,
+          description: description
+        })
+      } else {
+        console.warn(
+          `Skipping non-literal descriptor : ${node.getText(sourceFile)}`
+        )
+      }
     } catch {
-      // Dynamic message identifier – skip
+      console.warn(`Skipping dynamic descriptor : ${node.getText(sourceFile)}`)
     }
 
     ts.forEachChild(node, visit)
@@ -100,7 +119,6 @@ function extractFromDirectory(dir: string): Record<string, MessageEntry> {
   for (const file of findSourceFiles(dir)) {
     const contents = fs.readFileSync(file, 'utf8')
     for (const { id, defaultMessage, description } of extractMessageDescriptors(
-      file,
       contents
     )) {
       if (id)
