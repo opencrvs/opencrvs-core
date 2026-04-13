@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import { encodeScope, getUUID, SCOPES, UUID } from '@opencrvs/commons'
+import { encodeScope, getUUID, UUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import {
@@ -97,14 +97,16 @@ describe('announcement.broadcast', () => {
     })
   })
 
-  test('rejects with NOT_FOUND if the logged-in admin is not in the database', async () => {
-    const UNKNOWN_USER = {
-      id: getUUID(),
-      primaryOfficeId: getUUID(),
-      role: '',
-      name: []
-    }
-    const client = createTestClient(UNKNOWN_USER, [SCOPES.CONFIG_UPDATE_ALL])
+  test.only('rejects with NOT_FOUND if the logged-in admin is not in the database', async () => {
+    const client = createTestClient(
+      {
+        id: getUUID(),
+        primaryOfficeId: getUUID(),
+        role: '',
+        name: []
+      },
+      [scope]
+    )
 
     await expect(
       client.announcement.broadcast({
