@@ -97,7 +97,7 @@ describe('announcement.broadcast', () => {
     })
   })
 
-  test.only('rejects with NOT_FOUND if the logged-in admin is not in the database', async () => {
+  test('rejects with NOT_FOUND if the logged-in admin is not in the database', async () => {
     const client = createTestClient(
       {
         id: getUUID(),
