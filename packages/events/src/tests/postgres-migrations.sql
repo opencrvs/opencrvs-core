@@ -462,6 +462,7 @@ CREATE TABLE app.users (
     role text NOT NULL,
     status text NOT NULL,
     email text,
+    device text,
     mobile text,
     signature_path text,
     profile_image_path text,

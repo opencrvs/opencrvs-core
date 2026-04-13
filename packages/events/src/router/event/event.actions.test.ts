@@ -726,20 +726,22 @@ describe('Conditionals based on user role', () => {
       }
     }
 
-    const users = TestUserRole.options.map((role) => {
-      return seed.user({
-        primaryOfficeId: locations[0].id,
-        administrativeAreaId: locations[0].administrativeAreaId,
-        name: [
-          {
-            use: 'en',
-            family: role,
-            given: ['John']
-          }
-        ],
-        role
+    const users = await Promise.all(
+      TestUserRole.options.map(async (role) => {
+        return await seed.user({
+          primaryOfficeId: locations[0].id,
+          administrativeAreaId: locations[0].administrativeAreaId,
+          name: [
+            {
+              use: 'en',
+              family: role,
+              given: ['John']
+            }
+          ],
+          role
+        })
       })
-    })
+    )
 
     expect(users).toHaveLength(9)
     for (const u of users) {
@@ -775,7 +777,7 @@ describe('Conditionals based on user role', () => {
 
   it('Indexed result is not affected by SHOW conditionals', async () => {
     const { generator, seed, locations } = await setupTestCase()
-    const fieldAgent = seed.user({
+    const fieldAgent = await seed.user({
       primaryOfficeId: locations[0].id,
       administrativeAreaId: locations[0].administrativeAreaId,
       name: [
@@ -813,7 +815,7 @@ describe('Conditionals based on user role', () => {
       )
     ).resolves.toBeDefined()
 
-    const registrationAgent = seed.user({
+    const registrationAgent = await seed.user({
       primaryOfficeId: locations[0].id,
       name: [
         {
