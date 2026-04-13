@@ -14,7 +14,7 @@ import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { redis } from '@auth/database'
 import * as t from 'io-ts'
-import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
 import superjson from 'superjson'
 import {
   NotificationEvent,
@@ -49,7 +49,11 @@ const eventsClient = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: env.EVENTS_URL,
-      transformer: superjson
+      transformer: superjson,
+      headers({ opList }) {
+        const headers = opList[0].context?.headers
+        return (headers as HTTPHeaders) ?? {}
+      }
     })
   ]
 })
@@ -271,11 +275,13 @@ export async function recordUserAuditEvent(
   token: string,
   input: UserAuditLog
 ): Promise<void> {
+  const authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`
   try {
-    await eventsClient.user.audit.record.mutate(input)
+    await eventsClient.user.audit.record.mutate(input, {
+      context: { headers: { Authorization: authorization } }
+    })
   } catch (err) {
     logger.error('Failed to record user audit event', err)
-    throw err
   }
 }
 
