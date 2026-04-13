@@ -33,17 +33,12 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
-import {
-  RECORD_DECLARE_SCOPES,
-  usePermissions
-} from '@client/hooks/useAuthorization'
-import ProtectedComponent from '@client/components/ProtectedComponent'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
 import { parse, stringify } from 'qs'
-import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { ROUTES } from '../../v2-events/routes/routes'
 
@@ -351,17 +346,15 @@ const HeaderComponent = (props: IFullProps) => {
     {
       element: (
         <HeaderCenter>
-          <ProtectedComponent scopes={RECORD_DECLARE_SCOPES}>
-            <Button
-              type="iconPrimary"
-              size="medium"
-              key="newEvent"
-              id="header_new_event"
-              onClick={() => router.navigate(routes.SELECT_VITAL_EVENT)}
-            >
-              <Icon name="Plus" size="medium" />
-            </Button>
-          </ProtectedComponent>
+          <Button
+            type="iconPrimary"
+            size="medium"
+            key="newEvent"
+            id="header_new_event"
+            onClick={() => router.navigate(routes.SELECT_VITAL_EVENT)}
+          >
+            <Icon name="Plus" size="medium" />
+          </Button>
           {canSearchRecords && renderSearchInput(props)}
         </HeaderCenter>
       )

@@ -14,7 +14,9 @@ import { UUID } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
 export async function getAnonymousToken() {
-  const res = await fetch(new URL('/anonymous-token', env.AUTH_URL).toString())
+  const res = await fetch(
+    new URL('/internal/anonymous-token', env.AUTH_URL).toString()
+  )
   const { token } = await res.json()
   return token as string
 }

@@ -18,7 +18,6 @@ export const env = cleanEnv(process.env, {
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ default: undefined }),
   NODE_ENV: str({ devDefault: 'development' }),
-  QA_ENV: bool({ default: false }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
   CHECK_INVALID_TOKEN: bool({
     devDefault: false,
