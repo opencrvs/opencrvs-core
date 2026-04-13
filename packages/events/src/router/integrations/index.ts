@@ -54,7 +54,7 @@ const ListIntegrationsOutput = z.array(
     scopes: z.array(z.string()),
     status: z.string(),
     createdAt: z.iso.datetime(),
-    createdBy: z.string()
+    createdBy: UUID
   })
 )
 
@@ -80,7 +80,7 @@ const GetIntegrationOutput = z.object({
   status: z.string(),
   shaSecret: z.string().nullable(),
   createdAt: z.string(),
-  createdBy: z.string()
+  createdBy: UUID
 })
 
 const ToggleStatusOutput = z.object({
