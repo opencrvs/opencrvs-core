@@ -18,7 +18,8 @@ import {
   field,
   FieldType,
   SelectOption,
-  not
+  not,
+  ConditionalType
 } from '@opencrvs/commons/client'
 import {
   FormFieldGenerator,
@@ -63,9 +64,10 @@ export const ICD: StoryObj<typeof FormFieldGenerator> = {
             id: 'symptom.icd10',
             type: FieldType.AUTOCOMPLETE,
             label: {
-              id: 'storybook.duration.label',
-              defaultMessage: 'Duration',
-              description: 'The title for the duration input'
+              id: 'storybook.icd10.label',
+              defaultMessage:
+                'Type to search from a preconfigured list of 50 types of cancers',
+              description: 'The title for the icd10 input'
             },
             required: true,
             placeholder: {
@@ -74,8 +76,31 @@ export const ICD: StoryObj<typeof FormFieldGenerator> = {
               description: 'This is the placeholder for the duration input'
             },
             configuration: {
-              url: 'http://localhost:3040/causes-of-death?terms='
+              url: '/api/causes-of-death?terms=',
+              defaultOptions: [
+                { label: 'Enter symptom manually', value: 'OTHER' }
+              ]
             }
+          },
+          {
+            id: `symptom.icd10.other`,
+            type: FieldType.TEXTAREA,
+            required: false,
+            analytics: true,
+            label: {
+              defaultMessage:
+                'Enter the diagnosis or condition not found in the list above',
+              description: 'This is the label for the field',
+              id: `symptom.icd10.other.label`
+            },
+            conditionals: [
+              {
+                type: ConditionalType.SHOW,
+                conditional: field('symptom.icd10')
+                  .get('value')
+                  .isEqualTo('OTHER')
+              }
+            ]
           }
         ]}
         id="my-form"
