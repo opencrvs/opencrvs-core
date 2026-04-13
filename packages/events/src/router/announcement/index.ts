@@ -13,7 +13,7 @@ import { TRPCError } from '@trpc/server'
 import * as z from 'zod/v4'
 import { hasScope, logger } from '@opencrvs/commons'
 import { router, userOnlyProcedure } from '@events/router/trpc'
-import { getClient } from '@events/storage/postgres/events'
+import { getUserById } from '@events/storage/postgres/events/users'
 import {
   collectActiveRecipientEmails,
   countTodayAnnouncements,
@@ -47,17 +47,10 @@ export const announcementRouter = router({
         })
       }
 
-      const db = getClient()
-
       // TODO: replace with getUserById(ctx.user.id) once mongo user references
       // are removed and ctx.user.id is a postgres UUID directly.
       // https://github.com/opencrvs/opencrvs-core/issues/11885
-      const admin = await db
-        .selectFrom('users')
-        .select(['id', 'email'])
-        .where('legacyId', '=', ctx.user.id)
-        .executeTakeFirst()
-
+      const admin = await getUserById(ctx.user.id)
       if (!admin) {
         throw new TRPCError({
           code: 'NOT_FOUND',

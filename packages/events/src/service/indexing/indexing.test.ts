@@ -1039,7 +1039,32 @@ describe('placeOfEvent location hierarchy handling', () => {
     generator = g
     seed = s
 
-    const user = seed.user({
+    // Setup: Create location hierarchy (grandparent -> parent -> child office)
+    grandParentAdministrativeArea = {
+      ...generator.administrativeAreas.set(1, prng)[0],
+      name: 'Grand Parent administrative area'
+    }
+    parentAdministrativeArea = {
+      ...generator.administrativeAreas.set(1, prng)[0],
+      id: parentAdministrativeAreaId,
+      parentId: grandParentAdministrativeArea.id,
+      name: 'Parent administrative area'
+    }
+    childOffice = {
+      ...generator.locations.set(1, prng)[0],
+      id: childOfficeId,
+      administrativeAreaId: parentAdministrativeAreaId,
+      name: 'Child location',
+      locationType: 'CRVS_OFFICE'
+    }
+
+    await seed.administrativeAreas([
+      grandParentAdministrativeArea,
+      parentAdministrativeArea
+    ])
+    await seed.locations([childOffice])
+
+    const user = await seed.user({
       role: TestUserRole.enum.LOCAL_REGISTRAR,
       name: [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: childOfficeId,
@@ -1057,31 +1082,6 @@ describe('placeOfEvent location hierarchy handling', () => {
       encodeScope({ type: 'record.reindex' })
     ])
     esClient = getOrCreateClient()
-
-    // Setup: Create location hierarchy (grandparent -> parent -> child office)
-    grandParentAdministrativeArea = {
-      ...generator.administrativeAreas.set(1, prng)[0],
-      name: 'Grand Parent administrative area'
-    }
-    parentAdministrativeArea = {
-      ...generator.administrativeAreas.set(1, prng)[0],
-      id: parentAdministrativeAreaId,
-      parentId: grandParentAdministrativeArea.id,
-      name: 'Parent administrative area'
-    }
-    childOffice = {
-      ...generator.locations.set(1, prng)[0],
-      id: user.primaryOfficeId,
-      administrativeAreaId: parentAdministrativeAreaId,
-      name: 'Child location',
-      locationType: 'CRVS_OFFICE'
-    }
-
-    await seed.administrativeAreas([
-      grandParentAdministrativeArea,
-      parentAdministrativeArea
-    ])
-    await seed.locations([childOffice])
 
     declarationWithHomeAddress = {
       ...generateActionDeclarationInput(

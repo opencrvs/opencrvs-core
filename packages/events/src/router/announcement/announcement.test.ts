@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { http, HttpResponse } from 'msw'
-import { encodeScope, UUID } from '@opencrvs/commons'
+import { encodeScope, getUUID, SCOPES, UUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { getClient } from '@events/storage/postgres/events'
 import {
@@ -98,8 +98,13 @@ describe('announcement.broadcast', () => {
   })
 
   test('rejects with NOT_FOUND if the logged-in admin is not in the database', async () => {
-    const { user } = await setupTestCase()
-    const client = createTestClient(user, [scope])
+    const UNKNOWN_USER = {
+      id: getUUID(),
+      primaryOfficeId: getUUID(),
+      role: '',
+      name: []
+    }
+    const client = createTestClient(UNKNOWN_USER, [SCOPES.CONFIG_UPDATE_ALL])
 
     await expect(
       client.announcement.broadcast({
@@ -111,18 +116,9 @@ describe('announcement.broadcast', () => {
   })
 
   test('rejects with NOT_FOUND if no active users with email addresses exist', async () => {
-    const { user, eventsDb, locations } = await setupTestCase()
+    const { user, eventsDb } = await setupTestCase()
 
-    await eventsDb
-      .insertInto('users')
-      .values({
-        legacyId: user.id,
-        role: user.role,
-        status: 'active',
-        mobile: '+1234567890',
-        officeId: locations[0].id
-      })
-      .execute()
+    await eventsDb.updateTable('users').set({ status: 'pending' }).execute()
 
     const client = createTestClient(user, [scope])
 
