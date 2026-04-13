@@ -9,7 +9,7 @@ SELECT
   lu."securityQuestionAnswers"::jsonb AS security_questions
 FROM
   users u
-  LEFT JOIN legacy_users lu ON u.legacy_id = lu._id;
+  INNER JOIN legacy_users lu ON u.legacy_id = lu._id;
 
 -- Down Migration
 DELETE FROM user_credentials
