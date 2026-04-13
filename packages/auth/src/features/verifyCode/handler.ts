@@ -54,13 +54,13 @@ export default async function authenticateHandler(
   )
 
   await deleteUsedVerificationCode(nonce)
-  const response: IVerifyResponse = { token }
 
-  recordUserAuditEvent(response.token, {
+  recordUserAuditEvent(token, {
     operation: 'user.logged_in',
     requestData: { subjectId: userId }
   })
 
+  const response: IVerifyResponse = { token }
   return response
 }
 export const requestSchema = Joi.object({
