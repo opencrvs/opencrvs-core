@@ -31,5 +31,6 @@ export const env = cleanEnv(process.env, {
     devDefault: false,
     default: true,
     desc: 'Enable two-factor authentication. When disabled, verification codes are set to 000000.'
-  })
+  }),
+  DEFAULT_USER_PASSWORD: str({ devDefault: 'test', default: undefined })
 })

@@ -260,15 +260,7 @@ export async function updateUser(
   return getUser(input.id)
 }
 
-function hasDemoScope(request: string): boolean {
-  return hasScope(request, 'demo')
-}
-
-function generateRandomPassword(demoUser?: boolean) {
-  if (!!demoUser) {
-    return 'test'
-  }
-
+function generateRandomPassword() {
   const length = 6
   const charset =
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -315,7 +307,7 @@ export async function createUser(input: CreateUserPayload, _token: string) {
   // Hash the provided password, or generate a random placeholder for pending
   // users who will set their own password via the activation flow.
   const password =
-    input.password ?? generateRandomPassword(hasDemoScope(_token))
+    input.password ?? env.DEFAULT_USER_PASSWORD ?? generateRandomPassword()
   const { hash, salt } = await generateSaltedHash(password)
 
   const userPayload = {
