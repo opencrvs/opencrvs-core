@@ -60,6 +60,7 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
+      ['Unassign']: AssertType.ENABLED,
       ['Print']: AssertType.HIDDEN,
       ['Correct']: AssertType.HIDDEN
     }
