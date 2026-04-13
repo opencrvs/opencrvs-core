@@ -216,6 +216,7 @@ export async function searchUsersWithInput(input: SearchUsersPayload) {
       'users.profileImagePath',
       'users.fullHonorificName'
     ])
+    .orderBy('users.firstname', 'asc')
 
   // 🔍 Dynamic filters
   if (input.username) {
