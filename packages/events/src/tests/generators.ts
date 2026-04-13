@@ -14,6 +14,7 @@ import {
   createPrng,
   EventConfig,
   eventPayloadGenerator,
+  generateRandomSignature,
   generateTrackingId,
   generateUuid,
   getUUID,
@@ -25,6 +26,7 @@ import {
 } from '@opencrvs/commons'
 import { setAdministrativeAreas } from '../service/administrative-areas'
 import { setLocations } from '../service/locations/locations'
+import { createUserWithCredentials } from '../storage/postgres/events/users'
 interface Name {
   use: string
   given: string[]
@@ -136,12 +138,37 @@ export function payloadGenerator(
  * Use with payloadGenerator for creating test data.
  */
 export function seeder() {
-  const seedUser = (
+  const seedUser = async (
     user: Omit<CreatedUser, 'id'> & {
       id?: UUID
       administrativeAreaId?: UUID | null
+      rng?: () => number
     }
   ) => {
+    const id = (user.id ?? getUUID()) as UUID
+    await createUserWithCredentials(
+      {
+        id,
+        officeId: user.primaryOfficeId,
+        role: user.role,
+        status: 'active',
+        legacyId: null,
+        firstname: user.name?.[0]?.given?.[0] ?? null,
+        surname: user.name?.[0]?.family ?? null,
+        fullHonorificName: user.fullHonorificName ?? null,
+        email: `user-${id}@test.example`,
+        mobile: null,
+        device: null,
+        signaturePath: user.rng ? generateRandomSignature(user.rng) : null,
+        profileImagePath: null
+      },
+      {
+        username: `user-${id}`,
+        passwordHash: 'dummy-hash',
+        salt: 'dummy-salt',
+        securityQuestions: {}
+      }
+    )
     return {
       primaryOfficeId: user.primaryOfficeId,
       administrativeAreaId: user.administrativeAreaId ?? null,
@@ -149,7 +176,7 @@ export function seeder() {
       status: 'active',
       fullHonorificName: user.fullHonorificName,
       role: user.role as TestUserRole,
-      id: user.id ?? getUUID()
+      id
     }
   }
   const seedLocations = async (locations: Location[]) => setLocations(locations)
