@@ -39,6 +39,10 @@ V1 are deprecated. 2.0.0 onwards, locations are fetched from `events` service.
 
 ### New features
 
+#### Autocomplete Input
+
+A select component enhanced with suggestions. The list of suggestions are fetched from the database reference_data schema in countryconfig.
+
 #### HTTP Input
 
 HTTP input now accepts `field('..')` references in the HTTP body definition.
