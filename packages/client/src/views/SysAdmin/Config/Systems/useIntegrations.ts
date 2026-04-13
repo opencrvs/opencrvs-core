@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useTRPC, trpcClient } from '@client/v2-events/trpc'
-import { SCOPES, encodeScope, RecordScopeTypeV2 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { UUID } from '@opencrvs/commons/client'
+import { trpcClient, useTRPC } from '@client/v2-events/trpc'
+import { encodeScope, UUID } from '@opencrvs/commons/client'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 /** Data shape returned by integrations.list */
 export interface IntegrationItem {
@@ -43,33 +42,24 @@ export interface IntegrationDetails {
 
 type SystemIntegrationType = 'HEALTH' | 'RECORD_SEARCH'
 
-const DEFAULT_SCOPES_BY_TYPE: Record<SystemIntegrationType, string[]> = {
-  HEALTH: [SCOPES.NOTIFICATION_API],
-  RECORD_SEARCH: [SCOPES.RECORDSEARCH]
-}
-
-const CONFIGURABLE_SCOPES_BY_TYPE: Record<
-  SystemIntegrationType,
-  RecordScopeTypeV2[]
-> = {
-  HEALTH: ['record.create', 'record.notify'],
-  RECORD_SEARCH: []
-}
-
 function getSystemScopesFromType(
   type: SystemIntegrationType,
   eventIds: string[]
 ): string[] {
-  const literalScopes = DEFAULT_SCOPES_BY_TYPE[type]
-  const v2Scopes = CONFIGURABLE_SCOPES_BY_TYPE[type].map(
-    (scope: RecordScopeTypeV2) =>
-      encodeScope({
-        type: scope,
-        options: { event: eventIds }
-      })
-  )
+  if (type === 'HEALTH') {
+    return [
+      encodeScope({ type: 'record.create', options: { event: eventIds } }),
+      encodeScope({ type: 'record.notify', options: { event: eventIds } })
+    ]
+  }
 
-  return [...literalScopes, ...v2Scopes]
+  if (type === 'RECORD_SEARCH') {
+    return [
+      encodeScope({ type: 'record.search', options: { event: eventIds } })
+    ]
+  }
+
+  return []
 }
 
 export function useIntegrations() {
@@ -143,7 +133,8 @@ export function useIntegrations() {
     isLoading: listQuery.isLoading,
     isError: listQuery.isError,
     createIntegration: createMutation.mutateAsync,
-    createResult: (createMutation.data ?? null) as CreateIntegrationResult | null,
+    createResult: (createMutation.data ??
+      null) as CreateIntegrationResult | null,
     isCreating: createMutation.isPending,
     createError: createMutation.error,
     resetCreate: createMutation.reset,

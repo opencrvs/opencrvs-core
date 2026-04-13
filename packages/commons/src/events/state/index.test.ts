@@ -689,6 +689,121 @@ describe('getCurrentEventState()', () => {
     })
   })
 
+  test('EDIT action updates updatedAt, updatedBy and updatedAtLocation metadata', () => {
+    const createAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-01-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: getUUID(),
+        createdByRole: 'HOSPITAL_CLERK'
+      }
+    })
+
+    const declareAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-02-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: getUUID(),
+        createdByRole: 'HOSPITAL_CLERK'
+      }
+    })
+
+    const editAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.EDIT,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-03-01T00:00:00.000Z',
+        createdBy: 'user2',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: getUUID(),
+        createdByRole: 'REGISTRATION_AGENT'
+      }
+    })
+
+    const event = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      actions: [createAction, declareAction, editAction],
+      createdAt: new Date(Date.now()).toISOString(),
+      id: getUUID(),
+      updatedAt: new Date(Date.now()).toISOString()
+    }
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.updatedAt).toBe(editAction.createdAt)
+    expect(state.updatedBy).toBe(editAction.createdBy)
+    expect(state.updatedAtLocation).toBe(editAction.createdAtLocation)
+    expect(state.updatedByUserRole).toBe(editAction.createdByRole)
+  })
+
+  test('EDIT action does not affect legalStatuses', () => {
+    const createAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-01-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: getUUID(),
+        createdByRole: 'HOSPITAL_CLERK'
+      }
+    })
+
+    const declareAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-02-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: getUUID(),
+        createdByRole: 'HOSPITAL_CLERK'
+      }
+    })
+
+    const editAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.EDIT,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-03-01T00:00:00.000Z',
+        createdBy: 'user2',
+        createdByUserType: TokenUserType.enum.user,
+        createdAtLocation: getUUID(),
+        createdByRole: 'REGISTRATION_AGENT'
+      }
+    })
+
+    const event = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      actions: [createAction, declareAction, editAction],
+      createdAt: new Date(Date.now()).toISOString(),
+      id: getUUID(),
+      updatedAt: new Date(Date.now()).toISOString()
+    }
+
+    const state = getCurrentEventState(event, tennisClubMembershipEvent)
+
+    expect(state.legalStatuses[EventStatus.enum.DECLARED]).toMatchObject({
+      createdBy: declareAction.createdBy,
+      createdAtLocation: declareAction.createdAtLocation,
+      createdByRole: declareAction.createdByRole
+    })
+  })
+
   test('sets dateOfEvent correctly when configured', () => {
     const event = generateEventDocument({
       configuration: tennisClubMembershipEvent,

@@ -18,12 +18,11 @@ import {
 import {
   logger,
   personNameFromV1ToV2,
-  SCOPES,
   User,
   UserInput,
   UserOrSystem
 } from '@opencrvs/commons'
-import { requiresAnyOfScopes } from '@events/router/middleware'
+import { allowedWithAnyOfScopes } from '@events/router/middleware'
 import {
   router,
   userAndSystemProcedure,
@@ -120,12 +119,7 @@ export const userRouter = router({
       return users[0]
     }),
   create: userAndSystemProcedure
-    .use(
-      requiresAnyOfScopes([
-        SCOPES.USER_CREATE,
-        SCOPES.USER_CREATE_MY_JURISDICTION
-      ])
-    )
+    .use(allowedWithAnyOfScopes(['user.create']))
     .input(UserInput)
     .output(User)
     .mutation(async ({ input, ctx }) => {
@@ -154,12 +148,7 @@ export const userRouter = router({
       return createUser(input, ctx.token)
     }),
   update: userAndSystemProcedure
-    .use(
-      requiresAnyOfScopes([
-        SCOPES.USER_UPDATE,
-        SCOPES.USER_UPDATE_MY_JURISDICTION
-      ])
-    )
+    .use(allowedWithAnyOfScopes(['user.edit']))
     .input(UserInput.and(z.object({ id: z.string() })))
     .output(User)
     .mutation(async ({ input, ctx }) => {

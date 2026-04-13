@@ -50,7 +50,6 @@ export default async function authenticateHandler(
     WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
     role,
-    false,
     TokenUserType.enum.user
   )
 

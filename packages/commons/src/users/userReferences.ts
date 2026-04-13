@@ -10,7 +10,7 @@
  */
 import {
   JurisdictionFilter,
-  RecordScopeTypeV2,
+  ScopeType,
   ScopeOptionKey,
   getScopeOptionValue
 } from '../scopes'
@@ -18,10 +18,9 @@ import { getAcceptedScopesFromToken } from '../authentication'
 import z from 'zod/v4'
 
 const ScopeOptionReference = z.object({
-  $scope: RecordScopeTypeV2,
+  $scope: ScopeType,
   $option: ScopeOptionKey
 })
-
 type ScopeOptionReference = z.infer<typeof ScopeOptionReference>
 
 export const JurisdictionReference = z.object({
@@ -62,11 +61,18 @@ function resolveJurisdictionScopeOptionReference(
   const { $scope, $option } = scopeOptionReference
   const acceptedScopes = getAcceptedScopesFromToken(token, [$scope])
 
-  const acceptedScopesMatchingEventType = acceptedScopes.filter(
-    (scope) =>
-      scope.options?.event?.includes(eventType) ||
-      scope.options?.event === undefined
-  )
+  const acceptedScopesMatchingEventType = acceptedScopes.filter((scope) => {
+    // Only filter with event type if the scope has options and event type is defined
+    if (
+      !('options' in scope) ||
+      !scope.options ||
+      !('event' in scope.options)
+    ) {
+      return true
+    }
+
+    return scope.options.event?.includes(eventType)
+  })
 
   const acceptedJurisdictionFilters = acceptedScopesMatchingEventType
     .map((scope) => getScopeOptionValue(scope, $option))
@@ -122,7 +128,7 @@ export function resolveJurisdictionReference(
 
 /** Functions for referencing values from the logged in user's details */
 export const userReferenceFunctions = {
-  scope: (scope: RecordScopeTypeV2) => ({
+  scope: (scope: ScopeType) => ({
     /**
      * user.scope().attribute() is used to create a scope option reference.
      *
