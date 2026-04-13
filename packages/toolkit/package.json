@@ -15,7 +15,10 @@
     "./events/deduplication": "./dist/events/deduplication.js",
     "./conditionals": "./dist/conditionals/index.js",
     "./notification": "./dist/notification/index.js",
-    "./translations": "./dist/core-en.json"
+    "./translations": {
+      "types": "./dist/core-en.json.d.ts",
+      "default": "./dist/core-en.json"
+    }
   },
   "scripts": {
     "build": "./build.sh",

@@ -146,9 +146,14 @@ async function main() {
 
   fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true })
   await fs.promises.writeFile(OUTPUT_PATH, JSON.stringify(sorted, null, 2))
-  console.log(
-    `Written ${Object.keys(sorted).length} keys → ${OUTPUT_PATH}`
+
+  const translationsDefinition = `declare const translations: Record<string, { defaultMessage: string; description: string }>
+  export default translations`
+  fs.writeFileSync(
+    OUTPUT_PATH.replace('.json', '.json.d.ts'),
+    translationsDefinition
   )
+  console.log(`Written ${Object.keys(sorted).length} keys → ${OUTPUT_PATH}`)
 }
 
 main().catch((err) => {
